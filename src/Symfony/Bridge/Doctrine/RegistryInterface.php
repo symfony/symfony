@@ -26,7 +26,7 @@ interface RegistryInterface extends ManagerRegistryInterface
      *
      * @return string The default entity manager name
      */
-    function getDefaultEntityManagerName();
+    public function getDefaultEntityManagerName();
 
     /**
      * Gets a named entity manager.
@@ -35,14 +35,14 @@ interface RegistryInterface extends ManagerRegistryInterface
      *
      * @return EntityManager
      */
-    function getEntityManager($name = null);
+    public function getEntityManager($name = null);
 
     /**
      * Gets an array of all registered entity managers
      *
      * @return array An array of EntityManager instances
      */
-    function getEntityManagers();
+    public function getEntityManagers();
 
     /**
      * Resets a named entity manager.
@@ -61,7 +61,7 @@ interface RegistryInterface extends ManagerRegistryInterface
      *
      * @return EntityManager
      */
-    function resetEntityManager($name = null);
+    public function resetEntityManager($name = null);
 
     /**
      * Resolves a registered namespace alias to the full namespace.
@@ -74,14 +74,14 @@ interface RegistryInterface extends ManagerRegistryInterface
      *
      * @see Configuration::getEntityNamespace
      */
-    function getEntityNamespace($alias);
+    public function getEntityNamespace($alias);
 
     /**
      * Gets all connection names.
      *
      * @return array An array of connection names
      */
-    function getEntityManagerNames();
+    public function getEntityManagerNames();
 
     /**
      * Gets the entity manager associated with a given class.
@@ -90,5 +90,5 @@ interface RegistryInterface extends ManagerRegistryInterface
      *
      * @return EntityManager|null
      */
-    function getEntityManagerForClass($class);
+    public function getEntityManagerForClass($class);
 }

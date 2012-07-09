@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @Annotation
@@ -78,6 +77,7 @@ class Regex extends Constraint
 
             // Unescape the delimiter in pattern
             $pattern = str_replace('\\' . $delimiter, $delimiter, $pattern);
+
             return $start . $pattern . $end;
         }
 

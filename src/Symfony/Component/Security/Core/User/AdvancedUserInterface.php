@@ -47,7 +47,7 @@ interface AdvancedUserInterface extends UserInterface
      *
      * @see AccountExpiredException
      */
-    function isAccountNonExpired();
+    public function isAccountNonExpired();
 
     /**
      * Checks whether the user is locked.
@@ -59,7 +59,7 @@ interface AdvancedUserInterface extends UserInterface
      *
      * @see LockedException
      */
-    function isAccountNonLocked();
+    public function isAccountNonLocked();
 
     /**
      * Checks whether the user's credentials (password) has expired.
@@ -71,7 +71,7 @@ interface AdvancedUserInterface extends UserInterface
      *
      * @see CredentialsExpiredException
      */
-    function isCredentialsNonExpired();
+    public function isCredentialsNonExpired();
 
     /**
      * Checks whether the user is enabled.
@@ -83,5 +83,5 @@ interface AdvancedUserInterface extends UserInterface
      *
      * @see DisabledException
      */
-    function isEnabled();
+    public function isEnabled();
 }

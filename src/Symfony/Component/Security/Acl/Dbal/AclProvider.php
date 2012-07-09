@@ -339,7 +339,7 @@ QUERY;
      * @param ObjectIdentityInterface $oid
      * @return integer
      */
-    protected final function retrieveObjectIdentityPrimaryKey(ObjectIdentityInterface $oid)
+    final protected function retrieveObjectIdentityPrimaryKey(ObjectIdentityInterface $oid)
     {
         return $this->connection->executeQuery($this->getSelectObjectIdentityIdSql($oid))->fetchColumn();
     }

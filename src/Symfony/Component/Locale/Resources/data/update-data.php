@@ -398,7 +398,6 @@ genrb($namesGeneratedDir, $namesDir);
 clear_directory($namesGeneratedDir);
 rmdir($namesGeneratedDir);
 
-
 // Generate the data to the stubbed intl classes We only extract data for the 'en' locale
 // The extracted data is used only by the stub classes
 $defaultLocale = 'en';

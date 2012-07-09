@@ -26,7 +26,7 @@ interface DenormalizerInterface
      * @param string $format format the given data was extracted from
      * @return object
      */
-    function denormalize($data, $class, $format = null);
+    public function denormalize($data, $class, $format = null);
 
     /**
      * Checks whether the given class is supported for denormalization by this normalizer
@@ -36,5 +36,5 @@ interface DenormalizerInterface
      * @param string $format The format being deserialized from.
      * @return Boolean
      */
-    function supportsDenormalization($data, $type, $format = null);
+    public function supportsDenormalization($data, $type, $format = null);
 }

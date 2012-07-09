@@ -26,7 +26,7 @@ interface EncoderInterface
      *
      * @return scalar
      */
-    function encode($data, $format);
+    public function encode($data, $format);
 
     /**
      * Checks whether the serializer can encode to given format
@@ -34,5 +34,5 @@ interface EncoderInterface
      * @param string $format format name
      * @return Boolean
      */
-    function supportsEncoding($format);
+    public function supportsEncoding($format);
 }

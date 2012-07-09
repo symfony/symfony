@@ -51,7 +51,7 @@ class EsiListener implements EventSubscriberInterface
         $this->esi->addSurrogateControl($event->getResponse());
     }
 
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             KernelEvents::RESPONSE => 'onKernelResponse',

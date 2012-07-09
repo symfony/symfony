@@ -16,7 +16,6 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateFilenameParser;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinder;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BaseBundle\BaseBundle;
 
-
 class TemplateFinderTest extends TestCase
 {
     public function testFindAllTemplates()

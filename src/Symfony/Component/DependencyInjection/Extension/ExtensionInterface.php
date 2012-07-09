@@ -32,7 +32,7 @@ interface ExtensionInterface
      *
      * @api
      */
-    function load(array $config, ContainerBuilder $container);
+    public function load(array $config, ContainerBuilder $container);
 
     /**
      * Returns the namespace to be used for this extension (XML namespace).
@@ -41,7 +41,7 @@ interface ExtensionInterface
      *
      * @api
      */
-    function getNamespace();
+    public function getNamespace();
 
     /**
      * Returns the base path for the XSD files.
@@ -50,7 +50,7 @@ interface ExtensionInterface
      *
      * @api
      */
-    function getXsdValidationBasePath();
+    public function getXsdValidationBasePath();
 
     /**
      * Returns the recommended alias to use in XML.
@@ -61,5 +61,5 @@ interface ExtensionInterface
      *
      * @api
      */
-    function getAlias();
+    public function getAlias();
 }

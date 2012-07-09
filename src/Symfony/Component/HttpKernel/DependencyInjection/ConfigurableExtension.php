@@ -30,7 +30,7 @@ abstract class ConfigurableExtension extends Extension
     /**
      * {@inheritDoc}
      */
-    public final function load(array $configs, ContainerBuilder $container)
+    final public function load(array $configs, ContainerBuilder $container)
     {
         $this->loadInternal($this->processConfiguration($this->getConfiguration(array(), $container), $configs), $container);
     }

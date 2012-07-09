@@ -30,7 +30,7 @@ interface FormFactoryInterface
      *
      * @throws Exception\FormException if any given option is not applicable to the given type
      */
-    function create($type, $data = null, array $options = array(), FormBuilderInterface $parent = null);
+    public function create($type, $data = null, array $options = array(), FormBuilderInterface $parent = null);
 
     /**
      * Returns a form.
@@ -47,7 +47,7 @@ interface FormFactoryInterface
      *
      * @throws Exception\FormException if any given option is not applicable to the given type
      */
-    function createNamed($name, $type, $data = null, array $options = array(), FormBuilderInterface $parent = null);
+    public function createNamed($name, $type, $data = null, array $options = array(), FormBuilderInterface $parent = null);
 
     /**
      * Returns a form for a property of a class.
@@ -64,7 +64,7 @@ interface FormFactoryInterface
      *
      * @throws Exception\FormException if any given option is not applicable to the form type
      */
-    function createForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null);
+    public function createForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null);
 
     /**
      * Returns a form builder.
@@ -78,7 +78,7 @@ interface FormFactoryInterface
      *
      * @throws Exception\FormException if any given option is not applicable to the given type
      */
-    function createBuilder($type, $data = null, array $options = array(), FormBuilderInterface $parent = null);
+    public function createBuilder($type, $data = null, array $options = array(), FormBuilderInterface $parent = null);
 
     /**
      * Returns a form builder.
@@ -93,7 +93,7 @@ interface FormFactoryInterface
      *
      * @throws Exception\FormException if any given option is not applicable to the given type
      */
-    function createNamedBuilder($name, $type, $data = null, array $options = array(), FormBuilderInterface $parent = null);
+    public function createNamedBuilder($name, $type, $data = null, array $options = array(), FormBuilderInterface $parent = null);
 
     /**
      * Returns a form builder for a property of a class.
@@ -111,7 +111,7 @@ interface FormFactoryInterface
      *
      * @throws Exception\FormException if any given option is not applicable to the form type
      */
-    function createBuilderForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null);
+    public function createBuilderForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null);
 
     /**
      * Returns a type by name.
@@ -124,7 +124,7 @@ interface FormFactoryInterface
      *
      * @throws Exception\FormException if the type can not be retrieved from any extension
      */
-    function getType($name);
+    public function getType($name);
 
     /**
      * Returns whether the given type is supported.
@@ -133,12 +133,12 @@ interface FormFactoryInterface
      *
      * @return Boolean Whether the type is supported
      */
-    function hasType($name);
+    public function hasType($name);
 
     /**
      * Adds a type.
      *
      * @param FormTypeInterface $type The type
      */
-    function addType(FormTypeInterface $type);
+    public function addType(FormTypeInterface $type);
 }

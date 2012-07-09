@@ -683,7 +683,7 @@ class FormConfig implements FormConfigEditorInterface
      * @throws UnexpectedTypeException   If the name is not a string.
      * @throws \InvalidArgumentException If the name contains invalid characters.
      */
-    static public function validateName($name)
+    public static function validateName($name)
     {
         if (!is_string($name)) {
             throw new UnexpectedTypeException($name, 'string');
@@ -711,7 +711,7 @@ class FormConfig implements FormConfigEditorInterface
      *
      * @return Boolean Whether the name is valid.
      */
-    static public function isValidName($name)
+    public static function isValidName($name)
     {
         return '' === $name || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
     }

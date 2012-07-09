@@ -29,5 +29,5 @@ interface DumperInterface
      *
      * @api
      */
-    function dump(array $options = array());
+    public function dump(array $options = array());
 }

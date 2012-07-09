@@ -42,7 +42,7 @@ class CssSelector
      *
      * @api
      */
-    static public function toXPath($cssExpr, $prefix = 'descendant-or-self::')
+    public static function toXPath($cssExpr, $prefix = 'descendant-or-self::')
     {
         if (is_string($cssExpr)) {
             if (!$cssExpr) {

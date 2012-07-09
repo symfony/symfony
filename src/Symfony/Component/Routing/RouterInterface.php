@@ -28,5 +28,5 @@ interface RouterInterface extends UrlMatcherInterface, UrlGeneratorInterface
      *
      * @return RouteCollection A RouteCollection instance
      */
-    function getRouteCollection();
+    public function getRouteCollection();
 }

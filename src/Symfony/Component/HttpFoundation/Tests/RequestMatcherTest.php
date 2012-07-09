@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
-
-
 use Symfony\Component\HttpFoundation\RequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
 

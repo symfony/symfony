@@ -85,5 +85,5 @@ class RegisterKernelListenersPassTest extends \PHPUnit_Framework_TestCase
 
 class SubscriberService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
 {
-    static function getSubscribedEvents() {}
+    public static function getSubscribedEvents() {}
 }

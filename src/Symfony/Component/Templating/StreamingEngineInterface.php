@@ -28,5 +28,5 @@ interface StreamingEngineInterface
      *
      * @throws \RuntimeException if the template cannot be rendered
      */
-    function stream($name, array $parameters = array());
+    public function stream($name, array $parameters = array());
 }

@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
 
-
 class MoneyToLocalizedStringTransformerTest extends LocalizedTestCase
 {
     protected function setUp()

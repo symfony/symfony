@@ -80,7 +80,7 @@ class StubLocale
      *
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
-    static public function getDisplayCountries($locale)
+    public static function getDisplayCountries($locale)
     {
         return self::getStubData($locale, 'countries', 'region');
     }
@@ -90,7 +90,7 @@ class StubLocale
      *
      * @return array  The country codes
      */
-    static public function getCountries()
+    public static function getCountries()
     {
         return array_keys(self::getDisplayCountries(self::getDefault()));
     }
@@ -104,7 +104,7 @@ class StubLocale
      *
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
-    static public function getDisplayLanguages($locale)
+    public static function getDisplayLanguages($locale)
     {
         return self::getStubData($locale, 'languages', 'lang');
     }
@@ -114,7 +114,7 @@ class StubLocale
      *
      * @return array  The language codes
      */
-    static public function getLanguages()
+    public static function getLanguages()
     {
         return array_keys(self::getDisplayLanguages(self::getDefault()));
     }
@@ -128,7 +128,7 @@ class StubLocale
      *
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
-    static public function getDisplayLocales($locale)
+    public static function getDisplayLocales($locale)
     {
         return self::getStubData($locale, 'locales', 'names');
     }
@@ -138,7 +138,7 @@ class StubLocale
      *
      * @return array  The locale codes
      */
-    static public function getLocales()
+    public static function getLocales()
     {
         return array_keys(self::getDisplayLocales(self::getDefault()));
     }
@@ -150,7 +150,7 @@ class StubLocale
      *
      * @return array  The currencies data
      */
-    static public function getCurrenciesData($locale)
+    public static function getCurrenciesData($locale)
     {
         return self::getStubData($locale, 'currencies', 'curr');
     }
@@ -164,7 +164,7 @@ class StubLocale
      *
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
-    static public function getDisplayCurrencies($locale)
+    public static function getDisplayCurrencies($locale)
     {
         $currencies = self::getCurrenciesData($locale);
 
@@ -184,7 +184,7 @@ class StubLocale
      *
      * @return array  The currencies codes
      */
-    static public function getCurrencies()
+    public static function getCurrencies()
     {
         return array_keys(self::getCurrenciesData(self::getDefault()));
     }
@@ -200,7 +200,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function acceptFromHttp($header)
+    public static function acceptFromHttp($header)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -216,7 +216,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function composeLocale(array $subtags)
+    public static function composeLocale(array $subtags)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -234,7 +234,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function filterMatches($langtag, $locale, $canonicalize = false)
+    public static function filterMatches($langtag, $locale, $canonicalize = false)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -250,7 +250,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function getAllVariants($locale)
+    public static function getAllVariants($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -264,7 +264,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function getDefault()
+    public static function getDefault()
     {
         return 'en';
     }
@@ -281,7 +281,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function getDisplayLanguage($locale, $inLocale = null)
+    public static function getDisplayLanguage($locale, $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -298,7 +298,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function getDisplayName($locale, $inLocale = null)
+    public static function getDisplayName($locale, $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -315,7 +315,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function getDisplayRegion($locale, $inLocale = null)
+    public static function getDisplayRegion($locale, $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -332,7 +332,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function getDisplayScript($locale, $inLocale = null)
+    public static function getDisplayScript($locale, $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -349,7 +349,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function getDisplayVariant($locale, $inLocale = null)
+    public static function getDisplayVariant($locale, $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -365,7 +365,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function getKeywords($locale)
+    public static function getKeywords($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -381,7 +381,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function getPrimaryLanguage($locale)
+    public static function getPrimaryLanguage($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -397,7 +397,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function getRegion($locale)
+    public static function getRegion($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -413,7 +413,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function getScript($locale)
+    public static function getScript($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -430,7 +430,7 @@ class StubLocale
      *
      * @throws RuntimeException       When the intl extension is not loaded
      */
-    static public function lookup(array $langtag, $locale, $canonicalize = false, $default = null)
+    public static function lookup(array $langtag, $locale, $canonicalize = false, $default = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -446,7 +446,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function parseLocale($locale)
+    public static function parseLocale($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -462,7 +462,7 @@ class StubLocale
      *
      * @throws MethodNotImplementedException
      */
-    static public function setDefault($locale)
+    public static function setDefault($locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -478,7 +478,7 @@ class StubLocale
      *
      * @throws InvalidArgumentException  When the locale is different than 'en'
      */
-    static private function getStubData($locale, $cacheVariable, $stubDataDir)
+    private static function getStubData($locale, $cacheVariable, $stubDataDir)
     {
         if ('en' !== $locale) {
             throw new \InvalidArgumentException(sprintf('Only the \'en\' locale is supported. %s', NotImplementedException::INTL_INSTALL_MESSAGE));

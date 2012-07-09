@@ -35,7 +35,7 @@ interface EventDispatcherInterface
      *
      * @api
      */
-    function dispatch($eventName, Event $event = null);
+    public function dispatch($eventName, Event $event = null);
 
     /**
      * Adds an event listener that listens on the specified events.
@@ -47,7 +47,7 @@ interface EventDispatcherInterface
      *
      * @api
      */
-    function addListener($eventName, $listener, $priority = 0);
+    public function addListener($eventName, $listener, $priority = 0);
 
     /**
      * Adds an event subscriber.
@@ -59,7 +59,7 @@ interface EventDispatcherInterface
      *
      * @api
      */
-    function addSubscriber(EventSubscriberInterface $subscriber);
+    public function addSubscriber(EventSubscriberInterface $subscriber);
 
     /**
      * Removes an event listener from the specified events.
@@ -67,14 +67,14 @@ interface EventDispatcherInterface
      * @param string|array $eventName The event(s) to remove a listener from
      * @param callable     $listener  The listener to remove
      */
-    function removeListener($eventName, $listener);
+    public function removeListener($eventName, $listener);
 
     /**
      * Removes an event subscriber.
      *
      * @param EventSubscriberInterface $subscriber The subscriber
      */
-    function removeSubscriber(EventSubscriberInterface $subscriber);
+    public function removeSubscriber(EventSubscriberInterface $subscriber);
 
     /**
      * Gets the listeners of a specific event or all listeners.
@@ -83,7 +83,7 @@ interface EventDispatcherInterface
      *
      * @return array The event listeners for the specified event, or all event listeners by event name
      */
-    function getListeners($eventName = null);
+    public function getListeners($eventName = null);
 
     /**
      * Checks whether an event has any registered listeners.
@@ -92,5 +92,5 @@ interface EventDispatcherInterface
      *
      * @return Boolean true if the specified event has any listeners, false otherwise
      */
-    function hasListeners($eventName = null);
+    public function hasListeners($eventName = null);
 }

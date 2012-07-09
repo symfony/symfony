@@ -24,7 +24,7 @@ class ClassMapGenerator
      * @param array|string $dirs Directories or a single path to search in
      * @param string       $file The name of the class map file
      */
-    static public function dump($dirs, $file)
+    public static function dump($dirs, $file)
     {
         $dirs = (array) $dirs;
         $maps = array();
@@ -43,7 +43,7 @@ class ClassMapGenerator
      *
      * @return array A class map array
      */
-    static public function createMap($dir)
+    public static function createMap($dir)
     {
         if (is_string($dir)) {
             $dir = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
@@ -80,7 +80,7 @@ class ClassMapGenerator
      *
      * @return array The found classes
      */
-    static private function findClasses($path)
+    private static function findClasses($path)
     {
         $contents = file_get_contents($path);
         $tokens   = token_get_all($contents);

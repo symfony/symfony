@@ -155,7 +155,7 @@ class StubIntlDateFormatter
      *
      * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
      */
-    static public function create($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
+    public static function create($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
     {
         return new self($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
     }

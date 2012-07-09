@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Finder\Iterator;
 
-
 /**
  * MultiplePcreFilterIterator filters files using patterns (regexps, globs or strings).
  *

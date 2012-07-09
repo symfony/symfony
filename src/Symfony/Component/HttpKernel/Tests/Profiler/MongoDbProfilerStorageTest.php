@@ -26,7 +26,7 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
 {
     protected static $storage;
 
-    static public function setUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         if (extension_loaded('mongo')) {
             self::$storage = new DummyMongoDbProfilerStorage('mongodb://localhost/symfony_tests/profiler_data', '', '', 86400);
@@ -38,7 +38,7 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
         }
     }
 
-    static public function tearDownAfterClass()
+    public static function tearDownAfterClass()
     {
         if (self::$storage) {
             self::$storage->purge();

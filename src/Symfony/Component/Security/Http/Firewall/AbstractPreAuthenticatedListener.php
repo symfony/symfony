@@ -51,7 +51,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
      */
-    public final function handle(GetResponseEvent $event)
+    final public function handle(GetResponseEvent $event)
     {
         $request = $event->getRequest();
 

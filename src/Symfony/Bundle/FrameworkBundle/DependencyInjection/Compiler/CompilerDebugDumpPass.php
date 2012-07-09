@@ -24,7 +24,7 @@ class CompilerDebugDumpPass implements CompilerPassInterface
         $cache->write(implode("\n", $container->getCompiler()->getLog()));
     }
 
-    static public function getCompilerLogFilename(ContainerInterface $container)
+    public static function getCompilerLogFilename(ContainerInterface $container)
     {
         $class = $container->getParameter('kernel.container_class');
 

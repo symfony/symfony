@@ -46,7 +46,7 @@ interface DataTransformerInterface
      * @throws UnexpectedTypeException   when the argument is not a string
      * @throws TransformationFailedException  when the transformation fails
      */
-    function transform($value);
+    public function transform($value);
 
     /**
      * Transforms a value from the transformed representation to its original
@@ -73,5 +73,5 @@ interface DataTransformerInterface
      * @throws UnexpectedTypeException   when the argument is not of the expected type
      * @throws TransformationFailedException  when the transformation fails
      */
-    function reverseTransform($value);
+    public function reverseTransform($value);
 }

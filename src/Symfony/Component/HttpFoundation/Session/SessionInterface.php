@@ -29,7 +29,7 @@ interface SessionInterface
      *
      * @api
      */
-    function start();
+    public function start();
 
     /**
      * Returns the session ID.
@@ -38,7 +38,7 @@ interface SessionInterface
      *
      * @api
      */
-    function getId();
+    public function getId();
 
     /**
      * Sets the session ID
@@ -47,7 +47,7 @@ interface SessionInterface
      *
      * @api
      */
-    function setId($id);
+    public function setId($id);
 
     /**
      * Returns the session name.
@@ -56,7 +56,7 @@ interface SessionInterface
      *
      * @api
      */
-    function getName();
+    public function getName();
 
     /**
      * Sets the session name.
@@ -65,7 +65,7 @@ interface SessionInterface
      *
      * @api
      */
-    function setName($name);
+    public function setName($name);
 
     /**
      * Invalidates the current session.
@@ -82,7 +82,7 @@ interface SessionInterface
      *
      * @api
      */
-    function invalidate($lifetime = null);
+    public function invalidate($lifetime = null);
 
     /**
      * Migrates the current session to a new session id while maintaining all
@@ -98,7 +98,7 @@ interface SessionInterface
      *
      * @api
      */
-    function migrate($destroy = false, $lifetime = null);
+    public function migrate($destroy = false, $lifetime = null);
 
     /**
      * Force the session to be saved and closed.
@@ -107,7 +107,7 @@ interface SessionInterface
      * the session will be automatically saved at the end of
      * code execution.
      */
-    function save();
+    public function save();
 
     /**
      * Checks if an attribute is defined.
@@ -118,7 +118,7 @@ interface SessionInterface
      *
      * @api
      */
-    function has($name);
+    public function has($name);
 
     /**
      * Returns an attribute.
@@ -130,7 +130,7 @@ interface SessionInterface
      *
      * @api
      */
-    function get($name, $default = null);
+    public function get($name, $default = null);
 
     /**
      * Sets an attribute.
@@ -140,7 +140,7 @@ interface SessionInterface
      *
      * @api
      */
-    function set($name, $value);
+    public function set($name, $value);
 
     /**
      * Returns attributes.
@@ -149,14 +149,14 @@ interface SessionInterface
      *
      * @api
      */
-    function all();
+    public function all();
 
     /**
      * Sets attributes.
      *
      * @param array $attributes Attributes
      */
-    function replace(array $attributes);
+    public function replace(array $attributes);
 
     /**
      * Removes an attribute.
@@ -167,28 +167,28 @@ interface SessionInterface
      *
      * @api
      */
-    function remove($name);
+    public function remove($name);
 
     /**
      * Clears all attributes.
      *
      * @api
      */
-    function clear();
+    public function clear();
 
     /**
      * Checks if the session was started.
      *
      * @return Boolean
      */
-    function isStarted();
+    public function isStarted();
 
     /**
      * Registers a SessionBagInterface with the session.
      *
      * @param SessionBagInterface $bag
      */
-    function registerBag(SessionBagInterface $bag);
+    public function registerBag(SessionBagInterface $bag);
 
     /**
      * Gets a bag instance by name.
@@ -197,12 +197,12 @@ interface SessionInterface
      *
      * @return SessionBagInterface
      */
-    function getBag($name);
+    public function getBag($name);
 
     /**
      * Gets session meta.
      *
      * @return MetadataBag
      */
-    function getMetadataBag();
+    public function getMetadataBag();
 }

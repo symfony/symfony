@@ -23,7 +23,7 @@ interface EntityLoaderInterface
      *
      * @return array The entities.
      */
-    function getEntities();
+    public function getEntities();
 
     /**
      * Returns an array of entities matching the given identifiers.
@@ -35,5 +35,5 @@ interface EntityLoaderInterface
      *
      * @return array The entities.
      */
-    function getEntitiesByIds($identifier, array $values);
+    public function getEntitiesByIds($identifier, array $values);
 }

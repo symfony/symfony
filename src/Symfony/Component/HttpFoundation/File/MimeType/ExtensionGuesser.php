@@ -33,7 +33,7 @@ class ExtensionGuesser implements ExtensionGuesserInterface
      *
      * @var ExtensionGuesser
      */
-    static private $instance = null;
+    private static $instance = null;
 
     /**
      * All registered ExtensionGuesserInterface instances
@@ -47,7 +47,7 @@ class ExtensionGuesser implements ExtensionGuesserInterface
      *
      * @return ExtensionGuesser
      */
-    static public function getInstance()
+    public static function getInstance()
     {
         if (null === self::$instance) {
             self::$instance = new self();

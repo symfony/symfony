@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 
 use Symfony\Component\Form\Util\PropertyPath;
-use Symfony\Component\Form\Util\PropertyPathIterator;
 use Symfony\Component\Form\Util\PropertyPathInterface;
 
 /**
@@ -231,7 +230,6 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
 
         return $this->mapsForm[$index];
     }
-
 
     /**
      * Returns a new iterator for this path

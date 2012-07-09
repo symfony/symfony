@@ -113,7 +113,7 @@ class IcuResFileDumper implements DumperInterface
     {
         $padding = strlen($data) % 4;
 
-        if ($padding ) {
+        if ($padding) {
             return str_repeat("\xAA", 4 - $padding);
         }
     }

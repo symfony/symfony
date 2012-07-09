@@ -29,7 +29,7 @@ interface AccessDecisionManagerInterface
      *
      * @return Boolean true if the access is granted, false otherwise
      */
-    function decide(TokenInterface $token, array $attributes, $object = null);
+    public function decide(TokenInterface $token, array $attributes, $object = null);
 
     /**
      * Checks if the access decision manager supports the given attribute.
@@ -38,7 +38,7 @@ interface AccessDecisionManagerInterface
      *
      * @return Boolean true if this decision manager supports the attribute, false otherwise
      */
-    function supportsAttribute($attribute);
+    public function supportsAttribute($attribute);
 
     /**
      * Checks if the access decision manager supports the given class.
@@ -47,5 +47,5 @@ interface AccessDecisionManagerInterface
      *
      * @return true if this decision manager can process the class
      */
-    function supportsClass($class);
+    public function supportsClass($class);
 }

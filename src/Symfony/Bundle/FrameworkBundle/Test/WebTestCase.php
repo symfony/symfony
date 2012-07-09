@@ -22,8 +22,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 abstract class WebTestCase extends \PHPUnit_Framework_TestCase
 {
-    static protected $class;
-    static protected $kernel;
+    protected static $class;
+    protected static $kernel;
 
     /**
      * Creates a Client.
@@ -33,7 +33,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      *
      * @return Client A Client instance
      */
-    static protected function createClient(array $options = array(), array $server = array())
+    protected static function createClient(array $options = array(), array $server = array())
     {
         if (null !== static::$kernel) {
             static::$kernel->shutdown();
@@ -56,7 +56,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      *
      * @return string The directory where phpunit.xml(.dist) is stored
      */
-    static protected function getPhpUnitXmlDir()
+    protected static function getPhpUnitXmlDir()
     {
         if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
             throw new \RuntimeException('You must override the WebTestCase::createKernel() method.');
@@ -89,7 +89,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      *
      * @return string The value of the phpunit cli configuration option
      */
-    static private function getPhpUnitCliConfigArgument()
+    private static function getPhpUnitCliConfigArgument()
     {
         $dir = null;
         $reversedArgs = array_reverse($_SERVER['argv']);
@@ -114,7 +114,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      *
      * @return string The Kernel class name
      */
-    static protected function getKernelClass()
+    protected static function getKernelClass()
     {
         $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : static::getPhpUnitXmlDir();
 
@@ -145,7 +145,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      *
      * @return HttpKernelInterface A HttpKernelInterface instance
      */
-    static protected function createKernel(array $options = array())
+    protected static function createKernel(array $options = array())
     {
         if (null === static::$class) {
             static::$class = static::getKernelClass();

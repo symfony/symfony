@@ -36,4 +36,3 @@ class GetterMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar from getter', $metadata->getValue($entity));
     }
 }
-

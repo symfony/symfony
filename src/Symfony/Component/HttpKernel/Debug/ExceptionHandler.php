@@ -45,7 +45,7 @@ class ExceptionHandler
      *
      * @return The registered exception handler
      */
-    static public function register($debug = true)
+    public static function register($debug = true)
     {
         $handler = new static($debug);
 

@@ -61,7 +61,7 @@ class Response
      *
      * @var array
      */
-    static public $statusTexts = array(
+    public static $statusTexts = array(
         100 => 'Continue',
         101 => 'Switching Protocols',
         102 => 'Processing',            // RFC2518
@@ -158,7 +158,7 @@ class Response
      *
      * @return Response
      */
-    static public function create($content = '', $status = 200, $headers = array())
+    public static function create($content = '', $status = 200, $headers = array())
     {
         return new static($content, $status, $headers);
     }

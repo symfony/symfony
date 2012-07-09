@@ -22,9 +22,9 @@ use Symfony\Component\Yaml\Exception\ParseException;
  */
 class Yaml
 {
-    static public $enablePhpParsing = false;
+    public static $enablePhpParsing = false;
 
-    static public function enablePhpParsing()
+    public static function enablePhpParsing()
     {
         self::$enablePhpParsing = true;
     }
@@ -49,7 +49,7 @@ class Yaml
      *
      * @api
      */
-    static public function parse($input)
+    public static function parse($input)
     {
         // if input is a file, process it
         $file = '';
@@ -102,7 +102,7 @@ class Yaml
      *
      * @api
      */
-    static public function dump($array, $inline = 2)
+    public static function dump($array, $inline = 2)
     {
         $yaml = new Dumper();
 

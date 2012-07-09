@@ -748,7 +748,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @return string The PHP string with the comments removed
      */
-    static public function stripComments($source)
+    public static function stripComments($source)
     {
         if (!function_exists('token_get_all')) {
             return $source;

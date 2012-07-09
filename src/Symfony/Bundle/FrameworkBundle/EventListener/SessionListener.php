@@ -52,7 +52,7 @@ class SessionListener implements EventSubscriberInterface
         $request->setSession($this->container->get('session'));
     }
 
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             KernelEvents::REQUEST => array('onKernelRequest', 128),

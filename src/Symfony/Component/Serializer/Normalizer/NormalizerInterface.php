@@ -25,7 +25,7 @@ interface NormalizerInterface
      * @param string $format format the normalization result will be encoded as
      * @return array|scalar
      */
-    function normalize($object, $format = null);
+    public function normalize($object, $format = null);
 
     /**
      * Checks whether the given class is supported for normalization by this normalizer
@@ -34,5 +34,5 @@ interface NormalizerInterface
      * @param string $format The format being (de-)serialized from or into.
      * @return Boolean
      */
-    function supportsNormalization($data, $format = null);
+    public function supportsNormalization($data, $format = null);
 }

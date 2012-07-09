@@ -44,7 +44,7 @@ class CsrfValidationListener implements EventSubscriberInterface
      */
     private $intention;
 
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             FormEvents::PRE_BIND => 'preBind',

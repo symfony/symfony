@@ -38,7 +38,6 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
         unset($this->options['bar']);
 
-
         $this->assertTrue(isset($this->options['foo']));
         $this->assertFalse(isset($this->options['bar']));
         $this->assertEquals(0, $this->options['foo']);

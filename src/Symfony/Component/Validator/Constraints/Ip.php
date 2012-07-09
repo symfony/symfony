@@ -44,7 +44,7 @@ class Ip extends Constraint
     const V6_ONLY_PUBLIC = '6_public';
     const ALL_ONLY_PUBLIC = 'all_public';
 
-    static protected $versions = array(
+    protected static $versions = array(
         self::V4,
         self::V6,
         self::ALL,

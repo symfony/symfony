@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-
 class PasswordTypeTest extends TypeTestCase
 {
     public function testEmptyIfNotBound()

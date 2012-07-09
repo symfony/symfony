@@ -43,7 +43,7 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
      *
      * @return Boolean
      */
-    static public function isSupported()
+    public static function isSupported()
     {
         return !defined('PHP_WINDOWS_VERSION_BUILD');
     }

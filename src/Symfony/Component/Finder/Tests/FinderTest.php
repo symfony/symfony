@@ -15,9 +15,9 @@ use Symfony\Component\Finder\Finder;
 
 class FinderTest extends Iterator\RealIteratorTestCase
 {
-    static protected $tmpDir;
+    protected static $tmpDir;
 
-    static public function setUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
 
@@ -171,7 +171,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertSame($finder, $finder->sortByType());
         $this->assertIterator($this->toAbsolute(array('foo', 'toto', 'foo/bar.tmp', 'test.php', 'test.py')), $finder->in(self::$tmpDir)->getIterator());
     }
-
 
     public function testSortByAccessedTime()
     {

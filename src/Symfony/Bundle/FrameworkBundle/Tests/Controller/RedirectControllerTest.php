@@ -68,7 +68,6 @@ class RedirectControllerTest extends TestCase
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
-
         $container
             ->expects($this->at(0))
             ->method('get')

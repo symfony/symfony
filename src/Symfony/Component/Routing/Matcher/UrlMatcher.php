@@ -166,10 +166,10 @@ class UrlMatcher implements UrlMatcherInterface
 
     /**
      * Get merged default parameters.
-     * 
+     *
      * @param array $params   The parameters
      * @param array $defaults The defaults
-     * 
+     *
      * @return array Merged default parameters
      */
     protected function mergeDefaults($params, $defaults)

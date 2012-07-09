@@ -162,7 +162,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    static protected function controllerMethod4()
+    protected static function controllerMethod4()
     {
     }
 

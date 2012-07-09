@@ -625,4 +625,3 @@ class SecurityExtension extends Extension
         return new MainConfiguration($this->factories, $this->userProviderFactories);
     }
 }
-

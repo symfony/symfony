@@ -91,7 +91,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      *
      * @return TokenInterface
      */
-    public final function autoLogin(Request $request)
+    final public function autoLogin(Request $request)
     {
         if (null === $cookie = $request->cookies->get($this->options['name'])) {
             return;
@@ -156,7 +156,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      *
      * @param Request $request
      */
-    public final function loginFail(Request $request)
+    final public function loginFail(Request $request)
     {
         $this->cancelCookie($request);
         $this->onLoginFail($request);
@@ -170,7 +170,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param Response       $response
      * @param TokenInterface $token    The token that resulted in a successful authentication
      */
-    public final function loginSuccess(Request $request, Response $response, TokenInterface $token)
+    final public function loginSuccess(Request $request, Response $response, TokenInterface $token)
     {
         if (!$token->getUser() instanceof UserInterface) {
             if (null !== $this->logger) {
@@ -221,7 +221,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      */
     abstract protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token);
 
-    protected final function getUserProvider($class)
+    final protected function getUserProvider($class)
     {
         foreach ($this->userProviders as $provider) {
             if ($provider->supportsClass($class)) {

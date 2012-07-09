@@ -19,7 +19,7 @@ namespace Symfony\Component\Translation;
 class PluralizationRules
 {
     // @codeCoverageIgnoreStart
-    static private $rules = array();
+    private static $rules = array();
 
     /**
      * Returns the plural position to use for the given locale and number.
@@ -29,7 +29,7 @@ class PluralizationRules
      *
      * @return integer The plural position
      */
-    static public function get($number, $locale)
+    public static function get($number, $locale)
     {
         if ("pt_BR" == $locale) {
             // temporary set a locale for brazilian
@@ -195,7 +195,7 @@ class PluralizationRules
      *
      * @return null
      */
-    static public function set($rule, $locale)
+    public static function set($rule, $locale)
     {
         if ("pt_BR" == $locale) {
             // temporary set a locale for brazilian

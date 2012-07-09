@@ -32,7 +32,7 @@ interface ValidatorInterface
      *
      * @api
      */
-    function validate($object, $groups = null);
+    public function validate($object, $groups = null);
 
     /**
      * Validate a single property of an object against its current value.
@@ -45,7 +45,7 @@ interface ValidatorInterface
      *
      * @api
      */
-    function validateProperty($object, $property, $groups = null);
+    public function validateProperty($object, $property, $groups = null);
 
     /**
      * Validate a single property of an object against the given value.
@@ -59,7 +59,7 @@ interface ValidatorInterface
      *
      * @api
      */
-    function validatePropertyValue($class, $property, $value, $groups = null);
+    public function validatePropertyValue($class, $property, $value, $groups = null);
 
     /**
      * Validates a given value against a specific Constraint.
@@ -72,7 +72,7 @@ interface ValidatorInterface
      *
      * @api
      */
-    function validateValue($value, Constraint $constraint, $groups = null);
+    public function validateValue($value, Constraint $constraint, $groups = null);
 
     /**
      * Returns the factory for ClassMetadata instances
@@ -81,5 +81,5 @@ interface ValidatorInterface
      *
      * @api
      */
-    function getMetadataFactory();
+    public function getMetadataFactory();
 }

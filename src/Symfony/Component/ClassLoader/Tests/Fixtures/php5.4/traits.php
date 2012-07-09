@@ -1,7 +1,7 @@
 <?php
 namespace {
-    trait TFoo {
-
+    trait TFoo
+    {
     }
 
     class CFoo
@@ -11,16 +11,16 @@ namespace {
 }
 
 namespace Foo {
-    trait TBar {
-
+    trait TBar
+    {
     }
 
-    interface IBar {
-
+    interface IBar
+    {
     }
 
-    trait TFooBar {
-
+    trait TFooBar
+    {
     }
 
     class CBar implements IBar

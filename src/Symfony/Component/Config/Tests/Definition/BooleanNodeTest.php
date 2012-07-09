@@ -58,4 +58,3 @@ class BooleanNodeTest extends \PHPUnit_Framework_TestCase
         );
     }
 }
-

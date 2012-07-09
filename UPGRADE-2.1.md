@@ -436,6 +436,14 @@
     enable BC behavior by setting the "cascade_validation" option to `true`
     on the parent form.
 
+  * Compound form elements have the violation errors supressed by default. 
+    To circumvent this mis-behavior, you need to force `compound=false` while
+    adding the element to `FormBuilder`.
+
+    ```
+    $builder->add('birthDate', 'birthday', array('compound' => false));
+    ```
+
 #### BC Breaks in Themes and HTML
 
   * FormType and FieldType were merged and require you to adapt your form

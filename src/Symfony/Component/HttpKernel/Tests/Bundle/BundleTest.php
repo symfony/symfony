@@ -25,7 +25,7 @@ class BundleTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('The "Console" component is not available');
         }
 
-        if (!class_exists('Symfony\Component\DependencyInjection\ContainerAwareInterface')) {
+        if (!interface_exists('Symfony\Component\DependencyInjection\ContainerAwareInterface')) {
             $this->markTestSkipped('The "DependencyInjection" component is not available');
         }
 

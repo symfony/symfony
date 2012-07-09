@@ -98,10 +98,10 @@ class MinLengthValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->context->expects($this->once())
             ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $value,
+            ->with('myMessage', $this->identicalTo(array(
+                '{{ value }}' => (string) $value,
                 '{{ limit }}' => 5,
-            ), null, 5);
+            )), $this->identicalTo($value), 5);
 
         $this->validator->validate($value, $constraint);
     }

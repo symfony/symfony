@@ -59,12 +59,12 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         /following-sibling::td
             [./input[@id="name_second"]]
     ]
-    [count(../tr)=3]
 /following-sibling::tr[@style="display: none"]
     [./td[@colspan="2"]/input
         [@type="hidden"]
         [@id="name__token"]
     ]
+    [count(../tr)=3]
 '
         );
     }
@@ -76,12 +76,13 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $view = $form->createView();
         $html = $this->renderRow($view);
 
+        // The errors of the form are not rendered by intention!
+        // In practice, repeated fields cannot have errors as all errors
+        // on them are mapped to the first child.
+        // (see RepeatedTypeValidatorExtension)
+
         $this->assertMatchesXpath($html,
 '/tr
-    [./td[@colspan="2"]/ul
-        [./li[.="[trans]Error![/trans]"]]
-    ]
-/following-sibling::tr
     [
         ./td
             [./label[@for="name_first"]]
@@ -95,12 +96,12 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         /following-sibling::td
             [./input[@id="name_second"]]
     ]
-    [count(../tr)=4]
 /following-sibling::tr[@style="display: none"]
     [./td[@colspan="2"]/input
         [@type="hidden"]
         [@id="name__token"]
     ]
+    [count(../tr)=3]
 '
         );
     }
@@ -235,9 +236,8 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
     [
-        ./tr/td/table
-            [@id="name_child"]
-            [./tr/td/ul/li[.="[trans]Error![/trans]"]]
+        ./tr/td/ul[./li[.="[trans]Error![/trans]"]]
+        /following-sibling::table[@id="name_child"]
     ]
     [count(.//li[.="[trans]Error![/trans]"])=1]
 '

@@ -365,6 +365,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      */
     protected function &readProperty(&$objectOrArray, $property, $isIndex)
     {
+        // The local variable (instead of immediate returns) is necessary
+        // because we want to return by reference!
         $result = null;
 
         if ($isIndex) {
@@ -373,7 +375,11 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             }
 
             if (isset($objectOrArray[$property])) {
-                $result =& $objectOrArray[$property];
+                if (is_array($objectOrArray)) {
+                    $result =& $objectOrArray[$property];
+                } else {
+                    $result = $objectOrArray[$property];
+                }
             }
         } elseif (is_object($objectOrArray)) {
             $camelProp = $this->camelize($property);
@@ -402,7 +408,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 $result = $objectOrArray->$hasser();
             } elseif ($reflClass->hasMethod('__get')) {
                 // needed to support magic method __get
-                $result =& $objectOrArray->$property;
+                $result = $objectOrArray->$property;
             } elseif ($reflClass->hasProperty($property)) {
                 if (!$reflClass->getProperty($property)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "%s()" or "%s()"?', $property, $reflClass->name, $getter, $isser));

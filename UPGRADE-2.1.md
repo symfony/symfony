@@ -67,7 +67,7 @@
 
 ### HttpFoundation
 
- * [BC BREAK] The current locale for the user is not stored anymore in the session
+ * The current locale for the user is not stored anymore in the session
 
    You can simulate the old behavior by registering a listener that looks like the following, if the paramater which handle locale value in the request is `_locale`:
 
@@ -134,7 +134,7 @@
         public function equals(UserInterface $user) { /* ... */ }
         // ...
     }
-```
+    ```
 
     After:
 
@@ -146,6 +146,7 @@
         // ...
     }
     ```
+
   * The custom factories for the firewall configuration are now
     registered during the build method of bundles instead of being registered
     by the end-user. This means that you will you need to remove the 'factories'

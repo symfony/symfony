@@ -40,7 +40,7 @@ class Locale extends \Locale
      *
      * @throws RuntimeException   When the resource bundles cannot be loaded
      */
-    static public function getDisplayCountries($locale)
+    public static function getDisplayCountries($locale)
     {
         if (!isset(self::$countries[$locale])) {
             $bundle = \ResourceBundle::create($locale, __DIR__.'/Resources/data/region');
@@ -81,7 +81,7 @@ class Locale extends \Locale
      * @return array              The country codes
      * @throws RuntimeException   When the resource bundles cannot be loaded
      */
-    static public function getCountries()
+    public static function getCountries()
     {
         return array_keys(self::getDisplayCountries(self::getDefault()));
     }
@@ -95,7 +95,7 @@ class Locale extends \Locale
      *
      * @throws RuntimeException   When the resource bundles cannot be loaded
      */
-    static public function getDisplayLanguages($locale)
+    public static function getDisplayLanguages($locale)
     {
         if (!isset(self::$languages[$locale])) {
             $bundle = \ResourceBundle::create($locale, __DIR__.'/Resources/data/lang');
@@ -134,7 +134,7 @@ class Locale extends \Locale
      * @return array              The language codes
      * @throws RuntimeException   When the resource bundles cannot be loaded
      */
-    static public function getLanguages()
+    public static function getLanguages()
     {
         return array_keys(self::getDisplayLanguages(self::getDefault()));
     }
@@ -146,7 +146,7 @@ class Locale extends \Locale
      * @return array              The locale names with their codes as keys
      * @throws RuntimeException   When the resource bundles cannot be loaded
      */
-    static public function getDisplayLocales($locale)
+    public static function getDisplayLocales($locale)
     {
         if (!isset(self::$locales[$locale])) {
             $bundle = \ResourceBundle::create($locale, __DIR__.'/Resources/data/names');
@@ -182,7 +182,7 @@ class Locale extends \Locale
      * @return array              The locale codes
      * @throws RuntimeException   When the resource bundles cannot be loaded
      */
-    static public function getLocales()
+    public static function getLocales()
     {
         return array_keys(self::getDisplayLocales(self::getDefault()));
     }
@@ -192,7 +192,7 @@ class Locale extends \Locale
      *
      * @return string|null The ICU version
      */
-    static public function getIcuVersion()
+    public static function getIcuVersion()
     {
         if (defined('INTL_ICU_VERSION')) {
             return INTL_ICU_VERSION;
@@ -217,7 +217,7 @@ class Locale extends \Locale
      *
      * @return string|null The ICU Data version
      */
-    static public function getIcuDataVersion()
+    public static function getIcuDataVersion()
     {
         if (defined('INTL_ICU_DATA_VERSION')) {
             return INTL_ICU_DATA_VERSION;
@@ -243,7 +243,7 @@ class Locale extends \Locale
      * @param $locale             The locale to find the fallback for
      * @return string|null        The fallback locale, or null if no parent exists
      */
-    static protected function getFallbackLocale($locale)
+    protected static function getFallbackLocale($locale)
     {
         if ($locale === self::getDefault()) {
             return null;

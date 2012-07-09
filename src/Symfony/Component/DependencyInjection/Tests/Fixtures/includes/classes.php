@@ -16,17 +16,17 @@ class BazClass
         $instance->configure();
     }
 
-    static public function getInstance()
+    public static function getInstance()
     {
         return new self();
     }
 
-    static public function configureStatic($instance)
+    public static function configureStatic($instance)
     {
         $instance->configure();
     }
 
-    static public function configureStatic1()
+    public static function configureStatic1()
     {
     }
 }

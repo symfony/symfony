@@ -132,7 +132,6 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         @unlink($targetPath);
     }
 
-
     public function testGetClientOriginalNameSanitizeFilename()
     {
         $file = new UploadedFile(
@@ -206,7 +205,6 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($file->isValid());
     }
-
 
     public function uploadedFileErrorProvider()
     {

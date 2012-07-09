@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Tests\Core\Authentication\Provider;
 
-
 use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;

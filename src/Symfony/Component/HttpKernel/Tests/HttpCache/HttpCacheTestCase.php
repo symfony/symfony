@@ -154,7 +154,7 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
         $this->catch = $catch;
     }
 
-    static public function clearDirectory($directory)
+    public static function clearDirectory($directory)
     {
         if (!is_dir($directory)) {
             return;

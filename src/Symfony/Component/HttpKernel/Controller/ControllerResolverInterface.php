@@ -45,7 +45,7 @@ interface ControllerResolverInterface
      *
      * @api
      */
-    function getController(Request $request);
+    public function getController(Request $request);
 
     /**
      * Returns the arguments to pass to the controller.
@@ -59,5 +59,5 @@ interface ControllerResolverInterface
      *
      * @api
      */
-    function getArguments(Request $request, $controller);
+    public function getArguments(Request $request, $controller);
 }

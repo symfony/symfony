@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
 /**
  * A generic encoder factory implementation
  *

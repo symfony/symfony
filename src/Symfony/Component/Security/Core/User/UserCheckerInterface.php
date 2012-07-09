@@ -25,12 +25,12 @@ interface UserCheckerInterface
      *
      * @param UserInterface $user a UserInterface instance
      */
-    function checkPreAuth(UserInterface $user);
+    public function checkPreAuth(UserInterface $user);
 
     /**
      * Checks the user account after authentication.
      *
      * @param UserInterface $user a UserInterface instance
      */
-    function checkPostAuth(UserInterface $user);
+    public function checkPostAuth(UserInterface $user);
 }

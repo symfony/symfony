@@ -23,21 +23,21 @@ interface FormConfigInterface
      *
      * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface The dispatcher.
      */
-    function getEventDispatcher();
+    public function getEventDispatcher();
 
     /**
      * Returns the name of the form used as HTTP parameter.
      *
      * @return string The form name.
      */
-    function getName();
+    public function getName();
 
     /**
      * Returns the property path that the form should be mapped to.
      *
      * @return Util\PropertyPath The property path.
      */
-    function getPropertyPath();
+    public function getPropertyPath();
 
     /**
      * Returns whether the form should be mapped to an element of its
@@ -45,14 +45,14 @@ interface FormConfigInterface
      *
      * @return Boolean Whether the form is mapped.
      */
-    function getMapped();
+    public function getMapped();
 
     /**
      * Returns whether the form's data should be modified by reference.
      *
      * @return Boolean Whether to modify the form's data by reference.
      */
-    function getByReference();
+    public function getByReference();
 
     /**
      * Returns whether the form should be virtual.
@@ -63,7 +63,7 @@ interface FormConfigInterface
      *
      * @return Boolean Whether the form is virtual.
      */
-    function getVirtual();
+    public function getVirtual();
 
     /**
      * Returns whether the form is compound.
@@ -74,35 +74,35 @@ interface FormConfigInterface
      *
      * @return Boolean Whether the form is compound.
      */
-    function getCompound();
+    public function getCompound();
 
     /**
      * Returns the form types used to construct the form.
      *
      * @return array An array of {@link FormTypeInterface} instances.
      */
-    function getTypes();
+    public function getTypes();
 
     /**
      * Returns the view transformers of the form.
      *
      * @return array An array of {@link DataTransformerInterface} instances.
      */
-    function getViewTransformers();
+    public function getViewTransformers();
 
     /**
      * Returns the model transformers of the form.
      *
      * @return array An array of {@link DataTransformerInterface} instances.
      */
-    function getModelTransformers();
+    public function getModelTransformers();
 
     /**
      * Returns the data mapper of the form.
      *
      * @return DataMapperInterface The data mapper.
      */
-    function getDataMapper();
+    public function getDataMapper();
 
     /**
      * Returns the validators of the form.
@@ -111,42 +111,42 @@ interface FormConfigInterface
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
-    function getValidators();
+    public function getValidators();
 
     /**
      * Returns whether the form is required.
      *
      * @return Boolean Whether the form is required.
      */
-    function getRequired();
+    public function getRequired();
 
     /**
      * Returns whether the form is disabled.
      *
      * @return Boolean Whether the form is disabled.
      */
-    function getDisabled();
+    public function getDisabled();
 
     /**
      * Returns whether errors attached to the form will bubble to its parent.
      *
      * @return Boolean Whether errors will bubble up.
      */
-    function getErrorBubbling();
+    public function getErrorBubbling();
 
     /**
      * Returns the data that should be returned when the form is empty.
      *
      * @return mixed The data returned if the form is empty.
      */
-    function getEmptyData();
+    public function getEmptyData();
 
     /**
      * Returns additional attributes of the form.
      *
      * @return array An array of key-value combinations.
      */
-    function getAttributes();
+    public function getAttributes();
 
     /**
      * Returns whether the attribute with the given name exists.
@@ -155,7 +155,7 @@ interface FormConfigInterface
      *
      * @return Boolean Whether the attribute exists.
      */
-    function hasAttribute($name);
+    public function hasAttribute($name);
 
     /**
      * Returns the value of the given attribute.
@@ -165,28 +165,28 @@ interface FormConfigInterface
      *
      * @return mixed The attribute value.
      */
-    function getAttribute($name, $default = null);
+    public function getAttribute($name, $default = null);
 
     /**
      * Returns the initial data of the form.
      *
      * @return mixed The initial form data.
      */
-    function getData();
+    public function getData();
 
     /**
      * Returns the class of the form data or null if the data is scalar or an array.
      *
      * @return string The data class or null.
      */
-    function getDataClass();
+    public function getDataClass();
 
     /**
      * Returns all options passed during the construction of the form.
      *
      * @return array The passed options.
      */
-    function getOptions();
+    public function getOptions();
 
     /**
      * Returns whether a specific option exists.
@@ -195,7 +195,7 @@ interface FormConfigInterface
      *
      * @return Boolean Whether the option exists.
      */
-    function hasOption($name);
+    public function hasOption($name);
 
     /**
      * Returns the value of a specific option.
@@ -205,5 +205,5 @@ interface FormConfigInterface
      *
      * @return mixed The option value.
      */
-    function getOption($name, $default = null);
+    public function getOption($name, $default = null);
 }

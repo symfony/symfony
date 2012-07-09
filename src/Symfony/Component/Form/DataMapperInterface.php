@@ -24,7 +24,7 @@ interface DataMapperInterface
      *
      * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported.
      */
-    function mapDataToForms($data, array $forms);
+    public function mapDataToForms($data, array $forms);
 
     /**
      * Maps the data of a list of forms into the properties of some data.
@@ -34,5 +34,5 @@ interface DataMapperInterface
      *
      * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported.
      */
-    function mapFormsToData(array $forms, &$data);
+    public function mapFormsToData(array $forms, &$data);
 }

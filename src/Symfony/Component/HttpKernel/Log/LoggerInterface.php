@@ -23,40 +23,40 @@ interface LoggerInterface
     /**
      * @api
      */
-    function emerg($message, array $context = array());
+    public function emerg($message, array $context = array());
 
     /**
      * @api
      */
-    function alert($message, array $context = array());
+    public function alert($message, array $context = array());
 
     /**
      * @api
      */
-    function crit($message, array $context = array());
+    public function crit($message, array $context = array());
 
     /**
      * @api
      */
-    function err($message, array $context = array());
+    public function err($message, array $context = array());
 
     /**
      * @api
      */
-    function warn($message, array $context = array());
+    public function warn($message, array $context = array());
 
     /**
      * @api
      */
-    function notice($message, array $context = array());
+    public function notice($message, array $context = array());
 
     /**
      * @api
      */
-    function info($message, array $context = array());
+    public function info($message, array $context = array());
 
     /**
      * @api
      */
-    function debug($message, array $context = array());
+    public function debug($message, array $context = array());
 }

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\FormError;
-
 class DateTimeTypeTest extends LocalizedTestCase
 {
     public function testSubmit_dateTime()
@@ -140,14 +138,14 @@ class DateTimeTypeTest extends LocalizedTestCase
 
         $form->bind(array(
             'date' => array(
-                'day' => (int)$dateTime->format('d'),
-                'month' => (int)$dateTime->format('m'),
-                'year' => (int)$dateTime->format('Y'),
+                'day' => (int) $dateTime->format('d'),
+                'month' => (int) $dateTime->format('m'),
+                'year' => (int) $dateTime->format('Y'),
             ),
             'time' => array(
-                'hour' => (int)$dateTime->format('H'),
-                'minute' => (int)$dateTime->format('i'),
-                'second' => (int)$dateTime->format('s'),
+                'hour' => (int) $dateTime->format('H'),
+                'minute' => (int) $dateTime->format('i'),
+                'second' => (int) $dateTime->format('s'),
             ),
         ));
 

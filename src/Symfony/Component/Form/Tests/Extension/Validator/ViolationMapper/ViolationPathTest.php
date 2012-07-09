@@ -243,4 +243,3 @@ class ViolationPathTest extends \PHPUnit_Framework_TestCase
         $path->mapsForm(-1);
     }
 }
-

@@ -11,7 +11,7 @@ class FooClass
         $this->arguments = $arguments;
     }
 
-    static public function getInstance($arguments = array())
+    public static function getInstance($arguments = array())
     {
         $obj = new self($arguments);
         $obj->called = true;

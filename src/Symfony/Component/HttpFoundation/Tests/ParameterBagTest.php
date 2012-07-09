@@ -200,7 +200,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('bang'), $bag->filter('array', '', false), '->filter() gets a value of parameter as an array');
 
-
     }
 
     /**

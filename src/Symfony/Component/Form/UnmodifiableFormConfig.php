@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\EventDispatcher\UnmodifiableEventDispatcher;
 
@@ -130,7 +129,7 @@ class UnmodifiableFormConfig implements FormConfigInterface
     public function __construct(FormConfigInterface $config)
     {
         $dispatcher = $config->getEventDispatcher();
-        if (!$dispatcher instanceof UnmodifiableEventDispatcher)  {
+        if (!$dispatcher instanceof UnmodifiableEventDispatcher) {
             $dispatcher = new UnmodifiableEventDispatcher($dispatcher);
         }
 

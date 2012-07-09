@@ -76,7 +76,7 @@ class StubCollator
      *
      * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
      */
-    static public function create($locale)
+    public static function create($locale)
     {
         return new self($locale);
     }

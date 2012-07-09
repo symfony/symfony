@@ -25,7 +25,6 @@ $loader->registerNamespaces(array(
 ));
 $loader->register();
 
-
 $schema = new Schema(array(
     'class_table_name'         => 'acl_classes',
     'entry_table_name'         => 'acl_entries',

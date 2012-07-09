@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Constraints\Min;
 use Symfony\Component\Validator\Constraints\Max;
@@ -56,7 +55,6 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->validator->validate(null, new All(new Min(4)));
     }
-
 
     /**
      * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException

@@ -428,7 +428,6 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Extra!', $context->getViolations()->get(0)->getMessage());
     }
 
-
     /**
      * @dataProvider getPostMaxSizeFixtures
      */

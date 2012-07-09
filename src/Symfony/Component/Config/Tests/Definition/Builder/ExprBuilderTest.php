@@ -13,7 +13,6 @@ namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
-
 class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -160,6 +159,7 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
     protected function getTestBuilder()
     {
         $builder = new TreeBuilder();
+
         return $builder
             ->root('test')
             ->children()
@@ -191,7 +191,8 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
      * @param $val The value that the closure must return
      * @return Closure
      */
-    protected function returnClosure($val) {
+    protected function returnClosure($val)
+    {
         return function($v) use ($val) {
             return $val;
         };

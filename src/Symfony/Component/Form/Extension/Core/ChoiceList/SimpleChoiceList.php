@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
-
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**

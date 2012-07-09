@@ -32,6 +32,6 @@ class SingleIdentEntity
 
     public function __toString()
     {
-        return (string)$this->name;
+        return (string) $this->name;
     }
 }

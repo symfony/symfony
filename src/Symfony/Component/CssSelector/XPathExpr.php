@@ -219,7 +219,7 @@ class XPathExpr
      *
      * @return string
      */
-    static public function xpathLiteral($s)
+    public static function xpathLiteral($s)
     {
         if ($s instanceof Node\ElementNode) {
             // This is probably a symbol that looks like an expression...

@@ -98,32 +98,32 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     protected function renderEnctype(FormView $view)
     {
-        return (string)$this->extension->renderEnctype($view);
+        return (string) $this->extension->renderEnctype($view);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        return (string)$this->extension->renderLabel($view, $label, $vars);
+        return (string) $this->extension->renderLabel($view, $label, $vars);
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string)$this->extension->renderErrors($view);
+        return (string) $this->extension->renderErrors($view);
     }
 
     protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string)$this->extension->renderWidget($view, $vars);
+        return (string) $this->extension->renderWidget($view, $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string)$this->extension->renderRow($view, $vars);
+        return (string) $this->extension->renderRow($view, $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string)$this->extension->renderRest($view, $vars);
+        return (string) $this->extension->renderRest($view, $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)
@@ -131,14 +131,14 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->extension->setTheme($view, $themes);
     }
 
-    static public function themeBlockInheritanceProvider()
+    public static function themeBlockInheritanceProvider()
     {
         return array(
             array(array('theme.html.twig'))
         );
     }
 
-    static public function themeInheritanceProvider()
+    public static function themeInheritanceProvider()
     {
         return array(
             array(array('parent_label.html.twig'), array('child_label.html.twig'))

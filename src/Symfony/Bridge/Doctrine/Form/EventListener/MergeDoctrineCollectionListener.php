@@ -26,7 +26,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class MergeDoctrineCollectionListener implements EventSubscriberInterface
 {
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         // Higher priority than core MergeCollectionListener so that this one
         // is called before

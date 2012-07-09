@@ -59,7 +59,7 @@ class StaticMethodLoaderTest extends \PHPUnit_Framework_TestCase
 
 class StaticLoaderEntity
 {
-    static public $invokedWith = null;
+    public static $invokedWith = null;
 
     public static function loadMetadata(ClassMetadata $metadata)
     {
@@ -73,7 +73,7 @@ class StaticLoaderDocument extends BaseStaticLoaderDocument
 
 class BaseStaticLoaderDocument
 {
-    static public function loadMetadata(ClassMetadata $metadata)
+    public static function loadMetadata(ClassMetadata $metadata)
     {
         $metadata->addConstraint(new ConstraintA());
     }

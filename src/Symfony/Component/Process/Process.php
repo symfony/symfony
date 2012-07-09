@@ -57,7 +57,7 @@ class Process
      *
      * @var array
      */
-    static public $exitCodes = array(
+    public static $exitCodes = array(
         0 => 'OK',
         1 => 'General error',
         2 => 'Misuse of shell builtins',

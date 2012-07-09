@@ -29,7 +29,7 @@ interface FormBuilderInterface extends FormConfigEditorInterface, \Traversable, 
      *
      * @return FormBuilderInterface The builder object.
      */
-    function add($child, $type = null, array $options = array());
+    public function add($child, $type = null, array $options = array());
 
     /**
      * Creates a form builder.
@@ -40,7 +40,7 @@ interface FormBuilderInterface extends FormConfigEditorInterface, \Traversable, 
      *
      * @return FormBuilderInterface The created builder.
      */
-    function create($name, $type = null, array $options = array());
+    public function create($name, $type = null, array $options = array());
 
     /**
      * Returns a child by name.
@@ -51,7 +51,7 @@ interface FormBuilderInterface extends FormConfigEditorInterface, \Traversable, 
      *
      * @throws Exception\FormException if the given child does not exist
      */
-    function get($name);
+    public function get($name);
     /**
      * Removes the field with the given name.
      *
@@ -59,7 +59,7 @@ interface FormBuilderInterface extends FormConfigEditorInterface, \Traversable, 
      *
      * @return FormBuilderInterface The builder object.
      */
-    function remove($name);
+    public function remove($name);
 
     /**
      * Returns whether a field with the given name exists.
@@ -68,28 +68,28 @@ interface FormBuilderInterface extends FormConfigEditorInterface, \Traversable, 
      *
      * @return Boolean
      */
-    function has($name);
+    public function has($name);
 
     /**
      * Returns the children.
      *
      * @return array
      */
-    function all();
+    public function all();
 
     /**
      * Returns the associated form factory.
      *
      * @return FormFactoryInterface The factory
      */
-    function getFormFactory();
+    public function getFormFactory();
 
     /**
      * Creates the form.
      *
      * @return Form The form
      */
-    function getForm();
+    public function getForm();
 
     /**
      * Sets the parent builder.
@@ -98,19 +98,19 @@ interface FormBuilderInterface extends FormConfigEditorInterface, \Traversable, 
      *
      * @return FormBuilderInterface The builder object.
      */
-    function setParent(FormBuilderInterface $parent = null);
+    public function setParent(FormBuilderInterface $parent = null);
 
     /**
      * Returns the parent builder.
      *
      * @return FormBuilderInterface The parent builder
      */
-    function getParent();
+    public function getParent();
 
     /**
      * Returns whether the builder has a parent.
      *
      * @return Boolean
      */
-    function hasParent();
+    public function hasParent();
 }

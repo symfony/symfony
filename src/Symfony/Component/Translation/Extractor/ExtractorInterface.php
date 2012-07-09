@@ -27,12 +27,12 @@ interface ExtractorInterface
      * @param string           $directory The path to look into
      * @param MessageCatalogue $catalogue The catalogue
      */
-    function extract($directory, MessageCatalogue $catalogue);
+    public function extract($directory, MessageCatalogue $catalogue);
 
     /**
      * Sets the prefix that should be used for new found messages.
      *
      * @param string $prefix The prefix
      */
-    function setPrefix($prefix);
+    public function setPrefix($prefix);
 }

@@ -525,7 +525,7 @@ class FormFieldRegistry
      *
      * @return FormFieldRegistry
      */
-    static private function create($base, array $values)
+    private static function create($base, array $values)
     {
         $registry = new static();
         $registry->base = $base;

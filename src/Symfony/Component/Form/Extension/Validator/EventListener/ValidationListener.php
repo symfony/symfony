@@ -30,7 +30,7 @@ class ValidationListener implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(FormEvents::POST_BIND => 'validateForm');
     }

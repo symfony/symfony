@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataMapper;
 
-use Symfony\Component\Form\Tests\FormInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfig;
 use Symfony\Component\Form\FormConfigInterface;

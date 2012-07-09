@@ -20,7 +20,7 @@ class TimezoneType extends AbstractType
      * Stores the available timezone choices
      * @var array
      */
-    static private $timezones;
+    private static $timezones;
 
     /**
      * {@inheritdoc}
@@ -58,7 +58,7 @@ class TimezoneType extends AbstractType
      *
      * @return array The timezone choices
      */
-    static public function getTimezones()
+    public static function getTimezones()
     {
         if (null === static::$timezones) {
             static::$timezones = array();

@@ -33,4 +33,3 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $metadata->getValue($entity));
     }
 }
-

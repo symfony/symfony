@@ -18,4 +18,3 @@ $container->loadFromExtension('framework', array(
         'cookie_httponly'   => true,
     ),
 ));
-

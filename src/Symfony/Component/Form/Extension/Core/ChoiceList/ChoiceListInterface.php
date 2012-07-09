@@ -33,14 +33,14 @@ interface ChoiceListInterface
      *
      * @return array The choices with their indices as keys.
      */
-    function getChoices();
+    public function getChoices();
 
     /**
      * Returns the values for the choices
      *
      * @return array The values with the corresponding choice indices as keys.
      */
-    function getValues();
+    public function getValues();
 
     /**
      * Returns the choice views of the preferred choices as nested array with
@@ -64,7 +64,7 @@ interface ChoiceListInterface
      *               choice indices as keys on the lowest levels and the choice
      *               group names in the keys of the higher levels.
      */
-    function getPreferredViews();
+    public function getPreferredViews();
 
     /**
      * Returns the choice views of the choices that are not preferred as nested
@@ -90,7 +90,7 @@ interface ChoiceListInterface
      *
      * @see getPreferredValues
      */
-    function getRemainingViews();
+    public function getRemainingViews();
 
     /**
      * Returns the choices corresponding to the given values.
@@ -100,7 +100,7 @@ interface ChoiceListInterface
      *
      * @return array An array of choices with ascending, 0-based numeric keys
      */
-    function getChoicesForValues(array $values);
+    public function getChoicesForValues(array $values);
 
     /**
      * Returns the values corresponding to the given choices.
@@ -111,7 +111,7 @@ interface ChoiceListInterface
      * @return array An array of choice values with ascending, 0-based numeric
      *               keys
      */
-    function getValuesForChoices(array $choices);
+    public function getValuesForChoices(array $choices);
 
     /**
      * Returns the indices corresponding to the given choices.
@@ -121,7 +121,7 @@ interface ChoiceListInterface
      *
      * @return array An array of indices with ascending, 0-based numeric keys
      */
-    function getIndicesForChoices(array $choices);
+    public function getIndicesForChoices(array $choices);
 
     /**
      * Returns the indices corresponding to the given values.
@@ -131,5 +131,5 @@ interface ChoiceListInterface
      *
      * @return array An array of indices with ascending, 0-based numeric keys
      */
-    function getIndicesForValues(array $values);
+    public function getIndicesForValues(array $values);
 }

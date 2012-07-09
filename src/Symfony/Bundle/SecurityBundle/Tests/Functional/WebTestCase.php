@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class WebTestCase extends BaseWebTestCase
 {
-    static public function assertRedirect($response, $location)
+    public static function assertRedirect($response, $location)
     {
         self::assertTrue($response->isRedirect(), 'Response is not a redirect, got status code: '.substr($response, 0, 2000));
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));
@@ -42,14 +42,14 @@ class WebTestCase extends BaseWebTestCase
         $fs->remove($dir);
     }
 
-    static protected function getKernelClass()
+    protected static function getKernelClass()
     {
         require_once __DIR__.'/app/AppKernel.php';
 
         return 'Symfony\Bundle\SecurityBundle\Tests\Functional\AppKernel';
     }
 
-    static protected function createKernel(array $options = array())
+    protected static function createKernel(array $options = array())
     {
         $class = self::getKernelClass();
 

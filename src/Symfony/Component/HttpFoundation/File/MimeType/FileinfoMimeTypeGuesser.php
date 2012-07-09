@@ -26,7 +26,7 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
      *
      * @return Boolean
      */
-    static public function isSupported()
+    public static function isSupported()
     {
         return function_exists('finfo_open');
     }

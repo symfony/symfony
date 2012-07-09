@@ -61,7 +61,6 @@ class ChoiceTypeTest extends TypeTestCase
         );
     }
 
-
     protected function tearDown()
     {
         parent::tearDown();

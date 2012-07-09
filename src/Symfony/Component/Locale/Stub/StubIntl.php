@@ -71,7 +71,7 @@ abstract class StubIntl
      *
      * @return Boolean
      */
-    static public function isFailure($errorCode)
+    public static function isFailure($errorCode)
     {
         return isset(self::$errorCodes[$errorCode])
             && $errorCode > self::U_ZERO_ERROR;
@@ -84,7 +84,7 @@ abstract class StubIntl
      *
      * @return integer
      */
-    static public function getErrorCode()
+    public static function getErrorCode()
     {
         return self::$errorCode;
     }
@@ -96,7 +96,7 @@ abstract class StubIntl
      *
      * @return string
      */
-    static public function getErrorMessage()
+    public static function getErrorMessage()
     {
         return self::$errorMessage;
     }
@@ -106,7 +106,7 @@ abstract class StubIntl
      *
      * @return string
      */
-    static public function getErrorName($code)
+    public static function getErrorName($code)
     {
         if (isset(self::$errorCodes[$code])) {
             return self::$errorCodes[$code];
@@ -123,7 +123,7 @@ abstract class StubIntl
      *
      * @throws \InvalidArgumentException If the code is not one of the error constants in this class
      */
-    static public function setError($code, $message = '')
+    public static function setError($code, $message = '')
     {
         if (!isset(self::$errorCodes[$code])) {
             throw new \InvalidArgumentException(sprintf('No such error code: "%s"', $code));

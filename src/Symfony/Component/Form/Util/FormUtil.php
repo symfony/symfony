@@ -34,7 +34,7 @@ abstract class FormUtil
      * @see http://english-zone.com/spelling/plurals.html
      * @see http://www.scribd.com/doc/3271143/List-of-100-Irregular-Plural-Nouns-in-English
      */
-    static private $pluralMap = array(
+    private static $pluralMap = array(
         // First entry: plural suffix, reversed
         // Second entry: length of plural suffix
         // Third entry: Whether the suffix may succeed a vocal
@@ -117,7 +117,7 @@ abstract class FormUtil
      * @return string|array The singular form or an array of possible singular
      *                      forms
      */
-    static public function singularify($plural)
+    public static function singularify($plural)
     {
         $pluralRev = strrev($plural);
         $lowerPluralRev = strtolower($pluralRev);
@@ -198,7 +198,7 @@ abstract class FormUtil
      *
      * @return Boolean Whether the choice is a group
      */
-    static public function isChoiceGroup($choice)
+    public static function isChoiceGroup($choice)
     {
         return is_array($choice) || $choice instanceof \Traversable;
     }
@@ -211,7 +211,7 @@ abstract class FormUtil
      *
      * @return Boolean Whether the choice is selected
      */
-    static public function isChoiceSelected($choice, $value)
+    public static function isChoiceSelected($choice, $value)
     {
         if (is_array($value)) {
             return false !== array_search($choice, $value, true);
@@ -231,7 +231,7 @@ abstract class FormUtil
      *
      * @return Boolean
      */
-    static public function isEmpty($data)
+    public static function isEmpty($data)
     {
         // Should not do a check for array() === $data!!!
         // This method is used in occurrences where arrays are

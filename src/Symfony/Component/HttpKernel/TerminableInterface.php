@@ -35,5 +35,5 @@ interface TerminableInterface
      *
      * @api
      */
-    function terminate(Request $request, Response $response);
+    public function terminate(Request $request, Response $response);
 }

@@ -246,7 +246,6 @@ class StubNumberFormatterTest extends LocaleTestCase
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
 
-
     public function formatCurrencyWithCurrencyStyleSwissRoundingProvider()
     {
         // The currency symbol was updated from 4.2 to the 4.4 version. The ICU CLDR data was updated in 2010-03-03,

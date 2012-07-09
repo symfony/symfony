@@ -27,7 +27,7 @@ interface TemplateReferenceInterface
      *
      * @api
      */
-    function all();
+    public function all();
 
     /**
      * Sets a template parameter.
@@ -41,7 +41,7 @@ interface TemplateReferenceInterface
      *
      * @api
      */
-    function set($name, $value);
+    public function set($name, $value);
 
     /**
      * Gets a template parameter.
@@ -54,7 +54,7 @@ interface TemplateReferenceInterface
      *
      * @api
      */
-    function get($name);
+    public function get($name);
 
     /**
      * Returns the path to the template.
@@ -65,7 +65,7 @@ interface TemplateReferenceInterface
      *
      * @api
      */
-    function getPath();
+    public function getPath();
 
     /**
      * Returns the "logical" template name.
@@ -76,5 +76,5 @@ interface TemplateReferenceInterface
      *
      * @api
      */
-    function getLogicalName();
+    public function getLogicalName();
 }

@@ -33,5 +33,5 @@ interface DenormalizableInterface
      * @param string|null  $format The format is optionally given to be able to denormalize differently
      *   based on different input formats.
      */
-    function denormalize(DenormalizerInterface $denormalizer, $data, $format = null);
+    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null);
 }

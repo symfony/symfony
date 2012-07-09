@@ -33,5 +33,5 @@ interface LogoutSuccessHandlerInterface
      *
      * @return Response never null
      */
-    function onLogoutSuccess(Request $request);
+    public function onLogoutSuccess(Request $request);
 }

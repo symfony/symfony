@@ -14,7 +14,6 @@ namespace Symfony\Component\Routing\Tests\Matcher\Dumper;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RequestContext;
 
 class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 {

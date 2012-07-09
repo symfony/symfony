@@ -82,14 +82,14 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         $this->helper->setTheme($view, $themes);
     }
 
-    static public function themeBlockInheritanceProvider()
+    public static function themeBlockInheritanceProvider()
     {
         return array(
             array(array('TestBundle:Parent'))
         );
     }
 
-    static public function themeInheritanceProvider()
+    public static function themeInheritanceProvider()
     {
         return array(
             array(array('TestBundle:Parent'), array('TestBundle:Child'))

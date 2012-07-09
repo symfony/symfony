@@ -335,7 +335,7 @@ class ChoiceList implements ChoiceListInterface
     {
         $index = $this->createIndex($choice);
 
-        if ('' === $index || null === $index || !FormConfig::isValidName((string)$index)) {
+        if ('' === $index || null === $index || !FormConfig::isValidName((string) $index)) {
             throw new InvalidConfigurationException('The index "' . $index . '" created by the choice list is invalid. It should be a valid, non-empty Form name.');
         }
 

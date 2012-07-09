@@ -414,7 +414,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @return Boolean Whether it is a lazy option closure.
      */
-    static private function isEvaluatedLazily($value)
+    private static function isEvaluatedLazily($value)
     {
         if (!$value instanceof \Closure) {
             return false;

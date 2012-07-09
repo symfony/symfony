@@ -281,7 +281,7 @@ class XmlDumper extends Dumper
      *
      * @param mixed $value Value to convert
      */
-    static public function phpToXml($value)
+    public static function phpToXml($value)
     {
         switch (true) {
             case null === $value:

@@ -29,5 +29,5 @@ interface RequestMatcherInterface
      *
      * @api
      */
-    function matches(Request $request);
+    public function matches(Request $request);
 }

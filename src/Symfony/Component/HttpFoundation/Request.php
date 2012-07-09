@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class Request
 {
-    static protected $trustProxy = false;
+    protected static $trustProxy = false;
 
     /**
      * @var \Symfony\Component\HttpFoundation\ParameterBag
@@ -149,7 +149,7 @@ class Request
     /**
      * @var array
      */
-    static protected $formats;
+    protected static $formats;
 
     /**
      * Constructor.
@@ -213,7 +213,7 @@ class Request
      *
      * @api
      */
-    static public function createFromGlobals()
+    public static function createFromGlobals()
     {
         $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
 
@@ -242,7 +242,7 @@ class Request
      *
      * @api
      */
-    static public function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
+    public static function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
     {
         $defaults = array(
             'SERVER_NAME'          => 'localhost',
@@ -444,7 +444,7 @@ class Request
      *
      * @api
      */
-    static public function trustProxyData()
+    public static function trustProxyData()
     {
         self::$trustProxy = true;
     }
@@ -455,7 +455,7 @@ class Request
      *
      * @return boolean
      */
-    static public function isProxyTrusted()
+    public static function isProxyTrusted()
     {
         return self::$trustProxy;
     }
@@ -470,7 +470,7 @@ class Request
      *
      * @return string A normalized query string for the Request
      */
-    static public function normalizeQueryString($qs)
+    public static function normalizeQueryString($qs)
     {
         if ('' == $qs) {
             return '';
@@ -848,6 +848,7 @@ class Request
     public function getQueryString()
     {
         $qs = static::normalizeQueryString($this->server->get('QUERY_STRING'));
+
         return '' === $qs ? null : $qs;
     }
 
@@ -1454,7 +1455,7 @@ class Request
     /**
      * Initializes HTTP request formats.
      */
-    static protected function initializeFormats()
+    protected static function initializeFormats()
     {
         static::$formats = array(
             'html' => array('text/html', 'application/xhtml+xml'),

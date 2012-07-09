@@ -47,7 +47,7 @@ interface UserInterface
      *
      * @return Role[] The user roles
      */
-    function getRoles();
+    public function getRoles();
 
     /**
      * Returns the password used to authenticate the user.
@@ -57,7 +57,7 @@ interface UserInterface
      *
      * @return string The password
      */
-    function getPassword();
+    public function getPassword();
 
     /**
      * Returns the salt that was originally used to encode the password.
@@ -66,14 +66,14 @@ interface UserInterface
      *
      * @return string The salt
      */
-    function getSalt();
+    public function getSalt();
 
     /**
      * Returns the username used to authenticate the user.
      *
      * @return string The username
      */
-    function getUsername();
+    public function getUsername();
 
     /**
      * Removes sensitive data from the user.
@@ -83,5 +83,5 @@ interface UserInterface
      *
      * @return void
      */
-    function eraseCredentials();
+    public function eraseCredentials();
 }

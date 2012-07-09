@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\File\Mimetype;
+namespace Symfony\Component\HttpFoundation\File\MimeType;
 
 /**
  * Provides a best-guess mapping of mime type to file extension.

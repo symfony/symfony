@@ -39,7 +39,7 @@ class ErrorHandler
      *
      * @return The registered error handler
      */
-    static public function register($level = null)
+    public static function register($level = null)
     {
         $handler = new static();
         $handler->setLevel($level);

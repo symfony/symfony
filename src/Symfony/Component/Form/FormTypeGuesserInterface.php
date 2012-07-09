@@ -24,7 +24,7 @@ interface FormTypeGuesserInterface
      *
      * @return Guess\TypeGuess A guess for the field's type and options
      */
-    function guessType($class, $property);
+    public function guessType($class, $property);
 
     /**
      * Returns a guess whether a property of a class is required
@@ -34,7 +34,7 @@ interface FormTypeGuesserInterface
      *
      * @return Guess\Guess A guess for the field's required setting
      */
-    function guessRequired($class, $property);
+    public function guessRequired($class, $property);
 
     /**
      * Returns a guess about the field's maximum length
@@ -44,7 +44,7 @@ interface FormTypeGuesserInterface
      *
      * @return Guess\Guess A guess for the field's maximum length
      */
-    function guessMaxLength($class, $property);
+    public function guessMaxLength($class, $property);
 
     /**
      * Returns a guess about the field's minimum length
@@ -56,7 +56,7 @@ interface FormTypeGuesserInterface
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
-    function guessMinLength($class, $property);
+    public function guessMinLength($class, $property);
 
     /**
      * Returns a guess about the field's pattern
@@ -72,5 +72,5 @@ interface FormTypeGuesserInterface
      *
      * @return Guess\Guess A guess for the field's required pattern
      */
-    function guessPattern($class, $property);
+    public function guessPattern($class, $property);
 }

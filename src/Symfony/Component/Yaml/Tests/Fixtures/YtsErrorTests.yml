@@ -23,4 +23,3 @@ yaml: |
     secondline: 2
 php: |
   array('foo' => null, 'firstline' => 1, 'secondline' => 2)
-

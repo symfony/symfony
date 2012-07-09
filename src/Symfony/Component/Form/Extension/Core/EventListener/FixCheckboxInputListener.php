@@ -44,7 +44,7 @@ class FixCheckboxInputListener implements EventSubscriberInterface
         $event->setData(count($indices) > 0 ? array_combine($indices, $values) : array());
     }
 
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(FormEvents::PRE_BIND => 'preBind');
     }

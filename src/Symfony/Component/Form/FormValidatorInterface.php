@@ -24,5 +24,5 @@ interface FormValidatorInterface
     /**
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
-    function validate(FormInterface $form);
+    public function validate(FormInterface $form);
 }

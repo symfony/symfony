@@ -35,7 +35,7 @@ abstract class DoctrineOrmTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @return EntityManager
      */
-    static public function createTestEntityManager($paths = array())
+    public static function createTestEntityManager($paths = array())
     {
         if (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers())) {
             self::markTestSkipped('This test requires SQLite support in your environment');

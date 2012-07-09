@@ -667,7 +667,7 @@ class Crawler extends \SplObjectStorage
      * @return string Converted string
      *
      */
-    static public function xpathLiteral($s)
+    public static function xpathLiteral($s)
     {
         if (false === strpos($s, "'")) {
             return sprintf("'%s'", $s);

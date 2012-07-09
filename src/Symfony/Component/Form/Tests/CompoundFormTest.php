@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Extension\Core\EventListener\BindRequestListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -360,6 +361,7 @@ class FormTest extends AbstractFormTest
         $form = $this->getBuilder('author')
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
+            ->addEventSubscriber(new BindRequestListener())
             ->getForm();
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
@@ -408,6 +410,7 @@ class FormTest extends AbstractFormTest
         $form = $this->getBuilder('')
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
+            ->addEventSubscriber(new BindRequestListener())
             ->getForm();
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
@@ -449,7 +452,9 @@ class FormTest extends AbstractFormTest
             'REQUEST_METHOD' => $method,
         ));
 
-        $form = $this->getBuilder('image')->getForm();
+        $form = $this->getBuilder('image')
+            ->addEventSubscriber(new BindRequestListener())
+            ->getForm();
 
         $form->bindRequest($request);
 
@@ -480,7 +485,9 @@ class FormTest extends AbstractFormTest
             'REQUEST_METHOD' => $method,
         ));
 
-        $form = $this->getBuilder('name')->getForm();
+        $form = $this->getBuilder('name')
+            ->addEventSubscriber(new BindRequestListener())
+            ->getForm();
 
         $form->bindRequest($request);
 
@@ -509,6 +516,7 @@ class FormTest extends AbstractFormTest
         $form = $this->getBuilder('author')
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
+            ->addEventSubscriber(new BindRequestListener())
             ->getForm();
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());
@@ -538,6 +546,7 @@ class FormTest extends AbstractFormTest
         $form = $this->getBuilder('')
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
+            ->addEventSubscriber(new BindRequestListener())
             ->getForm();
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());

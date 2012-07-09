@@ -20,3 +20,6 @@ CHANGELOG
  * `ObjectIdentity::fromDomainObject`, `UserSecurityIdentity::fromAccount` and
    `UserSecurityIdentity::fromToken` now return correct identities for proxies
    objects (e.g. Doctrine proxies)
+ * [BC BREAK] moved the default authentication success and failure handling to
+   seperate classes. The order of arguments in the constructor of the
+   `AbstractAuthenticationListener` has changed.

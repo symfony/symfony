@@ -213,6 +213,18 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foobar', $path->getValue($object));
     }
 
+    /*
+     * https://github.com/symfony/symfony/pull/4450
+     */
+    public function testGetValueReadsMagicGetThatReturnsConstant()
+    {
+        $path = new PropertyPath('magicProperty');
+
+        $object = new Magician();
+
+        $this->assertNull($path->getValue($object));
+    }
+
     /**
      * @expectedException Symfony\Component\Form\Exception\PropertyAccessDeniedException
      */

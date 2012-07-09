@@ -20,6 +20,9 @@
 {% block form_widget_compound %}
 {% spaceless %}
     <div {{ block('widget_container_attributes') }}>
+        {% if form.parent is empty %}
+            {{ form_errors(form) }}
+        {% endif %}
         {{ block('form_rows') }}
         {{ form_rest(form) }}
     </div>
@@ -236,6 +239,10 @@
 
 {% block repeated_row %}
 {% spaceless %}
+    {#
+    No need to render the errors here, as all errors are mapped
+    to the first child (see RepeatedTypeValidatorExtension).
+    #}
     {{ block('form_rows') }}
 {% endspaceless %}
 {% endblock repeated_row %}
@@ -244,13 +251,7 @@
 {% spaceless %}
     <div>
         {{ form_label(form, label|default(null)) }}
-        {#
-        If the child is a compound form, the errors are rendered inside
-        the container. See also block form_rows.
-        #}
-        {% if not compound %}
-            {{ form_errors(form) }}
-        {% endif %}
+        {{ form_errors(form) }}
         {{ form_widget(form) }}
     </div>
 {% endspaceless %}
@@ -298,7 +299,6 @@
 
 {% block form_rows %}
 {% spaceless %}
-    {{ form_errors(form) }}
     {% for child in form %}
         {{ form_row(child) }}
     {% endfor %}

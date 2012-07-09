@@ -193,5 +193,4 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
     {
         $this->remove($offset);
     }
-
 }

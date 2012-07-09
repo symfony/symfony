@@ -26,7 +26,7 @@ class Route
     private $options;
     private $compiled;
 
-    static private $compilers = array();
+    private static $compilers = array();
 
     /**
      * Constructor.

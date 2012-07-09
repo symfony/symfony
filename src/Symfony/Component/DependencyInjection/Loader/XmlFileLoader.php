@@ -467,7 +467,7 @@ EOF
      *
      * @return array A PHP array
      */
-    static public function convertDomElementToArray(\DomElement $element)
+    public static function convertDomElementToArray(\DomElement $element)
     {
         $empty = true;
         $config = array();

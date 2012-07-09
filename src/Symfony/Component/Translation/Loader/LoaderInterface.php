@@ -33,5 +33,5 @@ interface LoaderInterface
      *
      * @api
      */
-    function load($resource, $locale, $domain = 'messages');
+    public function load($resource, $locale, $domain = 'messages');
 }

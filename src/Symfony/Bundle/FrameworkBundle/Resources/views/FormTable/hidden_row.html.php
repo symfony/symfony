@@ -3,4 +3,3 @@
         <?php echo $view['form']->widget($form) ?>
     </td>
 </tr>
-

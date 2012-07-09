@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
-
 class TimezoneTypeTest extends TypeTestCase
 {
     public function testTimezonesAreSelectable()

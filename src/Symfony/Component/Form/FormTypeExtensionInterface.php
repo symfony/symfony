@@ -24,7 +24,7 @@ interface FormTypeExtensionInterface
      * @param FormBuilder $builder The form builder
      * @param array       $options The options
      */
-    function buildForm(FormBuilder $builder, array $options);
+    public function buildForm(FormBuilder $builder, array $options);
 
     /**
      * Builds the view.
@@ -37,7 +37,7 @@ interface FormTypeExtensionInterface
      * @param FormView      $view The view
      * @param FormInterface $form The form
      */
-    function buildView(FormView $view, FormInterface $form);
+    public function buildView(FormView $view, FormInterface $form);
 
     /**
      * Builds the view.
@@ -50,7 +50,7 @@ interface FormTypeExtensionInterface
      * @param FormView      $view The view
      * @param FormInterface $form The form
      */
-    function buildViewBottomUp(FormView $view, FormInterface $form);
+    public function buildViewBottomUp(FormView $view, FormInterface $form);
 
     /**
      * Overrides the default options form the extended type.
@@ -59,7 +59,7 @@ interface FormTypeExtensionInterface
      *
      * @return array
      */
-    function getDefaultOptions(array $options);
+    public function getDefaultOptions(array $options);
 
     /**
      * Returns the allowed option values for each option (if any).
@@ -68,13 +68,12 @@ interface FormTypeExtensionInterface
      *
      * @return array The allowed option values
      */
-    function getAllowedOptionValues(array $options);
-
+    public function getAllowedOptionValues(array $options);
 
     /**
      * Returns the name of the type being extended
      *
      * @return string The name of the type being extended
      */
-    function getExtendedType();
+    public function getExtendedType();
 }

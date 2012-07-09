@@ -23,12 +23,12 @@ interface HttpExceptionInterface
      *
      * @return integer An HTTP response status code
      */
-    function getStatusCode();
+    public function getStatusCode();
 
     /**
      * Returns response headers.
      *
      * @return array Response headers
      */
-    function getHeaders();
+    public function getHeaders();
 }

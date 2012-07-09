@@ -34,7 +34,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function registerBundles();
+    public function registerBundles();
 
     /**
      * Loads the container configuration
@@ -43,14 +43,14 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function registerContainerConfiguration(LoaderInterface $loader);
+    public function registerContainerConfiguration(LoaderInterface $loader);
 
     /**
      * Boots the current kernel.
      *
      * @api
      */
-    function boot();
+    public function boot();
 
     /**
      * Shutdowns the kernel.
@@ -59,7 +59,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function shutdown();
+    public function shutdown();
 
     /**
      * Gets the registered bundle instances.
@@ -68,7 +68,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function getBundles();
+    public function getBundles();
 
     /**
      * Checks if a given class name belongs to an active bundle.
@@ -79,7 +79,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function isClassInActiveBundle($class);
+    public function isClassInActiveBundle($class);
 
     /**
      * Returns a bundle and optionally its descendants by its name.
@@ -93,7 +93,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function getBundle($name, $first = true);
+    public function getBundle($name, $first = true);
 
     /**
      * Returns the file path for a given resource.
@@ -123,7 +123,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function locateResource($name, $dir = null, $first = true);
+    public function locateResource($name, $dir = null, $first = true);
 
     /**
      * Gets the name of the kernel
@@ -132,7 +132,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function getName();
+    public function getName();
 
     /**
      * Gets the environment.
@@ -141,7 +141,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function getEnvironment();
+    public function getEnvironment();
 
     /**
      * Checks if debug mode is enabled.
@@ -150,7 +150,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function isDebug();
+    public function isDebug();
 
     /**
      * Gets the application root dir.
@@ -159,7 +159,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function getRootDir();
+    public function getRootDir();
 
     /**
      * Gets the current container.
@@ -168,7 +168,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function getContainer();
+    public function getContainer();
 
     /**
      * Gets the request start time (not available if debug is disabled).
@@ -177,7 +177,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function getStartTime();
+    public function getStartTime();
 
     /**
      * Gets the cache directory.
@@ -186,7 +186,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function getCacheDir();
+    public function getCacheDir();
 
     /**
      * Gets the log directory.
@@ -195,5 +195,5 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    function getLogDir();
+    public function getLogDir();
 }

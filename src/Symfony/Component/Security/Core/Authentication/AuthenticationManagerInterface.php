@@ -31,5 +31,5 @@ interface AuthenticationManagerInterface
      *
      * @throws AuthenticationException if the authentication fails
      */
-    function authenticate(TokenInterface $token);
+    public function authenticate(TokenInterface $token);
 }

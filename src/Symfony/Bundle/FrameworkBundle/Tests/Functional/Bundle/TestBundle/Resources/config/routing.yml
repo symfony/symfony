@@ -17,4 +17,3 @@ session_setflash:
 session_showflash:
     pattern: /session_showflash
     defaults: { _controller: TestBundle:Session:showFlash}
-

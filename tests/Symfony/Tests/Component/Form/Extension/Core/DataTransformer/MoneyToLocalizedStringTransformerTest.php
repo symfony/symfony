@@ -15,7 +15,6 @@ require_once __DIR__ . '/LocalizedTestCase.php';
 
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
 
-
 class MoneyToLocalizedStringTransformerTest extends LocalizedTestCase
 {
     protected function setUp()

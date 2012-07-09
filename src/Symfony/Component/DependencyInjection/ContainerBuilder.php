@@ -837,7 +837,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return array An array of Service conditionals
      */
-    static public function getServiceConditionals($value)
+    public static function getServiceConditionals($value)
     {
         $services = array();
 

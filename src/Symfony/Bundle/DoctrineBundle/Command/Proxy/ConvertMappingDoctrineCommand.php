@@ -50,7 +50,6 @@ EOT
         return parent::execute($input, $output);
     }
 
-
     protected function getExporter($toType, $destPath)
     {
         $exporter = parent::getExporter($toType, $destPath);

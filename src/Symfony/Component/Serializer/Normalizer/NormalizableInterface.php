@@ -35,7 +35,7 @@ interface NormalizableInterface
      *   based on different output formats.
      * @return array|scalar
      */
-    function normalize(SerializerInterface $serializer, $format = null);
+    public function normalize(SerializerInterface $serializer, $format = null);
 
     /**
      * Denormalizes the object back from an array of scalars|arrays.
@@ -49,5 +49,5 @@ interface NormalizableInterface
      * @param string|null  $format The format is optionally given to be able to denormalize differently
      *   based on different input formats.
      */
-    function denormalize(SerializerInterface $serializer, $data, $format = null);
+    public function denormalize(SerializerInterface $serializer, $data, $format = null);
 }

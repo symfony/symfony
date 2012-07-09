@@ -65,7 +65,7 @@ class Processor
      *
      * @return array the config with normalized keys
      */
-    static public function normalizeKeys(array $config)
+    public static function normalizeKeys(array $config)
     {
         foreach ($config as $key => $value) {
             if (is_array($value)) {
@@ -104,7 +104,7 @@ class Processor
      *
      * @return array
      */
-    static public function normalizeConfig($config, $key, $plural = null)
+    public static function normalizeConfig($config, $key, $plural = null)
     {
         if (null === $plural) {
             $plural = $key.'s';

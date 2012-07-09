@@ -21,7 +21,7 @@ interface ConstraintValidatorInterface
      *
      * @param ExecutionContext $context The current validation context
      */
-    function initialize(ExecutionContext $context);
+    public function initialize(ExecutionContext $context);
 
     /**
      * Checks if the passed value is valid.
@@ -33,19 +33,19 @@ interface ConstraintValidatorInterface
      *
      * @api
      */
-    function isValid($value, Constraint $constraint);
+    public function isValid($value, Constraint $constraint);
 
     /**
      * @return string
      *
      * @api
      */
-    function getMessageTemplate();
+    public function getMessageTemplate();
 
     /**
      * @return array
      *
      * @api
      */
-    function getMessageParameters();
+    public function getMessageParameters();
 }

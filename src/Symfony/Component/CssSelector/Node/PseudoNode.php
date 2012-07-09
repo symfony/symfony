@@ -23,7 +23,7 @@ use Symfony\Component\CssSelector\Exception\ParseException;
  */
 class PseudoNode implements NodeInterface
 {
-    static protected $unsupported = array(
+    protected static $unsupported = array(
         'indeterminate', 'first-line', 'first-letter',
         'selection', 'before', 'after', 'link', 'visited',
         'active', 'focus', 'hover',

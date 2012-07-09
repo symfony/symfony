@@ -31,7 +31,7 @@ class Response
     protected $statusText;
     protected $charset;
 
-    static public $statusTexts = array(
+    public static $statusTexts = array(
         100 => 'Continue',
         101 => 'Switching Protocols',
         200 => 'OK',

@@ -51,7 +51,7 @@ interface RememberMeServicesInterface
      *
      * @return TokenInterface
      */
-    function autoLogin(Request $request);
+    public function autoLogin(Request $request);
 
     /**
      * Called whenever an interactive authentication attempt was made, but the
@@ -63,7 +63,7 @@ interface RememberMeServicesInterface
      *
      * @return void
      */
-    function loginFail(Request $request);
+    public function loginFail(Request $request);
 
     /**
      * Called whenever an interactive authentication attempt is successful
@@ -82,5 +82,5 @@ interface RememberMeServicesInterface
      *
      * @return void
      */
-    function loginSuccess(Request $request, Response $response, TokenInterface $token);
+    public function loginSuccess(Request $request, Response $response, TokenInterface $token);
 }

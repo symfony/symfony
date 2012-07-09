@@ -29,7 +29,7 @@ class Inline
      *
      * @return array A PHP array representing the YAML string
      */
-    static public function parse($value)
+    public static function parse($value)
     {
         $value = trim($value);
 
@@ -69,7 +69,7 @@ class Inline
      *
      * @throws DumpException When trying to dump PHP resource
      */
-    static public function dump($value)
+    public static function dump($value)
     {
         switch (true) {
             case is_resource($value):
@@ -119,7 +119,7 @@ class Inline
      *
      * @return string The YAML string representing the PHP array
      */
-    static private function dumpArray($value)
+    private static function dumpArray($value)
     {
         // array
         $keys = array_keys($value);
@@ -156,7 +156,7 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    static public function parseScalar($scalar, $delimiters = null, $stringDelimiters = array('"', "'"), &$i = 0, $evaluate = true)
+    public static function parseScalar($scalar, $delimiters = null, $stringDelimiters = array('"', "'"), &$i = 0, $evaluate = true)
     {
         if (in_array($scalar[$i], $stringDelimiters)) {
             // quoted scalar
@@ -194,7 +194,7 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    static private function parseQuotedScalar($scalar, &$i)
+    private static function parseQuotedScalar($scalar, &$i)
     {
         if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
             throw new ParseException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
@@ -224,7 +224,7 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    static private function parseSequence($sequence, &$i = 0)
+    private static function parseSequence($sequence, &$i = 0)
     {
         $output = array();
         $len = strlen($sequence);
@@ -280,7 +280,7 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    static private function parseMapping($mapping, &$i = 0)
+    private static function parseMapping($mapping, &$i = 0)
     {
         $output = array();
         $len = strlen($mapping);
@@ -341,7 +341,7 @@ class Inline
      *
      * @return string A YAML string
      */
-    static private function evaluateScalar($scalar)
+    private static function evaluateScalar($scalar)
     {
         $scalar = trim($scalar);
 
@@ -386,7 +386,7 @@ class Inline
      *
      * @return string The regular expression
      */
-    static private function getTimestampRegex()
+    private static function getTimestampRegex()
     {
         return <<<EOF
         ~^

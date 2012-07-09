@@ -45,7 +45,7 @@ class Finder implements \IteratorAggregate
     private $dates       = array();
     private $iterators   = array();
 
-    static private $vcsPatterns = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
+    private static $vcsPatterns = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
 
     /**
      * Constructor.
@@ -62,7 +62,7 @@ class Finder implements \IteratorAggregate
      *
      * @api
      */
-    static public function create()
+    public static function create()
     {
         return new self();
     }
@@ -273,7 +273,7 @@ class Finder implements \IteratorAggregate
         return $this;
     }
 
-    static public function addVCSPattern($pattern)
+    public static function addVCSPattern($pattern)
     {
         self::$vcsPatterns[] = $pattern;
     }

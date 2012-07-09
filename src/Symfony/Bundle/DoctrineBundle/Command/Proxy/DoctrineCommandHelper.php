@@ -29,7 +29,7 @@ abstract class DoctrineCommandHelper
      * @param Application $application
      * @param string      $emName
      */
-    static public function setApplicationEntityManager(Application $application, $emName)
+    public static function setApplicationEntityManager(Application $application, $emName)
     {
         $em = $application->getKernel()->getContainer()->get('doctrine')->getEntityManager($emName);
         $helperSet = $application->getHelperSet();
@@ -37,7 +37,7 @@ abstract class DoctrineCommandHelper
         $helperSet->set(new EntityManagerHelper($em), 'em');
     }
 
-    static public function setApplicationConnection(Application $application, $connName)
+    public static function setApplicationConnection(Application $application, $connName)
     {
         $connection = $application->getKernel()->getContainer()->get('doctrine')->getConnection($connName);
         $helperSet = $application->getHelperSet();

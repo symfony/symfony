@@ -87,4 +87,3 @@ class CustomXmlFileLoader extends XmlFileLoader
         return true;
     }
 }
-

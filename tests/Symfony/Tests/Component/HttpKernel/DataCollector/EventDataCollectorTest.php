@@ -35,12 +35,12 @@ class EventDataCollectorTest extends \PHPUnit_Framework_TestCase
 
 class TestEventDispatcher extends EventDispatcher implements TraceableEventDispatcherInterface
 {
-    function getCalledListeners()
+    public function getCalledListeners()
     {
         return array('foo');
     }
 
-    function getNotCalledListeners()
+    public function getNotCalledListeners()
     {
         return array('bar');
     }

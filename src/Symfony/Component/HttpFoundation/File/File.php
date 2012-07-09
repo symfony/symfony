@@ -29,7 +29,7 @@ class File extends \SplFileInfo
      *
      * @var array
      */
-    static protected $defaultExtensions = array(
+    protected static $defaultExtensions = array(
         'application/andrew-inset' => 'ez',
         'application/appledouble' => 'base64',
         'application/applefile' => 'base64',

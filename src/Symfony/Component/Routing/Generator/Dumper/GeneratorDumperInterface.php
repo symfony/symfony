@@ -34,12 +34,12 @@ interface GeneratorDumperInterface
      *
      * @return string A PHP class representing the generator class
      */
-    function dump(array $options = array());
+    public function dump(array $options = array());
 
     /**
      * Gets the routes to dump.
      *
      * @return RouteCollection A RouteCollection instance
      */
-    function getRoutes();
+    public function getRoutes();
 }

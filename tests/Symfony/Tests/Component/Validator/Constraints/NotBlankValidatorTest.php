@@ -78,4 +78,3 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->validator->getMessageParameters(), array());
     }
 }
-

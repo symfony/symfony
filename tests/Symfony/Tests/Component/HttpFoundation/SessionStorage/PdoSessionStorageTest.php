@@ -57,4 +57,3 @@ class PdoSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, count($this->pdo->query('SELECT * FROM sessions')->fetchAll()));
     }
 }
-

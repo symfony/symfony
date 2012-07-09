@@ -26,7 +26,7 @@ class ContentTypeMimeTypeGuesser implements MimeTypeGuesserInterface
      *
      * @return Boolean
      */
-    static public function isSupported()
+    public static function isSupported()
     {
         return function_exists('mime_content_type');
     }

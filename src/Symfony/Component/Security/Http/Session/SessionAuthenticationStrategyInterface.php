@@ -35,5 +35,5 @@ interface SessionAuthenticationStrategyInterface
      *
      * @return void
      */
-    function onAuthentication(Request $request, TokenInterface $token);
+    public function onAuthentication(Request $request, TokenInterface $token);
 }

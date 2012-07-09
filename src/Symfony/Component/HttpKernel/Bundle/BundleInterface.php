@@ -27,14 +27,14 @@ interface BundleInterface
      *
      * @api
      */
-    function boot();
+    public function boot();
 
     /**
      * Shutdowns the Bundle.
      *
      * @api
      */
-    function shutdown();
+    public function shutdown();
 
     /**
      * Builds the bundle.
@@ -45,7 +45,7 @@ interface BundleInterface
      *
      * @api
      */
-    function build(ContainerBuilder $container);
+    public function build(ContainerBuilder $container);
 
     /**
      * Returns the container extension that should be implicitly loaded.
@@ -54,7 +54,7 @@ interface BundleInterface
      *
      * @api
      */
-    function getContainerExtension();
+    public function getContainerExtension();
 
     /**
      * Returns the bundle parent name.
@@ -63,7 +63,7 @@ interface BundleInterface
      *
      * @api
      */
-    function getParent();
+    public function getParent();
 
     /**
      * Returns the bundle name (the class short name).
@@ -72,7 +72,7 @@ interface BundleInterface
      *
      * @api
      */
-    function getName();
+    public function getName();
 
     /**
      * Gets the Bundle namespace.
@@ -81,7 +81,7 @@ interface BundleInterface
      *
      * @api
      */
-    function getNamespace();
+    public function getNamespace();
 
     /**
      * Gets the Bundle directory path.
@@ -92,5 +92,5 @@ interface BundleInterface
      *
      * @api
      */
-    function getPath();
+    public function getPath();
 }

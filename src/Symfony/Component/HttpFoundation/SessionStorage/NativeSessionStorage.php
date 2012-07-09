@@ -20,8 +20,8 @@ namespace Symfony\Component\HttpFoundation\SessionStorage;
  */
 class NativeSessionStorage implements SessionStorageInterface
 {
-    static protected $sessionIdRegenerated = false;
-    static protected $sessionStarted       = false;
+    protected static $sessionIdRegenerated = false;
+    protected static $sessionStarted       = false;
 
     protected $options;
 

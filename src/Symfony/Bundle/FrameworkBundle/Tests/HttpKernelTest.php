@@ -48,7 +48,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
         $kernel = new HttpKernel($dispatcher, $container, $resolver);
 
-        $controller = function() use($expected) {
+        $controller = function() use ($expected) {
             return $expected;
         };
 

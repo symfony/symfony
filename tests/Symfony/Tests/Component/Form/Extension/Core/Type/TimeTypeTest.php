@@ -13,7 +13,6 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 require_once __DIR__ . '/LocalizedTestCase.php';
 
-
 class TimeTypeTest extends LocalizedTestCase
 {
     public function testSubmit_dateTime()
@@ -200,9 +199,9 @@ class TimeTypeTest extends LocalizedTestCase
         $outputTime->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
         $displayedData = array(
-            'hour' => (int)$outputTime->format('H'),
-            'minute' => (int)$outputTime->format('i'),
-            'second' => (int)$outputTime->format('s')
+            'hour' => (int) $outputTime->format('H'),
+            'minute' => (int) $outputTime->format('i'),
+            'second' => (int) $outputTime->format('s')
         );
 
         $this->assertEquals($displayedData, $form->getClientData());
@@ -226,9 +225,9 @@ class TimeTypeTest extends LocalizedTestCase
         $outputTime->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
         $displayedData = array(
-            'hour' => (int)$outputTime->format('H'),
-            'minute' => (int)$outputTime->format('i'),
-            'second' => (int)$outputTime->format('s')
+            'hour' => (int) $outputTime->format('H'),
+            'minute' => (int) $outputTime->format('i'),
+            'second' => (int) $outputTime->format('s')
         );
 
         $this->assertDateTimeEquals($dateTime, $form->getData());

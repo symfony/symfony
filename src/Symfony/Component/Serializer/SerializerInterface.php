@@ -27,7 +27,7 @@ interface SerializerInterface
      * @param string $format format name
      * @return string
      */
-    function serialize($data, $format);
+    public function serialize($data, $format);
 
     /**
      * Deserializes data into the given type.
@@ -36,7 +36,7 @@ interface SerializerInterface
      * @param string $type
      * @param string $format
      */
-    function deserialize($data, $type, $format);
+    public function deserialize($data, $type, $format);
 
     /**
      * Normalizes any data into a set of arrays/scalars
@@ -45,7 +45,7 @@ interface SerializerInterface
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
      * @return array|scalar
      */
-    function normalize($data, $format = null);
+    public function normalize($data, $format = null);
 
     /**
      * Denormalizes data into the given type.
@@ -55,7 +55,7 @@ interface SerializerInterface
      * @param string $format
      * @return mixed
      */
-    function denormalize($data, $type, $format = null);
+    public function denormalize($data, $type, $format = null);
 
     /**
      * Encodes data into the given format
@@ -64,7 +64,7 @@ interface SerializerInterface
      * @param string $format format name
      * @return array|scalar
      */
-    function encode($data, $format);
+    public function encode($data, $format);
 
     /**
      * Decodes a string from the given format back into PHP data
@@ -73,7 +73,7 @@ interface SerializerInterface
      * @param string $format format name
      * @return mixed
      */
-    function decode($data, $format);
+    public function decode($data, $format);
 
     /**
      * Checks whether the serializer can serialize to given format
@@ -81,7 +81,7 @@ interface SerializerInterface
      * @param string $format format name
      * @return Boolean
      */
-    function supportsSerialization($format);
+    public function supportsSerialization($format);
 
     /**
      * Checks whether the serializer can deserialize from given format
@@ -89,7 +89,7 @@ interface SerializerInterface
      * @param string $format format name
      * @return Boolean
      */
-    function supportsDeserialization($format);
+    public function supportsDeserialization($format);
 
     /**
      * Checks whether the serializer can encode to given format
@@ -97,7 +97,7 @@ interface SerializerInterface
      * @param string $format format name
      * @return Boolean
      */
-    function supportsEncoding($format);
+    public function supportsEncoding($format);
 
     /**
      * Checks whether the serializer can decode from given format
@@ -105,12 +105,12 @@ interface SerializerInterface
      * @param string $format format name
      * @return Boolean
      */
-    function supportsDecoding($format);
+    public function supportsDecoding($format);
 
     /**
      * Get the encoder for the given format
      *
      * @return EncoderInterface
      */
-    function getEncoder($format);
+    public function getEncoder($format);
 }

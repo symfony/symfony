@@ -35,5 +35,5 @@ interface AuthenticationFailureHandlerInterface
      *
      * @return Response the response to return
      */
-    function onAuthenticationFailure(Request $request, AuthenticationException $exception);
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception);
 }

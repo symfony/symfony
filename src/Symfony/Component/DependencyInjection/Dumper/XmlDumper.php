@@ -294,7 +294,7 @@ class XmlDumper extends Dumper
      *
      * @throws \RuntimeException When trying to dump object or resource
      */
-    static public function phpToXml($value)
+    public static function phpToXml($value)
     {
         switch (true) {
             case null === $value:

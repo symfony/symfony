@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
-
 class CountryTypeTest extends LocalizedTestCase
 {
     public function testCountriesAreSelectable()

@@ -150,7 +150,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @throws ForbiddenOverwriteException
      */
-    public final function merge($leftSide, $rightSide)
+    final public function merge($leftSide, $rightSide)
     {
         if (!$this->allowOverwrite) {
             throw new ForbiddenOverwriteException(sprintf(
@@ -174,7 +174,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return mixed The normalized value.
      */
-    public final function normalize($value)
+    final public function normalize($value)
     {
         // run custom normalization closures
         foreach ($this->normalizationClosures as $closure) {
@@ -202,7 +202,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return mixed The finalized value
      */
-    public final function finalize($value)
+    final public function finalize($value)
     {
         $this->validateType($value);
 

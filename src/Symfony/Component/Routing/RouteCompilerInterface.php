@@ -25,5 +25,5 @@ interface RouteCompilerInterface
      *
      * @return CompiledRoute A CompiledRoute instance
      */
-    function compile(Route $route);
+    public function compile(Route $route);
 }

@@ -41,4 +41,3 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
     }
 }
-

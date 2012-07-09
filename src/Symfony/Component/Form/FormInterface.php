@@ -23,28 +23,28 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @param FormInterface $parent The parent form
      */
-    function setParent(FormInterface $parent = null);
+    public function setParent(FormInterface $parent = null);
 
     /**
      * Returns the parent form.
      *
      * @return FormInterface The parent form
      */
-    function getParent();
+    public function getParent();
 
     /**
      * Returns whether the form has a parent.
      *
      * @return Boolean
      */
-    function hasParent();
+    public function hasParent();
 
     /**
      * Adds a child to the form.
      *
      * @param FormInterface $child The FormInterface to add as a child
      */
-    function add(FormInterface $child);
+    public function add(FormInterface $child);
 
     /**
      * Returns whether a child with the given name exists.
@@ -53,35 +53,35 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return Boolean
      */
-    function has($name);
+    public function has($name);
 
     /**
      * Removes a child from the form.
      *
      * @param string $name The name of the child to remove
      */
-    function remove($name);
+    public function remove($name);
 
     /**
      * Returns all children in this group.
      *
      * @return array An array of FormInterface instances
      */
-    function getChildren();
+    public function getChildren();
 
     /**
      * Return whether the form has children.
      *
      * @return Boolean
      */
-    function hasChildren();
+    public function hasChildren();
 
     /**
      * Returns all errors.
      *
      * @return array An array of FormError instances that occurred during binding
      */
-    function getErrors();
+    public function getErrors();
 
     /**
      * Updates the field with default data.
@@ -90,14 +90,14 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return Form The current form
      */
-    function setData($appData);
+    public function setData($appData);
 
     /**
      * Returns the data in the format needed for the underlying object.
      *
      * @return mixed
      */
-    function getData();
+    public function getData();
 
     /**
      * Returns the normalized data of the field.
@@ -106,56 +106,56 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *                When the field is bound, the normalized bound data is
      *                returned if the field is valid, null otherwise.
      */
-    function getNormData();
+    public function getNormData();
 
     /**
      * Returns the data transformed by the value transformer.
      *
      * @return string
      */
-    function getClientData();
+    public function getClientData();
 
     /**
      * Returns the extra data.
      *
      * @return array The bound data which do not belong to a child
      */
-    function getExtraData();
+    public function getExtraData();
 
     /**
      * Returns whether the field is bound.
      *
      * @return Boolean true if the form is bound to input values, false otherwise
      */
-    function isBound();
+    public function isBound();
 
     /**
      * Returns the supported types.
      *
      * @return array An array of FormTypeInterface
      */
-    function getTypes();
+    public function getTypes();
 
     /**
      * Returns the name by which the form is identified in forms.
      *
      * @return string  The name of the form.
      */
-    function getName();
+    public function getName();
 
     /**
      * Adds an error to this form.
      *
      * @param FormError $error
      */
-    function addError(FormError $error);
+    public function addError(FormError $error);
 
     /**
      * Returns whether the form is valid.
      *
      * @return Boolean
      */
-    function isValid();
+    public function isValid();
 
     /**
      * Returns whether the form is required to be filled out.
@@ -166,7 +166,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return Boolean
      */
-    function isRequired();
+    public function isRequired();
 
     /**
      * Returns whether this form can be read only.
@@ -179,56 +179,56 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return Boolean
      */
-    function isReadOnly();
+    public function isReadOnly();
 
     /**
      * Returns whether the form is empty.
      *
      * @return Boolean
      */
-    function isEmpty();
+    public function isEmpty();
 
     /**
      * Returns whether the data in the different formats is synchronized.
      *
      * @return Boolean
      */
-    function isSynchronized();
+    public function isSynchronized();
 
     /**
      * Writes data into the form.
      *
      * @param mixed $data The data
      */
-    function bind($data);
+    public function bind($data);
 
     /**
      * Returns whether the form has an attribute with the given name.
      *
      * @param string $name The name of the attribute
      */
-    function hasAttribute($name);
+    public function hasAttribute($name);
 
     /**
      * Returns the value of the attributes with the given name.
      *
      * @param string $name The name of the attribute
      */
-    function getAttribute($name);
+    public function getAttribute($name);
 
     /**
      * Returns the root of the form tree.
      *
      * @return FormInterface  The root of the tree
      */
-    function getRoot();
+    public function getRoot();
 
     /**
      * Returns whether the field is the root of the form tree.
      *
      * @return Boolean
      */
-    function isRoot();
+    public function isRoot();
 
     /**
      * Creates a view.
@@ -237,5 +237,5 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormView The view
      */
-    function createView(FormView $parent = null);
+    public function createView(FormView $parent = null);
 }

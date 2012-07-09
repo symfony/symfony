@@ -27,5 +27,5 @@ interface EncoderFactoryInterface
      *
      * @return PasswordEncoderInterface never null
      */
-    function getEncoder(UserInterface $user);
+    public function getEncoder(UserInterface $user);
 }

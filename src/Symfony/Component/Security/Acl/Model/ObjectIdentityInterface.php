@@ -30,7 +30,7 @@ interface ObjectIdentityInterface
      * @param ObjectIdentityInterface $identity
      * @return Boolean
      */
-    function equals(ObjectIdentityInterface $identity);
+    public function equals(ObjectIdentityInterface $identity);
 
     /**
      * Obtains a unique identifier for this object. The identifier must not be
@@ -38,12 +38,12 @@ interface ObjectIdentityInterface
      *
      * @return string cannot return null
      */
-    function getIdentifier();
+    public function getIdentifier();
 
     /**
      * Returns a type for the domain object. Typically, this is the PHP class name.
      *
      * @return string cannot return null
      */
-    function getType();
+    public function getType();
 }

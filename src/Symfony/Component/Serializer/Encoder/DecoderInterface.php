@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
-
 /*
  * This file is part of the Symfony framework.
  *
@@ -27,5 +26,5 @@ interface DecoderInterface
      *
      * @return mixed
      */
-    function decode($data, $format);
+    public function decode($data, $format);
 }

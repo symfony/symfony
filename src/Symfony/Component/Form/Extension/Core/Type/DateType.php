@@ -69,12 +69,6 @@ class DateType extends AbstractType
             $yearOptions = $monthOptions = $dayOptions = array();
 
             if ('choice' === $options['widget']) {
-                if (is_array($options['empty_value'])) {
-                    $options['empty_value'] = array_merge(array('year' => null, 'month' => null, 'day' => null), $options['empty_value']);
-                } else {
-                    $options['empty_value'] = array('year' => $options['empty_value'], 'month' => $options['empty_value'], 'day' => $options['empty_value']);
-                }
-
                 $years = $months = $days = array();
 
                 foreach ($options['years'] as $year) {
@@ -170,6 +164,21 @@ class DateType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
+        $emptyValueFilter = function (Options $options, $emptyValue) {
+            if (is_array($emptyValue)) {
+                return array_merge(
+                    array('year' => null, 'month' => null, 'day' => null),
+                    $emptyValue
+                );
+            }
+
+            return array(
+                'year' => $emptyValue,
+                'month' => $emptyValue,
+                'day' => $emptyValue
+            );
+        };
+
         $resolver->setDefaults(array(
             'years'          => range(date('Y') - 5, date('Y') + 5),
             'months'         => range(1, 12),
@@ -190,6 +199,10 @@ class DateType extends AbstractType
             // this option.
             'data_class'     => null,
             'compound'       => $compound,
+        ));
+
+        $resolver->setFilters(array(
+            'empty_value' => $emptyValueFilter,
         ));
 
         $resolver->setAllowedValues(array(

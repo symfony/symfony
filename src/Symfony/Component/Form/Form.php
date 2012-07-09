@@ -331,6 +331,11 @@ class Form implements \IteratorAggregate, FormInterface
             throw new AlreadyBoundException('You cannot change the data of a bound form');
         }
 
+        // Don't allow modifications of the configured data if the data is locked
+        if ($this->config->getDataLocked() && $modelData !== $this->config->getData()) {
+            return $this;
+        }
+
         if (is_object($modelData) && !$this->config->getByReference()) {
             $modelData = clone $modelData;
         }

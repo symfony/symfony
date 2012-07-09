@@ -73,6 +73,7 @@ class DateValidatorTest extends \PHPUnit_Framework_TestCase
     public function testInvalidDates($date)
     {
         $this->assertFalse($this->validator->isValid($date, new Date()));
+        $this->assertEquals('This value is not a valid date', $this->validator->getMessageTemplate());
     }
 
     public function getInvalidDates()

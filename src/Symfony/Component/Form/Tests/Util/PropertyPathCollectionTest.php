@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Util;
 
 use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\Form\Util\FormUtil;
 
 class PropertyPathCollectionTest_Car
 {
@@ -69,6 +70,11 @@ class PropertyPathCollectionTest_CarOnlyRemover
 {
     public function removeAxis($axis) {}
 
+    public function getAxes() {}
+}
+
+class PropertyPathCollectionTest_CarNoAdderAndRemover
+{
     public function getAxes() {}
 }
 
@@ -194,5 +200,48 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($axesBefore));
 
         $path->setValue($car, $axesAfter);
+    }
+
+    /**
+     * @dataProvider noAdderRemoverData
+     */
+    public function testNoAdderAndRemoverThrowsSensibleError($path, $message)
+    {
+        $car = $this->getMock(__CLASS__ . '_CarNoAdderAndRemover');
+        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
+        $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
+
+        try {
+            $path->setValue($car, $axesAfter);
+            $this->fail('An expected exception was not thrown!');
+        } catch (\Symfony\Component\Form\Exception\InvalidPropertyException $e) {
+            $this->assertEquals(str_replace("{class}", get_class($car), $message), $e->getMessage());
+        }
+    }
+
+    public function noAdderRemoverData()
+    {
+        $data = array();
+
+        $propertyPath = new PropertyPath('axes');
+        $expectedMessage = sprintf(
+            'Neither element "axes" nor method "setAxes()" exists in class '
+                .'"{class}", nor could adders and removers be found based on the '
+                .'guessed singulars: %s (provide a singular by suffixing the '
+                .'property path with "|{singular}" to override the guesser)',
+            implode(', ', (array) $singulars = FormUtil::singularify('Axes'))
+        );
+        $data[] = array($propertyPath, $expectedMessage);
+
+        $propertyPath = new PropertyPath('axes|boo');
+        $expectedMessage = sprintf(
+            'Neither element "axes" nor method "setAxes()" exists in class '
+                .'"{class}", nor could adders and removers be found based on the '
+                .'passed singular: %s',
+            'boo'
+        );
+        $data[] = array($propertyPath, $expectedMessage);
+
+        return $data;
     }
 }

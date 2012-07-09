@@ -104,6 +104,9 @@ class MaxLengthValidatorTest extends \PHPUnit_Framework_TestCase
             ), null, 5);
 
         $this->validator->validate($value, $constraint);
+
+        Fixtures\TestViolationInteroperability::newInstance()
+            ->testViolation($constraint, new MaxLengthValidator(), $value);
     }
 
     public function getInvalidValues()

@@ -145,3 +145,4 @@ CHANGELOG
  * DateType, TimeType and DateTimeType now show empty values again if not required
  * [BC BREAK] fixed rendering of errors for DateType, BirthdayType and similar ones
  * [BC BREAK] fixed: form constraints are only validated if they belong to the validated group
+ * fixed: the "data" option supersedes default values from the model

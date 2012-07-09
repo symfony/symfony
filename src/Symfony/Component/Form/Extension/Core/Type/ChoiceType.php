@@ -81,8 +81,14 @@ class ChoiceType extends AbstractType
             'preferred_choices' => $options['choice_list']->getPreferredViews(),
             'choices'           => $options['choice_list']->getRemainingViews(),
             'separator'         => '-------------------',
-            'empty_value'       => $options['empty_value'],
+            'empty_value'       => null,
         ));
+
+        // Check if the choices already contain the empty value
+        // Only add the empty value option if this is not the case
+        if (0 === count($options['choice_list']->getIndicesForValues(array('')))) {
+            $view->setVar('empty_value', $options['empty_value']);
+        }
 
         if ($options['multiple'] && !$options['expanded']) {
             // Add "[]" to the name in case a select tag with multiple options is

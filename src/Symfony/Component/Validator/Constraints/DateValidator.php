@@ -48,12 +48,12 @@ class DateValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (!preg_match(static::PATTERN, $value, $matches)) {
+        if (!preg_match(static::PATTERN, $value, $matches) || !checkdate($matches[2], $matches[3], $matches[1])) {
             $this->setMessage($constraint->message, array('{{ value }}' => $value));
 
             return false;
         }
 
-        return checkdate($matches[2], $matches[3], $matches[1]);
+        return true;
     }
 }

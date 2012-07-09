@@ -124,6 +124,9 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('strict_variables')->end()
                 ->scalarNode('auto_reload')->end()
                 ->scalarNode('optimizations')->end()
+                ->arrayNode('loader_paths')
+                    ->prototype('variable')->end()
+                ->end()
             ->end()
         ;
     }

@@ -159,6 +159,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
         $intlDateFormatter = new \IntlDateFormatter(\Locale::getDefault(), $dateFormat, $timeFormat, $timezone, $calendar, $pattern);
         $intlDateFormatter->setLenient(false);
+
         return $intlDateFormatter;
     }
 }

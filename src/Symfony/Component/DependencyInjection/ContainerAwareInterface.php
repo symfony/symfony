@@ -27,5 +27,5 @@ interface ContainerAwareInterface
      *
      * @api
      */
-    function setContainer(ContainerInterface $container = null);
+    public function setContainer(ContainerInterface $container = null);
 }

@@ -21,7 +21,7 @@ class DebugUniversalClassLoader extends UniversalClassLoader
     /**
      * Replaces all regular UniversalClassLoader instances by a DebugUniversalClassLoader ones.
      */
-    static public function enable()
+    public static function enable()
     {
         if (!is_array($functions = spl_autoload_functions())) {
             return;

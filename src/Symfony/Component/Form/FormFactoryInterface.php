@@ -26,7 +26,7 @@ interface FormFactoryInterface
      *
      * @throws FormException if any given option is not applicable to the given type
      */
-    function create($type, $data = null, array $options = array());
+    public function create($type, $data = null, array $options = array());
 
     /**
      * Returns a form.
@@ -40,7 +40,7 @@ interface FormFactoryInterface
      *
      * @throws FormException if any given option is not applicable to the given type
      */
-    function createNamed($type, $name, $data = null, array $options = array());
+    public function createNamed($type, $name, $data = null, array $options = array());
 
     /**
      * Returns a form for a property of a class.
@@ -54,7 +54,7 @@ interface FormFactoryInterface
      *
      * @throws FormException if any given option is not applicable to the form type
      */
-    function createForProperty($class, $property, $data = null, array $options = array());
+    public function createForProperty($class, $property, $data = null, array $options = array());
 
     /**
      * Returns a form builder
@@ -67,7 +67,7 @@ interface FormFactoryInterface
      *
      * @throws FormException if any given option is not applicable to the given type
      */
-    function createBuilder($type, $data = null, array $options = array());
+    public function createBuilder($type, $data = null, array $options = array());
 
     /**
      * Returns a form builder.
@@ -81,7 +81,7 @@ interface FormFactoryInterface
      *
      * @throws FormException if any given option is not applicable to the given type
      */
-    function createNamedBuilder($type, $name, $data = null, array $options = array());
+    public function createNamedBuilder($type, $name, $data = null, array $options = array());
 
     /**
      * Returns a form builder for a property of a class.
@@ -98,11 +98,11 @@ interface FormFactoryInterface
      *
      * @throws FormException if any given option is not applicable to the form type
      */
-    function createBuilderForProperty($class, $property, $data = null, array $options = array());
+    public function createBuilderForProperty($class, $property, $data = null, array $options = array());
 
-    function getType($name);
+    public function getType($name);
 
-    function hasType($name);
+    public function hasType($name);
 
-    function addType(FormTypeInterface $type);
+    public function addType(FormTypeInterface $type);
 }

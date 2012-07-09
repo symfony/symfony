@@ -16,9 +16,9 @@ use Symfony\Component\DependencyInjection\Dumper\GraphvizDumper;
 
 class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 {
-    static protected $fixturesPath;
+    protected static $fixturesPath;
 
-    static public function setUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         self::$fixturesPath = __DIR__.'/../Fixtures/';
     }

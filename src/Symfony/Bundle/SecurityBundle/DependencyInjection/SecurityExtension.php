@@ -600,7 +600,6 @@ class SecurityExtension extends Extension
         return $this->factories = $factories;
     }
 
-
     /**
      * Returns the base path for the XSD files.
      *
@@ -616,4 +615,3 @@ class SecurityExtension extends Extension
         return 'http://symfony.com/schema/dic/security';
     }
 }
-

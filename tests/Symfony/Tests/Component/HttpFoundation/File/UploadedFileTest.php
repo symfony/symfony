@@ -208,7 +208,6 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($file->isValid());
     }
 
-
     public function uploadedFileErrorProvider()
     {
         return array(

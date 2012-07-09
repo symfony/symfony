@@ -196,7 +196,7 @@ class Controller
         return new Response('foo');
     }
 
-    static public function staticController()
+    public static function staticController()
     {
         return new Response('foo');
     }

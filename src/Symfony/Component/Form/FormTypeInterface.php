@@ -25,7 +25,7 @@ interface FormTypeInterface
      * @param FormBuilder $builder The form builder
      * @param array       $options The options
      */
-    function buildForm(FormBuilder $builder, array $options);
+    public function buildForm(FormBuilder $builder, array $options);
 
     /**
      * Builds the form view.
@@ -39,7 +39,7 @@ interface FormTypeInterface
      * @param FormView      $view The view
      * @param FormInterface $form The form
      */
-    function buildView(FormView $view, FormInterface $form);
+    public function buildView(FormView $view, FormInterface $form);
 
     /**
      * Builds the form view.
@@ -56,7 +56,7 @@ interface FormTypeInterface
      * @param FormView      $view The view
      * @param FormInterface $form The form
      */
-    function buildViewBottomUp(FormView $view, FormInterface $form);
+    public function buildViewBottomUp(FormView $view, FormInterface $form);
 
     /**
      * Returns a builder for the current type.
@@ -70,7 +70,7 @@ interface FormTypeInterface
      *
      * @return FormBuilder|null A form builder or null when the type does not have a builder
      */
-    function createBuilder($name, FormFactoryInterface $factory, array $options);
+    public function createBuilder($name, FormFactoryInterface $factory, array $options);
 
     /**
      * Returns the default options for this type.
@@ -79,7 +79,7 @@ interface FormTypeInterface
      *
      * @return array The default options
      */
-    function getDefaultOptions(array $options);
+    public function getDefaultOptions(array $options);
 
     /**
      * Returns the allowed option values for each option (if any).
@@ -88,7 +88,7 @@ interface FormTypeInterface
      *
      * @return array The allowed option values
      */
-    function getAllowedOptionValues(array $options);
+    public function getAllowedOptionValues(array $options);
 
     /**
      * Returns the name of the parent type.
@@ -97,14 +97,14 @@ interface FormTypeInterface
      *
      * @return string|null The name of the parent type if any otherwise null
      */
-    function getParent(array $options);
+    public function getParent(array $options);
 
     /**
      * Returns the name of this type.
      *
      * @return string The name of this type
      */
-    function getName();
+    public function getName();
 
     /**
      * Adds extensions for this type.
@@ -113,12 +113,12 @@ interface FormTypeInterface
      *
      * @throws UnexpectedTypeException if any extension does not implement FormTypeExtensionInterface
      */
-    function setExtensions(array $extensions);
+    public function setExtensions(array $extensions);
 
     /**
      * Returns the extensions associated with this type.
      *
      * @return array An array of FormTypeExtensionInterface
      */
-    function getExtensions();
+    public function getExtensions();
 }

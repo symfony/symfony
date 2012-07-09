@@ -25,7 +25,7 @@ interface SessionStorageInterface
      *
      * @api
      */
-    function start();
+    public function start();
 
     /**
      * Returns the session ID
@@ -36,7 +36,7 @@ interface SessionStorageInterface
      *
      * @api
      */
-    function getId();
+    public function getId();
 
     /**
      * Reads data from this storage.
@@ -51,7 +51,7 @@ interface SessionStorageInterface
      *
      * @api
      */
-    function read($key);
+    public function read($key);
 
     /**
      * Removes data from this storage.
@@ -66,7 +66,7 @@ interface SessionStorageInterface
      *
      * @api
      */
-    function remove($key);
+    public function remove($key);
 
     /**
      * Writes data to this storage.
@@ -80,7 +80,7 @@ interface SessionStorageInterface
      *
      * @api
      */
-    function write($key, $data);
+    public function write($key, $data);
 
     /**
      * Regenerates id that represents this storage.
@@ -93,5 +93,5 @@ interface SessionStorageInterface
      *
      * @api
      */
-    function regenerate($destroy = false);
+    public function regenerate($destroy = false);
 }

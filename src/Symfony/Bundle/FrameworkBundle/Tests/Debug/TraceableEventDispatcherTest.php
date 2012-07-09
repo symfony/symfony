@@ -42,9 +42,9 @@ class TraceableEventDispatcherTest extends TestCase
 
 class StaticClassFixture
 {
-    static public $called = false;
+    public static $called = false;
 
-    static public function staticListener($event)
+    public static function staticListener($event)
     {
         self::$called = true;
     }

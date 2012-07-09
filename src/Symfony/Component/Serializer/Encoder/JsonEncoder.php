@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
-
 /*
  * This file is part of the Symfony framework.
  *

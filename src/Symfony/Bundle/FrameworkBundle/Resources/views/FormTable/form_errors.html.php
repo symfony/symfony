@@ -4,4 +4,4 @@
         <?php echo $view['form']->renderBlock('field_errors'); ?>
     </td>
 </tr>
-<?php endif; ?>
+<?php endif;

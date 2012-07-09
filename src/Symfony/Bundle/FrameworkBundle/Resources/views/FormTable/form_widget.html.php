@@ -2,4 +2,3 @@
     <?php echo $view['form']->renderBlock('field_rows') ?>
     <?php echo $view['form']->rest($form) ?>
 </table>
-

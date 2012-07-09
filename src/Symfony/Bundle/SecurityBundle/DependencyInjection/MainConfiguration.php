@@ -268,7 +268,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->ifTrue(function($v) {
                     return true === $v['security'] && isset($v['pattern']) && !isset($v['request_matcher']);
                 })
-                ->then(function($firewall) use($abstractFactoryKeys) {
+                ->then(function($firewall) use ($abstractFactoryKeys) {
                     foreach ($abstractFactoryKeys as $k) {
                         if (!isset($firewall[$k]['check_path'])) {
                             continue;

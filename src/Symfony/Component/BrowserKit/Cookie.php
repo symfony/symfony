@@ -117,7 +117,7 @@ class Cookie
      *
      * @api
      */
-    static public function fromString($cookie, $url = null)
+    public static function fromString($cookie, $url = null)
     {
         $parts = explode(';', $cookie);
 

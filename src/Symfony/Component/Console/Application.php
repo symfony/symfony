@@ -596,7 +596,7 @@ class Application
      *
      * @return array An array of abbreviations
      */
-    static public function getAbbreviations($names)
+    public static function getAbbreviations($names)
     {
         $abbrevs = array();
         foreach ($names as $name) {

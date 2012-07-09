@@ -23,7 +23,7 @@ interface InputInterface
      *
      * @return string The value of the first argument or null otherwise
      */
-    function getFirstArgument();
+    public function getFirstArgument();
 
     /**
      * Returns true if the raw parameters (not parsed) contain a value.
@@ -35,7 +35,7 @@ interface InputInterface
      *
      * @return Boolean true if the value is contained in the raw parameters
      */
-    function hasParameterOption($values);
+    public function hasParameterOption($values);
 
     /**
      * Returns the value of a raw option (not parsed).
@@ -48,14 +48,14 @@ interface InputInterface
      *
      * @return mixed The option value
      */
-    function getParameterOption($values, $default = false);
+    public function getParameterOption($values, $default = false);
 
     /**
      * Binds the current Input instance with the given arguments and options.
      *
      * @param InputDefinition $definition A InputDefinition instance
      */
-    function bind(InputDefinition $definition);
+    public function bind(InputDefinition $definition);
 
     /**
      * Validates if arguments given are correct.
@@ -64,14 +64,14 @@ interface InputInterface
      *
      * @throws \RuntimeException
      */
-    function validate();
+    public function validate();
 
     /**
      * Returns all the given arguments merged with the default values.
      *
      * @return array
      */
-    function getArguments();
+    public function getArguments();
 
     /**
      * Gets argument by name.
@@ -80,14 +80,14 @@ interface InputInterface
      *
      * @return mixed
      */
-    function getArgument($name);
+    public function getArgument($name);
 
     /**
      * Returns all the given options merged with the default values.
      *
      * @return array
      */
-    function getOptions();
+    public function getOptions();
 
     /**
      * Gets an option by name.
@@ -96,12 +96,12 @@ interface InputInterface
      *
      * @return mixed
      */
-    function getOption($name);
+    public function getOption($name);
 
     /**
      * Is this input means interactive?
      *
      * @return Boolean
      */
-    function isInteractive();
+    public function isInteractive();
 }

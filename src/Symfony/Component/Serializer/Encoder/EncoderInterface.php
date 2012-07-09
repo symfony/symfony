@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
-
 /*
  * This file is part of the Symfony framework.
  *
@@ -27,5 +26,5 @@ interface EncoderInterface
      *
      * @return string
      */
-    function encode($data, $format);
+    public function encode($data, $format);
 }

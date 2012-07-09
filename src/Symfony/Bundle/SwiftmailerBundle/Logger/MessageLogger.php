@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\SwiftmailerBundle\Logger;
 
-
 /**
  * MessageLogger.
  *

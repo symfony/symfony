@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
-
 /**
  * SqliteProfilerStorage stores profiling information in a SQLite database.
  *

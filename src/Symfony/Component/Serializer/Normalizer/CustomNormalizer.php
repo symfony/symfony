@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-
 /*
  * This file is part of the Symfony framework.
  *

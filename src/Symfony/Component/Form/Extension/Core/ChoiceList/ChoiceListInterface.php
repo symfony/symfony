@@ -18,5 +18,5 @@ interface ChoiceListInterface
      *
      * @return array
      */
-    function getChoices();
+    public function getChoices();
 }

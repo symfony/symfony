@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class FileBag extends ParameterBag
 {
-    static private $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
+    private static $fileKeys = array('error', 'name', 'size', 'tmp_name', 'type');
 
     /**
      * Constructor.

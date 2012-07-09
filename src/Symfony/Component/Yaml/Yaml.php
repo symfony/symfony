@@ -42,7 +42,7 @@ class Yaml
      *
      * @api
      */
-    static public function parse($input)
+    public static function parse($input)
     {
         $file = '';
 
@@ -93,7 +93,7 @@ class Yaml
      *
      * @api
      */
-    static public function dump($array, $inline = 2)
+    public static function dump($array, $inline = 2)
     {
         $yaml = new Dumper();
 

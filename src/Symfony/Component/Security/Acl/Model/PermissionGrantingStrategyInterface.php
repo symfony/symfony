@@ -27,7 +27,7 @@ interface PermissionGrantingStrategyInterface
      * @param Boolean      $administrativeMode
      * @return Boolean
      */
-    function isGranted(AclInterface $acl, array $masks, array $sids, $administrativeMode = false);
+    public function isGranted(AclInterface $acl, array $masks, array $sids, $administrativeMode = false);
 
     /**
      * Determines whether access to a domain object's field is to be granted
@@ -40,5 +40,5 @@ interface PermissionGrantingStrategyInterface
      *
      * @return Boolean
      */
-    function isFieldGranted(AclInterface $acl, $field, array $masks, array $sids, $administrativeMode = false);
+    public function isFieldGranted(AclInterface $acl, $field, array $masks, array $sids, $administrativeMode = false);
 }

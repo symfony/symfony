@@ -108,7 +108,7 @@ class FilesystemLoader extends Loader
      *
      * @return true if the path exists and is absolute, false otherwise
      */
-    static protected function isAbsolutePath($file)
+    protected static function isAbsolutePath($file)
     {
         if ($file[0] == '/' || $file[0] == '\\'
             || (strlen($file) > 3 && ctype_alpha($file[0])

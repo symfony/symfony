@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-
 /**
  * Used to format logging messages during the compilation.
  *

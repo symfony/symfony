@@ -39,7 +39,7 @@ class Interval
      * @param integer $number   A number
      * @param string  $interval An interval
      */
-    static public function test($number, $interval)
+    public static function test($number, $interval)
     {
         $interval = trim($interval);
 
@@ -71,7 +71,7 @@ class Interval
      *
      * @return string A Regexp (without the delimiters)
      */
-    static public function getIntervalRegexp()
+    public static function getIntervalRegexp()
     {
         return <<<EOF
         ({\s*
@@ -90,7 +90,7 @@ class Interval
 EOF;
     }
 
-    static private function convertNumber($number)
+    private static function convertNumber($number)
     {
         if ('-Inf' === $number) {
             return log(0);

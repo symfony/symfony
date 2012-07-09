@@ -88,7 +88,7 @@ class DoctrineDataCollector extends DataCollector
     private function sanitizeQueries($queries)
     {
         foreach ($queries as $i => $query) {
-            foreach ((array)$query['params'] as $j => $param) {
+            foreach ((array) $query['params'] as $j => $param) {
                 $queries[$i]['params'][$j] = $this->varToString($param);
             }
         }

@@ -13,11 +13,11 @@ namespace Symfony\Component\Form;
 
 interface DataMapperInterface
 {
-    function mapDataToForms($data, array $forms);
+    public function mapDataToForms($data, array $forms);
 
-    function mapDataToForm($data, FormInterface $form);
+    public function mapDataToForm($data, FormInterface $form);
 
-    function mapFormsToData(array $forms, &$data);
+    public function mapFormsToData(array $forms, &$data);
 
-    function mapFormToData(FormInterface $form, &$data);
+    public function mapFormToData(FormInterface $form, &$data);
 }

@@ -23,7 +23,7 @@ use Symfony\Component\CssSelector\Exception\ParseException;
  */
 class CombinedSelectorNode implements NodeInterface
 {
-    static protected $methodMapping = array(
+    protected static $methodMapping = array(
         ' ' => 'descendant',
         '>' => 'child',
         '+' => 'direct_adjacent',

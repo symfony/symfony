@@ -31,5 +31,5 @@ interface RedirectableUrlMatcherInterface
      *
      * @api
      */
-    function redirect($path, $route, $scheme = null);
+    public function redirect($path, $route, $scheme = null);
 }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\HttpFoundation;
 
-
 use Symfony\Component\HttpFoundation\SessionStorage\ArraySessionStorage;
 
 use Symfony\Component\HttpFoundation\Session;

@@ -82,4 +82,3 @@ class LoaderChainTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($chain->loadClassMetadata($metadata));
     }
 }
-

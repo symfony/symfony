@@ -224,7 +224,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $parent = $this->getForm();
 
         for ($i = 0; $i < 2; $i++) {
-            $child = $this->getForm((string)$i, '['.$i.']');
+            $child = $this->getForm((string) $i, '['.$i.']');
             $child->add($this->getForm('firstName'));
             $parent->add($child);
         }
@@ -417,7 +417,7 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $parent->add($child);
 
         for ($i = 0; $i < 2; $i++) {
-            $collection = $this->getForm((string)$i, '['.$i.']');
+            $collection = $this->getForm((string) $i, '['.$i.']');
             $collection->add($this->getForm('street'));
 
             $child->add($collection);

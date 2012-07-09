@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-
 /**
  * Interface for finding all the templates.
  *
@@ -24,5 +23,5 @@ interface TemplateFinderInterface
      *
      * @return array An array of templates of type TemplateReferenceInterface
      */
-    function findAllTemplates();
+    public function findAllTemplates();
 }

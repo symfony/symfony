@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
-
 class RepeatedTypeTest extends TypeTestCase
 {
     protected $form;

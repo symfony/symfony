@@ -33,5 +33,5 @@ interface LogoutHandlerInterface
      *
      * @return void
      */
-    function logout(Request $request, Response $response, TokenInterface $token);
+    public function logout(Request $request, Response $response, TokenInterface $token);
 }

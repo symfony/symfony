@@ -99,7 +99,7 @@ class SimpleXMLElement extends \SimpleXMLElement
      *
      * @return mixed
      */
-    static public function phpize($value)
+    public static function phpize($value)
     {
         $value = (string) $value;
         $lowercaseValue = strtolower($value);

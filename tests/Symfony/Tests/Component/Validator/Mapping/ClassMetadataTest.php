@@ -190,4 +190,3 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $this->metadata->setGroupSequence(array('Foo', $this->metadata->getDefaultGroup(), Constraint::DEFAULT_GROUP));
     }
 }
-

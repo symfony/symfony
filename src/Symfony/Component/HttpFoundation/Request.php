@@ -20,7 +20,7 @@ namespace Symfony\Component\HttpFoundation;
  */
 class Request
 {
-    static protected $trustProxy = false;
+    protected static $trustProxy = false;
 
     /**
      * @var \Symfony\Component\HttpFoundation\ParameterBag
@@ -83,7 +83,7 @@ class Request
     protected $format;
     protected $session;
 
-    static protected $formats;
+    protected static $formats;
 
     /**
      * Constructor.
@@ -147,7 +147,7 @@ class Request
      *
      * @api
      */
-    static public function createFromGlobals()
+    public static function createFromGlobals()
     {
         $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
 
@@ -176,7 +176,7 @@ class Request
      *
      * @api
      */
-    static public function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
+    public static function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
     {
         $defaults = array(
             'SERVER_NAME'          => 'localhost',
@@ -362,7 +362,7 @@ class Request
      *
      * @api
      */
-    static public function trustProxyData()
+    public static function trustProxyData()
     {
         self::$trustProxy = true;
     }
@@ -1227,7 +1227,7 @@ class Request
     /**
      * Initializes HTTP request formats.
      */
-    static protected function initializeFormats()
+    protected static function initializeFormats()
     {
         static::$formats = array(
             'html' => array('text/html', 'application/xhtml+xml'),

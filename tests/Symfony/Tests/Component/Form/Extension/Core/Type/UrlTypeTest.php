@@ -13,7 +13,6 @@ namespace Symfony\Tests\Component\Form\Extension\Core\Type;
 
 require_once __DIR__ . '/LocalizedTestCase.php';
 
-
 class UrlTypeTest extends LocalizedTestCase
 {
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()

@@ -19,7 +19,6 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
-
 /**
  * An ACL implementation.
  *

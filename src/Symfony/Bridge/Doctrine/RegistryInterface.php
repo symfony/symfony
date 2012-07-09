@@ -26,7 +26,7 @@ interface RegistryInterface
      *
      * @return string The default connection name
      */
-    function getDefaultConnectionName();
+    public function getDefaultConnectionName();
 
     /**
      * Gets the named connection.
@@ -35,28 +35,28 @@ interface RegistryInterface
      *
      * @return Connection
      */
-    function getConnection($name = null);
+    public function getConnection($name = null);
 
     /**
      * Gets an array of all registered connections
      *
      * @return array An array of Connection instances
      */
-    function getConnections();
+    public function getConnections();
 
     /**
      * Gets all connection names.
      *
      * @return array An array of connection names
      */
-    function getConnectionNames();
+    public function getConnectionNames();
 
     /**
      * Gets the default entity manager name.
      *
      * @return string The default entity manager name
      */
-    function getDefaultEntityManagerName();
+    public function getDefaultEntityManagerName();
 
     /**
      * Gets a named entity manager.
@@ -65,14 +65,14 @@ interface RegistryInterface
      *
      * @return EntityManager
      */
-    function getEntityManager($name = null);
+    public function getEntityManager($name = null);
 
     /**
      * Gets an array of all registered entity managers
      *
      * @return array An array of EntityManager instances
      */
-    function getEntityManagers();
+    public function getEntityManagers();
 
     /**
      * Resets a named entity manager.
@@ -91,7 +91,7 @@ interface RegistryInterface
      *
      * @return EntityManager
      */
-    function resetEntityManager($name = null);
+    public function resetEntityManager($name = null);
 
     /**
      * Resolves a registered namespace alias to the full namespace.
@@ -104,14 +104,14 @@ interface RegistryInterface
      *
      * @see Configuration::getEntityNamespace
      */
-    function getEntityNamespace($alias);
+    public function getEntityNamespace($alias);
 
     /**
      * Gets all connection names.
      *
      * @return array An array of connection names
      */
-    function getEntityManagerNames();
+    public function getEntityManagerNames();
 
     /**
      * Gets the EntityRepository for an entity.
@@ -121,7 +121,7 @@ interface RegistryInterface
      *
      * @return Doctrine\ORM\EntityRepository
      */
-    function getRepository($entityName, $entityManagerName = null);
+    public function getRepository($entityName, $entityManagerName = null);
 
     /**
      * Gets the entity manager associated with a given class.
@@ -130,5 +130,5 @@ interface RegistryInterface
      *
      * @return EntityManager|null
      */
-    function getEntityManagerForClass($class);
+    public function getEntityManagerForClass($class);
 }

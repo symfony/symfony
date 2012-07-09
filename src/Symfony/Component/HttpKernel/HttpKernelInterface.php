@@ -43,5 +43,5 @@ interface HttpKernelInterface
      *
      * @api
      */
-    function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true);
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true);
 }

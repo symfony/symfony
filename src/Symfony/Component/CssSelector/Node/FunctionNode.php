@@ -24,7 +24,7 @@ use Symfony\Component\CssSelector\XPathExpr;
  */
 class FunctionNode implements NodeInterface
 {
-    static protected $unsupported = array('target', 'lang', 'enabled', 'disabled');
+    protected static $unsupported = array('target', 'lang', 'enabled', 'disabled');
 
     protected $selector;
     protected $type;

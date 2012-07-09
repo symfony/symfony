@@ -17,11 +17,11 @@ use Symfony\Component\Console\Input\InputOption;
 
 class InputDefinitionTest extends \PHPUnit_Framework_TestCase
 {
-    static protected $fixtures;
+    protected static $fixtures;
 
     protected $foo, $bar, $foo1, $foo2;
 
-    static public function setUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         self::$fixtures = __DIR__.'/../Fixtures/';
     }
@@ -96,7 +96,6 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\Exception', $e, '->addArgument() throws a Exception if there is an array parameter already registered');
             $this->assertEquals('Cannot add an argument after an array argument.', $e->getMessage());
         }
-
 
         // cannot add a required argument after an optional one
         $definition = new InputDefinition();

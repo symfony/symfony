@@ -69,7 +69,7 @@ abstract class Guess
      *
      * @return Guess  The guess with the highest confidence
      */
-    static public function getBestGuess(array $guesses)
+    public static function getBestGuess(array $guesses)
     {
         usort($guesses, function ($a, $b) {
             return $b->getConfidence() - $a->getConfidence();

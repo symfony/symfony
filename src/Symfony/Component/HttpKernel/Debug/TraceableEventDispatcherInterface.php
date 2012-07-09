@@ -21,12 +21,12 @@ interface TraceableEventDispatcherInterface
      *
      * @return array An array of called listeners
      */
-    function getCalledListeners();
+    public function getCalledListeners();
 
     /**
      * Gets the not called listeners.
      *
      * @return array An array of not called listeners
      */
-    function getNotCalledListeners();
+    public function getNotCalledListeners();
 }

@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Util;
 
 abstract class FormUtil
 {
-    static public function toArrayKey($value)
+    public static function toArrayKey($value)
     {
         if (is_bool($value) || (string) (int) $value === (string) $value) {
             return (int) $value;
@@ -22,7 +22,7 @@ abstract class FormUtil
         return (string) $value;
     }
 
-    static public function toArrayKeys(array $array)
+    public static function toArrayKeys(array $array)
     {
         return array_map(array(__CLASS__, 'toArrayKey'), $array);
     }
@@ -34,7 +34,7 @@ abstract class FormUtil
      *
      * @return Boolean Whether the choice is a group
      */
-    static public function isChoiceGroup($choice)
+    public static function isChoiceGroup($choice)
     {
         return is_array($choice) || $choice instanceof \Traversable;
     }
@@ -47,7 +47,7 @@ abstract class FormUtil
      *
      * @return Boolean Whether the choice is selected
      */
-    static public function isChoiceSelected($choice, $value)
+    public static function isChoiceSelected($choice, $value)
     {
         $choice = static::toArrayKey($choice);
 

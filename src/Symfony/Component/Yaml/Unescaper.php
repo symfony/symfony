@@ -48,7 +48,7 @@ class Unescaper
     public function unescapeDoubleQuotedString($value)
     {
         $self = $this;
-        $callback = function($match) use($self) {
+        $callback = function($match) use ($self) {
             return $self->unescapeCharacter($match[0]);
         };
 

@@ -35,5 +35,5 @@ interface AuthenticationSuccessHandlerInterface
      *
      * @return Response the response to return
      */
-    function onAuthenticationSuccess(Request $request, TokenInterface $token);
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token);
 }

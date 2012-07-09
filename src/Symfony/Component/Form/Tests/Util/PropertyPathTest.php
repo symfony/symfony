@@ -123,26 +123,6 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Bernhard', $path->getValue($object));
     }
 
-    public function testGetValueReadsArrayAccess()
-    {
-        $object = new \ArrayObject();
-        $object['firstName'] = 'Bernhard';
-
-        $path = new PropertyPath('[firstName]');
-
-        $this->assertEquals('Bernhard', $path->getValue($object));
-    }
-
-    /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
-     */
-    public function testGetValueThrowsExceptionIfArrayAccessExpected()
-    {
-        $path = new PropertyPath('[firstName]');
-
-        $path->getValue(new Author());
-    }
-
     /**
      * @expectedException Symfony\Component\Form\Exception\PropertyAccessDeniedException
      */
@@ -328,16 +308,6 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Bernhard', $object->child['index']->firstName);
     }
 
-    public function testSetValueUpdatesArrayAccess()
-    {
-        $object = new \ArrayObject();
-
-        $path = new PropertyPath('[firstName]');
-        $path->setValue($object, 'Bernhard');
-
-        $this->assertEquals('Bernhard', $object['firstName']);
-    }
-
     public function testSetValueUpdateMagicSet()
     {
         $object = new Magician();
@@ -346,16 +316,6 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $path->setValue($object, 'foobar');
 
         $this->assertEquals('foobar', $object->__get('magicProperty'));
-    }
-
-    /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
-     */
-    public function testSetValueThrowsExceptionIfArrayAccessExpected()
-    {
-        $path = new PropertyPath('[firstName]');
-
-        $path->setValue(new Author(), 'Bernhard');
     }
 
     public function testSetValueUpdatesSetters()

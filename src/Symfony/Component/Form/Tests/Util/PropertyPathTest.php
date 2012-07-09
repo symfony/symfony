@@ -580,4 +580,21 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
 
         $propertyPath->isIndex(-1);
     }
+
+    public function testGetCustomArrayCollection()
+    {
+        $collection = new \Symfony\Component\Form\Tests\Fixtures\CustomArrayObject(array('foo', array('bar')));
+        $path = new PropertyPath('[1][0]');
+        $bar = $path->getValue($collection);
+        $this->assertEquals('bar', $bar);
+    }
+
+    public function testSetCustomArrayCollection()
+    {
+        $collection = new \Symfony\Component\Form\Tests\Fixtures\CustomArrayObject(array('foo', array('bar')));
+        $path = new PropertyPath('[1][0]');
+        $path->setValue($collection, 'baz');
+        $this->assertEquals('baz', $collection[1][0]);
+    }
+
 }

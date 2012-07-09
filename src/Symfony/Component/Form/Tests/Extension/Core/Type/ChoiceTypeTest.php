@@ -613,6 +613,23 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertEquals($viewValue, $view->getVar('empty_value'));
     }
 
+    /**
+     * @dataProvider getOptionsWithEmptyValue
+     */
+    public function testDontPassEmptyValueIfContainedInChoices($multiple, $expanded, $required, $emptyValue, $viewValue)
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => $multiple,
+            'expanded' => $expanded,
+            'required' => $required,
+            'empty_value' => $emptyValue,
+            'choices' => array('a' => 'A', '' => 'Empty'),
+        ));
+        $view = $form->createView();
+
+        $this->assertNull($view->getVar('empty_value'));
+    }
+
     public function getOptionsWithEmptyValue()
     {
         return array(

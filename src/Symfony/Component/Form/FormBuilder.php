@@ -13,7 +13,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\CircularReferenceException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -43,8 +42,6 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
      * @var array
      */
     private $unresolvedChildren = array();
-
-    private $currentLoadingType;
 
     /**
      * The parent of this builder
@@ -96,10 +93,6 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
 
         if (null !== $type && !is_string($type) && !$type instanceof FormTypeInterface) {
             throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
-        }
-
-        if ($this->currentLoadingType && ($type instanceof FormTypeInterface ? $type->getName() : $type) == $this->currentLoadingType) {
-            throw new CircularReferenceException(is_string($type) ? $this->getFormFactory()->getType($type) : $type);
         }
 
         // Add to "children" to maintain order
@@ -209,11 +202,6 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
         }
 
         return $form;
-    }
-
-    public function setCurrentLoadingType($type)
-    {
-        $this->currentLoadingType = $type;
     }
 
     /**

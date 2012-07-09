@@ -64,9 +64,11 @@ class ObjectChoiceList extends ChoiceList
      *                       key pointing to the nested array.
      * @param string $labelPath A property path pointing to the property used
      *                          for the choice labels. The value is obtained
-     *                          by calling the getter on the object. If the
-     *                          path is NULL, the object's __toString() method
-     *                          is used instead.
+     *                          by calling the getter on the object. You can
+     *                          also pass any callable. When callable will be
+     *                          executed it will get the choice parameter passed.
+     *                          If the path is NULL, the object's __toString()
+     *                          method is used instead.
      * @param array $preferredChoices A flat array of choices that should be
      *                                presented to the user with priority.
      * @param string $groupPath A property path pointing to the property used
@@ -78,7 +80,14 @@ class ObjectChoiceList extends ChoiceList
      */
     public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null)
     {
-        $this->labelPath = $labelPath ? new PropertyPath($labelPath) : null;
+        if (is_scalar($labelPath)) {
+            $this->labelPath = new PropertyPath($labelPath);
+        } elseif (is_callable($labelPath)) {
+            $this->labelPath = $labelPath;
+        } else {
+            $this->labelPath = null;
+        }
+
         $this->groupPath = $groupPath ? new PropertyPath($groupPath) : null;
         $this->valuePath = $valuePath ? new PropertyPath($valuePath) : null;
 
@@ -163,8 +172,10 @@ class ObjectChoiceList extends ChoiceList
             if (is_array($choice) || $choice instanceof \Traversable) {
                 $labels[$i] = array();
                 $this->extractLabels($choice, $labels[$i]);
-            } elseif ($this->labelPath) {
+            } elseif ($this->labelPath instanceof PropertyPath) {
                 $labels[$i] = $this->labelPath->getValue($choice);
+            } elseif (is_callable($this->labelPath)) {
+                $labels[$i] = call_user_func($this->labelPath, $choice);
             } elseif (method_exists($choice, '__toString')) {
                 $labels[$i] = (string) $choice;
             } else {

@@ -546,4 +546,88 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
         $this->assertEquals('date', $view->getVar('type'));
     }
+
+    public function testPassDefaultEmptyValueToViewIfNotRequired()
+    {
+        $form = $this->factory->create('date', null, array(
+            'required' => false,
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('', $view->get('year')->getVar('empty_value'));
+        $this->assertSame('', $view->get('month')->getVar('empty_value'));
+        $this->assertSame('', $view->get('day')->getVar('empty_value'));
+    }
+
+    public function testPassNoEmptyValueToViewIfRequired()
+    {
+        $form = $this->factory->create('date', null, array(
+            'required' => true,
+        ));
+
+        $view = $form->createView();
+        $this->assertNull($view->get('year')->getVar('empty_value'));
+        $this->assertNull($view->get('month')->getVar('empty_value'));
+        $this->assertNull($view->get('day')->getVar('empty_value'));
+    }
+
+    public function testPassEmptyValueAsString()
+    {
+        $form = $this->factory->create('date', null, array(
+            'empty_value' => 'Empty',
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('Empty', $view->get('year')->getVar('empty_value'));
+        $this->assertSame('Empty', $view->get('month')->getVar('empty_value'));
+        $this->assertSame('Empty', $view->get('day')->getVar('empty_value'));
+    }
+
+    public function testPassEmptyValueAsArray()
+    {
+        $form = $this->factory->create('date', null, array(
+            'empty_value' => array(
+                'year' => 'Empty year',
+                'month' => 'Empty month',
+                'day' => 'Empty day',
+            ),
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('Empty year', $view->get('year')->getVar('empty_value'));
+        $this->assertSame('Empty month', $view->get('month')->getVar('empty_value'));
+        $this->assertSame('Empty day', $view->get('day')->getVar('empty_value'));
+    }
+
+    public function testPassEmptyValueAsPartialArray_addEmptyIfNotRequired()
+    {
+        $form = $this->factory->create('date', null, array(
+            'required' => false,
+            'empty_value' => array(
+                'year' => 'Empty year',
+                'day' => 'Empty day',
+            ),
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('Empty year', $view->get('year')->getVar('empty_value'));
+        $this->assertSame('', $view->get('month')->getVar('empty_value'));
+        $this->assertSame('Empty day', $view->get('day')->getVar('empty_value'));
+    }
+
+    public function testPassEmptyValueAsPartialArray_addNullIfRequired()
+    {
+        $form = $this->factory->create('date', null, array(
+            'required' => true,
+            'empty_value' => array(
+                'year' => 'Empty year',
+                'day' => 'Empty day',
+            ),
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('Empty year', $view->get('year')->getVar('empty_value'));
+        $this->assertNull($view->get('month')->getVar('empty_value'));
+        $this->assertSame('Empty day', $view->get('day')->getVar('empty_value'));
+    }
 }

@@ -103,13 +103,19 @@ class ClassCollectionLoader
 
             $c = preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($class->getFileName()));
 
-            // add namespace declaration for global code
+            // fakes namespace declaration for global code
             if (!$class->inNamespace()) {
-                $c = "\nnamespace\n{\n".self::stripComments($c)."\n}\n";
-            } else {
-                $c = self::fixNamespaceDeclarations('<?php '.$c);
-                $c = preg_replace('/^\s*<\?php/', '', $c);
+                $c = "\nnamespace;\n".$c."\n";
             }
+
+            $c = self::fixNamespaceDeclarations('<?php '.$c);
+            $c = preg_replace('/^\s*<\?php/', '', $c);
+            $isTaggable = $class->implementsInterface('Symfony\Component\ClassLoader\TaggableInterface');
+            if ($isTaggable && !$class->isAbstract()) {
+                $c = self::dumpTags($class, $c);
+            }
+            // replace multiple new lines with a single newline
+            $c = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $c);
 
             $content .= $c;
         }
@@ -201,37 +207,6 @@ class ClassCollectionLoader
     }
 
     /**
-     * Removes comments from a PHP source string.
-     *
-     * We don't use the PHP php_strip_whitespace() function
-     * as we want the content to be readable and well-formatted.
-     *
-     * @param string $source A PHP string
-     *
-     * @return string The PHP string with the comments removed
-     */
-    static private function stripComments($source)
-    {
-        if (!function_exists('token_get_all')) {
-            return $source;
-        }
-
-        $output = '';
-        foreach (token_get_all($source) as $token) {
-            if (is_string($token)) {
-                $output .= $token;
-            } elseif (!in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
-                $output .= $token[1];
-            }
-        }
-
-        // replace multiple new lines with a single newline
-        $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
-
-        return $output;
-    }
-
-    /**
      * Gets an ordered array of passed classes including all their dependencies.
      *
      * @param array $classes
@@ -307,5 +282,24 @@ class ClassCollectionLoader
         }
 
         return $classes;
+    }
+
+    static private function dumpTags(\ReflectionClass $class, $output)
+    {
+        $m = $class->getMethod('dumpTags');
+        $tags = $m->invoke(null, $class);
+
+        $constants = "\n";
+        foreach ($tags as $name => $value) {
+            $constants .= "const $name = '$value';\n";
+        }
+
+        $output = preg_replace(
+            '/^([ \t]*)((?:[\w \t]+ )?(class|trait) [\w, \t\\\\]+?)[ \s]*{\s*$/m',
+            "\\1\\2\\1{\n$constants",
+            $output
+        );
+
+        return $output;
     }
 }

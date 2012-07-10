@@ -526,10 +526,6 @@ class InputDefinition
 
     private function formatDefaultValue($default)
     {
-        if (is_array($default) && $default === array_values($default)) {
-            return sprintf("array('%s')", implode("', '", $default));
-        }
-
-        return str_replace("\n", '', var_export($default, true));
+        return json_encode($default);
     }
 }

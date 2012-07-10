@@ -3,7 +3,7 @@ Usage:
 
 Arguments:
  command               The command to execute
- command_name          The command name (default: 'help')
+ command_name          The command name (default: "help")
 
 Options:
  --xml                 To output help as XML

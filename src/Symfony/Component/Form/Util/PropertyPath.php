@@ -31,6 +31,9 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      */
     const SINGULAR_SEPARATOR = '|';
 
+    const VALUE = 0;
+    const IS_REF = 1;
+
     /**
      * The elements of the property path
      * @var array
@@ -272,7 +275,9 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      */
     public function getValue($objectOrArray)
     {
-        return $this->readPropertyAt($objectOrArray, $this->length - 1);
+        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $this->length - 1);
+
+        return $propertyValues[count($propertyValues) - 1][self::VALUE];
     }
 
     /**
@@ -306,48 +311,70 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      */
     public function setValue(&$objectOrArray, $value)
     {
-        $objectOrArray =& $this->readPropertyAt($objectOrArray, $this->length - 2);
+        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $this->length - 2);
+        $overwrite = true;
 
-        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-            throw new UnexpectedTypeException($objectOrArray, 'object or array');
+        // Add the root object to the list
+        array_unshift($propertyValues, array(
+            self::VALUE => &$objectOrArray,
+            self::IS_REF => true,
+        ));
+
+        for ($i = count($propertyValues) - 1; $i >= 0; --$i) {
+            $objectOrArray =& $propertyValues[$i][self::VALUE];
+
+            if ($overwrite) {
+                if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
+                    throw new UnexpectedTypeException($objectOrArray, 'object or array');
+                }
+
+                $property = $this->elements[$i];
+                $singular = $this->singulars[$i];
+                $isIndex = $this->isIndex[$i];
+
+                $this->writeProperty($objectOrArray, $property, $singular, $isIndex, $value);
+            }
+
+            $value =& $objectOrArray;
+            $overwrite = !$propertyValues[$i][self::IS_REF];
         }
-
-        $property = $this->elements[$this->length - 1];
-        $singular = $this->singulars[$this->length - 1];
-        $isIndex = $this->isIndex[$this->length - 1];
-
-        $this->writeProperty($objectOrArray, $property, $singular, $isIndex, $value);
     }
 
     /**
      * Reads the path from an object up to a given path index.
      *
      * @param object|array $objectOrArray The object or array to read from.
-     * @param integer      $index         The integer up to which should be read.
+     * @param integer      $lastIndex     The integer up to which should be read.
      *
-     * @return mixed The value read at the end of the path.
+     * @return array The values read in the path.
      *
      * @throws UnexpectedTypeException If a value within the path is neither object nor array.
      */
-    protected function &readPropertyAt(&$objectOrArray, $index)
+    private function &readPropertiesUntil(&$objectOrArray, $lastIndex)
     {
-        for ($i = 0; $i <= $index; ++$i) {
+        $propertyValues = array();
+
+        for ($i = 0; $i <= $lastIndex; ++$i) {
             if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
                 throw new UnexpectedTypeException($objectOrArray, 'object or array');
             }
 
-            // Create missing nested arrays on demand
-            if (is_array($objectOrArray) && !array_key_exists($this->elements[$i], $objectOrArray)) {
-                $objectOrArray[$this->elements[$i]] = $i + 1 < $this->length ? array() : null;
-            }
-
             $property = $this->elements[$i];
             $isIndex = $this->isIndex[$i];
+            $isArrayAccess = is_array($objectOrArray) || $objectOrArray instanceof \ArrayAccess;
 
-            $objectOrArray =& $this->readProperty($objectOrArray, $property, $isIndex);
+            // Create missing nested arrays on demand
+            if ($isIndex && $isArrayAccess && !isset($objectOrArray[$property])) {
+                $objectOrArray[$property] = $i + 1 < $this->length ? array() : null;
+            }
+
+            $propertyValue =& $this->readProperty($objectOrArray, $property, $isIndex);
+            $objectOrArray =& $propertyValue[self::VALUE];
+
+            $propertyValues[] =& $propertyValue;
         }
 
-        return $objectOrArray;
+        return $propertyValues;
     }
 
     /**
@@ -363,11 +390,14 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * @throws PropertyAccessDeniedException If the property cannot be accessed due to
      *                                       access restrictions (private or protected).
      */
-    protected function &readProperty(&$objectOrArray, $property, $isIndex)
+    private function &readProperty(&$objectOrArray, $property, $isIndex)
     {
-        // The local variable (instead of immediate returns) is necessary
-        // because we want to return by reference!
-        $result = null;
+        // Use an array instead of an object since performance is
+        // very crucial here
+        $result = array(
+            self::VALUE => null,
+            self::IS_REF => false
+        );
 
         if ($isIndex) {
             if (!$objectOrArray instanceof \ArrayAccess && !is_array($objectOrArray)) {
@@ -376,9 +406,10 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
             if (isset($objectOrArray[$property])) {
                 if (is_array($objectOrArray)) {
-                    $result =& $objectOrArray[$property];
+                    $result[self::VALUE] =& $objectOrArray[$property];
+                    $result[self::IS_REF] = true;
                 } else {
-                    $result = $objectOrArray[$property];
+                    $result[self::VALUE] = $objectOrArray[$property];
                 }
             }
         } elseif (is_object($objectOrArray)) {
@@ -393,36 +424,43 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                     throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $getter, $reflClass->name));
                 }
 
-                $result = $objectOrArray->$getter();
+                $result[self::VALUE] = $objectOrArray->$getter();
             } elseif ($reflClass->hasMethod($isser)) {
                 if (!$reflClass->getMethod($isser)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $isser, $reflClass->name));
                 }
 
-                $result = $objectOrArray->$isser();
+                $result[self::VALUE] = $objectOrArray->$isser();
             } elseif ($reflClass->hasMethod($hasser)) {
                 if (!$reflClass->getMethod($hasser)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $hasser, $reflClass->name));
                 }
 
-                $result = $objectOrArray->$hasser();
+                $result[self::VALUE] = $objectOrArray->$hasser();
             } elseif ($reflClass->hasMethod('__get')) {
                 // needed to support magic method __get
-                $result = $objectOrArray->$property;
+                $result[self::VALUE] = $objectOrArray->$property;
             } elseif ($reflClass->hasProperty($property)) {
                 if (!$reflClass->getProperty($property)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "%s()" or "%s()"?', $property, $reflClass->name, $getter, $isser));
                 }
 
-                $result =& $objectOrArray->$property;
+                $result[self::VALUE] =& $objectOrArray->$property;
+                $result[self::IS_REF] = true;
             } elseif (property_exists($objectOrArray, $property)) {
                 // needed to support \stdClass instances
-                $result =& $objectOrArray->$property;
+                $result[self::VALUE] =& $objectOrArray->$property;
+                $result[self::IS_REF] = true;
             } else {
                 throw new InvalidPropertyException(sprintf('Neither property "%s" nor method "%s()" nor method "%s()" exists in class "%s"', $property, $getter, $isser, $reflClass->name));
             }
         } else {
             throw new InvalidPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you should write the property path as "[%s]" instead?', $property, $property));
+        }
+
+        // Objects are always passed around by reference
+        if (is_object($result[self::VALUE])) {
+            $result[self::IS_REF] = true;
         }
 
         return $result;
@@ -441,7 +479,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * @throws PropertyAccessDeniedException If the property cannot be accessed due to
      *                                       access restrictions (private or protected).
      */
-    protected function writeProperty(&$objectOrArray, $property, $singular, $isIndex, $value)
+    private function writeProperty(&$objectOrArray, $property, $singular, $isIndex, $value)
     {
         $adderRemoverError = null;
 
@@ -466,7 +504,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                     // At this point the add and remove methods have been found
                     $itemsToAdd = is_object($value) ? clone $value : $value;
                     $itemToRemove = array();
-                    $previousValue = $this->readProperty($objectOrArray, $property, $isIndex);
+                    $propertyValue = $this->readProperty($objectOrArray, $property, $isIndex);
+                    $previousValue = $propertyValue[self::VALUE];
 
                     if (is_array($previousValue) || $previousValue instanceof Traversable) {
                         foreach ($previousValue as $previousItem) {
@@ -538,7 +577,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @return string The camelized version of the string.
      */
-    protected function camelize($string)
+    private function camelize($string)
     {
         return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) { return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); }, $string);
     }

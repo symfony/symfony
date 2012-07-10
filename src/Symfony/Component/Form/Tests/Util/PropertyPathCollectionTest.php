@@ -81,6 +81,8 @@ class PropertyPathCollectionTest_CarNoAdderAndRemover
 class PropertyPathCollectionTest_CompositeCar
 {
     public function getStructure() {}
+
+    public function setStructure($structure) {}
 }
 
 class PropertyPathCollectionTest_CarStructure
@@ -105,6 +107,15 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Bernhard', $path->getValue($object));
     }
 
+    public function testGetValueReadsNestedArrayAccess()
+    {
+        $object = $this->getCollection(array('person' => array('firstName' => 'Bernhard')));
+
+        $path = new PropertyPath('[person][firstName]');
+
+        $this->assertEquals('Bernhard', $path->getValue($object));
+    }
+
     /**
      * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
      */
@@ -123,6 +134,16 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
         $path->setValue($object, 'Bernhard');
 
         $this->assertEquals('Bernhard', $object['firstName']);
+    }
+
+    public function testSetValueUpdatesNestedArrayAccess()
+    {
+        $object = $this->getCollection(array());
+
+        $path = new PropertyPath('[person][firstName]');
+        $path->setValue($object, 'Bernhard');
+
+        $this->assertEquals('Bernhard', $object['person']['firstName']);
     }
 
     /**

@@ -198,7 +198,9 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
         $form = new Form($this);
 
         foreach ($this->children as $child) {
-            $form->add($child->getForm());
+            if(is_object($child)) {
+                $form->add($child->getForm());
+            }
         }
 
         return $form;

@@ -151,3 +151,7 @@ CHANGELOG
    of padding them automatically
  * [BC BREAK] DateType defaults to the format "yyyy-MM-dd" now in order to support
    the HTML 5 date field out of the box
+ * added the option "format" to DateTimeType
+ * [BC BREAK] DateTimeType defaults to the format "yyyy-MM-dd'T'HH:mm:ss" now. This
+   is almost identical to the pattern of the HTML 5 datetime input, but not quite,
+   because ICU cannot generate RFC 3339 dates (which have a timezone suffix).

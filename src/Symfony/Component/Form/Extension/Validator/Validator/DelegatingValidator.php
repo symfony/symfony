@@ -66,14 +66,18 @@ class DelegatingValidator implements FormValidatorInterface
                         foreach ($propertyPath->getElements() as $element) {
                             $children = $child->getChildren();
                             if (!isset($children[$element])) {
-                                $form->addError($error);
+                                if ($form->isSynchronized()) {
+                                    $form->addError($error);
+                                }
                                 break;
                             }
 
                             $child = $children[$element];
                         }
 
-                        $child->addError($error);
+                        if ($child->isSynchronized()) {
+                            $child->addError($error);
+                        }
                     }
                 }
             } elseif (count($violations = $this->validator->validate($form))) {
@@ -85,12 +89,16 @@ class DelegatingValidator implements FormValidatorInterface
 
                     foreach ($mapping as $mappedPath => $child) {
                         if (preg_match($mappedPath, $propertyPath)) {
-                            $child->addError($error);
+                            if ($child->isSynchronized()) {
+                                $child->addError($error);
+                            }
                             continue 2;
                         }
                     }
 
-                    $form->addError($error);
+                    if ($form->isSynchronized()) {
+                        $form->addError($error);
+                    }
                 }
             }
         }

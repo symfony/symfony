@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
@@ -37,7 +38,9 @@ abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('The "EventDispatcher" component is not available');
         }
 
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        // We need an actual dispatcher to bind the deprecated
+        // bindRequest() method
+        $this->dispatcher = new EventDispatcher();;
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->form = $this->createForm();
     }

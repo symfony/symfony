@@ -283,12 +283,21 @@ class ClassCollectionLoader
             }
         }
 
-        foreach ($class->getInterfaces() as $interface) {
-            if ($interface->isUserDefined() && !isset(self::$seen[$interface->getName()])) {
-                self::$seen[$interface->getName()] = true;
+        return array_merge(self::getInterfaces($class), $classes);
+    }
 
-                array_unshift($classes, $interface);
-            }
+    private static function getInterfaces(\ReflectionClass $class)
+    {
+        $classes = array();
+
+        foreach ($class->getInterfaces() as $interface) {
+            $classes = array_merge($classes, self::getInterfaces($interface));
+        }
+
+        if ($class->isUserDefined() && $class->isInterface() && !isset(self::$seen[$class->getName()])) {
+            self::$seen[$class->getName()] = true;
+
+            $classes[] = $class;
         }
 
         return $classes;

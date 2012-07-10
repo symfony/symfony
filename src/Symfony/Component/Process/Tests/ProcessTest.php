@@ -19,6 +19,23 @@ use Symfony\Component\Process\Process;
 class ProcessTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testNegativeTimeoutFromConstructor()
+    {
+        new Process('', null, null, null, -1);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testNegativeTimeoutFromSetter()
+    {
+        $p = new Process('');
+        $p->setTimeout(-1);
+    }
+
+    /**
      * tests results from sub processes
      *
      * @dataProvider responsesCodeProvider

@@ -43,7 +43,11 @@ class DateTimeType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            $builder->addViewTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
+            $builder->addViewTransformer(new DateTimeToStringTransformer(
+                $options['data_timezone'],
+                $options['user_timezone'],
+                $format
+            ));
         } else {
             // Only pass a subset of the options to children
             $dateOptions = array_intersect_key($options, array_flip(array(
@@ -54,6 +58,7 @@ class DateTimeType extends AbstractType
                 'required',
                 'translation_domain',
             )));
+
             $timeOptions = array_intersect_key($options, array_flip(array(
                 'hours',
                 'minutes',
@@ -64,21 +69,15 @@ class DateTimeType extends AbstractType
                 'translation_domain',
             )));
 
-            // If `widget` is set, overwrite widget options from `date` and `time`
-            if (isset($options['widget'])) {
-                $dateOptions['widget'] = $options['widget'];
-                $timeOptions['widget'] = $options['widget'];
-            } else {
-                if (isset($options['date_widget'])) {
-                    $dateOptions['widget'] = $options['date_widget'];
-                }
-
-                if (isset($options['time_widget'])) {
-                    $timeOptions['widget'] = $options['time_widget'];
-                }
+            if (null !== $options['date_widget']) {
+                $dateOptions['widget'] = $options['date_widget'];
             }
 
-            if (isset($options['date_format'])) {
+            if (null !== $options['time_widget']) {
+                $timeOptions['widget'] = $options['time_widget'];
+            }
+
+            if (null !== $options['date_format']) {
                 $dateOptions['format'] = $options['date_format'];
             }
 
@@ -134,27 +133,28 @@ class DateTimeType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
+        // Defaults to the value of "widget"
+        $dateWidget = function (Options $options) {
+            return $options['widget'];
+        };
+
+        // Defaults to the value of "widget"
+        $timeWidget = function (Options $options) {
+            return $options['widget'];
+        };
+
         $resolver->setDefaults(array(
             'input'         => 'datetime',
             'data_timezone' => null,
             'user_timezone' => null,
-            'date_widget'   => null,
             'date_format'   => null,
-            'time_widget'   => null,
-            /* Defaults for date field */
-            'years'         => range(date('Y') - 5, date('Y') + 5),
-            'months'        => range(1, 12),
-            'days'          => range(1, 31),
-            /* Defaults for time field */
-            'hours'         => range(0, 23),
-            'minutes'       => range(0, 59),
-            'seconds'       => range(0, 59),
+            'widget'        => null,
+            'date_widget'   => $dateWidget,
+            'time_widget'   => $timeWidget,
             'with_seconds'  => false,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'  => false,
-            // This will overwrite "widget" child options
-            'widget'        => null,
             // If initialized with a \DateTime object, FormType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset
@@ -167,6 +167,12 @@ class DateTimeType extends AbstractType
         // set in DateType and TimeType
         $resolver->setOptional(array(
             'empty_value',
+            'years',
+            'months',
+            'days',
+            'hours',
+            'minutes',
+            'seconds',
         ));
 
         $resolver->setAllowedValues(array(

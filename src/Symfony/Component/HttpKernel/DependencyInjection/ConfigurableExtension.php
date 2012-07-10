@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Bundle\DependencyInjection\ConfigurableExtension as BaseConfigurableExtension;
 
 /**
  * This extension sub-class provides first-class integration with the
@@ -25,21 +25,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-abstract class ConfigurableExtension extends Extension
+abstract class ConfigurableExtension extends BaseConfigurableExtension
 {
-    /**
-     * {@inheritDoc}
-     */
-    final public function load(array $configs, ContainerBuilder $container)
-    {
-        $this->loadInternal($this->processConfiguration($this->getConfiguration(array(), $container), $configs), $container);
-    }
-
-    /**
-     * Configures the passed container according to the merged configuration.
-     *
-     * @param array            $mergedConfig
-     * @param ContainerBuilder $container
-     */
-    abstract protected function loadInternal(array $mergedConfig, ContainerBuilder $container);
 }

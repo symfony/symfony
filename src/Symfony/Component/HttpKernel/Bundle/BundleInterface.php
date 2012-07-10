@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Bundle;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\Bundle\BundleInterface as BaseBundleInterface;
+use Symfony\Component\Bundle\CommandBundleInterface;
+use Symfony\Component\Bundle\ContainerBundleInterface;
 
 /**
  * BundleInterface.
@@ -22,77 +22,6 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  *
  * @api
  */
-interface BundleInterface extends ContainerAwareInterface
+interface BundleInterface extends BaseBundleInterface, ContainerBundleInterface
 {
-    /**
-     * Boots the Bundle.
-     *
-     * @api
-     */
-    public function boot();
-
-    /**
-     * Shutdowns the Bundle.
-     *
-     * @api
-     */
-    public function shutdown();
-
-    /**
-     * Builds the bundle.
-     *
-     * It is only ever called once when the cache is empty.
-     *
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     *
-     * @api
-     */
-    public function build(ContainerBuilder $container);
-
-    /**
-     * Returns the container extension that should be implicitly loaded.
-     *
-     * @return ExtensionInterface|null The default extension or null if there is none
-     *
-     * @api
-     */
-    public function getContainerExtension();
-
-    /**
-     * Returns the bundle parent name.
-     *
-     * @return string The Bundle parent name it overrides or null if no parent
-     *
-     * @api
-     */
-    public function getParent();
-
-    /**
-     * Returns the bundle name (the class short name).
-     *
-     * @return string The Bundle name
-     *
-     * @api
-     */
-    public function getName();
-
-    /**
-     * Gets the Bundle namespace.
-     *
-     * @return string The Bundle namespace
-     *
-     * @api
-     */
-    public function getNamespace();
-
-    /**
-     * Gets the Bundle directory path.
-     *
-     * The path should always be returned as a Unix path (with /).
-     *
-     * @return string The Bundle absolute path
-     *
-     * @api
-     */
-    public function getPath();
 }

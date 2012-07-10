@@ -1,7 +1,7 @@
 {
-    "name": "symfony/http-kernel",
+    "name": "symfony/bundle",
     "type": "library",
-    "description": "Symfony HttpKernel Component",
+    "description": "Symfony Bundle Component",
     "keywords": [],
     "homepage": "http://symfony.com",
     "license": "MIT",
@@ -16,37 +16,28 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/event-dispatcher": "2.1.*",
-        "symfony/http-foundation": "2.1.*"
+        "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/browser-kit": "2.1.*",
-        "symfony/bundle": "2.1.*",
-        "symfony/class-loader": "2.1.*",
         "symfony/config": "2.1.*",
         "symfony/console": "2.1.*",
         "symfony/dependency-injection": "2.1.*",
-        "symfony/finder": "2.1.*",
-        "symfony/process": "2.1.*",
-        "symfony/routing": "2.1.*"
+        "symfony/finder": "2.1.*"
     },
     "suggest": {
-        "symfony/browser-kit": "self.version",
-        "symfony/bundle": "self.version",
-        "symfony/class-loader": "self.version",
         "symfony/config": "self.version",
         "symfony/console": "self.version",
         "symfony/dependency-injection": "self.version",
         "symfony/finder": "self.version"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\HttpKernel": "" }
+        "psr-0": { "Symfony\\Component\\Bundle": "" }
     },
-    "target-dir": "Symfony/Component/HttpKernel",
+    "target-dir": "Symfony/Component/Bundle",
     "extra": {
         "branch-alias": {
             "dev-master": "2.1-dev"
         }
-    }
+    },
+    "minimum-stability": "dev"
 }

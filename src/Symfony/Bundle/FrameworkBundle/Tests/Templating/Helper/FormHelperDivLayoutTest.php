@@ -33,6 +33,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         $templateNameParser = new StubTemplateNameParser($root, $rootTheme);
         $loader = new FilesystemLoader(array());
         $engine = new PhpEngine($templateNameParser, $loader);
+        $engine->addGlobal('global', '');
 
         $this->helper = new FormHelper($engine, $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'), array('FrameworkBundle:Form'));
 

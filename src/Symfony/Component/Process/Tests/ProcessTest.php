@@ -19,23 +19,6 @@ use Symfony\Component\Process\Process;
 class ProcessTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * tests getter/setter
-     *
-     * @dataProvider methodProvider
-     */
-    public function testDefaultGetterSetter($fn)
-    {
-        $p = new Process('php');
-
-        $setter = 'set'.$fn;
-        $getter = 'get'.$fn;
-
-        $this->assertNull($p->$setter(array('foo')));
-
-        $this->assertSame(array('foo'), $p->$getter(array('foo')));
-    }
-
-    /**
      * tests results from sub processes
      *
      * @dataProvider responsesCodeProvider

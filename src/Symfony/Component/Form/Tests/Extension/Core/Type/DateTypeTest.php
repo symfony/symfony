@@ -250,37 +250,45 @@ class DateTypeTest extends LocalizedTestCase
     /**
      * This test is to check that the strings '0', '1', '2', '3' are no accepted
      * as valid IntlDateFormatter constants for FULL, LONG, MEDIUM or SHORT respectively.
+     *
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testFormatOptionCustomPatternCollapsingIntlDateFormatterConstant()
+    public function testThrowExceptionIfFormatIsNoPattern()
     {
-        $form = $this->factory->create('date', null, array(
+        $this->factory->create('date', null, array(
             'format' => '0',
             'widget' => 'single_text',
             'input' => 'string',
         ));
-
-        $form->setData('2010-06-02');
-
-        // This would be what would be outputed if '0' was mistaken for \IntlDateFormatter::FULL
-        $this->assertNotEquals('Mittwoch, 02. Juni 2010', $form->getViewData());
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\CreationException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testValidateFormatOptionGivenWrongConstants()
+    public function testThrowExceptionIfFormatDoesNotContainYearMonthAndDay()
     {
-        $form = $this->factory->create('date', null, array(
+        $this->factory->create('date', null, array(
+            'months' => array(6, 7),
+            'format' => 'yy',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testThrowExceptionIfFormatIsNoConstant()
+    {
+        $this->factory->create('date', null, array(
             'format' => 105,
         ));
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\CreationException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testValidateFormatOptionGivenArrayValue()
+    public function testThrowExceptionIfFormatIsInvalid()
     {
-        $form = $this->factory->create('date', null, array(
+        $this->factory->create('date', null, array(
             'format' => array(),
         ));
     }
@@ -334,21 +342,6 @@ class DateTypeTest extends LocalizedTestCase
     {
         $form = $this->factory->create('date', null, array(
             'months' => array(6, 7),
-        ));
-
-        $view = $form->createView();
-
-        $this->assertEquals(array(
-            new ChoiceView('6', '06'),
-            new ChoiceView('7', '07'),
-        ), $view->get('month')->getVar('choices'));
-    }
-
-    public function testMonthsOptionNumericIfFormatContainsNoMonth()
-    {
-        $form = $this->factory->create('date', null, array(
-            'months' => array(6, 7),
-            'format' => 'yy',
         ));
 
         $view = $form->createView();

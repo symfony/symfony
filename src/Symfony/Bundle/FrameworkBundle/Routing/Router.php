@@ -103,9 +103,9 @@ class Router extends BaseRouter implements WarmableInterface
     /**
      * Replaces placeholders with the service container parameters in the given string.
      *
-     * @param string $value The source string which might contain %placeholders%
+     * @param mixed $value The source string which might contain %placeholders%
      *
-     * @return string A string where the placeholders have been replaced.
+     * @return mixed A string where the placeholders have been replaced, or the original value if not a string.
      *
      * @throws ParameterNotFoundException When a placeholder does not exist as a container parameter
      * @throws RuntimeException           When a container value is not a string or a numeric value
@@ -114,8 +114,8 @@ class Router extends BaseRouter implements WarmableInterface
     {
         $container = $this->container;
 
-        if (null === $value) {
-            return null;
+        if (null === $value || false === $value || true === $value || is_object($value)) {
+            return $value;
         }
 
         $escapedValue = preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($container, $value) {

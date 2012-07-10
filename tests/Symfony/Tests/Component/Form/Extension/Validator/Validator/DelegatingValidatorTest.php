@@ -12,9 +12,11 @@
 namespace Symfony\Tests\Component\Form\Extension\Validator\Validator;
 
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Extension\Validator\Validator\DelegatingValidator;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ExecutionContext;
 
@@ -85,6 +87,24 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         return $this->getBuilder($name, $propertyPath)->getForm();
     }
 
+    protected function getNonSynchronizedForm()
+    {
+        $form = $this->getBuilder()
+            ->appendClientTransformer(new CallbackTransformer(
+                function ($normValue) {
+                    return $normValue;
+                },
+                function () {
+                    throw new TransformationFailedException('Failed');
+                }
+            ))
+            ->getForm();
+
+        $form->bind('foobar');
+
+        return $form;
+    }
+
     protected function getMockForm()
     {
         return $this->getMock('Symfony\Tests\Component\Form\FormInterface');
@@ -116,6 +136,21 @@ class DelegatingValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($form);
 
         $this->assertEquals(array($this->getFormError()), $form->getErrors());
+    }
+
+    public function testNoFormErrorsOnNonSynchronizedForm()
+    {
+        $form = $this->getNonSynchronizedForm();
+
+        $this->delegate->expects($this->once())
+            ->method('validate')
+            ->will($this->returnValue(array(
+                $this->getConstraintViolation('constrainedProp')
+            )));
+
+        $this->validator->validate($form);
+
+        $this->assertEquals(array(), $form->getErrors());
     }
 
     public function testFormErrorsOnChild()

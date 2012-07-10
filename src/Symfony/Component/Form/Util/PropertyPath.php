@@ -516,7 +516,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 $objectOrArray->$property = $value;
             } elseif ($reflClass->hasProperty($property)) {
                 if (!$reflClass->getProperty($property)->isPublic()) {
-                    throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s". Maybe you should create the method "%s()"?', $property, $reflClass->name, $setter));
+                    throw new PropertyAccessDeniedException(sprintf('Property "%s" is not public in class "%s"%s. Maybe you should create the method "%s()"?', $property, $reflClass->name, $adderRemoverError, $setter));
                 }
 
                 $objectOrArray->$property = $value;

@@ -147,3 +147,5 @@ CHANGELOG
  * [BC BREAK] fixed: form constraints are only validated if they belong to the validated group
  * deprecated `bindRequest` in `Form` and replaced it by a listener to FormEvents::PRE_BIND
  * fixed: the "data" option supersedes default values from the model
+ * changed DateType to refer to the "format" option for calculating the year and day choices instead
+   of padding them automatically

@@ -34,6 +34,14 @@ class MinValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate(null, new Min(array('limit' => 10)));
     }
 
+    public function testEmptyStringIsValid()
+    {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate('', new Min(array('limit' => 10)));
+    }
+
     /**
      * @dataProvider getValidValues
      */

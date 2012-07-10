@@ -144,6 +144,19 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
         $router->getRouteCollection()->get('foo');
     }
 
+    public function testDefaultValueNullAsEmptyStringRegression()
+    {
+        $routes = new RouteCollection();
+        $routes->add('foo', new Route('foo', array('foo' => null), array('foo' => '\d+')));
+
+        $sc = $this->getServiceContainer($routes);
+
+        $router = new Router($sc, 'foo');
+
+        $route = $router->getRouteCollection()->get('foo');
+        $this->assertNull($route->getDefault('foo'));
+    }
+
     private function getServiceContainer(RouteCollection $routes)
     {
         $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');

@@ -25,11 +25,6 @@ class OutputFormatter implements OutputFormatterInterface
      */
     const FORMAT_PATTERN = '#(\\\\?)<(/?)([a-z][a-z0-9_=;-]+)?>([^\\\\<]*)#is';
 
-    /**
-     * The escape sequence for LG char.
-     */
-    const LG_CHAR_ESCAPING = '\\';
-
     private $decorated;
     private $styles = array();
     private $styleStack;
@@ -154,7 +149,7 @@ class OutputFormatter implements OutputFormatterInterface
     {
         $message = preg_replace_callback(self::FORMAT_PATTERN, array($this, 'replaceStyle'), $message);
 
-        return str_replace(self::LG_CHAR_ESCAPING.'<', '<', $message);
+        return str_replace('\\<', '<', $message);
     }
 
     /**
@@ -167,7 +162,7 @@ class OutputFormatter implements OutputFormatterInterface
     private function replaceStyle($match)
     {
         // we got "\<" escaped char
-        if (self::LG_CHAR_ESCAPING === $match[1]) {
+        if ('\\' === $match[1]) {
             return $match[0];
         }
 

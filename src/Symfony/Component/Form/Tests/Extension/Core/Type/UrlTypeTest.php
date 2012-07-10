@@ -43,7 +43,7 @@ class UrlTypeTest extends LocalizedTestCase
 
         $form->bind('');
 
-        $this->assertSame('', $form->getData());
+        $this->assertNull($form->getData());
         $this->assertSame('', $form->getViewData());
     }
 

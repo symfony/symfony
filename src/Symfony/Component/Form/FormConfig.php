@@ -119,6 +119,11 @@ class FormConfig implements FormConfigEditorInterface
     private $dataClass;
 
     /**
+     * @var Boolean
+     */
+    private $dataLocked;
+
+    /**
      * @var array
      */
     private $options;
@@ -510,6 +515,14 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * {@inheritdoc}
      */
+    public function getDataLocked()
+    {
+        return $this->dataLocked;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOptions()
     {
         return $this->options;
@@ -671,6 +684,16 @@ class FormConfig implements FormConfigEditorInterface
     public function setData($data)
     {
         $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDataLocked($locked)
+    {
+        $this->dataLocked = $locked;
 
         return $this;
     }

@@ -146,3 +146,4 @@ CHANGELOG
  * [BC BREAK] fixed rendering of errors for DateType, BirthdayType and similar ones
  * [BC BREAK] fixed: form constraints are only validated if they belong to the validated group
  * deprecated `bindRequest` in `Form` and replaced it by a listener to FormEvents::PRE_BIND
+ * fixed: the "data" option supersedes default values from the model

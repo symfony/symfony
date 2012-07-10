@@ -11,10 +11,7 @@
 
 namespace Symfony\Component\Config\Definition;
 
-use Symfony\Component\Config\Definition\VariableNode;
-use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-
 
 /**
  * This node represents a numeric value in the config tree
@@ -47,7 +44,7 @@ class NumericNode extends ScalarNode
         if (isset($this->max) && $value > $this->max) {
             $errorMsg = sprintf('The value %s is too big for path "%s". Should be less than: %s', $value, $this->getPath(), $this->max);
         }
-        if (isset($errorMsg)){
+        if (isset($errorMsg)) {
             $ex = new InvalidConfigurationException($errorMsg);
             $ex->setPath($this->getPath());
             throw $ex;

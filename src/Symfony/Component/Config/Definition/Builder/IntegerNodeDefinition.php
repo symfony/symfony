@@ -20,7 +20,6 @@ use Symfony\Component\Config\Definition\IntegerNode;
  */
 class IntegerNodeDefinition extends NumericNodeDefinition
 {
-
     /**
      * Instantiate a Node
      *
@@ -30,5 +29,4 @@ class IntegerNodeDefinition extends NumericNodeDefinition
     {
         return new IntegerNode($this->name, $this->parent, $this->min, $this->max);
     }
-
 }

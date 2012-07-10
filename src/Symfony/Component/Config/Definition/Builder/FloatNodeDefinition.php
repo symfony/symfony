@@ -20,7 +20,6 @@ use Symfony\Component\Config\Definition\FloatNode;
  */
 class FloatNodeDefinition extends NumericNodeDefinition
 {
-
     /**
      * Instantiate a Node
      *
@@ -30,5 +29,4 @@ class FloatNodeDefinition extends NumericNodeDefinition
     {
         return new FloatNode($this->name, $this->parent, $this->min, $this->max);
     }
-
 }

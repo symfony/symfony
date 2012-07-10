@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormViewInterface;
@@ -19,6 +20,7 @@ use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 use Symfony\Component\OptionsResolver\Options;
@@ -26,27 +28,67 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class DateTimeType extends AbstractType
 {
+    const DEFAULT_DATE_FORMAT = \IntlDateFormatter::MEDIUM;
+
+    const DEFAULT_TIME_FORMAT = \IntlDateFormatter::MEDIUM;
+
+    /**
+     * This is not quite the HTML5 format yet, because ICU lacks the
+     * capability of parsing and generating RFC 3339 dates, which
+     * are like the below pattern but with a timezone suffix. The
+     * timezone suffix is
+     *
+     *  * "Z" for UTC
+     *  * "(-|+)HH:mm" for other timezones (note the colon!)
+     *
+     * http://userguide.icu-project.org/formatparse/datetime#TOC-Date-Time-Format-Syntax
+     * http://www.w3.org/TR/html-markup/input.datetime.html
+     * http://tools.ietf.org/html/rfc3339
+     */
+    const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+
+    private static $acceptedFormats = array(
+        \IntlDateFormatter::FULL,
+        \IntlDateFormatter::LONG,
+        \IntlDateFormatter::MEDIUM,
+        \IntlDateFormatter::SHORT,
+    );
+
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $parts = array('year', 'month', 'day', 'hour', 'minute');
+        $dateParts = array('year', 'month', 'day');
         $timeParts = array('hour', 'minute');
 
-        $format = 'Y-m-d H:i';
         if ($options['with_seconds']) {
-            $format = 'Y-m-d H:i:s';
-
             $parts[] = 'second';
             $timeParts[] = 'second';
         }
 
+        $dateFormat = is_int($options['date_format']) ? $options['date_format'] : self::DEFAULT_DATE_FORMAT;
+        $timeFormat = self::DEFAULT_TIME_FORMAT;
+        $calendar = \IntlDateFormatter::GREGORIAN;
+        $pattern = is_string($options['format']) ? $options['format'] : null;
+
+        if (!in_array($dateFormat, self::$acceptedFormats, true)) {
+            throw new InvalidOptionsException('The "date_format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
+        }
+
+        if (null !== $pattern && (false === strpos($pattern, 'y') || false === strpos($pattern, 'M') || false === strpos($pattern, 'd') || false === strpos($pattern, 'H') || false === strpos($pattern, 'm'))) {
+            throw new InvalidOptionsException(sprintf('The "format" option should contain the patterns "y", "M", "d", "H" and "m". Its current value is "%s".', $pattern));
+        }
+
         if ('single_text' === $options['widget']) {
-            $builder->addViewTransformer(new DateTimeToStringTransformer(
+            $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
                 $options['data_timezone'],
                 $options['user_timezone'],
-                $format
+                $dateFormat,
+                $timeFormat,
+                $calendar,
+                $pattern
             ));
         } else {
             // Only pass a subset of the options to children
@@ -88,7 +130,7 @@ class DateTimeType extends AbstractType
                 ->addViewTransformer(new DataTransformerChain(array(
                     new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts),
                     new ArrayToPartsTransformer(array(
-                        'date' => array('year', 'month', 'day'),
+                        'date' => $dateParts,
                         'time' => $timeParts,
                     )),
                 )))
@@ -119,7 +161,10 @@ class DateTimeType extends AbstractType
     {
         $view->setVar('widget', $options['widget']);
 
-        if ('single_text' === $options['widget']) {
+        // Change the input to a HTML5 date input if
+        //  * the widget is set to "single_text"
+        //  * the format matches the one expected by HTML5
+        if ('single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
             $view->setVar('type', 'datetime');
         }
     }
@@ -147,6 +192,7 @@ class DateTimeType extends AbstractType
             'input'         => 'datetime',
             'data_timezone' => null,
             'user_timezone' => null,
+            'format'        => self::HTML5_FORMAT,
             'date_format'   => null,
             'widget'        => null,
             'date_widget'   => $dateWidget,

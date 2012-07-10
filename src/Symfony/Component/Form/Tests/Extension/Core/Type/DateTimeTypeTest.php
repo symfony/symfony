@@ -163,15 +163,14 @@ class DateTimeTypeTest extends LocalizedTestCase
             'input' => 'datetime',
         ));
 
-        $dateTime = new \DateTime('2010-06-02 03:04:05 America/New_York');
-
-        $form->bind('2010-06-02 03:04:05');
-
         $outputTime = new \DateTime('2010-06-02 03:04:00 Pacific/Tahiti');
+
+        $form->bind('2010-06-02T03:04:00');
+
         $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
 
         $this->assertDateTimeEquals($outputTime, $form->getData());
-        $this->assertEquals('2010-06-02 03:04', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04:00', $form->getViewData());
     }
 
     public function testSubmit_stringSingleText()
@@ -183,10 +182,10 @@ class DateTimeTypeTest extends LocalizedTestCase
             'widget' => 'single_text',
         ));
 
-        $form->bind('2010-06-02 03:04:05');
+        $form->bind('2010-06-02T03:04:00');
 
         $this->assertEquals('2010-06-02 03:04:00', $form->getData());
-        $this->assertEquals('2010-06-02 03:04', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04:00', $form->getViewData());
     }
 
     public function testSubmit_stringSingleText_withSeconds()
@@ -199,10 +198,10 @@ class DateTimeTypeTest extends LocalizedTestCase
             'with_seconds' => true,
         ));
 
-        $form->bind('2010-06-02 03:04:05');
+        $form->bind('2010-06-02T03:04:05');
 
         $this->assertEquals('2010-06-02 03:04:05', $form->getData());
-        $this->assertEquals('2010-06-02 03:04:05', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04:05', $form->getViewData());
     }
 
     public function testSubmit_differentPattern()

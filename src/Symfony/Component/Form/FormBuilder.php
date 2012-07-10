@@ -144,7 +144,7 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
     {
         unset($this->unresolvedChildren[$name]);
 
-        if (isset($this->children[$name])) {
+        if (array_key_exists($name, $this->children)) {
             if ($this->children[$name] instanceof self) {
                 $this->children[$name]->setParent(null);
             }

@@ -2,6 +2,6 @@
 
 namespace ClassesWithParents;
 
-interface CInterface extends GInterface
+interface GInterface
 {
 }

@@ -42,9 +42,25 @@ class DateTypeTest extends LocalizedTestCase
         ));
     }
 
+    public function testSubmitFromSingleTextDateTimeWithDefaultFormat()
+    {
+        $form = $this->factory->create('date', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'widget' => 'single_text',
+            'input' => 'datetime',
+        ));
+
+        $form->bind('2010-06-02');
+
+        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals('2010-06-02', $form->getViewData());
+    }
+
     public function testSubmitFromSingleTextDateTime()
     {
         $form = $this->factory->create('date', null, array(
+            'format' => \IntlDateFormatter::MEDIUM,
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'single_text',
@@ -60,6 +76,7 @@ class DateTypeTest extends LocalizedTestCase
     public function testSubmitFromSingleTextString()
     {
         $form = $this->factory->create('date', null, array(
+            'format' => \IntlDateFormatter::MEDIUM,
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'single_text',
@@ -75,6 +92,7 @@ class DateTypeTest extends LocalizedTestCase
     public function testSubmitFromSingleTextTimestamp()
     {
         $form = $this->factory->create('date', null, array(
+            'format' => \IntlDateFormatter::MEDIUM,
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'single_text',
@@ -92,6 +110,7 @@ class DateTypeTest extends LocalizedTestCase
     public function testSubmitFromSingleTextRaw()
     {
         $form = $this->factory->create('date', null, array(
+            'format' => \IntlDateFormatter::MEDIUM,
             'data_timezone' => 'UTC',
             'user_timezone' => 'UTC',
             'widget' => 'single_text',
@@ -296,6 +315,7 @@ class DateTypeTest extends LocalizedTestCase
     public function testSetData_differentTimezones()
     {
         $form = $this->factory->create('date', null, array(
+            'format' => \IntlDateFormatter::MEDIUM,
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
             'input' => 'string',
@@ -310,6 +330,7 @@ class DateTypeTest extends LocalizedTestCase
     public function testSetData_differentTimezonesDateTime()
     {
         $form = $this->factory->create('date', null, array(
+            'format' => \IntlDateFormatter::MEDIUM,
             'data_timezone' => 'America/New_York',
             'user_timezone' => 'Pacific/Tahiti',
             'input' => 'datetime',
@@ -488,6 +509,17 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date');
         $view = $form->createView();
 
+        $this->assertSame('{{ year }}-{{ month }}-{{ day }}', $view->getVar('date_pattern'));
+    }
+
+    public function testPassDatePatternToViewDifferentFormat()
+    {
+        $form = $this->factory->create('date', null, array(
+            'format' => \IntlDateFormatter::MEDIUM,
+        ));
+
+        $view = $form->createView();
+
         $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->getVar('date_pattern'));
     }
 
@@ -622,5 +654,36 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertSame('Empty year', $view->get('year')->getVar('empty_value'));
         $this->assertNull($view->get('month')->getVar('empty_value'));
         $this->assertSame('Empty day', $view->get('day')->getVar('empty_value'));
+    }
+
+    public function testPassHtml5TypeIfSingleTextAndHtml5Format()
+    {
+        $form = $this->factory->create('date', null, array(
+            'widget' => 'single_text',
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('date', $view->getVar('type'));
+    }
+
+    public function testDontPassHtml5TypeIfNotHtml5Format()
+    {
+        $form = $this->factory->create('date', null, array(
+            'widget' => 'single_text',
+            'format' => \IntlDateFormatter::MEDIUM,
+        ));
+
+        $view = $form->createView();
+        $this->assertNull($view->getVar('type'));
+    }
+
+    public function testPassHtml5TypeIfNotSingleText()
+    {
+        $form = $this->factory->create('date', null, array(
+            'widget' => 'text',
+        ));
+
+        $view = $form->createView();
+        $this->assertNull($view->getVar('type'));
     }
 }

@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices.</source>
-                <target>Você deveria selecionar {{ limit }} opções no mínimo.</target>
+                <target>Você deveria selecionar {{ limit }} opção no mínimo.|Você deveria selecionar {{ limit }} opções no mínimo.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choices.</source>
-                <target>Você deve selecionar, no máximo {{ limit }} opções.</target>
+                <target>Você deve selecionar, no máximo {{ limit }} opção.|Você deve selecionar, no máximo {{ limit }} opções.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
@@ -201,6 +201,18 @@
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail.</source>
                 <target>Uma extensão PHP causou a falha no envio.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} elements or more.</source>
+                <target>Esta coleção deve conter {{ limit }} elemento ou mais.|Esta coleção deve conter {{ limit }} elementos ou mais.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} elements or less.</source>
+                <target>Esta coleção deve conter {{ limit }} elemento ou menos.|Esta coleção deve conter {{ limit }} elementos ou menos.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} elements.</source>
+                <target>Esta coleção deve conter exatamente {{ limit }} elemento.|Esta coleção deve conter exatamente {{ limit }} elementos.</target>
             </trans-unit>
         </body>
     </file>

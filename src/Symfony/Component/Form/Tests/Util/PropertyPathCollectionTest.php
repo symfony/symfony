@@ -78,6 +78,13 @@ class PropertyPathCollectionTest_CarNoAdderAndRemover
     public function getAxes() {}
 }
 
+class PropertyPathCollectionTest_CarNoAdderAndRemoverWithProperty
+{
+    protected $axes = array();
+
+    public function getAxes() {}
+}
+
 class PropertyPathCollectionTest_CompositeCar
 {
     public function getStructure() {}
@@ -265,17 +272,15 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider noAdderRemoverData
      */
-    public function testNoAdderAndRemoverThrowsSensibleError($path, $message)
+    public function testNoAdderAndRemoverThrowsSensibleError($car, $path, $message)
     {
-        $car = $this->getMock(__CLASS__ . '_CarNoAdderAndRemover');
-        $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
-        $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
+        $axes = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
         try {
-            $path->setValue($car, $axesAfter);
+            $path->setValue($car, $axes);
             $this->fail('An expected exception was not thrown!');
-        } catch (\Symfony\Component\Form\Exception\InvalidPropertyException $e) {
-            $this->assertEquals(str_replace("{class}", get_class($car), $message), $e->getMessage());
+        } catch (\Symfony\Component\Form\Exception\FormException $e) {
+            $this->assertEquals($message, $e->getMessage());
         }
     }
 
@@ -283,24 +288,40 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
     {
         $data = array();
 
+        $car = $this->getMock(__CLASS__ . '_CarNoAdderAndRemover');
         $propertyPath = new PropertyPath('axes');
         $expectedMessage = sprintf(
             'Neither element "axes" nor method "setAxes()" exists in class '
-                .'"{class}", nor could adders and removers be found based on the '
+                .'"%s", nor could adders and removers be found based on the '
                 .'guessed singulars: %s (provide a singular by suffixing the '
                 .'property path with "|{singular}" to override the guesser)',
+            get_class($car),
             implode(', ', (array) $singulars = FormUtil::singularify('Axes'))
         );
-        $data[] = array($propertyPath, $expectedMessage);
+        $data[] = array($car, $propertyPath, $expectedMessage);
 
         $propertyPath = new PropertyPath('axes|boo');
         $expectedMessage = sprintf(
             'Neither element "axes" nor method "setAxes()" exists in class '
-                .'"{class}", nor could adders and removers be found based on the '
+                .'"%s", nor could adders and removers be found based on the '
                 .'passed singular: %s',
+            get_class($car),
             'boo'
         );
-        $data[] = array($propertyPath, $expectedMessage);
+        $data[] = array($car, $propertyPath, $expectedMessage);
+
+        $car = $this->getMock(__CLASS__ . '_CarNoAdderAndRemoverWithProperty');
+        $propertyPath = new PropertyPath('axes');
+        $expectedMessage = sprintf(
+            'Property "axes" is not public in class "%s", nor could adders and '
+                .'removers be found based on the guessed singulars: %s '
+                .'(provide a singular by suffixing the property path with '
+                .'"|{singular}" to override the guesser). Maybe you should '
+                .'create the method "setAxes()"?',
+            get_class($car),
+            implode(', ', (array) $singulars = FormUtil::singularify('Axes'))
+        );
+        $data[] = array($car, $propertyPath, $expectedMessage);
 
         return $data;
     }

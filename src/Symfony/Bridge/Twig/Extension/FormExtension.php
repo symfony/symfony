@@ -259,9 +259,11 @@ class FormExtension extends \Twig_Extension
             if (isset($blocks[$types[$typeIndex]])) {
                 $this->varStack[$rendering]['typeIndex'] = $typeIndex;
 
+                $context = $this->environment->mergeGlobals($this->varStack[$rendering]['variables']);
+
                 // we do not call renderBlock here to avoid too many nested level calls (XDebug limits the level to 100 by default)
                 ob_start();
-                $this->template->displayBlock($types[$typeIndex], $this->varStack[$rendering]['variables'], $blocks);
+                $this->template->displayBlock($types[$typeIndex], $context, $blocks);
                 $html = ob_get_clean();
 
                 if ($mainTemplate) {

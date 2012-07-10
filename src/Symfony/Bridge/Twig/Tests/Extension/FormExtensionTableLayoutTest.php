@@ -52,9 +52,10 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
             'custom_widgets.html.twig',
         ));
 
-        $environment = new \Twig_Environment($loader);
+        $environment = new \Twig_Environment($loader, array('strict_variables' => true));
         $environment->addExtension($this->extension);
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
+        $environment->addGlobal('global', '');
 
         $this->extension->initRuntime($environment);
     }

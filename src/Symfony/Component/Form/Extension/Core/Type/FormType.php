@@ -178,11 +178,6 @@ class FormType extends AbstractType
             return false !== $options['property_path'];
         };
 
-        // Compound forms are not displayed inline
-        $inline = function (Options $options) {
-            return !$options['compound'];
-        };
-
         $resolver->setDefaults(array(
             'data_class'         => $dataClass,
             'empty_data'         => $emptyData,
@@ -202,7 +197,6 @@ class FormType extends AbstractType
             'virtual'            => false,
             'compound'           => true,
             'translation_domain' => null,
-            'inline'             => $inline,
         ));
 
         // If data is given, the form is locked to that data

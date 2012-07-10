@@ -83,11 +83,11 @@ class ContainerBundleService
     /**
      * Returns the bundle's container extension.
      *
-     * @param Bundle $bundle Bundle
+     * @param BundleInterface $bundle Bundle
      *
      * @return ExtensionInterface|null The container extension
      */
-    public function getContainerExtension(Bundle $bundle)
+    public function getContainerExtension(BundleInterface $bundle)
     {
         if (!($bundle instanceof ContainerBundleInterface)) {
             return false;

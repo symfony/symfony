@@ -71,26 +71,12 @@ class CommandBundleService
     }
 
     /**
-     * Set required base class
-     *
-     * @param string $requiredCommandBaseClass Required command base class
-     *
-     * @return CommandBundleService
-     */
-    public function setRequiredCommandBaseClass($requiredCommandBaseClass)
-    {
-        $this->requiredCommandBaseClass = $requiredCommandBaseClass;
-
-        return $this;
-    }
-
-    /**
      * Finds and registers Commands.
      *
-     * @param Bundle      $bundle      A Bundle instance
-     * @param Application $application An Application instance
+     * @param BundleInterface $bundle      A Bundle instance
+     * @param Application     $application An Application instance
      */
-    public function registerCommands(Bundle $bundle, Application $application)
+    public function registerCommands(BundleInterface $bundle, Application $application)
     {
         if (!$dir = realpath($bundle->getPath().$this->commandPath)) {
             return;

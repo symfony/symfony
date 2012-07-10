@@ -17,12 +17,12 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/bundle": "2.1.*",
         "symfony/event-dispatcher": "2.1.*",
         "symfony/http-foundation": "2.1.*"
     },
     "require-dev": {
         "symfony/browser-kit": "2.1.*",
+        "symfony/bundle": "2.1.*",
         "symfony/class-loader": "2.1.*",
         "symfony/config": "2.1.*",
         "symfony/console": "2.1.*",
@@ -33,6 +33,7 @@
     },
     "suggest": {
         "symfony/browser-kit": "self.version",
+        "symfony/bundle": "self.version",
         "symfony/class-loader": "self.version",
         "symfony/config": "self.version",
         "symfony/console": "self.version",

@@ -15,6 +15,7 @@ use Symfony\Component\Finder\Iterator;
 use Symfony\Component\Finder\Shell;
 use Symfony\Component\Finder\Expr;
 use Symfony\Component\Finder\Command;
+use Symfony\Component\Finder\Iterator\SortableIterator;
 
 /**
  * Shell engine implementation using GNU find command.
@@ -41,34 +42,45 @@ class GnuFindAdapter extends AbstractAdapter
      */
     public function searchInDirectory($dir)
     {
-        // -noleaf option is required for filesystems
-        // who doesn't follow '.' and '..' convention
-        $command = Command::create()->add('find ')->arg($dir)->add('-noleaf')->add('-regextype posix-extended');
+        $command = Command::create();
+
+        $find = $command
+            ->ins('find')
+            ->add('find ')
+            ->arg($dir)
+            ->add('-noleaf') // -noleaf option is required for filesystems who doesn't follow '.' and '..' convention
+            ->add('-regextype posix-extended');
+
         if ($this->followLinks) {
-            $command->add('-follow');
+            $find->add('-follow');
         }
 
-        $command->add('-mindepth')->add($this->minDepth+1);
+        $find->add('-mindepth')->add($this->minDepth+1);
         // warning! INF < INF => true ; INF == INF => false ; INF === INF => true
         // https://bugs.php.net/bug.php?id=9118
         if (INF !== $this->maxDepth) {
-            $command->add('-maxdepth')->add($this->maxDepth+1);
+            $find->add('-maxdepth')->add($this->maxDepth+1);
         }
 
         if (Iterator\FileTypeFilterIterator::ONLY_DIRECTORIES === $this->mode) {
-            $command->add('-type d');
+            $find->add('-type d');
         } elseif (Iterator\FileTypeFilterIterator::ONLY_FILES === $this->mode) {
-            $command->add('-type f');
+            $find->add('-type f');
         }
 
-        $this->buildNamesCommand($command, $this->names);
-        $this->buildNamesCommand($command, $this->notNames, true);
-        $this->buildSizesCommand($command, $this->sizes);
-        $this->buildDatesCommand($command, $this->dates);
+        $this->buildNamesCommand($find, $this->names);
+        $this->buildNamesCommand($find, $this->notNames, true);
+        $this->buildSizesCommand($find, $this->sizes);
+        $this->buildDatesCommand($find, $this->dates);
 
-        if ($useGrep = $this->shell->testCommand('grep') && $this->shell->testCommand('xargs')) {
-            $this->buildContainsOptions($command, $this->contains);
-            $this->buildContainsOptions($command, $this->notContains, true);
+        if (($useGrep = $this->shell->testCommand('grep') && $this->shell->testCommand('xargs')) && ($this->contains || $this->notContains)) {
+            $grep = $command->ins('grep');
+            $this->buildContainsCommand($grep, $this->contains);
+            $this->buildContainsCommand($grep, $this->notContains, true);
+        }
+
+        if ($useSort = is_int($this->sort) && $this->shell->testCommand('sort') && $this->shell->testCommand('awk')) {
+            $this->buildSortCommand($command, $this->sort);
         }
 
         if ($this->shell->testCommand('uniq')) {
@@ -77,7 +89,7 @@ class GnuFindAdapter extends AbstractAdapter
             $paths = array_unique($command->execute());
         }
 
-        $iterator = new Iterator\FilePathsIterator($paths, $dir);
+        $iterator = new Iterator\FilePathsIterator($command->execute(), $dir);
 
         if ($this->exclude) {
             $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
@@ -91,7 +103,7 @@ class GnuFindAdapter extends AbstractAdapter
             $iterator = new Iterator\CustomFilterIterator($iterator, $this->filters);
         }
 
-        if ($this->sort) {
+        if (!$useSort && $this->sort) {
             $iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort);
             $iterator = $iteratorAggregate->getIterator();
         }
@@ -235,7 +247,7 @@ class GnuFindAdapter extends AbstractAdapter
      * @param array                             $contains
      * @param bool                              $not
      */
-    private function buildContainsOptions(Command $command, array $contains, $not = false)
+    private function buildContainsCommand(Command $command, array $contains, $not = false)
     {
         foreach ($contains as $contain) {
             $expr  = Expr::create($contain);
@@ -249,5 +261,21 @@ class GnuFindAdapter extends AbstractAdapter
                 ->add($not ? '-L' : '-l')
                 ->add('-Ee')->arg($regex);
         }
+    }
+
+    private function buildSortCommand(Command $command, $sort)
+    {
+        switch ($sort) {
+            case SortableIterator::SORT_BY_NAME:          $format = null;  break;
+            case SortableIterator::SORT_BY_TYPE:          $format = '%y';  break;
+            case SortableIterator::SORT_BY_ACCESSED_TIME: $format = '%A@'; break;
+            case SortableIterator::SORT_BY_CHANGED_TIME:  $format = '%C@'; break;
+            case SortableIterator::SORT_BY_MODIFIED_TIME: $format = '%T@'; break;
+            default: throw new \InvalidArgumentException('Unknown sort options: '.$sort.'.');
+        }
+
+        $command->get('find')->add('-printf')->arg($format.' %h/%f\\n');
+        $command->ins('sort')->add('| sort');
+        $command->ins('awk')->add('| awk')->arg('{ print $'.(null === $format ? '1' : '2').' }');
     }
 }

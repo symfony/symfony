@@ -30,7 +30,7 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $sizes       = array();
     protected $dates       = array();
     protected $filters     = array();
-    protected $sort        = array();
+    protected $sort        = false;
 
     /**
      * {@inheritdoc}

@@ -23,6 +23,13 @@ class CallbackValidatorTest_Class
 
         return false;
     }
+
+    public static function validateStaticTwo($object, ExecutionContext $context)
+    {
+        $context->addViolation('Static message two', array('{{ value }}' => $object), 'invalidValue2');
+
+        return false;
+    }
 }
 
 class CallbackValidatorTest_Object
@@ -37,6 +44,13 @@ class CallbackValidatorTest_Object
     public function validateTwo(ExecutionContext $context)
     {
         $context->addViolation('Other message', array('{{ value }}' => 'baz'), 'otherInvalidValue');
+
+        return false;
+    }
+
+    public function validateProperty($property, ExecutionContext $context)
+    {
+        $context->addViolation('Property message', array('{{ value }}' => $property), 'invalidProperty');
 
         return false;
     }
@@ -123,6 +137,48 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->validator->validate($object, new Callback(array(
             'validateOne', 'validateTwo'
+        )));
+    }
+
+    public function testPropertyCallbackMethod()
+    {
+        $attribute = 'test value';
+        $object = new CallbackValidatorTest_Object();
+
+        $this->context->expects($this->once())
+            ->method('getCurrentObject')
+            ->will($this->returnValue($object));
+        $this->context->expects($this->once())
+            ->method('getCurrentProperty')
+            ->will($this->returnValue('attribute'));
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('Property message', array(
+                '{{ value }}' => $attribute,
+            ));
+
+        $this->validator->validate($attribute, new Callback(array('validateProperty')));
+    }
+
+    public function testPropertyCallbackStaticMethod()
+    {
+        $attribute = 'test value';
+        $object = new CallbackValidatorTest_Object();
+
+        $this->context->expects($this->once())
+            ->method('getCurrentObject')
+            ->will($this->returnValue($object));
+        $this->context->expects($this->once())
+            ->method('getCurrentProperty')
+            ->will($this->returnValue('attribute'));
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('Static message two', array(
+                '{{ value }}' => $attribute,
+            ));
+
+        $this->validator->validate($attribute, new Callback(array(
+            array(__CLASS__.'_Class', 'validateStaticTwo')
         )));
     }
 

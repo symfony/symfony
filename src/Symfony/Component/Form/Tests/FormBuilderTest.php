@@ -134,6 +134,15 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->builder->has('foo'));
     }
 
+    // https://github.com/symfony/symfony/pull/4826
+    public function testRemoveAndGetForm()
+    {
+        $this->builder->add('foo', 'text');
+        $this->builder->remove('foo');
+        $form = $this->builder->getForm();
+        $this->assertInstanceOf('Symfony\Component\Form\Form', $form);
+    }
+
     public function testCreateNoTypeNo()
     {
         $this->factory->expects($this->once())

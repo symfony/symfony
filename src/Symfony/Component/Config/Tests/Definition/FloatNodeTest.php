@@ -31,6 +31,10 @@ class FloatNodeTest extends \PHPUnit_Framework_TestCase
             array(-678.987),
             array(12.56E45),
             array(0.0),
+            // Integer are accepted too, they will be cast
+            array(17),
+            array(-10),
+            array(0)
         );
     }
 
@@ -52,9 +56,6 @@ class FloatNodeTest extends \PHPUnit_Framework_TestCase
             array('foo'),
             array(true),
             array(false),
-            array(17),
-            array(-10),
-            array(0),
             array(array()),
             array(array('foo' => 'bar')),
             array(new \stdClass()),

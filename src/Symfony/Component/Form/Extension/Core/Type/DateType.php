@@ -23,82 +23,78 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTra
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class DateType extends AbstractType
 {
     const DEFAULT_FORMAT = \IntlDateFormatter::MEDIUM;
+
+    private static $acceptedFormats = array(
+        \IntlDateFormatter::FULL,
+        \IntlDateFormatter::LONG,
+        \IntlDateFormatter::MEDIUM,
+        \IntlDateFormatter::SHORT,
+    );
 
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $format = $options['format'];
-        $pattern = null;
+        $dateFormat = is_int($options['format']) ? $options['format'] : self::DEFAULT_FORMAT;
+        $timeFormat = \IntlDateFormatter::NONE;
+        $calendar = \IntlDateFormatter::GREGORIAN;
+        $pattern = is_string($options['format']) ? $options['format'] : null;
 
-        $allowedFormats = array(
-            \IntlDateFormatter::FULL,
-            \IntlDateFormatter::LONG,
-            \IntlDateFormatter::MEDIUM,
-            \IntlDateFormatter::SHORT,
-        );
-
-        // If $format is not in the allowed options, it's considered as the pattern of the formatter if it is a string
-        if (!in_array($format, $allowedFormats, true)) {
-            if (is_string($format)) {
-                $format = self::DEFAULT_FORMAT;
-                $pattern = $options['format'];
-            } else {
-                throw new CreationException('The "format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom pattern');
-            }
+        if (!in_array($dateFormat, self::$acceptedFormats, true)) {
+            throw new InvalidOptionsException('The "format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
         }
 
-        $formatter = new \IntlDateFormatter(
-            \Locale::getDefault(),
-            $format,
-            \IntlDateFormatter::NONE,
-            'UTC',
-            \IntlDateFormatter::GREGORIAN,
-            $pattern
-        );
-        $formatter->setLenient(false);
+        if (null !== $pattern && (false === strpos($pattern, 'y') || false === strpos($pattern, 'M') || false === strpos($pattern, 'd'))) {
+            throw new InvalidOptionsException(sprintf('The "format" option should contain the patterns "y", "M" and "d". Its current value is "%s".', $pattern));
+        }
 
         if ('single_text' === $options['widget']) {
-            $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer($options['data_timezone'], $options['user_timezone'], $format, \IntlDateFormatter::NONE, \IntlDateFormatter::GREGORIAN, $pattern));
+            $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
+                $options['data_timezone'],
+                $options['user_timezone'],
+                $dateFormat,
+                $timeFormat,
+                $calendar,
+                $pattern
+            ));
         } else {
             $yearOptions = $monthOptions = $dayOptions = array();
 
+            $formatter = new \IntlDateFormatter(
+                \Locale::getDefault(),
+                $dateFormat,
+                $timeFormat,
+                'UTC',
+                $calendar,
+                $pattern
+            );
+            $formatter->setLenient(false);
+
             if ('choice' === $options['widget']) {
-                $years = $months = $days = array();
-
-                foreach ($options['years'] as $year) {
-                    $years[$year] = str_pad($year, 4, '0', STR_PAD_LEFT);
-                }
-                foreach ($options['months'] as $month) {
-                    $months[$month] = str_pad($month, 2, '0', STR_PAD_LEFT);
-                }
-                foreach ($options['days'] as $day) {
-                    $days[$day] = str_pad($day, 2, '0', STR_PAD_LEFT);
-                }
-
                 // Only pass a subset of the options to children
                 $yearOptions = array(
-                    'choices' => $years,
+                    'choices' => $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years'])),
                     'empty_value' => $options['empty_value']['year'],
                 );
                 $monthOptions = array(
-                    'choices' => $this->formatMonths($formatter, $months),
+                    'choices' => $this->formatTimestamps($formatter, '/M+/', $this->listMonths($options['months'])),
                     'empty_value' => $options['empty_value']['month'],
                 );
                 $dayOptions = array(
-                    'choices' => $days,
+                    'choices' => $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days'])),
                     'empty_value' => $options['empty_value']['day'],
                 );
+            }
 
-                // Append generic carry-along options
-                foreach (array('required', 'translation_domain') as $passOpt) {
-                    $yearOptions[$passOpt] = $monthOptions[$passOpt] = $dayOptions[$passOpt] = $options[$passOpt];
-                }
+            // Append generic carry-along options
+            foreach (array('required', 'translation_domain') as $passOpt) {
+                $yearOptions[$passOpt] = $monthOptions[$passOpt] = $dayOptions[$passOpt] = $options[$passOpt];
             }
 
             $builder
@@ -108,6 +104,7 @@ class DateType extends AbstractType
                 ->addViewTransformer(new DateTimeToArrayTransformer(
                     $options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')
                 ))
+                ->setAttribute('formatter', $formatter)
             ;
         }
 
@@ -124,8 +121,6 @@ class DateType extends AbstractType
                 new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], array('year', 'month', 'day'))
             ));
         }
-
-        $builder->setAttribute('formatter', $formatter);
     }
 
     /**
@@ -139,7 +134,7 @@ class DateType extends AbstractType
             $view->setVar('type', 'date');
         }
 
-        if (count($view) > 0) {
+        if ($form->getConfig()->hasAttribute('formatter')) {
             $pattern = $form->getConfig()->getAttribute('formatter')->getPattern();
 
             // set right order with respect to locale (e.g.: de_DE=dd.MM.yy; en_US=M/d/yy)
@@ -224,6 +219,10 @@ class DateType extends AbstractType
                 'choice',
             ),
         ));
+
+        $resolver->setAllowedTypes(array(
+            'format' => array('int', 'string'),
+        ));
     }
 
     /**
@@ -242,18 +241,18 @@ class DateType extends AbstractType
         return 'date';
     }
 
-    private function formatMonths(\IntlDateFormatter $formatter, array $months)
+    private function formatTimestamps(\IntlDateFormatter $formatter, $regex, array $timestamps)
     {
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimezoneId();
 
         $formatter->setTimezoneId(\DateTimeZone::UTC);
 
-        if (preg_match('/M+/', $pattern, $matches)) {
+        if (preg_match($regex, $pattern, $matches)) {
             $formatter->setPattern($matches[0]);
 
-            foreach ($months as $key => $value) {
-                $months[$key] = $formatter->format(gmmktime(0, 0, 0, $key, 15));
+            foreach ($timestamps as $key => $timestamp) {
+                $timestamps[$key] = $formatter->format($timestamp);
             }
 
             // I'd like to clone the formatter above, but then we get a
@@ -263,6 +262,39 @@ class DateType extends AbstractType
 
         $formatter->setTimezoneId($timezone);
 
-        return $months;
+        return $timestamps;
+    }
+
+    private function listYears(array $years)
+    {
+        $result = array();
+
+        foreach ($years as $year) {
+            $result[$year] = gmmktime(0, 0, 0, 6, 15, $year);
+        }
+
+        return $result;
+    }
+
+    private function listMonths(array $months)
+    {
+        $result = array();
+
+        foreach ($months as $month) {
+            $result[$month] = gmmktime(0, 0, 0, $month, 15);
+        }
+
+        return $result;
+    }
+
+    private function listDays(array $days)
+    {
+        $result = array();
+
+        foreach ($days as $day) {
+            $result[$day] = gmmktime(0, 0, 0, 5, $day);
+        }
+
+        return $result;
     }
 }

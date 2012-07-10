@@ -29,6 +29,8 @@ class DateType extends AbstractType
 {
     const DEFAULT_FORMAT = \IntlDateFormatter::MEDIUM;
 
+    const HTML5_FORMAT = 'yyyy-MM-dd';
+
     private static $acceptedFormats = array(
         \IntlDateFormatter::FULL,
         \IntlDateFormatter::LONG,
@@ -130,7 +132,10 @@ class DateType extends AbstractType
     {
         $view->setVar('widget', $options['widget']);
 
-        if ('single_text' === $options['widget']) {
+        // Change the input to a HTML5 date input if
+        //  * the widget is set to "single_text"
+        //  * the format matches the one expected by HTML5
+        if ('single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
             $view->setVar('type', 'date');
         }
 
@@ -186,7 +191,7 @@ class DateType extends AbstractType
             'days'           => range(1, 31),
             'widget'         => 'choice',
             'input'          => 'datetime',
-            'format'         => self::DEFAULT_FORMAT,
+            'format'         => self::HTML5_FORMAT,
             'data_timezone'  => null,
             'user_timezone'  => null,
             'empty_value'    => $emptyValue,

@@ -23,6 +23,8 @@ class EnumNodeDefinition extends ScalarNodeDefinition
         }
 
         $this->values = $values;
+        
+        return $this;
     }
 
     /**

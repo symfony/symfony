@@ -83,6 +83,12 @@ class ProcessBuilder
 
     public function setTimeout($timeout)
     {
+        $timeout = (integer) $timeout;
+
+        if ($timeout < 0) {
+            throw new \InvalidArgumentException('The timeout value must be a valid positive integer.');
+        }
+
         $this->timeout = $timeout;
 
         return $this;

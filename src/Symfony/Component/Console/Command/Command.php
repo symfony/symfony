@@ -165,7 +165,7 @@ class Command
     }
 
     /**
-     * Initializes the command just after the input has been validated.
+     * Initializes the command just before the input is validated.
      *
      * This is mainly useful when a lot of commands extends one main command
      * where some things need to be initialized based on the input arguments and options.

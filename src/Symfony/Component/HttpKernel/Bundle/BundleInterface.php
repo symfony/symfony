@@ -61,7 +61,7 @@ interface BundleInterface extends ContainerAwareInterface
     /**
      * Returns the bundle name that this bundle overrides.
      *
-     * Despite the method name, there is no parent/child relationship
+     * Despite its name, this method does not imply any parent/child relationship
      * between the bundles, just a way to extend and override an existing
      * bundle.
      *

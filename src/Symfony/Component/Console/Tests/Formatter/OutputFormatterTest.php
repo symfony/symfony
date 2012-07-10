@@ -22,6 +22,14 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("foo<>bar", $formatter->format('foo<>bar'));
     }
 
+    public function testLGCharEscaping()
+    {
+        $formatter = new OutputFormatter(true);
+        $this->assertEquals("foo<bar", $formatter->format('foo\\<bar'));
+        $this->assertEquals("<info>some info</info>", $formatter->format('\\<info>some info\\</info>'));
+        $this->assertEquals("\\<info>some info\\</info>", OutputFormatter::escape('<info>some info</info>'));
+    }
+
     public function testBundledStyles()
     {
         $formatter = new OutputFormatter(true);

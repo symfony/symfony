@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
+        "symfony/bundle" : "self.version",
         "symfony/dependency-injection" : "self.version",
         "symfony/config" : "self.version",
         "symfony/event-dispatcher": "self.version",

@@ -875,6 +875,7 @@
       * `getClientData`
       * `getChildren`
       * `hasChildren`
+      * `bindRequest`
 
     Before:
 
@@ -904,6 +905,20 @@
 
     ```
     if (count($form) > 0) {
+    ```
+
+    Instead of `bindRequest`, you should now simply call `bind`:
+
+    Before:
+
+    ```
+    $form->bindRequest($request);
+    ```
+
+    After:
+
+    ```
+    $form->bind($request);
     ```
 
   * The option "validation_constraint" was deprecated and will be removed

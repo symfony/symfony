@@ -633,4 +633,16 @@ class FormTypeTest extends TypeTestCase
         $view = $form->createView();
         $this->assertFalse($view->getVar('valid'));
     }
+
+    public function testDataOptionSupersedesSetDataCalls()
+    {
+        $form = $this->factory->create('form', null, array(
+            'data' => 'default',
+            'compound' => false,
+        ));
+
+        $form->setData('foobar');
+
+        $this->assertSame('default', $form->getData());
+    }
 }

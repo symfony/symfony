@@ -43,7 +43,8 @@ class FormType extends AbstractType
             ->setByReference($options['by_reference'])
             ->setVirtual($options['virtual'])
             ->setCompound($options['compound'])
-            ->setData($options['data'])
+            ->setData(isset($options['data']) ? $options['data'] : null)
+            ->setDataLocked(isset($options['data']))
             ->setDataMapper($options['compound'] ? new PropertyPathMapper() : null)
             ->addEventSubscriber(new BindRequestListener())
         ;
@@ -183,7 +184,6 @@ class FormType extends AbstractType
         };
 
         $resolver->setDefaults(array(
-            'data'               => null,
             'data_class'         => $dataClass,
             'empty_data'         => $emptyData,
             'trim'               => true,
@@ -203,6 +203,12 @@ class FormType extends AbstractType
             'compound'           => true,
             'translation_domain' => null,
             'inline'             => $inline,
+        ));
+
+        // If data is given, the form is locked to that data
+        // (independent of its value)
+        $resolver->setOptional(array(
+            'data',
         ));
 
         $resolver->setAllowedTypes(array(

@@ -227,4 +227,17 @@ interface FormConfigEditorInterface extends FormConfigInterface
      * @return self The configuration object.
      */
     public function setData($data);
+
+    /**
+     * Locks the form's data to the data passed in the configuration.
+     *
+     * A form with locked data is restricted to the data passed in
+     * this configuration. The data can only be modified then by
+     * binding the form.
+     *
+     * @param  Boolean $locked Whether to lock the default data.
+     *
+     * @return self The configuration object.
+     */
+    public function setDataLocked($locked);
 }

@@ -117,6 +117,11 @@ class UnmodifiableFormConfig implements FormConfigInterface
     private $dataClass;
 
     /**
+     * @var Boolean
+     */
+    private $dataLocked;
+
+    /**
      * @var array
      */
     private $options;
@@ -152,6 +157,7 @@ class UnmodifiableFormConfig implements FormConfigInterface
         $this->attributes = $config->getAttributes();
         $this->data = $config->getData();
         $this->dataClass = $config->getDataClass();
+        $this->dataLocked = $config->getDataLocked();
         $this->options = $config->getOptions();
     }
 
@@ -323,6 +329,14 @@ class UnmodifiableFormConfig implements FormConfigInterface
     public function getDataClass()
     {
         return $this->dataClass;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDataLocked()
+    {
+        return $this->dataLocked;
     }
 
     /**

@@ -23,10 +23,10 @@ use Symfony\Component\Form\Tests\Fixtures\FixedFilterListener;
 
 class SimpleFormTest extends AbstractFormTest
 {
-    public function testDataIsInitializedEmpty()
+    public function testDataIsInitializedToConfiguredValue()
     {
         $model = new FixedDataTransformer(array(
-            '' => 'foo',
+            'default' => 'foo',
         ));
         $view = new FixedDataTransformer(array(
             'foo' => 'bar',
@@ -35,9 +35,10 @@ class SimpleFormTest extends AbstractFormTest
         $config = new FormConfig('name', null, $this->dispatcher);
         $config->addViewTransformer($view);
         $config->addModelTransformer($model);
+        $config->setData('default');
         $form = new Form($config);
 
-        $this->assertNull($form->getData());
+        $this->assertSame('default', $form->getData());
         $this->assertSame('foo', $form->getNormData());
         $this->assertSame('bar', $form->getViewData());
     }
@@ -374,6 +375,18 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertNull($form->getData());
         $this->assertNull($form->getNormData());
         $this->assertSame('', $form->getViewData());
+    }
+
+    public function testSetDataIsIgnoredIfDataIsLocked()
+    {
+        $form = $this->getBuilder()
+            ->setData('default')
+            ->setDataLocked(true)
+            ->getForm();
+
+        $form->setData('foobar');
+
+        $this->assertSame('default', $form->getData());
     }
 
     public function testBindConvertsEmptyToNullIfNoTransformer()

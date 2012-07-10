@@ -59,9 +59,13 @@ interface BundleInterface extends ContainerAwareInterface
     public function getContainerExtension();
 
     /**
-     * Returns the bundle parent name.
+     * Returns the bundle name that this bundle overrides.
      *
-     * @return string The Bundle parent name it overrides or null if no parent
+     * Despite the method name, there is no parent/child relationship
+     * between the bundles, just a way to extend and override an existing
+     * bundle.
+     *
+     * @return string The Bundle name it overrides or null if no parent
      *
      * @api
      */

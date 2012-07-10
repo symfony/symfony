@@ -74,18 +74,18 @@ function list_files($directory, $extension)
     return $files;
 }
 
-function genrb($source, $target)
+function genrb($source, $target, $icuBinPath = '', $params = '')
 {
-    exec('genrb -d '.$target.' '.$source.DIRECTORY_SEPARATOR.'*.txt', $output, $result);
+    exec($icuBinPath.'genrb --quiet '.$params.' -d '.$target.' '.$source.DIRECTORY_SEPARATOR.'*.txt', $output, $result);
 
     if ($result !== 0) {
         bailout('genrb failed');
     }
 }
 
-function genrb_file($target, $source, $locale)
+function genrb_file($target, $source, $locale, $icuBinPath = '')
 {
-    exec('genrb -v -d '.$target.' '.$source.DIRECTORY_SEPARATOR.$locale.'.txt', $output, $result);
+    exec($icuBinPath.'genrb --quiet -d '.$target.' '.$source.DIRECTORY_SEPARATOR.$locale.'.txt', $output, $result);
 
     if ($result !== 0) {
         bailout('genrb failed');
@@ -106,7 +106,7 @@ function load_resource_bundle($locale, $directory)
 function get_data($index, $dataDir, $locale = 'en', $constraint = null)
 {
     $data = array();
-    $bundle = load_resource_bundle($locale, __DIR__.DIRECTORY_SEPARATOR.$dataDir);
+    $bundle = load_resource_bundle($locale, $dataDir);
 
     foreach ($bundle->get($index) as $code => $name) {
         if (null !== $constraint) {
@@ -123,6 +123,56 @@ function get_data($index, $dataDir, $locale = 'en', $constraint = null)
     $collator->asort($data);
 
     return $data;
+}
+
+function icu_version() {
+    exec('icu-config --version', $output, $result);
+
+    if ($result !== 0 || !isset($output[0])) {
+        bailout('icu-config failed');
+    }
+
+    return $output[0];
+}
+
+function normalize_icu_version($version) {
+    preg_match('/^(?P<version>[0-9]\.[0-9]|[0-9]{2,})/', $version, $matches);
+
+    return $matches['version'];
+}
+
+function download_icu_data($version) {
+    $icu = parse_ini_file(__DIR__.'/icu.ini');
+
+    if (!isset($icu[$version])) {
+        bailout('The version '.$version.' is not available in the datasource.ini file.');
+    }
+
+    $checkoutPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'data-'.$version;
+
+    exec('svn checkout '.$icu[$version].' '.$checkoutPath, $output, $result);
+
+    if ($result !== 0) {
+        bailout('svn failed');
+    }
+
+    return $checkoutPath;
+}
+
+function is_42_or_earlier($version)
+{
+    return version_compare($version, '4.4', '<');
+}
+
+function is_latest_version($version)
+{
+    $icu = parse_ini_file(__DIR__.DIRECTORY_SEPARATOR.'icu.ini');
+
+    if (!isset($icu[$version])) {
+        bailout('The version '.$version.' is not available in the icu.ini file.');
+    }
+
+    return $icu['latest version'] == $version;
 }
 
 function create_stub_datafile($locale, $target, $data)
@@ -143,6 +193,7 @@ return %s;
 
 TEMPLATE;
 
+    ksort($data);
     $data = var_export($data, true);
     $data = preg_replace('/array \(/', 'array(', $data);
     $data = preg_replace('/\n {1,10}array\(/', 'array(', $data);
@@ -152,35 +203,96 @@ TEMPLATE;
     file_put_contents($target.DIRECTORY_SEPARATOR.$locale.'.php', $data);
 }
 
-if ($GLOBALS['argc'] !== 2) {
+function create_svn_info_file($source, $target)
+{
+    exec('svn info --xml '.$source, $output, $result);
+
+    $xml = simplexml_load_string(implode("\n", $output));
+
+    if ($result !== 0) {
+        bailout('svn info failed');
+    }
+
+    $url = (string) $xml->entry->url;
+    $revision = (string) $xml->entry->commit['revision'];
+    $author = (string) $xml->entry->commit->author;
+    $date = (string) $xml->entry->commit->date;
+
+    $data = <<<SVN_INFO_DATA
+SVN info data
+=============
+
+URL: $url
+Revision: $revision
+Author: $author
+Date: $date
+
+SVN_INFO_DATA;
+
+    file_put_contents($target.DIRECTORY_SEPARATOR.'svn-info.txt', $data);
+}
+
+if ($GLOBALS['argc'] < 1) {
     bailout(<<<MESSAGE
-Usage: php update-data.php [icu-data-directory]
+Usage: php update-data.php [icu-version] [icu-binaries-path]
 
-Updates the ICU resources in Symfony2 from the given ICU data directory. You
-can checkout the ICU data directory via SVN:
+Builds or update the ICU data in Symfony2 for a specific ICU version. If the
+ICU version or the path to the binaries are not provided, it will build the
+latest version released using the genrb found in the environment path.
 
-    $ svn co http://source.icu-project.org/repos/icu/icu/trunk/source/data icu-data
+Examples:
+
+    php update-data.php 4.2
+    It will build the ICU data using the 49 version data
+
+    php update-data.php 4.2 /path/to/icu/bin
+    It will build the ICU data using the 49 version data and the genrb and
+    icu-config binaries found in the environment path
+
+It is recommended to use the ICU binaries in the same version of the desired
+version to build the data files.
+
+Read the UPDATE.txt file for more info.
 
 MESSAGE
     );
 }
 
-// Verify that all required directories exist
-$source = $GLOBALS['argv'][1];
+check_command('svn');
+check_command('icu-config');
 
+// Script options
+$version = isset($GLOBALS['argv'][1]) ? $GLOBALS['argv'][1] : icu_version();
+$icuBinPath = isset($GLOBALS['argv'][2]) ? $GLOBALS['argv'][2] : '';
+
+// Slash the path
+if ('' != $icuBinPath && (strrpos($icuBinPath, DIRECTORY_SEPARATOR) + 1 != strlen($icuBinPath))) {
+    $icuBinPath .= DIRECTORY_SEPARATOR;
+}
+
+check_command($icuBinPath.'genrb');
+
+$version = normalize_icu_version($version);
+$source = download_icu_data($version);
+
+// Verify that all required directories exist
 check_dir($source);
+check_dir($source.DIRECTORY_SEPARATOR.'.svn');
 
 $source = realpath($source);
 
-check_dir($source.DIRECTORY_SEPARATOR.'curr');
-check_dir($source.DIRECTORY_SEPARATOR.'lang');
-check_dir($source.DIRECTORY_SEPARATOR.'locales');
-check_dir($source.DIRECTORY_SEPARATOR.'region');
+// Currency, language and region data are bundled in the locales directory in ICU <= 4.2
+if (!is_42_or_earlier($version)) {
+    check_dir($source.DIRECTORY_SEPARATOR.'curr');
+    check_dir($source.DIRECTORY_SEPARATOR.'lang');
+    check_dir($source.DIRECTORY_SEPARATOR.'region');
+}
 
-check_command('genrb');
+check_dir($source.DIRECTORY_SEPARATOR.'locales');
 
 // Convert the *.txt resource bundles to *.res files
-$target = __DIR__;
+$target = is_latest_version($version) ? 'current' : $version;
+$target = __DIR__.DIRECTORY_SEPARATOR.$target;
 $currDir = $target.DIRECTORY_SEPARATOR.'curr';
 $langDir = $target.DIRECTORY_SEPARATOR.'lang';
 $localesDir = $target.DIRECTORY_SEPARATOR.'locales';
@@ -188,11 +300,22 @@ $namesDir = $target.DIRECTORY_SEPARATOR.'names';
 $namesGeneratedDir = $namesDir.DIRECTORY_SEPARATOR.'generated';
 $regionDir = $target.DIRECTORY_SEPARATOR.'region';
 
+make_directory($target);
+clear_directory($target);
+create_svn_info_file($source, $target);
+
 make_directory($currDir);
 clear_directory($currDir);
 
-genrb_file($currDir, $source.DIRECTORY_SEPARATOR.'curr', 'en');
-genrb_file($currDir, $source.DIRECTORY_SEPARATOR.'curr', 'supplementalData');
+// Currency data is available at the locales data files in ICU <= 4.2 and the supplementalData file is available at the
+// misc directory
+if (is_42_or_earlier($version)) {
+    genrb_file($currDir, $source.DIRECTORY_SEPARATOR.'locales', 'en', $icuBinPath);
+    genrb_file($currDir, $source.DIRECTORY_SEPARATOR.'misc', 'supplementalData', $icuBinPath);
+} else {
+    genrb_file($currDir, $source.DIRECTORY_SEPARATOR.'curr', 'en', $icuBinPath);
+    genrb_file($currDir, $source.DIRECTORY_SEPARATOR.'curr', 'supplementalData', $icuBinPath);
+}
 
 // It seems \ResourceBundle does not like locale names with uppercase chars then we rename the binary file
 // See: http://bugs.php.net/bug.php?id=54025
@@ -205,15 +328,27 @@ if (!rename($filename_from, $filename_to)) {
 
 make_directory($langDir);
 clear_directory($langDir);
-genrb($source.DIRECTORY_SEPARATOR.'lang', $langDir);
+
+// Language data is available at the locales data files in ICU <= 4.2
+if (is_42_or_earlier($version)) {
+    genrb($source.DIRECTORY_SEPARATOR.'locales', $langDir, $icuBinPath);
+} else {
+    genrb($source.DIRECTORY_SEPARATOR.'lang', $langDir, $icuBinPath);
+}
 
 make_directory($localesDir);
 clear_directory($localesDir);
-genrb($source.DIRECTORY_SEPARATOR.'locales', $localesDir);
+genrb($source.DIRECTORY_SEPARATOR.'locales', $localesDir, $icuBinPath);
 
 make_directory($regionDir);
 clear_directory($regionDir);
-genrb($source.DIRECTORY_SEPARATOR.'region', $regionDir);
+
+// Region data is available at the locales data files in ICU <= 4.2
+if (is_42_or_earlier($version)) {
+    genrb($source.DIRECTORY_SEPARATOR.'locales', $regionDir, $icuBinPath);
+} else {
+    genrb($source.DIRECTORY_SEPARATOR.'region', $regionDir, $icuBinPath);
+}
 
 make_directory($namesDir);
 clear_directory($namesDir);
@@ -375,8 +510,6 @@ foreach ($translatedLocales as $translatedLocale) {
         continue;
     }
 
-    echo "Generating $translatedLocale...\n";
-
     $file = fopen($namesGeneratedDir.DIRECTORY_SEPARATOR.$translatedLocale.'.txt', 'w');
 
     fwrite($file, "$translatedLocale{\n");
@@ -388,11 +521,19 @@ foreach ($translatedLocales as $translatedLocale) {
 
     fwrite($file, "    }\n");
     fwrite($file, "}\n");
+
     fclose($file);
 }
 
 // Convert generated files to binary format
-genrb($namesGeneratedDir, $namesDir);
+// Even if the source and generated file are UTF-8 encoded, for some reason the data seems not correctly encoded, leading to
+// a parse error in genrb (Stopped parsing resource with U_ILLEGAL_CHAR_FOUND). So we call the genrb passing that the source
+// files are UTF-8 encoded.
+if (is_42_or_earlier($version)) {
+    genrb($namesGeneratedDir, $namesDir, $icuBinPath, '-e UTF-8');
+} else {
+    genrb($namesGeneratedDir, $namesDir, $icuBinPath);
+}
 
 // Clean up
 clear_directory($namesGeneratedDir);
@@ -406,7 +547,7 @@ $currencies = array();
 $currenciesMeta = array();
 $defaultMeta = array();
 
-$bundle = load_resource_bundle('supplementaldata', __DIR__.'/curr');
+$bundle = load_resource_bundle('supplementaldata', $currDir);
 
 foreach ($bundle->get('CurrencyMeta') as $code => $data) {
     // The 'DEFAULT' key contains the fraction digits and the rounding increment that are common for a lot of currencies
@@ -424,7 +565,7 @@ foreach ($bundle->get('CurrencyMeta') as $code => $data) {
     $currenciesMeta[$code]['roundingIncrement'] = $data[1];
 }
 
-$bundle = load_resource_bundle('en', __DIR__.'/curr');
+$bundle = load_resource_bundle('en', $currDir);
 
 foreach ($bundle->get('Currencies') as $code => $data) {
     $currencies[$code]['symbol'] = $data[0];
@@ -452,7 +593,7 @@ $countriesConstraint = function($code) {
     return false;
 };
 
-$countries = get_data('Countries', 'region', $defaultLocale, $countriesConstraint);
+$countries = get_data('Countries', $regionDir, $defaultLocale, $countriesConstraint);
 
 // Languages
 $languagesConstraint = function($code) {
@@ -464,10 +605,10 @@ $languagesConstraint = function($code) {
     return false;
 };
 
-$languages = get_data('Languages', 'lang', $defaultLocale, $languagesConstraint);
+$languages = get_data('Languages', $langDir, $defaultLocale, $languagesConstraint);
 
 // Display locales
-$displayLocales = get_data('Locales', 'names', $defaultLocale);
+$displayLocales = get_data('Locales', $namesDir, $defaultLocale);
 
 // Create the stubs datafiles
 $stubDir = $target.DIRECTORY_SEPARATOR.'stub';
@@ -496,3 +637,19 @@ create_stub_datafile($defaultLocale, $stubRegionDir, $countries);
 // Clean up
 clear_directory($currDir);
 rmdir($currDir);
+
+// Creates the data version file, used in CI environments
+$dataVersion = __DIR__.DIRECTORY_SEPARATOR.'data-version.php';
+
+if (!is_latest_version($version)) {
+    $data = <<<DATA_VERSION
+<?php
+
+return $version;
+
+DATA_VERSION;
+
+    file_put_contents($dataVersion, $data);
+} elseif (file_exists($dataVersion)) {
+    unlink($dataVersion);
+}

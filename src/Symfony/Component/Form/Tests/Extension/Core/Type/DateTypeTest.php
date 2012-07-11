@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\FormError;
 
 class DateTypeTest extends LocalizedTestCase
 {
@@ -685,5 +686,58 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
         $this->assertNull($view->getVar('type'));
+    }
+
+    public function provideCompoundWidgets()
+    {
+        return array(
+            array('text'),
+            array('choice'),
+        );
+    }
+
+    /**
+     * @dataProvider provideCompoundWidgets
+     */
+    public function testYearErrorsBubbleUp($widget)
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('date', null, array(
+            'widget' => $widget,
+        ));
+        $form->get('year')->addError($error);
+
+        $this->assertSame(array(), $form->get('year')->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
+    /**
+     * @dataProvider provideCompoundWidgets
+     */
+    public function testMonthErrorsBubbleUp($widget)
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('date', null, array(
+            'widget' => $widget,
+        ));
+        $form->get('month')->addError($error);
+
+        $this->assertSame(array(), $form->get('month')->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
+    /**
+     * @dataProvider provideCompoundWidgets
+     */
+    public function testDayErrorsBubbleUp($widget)
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('date', null, array(
+            'widget' => $widget,
+        ));
+        $form->get('day')->addError($error);
+
+        $this->assertSame(array(), $form->get('day')->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
     }
 }

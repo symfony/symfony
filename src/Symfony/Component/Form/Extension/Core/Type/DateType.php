@@ -66,7 +66,9 @@ class DateType extends AbstractType
                 $pattern
             ));
         } else {
-            $yearOptions = $monthOptions = $dayOptions = array();
+            $yearOptions = $monthOptions = $dayOptions = array(
+                'error_bubbling' => true,
+            );
 
             $formatter = new \IntlDateFormatter(
                 \Locale::getDefault(),
@@ -80,18 +82,12 @@ class DateType extends AbstractType
 
             if ('choice' === $options['widget']) {
                 // Only pass a subset of the options to children
-                $yearOptions = array(
-                    'choices' => $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years'])),
-                    'empty_value' => $options['empty_value']['year'],
-                );
-                $monthOptions = array(
-                    'choices' => $this->formatTimestamps($formatter, '/M+/', $this->listMonths($options['months'])),
-                    'empty_value' => $options['empty_value']['month'],
-                );
-                $dayOptions = array(
-                    'choices' => $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days'])),
-                    'empty_value' => $options['empty_value']['day'],
-                );
+                $yearOptions['choices'] = $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years']));
+                $yearOptions['empty_value'] = $options['empty_value']['year'];
+                $monthOptions['choices'] = $this->formatTimestamps($formatter, '/M+/', $this->listMonths($options['months']));
+                $monthOptions['empty_value'] = $options['empty_value']['month'];
+                $dayOptions['choices'] = $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days']));
+                $dayOptions['empty_value'] = $options['empty_value']['day'];
             }
 
             // Append generic carry-along options

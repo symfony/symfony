@@ -151,6 +151,9 @@ class FullTransformer
                 }
             }
 
+            // reset error code and message
+            StubIntl::setError(StubIntl::U_ZERO_ERROR);
+
             return $this->calculateUnixTimestamp($dateTime, $options);
         }
 

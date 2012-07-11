@@ -859,6 +859,24 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         );
     }
 
+    /*
+     * https://github.com/symfony/symfony/issues/4242
+     */
+    public function testParseAfterErrorIntl()
+    {
+        $this->testParseErrorIntl('y-MMMMM-d', '1970-J-1');
+        $this->testParseIntl('y-M-d', '1970-1-1', 0);
+    }
+
+    /*
+     * https://github.com/symfony/symfony/issues/4242
+     */
+    public function testParseAfterErrorStub()
+    {
+        $this->testParseErrorStub('y-MMMMM-d', '1970-J-1');
+        $this->testParseStub('y-M-d', '1970-1-1', 0);
+    }
+
     /**
      * Just to document the differences between the stub and the intl implementations. The intl can parse
      * any of the tested formats alone. The stub does not implement them as it would be needed to add more

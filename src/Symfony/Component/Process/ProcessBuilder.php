@@ -93,7 +93,7 @@ class ProcessBuilder
         if (null === $timeout) {
             $this->timeout = null;
 
-            return;
+            return $this;
         }
 
         $timeout = (integer) $timeout;

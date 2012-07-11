@@ -480,7 +480,7 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertTrue($this->form->isSynchronized());
     }
 
-    public function testNotSynchronizedIfTransformationFailed()
+    public function testNotSynchronizedIfViewReverseTransformationFailed()
     {
         $transformer = $this->getDataTransformer();
         $transformer->expects($this->once())
@@ -489,6 +489,22 @@ class SimpleFormTest extends AbstractFormTest
 
         $form = $this->getBuilder()
             ->addViewTransformer($transformer)
+            ->getForm();
+
+        $form->bind('foobar');
+
+        $this->assertFalse($form->isSynchronized());
+    }
+
+    public function testNotSynchronizedIfModelReverseTransformationFailed()
+    {
+        $transformer = $this->getDataTransformer();
+        $transformer->expects($this->once())
+            ->method('reverseTransform')
+            ->will($this->throwException(new TransformationFailedException()));
+
+        $form = $this->getBuilder()
+            ->addModelTransformer($transformer)
             ->getForm();
 
         $form->bind('foobar');

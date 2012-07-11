@@ -47,6 +47,8 @@ class StreamedResponseListener implements EventSubscriberInterface
         if ($response instanceof StreamedResponse) {
             $response->setOutputStream($this->outputStream);
             $response->send();
+
+            $this->outputStream->close();
         }
     }
 

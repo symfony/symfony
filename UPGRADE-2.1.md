@@ -1167,6 +1167,23 @@
     private $numberOfCpus;
     ```
 
+  * The `MinLength` and `MaxLength` constraints were deprecated and will be
+    removed in Symfony 2.3. You should use the new constraint `Length` instead.
+
+    Before:
+
+    ```
+    /** @Assert\MinLength(8) */
+    private $password;
+    ```
+
+    After:
+
+    ```
+    /** @Assert\Length(min = 8) */
+    private $password;
+    ```
+
 ### Session
 
   * Flash messages now return an array based on their type. The old method is

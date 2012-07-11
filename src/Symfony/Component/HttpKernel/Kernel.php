@@ -79,7 +79,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $this->debug = (Boolean) $debug;
         $this->booted = false;
         $this->rootDir = $this->getRootDir();
-        $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+        $this->name = $this->getName();
         $this->classes = array();
 
         if ($this->debug) {
@@ -354,6 +354,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     public function getName()
     {
+        if (null === $this->name) {
+            $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+        }
+
         return $this->name;
     }
 

@@ -13,6 +13,15 @@
     configuration (i.e. `config.yml`), merging could yield a set of base URL's
     for multiple environments.
 
+ * The priorities for the built-in listeners have changed:
+
+                                       2.0         2.1
+   security.firewall   request         64          8
+   locale listener     early_request   253         255
+                       request         -1          16
+   router listener     early_request   255         128
+                       request         10          32
+
 ### Doctrine
 
   * The DoctrineBundle is moved from the Symfony repository to the Doctrine repository.

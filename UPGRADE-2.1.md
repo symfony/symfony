@@ -1136,6 +1136,26 @@
     private $recursiveCollection;
     ```
 
+  * The `Size` constraint was deprecated and will be removed in Symfony 2.3. You should
+    use the constraints `Min` and `Max` instead.
+
+    Before:
+
+    ```
+    /** @Assert\Size(min = 2, max = 16) */
+    private $numberOfCpus;
+    ```
+
+    After:
+
+    ```
+    /**
+     * @Assert\Min(2)
+     * @Assert\Max(16)
+     */
+    private $numberOfCpus;
+    ```
+
 ### Session
 
   * Flash messages now return an array based on their type. The old method is

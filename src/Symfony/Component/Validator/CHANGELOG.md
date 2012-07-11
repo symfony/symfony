@@ -5,8 +5,6 @@ CHANGELOG
 -----
 
  * added support for `ctype_*` assertions in `TypeValidator`
- * added a Range validator for numeric values
- * added a Size validator for string & collections
  * improved the ImageValidator with min width, max width, min height, and max height constraints
  * added support for MIME with wildcard in FileValidator
  * changed Collection validator to add "missing" and "extra" errors to
@@ -23,3 +21,5 @@ CHANGELOG
  * [BC BREAK] collections in fields annotated with `Valid` are not traversed
    recursively anymore by default. `Valid` contains a new property `deep`
    which enables the BC behavior.
+ * added MinCount and MaxCount constraint
+ * deprecated the Size constraint

@@ -47,6 +47,10 @@ class UniqueEntityValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint->fields, 'array');
         }
 
+        if (null !== $constraint->errorPath && !is_string($constraint->errorPath)) {
+            throw new UnexpectedTypeException($constraint->errorPath, 'string or null');
+        }
+
         $fields = (array) $constraint->fields;
 
         if (0 === count($fields)) {
@@ -114,6 +118,8 @@ class UniqueEntityValidator extends ConstraintValidator
             return;
         }
 
-        $this->context->addViolationAtSubPath($fields[0], $constraint->message, array(), $criteria[$fields[0]]);
+        $errorPath = null !== $constraint->errorPath ? $constraint->errorPath : $fields[0];
+
+        $this->context->addViolationAtSubPath($errorPath, $constraint->message, array(), $criteria[$fields[0]]);
     }
 }

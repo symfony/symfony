@@ -21,5 +21,5 @@ CHANGELOG
  * [BC BREAK] collections in fields annotated with `Valid` are not traversed
    recursively anymore by default. `Valid` contains a new property `deep`
    which enables the BC behavior.
- * added MinCount and MaxCount constraint
  * deprecated the Size constraint and renamed it to Range
+ * added Count constraint

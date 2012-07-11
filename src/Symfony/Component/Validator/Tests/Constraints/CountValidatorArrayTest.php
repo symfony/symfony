@@ -11,28 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-class MinCountValidatorCountableTest_Countable implements \Countable
-{
-    private $content;
-
-    public function __construct(array $content)
-    {
-        $this->content = $content;
-    }
-
-    public function count()
-    {
-        return count($this->content);
-    }
-}
-
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class MinCountValidatorCountableTest extends MinCountValidatorTest
+class CountValidatorArrayTest extends CountValidatorTest
 {
     protected function createCollection(array $content)
     {
-        return new MinCountValidatorCountableTest_Countable($content);
+        return $content;
     }
 }

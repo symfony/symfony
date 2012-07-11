@@ -18,15 +18,13 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class MinCountValidator extends ConstraintValidator
+class CountValidator extends ConstraintValidator
 {
     /**
      * Checks if the passed value is valid.
      *
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
-     *
-     * @throws UnexpectedTypeException If the given value is no array or \Countable.
      */
     public function validate($value, Constraint $constraint)
     {
@@ -40,11 +38,29 @@ class MinCountValidator extends ConstraintValidator
 
         $count = count($value);
 
-        if ($count < $constraint->limit) {
-            $this->context->addViolation($constraint->message, array(
+        if ($constraint->min == $constraint->max && $count != $constraint->min) {
+            $this->context->addViolation($constraint->exactMessage, array(
                 '{{ count }}' => $count,
-                '{{ limit }}' => $constraint->limit,
-            ), $value, (int) $constraint->limit);
+                '{{ limit }}' => $constraint->min,
+            ), $value, (int) $constraint->min);
+
+            return;
+        }
+
+        if (null !== $constraint->max && $count > $constraint->max) {
+            $this->context->addViolation($constraint->maxMessage, array(
+                '{{ count }}' => $count,
+                '{{ limit }}' => $constraint->max,
+            ), $value, (int) $constraint->max);
+
+            return;
+        }
+
+        if (null !== $constraint->min && $count < $constraint->min) {
+            $this->context->addViolation($constraint->minMessage, array(
+                '{{ count }}' => $count,
+                '{{ limit }}' => $constraint->min,
+            ), $value, (int) $constraint->min);
         }
     }
 }

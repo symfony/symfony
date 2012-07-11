@@ -59,6 +59,17 @@ class StreamOutputStream implements OutputStreamInterface
     }
 
     /**
+     * Expose the stream resource, so that it can be used for more efficient
+     * operations, such as stream_copy_to_stream.
+     *
+     * @return The stream resource
+     */
+    public function getStreamResource()
+    {
+        return $this->stream;
+    }
+
+    /**
      * Static factory method
      */
     static public function create($filename)

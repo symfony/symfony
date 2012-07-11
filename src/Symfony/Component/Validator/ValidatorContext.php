@@ -33,7 +33,7 @@ class ValidatorContext implements ValidatorContextInterface
     protected $constraintValidatorFactory = null;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setClassMetadataFactory(ClassMetadataFactoryInterface $classMetadataFactory)
     {
@@ -43,7 +43,7 @@ class ValidatorContext implements ValidatorContextInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $constraintValidatorFactory)
     {
@@ -53,7 +53,7 @@ class ValidatorContext implements ValidatorContextInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getValidator()
     {

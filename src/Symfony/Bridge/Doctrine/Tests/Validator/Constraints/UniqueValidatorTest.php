@@ -11,10 +11,17 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
+require_once __DIR__.'/../../DoctrineOrmTestCase.php';
+require_once __DIR__.'/../../Fixtures/SingleIdentEntity.php';
+require_once __DIR__.'/../../Fixtures/CompositeIdentEntity.php';
+require_once __DIR__.'/../../Fixtures/AssociationEntity.php';
+
 use Symfony\Bridge\Doctrine\Tests\DoctrineOrmTestCase;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIdentEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleTableParentEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleTableChildEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -69,7 +76,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         return $validatorFactory;
     }
 
-    public function createValidator($entityManagerName, $em, $validateClass = null, $uniqueFields = null)
+    public function createValidator($entityManagerName, $em, $validateClass = null, $uniqueFields = null, $checkParent = false)
     {
         if (!$validateClass) {
             $validateClass = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity';
@@ -83,7 +90,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $uniqueValidator = new UniqueEntityValidator($registry);
 
         $metadata = new ClassMetadata($validateClass);
-        $metadata->addConstraint(new UniqueEntity(array('fields' => $uniqueFields, 'em' => $entityManagerName)));
+        $metadata->addConstraint(new UniqueEntity(array('fields' => $uniqueFields, 'em' => $entityManagerName, 'checkParent' => $checkParent)));
 
         $metadataFactory = $this->createMetadataFactoryMock($metadata);
         $validatorFactory = $this->createValidatorFactory($uniqueValidator);
@@ -98,6 +105,8 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIdentEntity'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity'),
+            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleTableParentEntity'),
+            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleTableChildEntity'),
         ));
     }
 
@@ -225,5 +234,28 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
             'Associated entities are not allowed to have more than one identifier field'
         );
         $violationsList = $validator->validate($associated);
+    }
+
+    public function testSingleTableInheritanceEntity()
+    {
+        $entityManagerName = 'foo';
+        $em = $this->createTestEntityManager();
+        $this->createSchema($em);
+        $validator = $this->createValidator($entityManagerName, $em, 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleTableChildEntity', array('name'), true);
+
+        $parent = new SingleTableParentEntity(1, 'Foo');
+        $child = new SingleTableChildEntity(2, 'Foo');
+
+        $em->persist($parent);
+        $em->flush();
+
+        $violationsList = $validator->validate($child);
+
+        $this->assertEquals(1, $violationsList->count(), 'Violation found on parent entity');
+
+        $validator = $this->createValidator($entityManagerName, $em, 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleTableChildEntity', array('name'), false);
+        $violationsList = $validator->validate($child);
+
+        $this->assertEquals(0, $violationsList->count(), 'Violation on parent entity is not checked');
     }
 }

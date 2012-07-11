@@ -64,6 +64,7 @@ class StreamOutputStream implements OutputStreamInterface
     static public function create($filename)
     {
         $stream = fopen($filename, 'w');
+
         return new static($stream);
     }
 }

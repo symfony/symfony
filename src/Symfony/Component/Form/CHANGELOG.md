@@ -149,3 +149,8 @@ CHANGELOG
  * fixed: the "data" option supersedes default values from the model
  * changed DateType to refer to the "format" option for calculating the year and day choices instead
    of padding them automatically
+ * [BC BREAK] DateType defaults to the format "yyyy-MM-dd" now if the widget is
+   "single_text", in order to support the HTML 5 date field out of the box
+ * added the option "format" to DateTimeType
+ * [BC BREAK] DateTimeType now outputs RFC 3339 dates by default, as generated and
+   consumed by HTML5 browsers, if the widget is "single_text"

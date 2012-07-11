@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\FormError;
 
 class TimeTypeTest extends LocalizedTestCase
 {
@@ -505,5 +506,59 @@ class TimeTypeTest extends LocalizedTestCase
         $this->assertSame('Empty hour', $view->get('hour')->getVar('empty_value'));
         $this->assertNull($view->get('minute')->getVar('empty_value'));
         $this->assertSame('Empty second', $view->get('second')->getVar('empty_value'));
+    }
+
+    public function provideCompoundWidgets()
+    {
+        return array(
+            array('text'),
+            array('choice'),
+        );
+    }
+
+    /**
+     * @dataProvider provideCompoundWidgets
+     */
+    public function testHourErrorsBubbleUp($widget)
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('time', null, array(
+            'widget' => $widget,
+        ));
+        $form->get('hour')->addError($error);
+
+        $this->assertSame(array(), $form->get('hour')->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
+    /**
+     * @dataProvider provideCompoundWidgets
+     */
+    public function testMinuteErrorsBubbleUp($widget)
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('time', null, array(
+            'widget' => $widget,
+        ));
+        $form->get('minute')->addError($error);
+
+        $this->assertSame(array(), $form->get('minute')->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
+    /**
+     * @dataProvider provideCompoundWidgets
+     */
+    public function testSecondErrorsBubbleUp($widget)
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('time', null, array(
+            'widget' => $widget,
+            'with_seconds' => true,
+        ));
+        $form->get('second')->addError($error);
+
+        $this->assertSame(array(), $form->get('second')->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
     }
 }

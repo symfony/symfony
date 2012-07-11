@@ -94,13 +94,13 @@ class DateTimeType extends AbstractType
         if ('single_text' === $options['widget']) {
             if (self::HTML5_FORMAT === $pattern) {
                 $builder->addViewTransformer(new DateTimeToRfc3339Transformer(
-                    $options['data_timezone'],
-                    $options['user_timezone']
+                    $options['model_timezone'],
+                    $options['view_timezone']
                 ));
             } else {
                 $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
-                    $options['data_timezone'],
-                    $options['user_timezone'],
+                    $options['model_timezone'],
+                    $options['view_timezone'],
                     $dateFormat,
                     $timeFormat,
                     $calendar,
@@ -145,7 +145,7 @@ class DateTimeType extends AbstractType
 
             $builder
                 ->addViewTransformer(new DataTransformerChain(array(
-                    new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts),
+                    new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts),
                     new ArrayToPartsTransformer(array(
                         'date' => $dateParts,
                         'time' => $timeParts,
@@ -158,15 +158,15 @@ class DateTimeType extends AbstractType
 
         if ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'])
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'])
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
+                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
+                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], $parts)
             ));
         }
     }
@@ -205,25 +205,38 @@ class DateTimeType extends AbstractType
             return $options['widget'];
         };
 
+        // BC until Symfony 2.3
+        $modelTimezone = function (Options $options) {
+            return $options['data_timezone'];
+        };
+
+        // BC until Symfony 2.3
+        $viewTimezone = function (Options $options) {
+            return $options['user_timezone'];
+        };
+
         $resolver->setDefaults(array(
-            'input'         => 'datetime',
-            'data_timezone' => null,
-            'user_timezone' => null,
-            'format'        => self::HTML5_FORMAT,
-            'date_format'   => null,
-            'widget'        => null,
-            'date_widget'   => $dateWidget,
-            'time_widget'   => $timeWidget,
-            'with_seconds'  => false,
+            'input'          => 'datetime',
+            'model_timezone' => $modelTimezone,
+            'view_timezone'  => $viewTimezone,
+            // Deprecated timezone options
+            'data_timezone'  => null,
+            'user_timezone'  => null,
+            'format'         => self::HTML5_FORMAT,
+            'date_format'    => null,
+            'widget'         => null,
+            'date_widget'    => $dateWidget,
+            'time_widget'    => $timeWidget,
+            'with_seconds'   => false,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference'  => false,
+            'by_reference'   => false,
             // If initialized with a \DateTime object, FormType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset
             // this option.
-            'data_class'    => null,
-            'compound'      => $compound,
+            'data_class'     => null,
+            'compound'       => $compound,
         ));
 
         // Don't add some defaults in order to preserve the defaults

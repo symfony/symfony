@@ -22,4 +22,4 @@ CHANGELOG
    recursively anymore by default. `Valid` contains a new property `deep`
    which enables the BC behavior.
  * added MinCount and MaxCount constraint
- * deprecated the Size constraint
+ * deprecated the Size constraint and renamed it to Range

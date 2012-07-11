@@ -158,14 +158,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 return new TypeGuess('text', array(), Guess::LOW_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Size':
-                switch ($constraint->type) {
-                    case 'string':
-                        return new TypeGuess('text', array(), Guess::LOW_CONFIDENCE);
-                    case 'collection':
-                        return new TypeGuess('collection', array(), Guess::MEDIUM_CONFIDENCE);
-                }
-                break;
-
             case 'Symfony\Component\Validator\Constraints\Min':
             case 'Symfony\Component\Validator\Constraints\Max':
                 return new TypeGuess('number', array(), Guess::LOW_CONFIDENCE);
@@ -211,12 +203,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\MaxLength':
                 return new ValueGuess($constraint->limit, Guess::HIGH_CONFIDENCE);
 
-            case 'Symfony\Component\Validator\Constraints\Size':
-                if ('string' === $constraint->type && null !== $constraint->max) {
-                    return new ValueGuess($constraint->max, Guess::HIGH_CONFIDENCE);
-                }
-                break;
-
             case 'Symfony\Component\Validator\Constraints\Type':
                 if (in_array($constraint->type, array('double', 'float', 'numeric', 'real'))) {
                         return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
@@ -225,6 +211,9 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
             case 'Symfony\Component\Validator\Constraints\Max':
                 return new ValueGuess(strlen((string) $constraint->limit), Guess::LOW_CONFIDENCE);
+
+            case 'Symfony\Component\Validator\Constraints\Size':
+                return new ValueGuess(strlen((string) $constraint->max), Guess::LOW_CONFIDENCE);
         }
     }
 
@@ -241,25 +230,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\MinLength':
                 return new ValueGuess(sprintf('.{%s,}', (string) $constraint->limit), Guess::LOW_CONFIDENCE);
 
-            case 'Symfony\Component\Validator\Constraints\Size':
-                if ('string' !== $constraint->type) {
-                    return;
-                }
-
-                if ($constraint->min === $constraint->max) {
-                    return new ValueGuess(sprintf('.{%s}', (string) $constraint->min), Guess::LOW_CONFIDENCE);
-                }
-
-                if (null === $constraint->min) {
-                    return new ValueGuess(sprintf('.{0,%s}', (string) $constraint->max), Guess::LOW_CONFIDENCE);
-                }
-
-                if (null === $constraint->max) {
-                    return new ValueGuess(sprintf('.{%s,}', (string) $constraint->min), Guess::LOW_CONFIDENCE);
-                }
-
-                return new ValueGuess(sprintf('.{%s,%s}', (string) $constraint->min, (string) $constraint->max), Guess::LOW_CONFIDENCE);
-
             case 'Symfony\Component\Validator\Constraints\Regex':
                 $htmlPattern = $constraint->getHtmlPattern();
 
@@ -270,6 +240,9 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
             case 'Symfony\Component\Validator\Constraints\Min':
                 return new ValueGuess(sprintf('.{%s,}', strlen((string) $constraint->limit)), Guess::LOW_CONFIDENCE);
+
+            case 'Symfony\Component\Validator\Constraints\Size':
+                return new ValueGuess(sprintf('.{%s,%s}', strlen((string) $constraint->min), strlen((string) $constraint->max)), Guess::LOW_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Type':
                 if (in_array($constraint->type, array('double', 'float', 'numeric', 'real'))) {

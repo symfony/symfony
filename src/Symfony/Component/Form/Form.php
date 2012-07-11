@@ -544,11 +544,7 @@ class Form implements \IteratorAggregate, FormInterface
         try {
             // Normalize data to unified representation
             $normData = $this->viewToNorm($viewData);
-            $synchronized = true;
-        } catch (TransformationFailedException $e) {
-        }
 
-        if ($synchronized) {
             // Hook to change content of the data into the normalized
             // representation
             $event = new FormEvent($this, $normData);
@@ -560,6 +556,9 @@ class Form implements \IteratorAggregate, FormInterface
             // Synchronize representations - must not change the content!
             $modelData = $this->normToModel($normData);
             $viewData = $this->normToView($normData);
+            
+            $synchronized = true;
+        } catch (TransformationFailedException $e) {
         }
 
         $this->bound = true;

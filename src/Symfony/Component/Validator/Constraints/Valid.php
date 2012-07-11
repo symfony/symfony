@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @Annotation
@@ -23,4 +24,13 @@ class Valid extends Constraint
     public $traverse = true;
 
     public $deep = false;
+
+    public function __construct($options = null)
+    {
+        if (is_array($options) && array_key_exists('groups', $options)) {
+            throw new ConstraintDefinitionException('The option "groups" is not supported by the constraint ' . __CLASS__);
+        }
+
+        parent::__construct($options);
+    }
 }

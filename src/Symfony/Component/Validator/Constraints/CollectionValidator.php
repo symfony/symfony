@@ -52,17 +52,7 @@ class CollectionValidator extends ConstraintValidator
                 (is_array($value) && array_key_exists($field, $value)) ||
                 ($value instanceof \ArrayAccess && $value->offsetExists($field))
             ) {
-                if ($fieldConstraint instanceof Required || $fieldConstraint instanceof Optional) {
-                    $constraints = $fieldConstraint->constraints;
-                } else {
-                    $constraints = $fieldConstraint;
-                }
-
-                // cannot simply cast to array, because then the object is converted to an
-                // array instead of wrapped inside
-                $constraints = is_array($constraints) ? $constraints : array($constraints);
-
-                foreach ($constraints as $constr) {
+                foreach ($fieldConstraint->constraints as $constr) {
                     $walker->walkConstraint($constr, $value[$field], $group, $propertyPath.'['.$field.']');
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {

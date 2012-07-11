@@ -34,19 +34,7 @@ class RangeValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate(null, new Range(array('min' => 10, 'max' => 20)));
     }
 
-    /**
-     * @dataProvider getValidValues
-     */
-    public function testValidValues($value)
-    {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
-        $constraint = new Range(array('min' => 10, 'max' => 20));
-        $this->validator->validate($value, $constraint);
-    }
-
-    public function getValidValues()
+    public function getTenToTwenty()
     {
         return array(
             array(10.00001),
@@ -60,15 +48,143 @@ class RangeValidatorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @dataProvider getInvalidValues
-     */
-    public function testInvalidValues($value)
+    public function getLessThanTen()
     {
-        $this->context->expects($this->once())
+        return array(
+            array(9.99999),
+            array('9.99999'),
+            array(5),
+            array(1.0),
+        );
+    }
+
+    public function getMoreThanTwenty()
+    {
+        return array(
+            array(20.000001),
+            array('20.000001'),
+            array(21),
+            array(30.0),
+        );
+    }
+
+    /**
+     * @dataProvider getTenToTwenty
+     */
+    public function testValidValuesMin($value)
+    {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $constraint = new Range(array('min' => 10));
+        $this->validator->validate($value, $constraint);
+    }
+
+    /**
+     * @dataProvider getTenToTwenty
+     */
+    public function testValidValuesMax($value)
+    {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $constraint = new Range(array('max' => 20));
+        $this->validator->validate($value, $constraint);
+    }
+
+    /**
+     * @dataProvider getTenToTwenty
+     */
+    public function testValidValuesMinMax($value)
+    {
+        $this->context->expects($this->never())
             ->method('addViolation');
 
         $constraint = new Range(array('min' => 10, 'max' => 20));
+        $this->validator->validate($value, $constraint);
+    }
+
+    /**
+     * @dataProvider getLessThanTen
+     */
+    public function testInvalidValuesMin($value)
+    {
+        $constraint = new Range(array(
+            'min' => 10,
+            'minMessage' => 'myMessage',
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', $this->identicalTo(array(
+                '{{ value }}' => $value,
+                '{{ limit }}' => 10,
+        )));
+
+        $this->validator->validate($value, $constraint);
+    }
+
+    /**
+     * @dataProvider getMoreThanTwenty
+     */
+    public function testInvalidValuesMax($value)
+    {
+        $constraint = new Range(array(
+            'max' => 20,
+            'maxMessage' => 'myMessage',
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', $this->identicalTo(array(
+                '{{ value }}' => $value,
+                '{{ limit }}' => 20,
+            )));
+
+        $this->validator->validate($value, $constraint);
+    }
+
+    /**
+     * @dataProvider getMoreThanTwenty
+     */
+    public function testInvalidValuesCombinedMax($value)
+    {
+        $constraint = new Range(array(
+            'min' => 10,
+            'max' => 20,
+            'minMessage' => 'myMinMessage',
+            'maxMessage' => 'myMaxMessage',
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMaxMessage', $this->identicalTo(array(
+                '{{ value }}' => $value,
+                '{{ limit }}' => 20,
+            )));
+
+        $this->validator->validate($value, $constraint);
+    }
+
+    /**
+     * @dataProvider getLessThanTen
+     */
+    public function testInvalidValuesCombinedMin($value)
+    {
+        $constraint = new Range(array(
+            'min' => 10,
+            'max' => 20,
+            'minMessage' => 'myMinMessage',
+            'maxMessage' => 'myMaxMessage',
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMinMessage', $this->identicalTo(array(
+            '{{ value }}' => $value,
+            '{{ limit }}' => 10,
+        )));
+
         $this->validator->validate($value, $constraint);
     }
 

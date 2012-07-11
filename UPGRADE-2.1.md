@@ -1136,8 +1136,8 @@
     private $recursiveCollection;
     ```
 
-  * The `Size` constraint was deprecated and will be removed in Symfony 2.3. You should
-    use the constraints `Min` and `Max` instead.
+  * The `Size`, `Min` and `Max` constraints were deprecated and will be removed in
+    Symfony 2.3. You should use the new constraint `Range` instead.
 
     Before:
 
@@ -1149,10 +1149,21 @@
     After:
 
     ```
-    /**
-     * @Assert\Min(2)
-     * @Assert\Max(16)
-     */
+    /** @Assert\Range(min = 2, max = 16) */
+    private $numberOfCpus;
+    ```
+
+    Before:
+
+    ```
+    /** @Assert\Min(2) */
+    private $numberOfCpus;
+    ```
+
+    After:
+
+    ```
+    /** @Assert\Range(min = 2) */
     private $numberOfCpus;
     ```
 

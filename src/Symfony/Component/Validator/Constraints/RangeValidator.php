@@ -41,7 +41,7 @@ class RangeValidator extends ConstraintValidator
             return;
         }
 
-        if ($value > $constraint->max) {
+        if (null !== $constraint->max && $value > $constraint->max) {
             $this->context->addViolation($constraint->maxMessage, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->max,
@@ -50,7 +50,7 @@ class RangeValidator extends ConstraintValidator
             return;
         }
 
-        if ($value < $constraint->min) {
+        if (null !== $constraint->min && $value < $constraint->min) {
             $this->context->addViolation($constraint->minMessage, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->min,

@@ -53,7 +53,7 @@ class DateType extends AbstractType
         }
 
         if (null !== $pattern && (false === strpos($pattern, 'y') || false === strpos($pattern, 'M') || false === strpos($pattern, 'd'))) {
-            throw new InvalidOptionsException(sprintf('The "format" option should contain the patterns "y", "M" and "d". Its current value is "%s".', $pattern));
+            throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" and "d". Its current value is "%s".', $pattern));
         }
 
         if ('single_text' === $options['widget']) {

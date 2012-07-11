@@ -677,7 +677,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertNull($view->getVar('type'));
     }
 
-    public function testPassHtml5TypeIfNotSingleText()
+    public function testDontPassHtml5TypeIfNotSingleText()
     {
         $form = $this->factory->create('date', null, array(
             'widget' => 'text',

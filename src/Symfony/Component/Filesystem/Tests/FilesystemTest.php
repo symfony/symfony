@@ -733,6 +733,22 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             array('var/lib/symfony/', 'var/lib/symfony/src/Symfony/Component', '../../../'),
             array('/usr/lib/symfony/', '/var/lib/symfony/src/Symfony/Component', '../../../../../../usr/lib/symfony/'),
             array('/var/lib/symfony/src/Symfony/', '/var/lib/symfony/', 'src/Symfony/'),
+            array('/aa/bb', '/aa/bb', './'),
+            array('/aa/bb', '/aa/bb/', './'),
+            array('/aa/bb/', '/aa/bb', './'),
+            array('/aa/bb/', '/aa/bb/', './'),
+            array('/aa/bb/cc', '/aa/bb/cc/dd', '../'),
+            array('/aa/bb/cc', '/aa/bb/cc/dd/', '../'),
+            array('/aa/bb/cc/', '/aa/bb/cc/dd', '../'),
+            array('/aa/bb/cc/', '/aa/bb/cc/dd/', '../'),
+            array('/aa/bb/cc', '/aa', 'bb/cc/'),
+            array('/aa/bb/cc', '/aa/', 'bb/cc/'),
+            array('/aa/bb/cc/', '/aa', 'bb/cc/'),
+            array('/aa/bb/cc/', '/aa/', 'bb/cc/'),
+            array('/a/aab/bb', '/a/aa', '../aab/bb/'),
+            array('/a/aab/bb', '/a/aa/', '../aab/bb/'),
+            array('/a/aab/bb/', '/a/aa', '../aab/bb/'),
+            array('/a/aab/bb/', '/a/aa/', '../aab/bb/'),
         );
 
         if (defined('PHP_WINDOWS_VERSION_MAJOR')) {

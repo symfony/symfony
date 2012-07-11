@@ -171,7 +171,13 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
             case 'Symfony\Component\Validator\Constraints\Url':
                 return new TypeGuess('url', array(), Guess::HIGH_CONFIDENCE);
+
+            case 'Symfony\Component\Validator\Constraints\True':
+            case 'Symfony\Component\Validator\Constraints\False':
+                return new TypeGuess('checkbox', array(), Guess::MEDIUM_CONFIDENCE);
         }
+
+        return null;
     }
 
     /**
@@ -186,8 +192,11 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\NotNull':
             case 'Symfony\Component\Validator\Constraints\NotBlank':
+            case 'Symfony\Component\Validator\Constraints\True':
                 return new ValueGuess(true, Guess::HIGH_CONFIDENCE);
         }
+
+        return null;
     }
 
     /**
@@ -215,6 +224,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\Size':
                 return new ValueGuess(strlen((string) $constraint->max), Guess::LOW_CONFIDENCE);
         }
+
+        return null;
     }
 
     /**
@@ -250,6 +261,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 }
                 break;
         }
+
+        return null;
     }
 
     /**

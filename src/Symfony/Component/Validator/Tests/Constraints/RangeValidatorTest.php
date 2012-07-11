@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\Constraints\Size;
-use Symfony\Component\Validator\Constraints\SizeValidator;
+use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\RangeValidator;
 
-class SizeValidatorTest extends \PHPUnit_Framework_TestCase
+class RangeValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $context;
     protected $validator;
@@ -22,7 +22,7 @@ class SizeValidatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new SizeValidator();
+        $this->validator = new RangeValidator();
         $this->validator->initialize($this->context);
     }
 
@@ -31,7 +31,7 @@ class SizeValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->validate(null, new Size(array('min' => 10, 'max' => 20)));
+        $this->validator->validate(null, new Range(array('min' => 10, 'max' => 20)));
     }
 
     /**
@@ -42,7 +42,7 @@ class SizeValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $constraint = new Size(array('min' => 10, 'max' => 20));
+        $constraint = new Range(array('min' => 10, 'max' => 20));
         $this->validator->validate($value, $constraint);
     }
 
@@ -68,7 +68,7 @@ class SizeValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation');
 
-        $constraint = new Size(array('min' => 10, 'max' => 20));
+        $constraint = new Range(array('min' => 10, 'max' => 20));
         $this->validator->validate($value, $constraint);
     }
 
@@ -85,7 +85,7 @@ class SizeValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testMinMessageIsSet()
     {
-        $constraint = new Size(array(
+        $constraint = new Range(array(
             'min' => 10,
             'max' => 20,
             'minMessage' => 'myMessage',
@@ -103,7 +103,7 @@ class SizeValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testMaxMessageIsSet()
     {
-        $constraint = new Size(array(
+        $constraint = new Range(array(
             'min' => 10,
             'max' => 20,
             'maxMessage' => 'myMessage',

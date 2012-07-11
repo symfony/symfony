@@ -378,10 +378,8 @@ class StubIntlDateFormatter
         $timestamp = $transformer->parse($dateTime, $value);
 
         // behave like the intl extension. FullTransformer::parse() set the proper error
-        if (false === $timestamp) {
-            $this->errorCode = StubIntl::getErrorCode();
-            $this->errorMessage = StubIntl::getErrorMessage();
-        }
+        $this->errorCode = StubIntl::getErrorCode();
+        $this->errorMessage = StubIntl::getErrorMessage();
 
         return $timestamp;
     }

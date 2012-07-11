@@ -970,6 +970,28 @@
     ));
     ```
 
+  * The options "data_timezone" and "user_timezone" in `DateType`,
+    `DateTimeType` and `TimeType` were deprecated and will be removed in
+    Symfony 2.3. They were renamed to "model_timezone" and "view_timezone".
+
+    Before:
+
+    ```
+    $builder->add('scheduledFor', 'date', array(
+        'data_timezone' => 'UTC',
+        'user_timezone' => 'America/New_York',
+    ));
+    ```
+
+    After:
+
+    ```
+    $builder->add('scheduledFor', 'date', array(
+        'model_timezone' => 'UTC',
+        'view_timezone' => 'America/New_York',
+    ));
+    ```
+
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and

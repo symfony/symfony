@@ -7,6 +7,22 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.16 (2012-07-11)
+
+ * 854daa8: [Form] Fixed errors not to be added onto non-synchronized forms
+ * facbcdc: [Validator] fixed error message for dates like 2012-02-31 (closes #4223)
+ * 28f002d: [Locale] fixed bug on the parsing of TYPE_INT64 integers in 32 bit and 64 bit environments, caused by PHP bug fix :) (closes #4718)
+ * c1fea1d: fixed incorrect reference to set*Service() method
+ * b89b00f: bumped minimal version of Swiftmailer to 4.2.0
+ * 997bcfc: [SwiftmailerBridge] allowed versions 4.2.*
+ * 680b83c: [Security] Allow "0" as a password
+ * a609d55: [Locale] fixed StubIntlDateFormatter to behave like the ext/intl implementation
+ * 3ce8227: [Security] Only redirect to urls called with http method GET
+ * ba16a51: changed getName() to name on all Reflection* object calls (fixes #4555, refs https://bugs.php.net/bug.php?id=61384)
+ * 5d88255: Authorization header should only be rebuild when Basic Auth scheme is used
+ * 789fc14: Accept calling setLenient(false)
+ * b631073: [Yaml] Fixed double quotes escaping in Dumper.
+
 * 2.0.15 (2012-05-30)
 
  * 20b556d: [Form] fixed a bug that caused input date validation not to be strict when using the single_text widget with a datetime field

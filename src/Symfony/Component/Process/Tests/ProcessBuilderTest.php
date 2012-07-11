@@ -92,4 +92,14 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $pb = new ProcessBuilder();
         $pb->setTimeout(-1);
     }
+
+    public function testDisableTimeout()
+    {
+        $pb = new ProcessBuilder(array(''));
+        $pb->setTimeout(null);
+
+        $p = $pb->getProcess();
+
+        $this->assertNull($p->getTimeout(), "Default timeout set by ProcessBuilder is 60s, this should now be 'null'.");
+    }
 }

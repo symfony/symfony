@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
+use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
 use Symfony\Component\HttpKernel\Tests\Fixtures\FooBarBundle;
 
 class KernelTest extends \PHPUnit_Framework_TestCase
@@ -308,6 +309,13 @@ EOF;
         $kernel = new KernelForTest('test', true);
 
         $this->assertEquals('Fixtures', $kernel->getName());
+    }
+
+    public function testOverrideGetName()
+    {
+        $kernel = new KernelForOverrideName('test', true);
+
+        $this->assertEquals('overridden', $kernel->getName());
     }
 
     public function testSerialize()

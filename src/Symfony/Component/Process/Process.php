@@ -595,6 +595,8 @@ class Process
     public function setTimeout($timeout)
     {
         if (null === $timeout) {
+            $this->timeout = null;
+
             return null;
         }
 

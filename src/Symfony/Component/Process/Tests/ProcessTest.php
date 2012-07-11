@@ -35,6 +35,15 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $p->setTimeout(-1);
     }
 
+    public function testNullTimeout()
+    {
+        $p = new Process('');
+        $p->setTimeout(10);
+        $p->setTimeout(null);
+
+        $this->assertNull($p->getTimeout());
+    }
+
     /**
      * tests results from sub processes
      *

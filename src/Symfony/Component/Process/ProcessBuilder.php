@@ -91,7 +91,9 @@ class ProcessBuilder
     public function setTimeout($timeout)
     {
         if (null === $timeout) {
-            return null;
+            $this->timeout = null;
+
+            return;
         }
 
         $timeout = (integer) $timeout;

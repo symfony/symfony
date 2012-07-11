@@ -12,9 +12,9 @@
 namespace Symfony\Component\Form\Extension\Validator;
 
 use Symfony\Component\Form\Extension\Validator\Type;
+use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Validator\ValidatorInterface;
-use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Valid;
 
 class ValidatorExtension extends AbstractExtension
@@ -26,7 +26,7 @@ class ValidatorExtension extends AbstractExtension
         $this->validator = $validator;
 
         $metadata = $this->validator->getMetadataFactory()->getClassMetadata('Symfony\Component\Form\Form');
-        $metadata->addConstraint(new Callback(array(array('Symfony\Component\Form\Extension\Validator\Validator\DelegatingValidator', 'validateFormData'))));
+        $metadata->addConstraint(new Form());
         $metadata->addPropertyConstraint('children', new Valid());
     }
 
@@ -39,6 +39,7 @@ class ValidatorExtension extends AbstractExtension
     {
         return array(
             new Type\FormTypeValidatorExtension($this->validator),
+            new Type\RepeatedTypeValidatorExtension(),
         );
     }
 }

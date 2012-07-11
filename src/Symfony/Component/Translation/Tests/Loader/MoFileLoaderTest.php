@@ -16,7 +16,8 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class MoFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp() {
+    protected function setUp()
+    {
         if (!class_exists('Symfony\Component\Config\Loader\Loader')) {
             $this->markTestSkipped('The "Config" component is not available');
         }

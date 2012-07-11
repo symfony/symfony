@@ -90,9 +90,9 @@ class ObjectChoiceList extends ChoiceList
      *
      * Safe to be called multiple times. The list is cleared on every call.
      *
-     * @param array|\Traversable $choices The choices to write into the list.
-     * @param array $labels Ignored.
-     * @param array $preferredChoices The choices to display with priority.
+     * @param array|\Traversable $choices          The choices to write into the list.
+     * @param array              $labels           Ignored.
+     * @param array              $preferredChoices The choices to display with priority.
      */
     protected function initialize($choices, array $labels, array $preferredChoices)
     {

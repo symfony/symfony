@@ -131,6 +131,14 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isStarted()
+    {
+        return $this->storage->isStarted();
+    }
+
+    /**
      * Returns an iterator for attributes.
      *
      * @return \ArrayIterator An \ArrayIterator instance
@@ -209,7 +217,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * {@iheritdoc}
+     * {@inheritdoc}
      */
     public function getMetadataBag()
     {
@@ -217,7 +225,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * {@iheritdoc}
+     * {@inheritdoc}
      */
     public function registerBag(SessionBagInterface $bag)
     {
@@ -225,7 +233,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     }
 
     /**
-     * {@iheritdoc}
+     * {@inheritdoc}
      */
     public function getBag($name)
     {

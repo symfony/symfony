@@ -76,6 +76,18 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo1', $this->getFirstNamedRoute($collection, 'foo')->getPattern());
     }
 
+    public function testCount()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo'));
+
+        $collection1 = new RouteCollection();
+        $collection->addCollection($collection1);
+        $collection1->add('foo1', new Route('/foo1'));
+
+        $this->assertCount(2, $collection);
+    }
+
     protected function getFirstNamedRoute(RouteCollection $routeCollection, $name)
     {
         foreach ($routeCollection as $key => $route) {

@@ -27,8 +27,8 @@ class ConfigCache
     /**
      * Constructor.
      *
-     * @param string  $file     The absolute cache path
-     * @param Boolean $debug    Whether debugging is enabled or not
+     * @param string  $file  The absolute cache path
+     * @param Boolean $debug Whether debugging is enabled or not
      */
     public function __construct($file, $debug)
     {
@@ -101,7 +101,7 @@ class ConfigCache
 
         $tmpFile = tempnam(dirname($this->file), basename($this->file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $this->file)) {
-            chmod($this->file, 0666 & ~umask());
+            @chmod($this->file, 0666 & ~umask());
         } else {
             throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $this->file));
         }
@@ -110,7 +110,7 @@ class ConfigCache
             $file = $this->file.'.meta';
             $tmpFile = tempnam(dirname($file), basename($file));
             if (false !== @file_put_contents($tmpFile, serialize($metadata)) && @rename($tmpFile, $file)) {
-                chmod($file, 0666 & ~umask());
+                @chmod($file, 0666 & ~umask());
             }
         }
     }

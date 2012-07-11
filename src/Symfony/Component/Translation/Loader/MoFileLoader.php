@@ -147,7 +147,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
                     }
                     $messages[$item['ids']['plural']] = stripcslashes(implode('|', $plurals));
                 }
-            } elseif(!empty($item['ids']['singular'])) {
+            } elseif (!empty($item['ids']['singular'])) {
                 $messages[$item['ids']['singular']] = stripcslashes($item['translated']);
             }
         }
@@ -161,7 +161,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      * Reads an unsigned long from stream respecting endianess.
      *
      * @param resource $stream
-     * @param boolean $isBigEndian
+     * @param boolean  $isBigEndian
      * @return integer
      */
     private function readLong($stream, $isBigEndian)

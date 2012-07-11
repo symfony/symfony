@@ -125,7 +125,8 @@ function get_data($index, $dataDir, $locale = 'en', $constraint = null)
     return $data;
 }
 
-function create_stub_datafile($locale, $target, $data) {
+function create_stub_datafile($locale, $target, $data)
+{
     $template = <<<TEMPLATE
 <?php
 
@@ -397,7 +398,6 @@ genrb($namesGeneratedDir, $namesDir);
 clear_directory($namesGeneratedDir);
 rmdir($namesGeneratedDir);
 
-
 // Generate the data to the stubbed intl classes We only extract data for the 'en' locale
 // The extracted data is used only by the stub classes
 $defaultLocale = 'en';
@@ -441,8 +441,7 @@ foreach ($bundle->get('Currencies') as $code => $data) {
 }
 
 // Countries.
-$countriesConstraint = function($code)
-{
+$countriesConstraint = function($code) {
     // Global countries (f.i. "America") have numeric codes
     // Countries have alphabetic codes
     // "ZZ" is the code for unknown country
@@ -456,8 +455,7 @@ $countriesConstraint = function($code)
 $countries = get_data('Countries', 'region', $defaultLocale, $countriesConstraint);
 
 // Languages
-$languagesConstraint = function($code)
-{
+$languagesConstraint = function($code) {
     // "mul" is the code for multiple languages
     if ('mul' !== $code) {
         return true;

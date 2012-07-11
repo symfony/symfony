@@ -77,6 +77,15 @@ abstract class AbstractToken implements TokenInterface
         return $this->user;
     }
 
+    /**
+     * Sets the user in the token.
+     *
+     * The user can be a UserInterface instance, or an object implementing
+     * a __toString method or the username as a regular string.
+     *
+     * @param mixed $user The user
+     * @throws \InvalidArgumentException
+     */
     public function setUser($user)
     {
         if (!($user instanceof UserInterface || (is_object($user) && method_exists($user, '__toString')) || is_string($user))) {
@@ -169,7 +178,7 @@ abstract class AbstractToken implements TokenInterface
     /**
      * Returns true if the attribute exists.
      *
-     * @param  string  $name  The attribute name
+     * @param string $name The attribute name
      *
      * @return Boolean true if the attribute exists, false otherwise
      */

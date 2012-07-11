@@ -185,7 +185,7 @@ class DefinitionDecorator extends Definition
      * parent definition, otherwise your arguments will only be appended.
      *
      * @param integer $index
-     * @param mixed $value
+     * @param mixed   $value
      *
      * @return DefinitionDecorator the current instance
      * @throws InvalidArgumentException when $index isn't an integer

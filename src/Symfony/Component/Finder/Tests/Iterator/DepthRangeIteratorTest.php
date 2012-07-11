@@ -34,11 +34,11 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
     public function getAcceptData()
     {
         return array(
-            array(array(new NumberComparator('< 1')), array($this->getAbsolutePath('/.git'), $this->getAbsolutePath('/test.py'), $this->getAbsolutePath('/foo'), $this->getAbsolutePath('/test.php'), $this->getAbsolutePath('/toto'))),
-            array(array(new NumberComparator('<= 1')), array($this->getAbsolutePath('/.git'), $this->getAbsolutePath('/test.py'), $this->getAbsolutePath('/foo'), $this->getAbsolutePath('/foo/bar.tmp'), $this->getAbsolutePath('/test.php'), $this->getAbsolutePath('/toto'))),
+            array(array(new NumberComparator('< 1')), array($this->getAbsolutePath('/.git'), $this->getAbsolutePath('/test.py'), $this->getAbsolutePath('/foo'), $this->getAbsolutePath('/test.php'), $this->getAbsolutePath('/toto'), $this->getAbsolutePath('/.foo'), $this->getAbsolutePath('/.bar'))),
+            array(array(new NumberComparator('<= 1')), array($this->getAbsolutePath('/.git'), $this->getAbsolutePath('/test.py'), $this->getAbsolutePath('/foo'), $this->getAbsolutePath('/foo/bar.tmp'), $this->getAbsolutePath('/test.php'), $this->getAbsolutePath('/toto'), $this->getAbsolutePath('/.foo'), $this->getAbsolutePath('/.foo/.bar'), $this->getAbsolutePath('/.bar'))),
             array(array(new NumberComparator('> 1')), array()),
-            array(array(new NumberComparator('>= 1')), array($this->getAbsolutePath('/foo/bar.tmp'))),
-            array(array(new NumberComparator('1')), array($this->getAbsolutePath('/foo/bar.tmp'))),
+            array(array(new NumberComparator('>= 1')), array($this->getAbsolutePath('/foo/bar.tmp'), $this->getAbsolutePath('/.foo/.bar'))),
+            array(array(new NumberComparator('1')), array($this->getAbsolutePath('/foo/bar.tmp'), $this->getAbsolutePath('/.foo/.bar'))),
         );
     }
 

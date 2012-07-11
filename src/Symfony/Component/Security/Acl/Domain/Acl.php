@@ -19,7 +19,6 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
-
 /**
  * An ACL implementation.
  *
@@ -398,7 +397,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Deletes an ACE
      *
-     * @param string $property
+     * @param string  $property
      * @param integer $index
      * @throws \OutOfBoundsException
      */
@@ -422,9 +421,9 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Deletes a field-based ACE
      *
-     * @param string $property
+     * @param string  $property
      * @param integer $index
-     * @param string $field
+     * @param string  $field
      * @throws \OutOfBoundsException
      */
     private function deleteFieldAce($property, $index, $field)
@@ -552,10 +551,10 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Updates an ACE
      *
-     * @param string $property
+     * @param string  $property
      * @param integer $index
      * @param integer $mask
-     * @param string $strategy
+     * @param string  $strategy
      * @throws \OutOfBoundsException
      */
     private function updateAce($property, $index, $mask, $strategy = null)
@@ -605,11 +604,11 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Updates a field-based ACE
      *
-     * @param string $property
+     * @param string  $property
      * @param integer $index
-     * @param string $field
+     * @param string  $field
      * @param integer $mask
-     * @param string $strategy
+     * @param string  $strategy
      * @throws \InvalidArgumentException
      * @throws \OutOfBoundsException
      */
@@ -639,8 +638,8 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * Called when a property of the ACL changes
      *
      * @param string $name
-     * @param mixed $oldValue
-     * @param mixed $newValue
+     * @param mixed  $oldValue
+     * @param mixed  $newValue
      */
     private function onPropertyChanged($name, $oldValue, $newValue)
     {

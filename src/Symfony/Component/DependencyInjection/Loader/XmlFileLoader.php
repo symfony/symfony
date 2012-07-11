@@ -44,7 +44,7 @@ class XmlFileLoader extends FileLoader
         $this->container->addResource(new FileResource($path));
 
         // anonymous services
-        $xml = $this->processAnonymousServices($xml, $path);
+        $this->processAnonymousServices($xml, $path);
 
         // imports
         $this->parseImports($xml, $path);
@@ -76,7 +76,7 @@ class XmlFileLoader extends FileLoader
      * Parses parameters
      *
      * @param SimpleXMLElement $xml
-     * @param string $file
+     * @param string           $file
      */
     private function parseParameters(SimpleXMLElement $xml, $file)
     {
@@ -91,7 +91,7 @@ class XmlFileLoader extends FileLoader
      * Parses imports
      *
      * @param SimpleXMLElement $xml
-     * @param string $file
+     * @param string           $file
      */
     private function parseImports(SimpleXMLElement $xml, $file)
     {
@@ -109,7 +109,7 @@ class XmlFileLoader extends FileLoader
      * Parses multiple definitions
      *
      * @param SimpleXMLElement $xml
-     * @param string $file
+     * @param string           $file
      */
     private function parseDefinitions(SimpleXMLElement $xml, $file)
     {
@@ -125,9 +125,9 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses an individual Definition
      *
-     * @param string $id
+     * @param string           $id
      * @param SimpleXMLElement $service
-     * @param string $file
+     * @param string           $file
      */
     private function parseDefinition($id, $service, $file)
     {
@@ -221,37 +221,33 @@ class XmlFileLoader extends FileLoader
      * Processes anonymous services
      *
      * @param SimpleXMLElement $xml
-     * @param string $file
-     *
-     * @return array An array of anonymous services
+     * @param string           $file
      */
     private function processAnonymousServices(SimpleXMLElement $xml, $file)
     {
         $definitions = array();
         $count = 0;
 
-        // anonymous services as arguments
-        if (false === $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]')) {
-            return $xml;
-        }
-        foreach ($nodes as $node) {
-            // give it a unique name
-            $node['id'] = sprintf('%s_%d', md5($file), ++$count);
+        // anonymous services as arguments/properties
+        if (false !== $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]')) {
+            foreach ($nodes as $node) {
+                // give it a unique name
+                $node['id'] = sprintf('%s_%d', md5($file), ++$count);
 
-            $definitions[(string) $node['id']] = array($node->service, $file, false);
-            $node->service['id'] = (string) $node['id'];
+                $definitions[(string) $node['id']] = array($node->service, $file, false);
+                $node->service['id'] = (string) $node['id'];
+            }
         }
 
         // anonymous services "in the wild"
-        if (false === $nodes = $xml->xpath('//container:services/container:service[not(@id)]')) {
-            return $xml;
-        }
-        foreach ($nodes as $node) {
-            // give it a unique name
-            $node['id'] = sprintf('%s_%d', md5($file), ++$count);
+        if (false !== $nodes = $xml->xpath('//container:services/container:service[not(@id)]')) {
+            foreach ($nodes as $node) {
+                // give it a unique name
+                $node['id'] = sprintf('%s_%d', md5($file), ++$count);
 
-            $definitions[(string) $node['id']] = array($node, $file, true);
-            $node->service['id'] = (string) $node['id'];
+                $definitions[(string) $node['id']] = array($node, $file, true);
+                $node->service['id'] = (string) $node['id'];
+            }
         }
 
         // resolve definitions
@@ -271,15 +267,13 @@ class XmlFileLoader extends FileLoader
                 $oNode->parentNode->removeChild($oNode);
             }
         }
-
-        return $xml;
     }
 
     /**
      * Validates an XML document.
      *
      * @param DOMDocument $dom
-     * @param string $file
+     * @param string      $file
      */
     private function validate(\DOMDocument $dom, $file)
     {
@@ -291,7 +285,7 @@ class XmlFileLoader extends FileLoader
      * Validates a documents XML schema.
      *
      * @param \DOMDocument $dom
-     * @param string $file
+     * @param string       $file
      *
      * @throws RuntimeException         When extension references a non-existent XSD file
      * @throws InvalidArgumentException When XML doesn't validate its XSD schema
@@ -351,7 +345,7 @@ EOF
         ;
 
         $current = libxml_use_internal_errors(true);
-        $valid = $dom->schemaValidateSource($source);
+        $valid = @$dom->schemaValidateSource($source);
         foreach ($tmpfiles as $tmpfile) {
             @unlink($tmpfile);
         }
@@ -365,7 +359,7 @@ EOF
      * Validates an extension.
      *
      * @param \DOMDocument $dom
-     * @param string $file
+     * @param string       $file
      *
      * @throws InvalidArgumentException When no extension is found corresponding to a tag
      */
@@ -454,7 +448,7 @@ EOF
      *
      * @return array A PHP array
      */
-    static public function convertDomElementToArray(\DomElement $element)
+    public static function convertDomElementToArray(\DomElement $element)
     {
         $empty = true;
         $config = array();

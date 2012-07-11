@@ -4,6 +4,9 @@ CHANGELOG
 2.1.0
 -----
 
+ * [BC BREAK] The signature of ExceptionListener has changed
+ * changed the HttpUtils constructor signature to take a UrlGenerator and a UrlMatcher instead of a Router
+ * EncoderFactoryInterface::getEncoder() can now also take a class name as an argument
  * allow switching to the user that is already impersonated
  * added support for the remember_me parameter in the query
  * added AccessMapInterface
@@ -17,3 +20,6 @@ CHANGELOG
  * `ObjectIdentity::fromDomainObject`, `UserSecurityIdentity::fromAccount` and
    `UserSecurityIdentity::fromToken` now return correct identities for proxies
    objects (e.g. Doctrine proxies)
+ * [BC BREAK] moved the default authentication success and failure handling to
+   seperate classes. The order of arguments in the constructor of the
+   `AbstractAuthenticationListener` has changed.

@@ -35,6 +35,8 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('f', $option->getShortcut(), '__construct() can take a shortcut as its second argument');
         $option = new InputOption('foo', '-f');
         $this->assertEquals('f', $option->getShortcut(), '__construct() removes the leading - of the shortcut');
+        $option = new InputOption('foo');
+        $this->assertNull($option->getShortcut(), '__construct() makes the shortcut null by default');
 
         // mode argument
         $option = new InputOption('foo', 'f');
@@ -76,6 +78,30 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\Exception', $e, '__construct() throws an Exception if the mode is not valid');
             $this->assertEquals('Option mode "-1" is not valid.', $e->getMessage());
         }
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEmptyNameIsInvalid()
+    {
+        new InputOption('');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testDoubleDashNameIsInvalid()
+    {
+        new InputOption('--');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSingleDashOptionIsInvalid()
+    {
+        new InputOption('foo', '-');
     }
 
     public function testIsArray()

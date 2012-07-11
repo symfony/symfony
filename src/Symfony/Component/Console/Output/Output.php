@@ -176,5 +176,5 @@ abstract class Output implements OutputInterface
      * @param string  $message A message to write to the output
      * @param Boolean $newline Whether to add a newline or not
      */
-    abstract public function doWrite($message, $newline);
+    abstract protected function doWrite($message, $newline);
 }

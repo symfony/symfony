@@ -24,13 +24,14 @@ class SingleIdentEntity
     /** @Column(type="string", nullable=true) */
     public $name;
 
-    public function __construct($id, $name) {
+    public function __construct($id, $name)
+    {
         $this->id = $id;
         $this->name = $name;
     }
 
     public function __toString()
     {
-        return (string)$this->name;
+        return (string) $this->name;
     }
 }

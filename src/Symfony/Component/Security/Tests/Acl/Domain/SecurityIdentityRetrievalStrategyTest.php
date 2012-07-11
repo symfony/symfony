@@ -116,7 +116,6 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($username))
         ;
 
-
         return $account;
     }
 
@@ -176,7 +175,6 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue(false))
             ;
         }
-
 
         return new SecurityIdentityRetrievalStrategy($roleHierarchy, $trustResolver);
     }

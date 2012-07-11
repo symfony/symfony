@@ -23,5 +23,5 @@ interface CacheClearerInterface
      *
      * @param string $cacheDir The cache directory.
      */
-    function clear($cacheDir);
+    public function clear($cacheDir);
 }

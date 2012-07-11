@@ -12,17 +12,18 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class NumberType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->appendClientTransformer(new NumberToLocalizedStringTransformer(
+        $builder->addViewTransformer(new NumberToLocalizedStringTransformer(
             $options['precision'],
             $options['grouping'],
             $options['rounding_mode']
@@ -32,22 +33,17 @@ class NumberType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             // default precision is locale specific (usually around 3)
             'precision'     => null,
             'grouping'      => false,
             'rounding_mode' => \NumberFormatter::ROUND_HALFUP,
-        );
-    }
+            'compound'      => false,
+        ));
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedOptionValues()
-    {
-        return array(
+        $resolver->setAllowedValues(array(
             'rounding_mode' => array(
                 \NumberFormatter::ROUND_FLOOR,
                 \NumberFormatter::ROUND_DOWN,
@@ -57,13 +53,13 @@ class NumberType extends AbstractType
                 \NumberFormatter::ROUND_UP,
                 \NumberFormatter::ROUND_CEILING,
             ),
-        );
+        ));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getParent(array $options)
+    public function getParent()
     {
         return 'field';
     }

@@ -81,8 +81,27 @@ class ProcessBuilder
         return $this;
     }
 
+    /**
+     * Sets the process timeout.
+     *
+     * To disable the timeout, set this value to null.
+     *
+     * @param integer|null
+     */
     public function setTimeout($timeout)
     {
+        if (null === $timeout) {
+            $this->timeout = null;
+
+            return $this;
+        }
+
+        $timeout = (integer) $timeout;
+
+        if ($timeout < 0) {
+            throw new \InvalidArgumentException('The timeout value must be a valid positive integer.');
+        }
+
         $this->timeout = $timeout;
 
         return $this;

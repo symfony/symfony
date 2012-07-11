@@ -18,7 +18,7 @@ namespace Symfony\Component\Routing;
  *
  * @api
  */
-class Route
+class Route implements \Serializable
 {
     private $pattern;
     private $defaults;
@@ -26,7 +26,7 @@ class Route
     private $options;
     private $compiled;
 
-    static private $compilers = array();
+    private static $compilers = array();
 
     /**
      * Constructor.
@@ -35,10 +35,10 @@ class Route
      *
      *  * compiler_class: A class name able to compile this route instance (RouteCompiler by default)
      *
-     * @param string $pattern       The pattern to match
-     * @param array  $defaults      An array of default parameter values
-     * @param array  $requirements  An array of requirements for parameters (regexes)
-     * @param array  $options       An array of options
+     * @param string $pattern      The pattern to match
+     * @param array  $defaults     An array of default parameter values
+     * @param array  $requirements An array of requirements for parameters (regexes)
+     * @param array  $options      An array of options
      *
      * @api
      */
@@ -53,6 +53,25 @@ class Route
     public function __clone()
     {
         $this->compiled = null;
+    }
+
+    public function serialize()
+    {
+        return serialize(array(
+            'pattern' => $this->pattern,
+            'default' => $this->default,
+            'requirements' => $this->requirements,
+            'options' => $this->options,
+        ));
+    }
+
+    public function unserialize($data)
+    {
+        $data = unserialize($data);
+        $this->pattern = $data['pattern'];
+        $this->default = $data['default'];
+        $this->requirements = $data['requirements'];
+        $this->options = $data['options'];
     }
 
     /**
@@ -314,7 +333,7 @@ class Route
     /**
      * Sets a requirement for the given key.
      *
-     * @param string $key The key
+     * @param string $key   The key
      * @param string $regex The regex
      *
      * @return Route The current Route instance

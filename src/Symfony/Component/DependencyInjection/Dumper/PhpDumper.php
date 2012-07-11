@@ -70,7 +70,7 @@ class PhpDumper extends Dumper
      *  * class:      The class name
      *  * base_class: The base class name
      *
-     * @param  array  $options An array of options
+     * @param array $options An array of options
      *
      * @return string A PHP class representing of the service container
      *
@@ -152,7 +152,7 @@ class PhpDumper extends Dumper
     /**
      * Generates the require_once statement for service includes.
      *
-     * @param string $id The service id
+     * @param string     $id         The service id
      * @param Definition $definition
      *
      * @return string
@@ -182,7 +182,7 @@ class PhpDumper extends Dumper
     /**
      * Generates the inline definition of a service.
      *
-     * @param string $id
+     * @param string     $id
      * @param Definition $definition
      *
      * @return string
@@ -261,7 +261,7 @@ class PhpDumper extends Dumper
     /**
      * Adds the service return statement.
      *
-     * @param string $id Service id
+     * @param string     $id         Service id
      * @param Definition $definition
      *
      * @return string
@@ -278,7 +278,7 @@ class PhpDumper extends Dumper
     /**
      * Generates the service instance.
      *
-     * @param string $id
+     * @param string     $id
      * @param Definition $definition
      *
      * @return string
@@ -326,7 +326,7 @@ class PhpDumper extends Dumper
                 throw new RuntimeException('Factory method requires a factory service or factory class in service definition for '.$id);
             }
         } elseif (false !== strpos($class, '$')) {
-            $code = sprintf("        \$class = %s;\n        $return{$instantiation}new \$class(%s);\n", $class, implode(', ', $arguments));
+            $code = sprintf("        \$class = %s;\n\n        $return{$instantiation}new \$class(%s);\n", $class, implode(', ', $arguments));
         } else {
             $code = sprintf("        $return{$instantiation}new \\%s(%s);\n", substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
         }
@@ -341,7 +341,7 @@ class PhpDumper extends Dumper
     /**
      * Checks if the definition is a simple instance.
      *
-     * @param string $id
+     * @param string     $id
      * @param Definition $definition
      *
      * @return Boolean
@@ -364,9 +364,9 @@ class PhpDumper extends Dumper
     /**
      * Adds method calls to a service definition.
      *
-     * @param string $id
+     * @param string     $id
      * @param Definition $definition
-     * @param string $variableName
+     * @param string     $variableName
      *
      * @return string
      */
@@ -398,7 +398,7 @@ class PhpDumper extends Dumper
     /**
      * Generates the inline definition setup.
      *
-     * @param string $id
+     * @param string     $id
      * @param Definition $definition
      * @return string
      */
@@ -436,9 +436,9 @@ class PhpDumper extends Dumper
     /**
      * Adds configurator definition
      *
-     * @param string $id
+     * @param string     $id
      * @param Definition $definition
-     * @param string $variableName
+     * @param string     $variableName
      *
      * @return string
      */
@@ -462,7 +462,7 @@ class PhpDumper extends Dumper
     /**
      * Adds a service
      *
-     * @param string $id
+     * @param string     $id
      * @param Definition $definition
      *
      * @return string
@@ -613,7 +613,7 @@ EOF;
     /**
      * Adds the class headers.
      *
-     * @param string $class Class name
+     * @param string $class     Class name
      * @param string $baseClass The name of the base class
      *
      * @return string
@@ -802,8 +802,8 @@ EOF;
     /**
      * Exports parameters.
      *
-     * @param array $parameters
-     * @param string $path
+     * @param array   $parameters
+     * @param string  $path
      * @param integer $indent
      *
      * @return string
@@ -871,7 +871,7 @@ EOF;
     /**
      * Builds service calls from arguments
      *
-     * @param array  $arguments
+     * @param array $arguments
      * @param string &$calls    By reference
      * @param string &$behavior By reference
      */
@@ -950,7 +950,7 @@ EOF;
      * Checks if a service id has a reference
      *
      * @param string $id
-     * @param array $arguments
+     * @param array  $arguments
      *
      * @return Boolean
      */
@@ -974,7 +974,7 @@ EOF;
     /**
      * Dumps values.
      *
-     * @param array $value
+     * @param array   $value
      * @param Boolean $interpolate
      *
      * @return string
@@ -1037,8 +1037,7 @@ EOF;
                 return $this->dumpParameter(strtolower($match[1]));
             } else {
                 $that = $this;
-                $replaceParameters = function ($match) use ($that)
-                {
+                $replaceParameters = function ($match) use ($that) {
                     return "'.".$that->dumpParameter(strtolower($match[2])).".'";
                 };
 

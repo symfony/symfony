@@ -1,28 +1,30 @@
 <?php
 namespace {
-    trait TFoo {
-
+    trait TFoo
+    {
     }
 
-    class CFoo {
+    class CFoo
+    {
         use TFoo;
     }
 }
 
 namespace Foo {
-    trait TBar {
-
+    trait TBar
+    {
     }
 
-    interface IBar {
-
+    interface IBar
+    {
     }
 
-    trait TFooBar {
-
+    trait TFooBar
+    {
     }
 
-    class CBar implements IBar {
+    class CBar implements IBar
+    {
         use TBar, TFooBar;
     }
 }

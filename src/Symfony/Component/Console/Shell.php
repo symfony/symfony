@@ -145,6 +145,7 @@ EOF;
      * Tries to return autocompletion for the current entered text.
      *
      * @param string $text The last segment of the entered text
+     *
      * @return Boolean|array A list of guessed strings or true
      */
     private function autocompleter($text)

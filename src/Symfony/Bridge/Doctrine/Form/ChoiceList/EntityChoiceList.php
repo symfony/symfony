@@ -375,7 +375,7 @@ class EntityChoiceList extends ObjectChoiceList
      * be persisted or added to the identity map before. Otherwise an
      * exception is thrown.
      *
-     * @param  object $entity The entity for which to get the identifier
+     * @param object $entity The entity for which to get the identifier
      *
      * @return array          The identifier values
      *

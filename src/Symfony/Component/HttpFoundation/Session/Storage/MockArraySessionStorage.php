@@ -59,9 +59,14 @@ class MockArraySessionStorage implements SessionStorageInterface
     protected $metadataBag;
 
     /**
+     * @var array
+     */
+    protected $bags;
+
+    /**
      * Constructor.
      *
-     * @param string  $name    Session name
+     * @param string      $name    Session name
      * @param MetadataBag $metaBag MetadataBag instance.
      */
     public function __construct($name = 'MOCKSESSID', MetadataBag $metaBag = null)
@@ -197,6 +202,14 @@ class MockArraySessionStorage implements SessionStorageInterface
         }
 
         return $this->bags[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isStarted()
+    {
+        return $this->started;
     }
 
     /**

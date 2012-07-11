@@ -54,4 +54,18 @@ class SplFileInfo extends \SplFileInfo
     {
         return $this->relativePathname;
     }
+
+    /**
+     * Returns the contents of the file
+     *
+     * @return string the contents of the file
+     */
+    public function getContents()
+    {
+        $file = new \SplFileObject($this->getRealpath(), 'rb');
+        ob_start();
+        $file->fpassthru();
+
+        return ob_get_clean();
+    }
 }

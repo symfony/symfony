@@ -62,9 +62,9 @@ class HttpKernel extends BaseHttpKernel
     /**
      * Forwards the request to another controller.
      *
-     * @param  string  $controller The controller name (a string like BlogBundle:Post:index)
-     * @param  array   $attributes An array of request attributes
-     * @param  array   $query      An array of request query parameters
+     * @param string $controller The controller name (a string like BlogBundle:Post:index)
+     * @param array  $attributes An array of request attributes
+     * @param array  $query      An array of request query parameters
      *
      * @return Response A Response instance
      */

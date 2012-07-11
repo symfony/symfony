@@ -112,7 +112,6 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ value }}' => 'baz',
             ));
 
-
         $this->validator->validate($object, new Callback(array(
             'validateOne', 'validateTwo'
         )));

@@ -83,4 +83,26 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
         $_ENV = $snapshot;
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testNegativeTimeoutFromSetter()
+    {
+        $pb = new ProcessBuilder();
+        $pb->setTimeout(-1);
+    }
+
+    public function testNullTimeout()
+    {
+        $pb = new ProcessBuilder();
+        $pb->setTimeout(10);
+        $pb->setTimeout(null);
+
+        $r = new \ReflectionObject($pb);
+        $p = $r->getProperty('timeout');
+        $p->setAccessible(true);
+
+        $this->assertNull($p->getValue($pb));
+    }
 }

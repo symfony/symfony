@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Form\EventListener;
 
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -20,20 +20,20 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * This works with ORM, MongoDB and CouchDB instances of the collection interface.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see    Doctrine\Common\Collections\Collection
  */
 class MergeDoctrineCollectionListener implements EventSubscriberInterface
 {
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         // Higher priority than core MergeCollectionListener so that this one
         // is called before
-        return array(FormEvents::BIND_NORM_DATA => array('onBindNormData', 10));
+        return array(FormEvents::BIND => array('onBind', 10));
     }
 
-    public function onBindNormData(FilterDataEvent $event)
+    public function onBind(FormEvent $event)
     {
         $collection = $event->getForm()->getData();
         $data = $event->getData();

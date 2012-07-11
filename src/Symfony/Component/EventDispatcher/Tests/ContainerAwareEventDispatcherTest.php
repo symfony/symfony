@@ -235,14 +235,15 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
 class Service
 {
-    function onEvent(Event $e)
+    public function onEvent(Event $e)
     {
     }
 }
 
 class SubscriberService implements EventSubscriberInterface
 {
-    static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return array(
             'onEvent' => 'onEvent',
             'onEvent' => array('onEvent', 10),
@@ -250,7 +251,7 @@ class SubscriberService implements EventSubscriberInterface
         );
     }
 
-    function onEvent(Event $e)
+    public function onEvent(Event $e)
     {
     }
 }

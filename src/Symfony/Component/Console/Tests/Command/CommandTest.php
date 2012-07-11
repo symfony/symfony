@@ -25,9 +25,9 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CommandTest extends \PHPUnit_Framework_TestCase
 {
-    static protected $fixturesPath;
+    protected static $fixturesPath;
 
-    static public function setUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         self::$fixturesPath = __DIR__.'/../Fixtures/';
         require_once self::$fixturesPath.'/TestCommand.php';
@@ -224,8 +224,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     public function testSetCode()
     {
         $command = new \TestCommand();
-        $ret = $command->setCode(function (InputInterface $input, OutputInterface $output)
-        {
+        $ret = $command->setCode(function (InputInterface $input, OutputInterface $output) {
             $output->writeln('from the code...');
         });
         $this->assertEquals($command, $ret, '->setCode() implements a fluent interface');

@@ -66,7 +66,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
 
         try {
             $l->onKernelException($event2);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->assertSame('foo', $e->getMessage());
         }
 
@@ -88,7 +88,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
 
         try {
             $l->onKernelException($event2);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->assertSame('foo', $e->getMessage());
         }
 

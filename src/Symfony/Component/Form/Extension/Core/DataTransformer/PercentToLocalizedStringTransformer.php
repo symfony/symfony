@@ -18,7 +18,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 /**
  * Transforms between a normalized format (integer or float) and a percentage value.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
 class PercentToLocalizedStringTransformer implements DataTransformerInterface
@@ -64,9 +64,9 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms between a normalized format (integer or float) into a percentage value.
      *
-     * @param  number $value  Normalized value
+     * @param number $value Normalized value
      *
-     * @return number         Percentage value
+     * @return number Percentage value
      *
      * @throws UnexpectedTypeException if the given value is not numeric
      * @throws TransformationFailedException if the value could not be transformed
@@ -99,9 +99,9 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms between a percentage value into a normalized format (integer or float).
      *
-     * @param  number $value  Percentage value.
+     * @param number $value Percentage value.
      *
-     * @return number         Normalized value.
+     * @return number Normalized value.
      *
      * @throws UnexpectedTypeException if the given value is not a string
      * @throws TransformationFailedException if the value could not be transformed

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
-use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -33,7 +32,7 @@ interface DataCollectorInterface
      *
      * @api
      */
-    function collect(Request $request, Response $response, \Exception $exception = null);
+    public function collect(Request $request, Response $response, \Exception $exception = null);
 
     /**
      * Returns the name of the collector.
@@ -42,5 +41,5 @@ interface DataCollectorInterface
      *
      * @api
      */
-    function getName();
+    public function getName();
 }

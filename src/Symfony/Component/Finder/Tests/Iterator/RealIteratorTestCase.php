@@ -13,13 +13,16 @@ namespace Symfony\Component\Finder\Tests\Iterator;
 
 abstract class RealIteratorTestCase extends IteratorTestCase
 {
-    static protected $files;
+    protected static $files;
 
-    static public function setUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         $tmpDir = sys_get_temp_dir().'/symfony2_finder';
         self::$files = array(
             $tmpDir.'/.git/',
+            $tmpDir.'/.foo/',
+            $tmpDir.'/.foo/.bar',
+            $tmpDir.'/.bar',
             $tmpDir.'/test.py',
             $tmpDir.'/foo/',
             $tmpDir.'/foo/bar.tmp',
@@ -48,7 +51,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
         touch($tmpDir.'/test.php', strtotime('2005-10-15'));
     }
 
-    static public function tearDownAfterClass()
+    public static function tearDownAfterClass()
     {
         foreach (array_reverse(self::$files) as $file) {
             if ('/' === $file[strlen($file) - 1]) {

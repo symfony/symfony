@@ -37,6 +37,8 @@ class ExprBuilder
     /**
      * Marks the expression as being always used.
      *
+     * @param \Closure $then
+     *
      * @return ExprBuilder
      */
     public function always(\Closure $then = null)
@@ -212,11 +214,11 @@ class ExprBuilder
      *
      * @return array
      */
-    static public function buildExpressions(array $expressions)
+    public static function buildExpressions(array $expressions)
     {
         foreach ($expressions as $k => $expr) {
             if ($expr instanceof ExprBuilder) {
-                $expressions[$k] = function($v) use($expr) {
+                $expressions[$k] = function($v) use ($expr) {
                     return call_user_func($expr->ifPart, $v) ? call_user_func($expr->thenPart, $v) : $v;
                 };
             }

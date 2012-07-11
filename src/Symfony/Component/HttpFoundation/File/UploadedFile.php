@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 /**
  * A file uploaded through a form.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  * @author Fabien Potencier <fabien@symfony.com>
  *
@@ -199,9 +199,9 @@ class UploadedFile extends File
     /**
      * Returns the maximum size of an uploaded file as configured in php.ini
      *
-     * @return type The maximum size of an uploaded file in bytes
+     * @return int The maximum size of an uploaded file in bytes
      */
-    static public function getMaxFilesize()
+    public static function getMaxFilesize()
     {
         $max = trim(ini_get('upload_max_filesize'));
 

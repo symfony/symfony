@@ -108,13 +108,13 @@ class StubIntlDateFormatter
     /**
      * Constructor
      *
-     * @param  string  $locale   The locale code
-     * @param  int     $datetype Type of date formatting, one of the format type constants
-     * @param  int     $timetype Type of time formatting, one of the format type constants
-     * @param  string  $timezone Timezone identifier
-     * @param  int     $calendar Calendar to use for formatting or parsing; default is Gregorian.
+     * @param string $locale   The locale code
+     * @param int    $datetype Type of date formatting, one of the format type constants
+     * @param int    $timetype Type of time formatting, one of the format type constants
+     * @param string $timezone Timezone identifier
+     * @param int    $calendar Calendar to use for formatting or parsing; default is Gregorian.
      *                           One of the calendar constants.
-     * @param  string  $pattern  Optional pattern to use when formatting
+     * @param string $pattern Optional pattern to use when formatting
      *
      * @see    http://www.php.net/manual/en/intldateformatter.create.php
      * @see    http://userguide.icu-project.org/formatparse/datetime
@@ -142,20 +142,20 @@ class StubIntlDateFormatter
     /**
      * Static constructor
      *
-     * @param  string  $locale   The locale code
-     * @param  int     $datetype Type of date formatting, one of the format type constants
-     * @param  int     $timetype Type of time formatting, one of the format type constants
-     * @param  string  $timezone Timezone identifier
-     * @param  int     $calendar Calendar to use for formatting or parsing; default is Gregorian.
+     * @param string $locale   The locale code
+     * @param int    $datetype Type of date formatting, one of the format type constants
+     * @param int    $timetype Type of time formatting, one of the format type constants
+     * @param string $timezone Timezone identifier
+     * @param int    $calendar Calendar to use for formatting or parsing; default is Gregorian.
      *                           One of the calendar constants.
-     * @param  string  $pattern  Optional pattern to use when formatting
+     * @param string $pattern Optional pattern to use when formatting
      *
      * @see    http://www.php.net/manual/en/intldateformatter.create.php
      * @see    http://userguide.icu-project.org/formatparse/datetime
      *
      * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
      */
-    static public function create($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
+    public static function create($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
     {
         return new self($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
     }
@@ -163,7 +163,7 @@ class StubIntlDateFormatter
     /**
      * Format the date/time value (timestamp) as a string
      *
-     * @param  mixed         $timestamp   Unix timestamp to format
+     * @param mixed $timestamp Unix timestamp to format
      *
      * @return string                     The formatted value
      *
@@ -265,7 +265,7 @@ class StubIntlDateFormatter
     /**
      * Returns the formatter's locale
      *
-     * @param  int      $type   The locale name type to return between valid or actual (StubLocale::VALID_LOCALE or StubLocale::ACTUAL_LOCALE, respectively)
+     * @param int $type The locale name type to return between valid or actual (StubLocale::VALID_LOCALE or StubLocale::ACTUAL_LOCALE, respectively)
      *
      * @return string           The locale name used to create the formatter
      *
@@ -333,8 +333,8 @@ class StubIntlDateFormatter
     /**
      * Parse string to a field-based time value
      *
-     * @param  string   $value      String to convert to a time value
-     * @param  int      $position   Position at which to start the parsing in $value (zero-based).
+     * @param string $value    String to convert to a time value
+     * @param int    $position Position at which to start the parsing in $value (zero-based).
      *                              If no error occurs before $value is consumed, $parse_pos will
      *                              contain -1 otherwise it will contain the position at which parsing
      *                              ended. If $parse_pos > strlen($value), the parse fails immediately.
@@ -353,8 +353,8 @@ class StubIntlDateFormatter
     /**
      * Parse string to a timestamp value
      *
-     * @param  string   $value      String to convert to a time value
-     * @param  int      $position   Position at which to start the parsing in $value (zero-based).
+     * @param string $value    String to convert to a time value
+     * @param int    $position Position at which to start the parsing in $value (zero-based).
      *                              If no error occurs before $value is consumed, $parse_pos will
      *                              contain -1 otherwise it will contain the position at which parsing
      *                              ended. If $parse_pos > strlen($value), the parse fails immediately.
@@ -378,10 +378,8 @@ class StubIntlDateFormatter
         $timestamp = $transformer->parse($dateTime, $value);
 
         // behave like the intl extension. FullTransformer::parse() set the proper error
-        if (false === $timestamp) {
-            $this->errorCode = StubIntl::getErrorCode();
-            $this->errorMessage = StubIntl::getErrorMessage();
-        }
+        $this->errorCode = StubIntl::getErrorCode();
+        $this->errorMessage = StubIntl::getErrorMessage();
 
         return $timestamp;
     }
@@ -389,7 +387,7 @@ class StubIntlDateFormatter
     /**
      * Set the formatter's calendar
      *
-     * @param  string  $calendar  The calendar to use. Default is IntlDateFormatter::GREGORIAN.
+     * @param string $calendar The calendar to use. Default is IntlDateFormatter::GREGORIAN.
      *
      * @return Boolean            true on success or false on failure
      *
@@ -410,23 +408,25 @@ class StubIntlDateFormatter
      * patterns, parsing as much as possible to obtain a value. Extra space, unrecognized tokens, or
      * invalid values ("February 30th") are not accepted.
      *
-     * @param  Boolean $lenient   Sets whether the parser is lenient or not, default is false (strict)
+     * @param Boolean $lenient Sets whether the parser is lenient or not, default is false (strict)
      *
      * @return Boolean            true on success or false on failure
      *
      * @see    http://www.php.net/manual/en/intldateformatter.setlenient.php
      *
-     * @throws MethodNotImplementedException
+     * @throws MethodArgumentValueNotImplementedException When $lenient is true
      */
     public function setLenient($lenient)
     {
-        throw new MethodNotImplementedException(__METHOD__);
+        if ($lenient) {
+            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'lenient', $lenient, 'Only the strict parser is supported');
+        }
     }
 
     /**
      * Set the formatter's pattern
      *
-     * @param  string  $pattern   A pattern string in conformance with the ICU IntlDateFormatter documentation
+     * @param string $pattern A pattern string in conformance with the ICU IntlDateFormatter documentation
      *
      * @return Boolean            true on success or false on failure
      *
@@ -445,7 +445,7 @@ class StubIntlDateFormatter
     /**
      * Set the formatter's timezone identifier
      *
-     * @param  string  $timeZoneId   The time zone ID string of the time zone to use.
+     * @param string $timeZoneId The time zone ID string of the time zone to use.
      *                               If NULL or the empty string, the default time zone for the
      *                               runtime is used.
      *
@@ -456,7 +456,12 @@ class StubIntlDateFormatter
     public function setTimeZoneId($timeZoneId)
     {
         if (null === $timeZoneId) {
-            $timeZoneId = date_default_timezone_get();
+            // TODO: changes were made to ext/intl in PHP 5.4.4 release that need to be investigated since it will
+            // use ini's date.timezone when the time zone is not provided. As a not well tested workaround, uses UTC.
+            // See the first two items of the commit message for more information:
+            // https://github.com/php/php-src/commit/eb346ef0f419b90739aadfb6cc7b7436c5b521d9
+            $timeZoneId = getenv('TZ') ?: 'UTC';
+
             $this->unitializedTimeZoneId = true;
         }
 
@@ -487,7 +492,7 @@ class StubIntlDateFormatter
      * Create and returns a DateTime object with the specified timestamp and with the
      * current time zone
      *
-     * @param  int  $timestamp
+     * @param int $timestamp
      *
      * @return DateTime
      */

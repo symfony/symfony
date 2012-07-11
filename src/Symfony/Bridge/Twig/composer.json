@@ -16,15 +16,24 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2",
-        "twig/twig": ">=1.1,<2.0-dev"
+        "php": ">=5.3.3",
+        "twig/twig": ">=1.8,<2.0-dev"
+    },
+    "require-dev": {
+        "symfony/form": "2.1.*",
+        "symfony/routing": "2.1.*",
+        "symfony/templating": "2.1.*",
+        "symfony/translation": "2.1.*",
+        "symfony/yaml": "2.1.*",
+        "symfony/security": "2.1.*"
     },
     "suggest": {
         "symfony/form": "self.version",
         "symfony/routing": "self.version",
         "symfony/templating": "self.version",
         "symfony/translation": "self.version",
-        "symfony/yaml": "self.version"
+        "symfony/yaml": "self.version",
+        "symfony/security": "self.version"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Twig": "" }

@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 
 /**
  * ProfilerController.
@@ -25,6 +26,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ProfilerController extends ContainerAware
 {
+    protected $templateManager;
+
     /**
      * Renders a profiler panel for the given token.
      *
@@ -49,13 +52,13 @@ class ProfilerController extends ContainerAware
             throw new NotFoundHttpException(sprintf('Panel "%s" is not available for token "%s".', $panel, $token));
         }
 
-        return $this->container->get('templating')->renderResponse($this->getTemplateName($profiler, $panel), array(
+        return $this->container->get('templating')->renderResponse($this->getTemplateManager()->getName($profile, $panel), array(
             'token'     => $token,
             'profile'   => $profile,
             'collector' => $profile->getCollector($panel),
             'panel'     => $panel,
             'page'      => $page,
-            'templates' => $this->getTemplates($profiler),
+            'templates' => $this->getTemplateManager()->getTemplates($profile),
             'is_ajax'   => $request->isXmlHttpRequest(),
         ));
     }
@@ -63,7 +66,7 @@ class ProfilerController extends ContainerAware
     /**
      * Exports data for a given token.
      *
-     * @param string $token    The profiler token
+     * @param string $token The profiler token
      *
      * @return Response A Response instance
      */
@@ -181,7 +184,7 @@ class ProfilerController extends ContainerAware
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:toolbar.html.twig', array(
             'position'     => $position,
             'profile'      => $profile,
-            'templates'    => $this->getTemplates($profiler),
+            'templates'    => $this->getTemplateManager()->getTemplates($profile),
             'profiler_url' => $url,
         ));
     }
@@ -308,51 +311,17 @@ class ProfilerController extends ContainerAware
         return new Response($phpinfo);
     }
 
-    protected function getTemplateNames($profiler)
+    protected function getTemplateManager()
     {
-        $templates = array();
-        foreach ($this->container->getParameter('data_collector.templates') as $arguments) {
-            if (null === $arguments) {
-                continue;
-            }
-
-            list($name, $template) = $arguments;
-            if (!$profiler->has($name)) {
-                continue;
-            }
-
-            if ('.html.twig' === substr($template, -10)) {
-                $template = substr($template, 0, -10);
-            }
-
-            if (!$this->container->get('templating')->exists($template.'.html.twig')) {
-                throw new \UnexpectedValueException(sprintf('The profiler template "%s.html.twig" for data collector "%s" does not exist.', $template, $name));
-            }
-
-            $templates[$name] = $template.'.html.twig';
+        if (null === $this->templateManager) {
+            $this->templateManager = new TemplateManager(
+                $this->container->get('profiler'),
+                $this->container->get('templating'),
+                $this->container->get('twig'),
+                $this->container->getParameter('data_collector.templates')
+            );
         }
 
-        return $templates;
-    }
-
-    protected function getTemplateName($profiler, $panel)
-    {
-        $templates = $this->getTemplateNames($profiler);
-
-        if (!isset($templates[$panel])) {
-            throw new NotFoundHttpException(sprintf('Panel "%s" is not registered.', $panel));
-        }
-
-        return $templates[$panel];
-    }
-
-    protected function getTemplates($profiler)
-    {
-        $templates = $this->getTemplateNames($profiler);
-        foreach ($templates as $name => $template) {
-            $templates[$name] = $this->container->get('twig')->loadTemplate($template);
-        }
-
-        return $templates;
+        return $this->templateManager;
     }
 }

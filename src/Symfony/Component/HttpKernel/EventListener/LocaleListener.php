@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -26,7 +26,7 @@ class LocaleListener implements EventSubscriberInterface
     private $router;
     private $defaultLocale;
 
-    public function __construct($defaultLocale = 'en', RouterInterface $router = null)
+    public function __construct($defaultLocale = 'en', RequestContextAwareInterface $router = null)
     {
         $this->defaultLocale = $defaultLocale;
         $this->router = $router;
@@ -36,18 +36,10 @@ class LocaleListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if ($request->hasPreviousSession()) {
-            $request->setDefaultLocale($request->getSession()->get('_locale', $this->defaultLocale));
-        } else {
-            $request->setDefaultLocale($this->defaultLocale);
-        }
+        $request->setDefaultLocale($this->defaultLocale);
 
         if ($locale = $request->attributes->get('_locale')) {
             $request->setLocale($locale);
-
-            if ($request->hasPreviousSession()) {
-                $request->getSession()->set('_locale', $request->getLocale());
-            }
         }
 
         if (null !== $this->router) {
@@ -55,7 +47,7 @@ class LocaleListener implements EventSubscriberInterface
         }
     }
 
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             // must be registered after the Router to have access to the _locale

@@ -1,8 +1,8 @@
 {% use 'form_div_layout.html.twig' %}
 
-{% block input %}
+{% block form_widget_simple %}
 {% spaceless %}
     {% set type = type|default('text') %}
-    <input type="{{ type }}" {{ block('attributes') }} value="{{ value }}" rel="theme" />
+    <input type="{{ type }}" {{ block('widget_attributes') }} value="{{ value }}" rel="theme" />
 {% endspaceless %}
-{% endblock input %}
+{% endblock form_widget_simple %}

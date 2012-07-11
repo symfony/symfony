@@ -20,7 +20,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form = $this->factory->create('checkbox', null, array('value' => 'foobar'));
         $view = $form->createView();
 
-        $this->assertEquals('foobar', $view->get('value'));
+        $this->assertEquals('foobar', $view->getVar('value'));
     }
 
     public function testCheckedIfDataTrue()
@@ -29,7 +29,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->setData(true);
         $view = $form->createView();
 
-        $this->assertTrue($view->get('checked'));
+        $this->assertTrue($view->getVar('checked'));
     }
 
     public function testCheckedIfDataTrueWithEmptyValue()
@@ -38,7 +38,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->setData(true);
         $view = $form->createView();
 
-        $this->assertTrue($view->get('checked'));
+        $this->assertTrue($view->getVar('checked'));
     }
 
     public function testNotCheckedIfDataFalse()
@@ -47,7 +47,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->setData(false);
         $view = $form->createView();
 
-        $this->assertFalse($view->get('checked'));
+        $this->assertFalse($view->getVar('checked'));
     }
 
     public function testBindWithValueChecked()
@@ -58,7 +58,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->bind('foobar');
 
         $this->assertTrue($form->getData());
-        $this->assertEquals('foobar', $form->getClientData());
+        $this->assertEquals('foobar', $form->getViewData());
     }
 
     public function testBindWithRandomValueChecked()
@@ -69,7 +69,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->bind('krixikraxi');
 
         $this->assertTrue($form->getData());
-        $this->assertEquals('foobar', $form->getClientData());
+        $this->assertEquals('foobar', $form->getViewData());
     }
 
     public function testBindWithValueUnchecked()
@@ -80,7 +80,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->bind(null);
 
         $this->assertFalse($form->getData());
-        $this->assertNull($form->getClientData());
+        $this->assertNull($form->getViewData());
     }
 
     public function testBindWithEmptyValueChecked()
@@ -91,7 +91,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->bind('');
 
         $this->assertTrue($form->getData());
-        $this->assertSame('', $form->getClientData());
+        $this->assertSame('', $form->getViewData());
     }
 
     public function testBindWithEmptyValueUnchecked()
@@ -102,7 +102,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->bind(null);
 
         $this->assertFalse($form->getData());
-        $this->assertNull($form->getClientData());
+        $this->assertNull($form->getViewData());
     }
 
     /**
@@ -112,24 +112,22 @@ class CheckboxTypeTest extends TypeTestCase
     {
         // present a binary status field as a checkbox
         $transformer = new CallbackTransformer(
-            function ($value)
-            {
+            function ($value) {
                 return 'expedited' == $value;
             },
-            function ($value)
-            {
+            function ($value) {
                 return $value ? 'expedited' : 'standard';
             }
         );
 
         $form = $this->builder
             ->create('expedited_shipping', 'checkbox')
-            ->prependNormTransformer($transformer)
+            ->addModelTransformer($transformer)
             ->getForm();
         $form->setData($data);
         $view = $form->createView();
 
-        $this->assertEquals($expected, $view->get('checked'));
+        $this->assertEquals($expected, $view->getVar('checked'));
     }
 
     public function provideTransformedData()

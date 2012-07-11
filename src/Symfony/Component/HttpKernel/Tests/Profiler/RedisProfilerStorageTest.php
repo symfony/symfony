@@ -12,14 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
 use Symfony\Component\HttpKernel\Profiler\RedisProfilerStorage;
-
-class DummyRedisProfilerStorage extends RedisProfilerStorage
-{
-    public function getRedis()
-    {
-        return parent::getRedis();
-    }
-}
+use Symfony\Component\HttpKernel\Tests\Profiler\Mock\RedisMock;
 
 class RedisProfilerStorageTest extends AbstractProfilerStorageTest
 {
@@ -27,19 +20,14 @@ class RedisProfilerStorageTest extends AbstractProfilerStorageTest
 
     protected function setUp()
     {
-        if (!extension_loaded('redis')) {
-            $this->markTestSkipped('RedisProfilerStorageTest requires redis extension to be loaded');
-        }
+        $redisMock = new RedisMock();
+        $redisMock->connect('127.0.0.1', 6379);
 
-        self::$storage = new DummyRedisProfilerStorage('redis://127.0.0.1:6379', '', '', 86400);
-        try {
-            self::$storage->getRedis();
+        self::$storage = new RedisProfilerStorage('redis://127.0.0.1:6379', '', '', 86400);
+        self::$storage->setRedis($redisMock);
 
+        if (self::$storage) {
             self::$storage->purge();
-
-        } catch (\Exception $e) {
-            self::$storage = false;
-            $this->markTestSkipped('RedisProfilerStorageTest requires that there is a Redis server present on localhost');
         }
     }
 
@@ -47,7 +35,6 @@ class RedisProfilerStorageTest extends AbstractProfilerStorageTest
     {
         if (self::$storage) {
             self::$storage->purge();
-            self::$storage->getRedis()->close();
             self::$storage = false;
         }
     }

@@ -26,8 +26,8 @@ class StopwatchEvent
     /**
      * Constructor.
      *
-     * @param float   $origin   The origin time in milliseconds
-     * @param string  $category The event category
+     * @param float  $origin   The origin time in milliseconds
+     * @param string $category The event category
      *
      * @throws \InvalidArgumentException When the raw time is not valid
      */

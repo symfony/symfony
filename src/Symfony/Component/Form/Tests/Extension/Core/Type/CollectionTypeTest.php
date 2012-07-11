@@ -18,7 +18,7 @@ class CollectionTypeTest extends TypeTestCase
     public function testContainsNoChildByDefault()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'form',
+            'type' => 'text',
         ));
 
         $this->assertCount(0, $form);
@@ -27,7 +27,7 @@ class CollectionTypeTest extends TypeTestCase
     public function testSetDataAdjustsSize()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'form',
+            'type' => 'text',
             'options' => array(
                 'max_length' => 20,
             ),
@@ -39,21 +39,21 @@ class CollectionTypeTest extends TypeTestCase
         $this->assertCount(2, $form);
         $this->assertEquals('foo@foo.com', $form[0]->getData());
         $this->assertEquals('foo@bar.com', $form[1]->getData());
-        $this->assertEquals(20, $form[0]->getAttribute('max_length'));
-        $this->assertEquals(20, $form[1]->getAttribute('max_length'));
+        $this->assertEquals(20, $form[0]->getConfig()->getOption('max_length'));
+        $this->assertEquals(20, $form[1]->getConfig()->getOption('max_length'));
 
         $form->setData(array('foo@baz.com'));
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form[0]);
         $this->assertFalse(isset($form[1]));
         $this->assertCount(1, $form);
         $this->assertEquals('foo@baz.com', $form[0]->getData());
-        $this->assertEquals(20, $form[0]->getAttribute('max_length'));
+        $this->assertEquals(20, $form[0]->getConfig()->getOption('max_length'));
     }
 
     public function testThrowsExceptionIfObjectIsNotTraversable()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'form',
+            'type' => 'text',
         ));
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $form->setData(new \stdClass());
@@ -62,7 +62,7 @@ class CollectionTypeTest extends TypeTestCase
     public function testNotResizedIfBoundWithMissingData()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'form',
+            'type' => 'text',
         ));
         $form->setData(array('foo@foo.com', 'bar@bar.com'));
         $form->bind(array('foo@bar.com'));
@@ -70,13 +70,13 @@ class CollectionTypeTest extends TypeTestCase
         $this->assertTrue($form->has('0'));
         $this->assertTrue($form->has('1'));
         $this->assertEquals('foo@bar.com', $form[0]->getData());
-        $this->assertNull($form[1]->getData());
+        $this->assertEquals('', $form[1]->getData());
     }
 
     public function testResizedDownIfBoundWithMissingDataAndAllowDelete()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'form',
+            'type' => 'text',
             'allow_delete' => true,
         ));
         $form->setData(array('foo@foo.com', 'bar@bar.com'));
@@ -91,7 +91,7 @@ class CollectionTypeTest extends TypeTestCase
     public function testNotResizedIfBoundWithExtraData()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'form',
+            'type' => 'text',
         ));
         $form->setData(array('foo@bar.com'));
         $form->bind(array('foo@foo.com', 'bar@bar.com'));
@@ -104,7 +104,7 @@ class CollectionTypeTest extends TypeTestCase
     public function testResizedUpIfBoundWithExtraDataAndAllowAdd()
     {
         $form = $this->factory->create('collection', null, array(
-            'type' => 'form',
+            'type' => 'text',
             'allow_add' => true,
         ));
         $form->setData(array('foo@bar.com'));
@@ -138,7 +138,7 @@ class CollectionTypeTest extends TypeTestCase
             ))
         ;
 
-        $this->assertTrue($form->createView()->get('multipart'));
+        $this->assertTrue($form->createView()->getVar('multipart'));
     }
 
     public function testGetDataDoesNotContainsProtypeNameBeforeDataAreSet()
@@ -174,7 +174,7 @@ class CollectionTypeTest extends TypeTestCase
             'allow_add' => true,
         ));
 
-        $this->assertSame('__name__', $form->getAttribute('prototype')->getName(), '__name__ is the default');
+        $this->assertSame('__name__', $form->getConfig()->getAttribute('prototype')->getName(), '__name__ is the default');
 
         $form = $this->factory->create('collection', null, array(
             'type'           => 'form',
@@ -183,7 +183,7 @@ class CollectionTypeTest extends TypeTestCase
             'prototype_name' => '__test__',
         ));
 
-        $this->assertSame('__test__', $form->getAttribute('prototype')->getName());
+        $this->assertSame('__test__', $form->getConfig()->getAttribute('prototype')->getName());
     }
 
     public function testPrototypeDefaultLabel()
@@ -195,6 +195,6 @@ class CollectionTypeTest extends TypeTestCase
             'prototype_name' => '__test__',
         ));
 
-        $this->assertSame('__test__label__', $form->createView()->get('prototype')->get('label'));
+        $this->assertSame('__test__label__', $form->createView()->getVar('prototype')->getVar('label'));
     }
 }

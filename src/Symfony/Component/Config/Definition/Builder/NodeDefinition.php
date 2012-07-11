@@ -32,14 +32,13 @@ abstract class NodeDefinition implements NodeParentInterface
     protected $trueEquivalent;
     protected $falseEquivalent;
     protected $parent;
-    protected $info;
-    protected $example;
+    protected $attributes = array();
 
     /**
      * Constructor
      *
-     * @param string                $name   The name of the node
-     * @param NodeParentInterface   $parent The parent
+     * @param string              $name   The name of the node
+     * @param NodeParentInterface $parent The parent
      */
     public function __construct($name, NodeParentInterface $parent = null)
     {
@@ -55,6 +54,8 @@ abstract class NodeDefinition implements NodeParentInterface
      * Sets the parent node.
      *
      * @param NodeParentInterface $parent The parent
+     *
+     * @return NodeDefinition
      */
     public function setParent(NodeParentInterface $parent)
     {
@@ -70,11 +71,9 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return NodeDefinition
      */
-    public function setInfo($info)
+    public function info($info)
     {
-        $this->info = $info;
-
-        return $this;
+        return $this->attribute('info', $info);
     }
 
     /**
@@ -84,9 +83,22 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return NodeDefinition
      */
-    public function setExample($example)
+    public function example($example)
     {
-        $this->example = $example;
+        return $this->attribute('example', $example);
+    }
+
+    /**
+     * Sets an attribute on the node.
+     *
+     * @param string $key
+     * @param mixed $value
+     *
+     * @return NodeDefinition
+     */
+    public function attribute($key, $value)
+    {
+        $this->attributes[$key] = $value;
 
         return $this;
     }
@@ -123,9 +135,7 @@ abstract class NodeDefinition implements NodeParentInterface
         }
 
         $node = $this->createNode();
-
-        $node->setInfo($this->info);
-        $node->setExample($this->example);
+        $node->setAttributes($this->attributes);
 
         return $node;
     }

@@ -16,6 +16,8 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
 
 /**
+ * Eases the testing of console commands.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CommandTester

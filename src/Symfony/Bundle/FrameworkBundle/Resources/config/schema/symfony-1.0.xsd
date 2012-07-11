@@ -21,6 +21,7 @@
             <xsd:element name="annotations" type="annotations" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
+        <!-- charset is deprecated and will be removed in 2.2 -->
         <xsd:attribute name="charset" type="xsd:string" />
         <xsd:attribute name="trust-proxy-headers" type="xsd:string" />
         <xsd:attribute name="ide" type="xsd:string" />
@@ -66,6 +67,7 @@
         <xsd:attribute name="type" type="xsd:string" />
         <xsd:attribute name="http-port" type="xsd:string" />
         <xsd:attribute name="https-port" type="xsd:string" />
+        <xsd:attribute name="strict-parameters" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="session">
@@ -83,9 +85,9 @@
         <xsd:attribute name="domain" type="xsd:string" />
         <xsd:attribute name="secure" type="xsd:boolean" />
         <xsd:attribute name="httponly" type="xsd:boolean" />
+        <xsd:attribute name="auto-start" type="xsd:boolean" />
         <!-- end of deprecated attributes -->
         <xsd:attribute name="cache-limiter" type="xsd:string" />
-        <xsd:attribute name="auto-start" type="xsd:boolean" />
         <xsd:attribute name="gc-maxlifetime" type="xsd:string" />
         <xsd:attribute name="gc-divisor" type="xsd:string" />
         <xsd:attribute name="gc-probability" type="xsd:string" />

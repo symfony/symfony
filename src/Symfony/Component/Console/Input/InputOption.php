@@ -50,6 +50,10 @@ class InputOption
             $name = substr($name, 2);
         }
 
+        if (empty($name)) {
+            throw new \InvalidArgumentException('An option name cannot be empty.');
+        }
+
         if (empty($shortcut)) {
             $shortcut = null;
         }
@@ -57,6 +61,10 @@ class InputOption
         if (null !== $shortcut) {
             if ('-' === $shortcut[0]) {
                 $shortcut = substr($shortcut, 1);
+            }
+
+            if (empty($shortcut)) {
+                throw new \InvalidArgumentException('An option shortcut cannot be empty.');
             }
         }
 

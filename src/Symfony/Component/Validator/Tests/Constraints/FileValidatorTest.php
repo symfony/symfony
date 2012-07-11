@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\FileValidator;
-use Symfony\Component\HttpFoundation\File\File as FileObject;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
@@ -99,8 +98,9 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ limit }}'   => '10 bytes',
-                '{{ size }}'    => '11 bytes',
+                '{{ limit }}'   => '10',
+                '{{ size }}'    => '11',
+                '{{ suffix }}'  => 'bytes',
                 '{{ file }}'    => $this->path,
             ));
 
@@ -119,8 +119,9 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ limit }}'   => '1 kB',
-                '{{ size }}'    => '1.4 kB',
+                '{{ limit }}'   => '1',
+                '{{ size }}'    => '1.4',
+                '{{ suffix }}'  => 'kB',
                 '{{ file }}'    => $this->path,
             ));
 
@@ -139,8 +140,9 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ limit }}'   => '1 MB',
-                '{{ size }}'    => '1.4 MB',
+                '{{ limit }}'   => '1',
+                '{{ size }}'    => '1.4',
+                '{{ suffix }}'  => 'MB',
                 '{{ file }}'    => $this->path,
             ));
 
@@ -314,7 +316,10 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         );
 
         if (class_exists('Symfony\Component\HttpFoundation\File\UploadedFile')) {
-            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array('{{ limit }}' => UploadedFile::getMaxFilesize() . ' bytes'));
+            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array(
+                '{{ limit }}' => UploadedFile::getMaxFilesize(),
+                '{{ suffix }}' => 'bytes',
+            ));
         }
 
         return $tests;

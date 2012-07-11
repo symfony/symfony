@@ -16,7 +16,8 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class PoFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp() {
+    protected function setUp()
+    {
         if (!class_exists('Symfony\Component\Config\Loader\Loader')) {
             $this->markTestSkipped('The "Config" component is not available');
         }
@@ -39,7 +40,7 @@ class PoFileLoaderTest extends \PHPUnit_Framework_TestCase
         $resource = __DIR__.'/../fixtures/plurals.po';
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals(array('foo' => 'bar', 'foos' => '{0} bar|{1} bars'), $catalogue->all('domain1'));
+        $this->assertEquals(array('foo' => 'bar', 'foos' => 'bar|bars'), $catalogue->all('domain1'));
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
@@ -51,6 +52,17 @@ class PoFileLoaderTest extends \PHPUnit_Framework_TestCase
         $catalogue = $loader->load($resource, 'en', 'domain1');
 
         $this->assertEquals(array(), $catalogue->all('domain1'));
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+    }
+
+    public function testLoadEmptyTranslation()
+    {
+        $loader = new PoFileLoader();
+        $resource = __DIR__.'/../fixtures/empty-translation.po';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals(array('foo' => ''), $catalogue->all('domain1'));
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }

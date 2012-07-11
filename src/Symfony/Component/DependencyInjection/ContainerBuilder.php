@@ -291,7 +291,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns true if the given service is defined.
      *
-     * @param  string  $id      The service identifier
+     * @param string $id The service identifier
      *
      * @return Boolean true if the service is defined, false otherwise
      *
@@ -307,8 +307,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets a service.
      *
-     * @param  string  $id              The service identifier
-     * @param  integer $invalidBehavior The behavior when the service does not exist
+     * @param string  $id              The service identifier
+     * @param integer $invalidBehavior The behavior when the service does not exist
      *
      * @return object The associated service
      *
@@ -532,7 +532,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns true if an alias exists under the given identifier.
      *
-     * @param  string  $id The service identifier
+     * @param string $id The service identifier
      *
      * @return Boolean true if the alias exists, false otherwise
      *
@@ -558,7 +558,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets an alias.
      *
-     * @param  string  $id The service identifier
+     * @param string $id The service identifier
      *
      * @return string The aliased service identifier
      *
@@ -583,8 +583,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * This methods allows for simple registration of service definition
      * with a fluid interface.
      *
-     * @param  string $id    The service identifier
-     * @param  string $class The service class
+     * @param string $id    The service identifier
+     * @param string $class The service class
      *
      * @return Definition A Definition instance
      *
@@ -637,8 +637,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets a service definition.
      *
-     * @param  string     $id         The service identifier
-     * @param  Definition $definition A Definition instance
+     * @param string     $id         The service identifier
+     * @param Definition $definition A Definition instance
      *
      * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
@@ -660,7 +660,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns true if a service definition exists under the given identifier.
      *
-     * @param  string  $id The service identifier
+     * @param string $id The service identifier
      *
      * @return Boolean true if the service definition exists, false otherwise
      *
@@ -674,7 +674,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Gets a service definition.
      *
-     * @param  string  $id The service identifier
+     * @param string $id The service identifier
      *
      * @return Definition A Definition instance
      *
@@ -698,7 +698,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * The method "unaliases" recursively to return a Definition instance.
      *
-     * @param  string  $id The service identifier or alias
+     * @param string $id The service identifier or alias
      *
      * @return Definition A Definition instance
      *
@@ -718,8 +718,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Creates a service for a service definition.
      *
-     * @param  Definition $definition A service definition instance
-     * @param  string     $id         The service identifier
+     * @param Definition $definition A service definition instance
+     * @param string     $id         The service identifier
      *
      * @return object              The service described by the service definition
      *
@@ -728,24 +728,28 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private function createService(Definition $definition, $id)
     {
+        $parameterBag = $this->getParameterBag();
+
         if (null !== $definition->getFile()) {
-            require_once $this->getParameterBag()->resolveValue($definition->getFile());
+            require_once $parameterBag->resolveValue($definition->getFile());
         }
 
-        $arguments = $this->resolveServices($this->getParameterBag()->resolveValue($definition->getArguments()));
+        $arguments = $this->resolveServices(
+            $parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments()))
+        );
 
         if (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryClass()) {
-                $factory = $this->getParameterBag()->resolveValue($definition->getFactoryClass());
+                $factory = $parameterBag->resolveValue($definition->getFactoryClass());
             } elseif (null !== $definition->getFactoryService()) {
-                $factory = $this->get($this->getParameterBag()->resolveValue($definition->getFactoryService()));
+                $factory = $this->get($parameterBag->resolveValue($definition->getFactoryService()));
             } else {
                 throw new RuntimeException('Cannot create service from factory method without a factory service or factory class.');
             }
 
             $service = call_user_func_array(array($factory, $definition->getFactoryMethod()), $arguments);
         } else {
-            $r = new \ReflectionClass($this->getParameterBag()->resolveValue($definition->getClass()));
+            $r = new \ReflectionClass($parameterBag->resolveValue($definition->getClass()));
 
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
         }
@@ -774,11 +778,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
 
             if ($ok) {
-                call_user_func_array(array($service, $call[0]), $this->resolveServices($this->getParameterBag()->resolveValue($call[1])));
+                call_user_func_array(array($service, $call[0]), $this->resolveServices($parameterBag->resolveValue($call[1])));
             }
         }
 
-        $properties = $this->resolveServices($this->getParameterBag()->resolveValue($definition->getProperties()));
+        $properties = $this->resolveServices($parameterBag->resolveValue($definition->getProperties()));
         foreach ($properties as $name => $value) {
             $service->$name = $value;
         }
@@ -787,7 +791,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             if (is_array($callable) && is_object($callable[0]) && $callable[0] instanceof Reference) {
                 $callable[0] = $this->get((string) $callable[0]);
             } elseif (is_array($callable)) {
-                $callable[0] = $this->getParameterBag()->resolveValue($callable[0]);
+                $callable[0] = $parameterBag->resolveValue($callable[0]);
             }
 
             if (!is_callable($callable)) {
@@ -803,7 +807,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Replaces service references by the real service instance.
      *
-     * @param  mixed $value A value
+     * @param mixed $value A value
      *
      * @return mixed The same value with all service references replaced by the real service instances
      */
@@ -850,7 +854,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return array An array of Service conditionals
      */
-    static public function getServiceConditionals($value)
+    public static function getServiceConditionals($value)
     {
         $services = array();
 

@@ -20,6 +20,6 @@ class IntegerTypeTest extends LocalizedTestCase
         $form->bind('1.678');
 
         $this->assertSame(1, $form->getData());
-        $this->assertSame('1', $form->getClientData());
+        $this->assertSame('1', $form->getViewData());
     }
 }

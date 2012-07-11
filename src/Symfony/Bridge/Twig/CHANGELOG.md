@@ -4,6 +4,7 @@ CHANGELOG
 2.1.0
 -----
 
+ * added global variables access in a form theme
  * added TwigEngine
  * added TwigExtractor
  * added a csrf_token function

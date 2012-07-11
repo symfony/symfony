@@ -23,13 +23,13 @@ interface RedirectableUrlMatcherInterface
     /**
      * Redirects the user to another URL.
      *
-     * @param string  $path   The path info to redirect to.
-     * @param string  $route  The route that matched
-     * @param string  $scheme The URL scheme (null to keep the current one)
+     * @param string $path   The path info to redirect to.
+     * @param string $route  The route that matched
+     * @param string $scheme The URL scheme (null to keep the current one)
      *
      * @return array An array of parameters
      *
      * @api
      */
-    function redirect($path, $route, $scheme = null);
+    public function redirect($path, $route, $scheme = null);
 }

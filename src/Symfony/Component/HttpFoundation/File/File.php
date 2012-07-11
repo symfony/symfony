@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 /**
  * A file in the file system.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */
@@ -122,7 +122,7 @@ class File extends \SplFileInfo
             throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
         }
 
-        chmod($target, 0666 & ~umask());
+        @chmod($target, 0666 & ~umask());
 
         return new File($target);
     }

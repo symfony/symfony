@@ -42,7 +42,7 @@ class DebugClassLoader
     /**
      * Replaces all autoloaders implementing a findFile method by a DebugClassLoader wrapper.
      */
-    static public function enable()
+    public static function enable()
     {
         if (!is_array($functions = spl_autoload_functions())) {
             return;
@@ -73,7 +73,7 @@ class DebugClassLoader
      * Loads the given class or interface.
      *
      * @param string $class The name of the class
-     * 
+     *
      * @return Boolean|null True, if loaded
      */
     public function loadClass($class)

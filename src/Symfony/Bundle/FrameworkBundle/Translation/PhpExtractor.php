@@ -90,7 +90,7 @@ class PhpExtractor implements ExtractorInterface
     /**
      * Extracts trans message from php tokens.
      *
-     * @param array $tokens
+     * @param array            $tokens
      * @param MessageCatalogue $catalog
      */
     protected function parseTokens($tokens, MessageCatalogue $catalog)
@@ -100,7 +100,7 @@ class PhpExtractor implements ExtractorInterface
                 $message = '';
 
                 foreach ($sequence as $id => $item) {
-                    if($this->normalizeToken($tokens[$key + $id]) == $item) {
+                    if ($this->normalizeToken($tokens[$key + $id]) == $item) {
                         continue;
                     } elseif (self::MESSAGE_TOKEN == $item) {
                         $message = $this->normalizeToken($tokens[$key + $id]);

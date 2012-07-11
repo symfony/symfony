@@ -48,8 +48,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
         $kernel = new HttpKernel($dispatcher, $container, $resolver);
 
-        $controller = function() use($expected)
-        {
+        $controller = function() use ($expected) {
             return $expected;
         };
 
@@ -96,8 +95,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
         $kernel = new HttpKernel($dispatcher, $container, $resolver);
 
-        $controller = function() use ($expected)
-        {
+        $controller = function() use ($expected) {
             throw $expected;
         };
 
@@ -169,10 +167,6 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
 
     public function testExceptionInSubRequestsDoesNotMangleOutputBuffers()
     {
-        if (version_compare(phpversion(), '5.3.3', '<')) {
-            $this->markTestSkipped('Test fails with PHP 5.3.2 due to https://bugs.php.net/bug.php?id=50563');
-        }
-
         $request = new Request();
 
         $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');

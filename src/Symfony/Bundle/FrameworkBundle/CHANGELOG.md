@@ -4,6 +4,7 @@ CHANGELOG
 2.1.0
 -----
 
+ * moved the translation files to the Form and Validator components
  * changed the default extension for XLIFF files from .xliff to .xlf
  * moved Symfony\Bundle\FrameworkBundle\ContainerAwareEventDispatcher to Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
  * moved Symfony\Bundle\FrameworkBundle\Debug\TraceableEventDispatcher to Symfony\Component\EventDispatcher\ContainerAwareTraceableEventDispatcher
@@ -25,9 +26,15 @@ CHANGELOG
  * [BC BREAK] following session options: 'lifetime', 'path', 'domain', 'secure',
    'httponly' are now prefixed with cookie_ when dumped to the container
  * Added `handler_id` configuration under `session` key to represent `session.handler`
-   service, defaults to `session.handler.native_file`.
+   service, defaults to `session.handler.file`.
  * Added `gc_maxlifetime`, `gc_probability`, and `gc_divisor` to session
    configuration. This means session garbage collection has a
   `gc_probability`/`gc_divisor` chance of being run. The `gc_maxlifetime` defines
    how long a session can idle for. It is different from cookie lifetime which
    declares how long a cookie can be stored on the remote client.
+ * Removed 'auto_start' configuration parameter from session config. The session will
+   start on demand.
+ * [BC BREAK] TemplateNameParser::parseFromFilename() has been moved to a dedicated
+   parser: TemplateFilenameParser::parse().
+ * [BC BREAK] Kernel parameters are replaced by their value whereever they appear
+   in Route patterns, requirements and defaults. Use '%%' as the escaped value for '%'.

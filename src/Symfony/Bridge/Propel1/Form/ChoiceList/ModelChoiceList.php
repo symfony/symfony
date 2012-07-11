@@ -46,11 +46,11 @@ class ModelChoiceList extends ObjectChoiceList
     private $loaded = false;
 
     /**
-     * @param string $class
-     * @param string $labelPath
-     * @param array $choices
+     * @param string         $class
+     * @param string         $labelPath
+     * @param array          $choices
      * @param \ModelCriteria $queryObject
-     * @param string $groupPath
+     * @param string         $groupPath
      */
     public function __construct($class, $labelPath = null, $choices = null, $queryObject = null, $groupPath = null)
     {
@@ -335,7 +335,7 @@ class ModelChoiceList extends ObjectChoiceList
      * be persisted or added to the idmodel map before. Otherwise an
      * exception is thrown.
      *
-     * @param  object $model  The model for which to get the identifier
+     * @param object $model The model for which to get the identifier
      * @throws FormException   If the model does not exist
      */
     private function getIdentifierValues($model)

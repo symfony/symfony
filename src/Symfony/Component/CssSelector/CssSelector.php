@@ -33,8 +33,8 @@ class CssSelector
      * Optionally, a prefix can be added to the resulting XPath
      * expression with the $prefix parameter.
      *
-     * @param  mixed  $cssExpr The CSS expression.
-     * @param  string $prefix  An optional prefix for the XPath expression.
+     * @param mixed  $cssExpr The CSS expression.
+     * @param string $prefix  An optional prefix for the XPath expression.
      *
      * @return string
      *
@@ -42,7 +42,7 @@ class CssSelector
      *
      * @api
      */
-    static public function toXPath($cssExpr, $prefix = 'descendant-or-self::')
+    public static function toXPath($cssExpr, $prefix = 'descendant-or-self::')
     {
         if (is_string($cssExpr)) {
             if (!$cssExpr) {
@@ -84,11 +84,11 @@ class CssSelector
      * Parses an expression and returns the Node object that represents
      * the parsed expression.
      *
-     * @throws \Exception When tokenizer throws it while parsing
-     *
-     * @param  string $string The expression to parse
+     * @param string $string The expression to parse
      *
      * @return Node\NodeInterface
+     *
+     * @throws \Exception When tokenizer throws it while parsing
      */
     public function parse($string)
     {
@@ -109,7 +109,7 @@ class CssSelector
      * Parses a selector group contained in $stream and returns
      * the Node object that represents the expression.
      *
-     * @param  TokenStream $stream The stream to parse.
+     * @param TokenStream $stream The stream to parse.
      *
      * @return Node\NodeInterface
      */
@@ -136,11 +136,11 @@ class CssSelector
      * Parses a selector contained in $stream and returns the Node
      * object that represents it.
      *
-     * @throws ParseException When expected selector but got something else
-     *
-     * @param  TokenStream $stream The stream containing the selector.
+     * @param TokenStream $stream The stream containing the selector.
      *
      * @return Node\NodeInterface
+     *
+     * @throws ParseException When expected selector but got something else
      */
     private function parseSelector($stream)
     {
@@ -153,6 +153,11 @@ class CssSelector
             } elseif (in_array($peek, array('+', '>', '~'))) {
                 // A combinator
                 $combinator = (string) $stream->next();
+
+                // Ignore optional whitespace after a combinator
+                while (' ' == $stream->peek()) {
+                    $stream->next();
+                }
             } else {
                 $combinator = ' ';
             }
@@ -172,11 +177,11 @@ class CssSelector
      * Parses a simple selector (the current token) from $stream and returns
      * the resulting Node object.
      *
-     * @throws ParseException When expected symbol but got something else
-     *
-     * @param  TokenStream $stream The stream containing the selector.
+     * @param TokenStream $stream The stream containing the selector.
      *
      * @return Node\NodeInterface
+     *
+     * @throws ParseException When expected symbol but got something else
      */
     private function parseSimpleSelector($stream)
     {
@@ -279,13 +284,13 @@ class CssSelector
      * Parses an attribute from a selector contained in $stream and returns
      * the resulting AttribNode object.
      *
-     * @throws ParseException When encountered unexpected selector
-     *
-     * @param  Node\NodeInterface $selector The selector object whose attribute
+     * @param Node\NodeInterface $selector The selector object whose attribute
      *                                      is to be parsed.
-     * @param  TokenStream        $stream    The container token stream.
+     * @param TokenStream $stream The container token stream.
      *
      * @return Node\AttribNode
+     *
+     * @throws ParseException When encountered unexpected selector
      */
     private function parseAttrib($selector, $stream)
     {

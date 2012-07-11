@@ -23,12 +23,12 @@ interface AuditableEntryInterface extends EntryInterface
      *
      * @return Boolean
      */
-    function isAuditFailure();
+    public function isAuditFailure();
 
     /**
      * Whether auditing for successful denies is turned on
      *
      * @return Boolean
      */
-    function isAuditSuccess();
+    public function isAuditSuccess();
 }

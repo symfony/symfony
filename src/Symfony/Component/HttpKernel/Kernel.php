@@ -58,7 +58,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $classes;
     protected $errorReportingLevel;
 
-    const VERSION = '2.1.0-DEV';
+    const VERSION         = '2.1.0-DEV';
+    const VERSION_ID      = '20100';
+    const MAJOR_VERSION   = '2';
+    const MINOR_VERSION   = '1';
+    const RELEASE_VERSION = '0';
+    const EXTRA_VERSION   = 'DEV';
 
     /**
      * Constructor.
@@ -74,7 +79,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $this->debug = (Boolean) $debug;
         $this->booted = false;
         $this->rootDir = $this->getRootDir();
-        $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+        $this->name = $this->getName();
         $this->classes = array();
 
         if ($this->debug) {
@@ -349,6 +354,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     public function getName()
     {
+        if (null === $this->name) {
+            $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+        }
+
         return $this->name;
     }
 
@@ -387,7 +396,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         if (null === $this->rootDir) {
             $r = new \ReflectionObject($this);
-            $this->rootDir = dirname($r->getFileName());
+            $this->rootDir = str_replace('\\', '/', dirname($r->getFileName()));
         }
 
         return $this->rootDir;
@@ -408,8 +417,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     /**
      * Loads the PHP class cache.
      *
-     * @param string  $name      The cache name prefix
-     * @param string  $extension File extension of the resulting file
+     * @param string $name      The cache name prefix
+     * @param string $extension File extension of the resulting file
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {
@@ -460,6 +469,18 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     public function getLogDir()
     {
         return $this->rootDir.'/logs';
+    }
+
+    /**
+     * Gets the charset of the application.
+     *
+     * @return string The charset
+     *
+     * @api
+     */
+    public function getCharset()
+    {
+        return 'UTF-8';
     }
 
     /**
@@ -596,7 +617,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 'kernel.cache_dir'       => $this->getCacheDir(),
                 'kernel.logs_dir'        => $this->getLogDir(),
                 'kernel.bundles'         => $bundles,
-                'kernel.charset'         => 'UTF-8',
+                'kernel.charset'         => $this->getCharset(),
                 'kernel.container_class' => $this->getContainerClass(),
             ),
             $this->getEnvParameters()
@@ -731,7 +752,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @return string The PHP string with the comments removed
      */
-    static public function stripComments($source)
+    public static function stripComments($source)
     {
         if (!function_exists('token_get_all')) {
             return $source;

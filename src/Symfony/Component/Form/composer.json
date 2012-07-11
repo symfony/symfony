@@ -16,9 +16,14 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2",
-        "symfony/event-dispatcher": "self.version",
-        "symfony/locale": "self.version"
+        "php": ">=5.3.3",
+        "symfony/event-dispatcher": "2.1.*",
+        "symfony/locale": "2.1.*",
+        "symfony/options-resolver": "2.1.*"
+    },
+    "require-dev": {
+        "symfony/validator": "2.1.*",
+        "symfony/http-foundation": "2.1.*"
     },
     "suggest": {
         "symfony/validator": "self.version",

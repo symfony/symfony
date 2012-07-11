@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
-
 /**
  * Parser and formatter for month format
  *
@@ -22,7 +21,7 @@ class MonthTransformer extends Transformer
     /**
      * @var array
      */
-    static protected $months = array(
+    protected static $months = array(
         'January',
         'February',
         'March',
@@ -41,19 +40,19 @@ class MonthTransformer extends Transformer
      * Short months names (first 3 letters)
      * @var array
      */
-    static protected $shortMonths = array();
+    protected static $shortMonths = array();
 
     /**
      * Flipped $months array, $name => $index
      * @var array
      */
-    static protected $flippedMonths = array();
+    protected static $flippedMonths = array();
 
     /**
      * Flipped $shortMonths array, $name => $index
      * @var array
      */
-    static protected $flippedShortMonths = array();
+    protected static $flippedShortMonths = array();
 
     /**
      * Constructor

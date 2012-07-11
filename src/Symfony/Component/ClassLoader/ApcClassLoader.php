@@ -55,7 +55,7 @@ class ApcClassLoader
     public function __construct($prefix, $classFinder)
     {
         if (!extension_loaded('apc')) {
-            throw new \RuntimeException('Unable to use ApcUniversalClassLoader as APC is not enabled.');
+            throw new \RuntimeException('Unable to use ApcClassLoader as APC is not enabled.');
         }
 
         if (!method_exists($classFinder, 'findFile')) {

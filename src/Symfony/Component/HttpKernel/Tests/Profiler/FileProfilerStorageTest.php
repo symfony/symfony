@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class FileProfilerStorageTest extends AbstractProfilerStorageTest
 {
@@ -56,5 +57,29 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
     protected function getStorage()
     {
         return self::$storage;
+    }
+
+    public function testMultiRowIndexFile()
+    {
+        $iteration = 3;
+        for ($i = 0; $i < $iteration; $i++) {
+            $profile = new Profile('token' . $i);
+            $profile->setIp('127.0.0.' . $i);
+            $profile->setUrl('http://foo.bar/' . $i);
+            $storage = $this->getStorage();
+
+            $storage->write($profile);
+            $storage->write($profile);
+            $storage->write($profile);
+        }
+
+        $handle = fopen(self::$tmpDir . '/index.csv', 'r');
+        for ($i = 0; $i < $iteration; $i++) {
+            $row = fgetcsv($handle);
+            $this->assertEquals('token' . $i, $row[0]);
+            $this->assertEquals('127.0.0.' . $i, $row[1]);
+            $this->assertEquals('http://foo.bar/' . $i, $row[3]);
+        }
+        $this->assertFalse(fgetcsv($handle));
     }
 }

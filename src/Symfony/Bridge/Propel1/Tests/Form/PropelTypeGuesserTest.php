@@ -105,7 +105,7 @@ class PropelTypeGuesserTest extends Propel1TestCase
         $this->assertEquals($confidence, $value->getConfidence());
     }
 
-    static public function dataProviderForGuessType()
+    public static function dataProviderForGuessType()
     {
         return array(
             array('is_active',  'checkbox', Guess::HIGH_CONFIDENCE),

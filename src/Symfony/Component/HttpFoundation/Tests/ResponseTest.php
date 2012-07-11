@@ -352,14 +352,14 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         try {
             $response->setStatusCode(99);
             $this->fail();
-        } catch(\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue($response->isInvalid());
         }
 
         try {
             $response->setStatusCode(650);
             $this->fail();
-        } catch(\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->assertTrue($response->isInvalid());
         }
 
@@ -378,8 +378,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testIsRedirectRedirection()
     {
-        foreach (array(301, 302, 303, 307) as $code)
-        {
+        foreach (array(301, 302, 303, 307) as $code) {
             $response = new Response('', $code);
             $this->assertTrue($response->isRedirection());
             $this->assertTrue($response->isRedirect());
@@ -413,8 +412,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testIsEmpty()
     {
-        foreach (array(201, 204, 304) as $code)
-        {
+        foreach (array(201, 204, 304) as $code) {
             $response = new Response('', $code);
             $this->assertTrue($response->isEmpty());
         }

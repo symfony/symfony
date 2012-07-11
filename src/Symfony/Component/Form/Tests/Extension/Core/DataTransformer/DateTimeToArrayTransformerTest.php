@@ -105,12 +105,12 @@ class DateTimeToArrayTransformerTest extends DateTimeTestCase
         $dateTime = new \DateTime('2010-02-03 04:05:06 America/New_York');
         $dateTime->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
         $output = array(
-            'year' => (string)(int)$dateTime->format('Y'),
-            'month' => (string)(int)$dateTime->format('m'),
-            'day' => (string)(int)$dateTime->format('d'),
-            'hour' => (string)(int)$dateTime->format('H'),
-            'minute' => (string)(int)$dateTime->format('i'),
-            'second' => (string)(int)$dateTime->format('s'),
+            'year' => (string) (int) $dateTime->format('Y'),
+            'month' => (string) (int) $dateTime->format('m'),
+            'day' => (string) (int) $dateTime->format('d'),
+            'hour' => (string) (int) $dateTime->format('H'),
+            'minute' => (string) (int) $dateTime->format('i'),
+            'second' => (string) (int) $dateTime->format('s'),
         );
 
         $this->assertSame($output, $transformer->transform($input));

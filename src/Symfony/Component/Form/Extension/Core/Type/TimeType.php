@@ -13,20 +13,21 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\ReversedTransformer;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class TimeType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $parts  = array('hour', 'minute');
         $format = 'H:i';
@@ -36,17 +37,13 @@ class TimeType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            $builder->appendClientTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
+            $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
         } else {
-            $hourOptions = $minuteOptions = $secondOptions = array();
+            $hourOptions = $minuteOptions = $secondOptions = array(
+                'error_bubbling' => true,
+            );
 
             if ('choice' === $options['widget']) {
-                if (is_array($options['empty_value'])) {
-                    $options['empty_value'] = array_merge(array('hour' => null, 'minute' => null, 'second' => null), $options['empty_value']);
-                } else {
-                    $options['empty_value'] = array('hour' => $options['empty_value'], 'minute' => $options['empty_value'], 'second' => $options['empty_value']);
-                }
-
                 $hours = $minutes = array();
 
                 foreach ($options['hours'] as $hour) {
@@ -57,14 +54,10 @@ class TimeType extends AbstractType
                 }
 
                 // Only pass a subset of the options to children
-                $hourOptions = array(
-                    'choices' => $hours,
-                    'empty_value' => $options['empty_value']['hour'],
-                );
-                $minuteOptions = array(
-                    'choices' => $minutes,
-                    'empty_value' => $options['empty_value']['minute'],
-                );
+                $hourOptions['choices'] = $hours;
+                $hourOptions['empty_value'] = $options['empty_value']['hour'];
+                $minuteOptions['choices'] = $minutes;
+                $minuteOptions['empty_value'] = $options['empty_value']['minute'];
 
                 if ($options['with_seconds']) {
                     $seconds = array();
@@ -73,10 +66,8 @@ class TimeType extends AbstractType
                         $seconds[$second] = str_pad($second, 2, '0', STR_PAD_LEFT);
                     }
 
-                    $secondOptions = array(
-                        'choices' => $seconds,
-                        'empty_value' => $options['empty_value']['second'],
-                    );
+                    $secondOptions['choices'] = $seconds;
+                    $secondOptions['empty_value'] = $options['empty_value']['second'];
                 }
 
                 // Append generic carry-along options
@@ -97,55 +88,92 @@ class TimeType extends AbstractType
                 $builder->add('second', $options['widget'], $secondOptions);
             }
 
-            $builder->appendClientTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts, 'text' === $options['widget']));
+            $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget']));
         }
 
         if ('string' === $options['input']) {
-            $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'H:i:s')
+            $builder->addModelTransformer(new ReversedTransformer(
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], 'H:i:s')
             ));
         } elseif ('timestamp' === $options['input']) {
-            $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
+            $builder->addModelTransformer(new ReversedTransformer(
+                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
             ));
         } elseif ('array' === $options['input']) {
-            $builder->appendNormTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
+            $builder->addModelTransformer(new ReversedTransformer(
+                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], $parts)
             ));
         }
-
-        $builder
-            ->setAttribute('widget', $options['widget'])
-            ->setAttribute('with_seconds', $options['with_seconds'])
-        ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
-        $view
-            ->set('widget', $form->getAttribute('widget'))
-            ->set('with_seconds', $form->getAttribute('with_seconds'))
-        ;
+        $view->addVars(array(
+            'widget'       => $options['widget'],
+            'with_seconds' => $options['with_seconds'],
+        ));
+
+        if ('single_text' === $options['widget']) {
+            $view->setVar('type', 'time');
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions()
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        return array(
+        $compound = function (Options $options) {
+            return $options['widget'] !== 'single_text';
+        };
+
+        $emptyValue = $emptyValueDefault = function (Options $options) {
+            return $options['required'] ? null : '';
+        };
+
+        $emptyValueFilter = function (Options $options, $emptyValue) use ($emptyValueDefault) {
+            if (is_array($emptyValue)) {
+                $default = $emptyValueDefault($options);
+
+                return array_merge(
+                    array('hour' => $default, 'minute' => $default, 'second' => $default),
+                    $emptyValue
+                );
+            }
+
+            return array(
+                'hour' => $emptyValue,
+                'minute' => $emptyValue,
+                'second' => $emptyValue
+            );
+        };
+
+        // BC until Symfony 2.3
+        $modelTimezone = function (Options $options) {
+            return $options['data_timezone'];
+        };
+
+        // BC until Symfony 2.3
+        $viewTimezone = function (Options $options) {
+            return $options['user_timezone'];
+        };
+
+        $resolver->setDefaults(array(
             'hours'          => range(0, 23),
             'minutes'        => range(0, 59),
             'seconds'        => range(0, 59),
             'widget'         => 'choice',
             'input'          => 'datetime',
             'with_seconds'   => false,
+            'model_timezone' => $modelTimezone,
+            'view_timezone'  => $viewTimezone,
+            // Deprecated timezone options
             'data_timezone'  => null,
             'user_timezone'  => null,
-            'empty_value'    => null,
+            'empty_value'    => $emptyValue,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'   => false,
@@ -155,15 +183,14 @@ class TimeType extends AbstractType
             // representation is not \DateTime, but an array, we need to unset
             // this option.
             'data_class'     => null,
-        );
-    }
+            'compound'       => $compound,
+        ));
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllowedOptionValues()
-    {
-        return array(
+        $resolver->setFilters(array(
+            'empty_value' => $emptyValueFilter,
+        ));
+
+        $resolver->setAllowedValues(array(
             'input' => array(
                 'datetime',
                 'string',
@@ -175,13 +202,13 @@ class TimeType extends AbstractType
                 'text',
                 'choice',
             ),
-        );
+        ));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getParent(array $options)
+    public function getParent()
     {
         return 'field';
     }

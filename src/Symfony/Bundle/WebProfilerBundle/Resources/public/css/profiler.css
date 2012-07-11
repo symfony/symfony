@@ -236,12 +236,23 @@ li {
     background-color: #f6f6f6;
     border-bottom: 1px solid #dfdfdf;
     padding: 10px 50px;
-    margin-left: 250px;
+    margin-left: 210px;
     color: #313131;
     font-size: 12px;
     -moz-border-radius-topright: 16px;
     -webkit-border-top-right-radius: 16px;
     border-top-right-radius: 16px;
+}
+
+a#resume-view-all {
+    display: inline-block;
+    padding: 0.2em 0.7em;
+    margin-right: 0.5em;
+    background-color: #666;
+    border-radius: 16px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
 }
 
 table th.value {
@@ -455,4 +466,20 @@ td.main, td.menu {
     background: transparent url(../images/profiler/spinner.gif) scroll no-repeat 50% 50%;
     height: 30px;
     display: none;
+}
+
+.sf-profiler-timeline .legends {
+    font-size: 12px;
+    line-height: 1.5em;
+}
+
+.sf-profiler-timeline .legends span {
+    border-left-width: 10px;
+    border-left-style: solid;
+    padding: 0 10px 0 5px;
+}
+
+.sf-profiler-timeline canvas {
+    border: 1px solid #999;
+    border-width: 1px 0;
 }

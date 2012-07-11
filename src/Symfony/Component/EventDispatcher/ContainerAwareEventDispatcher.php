@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * container
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Jordan Alliot <jordan.alliot@gmail.com>
  */
 class ContainerAwareEventDispatcher extends EventDispatcher
@@ -54,10 +54,10 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     /**
      * Adds a service as event listener
      *
-     * @param string   $eventName Event for which the listener is added
-     * @param array    $callback  The service ID of the listener service & the method
+     * @param string $eventName Event for which the listener is added
+     * @param array  $callback  The service ID of the listener service & the method
      *                            name that has to be called
-     * @param integer  $priority  The higher this value, the earlier an event listener
+     * @param integer $priority The higher this value, the earlier an event listener
      *                            will be triggered in the chain.
      *                            Defaults to 0.
      */

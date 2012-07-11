@@ -13,12 +13,13 @@ namespace Symfony\Component\Form\Tests\Fixtures;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FooType extends AbstractType
 {
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->setAttribute('foo', 'x');
         $builder->setAttribute('data_option', $options['data']);
@@ -31,7 +32,7 @@ class FooType extends AbstractType
 
     public function createBuilder($name, FormFactoryInterface $factory, array $options)
     {
-        return new FormBuilder($name, $factory, new EventDispatcher());
+        return new FormBuilder($name, null, new EventDispatcher(), $factory);
     }
 
     public function getDefaultOptions()
@@ -51,7 +52,7 @@ class FooType extends AbstractType
         );
     }
 
-    public function getParent(array $options)
+    public function getParent()
     {
         return null;
     }

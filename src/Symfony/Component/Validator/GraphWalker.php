@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Mapping\MemberMetadata;
  * types of items.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class GraphWalker
 {
@@ -91,12 +91,8 @@ class GraphWalker
         $hash = spl_object_hash($object);
 
         // Exit, if the object is already validated for the current group
-        if (isset($this->validatedObjects[$hash])) {
-            if (isset($this->validatedObjects[$hash][$group])) {
+        if (isset($this->validatedObjects[$hash][$group])) {
                 return;
-            }
-        } else {
-            $this->validatedObjects[$hash] = array();
         }
 
         // Remember validating this object before starting and possibly
@@ -110,10 +106,9 @@ class GraphWalker
         }
 
         if (null !== $object) {
+            $pathPrefix = empty($propertyPath) ? '' : $propertyPath.'.';
             foreach ($metadata->getConstrainedProperties() as $property) {
-                $localPropertyPath = empty($propertyPath) ? $property : $propertyPath.'.'.$property;
-
-                $this->walkProperty($metadata, $property, $object, $group, $localPropertyPath, $propagatedGroup);
+                $this->walkProperty($metadata, $property, $object, $group, $pathPrefix.$property, $propagatedGroup);
             }
         }
     }
@@ -142,11 +137,11 @@ class GraphWalker
         }
 
         if ($metadata->isCascaded()) {
-            $this->walkReference($value, $propagatedGroup ?: $group, $propertyPath, $metadata->isCollectionCascaded());
+            $this->walkReference($value, $propagatedGroup ?: $group, $propertyPath, $metadata->isCollectionCascaded(), $metadata->isCollectionCascadedDeeply());
         }
     }
 
-    public function walkReference($value, $group, $propertyPath, $traverse)
+    public function walkReference($value, $group, $propertyPath, $traverse, $deep = false)
     {
         if (null !== $value) {
             if (!is_object($value) && !is_array($value)) {
@@ -157,7 +152,8 @@ class GraphWalker
                 foreach ($value as $key => $element) {
                     // Ignore any scalar values in the collection
                     if (is_object($element) || is_array($element)) {
-                        $this->walkReference($element, $group, $propertyPath.'['.$key.']', $traverse);
+                        // Only repeat the traversal if $deep is set
+                        $this->walkReference($element, $group, $propertyPath.'['.$key.']', $deep, $deep);
                     }
                 }
             }

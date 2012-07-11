@@ -15,9 +15,9 @@ namespace Symfony\Component\Form\Util;
  * Traverses a property path and provides additional methods to find out
  * information about the current element
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class PropertyPathIterator extends \ArrayIterator
+class PropertyPathIterator extends \ArrayIterator implements PropertyPathIteratorInterface
 {
     /**
      * The traversed property path
@@ -28,9 +28,9 @@ class PropertyPathIterator extends \ArrayIterator
     /**
      * Constructor.
      *
-     * @param PropertyPath $path  The property path to traverse
+     * @param PropertyPathInterface $path The property path to traverse
      */
-    public function __construct(PropertyPath $path)
+    public function __construct(PropertyPathInterface $path)
     {
         parent::__construct($path->getElements());
 
@@ -38,20 +38,7 @@ class PropertyPathIterator extends \ArrayIterator
     }
 
     /**
-     * Returns whether next() can be called without making the iterator invalid
-     *
-     * @return Boolean
-     */
-    public function hasNext()
-    {
-        return $this->offsetExists($this->key() + 1);
-    }
-
-    /**
-     * Returns whether the current element in the property path is an array
-     * index
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function isIndex()
     {
@@ -59,10 +46,7 @@ class PropertyPathIterator extends \ArrayIterator
     }
 
     /**
-     * Returns whether the current element in the property path is a property
-     * names
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function isProperty()
     {

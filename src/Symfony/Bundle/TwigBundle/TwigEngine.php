@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Config\FileLocatorInterface;
 
 /**
- * This engine knows how to render Twig templates.
+ * This engine renders Twig templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -45,6 +45,26 @@ class TwigEngine extends BaseEngine implements EngineInterface
         if (null !== $globals) {
             $environment->addGlobal('app', $globals);
         }
+    }
+
+    public function setDefaultEscapingStrategy($strategy)
+    {
+        $this->environment->getExtension('escaper')->setDefaultStrategy($strategy);
+    }
+
+    public function guessDefaultEscapingStrategy($filename)
+    {
+        // remove .twig
+        $filename = substr($filename, 0, -5);
+
+        // get the format
+        $format = substr($filename, strrpos($filename, '.') + 1);
+
+        if ('js' === $format) {
+            return 'js';
+        }
+
+        return 'html';
     }
 
     /**

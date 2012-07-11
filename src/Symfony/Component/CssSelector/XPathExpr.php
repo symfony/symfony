@@ -139,7 +139,7 @@ class XPathExpr
      * Adds a prefix to this XPath expression.
      * It will be prepended to any pre-existent prefixes.
      *
-     * @param string $prefix  The prefix to add.
+     * @param string $prefix The prefix to add.
      */
     public function addPrefix($prefix)
     {
@@ -215,11 +215,11 @@ class XPathExpr
     /**
      * Gets an XPath literal for $s.
      *
-     * @param  mixed $s Can either be a Node\ElementNode or a string.
+     * @param mixed $s Can either be a Node\ElementNode or a string.
      *
      * @return string
      */
-    static public function xpathLiteral($s)
+    public static function xpathLiteral($s)
     {
         if ($s instanceof Node\ElementNode) {
             // This is probably a symbol that looks like an expression...

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Finder\Iterator;
 
-
 /**
  * MultiplePcreFilterIterator filters files using patterns (regexps, globs or strings).
  *
@@ -51,14 +50,14 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
      *
      * @return Boolean Whether the given string is a regex
      */
-    protected function isRegex($str) {
-
+    protected function isRegex($str)
+    {
         if (preg_match('/^(.{3,}?)[imsxuADU]*$/', $str, $m)) {
             $start = substr($m[1], 0, 1);
             $end = substr($m[1], -1);
 
             if ($start === $end) {
-                return !preg_match('/[[:alnum:] \\\\]/', $start);
+                return !preg_match('/[*?[:alnum:] \\\\]/', $start);
             }
 
             if ($start === '{' && $end === '}') {

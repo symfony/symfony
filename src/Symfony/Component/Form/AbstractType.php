@@ -12,7 +12,11 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 abstract class AbstractType implements FormTypeInterface
 {
     /**
@@ -22,67 +26,28 @@ abstract class AbstractType implements FormTypeInterface
     private $extensions = array();
 
     /**
-     * Builds the form.
-     *
-     * This method gets called for each type in the hierarchy starting from the
-     * top most type.
-     * Type extensions can further modify the form.
-     *
-     * @see FormTypeExtensionInterface::buildForm()
-     *
-     * @param FormBuilder   $builder The form builder
-     * @param array         $options The options
+     * {@inheritdoc}
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
     }
 
     /**
-     * Builds the form view.
-     *
-     * This method gets called for each type in the hierarchy starting from the
-     * top most type.
-     * Type extensions can further modify the view.
-     *
-     * @see FormTypeExtensionInterface::buildView()
-     *
-     * @param FormView      $view The view
-     * @param FormInterface $form The form
+     * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
     }
 
     /**
-     * Builds the form view.
-     *
-     * This method gets called for each type in the hierarchy starting from the
-     * top most type.
-     * Type extensions can further modify the view.
-     *
-     * Children views have been built while this method gets called so you get
-     * a chance to modify them.
-     *
-     * @see FormTypeExtensionInterface::buildViewBottomUp()
-     *
-     * @param FormView      $view The view
-     * @param FormInterface $form The form
+     * {@inheritdoc}
      */
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
     {
     }
 
     /**
-     * Returns a builder for the current type.
-     *
-     * The builder is retrieved by going up in the type hierarchy when a type does
-     * not provide one.
-     *
-     * @param string                $name       The name of the builder
-     * @param FormFactoryInterface  $factory    The form factory
-     * @param array                 $options    The options
-     *
-     * @return FormBuilder|null A form builder or null when the type does not have a builder
+     * {@inheritdoc}
      */
     public function createBuilder($name, FormFactoryInterface $factory, array $options)
     {
@@ -90,9 +55,21 @@ abstract class AbstractType implements FormTypeInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults($this->getDefaultOptions());
+        $resolver->addAllowedValues($this->getAllowedOptionValues());
+    }
+
+    /**
      * Returns the default options for this type.
      *
      * @return array The default options
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+     *             Use {@link setDefaultOptions()} instead.
      */
     public function getDefaultOptions()
     {
@@ -103,6 +80,9 @@ abstract class AbstractType implements FormTypeInterface
      * Returns the allowed option values for each option (if any).
      *
      * @return array The allowed option values
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+     *             Use {@link setDefaultOptions()} instead.
      */
     public function getAllowedOptionValues()
     {
@@ -110,23 +90,15 @@ abstract class AbstractType implements FormTypeInterface
     }
 
     /**
-     * Returns the name of the parent type.
-     *
-     * @param array $options
-     *
-     * @return string|null The name of the parent type if any otherwise null
+     * {@inheritdoc}
      */
-    public function getParent(array $options)
+    public function getParent()
     {
         return 'form';
     }
 
     /**
-     * Adds extensions for this type.
-     *
-     * @param array $extensions An array of FormTypeExtensionInterface
-     *
-     * @throws UnexpectedTypeException if any extension does not implement FormTypeExtensionInterface
+     * {@inheritdoc}
      */
     public function setExtensions(array $extensions)
     {
@@ -140,9 +112,7 @@ abstract class AbstractType implements FormTypeInterface
     }
 
     /**
-     * Returns the extensions associated with this type.
-     *
-     * @return array An array of FormTypeExtensionInterface
+     * {@inheritdoc}
      */
     public function getExtensions()
     {

@@ -41,8 +41,7 @@ class ClosureLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new ClosureLoader($container = new ContainerBuilder());
 
-        $loader->load(function ($container)
-        {
+        $loader->load(function ($container) {
             $container->setParameter('foo', 'foo');
         });
 

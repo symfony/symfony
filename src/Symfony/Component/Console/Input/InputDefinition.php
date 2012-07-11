@@ -113,7 +113,7 @@ class InputDefinition
     public function addArgument(InputArgument $argument)
     {
         if (isset($this->arguments[$argument->getName()])) {
-            throw new \LogicException(sprintf('An argument with name "%s" already exist.', $argument->getName()));
+            throw new \LogicException(sprintf('An argument with name "%s" already exists.', $argument->getName()));
         }
 
         if ($this->hasAnArrayArgument) {
@@ -262,9 +262,9 @@ class InputDefinition
     public function addOption(InputOption $option)
     {
         if (isset($this->options[$option->getName()]) && !$option->equals($this->options[$option->getName()])) {
-            throw new \LogicException(sprintf('An option named "%s" already exist.', $option->getName()));
+            throw new \LogicException(sprintf('An option named "%s" already exists.', $option->getName()));
         } elseif (isset($this->shortcuts[$option->getShortcut()]) && !$option->equals($this->options[$this->shortcuts[$option->getShortcut()]])) {
-            throw new \LogicException(sprintf('An option with shortcut "%s" already exist.', $option->getShortcut()));
+            throw new \LogicException(sprintf('An option with shortcut "%s" already exists.', $option->getShortcut()));
         }
 
         $this->options[$option->getName()] = $option;
@@ -279,6 +279,8 @@ class InputDefinition
      * @param string $name The InputOption name
      *
      * @return InputOption A InputOption object
+     *
+     * @throws \InvalidArgumentException When option given doesn't exist
      *
      * @api
      */
@@ -524,10 +526,6 @@ class InputDefinition
 
     private function formatDefaultValue($default)
     {
-        if (is_array($default) && $default === array_values($default)) {
-            return sprintf("array('%s')", implode("', '", $default));
-        }
-
-        return str_replace("\n", '', var_export($default, true));
+        return json_encode($default);
     }
 }

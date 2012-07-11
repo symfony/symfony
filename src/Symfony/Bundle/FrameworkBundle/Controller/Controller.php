@@ -48,9 +48,9 @@ class Controller extends ContainerAware
     /**
      * Forwards the request to another controller.
      *
-     * @param  string  $controller The controller name (a string like BlogBundle:Post:index)
-     * @param  array   $path       An array of path parameters
-     * @param  array   $query      An array of query parameters
+     * @param string $controller The controller name (a string like BlogBundle:Post:index)
+     * @param array  $path       An array of path parameters
+     * @param array  $query      An array of query parameters
      *
      * @return Response A Response instance
      */
@@ -62,7 +62,7 @@ class Controller extends ContainerAware
     /**
      * Returns a RedirectResponse to the given URL.
      *
-     * @param string  $url The URL to redirect to
+     * @param string  $url    The URL to redirect to
      * @param integer $status The status code to use for the Response
      *
      * @return RedirectResponse
@@ -88,9 +88,9 @@ class Controller extends ContainerAware
     /**
      * Renders a view.
      *
-     * @param string   $view The view name
+     * @param string   $view       The view name
      * @param array    $parameters An array of parameters to pass to the view
-     * @param Response $response A response instance
+     * @param Response $response   A response instance
      *
      * @return Response A Response instance
      */
@@ -102,9 +102,9 @@ class Controller extends ContainerAware
     /**
      * Streams a view.
      *
-     * @param string           $view The view name
+     * @param string           $view       The view name
      * @param array            $parameters An array of parameters to pass to the view
-     * @param StreamedResponse $response A response instance
+     * @param StreamedResponse $response   A response instance
      *
      * @return StreamedResponse A StreamedResponse instance
      */
@@ -132,6 +132,9 @@ class Controller extends ContainerAware
      *
      *     throw $this->createNotFoundException('Page not found!');
      *
+     * @param string    $message  A message
+     * @param Exception $previous The previous exception
+     *
      * @return NotFoundHttpException
      */
     public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
@@ -143,8 +146,8 @@ class Controller extends ContainerAware
      * Creates and returns a Form instance from the type of the form.
      *
      * @param string|FormTypeInterface $type    The built type of the form
-     * @param mixed $data                       The initial data for the form
-     * @param array $options                    Options for the form
+     * @param mixed                    $data    The initial data for the form
+     * @param array                    $options Options for the form
      *
      * @return Form
      */
@@ -156,8 +159,8 @@ class Controller extends ContainerAware
     /**
      * Creates and returns a form builder instance
      *
-     * @param mixed $data               The initial data for the form
-     * @param array $options            Options for the form
+     * @param mixed $data    The initial data for the form
+     * @param array $options Options for the form
      *
      * @return FormBuilder
      */
@@ -221,7 +224,7 @@ class Controller extends ContainerAware
     /**
      * Returns true if the service id is defined.
      *
-     * @param  string  $id The service id
+     * @param string $id The service id
      *
      * @return Boolean true if the service id is defined, false otherwise
      */
@@ -233,7 +236,7 @@ class Controller extends ContainerAware
     /**
      * Gets a service by id.
      *
-     * @param  string $id The service id
+     * @param string $id The service id
      *
      * @return object The service
      */

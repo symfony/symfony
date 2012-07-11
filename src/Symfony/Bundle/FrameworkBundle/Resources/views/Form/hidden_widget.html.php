@@ -1,1 +1,1 @@
-<?php echo $view['form']->renderBlock('input', array('type' => isset($type) ? $type : "hidden")) ?>
+<?php echo $view['form']->renderBlock('form_widget_simple', array('type' => isset($type) ? $type : "hidden")) ?>

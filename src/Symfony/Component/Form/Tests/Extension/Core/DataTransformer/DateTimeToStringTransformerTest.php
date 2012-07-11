@@ -138,4 +138,13 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
         $reverseTransformer->reverseTransform('2010-2010-2010');
     }
+
+    public function testReverseTransformWithNonExistingDate()
+    {
+        $reverseTransformer = new DateTimeToStringTransformer();
+
+        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+
+        $reverseTransformer->reverseTransform('2010-04-31');
+    }
 }

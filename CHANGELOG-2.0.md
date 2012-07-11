@@ -7,6 +7,60 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.14 (2012-05-17)
+
+ * d1c831d: Change must-proxy-revalidate by proxy-revalidate
+ * 445fd2f: In console terms columns are width and rows are height
+ * 926ac98: [Finder] replaced static by self on a private variable
+ * 47605f6: [Form][DataMapper] Do not update form to data when form is read only
+ * c642a5e: [CssSelector] ignored an optional whitespace after a combinator
+ * cbc3ed3: [HttpKernel] added some constant for better forward compatibility
+ * 906f6f6: [DependencyInjection] fixed private services removal when used as configurators (closes #3758)
+ * 970d0b4: [BrowserKit] Check class existence only when required.
+ * 1ed8b72: Autoloader should not throw exception because PHP will continue to call other registered autoloaders.
+ * 7fe236a: [Security] Configure ports in RetryAuthenticationEntryPoint according to router settings
+
+* 2.0.13 (2012-04-30)
+
+ * 5b92b9e: [Console] Selectively output to STDOUT or OUTPUT stream
+ * c89f3d3: [HttpKernel] Added DEPRECATED errors
+ * 689a40d: [MonologBridge] Fixed the WebProcessor
+ * 2e7d3b1: http_build_query fix
+ * de73de0: http_build_query fix
+ * 3b7ee9a: http_build_query fix
+ * 14b3b05: [TwigBundle] added missing entry in the XSD schema
+ * 7ddc8cb: [FrameworkBundle] Monitor added/removed translations files in dev (fix #3653)
+ * 686653a: [HttpKernel] Fixed wache vary write (fixes #3896).
+ * 45ada32: Add Support for boolean as to string into yaml extension
+ * cd783fb: [HttpKernel] Fixed cache vary lookup (fixes #3896).
+ * 3939c90: [FrameworkBundle] Fix TraceableEventDispatcher unable to trace static class callables
+ * e4cbbf3: [Locale] fixed StubNumberFormatter::format() to behave like the NumberFormatter::parse() regarding to error flagging
+ * f16ff89: [Locale] fixed StubNumberFormatter::parse() to behave like the NumberFormatter::parse() regarding to error flagging
+ * 0a60664: [Locale] updated StubIntlDateFormatter::format() exception message when timestamp argument is an array for PHP >= 5.3.4
+ * 6f9c05d: [Locale] Complete Stub with intl_error_name
+ * 312a5a4: [Locale] fixed StubIntlDateFormatter::format() to set the right error for PHP >= 5.3.4 and to behave like the intl when formatting successfully
+ * bb61e09: [Locale] use the correct way for Intl error
+ * 01fcb08: [HttpKernel] Fix the ProfilerListener (fix #3620)
+ * 3ae826a: Fix issue #3251: Check attribute type of service tags
+ * 57dd914: [EventDispatcher] Fixed E_NOTICES with multiple eventnames per subscriber with mixed priorities
+ * 77185e0: [Routing] Allow spaces in the script name for the apache dumper
+ * 6465a69: [Routing] Fixes to handle spaces in route pattern
+ * 31dde14: [Locale] updated StubIntlDateFormatter::format() behavior for PHP >= 5.3.4
+ * 8a2b115: [Console] Mock terminal size to prevent formatting errors on small terminals
+ * 595cc11: [Console] Wrap exception messages to the terminal width to avoid ugly output
+ * 97f7b29: [Console] Avoid outputing \r's in exception messages
+ * 04ae7cc: [Routing] fixed exception message.
+ * f7647f9: [Routing] improved exception message when giving an invalid route name.
+ * 0024ddc: Fix for using route name as check_path.
+ * fc41d4f: [Security] [HttpDigest] Fixes a configuration error caused by an invalid 'key' child node configuration
+ * 24a0d0a: [DependencyInjection] Support Yaml calls without arguments
+ * 15dd17e: Simplified CONTENT_ headers retrieval
+ * 86a3512: [FrameworkBundle] Add support for full URLs to redirect controller
+ * 068e859: [TwigBundle] Changed getAndCleanOutputBuffering() handling of systems where ob_get_level() never returns 0
+ * efa807a: [HttpKernel] fixed sub-request which should be always a GET (refs #3657)
+ * c1206c3: [FrameworkBundle] Subrequests should always use GET method
+ * 0c9b2d4: use SecurityContextInterface instead of SecurityContext
+
 * 2.0.12 (2012-03-19)
 
  * 54b2413: Webprofiler ipv6 search fix

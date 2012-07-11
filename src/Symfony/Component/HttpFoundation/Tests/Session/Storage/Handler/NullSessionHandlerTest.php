@@ -55,4 +55,3 @@ class NullSessionStorageTest extends \PHPUnit_Framework_TestCase
         return new NativeSessionStorage(array(), new NullSessionHandler());
     }
 }
-

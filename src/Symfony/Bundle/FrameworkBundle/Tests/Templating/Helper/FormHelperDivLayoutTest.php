@@ -33,6 +33,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         $templateNameParser = new StubTemplateNameParser($root, $rootTheme);
         $loader = new FilesystemLoader(array());
         $engine = new PhpEngine($templateNameParser, $loader);
+        $engine->addGlobal('global', '');
 
         $this->helper = new FormHelper($engine, $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'), array('FrameworkBundle:Form'));
 
@@ -82,14 +83,14 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         $this->helper->setTheme($view, $themes);
     }
 
-    static public function themeBlockInheritanceProvider()
+    public static function themeBlockInheritanceProvider()
     {
         return array(
             array(array('TestBundle:Parent'))
         );
     }
 
-    static public function themeInheritanceProvider()
+    public static function themeInheritanceProvider()
     {
         return array(
             array(array('TestBundle:Parent'), array('TestBundle:Child'))

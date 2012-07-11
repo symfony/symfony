@@ -23,7 +23,7 @@ use Symfony\Component\CssSelector\Exception\ParseException;
  */
 class CombinedSelectorNode implements NodeInterface
 {
-    static protected $methodMapping = array(
+    protected static $methodMapping = array(
         ' ' => 'descendant',
         '>' => 'child',
         '+' => 'direct_adjacent',
@@ -37,8 +37,8 @@ class CombinedSelectorNode implements NodeInterface
     /**
      * The constructor.
      *
-     * @param NodeInterface $selector The XPath selector
-     * @param string $combinator The combinator
+     * @param NodeInterface $selector    The XPath selector
+     * @param string        $combinator  The combinator
      * @param NodeInterface $subselector The sub XPath selector
      */
     public function __construct($selector, $combinator, $subselector)
@@ -77,8 +77,10 @@ class CombinedSelectorNode implements NodeInterface
     /**
      * Joins a NodeInterface into the XPath of this object.
      *
-     * @param XPathExpr $xpath The XPath expression for this object
-     * @param NodeInterface $sub The NodeInterface object to add
+     * @param XPathExpr     $xpath The XPath expression for this object
+     * @param NodeInterface $sub   The NodeInterface object to add
+     *
+     * @return XPathExpr An XPath instance
      */
     protected function _xpath_descendant($xpath, $sub)
     {
@@ -91,8 +93,10 @@ class CombinedSelectorNode implements NodeInterface
     /**
      * Joins a NodeInterface as a child of this object.
      *
-     * @param XPathExpr $xpath The parent XPath expression
-     * @param NodeInterface $sub The NodeInterface object to add
+     * @param XPathExpr     $xpath The parent XPath expression
+     * @param NodeInterface $sub   The NodeInterface object to add
+     *
+     * @return XPathExpr An XPath instance
      */
     protected function _xpath_child($xpath, $sub)
     {
@@ -105,8 +109,10 @@ class CombinedSelectorNode implements NodeInterface
     /**
      * Joins an XPath expression as an adjacent of another.
      *
-     * @param XPathExpr $xpath The parent XPath expression
-     * @param NodeInterface $sub The adjacent XPath expression
+     * @param XPathExpr     $xpath The parent XPath expression
+     * @param NodeInterface $sub   The adjacent XPath expression
+     *
+     * @return XPathExpr An XPath instance
      */
     protected function _xpath_direct_adjacent($xpath, $sub)
     {
@@ -121,8 +127,10 @@ class CombinedSelectorNode implements NodeInterface
     /**
      * Joins an XPath expression as an indirect adjacent of another.
      *
-     * @param XPathExpr $xpath The parent XPath expression
-     * @param NodeInterface $sub The indirect adjacent NodeInterface object
+     * @param XPathExpr     $xpath The parent XPath expression
+     * @param NodeInterface $sub   The indirect adjacent NodeInterface object
+     *
+     * @return XPathExpr An XPath instance
      */
     protected function _xpath_indirect_adjacent($xpath, $sub)
     {

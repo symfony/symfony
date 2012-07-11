@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 
@@ -20,7 +20,7 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
  * Takes care of converting the input from a list of checkboxes to a correctly
  * indexed array.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FixCheckboxInputListener implements EventSubscriberInterface
 {
@@ -36,7 +36,7 @@ class FixCheckboxInputListener implements EventSubscriberInterface
         $this->choiceList = $choiceList;
     }
 
-    public function onBindClientData(FilterDataEvent $event)
+    public function preBind(FormEvent $event)
     {
         $values = (array) $event->getData();
         $indices = $this->choiceList->getIndicesForValues($values);
@@ -44,8 +44,8 @@ class FixCheckboxInputListener implements EventSubscriberInterface
         $event->setData(count($indices) > 0 ? array_combine($indices, $values) : array());
     }
 
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(FormEvents::BIND_CLIENT_DATA => 'onBindClientData');
+        return array(FormEvents::PRE_BIND => 'preBind');
     }
 }

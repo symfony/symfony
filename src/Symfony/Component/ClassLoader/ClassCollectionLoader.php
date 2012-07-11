@@ -18,7 +18,8 @@ namespace Symfony\Component\ClassLoader;
  */
 class ClassCollectionLoader
 {
-    static private $loaded;
+    private static $loaded;
+    private static $seen;
 
     /**
      * Loads a list of classes and caches them in one big file.
@@ -32,7 +33,7 @@ class ClassCollectionLoader
      *
      * @throws \InvalidArgumentException When class can't be loaded
      */
-    static public function load($classes, $cacheDir, $name, $autoReload, $adaptive = false, $extension = '.php')
+    public static function load($classes, $cacheDir, $name, $autoReload, $adaptive = false, $extension = '.php')
     {
         // each $name can only be loaded once per PHP process
         if (isset(self::$loaded[$name])) {
@@ -41,13 +42,20 @@ class ClassCollectionLoader
 
         self::$loaded[$name] = true;
 
+        $declared = array_merge(get_declared_classes(), get_declared_interfaces());
+        if (function_exists('get_declared_traits')) {
+            $declared = array_merge($declared, get_declared_traits());
+        }
+
         if ($adaptive) {
             // don't include already declared classes
-            $classes = array_diff($classes, get_declared_classes(), get_declared_interfaces());
+            $classes = array_diff($classes, $declared);
 
             // the cache is different depending on which classes are already declared
             $name = $name.'-'.substr(md5(implode('|', $classes)), 0, 5);
         }
+
+        $classes = array_unique($classes);
 
         $cache = $cacheDir.'/'.$name.$extension;
 
@@ -60,6 +68,9 @@ class ClassCollectionLoader
             } else {
                 $time = filemtime($cache);
                 $meta = unserialize(file_get_contents($metadata));
+
+                sort($meta[1]);
+                sort($classes);
 
                 if ($meta[1] != $classes) {
                     $reload = true;
@@ -83,18 +94,17 @@ class ClassCollectionLoader
 
         $files = array();
         $content = '';
-        foreach ($classes as $class) {
-            if (!class_exists($class) && !interface_exists($class) && (!function_exists('trait_exists') || !trait_exists($class))) {
-                throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
+        foreach (self::getOrderedClasses($classes) as $class) {
+            if (in_array($class->getName(), $declared)) {
+                continue;
             }
 
-            $r = new \ReflectionClass($class);
-            $files[] = $r->getFileName();
+            $files[] = $class->getFileName();
 
-            $c = preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($r->getFileName()));
+            $c = preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($class->getFileName()));
 
             // add namespace declaration for global code
-            if (!$r->inNamespace()) {
+            if (!$class->inNamespace()) {
                 $c = "\nnamespace\n{\n".self::stripComments($c)."\n}\n";
             } else {
                 $c = self::fixNamespaceDeclarations('<?php '.$c);
@@ -123,7 +133,7 @@ class ClassCollectionLoader
      *
      * @return string Namespaces with brackets
      */
-    static public function fixNamespaceDeclarations($source)
+    public static function fixNamespaceDeclarations($source)
     {
         if (!function_exists('token_get_all')) {
             return $source;
@@ -154,6 +164,7 @@ class ClassCollectionLoader
                     $inNamespace = false;
                     --$i;
                 } else {
+                    $output = rtrim($output);
                     $output .= "\n{";
                     $inNamespace = true;
                 }
@@ -177,11 +188,11 @@ class ClassCollectionLoader
      *
      * @throws \RuntimeException when a cache file cannot be written
      */
-    static private function writeCacheFile($file, $content)
+    private static function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
-            chmod($file, 0666 & ~umask());
+            @chmod($file, 0666 & ~umask());
 
             return;
         }
@@ -199,7 +210,7 @@ class ClassCollectionLoader
      *
      * @return string The PHP string with the comments removed
      */
-    static private function stripComments($source)
+    private static function stripComments($source)
     {
         if (!function_exists('token_get_all')) {
             return $source;
@@ -218,5 +229,92 @@ class ClassCollectionLoader
         $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
 
         return $output;
+    }
+
+    /**
+     * Gets an ordered array of passed classes including all their dependencies.
+     *
+     * @param array $classes
+     *
+     * @return array An array of sorted \ReflectionClass instances (dependencies added if needed)
+     *
+     * @throws \InvalidArgumentException When a class can't be loaded
+     */
+    private static function getOrderedClasses(array $classes)
+    {
+        $map = array();
+        self::$seen = array();
+        foreach ($classes as $class) {
+            try {
+                $reflectionClass = new \ReflectionClass($class);
+            } catch (\ReflectionException $e) {
+                throw new \InvalidArgumentException(sprintf('Unable to load class "%s"', $class));
+            }
+
+            $map = array_merge($map, self::getClassHierarchy($reflectionClass));
+        }
+
+        return $map;
+    }
+
+    private static function getClassHierarchy(\ReflectionClass $class)
+    {
+        if (isset(self::$seen[$class->getName()])) {
+            return array();
+        }
+
+        self::$seen[$class->getName()] = true;
+
+        $classes = array($class);
+        $parent = $class;
+        while (($parent = $parent->getParentClass()) && $parent->isUserDefined() && !isset(self::$seen[$parent->getName()])) {
+            self::$seen[$parent->getName()] = true;
+
+            array_unshift($classes, $parent);
+        }
+
+        if (function_exists('get_declared_traits')) {
+            foreach ($classes as $c) {
+                foreach (self::getTraits($c) as $trait) {
+                    self::$seen[$trait->getName()] = true;
+
+                    array_unshift($classes, $trait);
+                }
+            }
+        }
+
+        return array_merge(self::getInterfaces($class), $classes);
+    }
+
+    private static function getInterfaces(\ReflectionClass $class)
+    {
+        $classes = array();
+
+        foreach ($class->getInterfaces() as $interface) {
+            $classes = array_merge($classes, self::getInterfaces($interface));
+        }
+
+        if ($class->isUserDefined() && $class->isInterface() && !isset(self::$seen[$class->getName()])) {
+            self::$seen[$class->getName()] = true;
+
+            $classes[] = $class;
+        }
+
+        return $classes;
+    }
+
+    private static function getTraits(\ReflectionClass $class)
+    {
+        $traits = $class->getTraits();
+        $classes = array();
+        while ($trait = array_pop($traits)) {
+            if ($trait->isUserDefined() && !isset(self::$seen[$trait->getName()])) {
+                $classes[] = $trait;
+
+                $traits = array_merge($traits, $trait->getTraits());
+            }
+        }
+
+        return $classes;
     }
 }

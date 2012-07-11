@@ -31,7 +31,7 @@ class PhpGeneratorDumper extends GeneratorDumper
      *  * class:      The class name
      *  * base_class: The base class name
      *
-     * @param  array  $options An array of options
+     * @param array $options An array of options
      *
      * @return string A PHP class representing the generator class
      *
@@ -49,6 +49,7 @@ class PhpGeneratorDumper extends GeneratorDumper
 
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
  * {$options['class']}
@@ -63,9 +64,10 @@ class {$options['class']} extends {$options['base_class']}
     /**
      * Constructor.
      */
-    public function __construct(RequestContext \$context)
+    public function __construct(RequestContext \$context, LoggerInterface \$logger = null)
     {
         \$this->context = \$context;
+        \$this->logger = \$logger;
     }
 
 {$this->generateGenerateMethod()}

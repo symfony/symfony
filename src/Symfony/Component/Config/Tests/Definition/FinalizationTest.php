@@ -17,7 +17,6 @@ use Symfony\Component\Config\Definition\NodeInterface;
 
 class FinalizationTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testUnsetKeyWithDeepHierarchy()
     {
         $tb = new TreeBuilder();

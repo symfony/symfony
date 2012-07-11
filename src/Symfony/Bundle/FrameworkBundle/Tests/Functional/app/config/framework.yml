@@ -1,5 +1,4 @@
 framework:
-    charset:       UTF-8
     secret:        test
     csrf_protection:
         enabled: true
@@ -9,7 +8,6 @@ framework:
     test: ~
     default_locale: en
     session:
-        auto_start:     true
         storage_id:     session.storage.mock_file
 
 services:

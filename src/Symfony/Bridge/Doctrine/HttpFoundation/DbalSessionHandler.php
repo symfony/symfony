@@ -35,8 +35,8 @@ class DbalSessionHandler implements \SessionHandlerInterface
     /**
      * Constructor.
      *
-     * @param Connection $con        An instance of Connection.
-     * @param string     $tableName  Table name.
+     * @param Connection $con       An instance of Connection.
+     * @param string     $tableName Table name.
      */
     public function __construct(Connection $con, $tableName = 'sessions')
     {

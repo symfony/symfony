@@ -21,13 +21,9 @@ Resources
 
 You can run the unit tests with the following command:
 
-    phpunit -c src/Symfony/Component/Form/
+    phpunit
 
 If you also want to run the unit tests that depend on other Symfony
-Components, declare the following environment variables before running
-PHPUnit:
+Components, install dev dependencies before running PHPUnit:
 
-    export SYMFONY_EVENT_DISPATCHER=../path/to/EventDispatcher
-    export SYMFONY_LOCALE=../path/to/Locale
-    export SYMFONY_VALIDATOR=../path/to/Validator
-    export SYMFONY_HTTP_FOUNDATION=../path/to/HttpFoundation
+    php composer.phar install --dev

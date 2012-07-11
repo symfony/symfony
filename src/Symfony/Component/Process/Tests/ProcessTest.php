@@ -19,20 +19,29 @@ use Symfony\Component\Process\Process;
 class ProcessTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * tests getter/setter
-     *
-     * @dataProvider methodProvider
+     * @expectedException \InvalidArgumentException
      */
-    public function testDefaultGetterSetter($fn)
+    public function testNegativeTimeoutFromConstructor()
     {
-        $p = new Process('php');
+        new Process('', null, null, null, -1);
+    }
 
-        $setter = 'set'.$fn;
-        $getter = 'get'.$fn;
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testNegativeTimeoutFromSetter()
+    {
+        $p = new Process('');
+        $p->setTimeout(-1);
+    }
 
-        $this->assertNull($p->$setter(array('foo')));
+    public function testNullTimeout()
+    {
+        $p = new Process('');
+        $p->setTimeout(10);
+        $p->setTimeout(null);
 
-        $this->assertSame(array('foo'), $p->$getter(array('foo')));
+        $this->assertNull($p->getTimeout());
     }
 
     /**
@@ -66,6 +75,18 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $p->getOutput());
         $this->assertSame($expected, $p->getErrorOutput());
         $this->assertSame(0, $p->getExitCode());
+    }
+
+    public function testCallbackIsExecutedForOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('echo \'foo\';')));
+
+        $called = false;
+        $p->run(function ($type, $buffer) use (&$called) {
+            $called = $buffer === 'foo';
+        });
+
+        $this->assertTrue($called, 'The callback should be executed with the output');
     }
 
     public function testExitCodeText()
@@ -152,8 +173,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $baseData = str_repeat('*', 1024);
 
         $codes = array();
-        foreach (array(1, 16, 64, 1024, 4096) as $size)
-        {
+        foreach (array(1, 16, 64, 1024, 4096) as $size) {
             $data = str_repeat($baseData, $size) . '!';
             foreach ($variations as $code) {
                 $codes[] = array($data, $code);

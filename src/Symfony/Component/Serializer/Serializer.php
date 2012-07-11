@@ -63,7 +63,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public final function serialize($data, $format)
+    final public function serialize($data, $format)
     {
         if (!$this->supportsEncoding($format)) {
             throw new UnexpectedValueException('Serialization for the format '.$format.' is not supported');
@@ -81,7 +81,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public final function deserialize($data, $type, $format)
+    final public function deserialize($data, $type, $format)
     {
         if (!$this->supportsDecoding($format)) {
             throw new UnexpectedValueException('Deserialization for the format '.$format.' is not supported');
@@ -195,7 +195,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public final function encode($data, $format)
+    final public function encode($data, $format)
     {
         return $this->getEncoder($format)->encode($data, $format);
     }
@@ -203,7 +203,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public final function decode($data, $format)
+    final public function decode($data, $format)
     {
         return $this->getEncoder($format)->decode($data, $format);
     }
@@ -240,8 +240,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * Denormalizes data back into an object of the given class
      *
-     * @param mixed $data data to restore
-     * @param string $class the expected class to instantiate
+     * @param mixed  $data   data to restore
+     * @param string $class  the expected class to instantiate
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
      * @return object
      */

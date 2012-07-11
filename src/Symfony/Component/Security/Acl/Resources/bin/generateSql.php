@@ -25,7 +25,6 @@ $loader->registerNamespaces(array(
 ));
 $loader->register();
 
-
 $schema = new Schema(array(
     'class_table_name'         => 'acl_classes',
     'entry_table_name'         => 'acl_entries',
@@ -47,6 +46,6 @@ foreach ($finder as $file) {
     }
 
     $platform = $reflection->newInstance();
-    $targetFile = sprintf(__DIR__.'/../schema/%s.sql', $platform->getName());
+    $targetFile = sprintf(__DIR__.'/../schema/%s.sql', $platform->name);
     file_put_contents($targetFile, implode("\n\n", $schema->toSql($platform)));
 }

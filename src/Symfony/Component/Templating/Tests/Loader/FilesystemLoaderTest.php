@@ -17,9 +17,9 @@ use Symfony\Component\Templating\TemplateReference;
 
 class FilesystemLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    static protected $fixturesPath;
+    protected static $fixturesPath;
 
-    static public function setUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
     }
@@ -78,7 +78,7 @@ class ProjectTemplateLoader2 extends FilesystemLoader
         return $this->templatePathPatterns;
     }
 
-    static public function isAbsolutePath($path)
+    public static function isAbsolutePath($path)
     {
         return parent::isAbsolutePath($path);
     }

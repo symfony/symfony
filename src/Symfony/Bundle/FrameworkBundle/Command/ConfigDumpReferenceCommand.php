@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * A console command for dumping available configuration reference
@@ -102,6 +103,12 @@ EOF
                     '" does not have it\'s getConfiguration() method setup');
         }
 
+        if (!$configuration instanceof ConfigurationInterface) {
+            throw new \LogicException(
+                'Configuration class "'.get_class($configuration).
+                '" should implement ConfigurationInterface in order to be dumpable');
+        }
+
         $rootNode = $configuration->getConfigTreeBuilder()->buildTree();
 
         $output->writeln($message);
@@ -114,7 +121,7 @@ EOF
      * Outputs a single config reference line
      *
      * @param string $text
-     * @param int $indent
+     * @param int    $indent
      */
     private function outputLine($text, $indent = 0)
     {
@@ -127,7 +134,7 @@ EOF
 
     private function outputArray(array $array, $depth)
     {
-        $is_indexed = array_values($array) === $array;
+        $isIndexed = array_values($array) === $array;
 
         foreach ($array as $key => $value) {
             if (is_array($value)) {
@@ -136,7 +143,7 @@ EOF
                 $val = $value;
             }
 
-            if ($is_indexed) {
+            if ($isIndexed) {
                 $this->outputLine('- '.$val, $depth * 4);
             } else {
                 $this->outputLine(sprintf('%-20s %s', $key.':', $val), $depth * 4);
@@ -150,7 +157,7 @@ EOF
 
     /**
      * @param NodeInterface $node
-     * @param int $depth
+     * @param int           $depth
      */
     private function outputNode(NodeInterface $node, $depth = 0)
     {

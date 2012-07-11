@@ -84,7 +84,7 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
 
         $path = __DIR__.'/../Fixtures/to_delete';
         touch($path);
-        chmod($path, 0333);
+        @chmod($path, 0333);
 
         if (get_current_user() != 'root' && substr(sprintf('%o', fileperms($path)), -4) == '0333') {
             $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException');
@@ -98,7 +98,7 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
     {
         $path = __DIR__.'/../Fixtures/to_delete';
         if (file_exists($path)) {
-            chmod($path, 0666);
+            @chmod($path, 0666);
             @unlink($path);
         }
     }

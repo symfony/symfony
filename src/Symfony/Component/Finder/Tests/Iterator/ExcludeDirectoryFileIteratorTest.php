@@ -12,6 +12,7 @@
 namespace Symfony\Component\Finder\Tests\Iterator;
 
 use Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator;
+use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 
 class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
 {
@@ -20,7 +21,7 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
      */
     public function testAccept($directories, $expected)
     {
-        $inner = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(sys_get_temp_dir().'/symfony2_finder', \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+        $inner = new \RecursiveIteratorIterator(new RecursiveDirectoryIterator(sys_get_temp_dir().'/symfony2_finder', \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
 
         $iterator = new ExcludeDirectoryFilterIterator($inner, $directories);
 
@@ -33,12 +34,18 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
 
         return array(
             array(array('foo'), array(
+                $tmpDir.DIRECTORY_SEPARATOR.'.bar',
+                $tmpDir.DIRECTORY_SEPARATOR.'.foo',
+                $tmpDir.DIRECTORY_SEPARATOR.'.foo'.DIRECTORY_SEPARATOR.'.bar',
                 $tmpDir.DIRECTORY_SEPARATOR.'.git',
                 $tmpDir.DIRECTORY_SEPARATOR.'test.py',
                 $tmpDir.DIRECTORY_SEPARATOR.'test.php',
                 $tmpDir.DIRECTORY_SEPARATOR.'toto'
             )),
             array(array('fo'), array(
+                $tmpDir.DIRECTORY_SEPARATOR.'.bar',
+                $tmpDir.DIRECTORY_SEPARATOR.'.foo',
+                $tmpDir.DIRECTORY_SEPARATOR.'.foo'.DIRECTORY_SEPARATOR.'.bar',
                 $tmpDir.DIRECTORY_SEPARATOR.'.git',
                 $tmpDir.DIRECTORY_SEPARATOR.'test.py',
                 $tmpDir.DIRECTORY_SEPARATOR.'foo',

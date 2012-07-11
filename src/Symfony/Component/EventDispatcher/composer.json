@@ -16,7 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2"
+        "php": ">=5.3.3"
+    },
+    "require-dev": {
+        "symfony/dependency-injection": "2.1.*"
     },
     "suggest": {
         "symfony/dependency-injection": "self.version",

@@ -99,7 +99,7 @@ class StreamedResponse extends Response
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      *
      * This method only sends the content once.
      */
@@ -123,7 +123,7 @@ class StreamedResponse extends Response
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      *
      * @throws \LogicException when the content is not null
      */
@@ -135,7 +135,7 @@ class StreamedResponse extends Response
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      *
      * @return false
      */

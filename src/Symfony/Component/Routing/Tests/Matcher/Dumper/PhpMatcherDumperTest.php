@@ -14,7 +14,6 @@ namespace Symfony\Component\Routing\Tests\Matcher\Dumper;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RequestContext;
 
 class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,7 +28,7 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array(),
             array('_scheme' => 'https')
         ));
-        $dumper = new PhpMatcherDumper($collection, new RequestContext());
+        $dumper = new PhpMatcherDumper($collection);
         $dumper->dump();
     }
 
@@ -40,7 +39,7 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
     {
         $basePath = __DIR__.'/../../Fixtures/dumper/';
 
-        $dumper = new PhpMatcherDumper($collection, new RequestContext());
+        $dumper = new PhpMatcherDumper($collection);
 
         $this->assertStringEqualsFile($basePath.$fixture, $dumper->dump($options), '->dump() correctly dumps routes as optimized PHP code.');
     }

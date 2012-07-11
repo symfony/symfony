@@ -39,10 +39,10 @@ class LogoutListener implements ListenerInterface
      * Constructor
      *
      * @param SecurityContextInterface      $securityContext
-     * @param HttpUtils                     $httpUtils        An HttpUtilsInterface instance
-     * @param array                         $options          An array of options to process a logout attempt
-     * @param LogoutSuccessHandlerInterface $successHandler   A LogoutSuccessHandlerInterface instance
-     * @param CsrfProviderInterface         $csrfProvider     A CsrfProviderInterface instance
+     * @param HttpUtils                     $httpUtils       An HttpUtilsInterface instance
+     * @param array                         $options         An array of options to process a logout attempt
+     * @param LogoutSuccessHandlerInterface $successHandler  A LogoutSuccessHandlerInterface instance
+     * @param CsrfProviderInterface         $csrfProvider    A CsrfProviderInterface instance
      */
     public function __construct(SecurityContextInterface $securityContext, HttpUtils $httpUtils, array $options = array(), LogoutSuccessHandlerInterface $successHandler = null, CsrfProviderInterface $csrfProvider = null)
     {

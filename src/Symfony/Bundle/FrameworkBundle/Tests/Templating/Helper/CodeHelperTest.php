@@ -17,7 +17,7 @@ class CodeHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected static $helper;
 
-    static public function setUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         self::$helper = new CodeHelper('txmt://open?url=file://%f&line=%l', '/root', 'UTF-8');
     }

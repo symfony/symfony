@@ -17,7 +17,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 /**
  * Transforms between a timestamp and a DateTime object
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
 class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
@@ -25,9 +25,9 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a DateTime object into a timestamp in the configured timezone.
      *
-     * @param  DateTime $value  A DateTime object
+     * @param DateTime $value A DateTime object
      *
-     * @return integer          A timestamp
+     * @return integer A timestamp
      *
      * @throws UnexpectedTypeException if the given value is not an instance of \DateTime
      * @throws TransformationFailedException if the output timezone is not supported
@@ -55,7 +55,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a timestamp in the configured timezone into a DateTime object
      *
-     * @param  string $value  A timestamp
+     * @param string $value A timestamp
      *
      * @return \DateTime      An instance of \DateTime
      *

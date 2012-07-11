@@ -27,7 +27,7 @@ class Tokenizer
      * Takes a CSS selector and returns an array holding the Tokens
      * it contains.
      *
-     * @param  string $s The selector to lex.
+     * @param string $s The selector to lex.
      *
      * @return array Token[]
      */
@@ -109,12 +109,12 @@ class Tokenizer
      * and returns an array holding the unquoted string contained by $s and
      * the new position from which tokenizing should take over.
      *
-     * @throws ParseException When expected closing is not found
-     *
-     * @param  string  $s   The selector string containing the quoted string.
-     * @param  integer $pos The starting position for the quoted string.
+     * @param string  $s   The selector string containing the quoted string.
+     * @param integer $pos The starting position for the quoted string.
      *
      * @return array
+     *
+     * @throws ParseException When expected closing is not found
      */
     private function tokenizeEscapedString($s, $pos)
     {
@@ -146,16 +146,15 @@ class Tokenizer
     /**
      * Unescapes a string literal and returns the unescaped string.
      *
-     * @throws ParseException When invalid escape sequence is found
-     *
-     * @param  string $literal The string literal to unescape.
+     * @param string $literal The string literal to unescape.
      *
      * @return string
+     *
+     * @throws ParseException When invalid escape sequence is found
      */
     private function unescapeStringLiteral($literal)
     {
-        return preg_replace_callback('#(\\\\(?:[A-Fa-f0-9]{1,6}(?:\r\n|\s)?|[^A-Fa-f0-9]))#', function ($matches) use ($literal)
-        {
+        return preg_replace_callback('#(\\\\(?:[A-Fa-f0-9]{1,6}(?:\r\n|\s)?|[^A-Fa-f0-9]))#', function ($matches) use ($literal) {
             if ($matches[0][0] == '\\' && strlen($matches[0]) > 1) {
                 $matches[0] = substr($matches[0], 1);
                 if (in_array($matches[0][0], array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f'))) {
@@ -172,12 +171,12 @@ class Tokenizer
      * contained in it and the new position from which tokenizing should take
      * over.
      *
-     * @throws ParseException When Unexpected symbol is found
-     *
-     * @param  string  $s   The selector string.
-     * @param  integer $pos The position in $s at which the symbol starts.
+     * @param string  $s   The selector string.
+     * @param integer $pos The position in $s at which the symbol starts.
      *
      * @return array
+     *
+     * @throws ParseException When Unexpected symbol is found
      */
     private function tokenizeSymbol($s, $pos)
     {

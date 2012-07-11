@@ -284,4 +284,14 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     {
         new DateTimeToLocalizedStringTransformer(null, null, null, 'foobar');
     }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformWithNonExistingDate()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::SHORT);
+
+        $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('31.04.10 04:05'));
+    }
 }

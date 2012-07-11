@@ -134,7 +134,7 @@ class ProfilerListener implements EventSubscriberInterface
         }
     }
 
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             // kernel.request must be registered as early as possible to not break

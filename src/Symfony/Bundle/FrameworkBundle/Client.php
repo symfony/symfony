@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Client as BaseClient;
-use Symfony\Component\HttpKernel\Profiler\Profiler as HttpProfiler;
 use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -85,6 +84,11 @@ class Client extends BaseClient
     /**
      * Returns the script to execute when the request must be insulated.
      *
+     * It assumes that the autoloader is named 'autoload.php' and that it is
+     * stored in the same directory as the kernel (this is the case for the
+     * Symfony Standard Edition). If this is not your case, create your own
+     * client and override this method.
+     *
      * @param Request $request A Request instance
      *
      * @return string The script content
@@ -95,11 +99,22 @@ class Client extends BaseClient
         $request = str_replace("'", "\\'", serialize($request));
 
         $r = new \ReflectionObject($this->kernel);
+
+        $autoloader = dirname($r->getFileName()).'/autoload.php';
+        if (is_file($autoloader)) {
+            $autoloader = str_replace("'", "\\'", $autoloader);
+        } else {
+            $autoloader = '';
+        }
+
         $path = str_replace("'", "\\'", $r->getFileName());
 
         return <<<EOF
 <?php
 
+if ('$autoloader') {
+    require_once '$autoloader';
+}
 require_once '$path';
 
 \$kernel = unserialize('$kernel');

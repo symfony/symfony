@@ -61,7 +61,7 @@ class Response
      *
      * @var array
      */
-    static public $statusTexts = array(
+    public static $statusTexts = array(
         100 => 'Continue',
         101 => 'Switching Protocols',
         102 => 'Processing',            // RFC2518
@@ -102,26 +102,26 @@ class Response
         415 => 'Unsupported Media Type',
         416 => 'Requested Range Not Satisfiable',
         417 => 'Expectation Failed',
-        418 => 'I\'m a teapot',
-        422 => 'Unprocessable Entity',  // RFC4918
-        423 => 'Locked',                // RFC4918
-        424 => 'Failed Dependency',     // RFC4918
+        418 => 'I\'m a teapot',                                               // RFC2324
+        422 => 'Unprocessable Entity',                                        // RFC4918
+        423 => 'Locked',                                                      // RFC4918
+        424 => 'Failed Dependency',                                           // RFC4918
         425 => 'Reserved for WebDAV advanced collections expired proposal',   // RFC2817
-        426 => 'Upgrade Required',      // RFC2817
-        428 => 'Precondition Required', // RFC-nottingham-http-new-status-04
-        429 => 'Too Many Requests',     // RFC-nottingham-http-new-status-04
-        431 => 'Request Header Fields Too Large',   // RFC-nottingham-http-new-status-04
+        426 => 'Upgrade Required',                                            // RFC2817
+        428 => 'Precondition Required',                                       // RFC6585
+        429 => 'Too Many Requests',                                           // RFC6585
+        431 => 'Request Header Fields Too Large',                             // RFC6585
         500 => 'Internal Server Error',
         501 => 'Not Implemented',
         502 => 'Bad Gateway',
         503 => 'Service Unavailable',
         504 => 'Gateway Timeout',
         505 => 'HTTP Version Not Supported',
-        506 => 'Variant Also Negotiates (Experimental)', // [RFC2295]
-        507 => 'Insufficient Storage',  // RFC4918
-        508 => 'Loop Detected',         // RFC5842
-        510 => 'Not Extended',          // RFC2774
-        511 => 'Network Authentication Required',   // RFC-nottingham-http-new-status-04
+        506 => 'Variant Also Negotiates (Experimental)',                      // RFC2295
+        507 => 'Insufficient Storage',                                        // RFC4918
+        508 => 'Loop Detected',                                               // RFC5842
+        510 => 'Not Extended',                                                // RFC2774
+        511 => 'Network Authentication Required',                             // RFC6585
     );
 
     /**
@@ -158,7 +158,7 @@ class Response
      *
      * @return Response
      */
-    static public function create($content = '', $status = 200, $headers = array())
+    public static function create($content = '', $status = 200, $headers = array())
     {
         return new static($content, $status, $headers);
     }
@@ -206,7 +206,7 @@ class Response
         $headers = $this->headers;
 
         if ($this->isInformational() || in_array($this->statusCode, array(204, 304))) {
-            $this->setContent('');
+            $this->setContent(null);
         }
 
         // Content-type based on the Request
@@ -234,7 +234,7 @@ class Response
         if ('HEAD' === $request->getMethod()) {
             // cf. RFC2616 14.13
             $length = $headers->get('Content-Length');
-            $this->setContent('');
+            $this->setContent(null);
             if ($length) {
                 $headers->set('Content-Length', $length);
             }
@@ -533,7 +533,7 @@ class Response
      */
     public function mustRevalidate()
     {
-        return $this->headers->hasCacheControlDirective('must-revalidate') || $this->headers->has('must-proxy-revalidate');
+        return $this->headers->hasCacheControlDirective('must-revalidate') || $this->headers->has('proxy-revalidate');
     }
 
     /**
@@ -706,7 +706,7 @@ class Response
      * When the responses TTL is <= 0, the response may not be served from cache without first
      * revalidating with the origin.
      *
-     * @return integer The TTL in seconds
+     * @return integer|null The TTL in seconds
      *
      * @api
      */
@@ -1100,7 +1100,7 @@ class Response
      */
     public function isRedirect($location = null)
     {
-        return in_array($this->statusCode, array(201, 301, 302, 303, 307)) && (null === $location ?: $location == $this->headers->get('Location'));
+        return in_array($this->statusCode, array(201, 301, 302, 303, 307, 308)) && (null === $location ?: $location == $this->headers->get('Location'));
     }
 
     /**

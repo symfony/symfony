@@ -53,5 +53,6 @@ class CustomNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->normalizer->supportsDenormalization(array(), 'Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy'));
         $this->assertFalse($this->normalizer->supportsDenormalization(array(), 'stdClass'));
+        $this->assertTrue($this->normalizer->supportsDenormalization(array(), 'Symfony\Component\Serializer\Tests\Fixtures\DenormalizableDummy'));
     }
 }

@@ -14,37 +14,41 @@ namespace Symfony\Component\Form;
 /**
  * A form group bundling multiple form forms
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface FormInterface extends \ArrayAccess, \Traversable, \Countable
 {
     /**
      * Sets the parent form.
      *
-     * @param FormInterface $parent The parent form
+     * @param  FormInterface $parent The parent form
+     *
+     * @return FormInterface The form instance
      */
-    function setParent(FormInterface $parent = null);
+    public function setParent(FormInterface $parent = null);
 
     /**
      * Returns the parent form.
      *
      * @return FormInterface The parent form
      */
-    function getParent();
+    public function getParent();
 
     /**
      * Returns whether the form has a parent.
      *
      * @return Boolean
      */
-    function hasParent();
+    public function hasParent();
 
     /**
      * Adds a child to the form.
      *
-     * @param FormInterface $child The FormInterface to add as a child
+     * @param  FormInterface $child The FormInterface to add as a child
+     *
+     * @return FormInterface The form instance
      */
-    function add(FormInterface $child);
+    public function add(FormInterface $child);
 
     /**
      * Returns the child with the given name.
@@ -53,7 +57,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormInterface The child form
      */
-    function get($name);
+    public function get($name);
 
     /**
      * Returns whether a child with the given name exists.
@@ -62,109 +66,113 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return Boolean
      */
-    function has($name);
+    public function has($name);
 
     /**
      * Removes a child from the form.
      *
-     * @param string $name The name of the child to remove
+     * @param  string $name The name of the child to remove
+     *
+     * @return FormInterface The form instance
      */
-    function remove($name);
+    public function remove($name);
 
     /**
      * Returns all children in this group.
      *
      * @return array An array of FormInterface instances
      */
-    function getChildren();
-
-    /**
-     * Return whether the form has children.
-     *
-     * @return Boolean
-     */
-    function hasChildren();
+    public function all();
 
     /**
      * Returns all errors.
      *
      * @return array An array of FormError instances that occurred during binding
      */
-    function getErrors();
+    public function getErrors();
 
     /**
      * Updates the field with default data.
      *
-     * @param array $appData The data formatted as expected for the underlying object
+     * @param  array $modelData The data formatted as expected for the underlying object
      *
-     * @return Form The current form
+     * @return FormInterface The form instance
      */
-    function setData($appData);
+    public function setData($modelData);
 
     /**
      * Returns the data in the format needed for the underlying object.
      *
      * @return mixed
      */
-    function getData();
+    public function getData();
 
     /**
      * Returns the normalized data of the field.
      *
-     * @return mixed  When the field is not bound, the default data is returned.
+     * @return mixed When the field is not bound, the default data is returned.
      *                When the field is bound, the normalized bound data is
      *                returned if the field is valid, null otherwise.
      */
-    function getNormData();
+    public function getNormData();
 
     /**
      * Returns the data transformed by the value transformer.
      *
      * @return string
      */
-    function getClientData();
+    public function getViewData();
 
     /**
      * Returns the extra data.
      *
      * @return array The bound data which do not belong to a child
      */
-    function getExtraData();
+    public function getExtraData();
+
+    /**
+     * Returns the form's configuration.
+     *
+     * @return FormConfigInterface The configuration.
+     */
+    public function getConfig();
 
     /**
      * Returns whether the field is bound.
      *
      * @return Boolean true if the form is bound to input values, false otherwise
      */
-    function isBound();
-
-    /**
-     * Returns the supported types.
-     *
-     * @return array An array of FormTypeInterface
-     */
-    function getTypes();
+    public function isBound();
 
     /**
      * Returns the name by which the form is identified in forms.
      *
-     * @return string  The name of the form.
+     * @return string The name of the form.
      */
-    function getName();
+    public function getName();
+
+    /**
+     * Returns the property path that the form is mapped to.
+     *
+     * @return Util\PropertyPath The property path.
+     */
+    public function getPropertyPath();
 
     /**
      * Adds an error to this form.
      *
-     * @param FormError $error
+     * @param  FormError $error
+     *
+     * @return FormInterface The form instance
      */
-    function addError(FormError $error);
+    public function addError(FormError $error);
 
     /**
      * Returns whether the form is valid.
      *
      * @return Boolean
      */
-    function isValid();
+    public function isValid();
 
     /**
      * Returns whether the form is required to be filled out.
@@ -175,7 +183,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return Boolean
      */
-    function isRequired();
+    public function isRequired();
 
     /**
      * Returns whether this form is disabled.
@@ -188,63 +196,51 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return Boolean
      */
-    function isDisabled();
+    public function isDisabled();
 
     /**
      * Returns whether the form is empty.
      *
      * @return Boolean
      */
-    function isEmpty();
+    public function isEmpty();
 
     /**
      * Returns whether the data in the different formats is synchronized.
      *
      * @return Boolean
      */
-    function isSynchronized();
+    public function isSynchronized();
 
     /**
      * Writes data into the form.
      *
-     * @param mixed $data  The data
-     */
-    function bind($data);
-
-    /**
-     * Returns whether the form has an attribute with the given name.
+     * @param  mixed $data The data
      *
-     * @param string $name The name of the attribute
+     * @return FormInterface The form instance
      */
-    function hasAttribute($name);
-
-    /**
-     * Returns the value of the attributes with the given name.
-     *
-     * @param string $name The name of the attribute
-     */
-    function getAttribute($name);
+    public function bind($data);
 
     /**
      * Returns the root of the form tree.
      *
-     * @return FormInterface  The root of the tree
+     * @return FormInterface The root of the tree
      */
-    function getRoot();
+    public function getRoot();
 
     /**
      * Returns whether the field is the root of the form tree.
      *
      * @return Boolean
      */
-    function isRoot();
+    public function isRoot();
 
     /**
      * Creates a view.
      *
-     * @param FormView $parent The parent view
+     * @param FormViewInterface $parent The parent view
      *
-     * @return FormView The view
+     * @return FormViewInterface The view
      */
-    function createView(FormView $parent = null);
+    public function createView(FormViewInterface $parent = null);
 }

@@ -44,12 +44,8 @@ class AllValidator extends ConstraintValidator
         $group = $this->context->getGroup();
         $propertyPath = $this->context->getPropertyPath();
 
-        // cannot simply cast to array, because then the object is converted to an
-        // array instead of wrapped inside
-        $constraints = is_array($constraint->constraints) ? $constraint->constraints : array($constraint->constraints);
-
         foreach ($value as $key => $element) {
-            foreach ($constraints as $constr) {
+            foreach ($constraint->constraints as $constr) {
                 $walker->walkConstraint($constr, $element, $group, $propertyPath.'['.$key.']');
             }
         }

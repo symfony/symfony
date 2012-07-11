@@ -64,7 +64,7 @@ class TimeZoneTransformer extends Transformer
      * Only GMT, Etc/Universal, Etc/Zulu, Etc/Greenwich, Etc/GMT-0, Etc/GMT+0 and Etc/GMT0 are old names and
      * are linked to Etc/GMT or Etc/UTC.
      *
-     * @param  string  $formattedTimeZone A GMT timezone string (GMT-03:00, e.g.)
+     * @param string $formattedTimeZone A GMT timezone string (GMT-03:00, e.g.)
      *
      * @return string                     A timezone identifier
      *
@@ -74,7 +74,7 @@ class TimeZoneTransformer extends Transformer
      * @throws NotImplementedException   When the GMT time zone have minutes offset different than zero
      * @throws InvalidArgumentException  When the value can not be matched with pattern
      */
-    static public function getEtcTimeZoneId($formattedTimeZone)
+    public static function getEtcTimeZoneId($formattedTimeZone)
     {
         if (preg_match('/GMT(?P<signal>[+-])(?P<hours>\d{2}):?(?P<minutes>\d{2})/', $formattedTimeZone, $matches)) {
             $hours   = (int) $matches['hours'];

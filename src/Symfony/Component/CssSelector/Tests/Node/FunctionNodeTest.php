@@ -58,6 +58,11 @@ class FunctionNodeTest extends \PHPUnit_Framework_TestCase
         $function = new FunctionNode($element, ':', 'nth-child', $element2);
         $this->assertEquals("*/*[name() = 'h1' and (position() >= 1)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
 
+        // h1:nth-child(1)
+        $element2 = new ElementNode('*', new Token('Symbol', '2', -1));
+        $function = new FunctionNode($element, ':', 'nth-child', $element2);
+        $this->assertEquals("*/*[name() = 'h1' and (position() = 2)]", (string) $function->toXpath(), '->toXpath() returns the xpath representation of the node');
+
         // h1:nth-child(2n)
         $element2 = new ElementNode('*', new Token('Symbol', '2n', -1));
         $function = new FunctionNode($element, ':', 'nth-child', $element2);

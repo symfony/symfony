@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation\Dumper;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
- * IcuResDumper generates an ICU ResourceBundle formated string representation of a message catalogue.
+ * IcuResDumper generates an ICU ResourceBundle formatted string representation of a message catalogue.
  *
  * @author Stealth35
  */
@@ -113,7 +113,7 @@ class IcuResFileDumper implements DumperInterface
     {
         $padding = strlen($data) % 4;
 
-        if ($padding ) {
+        if ($padding) {
             return str_repeat("\xAA", 4 - $padding);
         }
     }

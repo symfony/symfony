@@ -249,6 +249,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *         ->append($this->getBarNodeDefinition())
      *     ;
      *
+     * @param NodeDefinition $node A NodeDefinition instance
+     *
      * @return ArrayNodeDefinition This node
      */
     public function append(NodeDefinition $node)
@@ -342,7 +344,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Validate the confifuration of a concrete node.
+     * Validate the configuration of a concrete node.
      *
      * @param NodeInterface $node The related node
      *

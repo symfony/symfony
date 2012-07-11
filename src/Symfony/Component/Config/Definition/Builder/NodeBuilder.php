@@ -32,6 +32,7 @@ class NodeBuilder implements NodeParentInterface
             'scalar'      => __NAMESPACE__.'\\ScalarNodeDefinition',
             'boolean'     => __NAMESPACE__.'\\BooleanNodeDefinition',
             'array'       => __NAMESPACE__.'\\ArrayNodeDefinition',
+            'enum'        => __NAMESPACE__.'\\EnumNodeDefinition',
         );
     }
 
@@ -83,6 +84,18 @@ class NodeBuilder implements NodeParentInterface
     public function booleanNode($name)
     {
         return $this->node($name, 'boolean');
+    }
+
+    /**
+     * Creates a child EnumNode.
+     *
+     * @param string $name
+     *
+     * @return EnumNodeDefinition
+     */
+    public function enumNode($name)
+    {
+        return $this->node($name, 'enum');
     }
 
     /**
@@ -164,7 +177,7 @@ class NodeBuilder implements NodeParentInterface
     /**
      * Adds or overrides a node Type.
      *
-     * @param string $type The name of the type
+     * @param string $type  The name of the type
      * @param string $class The fully qualified name the node definition class
      *
      * @return NodeBuilder This node builder

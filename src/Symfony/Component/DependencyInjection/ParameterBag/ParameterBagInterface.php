@@ -27,7 +27,7 @@ interface ParameterBagInterface
      *
      * @api
      */
-    function clear();
+    public function clear();
 
     /**
      * Adds parameters to the service container parameters.
@@ -36,7 +36,7 @@ interface ParameterBagInterface
      *
      * @api
      */
-    function add(array $parameters);
+    public function add(array $parameters);
 
     /**
      * Gets the service container parameters.
@@ -45,7 +45,7 @@ interface ParameterBagInterface
      *
      * @api
      */
-    function all();
+    public function all();
 
     /**
      * Gets a service container parameter.
@@ -58,7 +58,7 @@ interface ParameterBagInterface
      *
      * @api
      */
-    function get($name);
+    public function get($name);
 
     /**
      * Sets a service container parameter.
@@ -68,30 +68,48 @@ interface ParameterBagInterface
      *
      * @api
      */
-    function set($name, $value);
+    public function set($name, $value);
 
     /**
      * Returns true if a parameter name is defined.
      *
-     * @param  string  $name       The parameter name
+     * @param string $name The parameter name
      *
      * @return Boolean true if the parameter name is defined, false otherwise
      *
      * @api
      */
-    function has($name);
+    public function has($name);
 
     /**
      * Replaces parameter placeholders (%name%) by their values for all parameters.
      */
-    function resolve();
+    public function resolve();
 
     /**
      * Replaces parameter placeholders (%name%) by their values.
      *
-     * @param  mixed $value A value
+     * @param mixed $value A value
      *
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
      */
-    function resolveValue($value);
+    public function resolveValue($value);
+
+    /**
+     * Escape parameter placeholders %
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public function escapeValue($value);
+
+    /**
+     * Unescape parameter placeholders %
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public function unescapeValue($value);
 }

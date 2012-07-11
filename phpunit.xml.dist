@@ -11,6 +11,10 @@
          syntaxCheck="false"
          bootstrap="autoload.php.dist"
 >
+    <php>
+        <ini name="intl.default_locale" value="en"/>
+    </php>
+
     <testsuites>
         <testsuite name="Symfony Test Suite">
             <directory>./src/Symfony/Bridge/*/Tests/</directory>
@@ -22,7 +26,6 @@
     <groups>
         <exclude>
             <group>benchmark</group>
-            <group>memcached</group>
         </exclude>
     </groups>
 

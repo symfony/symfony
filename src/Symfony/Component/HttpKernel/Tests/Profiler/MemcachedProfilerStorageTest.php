@@ -12,44 +12,30 @@
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
 use Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage;
+use Symfony\Component\HttpKernel\Tests\Profiler\Mock\MemcachedMock;
 
-class DummyMemcachedProfilerStorage extends MemcachedProfilerStorage
-{
-    public function getMemcached()
-    {
-        return parent::getMemcached();
-    }
-}
-
-/**
- * @group memcached
- */
 class MemcachedProfilerStorageTest extends AbstractProfilerStorageTest
 {
     protected static $storage;
 
-    public static function tearDownAfterClass()
+    protected function setUp()
     {
+        $memcachedMock = new MemcachedMock();
+        $memcachedMock->addServer('127.0.0.1', 11211);
+
+        self::$storage = new MemcachedProfilerStorage('memcached://127.0.0.1:11211', '', '', 86400);
+        self::$storage->setMemcached($memcachedMock);
+
         if (self::$storage) {
             self::$storage->purge();
         }
     }
 
-    protected function setUp()
+    protected function tearDown()
     {
-        if (!extension_loaded('memcached')) {
-            $this->markTestSkipped('MemcachedProfilerStorageTest requires that the extension memcached is loaded');
-        }
-
-        self::$storage = new DummyMemcachedProfilerStorage('memcached://127.0.0.1:11211', '', '', 86400);
-        try {
-            self::$storage->getMemcached();
-        } catch (\Exception $e) {
-            $this->markTestSkipped('MemcachedProfilerStorageTest requires that there is a Memcache server present on localhost');
-        }
-
         if (self::$storage) {
             self::$storage->purge();
+            self::$storage = false;
         }
     }
 

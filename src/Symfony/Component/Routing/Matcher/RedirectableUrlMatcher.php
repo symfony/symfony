@@ -22,16 +22,14 @@ use Symfony\Component\Routing\Route;
 abstract class RedirectableUrlMatcher extends UrlMatcher implements RedirectableUrlMatcherInterface
 {
     /**
-     * @see UrlMatcher::match()
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function match($pathinfo)
     {
         try {
             $parameters = parent::match($pathinfo);
         } catch (ResourceNotFoundException $e) {
-            if ('/' === substr($pathinfo, -1)) {
+            if ('/' === substr($pathinfo, -1) || !in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
                 throw $e;
             }
 

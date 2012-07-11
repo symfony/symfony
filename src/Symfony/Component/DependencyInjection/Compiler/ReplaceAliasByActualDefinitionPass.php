@@ -63,8 +63,8 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
      * Updates references to remove aliases.
      *
      * @param ContainerBuilder $container The container
-     * @param string $currentId The alias identifier being replaced
-     * @param string $newId The id of the service the alias points to
+     * @param string           $currentId The alias identifier being replaced
+     * @param string           $newId     The id of the service the alias points to
      */
     private function updateReferences($container, $currentId, $newId)
     {
@@ -94,9 +94,9 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
     /**
      * Updates argument references.
      *
-     * @param array $arguments An array of Arguments
+     * @param array  $arguments An array of Arguments
      * @param string $currentId The alias identifier
-     * @param string $newId The identifier the alias points to
+     * @param string $newId     The identifier the alias points to
      */
     private function updateArgumentReferences(array $arguments, $currentId, $newId)
     {

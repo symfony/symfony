@@ -41,8 +41,8 @@ class YamlFileLoader extends FileLoader
             }
 
             if (isset($this->classes['namespaces'])) {
-                foreach ($this->classes['namespaces'] as $prefix => $namespace) {
-                    $this->namespaces[$prefix] = $namespace;
+                foreach ($this->classes['namespaces'] as $alias => $namespace) {
+                    $this->addNamespaceAlias($alias, $namespace);
                 }
 
                 unset($this->classes['namespaces']);
@@ -55,7 +55,7 @@ class YamlFileLoader extends FileLoader
             $yaml = $this->classes[$metadata->getClassName()];
 
             if (isset($yaml['group_sequence_provider'])) {
-                $metadata->setGroupSequenceProvider((bool)$yaml['group_sequence_provider']);
+                $metadata->setGroupSequenceProvider((bool) $yaml['group_sequence_provider']);
             }
 
             if (isset($yaml['constraints']) && is_array($yaml['constraints'])) {

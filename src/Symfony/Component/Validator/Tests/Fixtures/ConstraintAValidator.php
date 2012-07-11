@@ -17,7 +17,7 @@ use Symfony\Component\Validator\ExecutionContext;
 
 class ConstraintAValidator extends ConstraintValidator
 {
-    static public $passedContext;
+    public static $passedContext;
 
     public function initialize(ExecutionContext $context)
     {

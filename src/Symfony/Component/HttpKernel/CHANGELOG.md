@@ -4,6 +4,8 @@ CHANGELOG
 2.1.0
 -----
 
+ * [BC BREAK] the charset is now configured via the Kernel::getCharset() method
+ * [BC BREAK] the current locale for the user is not stored anymore in the session
  * added the HTTP method to the profiler storage
  * updated all listeners to implement EventSubscriberInterface
  * added TimeDataCollector

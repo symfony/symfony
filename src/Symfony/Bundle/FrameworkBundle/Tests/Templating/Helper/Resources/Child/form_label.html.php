@@ -1,1 +1,1 @@
-<label>child</label>
+<label><?php echo $global ?>child</label>

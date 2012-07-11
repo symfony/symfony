@@ -31,5 +31,5 @@ interface RoleInterface
      *
      * @return string|null A string representation of the role, or null
      */
-    function getRole();
+    public function getRole();
 }

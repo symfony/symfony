@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\FormError;
 
 class DateTypeTest extends LocalizedTestCase
 {
@@ -23,7 +24,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testInvalidWidgetOption()
     {
@@ -33,7 +34,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testInvalidInputOption()
     {
@@ -42,11 +43,27 @@ class DateTypeTest extends LocalizedTestCase
         ));
     }
 
+    public function testSubmitFromSingleTextDateTimeWithDefaultFormat()
+    {
+        $form = $this->factory->create('date', null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'widget' => 'single_text',
+            'input' => 'datetime',
+        ));
+
+        $form->bind('2010-06-02');
+
+        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals('2010-06-02', $form->getViewData());
+    }
+
     public function testSubmitFromSingleTextDateTime()
     {
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'format' => \IntlDateFormatter::MEDIUM,
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'widget' => 'single_text',
             'input' => 'datetime',
         ));
@@ -54,14 +71,15 @@ class DateTypeTest extends LocalizedTestCase
         $form->bind('2.6.2010');
 
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
-        $this->assertEquals('02.06.2010', $form->getClientData());
+        $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testSubmitFromSingleTextString()
     {
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'format' => \IntlDateFormatter::MEDIUM,
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'widget' => 'single_text',
             'input' => 'string',
         ));
@@ -69,14 +87,15 @@ class DateTypeTest extends LocalizedTestCase
         $form->bind('2.6.2010');
 
         $this->assertEquals('2010-06-02', $form->getData());
-        $this->assertEquals('02.06.2010', $form->getClientData());
+        $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testSubmitFromSingleTextTimestamp()
     {
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'format' => \IntlDateFormatter::MEDIUM,
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'widget' => 'single_text',
             'input' => 'timestamp',
         ));
@@ -86,14 +105,15 @@ class DateTypeTest extends LocalizedTestCase
         $dateTime = new \DateTime('2010-06-02 UTC');
 
         $this->assertEquals($dateTime->format('U'), $form->getData());
-        $this->assertEquals('02.06.2010', $form->getClientData());
+        $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testSubmitFromSingleTextRaw()
     {
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'format' => \IntlDateFormatter::MEDIUM,
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'widget' => 'single_text',
             'input' => 'array',
         ));
@@ -107,14 +127,14 @@ class DateTypeTest extends LocalizedTestCase
         );
 
         $this->assertEquals($output, $form->getData());
-        $this->assertEquals('02.06.2010', $form->getClientData());
+        $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
     public function testSubmitFromText()
     {
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'widget' => 'text',
         ));
 
@@ -129,14 +149,14 @@ class DateTypeTest extends LocalizedTestCase
         $dateTime = new \DateTime('2010-06-02 UTC');
 
         $this->assertDateTimeEquals($dateTime, $form->getData());
-        $this->assertEquals($text, $form->getClientData());
+        $this->assertEquals($text, $form->getViewData());
     }
 
     public function testSubmitFromChoice()
     {
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'widget' => 'choice',
         ));
 
@@ -151,14 +171,14 @@ class DateTypeTest extends LocalizedTestCase
         $dateTime = new \DateTime('2010-06-02 UTC');
 
         $this->assertDateTimeEquals($dateTime, $form->getData());
-        $this->assertEquals($text, $form->getClientData());
+        $this->assertEquals($text, $form->getViewData());
     }
 
     public function testSubmitFromChoiceEmpty()
     {
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'widget' => 'choice',
             'required' => false,
         ));
@@ -172,14 +192,14 @@ class DateTypeTest extends LocalizedTestCase
         $form->bind($text);
 
         $this->assertNull($form->getData());
-        $this->assertEquals($text, $form->getClientData());
+        $this->assertEquals($text, $form->getViewData());
     }
 
     public function testSubmitFromInputDateTimeDifferentPattern()
     {
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
             'widget' => 'single_text',
             'input' => 'datetime',
@@ -188,14 +208,14 @@ class DateTypeTest extends LocalizedTestCase
         $form->bind('06*2010*02');
 
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
-        $this->assertEquals('06*2010*02', $form->getClientData());
+        $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
     public function testSubmitFromInputStringDifferentPattern()
     {
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
             'widget' => 'single_text',
             'input' => 'string',
@@ -204,14 +224,14 @@ class DateTypeTest extends LocalizedTestCase
         $form->bind('06*2010*02');
 
         $this->assertEquals('2010-06-02', $form->getData());
-        $this->assertEquals('06*2010*02', $form->getClientData());
+        $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
     public function testSubmitFromInputTimestampDifferentPattern()
     {
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
             'widget' => 'single_text',
             'input' => 'timestamp',
@@ -222,14 +242,14 @@ class DateTypeTest extends LocalizedTestCase
         $dateTime = new \DateTime('2010-06-02 UTC');
 
         $this->assertEquals($dateTime->format('U'), $form->getData());
-        $this->assertEquals('06*2010*02', $form->getClientData());
+        $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
     public function testSubmitFromInputRawDifferentPattern()
     {
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
             'widget' => 'single_text',
             'input' => 'array',
@@ -244,43 +264,51 @@ class DateTypeTest extends LocalizedTestCase
         );
 
         $this->assertEquals($output, $form->getData());
-        $this->assertEquals('06*2010*02', $form->getClientData());
+        $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
     /**
      * This test is to check that the strings '0', '1', '2', '3' are no accepted
      * as valid IntlDateFormatter constants for FULL, LONG, MEDIUM or SHORT respectively.
+     *
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testFormatOptionCustomPatternCollapsingIntlDateFormatterConstant()
+    public function testThrowExceptionIfFormatIsNoPattern()
     {
-        $form = $this->factory->create('date', null, array(
+        $this->factory->create('date', null, array(
             'format' => '0',
             'widget' => 'single_text',
             'input' => 'string',
         ));
-
-        $form->setData('2010-06-02');
-
-        // This would be what would be outputed if '0' was mistaken for \IntlDateFormatter::FULL
-        $this->assertNotEquals('Mittwoch, 02. Juni 2010', $form->getClientData());
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\CreationException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testValidateFormatOptionGivenWrongConstants()
+    public function testThrowExceptionIfFormatDoesNotContainYearMonthAndDay()
     {
-        $form = $this->factory->create('date', null, array(
+        $this->factory->create('date', null, array(
+            'months' => array(6, 7),
+            'format' => 'yy',
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testThrowExceptionIfFormatIsNoConstant()
+    {
+        $this->factory->create('date', null, array(
             'format' => 105,
         ));
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\CreationException
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testValidateFormatOptionGivenArrayValue()
+    public function testThrowExceptionIfFormatIsInvalid()
     {
-        $form = $this->factory->create('date', null, array(
+        $this->factory->create('date', null, array(
             'format' => array(),
         ));
     }
@@ -288,22 +316,24 @@ class DateTypeTest extends LocalizedTestCase
     public function testSetData_differentTimezones()
     {
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'America/New_York',
-            'user_timezone' => 'Pacific/Tahiti',
+            'format' => \IntlDateFormatter::MEDIUM,
+            'model_timezone' => 'America/New_York',
+            'view_timezone' => 'Pacific/Tahiti',
             'input' => 'string',
             'widget' => 'single_text',
         ));
 
         $form->setData('2010-06-02');
 
-        $this->assertEquals('01.06.2010', $form->getClientData());
+        $this->assertEquals('01.06.2010', $form->getViewData());
     }
 
     public function testSetData_differentTimezonesDateTime()
     {
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'America/New_York',
-            'user_timezone' => 'Pacific/Tahiti',
+            'format' => \IntlDateFormatter::MEDIUM,
+            'model_timezone' => 'America/New_York',
+            'view_timezone' => 'Pacific/Tahiti',
             'input' => 'datetime',
             'widget' => 'single_text',
         ));
@@ -313,7 +343,7 @@ class DateTypeTest extends LocalizedTestCase
         $form->setData($dateTime);
 
         $this->assertDateTimeEquals($dateTime, $form->getData());
-        $this->assertEquals('01.06.2010', $form->getClientData());
+        $this->assertEquals('01.06.2010', $form->getViewData());
     }
 
     public function testYearsOption()
@@ -327,7 +357,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('2010', '2010'),
             new ChoiceView('2011', '2011'),
-        ), $view->getChild('year')->get('choices'));
+        ), $view->get('year')->getVar('choices'));
     }
 
     public function testMonthsOption()
@@ -341,22 +371,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('6', '06'),
             new ChoiceView('7', '07'),
-        ), $view->getChild('month')->get('choices'));
-    }
-
-    public function testMonthsOptionNumericIfFormatContainsNoMonth()
-    {
-        $form = $this->factory->create('date', null, array(
-            'months' => array(6, 7),
-            'format' => 'yy',
-        ));
-
-        $view = $form->createView();
-
-        $this->assertEquals(array(
-            new ChoiceView('6', '06'),
-            new ChoiceView('7', '07'),
-        ), $view->getChild('month')->get('choices'));
+        ), $view->get('month')->getVar('choices'));
     }
 
     public function testMonthsOptionShortFormat()
@@ -371,7 +386,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('1', 'Jän'),
             new ChoiceView('4', 'Apr')
-        ), $view->getChild('month')->get('choices'));
+        ), $view->get('month')->getVar('choices'));
     }
 
     public function testMonthsOptionLongFormat()
@@ -386,7 +401,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('1', 'Jänner'),
             new ChoiceView('4', 'April'),
-        ), $view->getChild('month')->get('choices'));
+        ), $view->get('month')->getVar('choices'));
     }
 
     public function testMonthsOptionLongFormatWithDifferentTimezone()
@@ -401,7 +416,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('1', 'Jänner'),
             new ChoiceView('4', 'April'),
-        ), $view->getChild('month')->get('choices'));
+        ), $view->get('month')->getVar('choices'));
     }
 
     public function testIsDayWithinRangeReturnsTrueIfWithin()
@@ -415,7 +430,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('6', '06'),
             new ChoiceView('7', '07'),
-        ), $view->getChild('day')->get('choices'));
+        ), $view->get('day')->getVar('choices'));
     }
 
     public function testIsPartiallyFilledReturnsFalseIfSingleText()
@@ -423,8 +438,8 @@ class DateTypeTest extends LocalizedTestCase
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'widget' => 'single_text',
         ));
 
@@ -438,8 +453,8 @@ class DateTypeTest extends LocalizedTestCase
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'widget' => 'choice',
         ));
 
@@ -457,8 +472,8 @@ class DateTypeTest extends LocalizedTestCase
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'widget' => 'choice',
         ));
 
@@ -476,8 +491,8 @@ class DateTypeTest extends LocalizedTestCase
         $this->markTestIncomplete('Needs to be reimplemented using validators');
 
         $form = $this->factory->create('date', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'widget' => 'choice',
         ));
 
@@ -495,7 +510,18 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date');
         $view = $form->createView();
 
-        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->get('date_pattern'));
+        $this->assertSame('{{ year }}-{{ month }}-{{ day }}', $view->getVar('date_pattern'));
+    }
+
+    public function testPassDatePatternToViewDifferentFormat()
+    {
+        $form = $this->factory->create('date', null, array(
+            'format' => \IntlDateFormatter::MEDIUM,
+        ));
+
+        $view = $form->createView();
+
+        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->getVar('date_pattern'));
     }
 
     public function testPassDatePatternToViewDifferentPattern()
@@ -506,7 +532,7 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame('{{ month }}*{{ year }}*{{ day }}', $view->get('date_pattern'));
+        $this->assertSame('{{ month }}*{{ year }}*{{ day }}', $view->getVar('date_pattern'));
     }
 
     public function testDontPassDatePatternIfText()
@@ -516,7 +542,7 @@ class DateTypeTest extends LocalizedTestCase
         ));
         $view = $form->createView();
 
-        $this->assertNull($view->get('date_pattern'));
+        $this->assertNull($view->getVar('date_pattern'));
     }
 
     public function testPassWidgetToView()
@@ -526,7 +552,7 @@ class DateTypeTest extends LocalizedTestCase
         ));
         $view = $form->createView();
 
-        $this->assertSame('single_text', $view->get('widget'));
+        $this->assertSame('single_text', $view->getVar('widget'));
     }
 
     // Bug fix
@@ -535,5 +561,183 @@ class DateTypeTest extends LocalizedTestCase
         // Throws an exception if "data_class" option is not explicitely set
         // to null in the type
         $this->factory->create('date', new \DateTime());
+    }
+
+    public function testSingleTextWidgetShouldUseTheRightInputType()
+    {
+        $form = $this->factory->create('date', null, array(
+            'widget' => 'single_text',
+        ));
+
+        $view = $form->createView();
+        $this->assertEquals('date', $view->getVar('type'));
+    }
+
+    public function testPassDefaultEmptyValueToViewIfNotRequired()
+    {
+        $form = $this->factory->create('date', null, array(
+            'required' => false,
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('', $view->get('year')->getVar('empty_value'));
+        $this->assertSame('', $view->get('month')->getVar('empty_value'));
+        $this->assertSame('', $view->get('day')->getVar('empty_value'));
+    }
+
+    public function testPassNoEmptyValueToViewIfRequired()
+    {
+        $form = $this->factory->create('date', null, array(
+            'required' => true,
+        ));
+
+        $view = $form->createView();
+        $this->assertNull($view->get('year')->getVar('empty_value'));
+        $this->assertNull($view->get('month')->getVar('empty_value'));
+        $this->assertNull($view->get('day')->getVar('empty_value'));
+    }
+
+    public function testPassEmptyValueAsString()
+    {
+        $form = $this->factory->create('date', null, array(
+            'empty_value' => 'Empty',
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('Empty', $view->get('year')->getVar('empty_value'));
+        $this->assertSame('Empty', $view->get('month')->getVar('empty_value'));
+        $this->assertSame('Empty', $view->get('day')->getVar('empty_value'));
+    }
+
+    public function testPassEmptyValueAsArray()
+    {
+        $form = $this->factory->create('date', null, array(
+            'empty_value' => array(
+                'year' => 'Empty year',
+                'month' => 'Empty month',
+                'day' => 'Empty day',
+            ),
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('Empty year', $view->get('year')->getVar('empty_value'));
+        $this->assertSame('Empty month', $view->get('month')->getVar('empty_value'));
+        $this->assertSame('Empty day', $view->get('day')->getVar('empty_value'));
+    }
+
+    public function testPassEmptyValueAsPartialArray_addEmptyIfNotRequired()
+    {
+        $form = $this->factory->create('date', null, array(
+            'required' => false,
+            'empty_value' => array(
+                'year' => 'Empty year',
+                'day' => 'Empty day',
+            ),
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('Empty year', $view->get('year')->getVar('empty_value'));
+        $this->assertSame('', $view->get('month')->getVar('empty_value'));
+        $this->assertSame('Empty day', $view->get('day')->getVar('empty_value'));
+    }
+
+    public function testPassEmptyValueAsPartialArray_addNullIfRequired()
+    {
+        $form = $this->factory->create('date', null, array(
+            'required' => true,
+            'empty_value' => array(
+                'year' => 'Empty year',
+                'day' => 'Empty day',
+            ),
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('Empty year', $view->get('year')->getVar('empty_value'));
+        $this->assertNull($view->get('month')->getVar('empty_value'));
+        $this->assertSame('Empty day', $view->get('day')->getVar('empty_value'));
+    }
+
+    public function testPassHtml5TypeIfSingleTextAndHtml5Format()
+    {
+        $form = $this->factory->create('date', null, array(
+            'widget' => 'single_text',
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('date', $view->getVar('type'));
+    }
+
+    public function testDontPassHtml5TypeIfNotHtml5Format()
+    {
+        $form = $this->factory->create('date', null, array(
+            'widget' => 'single_text',
+            'format' => \IntlDateFormatter::MEDIUM,
+        ));
+
+        $view = $form->createView();
+        $this->assertNull($view->getVar('type'));
+    }
+
+    public function testDontPassHtml5TypeIfNotSingleText()
+    {
+        $form = $this->factory->create('date', null, array(
+            'widget' => 'text',
+        ));
+
+        $view = $form->createView();
+        $this->assertNull($view->getVar('type'));
+    }
+
+    public function provideCompoundWidgets()
+    {
+        return array(
+            array('text'),
+            array('choice'),
+        );
+    }
+
+    /**
+     * @dataProvider provideCompoundWidgets
+     */
+    public function testYearErrorsBubbleUp($widget)
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('date', null, array(
+            'widget' => $widget,
+        ));
+        $form->get('year')->addError($error);
+
+        $this->assertSame(array(), $form->get('year')->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
+    /**
+     * @dataProvider provideCompoundWidgets
+     */
+    public function testMonthErrorsBubbleUp($widget)
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('date', null, array(
+            'widget' => $widget,
+        ));
+        $form->get('month')->addError($error);
+
+        $this->assertSame(array(), $form->get('month')->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
+    /**
+     * @dataProvider provideCompoundWidgets
+     */
+    public function testDayErrorsBubbleUp($widget)
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('date', null, array(
+            'widget' => $widget,
+        ));
+        $form->get('day')->addError($error);
+
+        $this->assertSame(array(), $form->get('day')->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
     }
 }

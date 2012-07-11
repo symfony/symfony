@@ -37,11 +37,12 @@ abstract class FileDumper implements DumperInterface
         foreach ($messages->getDomains() as $domain) {
             $file = $domain.'.'.$messages->getLocale().'.'.$this->getExtension();
             // backup
-            if (file_exists($options['path'].$file)) {
-                copy($options['path'].$file, $options['path'].'/'.$file.'~');
+            $fullpath = $options['path'].'/'.$file;
+            if (file_exists($fullpath)) {
+                copy($fullpath, $fullpath.'~');
             }
             // save file
-            file_put_contents($options['path'].'/'.$file, $this->format($messages, $domain));
+            file_put_contents($fullpath, $this->format($messages, $domain));
         }
     }
 

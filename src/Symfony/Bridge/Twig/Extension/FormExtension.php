@@ -22,7 +22,7 @@ use Symfony\Component\Form\Util\FormUtil;
  * FormExtension extends Twig with form capabilities.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormExtension extends \Twig_Extension
 {
@@ -91,6 +91,13 @@ class FormExtension extends \Twig_Extension
         );
     }
 
+    public function getFilters()
+    {
+        return array(
+            'humanize' => new \Twig_Filter_Function(__NAMESPACE__.'\humanize'),
+        );
+    }
+
     public function isChoiceGroup($label)
     {
         return FormUtil::isChoiceGroup($label);
@@ -98,7 +105,7 @@ class FormExtension extends \Twig_Extension
 
     public function isChoiceSelected(FormView $view, ChoiceView $choice)
     {
-        return FormUtil::isChoiceSelected($choice->getValue(), $view->get('value'));
+        return FormUtil::isChoiceSelected($choice->getValue(), $view->getVar('value'));
     }
 
     /**
@@ -108,7 +115,7 @@ class FormExtension extends \Twig_Extension
      *
      *     <form action="..." method="post" {{ form_enctype(form) }}>
      *
-     * @param FormView $view  The view for which to render the encoding type
+     * @param FormView $view The view for which to render the encoding type
      *
      * @return string The html markup
      */
@@ -156,8 +163,8 @@ class FormExtension extends \Twig_Extension
      *
      *     {{ form_widget(view, {'separator': '+++++'}) }}
      *
-     * @param FormView        $view      The view to render
-     * @param array           $variables Additional variables passed to the template
+     * @param FormView $view      The view to render
+     * @param array    $variables Additional variables passed to the template
      *
      * @return string The html markup
      */
@@ -181,8 +188,8 @@ class FormExtension extends \Twig_Extension
     /**
      * Renders the label of the given view
      *
-     * @param FormView $view  The view to render the label for
-     * @param string   $label Label name
+     * @param FormView $view      The view to render the label for
+     * @param string   $label     Label name
      * @param array    $variables Additional variables passed to the template
      *
      * @return string The html markup
@@ -205,9 +212,9 @@ class FormExtension extends \Twig_Extension
      * 3. the type name is recursively replaced by the parent type name until a
      *    corresponding block is found
      *
-     * @param FormView  $view       The form view
-     * @param string    $section    The section to render (i.e. 'row', 'widget', 'label', ...)
-     * @param array     $variables  Additional variables
+     * @param FormView $view      The form view
+     * @param string   $section   The section to render (i.e. 'row', 'widget', 'label', ...)
+     * @param array    $variables Additional variables
      *
      * @return string The html markup
      *
@@ -228,7 +235,7 @@ class FormExtension extends \Twig_Extension
             }
         }
 
-        $custom = '_'.$view->get('id');
+        $custom = '_'.$view->getVar('id');
         $rendering = $custom.$section;
         $blocks = $this->getBlocks($view);
 
@@ -237,11 +244,11 @@ class FormExtension extends \Twig_Extension
             $types = $this->varStack[$rendering]['types'];
             $this->varStack[$rendering]['variables'] = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
         } else {
-            $types = $view->get('types');
+            $types = $view->getVar('types');
             $types[] = $custom;
             $typeIndex = count($types) - 1;
             $this->varStack[$rendering] = array(
-                'variables' => array_replace_recursive($view->all(), $variables),
+                'variables' => array_replace_recursive($view->getVars(), $variables),
                 'types'     => $types,
             );
         }
@@ -252,9 +259,11 @@ class FormExtension extends \Twig_Extension
             if (isset($blocks[$types[$typeIndex]])) {
                 $this->varStack[$rendering]['typeIndex'] = $typeIndex;
 
+                $context = $this->environment->mergeGlobals($this->varStack[$rendering]['variables']);
+
                 // we do not call renderBlock here to avoid too many nested level calls (XDebug limits the level to 100 by default)
                 ob_start();
-                $this->template->displayBlock($types[$typeIndex], $this->varStack[$rendering]['variables'], $blocks);
+                $this->template->displayBlock($types[$typeIndex], $context, $blocks);
                 $html = ob_get_clean();
 
                 if ($mainTemplate) {
@@ -363,4 +372,9 @@ class FormExtension extends \Twig_Extension
 
         return $blocks;
     }
+}
+
+function humanize($text)
+{
+    return ucfirst(trim(strtolower(preg_replace('/[_\s]+/', ' ', $text))));
 }

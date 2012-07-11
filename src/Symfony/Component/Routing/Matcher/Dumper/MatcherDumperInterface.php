@@ -19,23 +19,19 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
 interface MatcherDumperInterface
 {
     /**
-     * Dumps a set of routes to a PHP class.
+     * Dumps a set of routes to a string representation of executable code
+     * that can then be used to match a request against these routes.
      *
-     * Available options:
+     * @param array $options An array of options
      *
-     *  * class:      The class name
-     *  * base_class: The base class name
-     *
-     * @param  array  $options An array of options
-     *
-     * @return string A PHP class representing the matcher class
+     * @return string Executable code
      */
-    function dump(array $options = array());
+    public function dump(array $options = array());
 
     /**
-     * Gets the routes to match.
+     * Gets the routes to dump.
      *
      * @return RouteCollection A RouteCollection instance
      */
-    function getRoutes();
+    public function getRoutes();
 }

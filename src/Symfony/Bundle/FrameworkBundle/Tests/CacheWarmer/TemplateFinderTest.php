@@ -12,10 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
+use Symfony\Bundle\FrameworkBundle\Templating\TemplateFilenameParser;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinder;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BaseBundle\BaseBundle;
-
 
 class TemplateFinderTest extends TestCase
 {
@@ -38,7 +37,7 @@ class TemplateFinderTest extends TestCase
             ->will($this->returnValue(array('BaseBundle' => new BaseBundle())))
         ;
 
-        $parser = new TemplateNameParser($kernel);
+        $parser = new TemplateFilenameParser($kernel);
 
         $finder = new TemplateFinder($kernel, $parser, __DIR__.'/../Fixtures/Resources');
 

@@ -50,12 +50,12 @@ class SecurityContext implements SecurityContextInterface
      *
      * @throws AuthenticationCredentialsNotFoundException when the security context has no authentication token.
      *
-     * @param mixed $attributes
+     * @param mixed      $attributes
      * @param mixed|null $object
      *
      * @return Boolean
      */
-    public final function isGranted($attributes, $object = null)
+    final public function isGranted($attributes, $object = null)
     {
         if (null === $this->token) {
             throw new AuthenticationCredentialsNotFoundException('The security context contains no authentication token. One possible reason may be that there is no firewall configured for this URL.');

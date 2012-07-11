@@ -62,8 +62,8 @@ class XmlFileLoader extends FileLoader
      * Parses a node from a loaded XML file.
      *
      * @param RouteCollection $collection the collection to associate with the node
-     * @param DOMElement      $node the node to parse
-     * @param string          $path the path of the XML file being processed
+     * @param DOMElement      $node       the node to parse
+     * @param string          $path       the path of the XML file being processed
      * @param string          $file
      */
     protected function parseNode(RouteCollection $collection, \DOMElement $node, $path, $file)
@@ -110,12 +110,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return Boolean True if this class supports the given resource, false otherwise
+     * {@inheritdoc}
      *
      * @api
      */

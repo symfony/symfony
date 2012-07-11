@@ -1,8 +1,5 @@
-<?php if ($form->hasChildren()): ?>
-<div <?php echo $view['form']->renderBlock('container_attributes') ?>>
-    <?php echo $view['form']->renderBlock('form_rows') ?>
-    <?php echo $view['form']->rest($form) ?>
-</div>
+<?php if ($compound): ?>
+<?php echo $view['form']->renderBlock('form_widget_compound')?>
 <?php else: ?>
-<?php echo $view['form']->renderBlock('input')?>
+<?php echo $view['form']->renderBlock('form_widget_simple')?>
 <?php endif ?>

@@ -30,7 +30,7 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateRedirectResponse()
     {
-        $utils = new HttpUtils($this->getRouter());
+        $utils = new HttpUtils($this->getUrlGenerator());
 
         // absolute path
         $response = $utils->createRedirectResponse($this->getRequest(), '/foobar');
@@ -42,14 +42,14 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($response->isRedirect('http://symfony.com/'));
 
         // route name
-        $utils = new HttpUtils($router = $this->getMockBuilder('Symfony\Component\Routing\Router')->disableOriginalConstructor()->getMock());
-        $router
+        $utils = new HttpUtils($urlGenerator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface'));
+        $urlGenerator
             ->expects($this->any())
             ->method('generate')
             ->with('foobar', array(), true)
             ->will($this->returnValue('http://localhost/foo/bar'))
         ;
-        $router
+        $urlGenerator
             ->expects($this->any())
             ->method('getContext')
             ->will($this->returnValue($this->getMock('Symfony\Component\Routing\RequestContext')))
@@ -60,7 +60,7 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateRequest()
     {
-        $utils = new HttpUtils($this->getRouter());
+        $utils = new HttpUtils($this->getUrlGenerator());
 
         // absolute path
         $request = $this->getRequest();
@@ -72,13 +72,13 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $subRequest->server->get('Foo'));
 
         // route name
-        $utils = new HttpUtils($router = $this->getMockBuilder('Symfony\Component\Routing\Router')->disableOriginalConstructor()->getMock());
-        $router
+        $utils = new HttpUtils($urlGenerator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface'));
+        $urlGenerator
             ->expects($this->once())
             ->method('generate')
             ->will($this->returnValue('/foo/bar'))
         ;
-        $router
+        $urlGenerator
             ->expects($this->any())
             ->method('getContext')
             ->will($this->returnValue($this->getMock('Symfony\Component\Routing\RequestContext')))
@@ -93,55 +93,55 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckRequestPath()
     {
-        $utils = new HttpUtils($this->getRouter());
+        $utils = new HttpUtils($this->getUrlGenerator());
 
         $this->assertTrue($utils->checkRequestPath($this->getRequest(), '/'));
         $this->assertFalse($utils->checkRequestPath($this->getRequest(), '/foo'));
 
-        $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
-        $router
+        $urlMatcher = $this->getMock('Symfony\Component\Routing\Matcher\UrlMatcherInterface');
+        $urlMatcher
             ->expects($this->any())
             ->method('match')
             ->will($this->throwException(new ResourceNotFoundException()))
         ;
-        $utils = new HttpUtils($router);
+        $utils = new HttpUtils(null, $urlMatcher);
         $this->assertFalse($utils->checkRequestPath($this->getRequest(), 'foobar'));
 
-        $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
-        $router
+        $urlMatcher = $this->getMock('Symfony\Component\Routing\Matcher\UrlMatcherInterface');
+        $urlMatcher
             ->expects($this->any())
             ->method('match')
             ->will($this->returnValue(array('_route' => 'foobar')))
         ;
-        $utils = new HttpUtils($router);
+        $utils = new HttpUtils(null, $urlMatcher);
         $this->assertTrue($utils->checkRequestPath($this->getRequest('/foo/bar'), 'foobar'));
     }
 
     /**
      * @expectedException \RuntimeException
      */
-    public function testCheckRequestPathWithRouterLoadingException()
+    public function testCheckRequestPathWithUrlMatcherLoadingException()
     {
-        $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
-        $router
+        $urlMatcher = $this->getMock('Symfony\Component\Routing\Matcher\UrlMatcherInterface');
+        $urlMatcher
             ->expects($this->any())
             ->method('match')
             ->will($this->throwException(new \RuntimeException()))
         ;
-        $utils = new HttpUtils($router);
+        $utils = new HttpUtils(null, $urlMatcher);
         $utils->checkRequestPath($this->getRequest(), 'foobar');
     }
 
-    private function getRouter()
+    private function getUrlGenerator()
     {
-        $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
-        $router
+        $urlGenerator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
+        $urlGenerator
             ->expects($this->any())
             ->method('generate')
             ->will($this->returnValue('/foo/bar'))
         ;
 
-        return $router;
+        return $urlGenerator;
     }
 
     private function getRequest($path = '/')

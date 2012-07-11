@@ -23,7 +23,7 @@ use Symfony\Component\Form\Util\FormUtil;
  * FormHelper provides helpers to help display forms.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormHelper extends Helper
 {
@@ -66,7 +66,7 @@ class FormHelper extends Helper
 
     public function isChoiceSelected(FormView $view, ChoiceView $choice)
     {
-        return FormUtil::isChoiceSelected($choice->getValue(), $view->get('value'));
+        return FormUtil::isChoiceSelected($choice->getValue(), $view->getVar('value'));
     }
 
     /**
@@ -79,7 +79,7 @@ class FormHelper extends Helper
      */
     public function setTheme(FormView $view, $themes)
     {
-        $this->themes[$view->get('id')] = (array) $themes;
+        $this->themes[$view->getVar('id')] = (array) $themes;
         $this->templates = array();
     }
 
@@ -90,7 +90,7 @@ class FormHelper extends Helper
      *
      *     <form action="..." method="post" <?php echo $view['form']->enctype() ?>>
      *
-     * @param FormView $view  The view for which to render the encoding type
+     * @param FormView $view The view for which to render the encoding type
      *
      * @return string The html markup
      */
@@ -219,9 +219,9 @@ class FormHelper extends Helper
      * 3. the type name is recursively replaced by the parent type name until a
      *    corresponding block is found
      *
-     * @param FormView  $view       The form view
-     * @param string    $section    The section to render (i.e. 'row', 'widget', 'label', ...)
-     * @param array     $variables  Additional variables
+     * @param FormView $view      The form view
+     * @param string   $section   The section to render (i.e. 'row', 'widget', 'label', ...)
+     * @param array    $variables Additional variables
      *
      * @return string The html markup
      *
@@ -237,7 +237,7 @@ class FormHelper extends Helper
 
         $template = null;
 
-        $custom = '_'.$view->get('id');
+        $custom = '_'.$view->getVar('id');
         $rendering = $custom.$section;
 
         if (isset($this->varStack[$rendering])) {
@@ -245,10 +245,10 @@ class FormHelper extends Helper
             $types = $this->varStack[$rendering]['types'];
             $variables = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
         } else {
-            $types = $view->get('types');
+            $types = $view->getVar('types');
             $types[] = $custom;
             $typeIndex = count($types) - 1;
-            $variables = array_replace_recursive($view->all(), $variables);
+            $variables = array_replace_recursive($view->getVars(), $variables);
             $this->varStack[$rendering]['types'] = $types;
         }
 
@@ -278,7 +278,7 @@ class FormHelper extends Helper
 
                 return trim($html);
             }
-        }  while (--$typeIndex >= 0);
+        } while (--$typeIndex >= 0);
 
         throw new FormException(sprintf(
             'Unable to render the form as none of the following blocks exist: "%s".',
@@ -314,6 +314,11 @@ class FormHelper extends Helper
         return trim($this->engine->render($template, $variables));
     }
 
+    public function humanize($text)
+    {
+        return ucfirst(trim(strtolower(preg_replace('/[_\s]+/', ' ', $text))));
+    }
+
     public function getName()
     {
         return 'form';
@@ -330,7 +335,7 @@ class FormHelper extends Helper
     protected function lookupTemplate(FormView $view, $block)
     {
         $file = $block.'.html.php';
-        $id = $view->get('id');
+        $id = $view->getVar('id');
 
         if (!isset($this->templates[$id][$block])) {
             $template = false;

@@ -31,7 +31,7 @@ class RequestMatcher implements RequestMatcherInterface
     private $host;
 
     /**
-     * @var string
+     * @var array
      */
     private $methods;
 

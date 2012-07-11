@@ -19,8 +19,8 @@ namespace Symfony\Component\ClassLoader;
  *     $loader = new ClassLoader();
  *
  *     // register classes with namespaces
- *     $loader->add('Symfony\Component', __DIR__.'/component');
- *     $loader->add('Symfony',           __DIR__.'/framework');
+ *     $loader->addPrefix('Symfony\Component', __DIR__.'/component');
+ *     $loader->addPrefix('Symfony',           __DIR__.'/framework');
  *
  *     // activate the autoloader
  *     $loader->register();
@@ -143,7 +143,7 @@ class ClassLoader
      * Loads the given class or interface.
      *
      * @param string $class The name of the class
-     * 
+     *
      * @return Boolean|null True, if loaded
      */
     public function loadClass($class)

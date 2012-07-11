@@ -34,7 +34,7 @@ abstract class FormUtil
      * @see http://english-zone.com/spelling/plurals.html
      * @see http://www.scribd.com/doc/3271143/List-of-100-Irregular-Plural-Nouns-in-English
      */
-    static private $pluralMap = array(
+    private static $pluralMap = array(
         // First entry: plural suffix, reversed
         // Second entry: length of plural suffix
         // Third entry: Whether the suffix may succeed a vocal
@@ -113,11 +113,11 @@ abstract class FormUtil
      * If the method can't determine the form with certainty, an array of the
      * possible singulars is returned.
      *
-     * @param  string $plural A word in plural form
+     * @param string $plural A word in plural form
      * @return string|array The singular form or an array of possible singular
      *                      forms
      */
-    static public function singularify($plural)
+    public static function singularify($plural)
     {
         $pluralRev = strrev($plural);
         $lowerPluralRev = strtolower($pluralRev);
@@ -198,7 +198,7 @@ abstract class FormUtil
      *
      * @return Boolean Whether the choice is a group
      */
-    static public function isChoiceGroup($choice)
+    public static function isChoiceGroup($choice)
     {
         return is_array($choice) || $choice instanceof \Traversable;
     }
@@ -211,12 +211,31 @@ abstract class FormUtil
      *
      * @return Boolean Whether the choice is selected
      */
-    static public function isChoiceSelected($choice, $value)
+    public static function isChoiceSelected($choice, $value)
     {
         if (is_array($value)) {
             return false !== array_search($choice, $value, true);
         }
 
         return $choice === $value;
+    }
+
+    /**
+     * Returns whether the given data is empty.
+     *
+     * This logic is reused multiple times throughout the processing of
+     * a form and needs to be consistent. PHP's keyword `empty` cannot
+     * be used as it also considers 0 and "0" to be empty.
+     *
+     * @param  mixed $data
+     *
+     * @return Boolean
+     */
+    public static function isEmpty($data)
+    {
+        // Should not do a check for array() === $data!!!
+        // This method is used in occurrences where arrays are
+        // not considered to be empty, ever.
+        return null === $data || '' === $data;
     }
 }

@@ -20,11 +20,9 @@ Resources
 
 You can run the unit tests with the following command:
 
-    phpunit -c src/Symfony/Component/EventDispatcher/
+    phpunit
 
 If you also want to run the unit tests that depend on other Symfony
-Components, declare the following environment variables before running
-PHPUnit:
+Components, install dev dependencies before running PHPUnit:
 
-    export SYMFONY_DEPENDENCY_INJECTION=../path/to/DependencyInjection
-    export SYMFONY_HTTP_KERNEL=../path/to/HttpKernel
+    php composer.phar install --dev

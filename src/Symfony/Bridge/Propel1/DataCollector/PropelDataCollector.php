@@ -38,8 +38,8 @@ class PropelDataCollector extends DataCollector
     /**
      * Constructor
      *
-     * @param \Symfony\Bridge\Propel1\Logger\PropelLogger $logger    A Propel logger.
-     * @param \PropelConfiguration $propelConfiguration             The Propel configuration object.
+     * @param PropelLogger         $logger              A Propel logger.
+     * @param \PropelConfiguration $propelConfiguration The Propel configuration object.
      */
     public function __construct(PropelLogger $logger, \PropelConfiguration $propelConfiguration)
     {

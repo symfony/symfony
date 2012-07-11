@@ -29,5 +29,5 @@ interface TaggedContainerInterface extends ContainerInterface
      *
      * @api
      */
-    function findTaggedServiceIds($name);
+    public function findTaggedServiceIds($name);
 }

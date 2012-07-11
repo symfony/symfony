@@ -74,11 +74,13 @@ EOF
         }
     }
 
-    protected function outputRoutes(OutputInterface $output)
+    protected function outputRoutes(OutputInterface $output, $routes = null)
     {
-        $routes = array();
-        foreach ($this->getContainer()->get('router')->getRouteCollection()->all() as $name => $route) {
-            $routes[$name] = $route->compile();
+        if (null === $routes) {
+            $routes = array();
+            foreach ($this->getContainer()->get('router')->getRouteCollection()->all() as $name => $route) {
+                $routes[$name] = $route->compile();
+            }
         }
 
         $output->writeln($this->getHelper('formatter')->formatSection('router', 'Current routes'));

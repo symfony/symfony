@@ -140,6 +140,51 @@ EOF
             }
         }
     }
+
+    /**
+     *
+     * @expectedException Symfony\Component\Yaml\Exception\ParseException
+     *
+     */
+    public function testUnindentedCollectionException()
+    {
+        $yaml = <<<EOF
+
+collection:
+-item1
+-item2
+-item3
+
+EOF;
+
+        $this->parser->parse($yaml);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testSequenceInAMapping()
+    {
+        Yaml::parse(<<<EOF
+yaml:
+  hash: me
+  - array stuff
+EOF
+        );
+    }
+
+    /**
+     * @expectedException Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testMappingInASequence()
+    {
+        Yaml::parse(<<<EOF
+yaml:
+  - array stuff
+  hash: me
+EOF
+        );
+    }
 }
 
 class B

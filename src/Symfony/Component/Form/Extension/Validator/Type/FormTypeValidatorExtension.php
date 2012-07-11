@@ -12,49 +12,91 @@
 namespace Symfony\Component\Form\Extension\Validator\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Extension\Validator\EventListener\DelegatingValidationListener;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
+use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormTypeValidatorExtension extends AbstractTypeExtension
 {
+    /**
+     * @var ValidatorInterface
+     */
     private $validator;
+
+    /**
+     * @var ViolationMapper
+     */
+    private $violationMapper;
 
     public function __construct(ValidatorInterface $validator)
     {
         $this->validator = $validator;
+        $this->violationMapper = new ViolationMapper();
     }
 
-    public function buildForm(FormBuilder $builder, array $options)
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (empty($options['validation_groups'])) {
-            $options['validation_groups'] = null;
-        } else {
-            $options['validation_groups'] = is_callable($options['validation_groups'])
-                ? $options['validation_groups']
-                : (array) $options['validation_groups'];
-        }
-
-        $builder
-            ->setAttribute('validation_groups', $options['validation_groups'])
-            ->setAttribute('validation_constraint', $options['validation_constraint'])
-            ->setAttribute('cascade_validation', $options['cascade_validation'])
-            ->addEventSubscriber(new DelegatingValidationListener($this->validator))
-        ;
+        $builder->addEventSubscriber(new ValidationListener($this->validator, $this->violationMapper));
     }
 
-    public function getDefaultOptions()
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        return array(
-            'validation_groups' => null,
+        // BC clause
+        $constraints = function (Options $options) {
+            return $options['validation_constraint'];
+        };
+
+        // Make sure that validation groups end up as null, closure or array
+        $validationGroupsFilter = function (Options $options, $groups) {
+            if (empty($groups)) {
+                return null;
+            }
+
+            if (is_callable($groups)) {
+                return $groups;
+            }
+
+            return (array) $groups;
+        };
+
+        // Constraint should always be converted to an array
+        $constraintsFilter = function (Options $options, $constraints) {
+            return is_object($constraints) ? array($constraints) : (array) $constraints;
+        };
+
+        $resolver->setDefaults(array(
+            'error_mapping'         => array(),
+            'validation_groups'     => null,
+            // "validation_constraint" is deprecated. Use "constraints".
             'validation_constraint' => null,
-            'cascade_validation' => false,
-        );
+            'constraints'           => $constraints,
+            'cascade_validation'    => false,
+            'invalid_message'       => 'This value is not valid.',
+            'extra_fields_message'  => 'This form should not contain extra fields.',
+            'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
+        ));
+
+        $resolver->setFilters(array(
+            'validation_groups' => $validationGroupsFilter,
+            'constraints'       => $constraintsFilter,
+        ));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getExtendedType()
     {
         return 'form';

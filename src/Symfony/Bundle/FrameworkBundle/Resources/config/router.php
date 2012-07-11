@@ -18,12 +18,13 @@
  * and pass it as a value to 'router' option of server:run command.
  *
  * @author: Michał Pipa <michal.pipa.xsolve@gmail.com>
+ * @author: Albert Jessurum <ajessu@gmail.com>
  */
 
-if (isset($_SERVER['SCRIPT_FILENAME'])) {
+if (is_file($_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . $_SERVER['SCRIPT_NAME'])) {
     return false;
 }
 
-$_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.'app_dev.php';
+$_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'app_dev.php';
 
 require 'app_dev.php';

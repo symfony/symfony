@@ -11,12 +11,12 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
-use Symfony\Component\Form\FormView;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
-use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 {
@@ -52,9 +52,10 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             'custom_widgets.html.twig',
         ));
 
-        $environment = new \Twig_Environment($loader);
+        $environment = new \Twig_Environment($loader, array('strict_variables' => true));
         $environment->addExtension($this->extension);
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
+        $environment->addGlobal('global', '');
 
         $this->extension->initRuntime($environment);
     }
@@ -69,7 +70,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingUse()
     {
         $view = $this->factory
-            ->createNamed('email', 'name')
+            ->createNamed('name', 'email')
             ->createView()
         ;
 
@@ -84,7 +85,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public function testThemeBlockInheritanceUsingExtend()
     {
         $view = $this->factory
-            ->createNamed('email', 'name')
+            ->createNamed('name', 'email')
             ->createView()
         ;
 
@@ -98,32 +99,32 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     protected function renderEnctype(FormView $view)
     {
-        return (string)$this->extension->renderEnctype($view);
+        return (string) $this->extension->renderEnctype($view);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        return (string)$this->extension->renderLabel($view, $label, $vars);
+        return (string) $this->extension->renderLabel($view, $label, $vars);
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string)$this->extension->renderErrors($view);
+        return (string) $this->extension->renderErrors($view);
     }
 
     protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string)$this->extension->renderWidget($view, $vars);
+        return (string) $this->extension->renderWidget($view, $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string)$this->extension->renderRow($view, $vars);
+        return (string) $this->extension->renderRow($view, $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string)$this->extension->renderRest($view, $vars);
+        return (string) $this->extension->renderRest($view, $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)
@@ -131,14 +132,14 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->extension->setTheme($view, $themes);
     }
 
-    static public function themeBlockInheritanceProvider()
+    public static function themeBlockInheritanceProvider()
     {
         return array(
             array(array('theme.html.twig'))
         );
     }
 
-    static public function themeInheritanceProvider()
+    public static function themeInheritanceProvider()
     {
         return array(
             array(array('parent_label.html.twig'), array('child_label.html.twig'))

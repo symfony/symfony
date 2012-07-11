@@ -29,32 +29,28 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAdd()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $crawler = new Crawler();
         $crawler->add($this->createDomDocument());
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->add() adds nodes from a \DOMDocument');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMDocument');
 
         $crawler = new Crawler();
         $crawler->add($this->createNodeList());
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->add() adds nodes from a \DOMNodeList');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMNodeList');
 
         foreach ($this->createNodeList() as $node) {
             $list[] = $node;
         }
         $crawler = new Crawler();
         $crawler->add($list);
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->add() adds nodes from an array of nodes');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from an array of nodes');
 
         $crawler = new Crawler();
         $crawler->add($this->createNodeList()->item(0));
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->add() adds nodes from an \DOMNode');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from an \DOMNode');
 
         $crawler = new Crawler();
         $crawler->add('<html><body>Foo</body></html>');
-        $this->assertEquals('Foo', $crawler->filter('body')->text(), '->add() adds nodes from a string');
+        $this->assertEquals('Foo', $crawler->filterXPath('//body')->text(), '->add() adds nodes from a string');
     }
 
     /**
@@ -62,19 +58,26 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddHtmlContent()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $crawler = new Crawler();
         $crawler->addHtmlContent('<html><div class="foo"></html>', 'UTF-8');
 
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addHtmlContent() adds nodes from an HTML string');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addHtmlContent() adds nodes from an HTML string');
 
         $crawler->addHtmlContent('<html><head><base href="http://symfony.com"></head><a href="/contact"></a></html>', 'UTF-8');
 
-        $this->assertEquals('http://symfony.com', $crawler->filter('base')->attr('href'), '->addHtmlContent() adds nodes from an HTML string');
-        $this->assertEquals('http://symfony.com/contact', $crawler->filter('a')->link()->getUri(), '->addHtmlContent() adds nodes from an HTML string');
+        $this->assertEquals('http://symfony.com', $crawler->filterXPath('//base')->attr('href'), '->addHtmlContent() adds nodes from an HTML string');
+        $this->assertEquals('http://symfony.com/contact', $crawler->filterXPath('//a')->link()->getUri(), '->addHtmlContent() adds nodes from an HTML string');
+    }
+
+    /**
+     * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
+     */
+    public function testAddHtmlContentCharset()
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent('<html><div class="foo">Tiếng Việt</html>', 'UTF-8');
+
+        $this->assertEquals('Tiếng Việt', $crawler->filterXPath('//div')->text());
     }
 
     /**
@@ -82,10 +85,6 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddHtmlContentWithErrors()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         libxml_use_internal_errors(true);
 
         $crawler = new Crawler();
@@ -114,14 +113,21 @@ EOF
      */
     public function testAddXmlContent()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $crawler = new Crawler();
         $crawler->addXmlContent('<html><div class="foo"></div></html>', 'UTF-8');
 
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addXmlContent() adds nodes from an XML string');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addXmlContent() adds nodes from an XML string');
+    }
+
+    /**
+     * @covers Symfony\Component\DomCrawler\Crawler::addXmlContent
+     */
+    public function testAddXmlContentCharset()
+    {
+        $crawler = new Crawler();
+        $crawler->addXmlContent('<html><div class="foo">Tiếng Việt</div></html>', 'UTF-8');
+
+        $this->assertEquals('Tiếng Việt', $crawler->filterXPath('//div')->text());
     }
 
     /**
@@ -155,29 +161,25 @@ EOF
      */
     public function testAddContent()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $crawler = new Crawler();
         $crawler->addContent('<html><div class="foo"></html>', 'text/html; charset=UTF-8');
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addContent() adds nodes from an HTML string');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() adds nodes from an HTML string');
 
         $crawler = new Crawler();
         $crawler->addContent('<html><div class="foo"></html>', 'text/html; charset=UTF-8; dir=RTL');
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addContent() adds nodes from an HTML string with extended content type');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() adds nodes from an HTML string with extended content type');
 
         $crawler = new Crawler();
         $crawler->addContent('<html><div class="foo"></html>');
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addContent() uses text/html as the default type');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() uses text/html as the default type');
 
         $crawler = new Crawler();
         $crawler->addContent('<html><div class="foo"></div></html>', 'text/xml; charset=UTF-8');
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addContent() adds nodes from an XML string');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() adds nodes from an XML string');
 
         $crawler = new Crawler();
         $crawler->addContent('<html><div class="foo"></div></html>', 'text/xml');
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addContent() adds nodes from an XML string');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() adds nodes from an XML string');
 
         $crawler = new Crawler();
         $crawler->addContent('foo bar', 'text/plain');
@@ -189,14 +191,10 @@ EOF
      */
     public function testAddDocument()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $crawler = new Crawler();
         $crawler->addDocument($this->createDomDocument());
 
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addDocument() adds nodes from a \DOMDocument');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addDocument() adds nodes from a \DOMDocument');
     }
 
     /**
@@ -204,14 +202,10 @@ EOF
      */
     public function testAddNodeList()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $crawler = new Crawler();
         $crawler->addNodeList($this->createNodeList());
 
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addNodeList() adds nodes from a \DOMNodeList');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNodeList() adds nodes from a \DOMNodeList');
     }
 
     /**
@@ -219,10 +213,6 @@ EOF
      */
     public function testAddNodes()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         foreach ($this->createNodeList() as $node) {
             $list[] = $node;
         }
@@ -230,7 +220,7 @@ EOF
         $crawler = new Crawler();
         $crawler->addNodes($list);
 
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addNodes() adds nodes from an array of nodes');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNodes() adds nodes from an array of nodes');
     }
 
     /**
@@ -238,14 +228,10 @@ EOF
      */
     public function testAddNode()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $crawler = new Crawler();
         $crawler->addNode($this->createNodeList()->item(0));
 
-        $this->assertEquals('foo', $crawler->filter('div')->attr('class'), '->addNode() adds nodes from an \DOMNode');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from an \DOMNode');
     }
 
     public function testClear()
@@ -257,11 +243,7 @@ EOF
 
     public function testEq()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
-        $crawler = $this->createTestCrawler()->filter('li');
+        $crawler = $this->createTestCrawler()->filterXPath('//li');
         $this->assertNotSame($crawler, $crawler->eq(0), '->eq() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->eq() returns a new instance of a crawler');
 
@@ -271,12 +253,7 @@ EOF
 
     public function testEach()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
-        $data = $this->createTestCrawler()->filter('ul.first li')->each(function ($node, $i)
-        {
+        $data = $this->createTestCrawler()->filterXPath('//ul[1]/li')->each(function ($node, $i) {
             return $i.'-'.$node->nodeValue;
         });
 
@@ -285,13 +262,8 @@ EOF
 
     public function testReduce()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
-        $crawler = $this->createTestCrawler()->filter('ul.first li');
-        $nodes = $crawler->reduce(function ($node, $i)
-        {
+        $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
+        $nodes = $crawler->reduce(function ($node, $i) {
             return $i == 1 ? false : true;
         });
         $this->assertNotSame($nodes, $crawler, '->reduce() returns a new instance of a crawler');
@@ -302,14 +274,10 @@ EOF
 
     public function testAttr()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
-        $this->assertEquals('first', $this->createTestCrawler()->filter('li')->attr('class'), '->attr() returns the attribute of the first element of the node list');
+        $this->assertEquals('first', $this->createTestCrawler()->filterXPath('//li')->attr('class'), '->attr() returns the attribute of the first element of the node list');
 
         try {
-            $this->createTestCrawler()->filter('ol')->attr('class');
+            $this->createTestCrawler()->filterXPath('//ol')->attr('class');
             $this->fail('->attr() throws an \InvalidArgumentException if the node list is empty');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->attr() throws an \InvalidArgumentException if the node list is empty');
@@ -318,14 +286,10 @@ EOF
 
     public function testText()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
-        $this->assertEquals('One', $this->createTestCrawler()->filter('li')->text(), '->text() returns the node value of the first element of the node list');
+        $this->assertEquals('One', $this->createTestCrawler()->filterXPath('//li')->text(), '->text() returns the node value of the first element of the node list');
 
         try {
-            $this->createTestCrawler()->filter('ol')->text();
+            $this->createTestCrawler()->filterXPath('//ol')->text();
             $this->fail('->text() throws an \InvalidArgumentException if the node list is empty');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->text() throws an \InvalidArgumentException if the node list is empty');
@@ -334,16 +298,12 @@ EOF
 
     public function testExtract()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
-        $crawler = $this->createTestCrawler()->filter('ul.first li');
+        $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
 
         $this->assertEquals(array('One', 'Two', 'Three'), $crawler->extract('_text'), '->extract() returns an array of extracted data from the node list');
         $this->assertEquals(array(array('One', 'first'), array('Two', ''), array('Three', '')), $crawler->extract(array('_text', 'class')), '->extract() returns an array of extracted data from the node list');
 
-        $this->assertEquals(array(), $this->createTestCrawler()->filter('lo')->extract('_text'), '->extract() returns an empty array if the node list is empty');
+        $this->assertEquals(array(), $this->createTestCrawler()->filterXPath('//ol')->extract('_text'), '->extract() returns an empty array if the node list is empty');
     }
 
     /**
@@ -351,15 +311,11 @@ EOF
      */
     public function testFilterXPath()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->filterXPath('//li'), '->filterXPath() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->filterXPath() returns a new instance of a crawler');
 
-        $crawler = $this->createTestCrawler()->filter('ul');
+        $crawler = $this->createTestCrawler()->filterXPath('//ul');
 
         $this->assertCount(6, $crawler->filterXPath('//li'), '->filterXPath() filters the node list with the XPath expression');
     }
@@ -418,10 +374,6 @@ EOF
 
     public function testLink()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectLink('Foo');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Link', $crawler->link(), '->link() returns a Link instance');
 
@@ -431,7 +383,7 @@ EOF
         $this->assertEquals('http://example.com/bar?get=param', $crawler->link()->getUri(), '->link() returns a Link instance');
 
         try {
-            $this->createTestCrawler()->filter('ol')->link();
+            $this->createTestCrawler()->filterXPath('//ol')->link();
             $this->fail('->link() throws an \InvalidArgumentException if the node list is empty');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->link() throws an \InvalidArgumentException if the node list is empty');
@@ -440,10 +392,6 @@ EOF
 
     public function testLinks()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectLink('Foo');
         $this->assertInternalType('array', $crawler->links(), '->links() returns an array');
 
@@ -451,22 +399,18 @@ EOF
         $links = $crawler->links();
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Link', $links[0], '->links() returns an array of Link instances');
 
-        $this->assertEquals(array(), $this->createTestCrawler()->filter('ol')->links(), '->links() returns an empty array if the node selection is empty');
+        $this->assertEquals(array(), $this->createTestCrawler()->filterXPath('//ol')->links(), '->links() returns an empty array if the node selection is empty');
     }
 
     public function testForm()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectButton('FooValue');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Form', $crawler->form(), '->form() returns a Form instance');
 
         $this->assertEquals(array('FooName' => 'FooBar'), $crawler->form(array('FooName' => 'FooBar'))->getValues(), '->form() takes an array of values to submit as its first argument');
 
         try {
-            $this->createTestCrawler()->filter('ol')->form();
+            $this->createTestCrawler()->filterXPath('//ol')->form();
             $this->fail('->form() throws an \InvalidArgumentException if the node list is empty');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->form() throws an \InvalidArgumentException if the node list is empty');
@@ -475,11 +419,7 @@ EOF
 
     public function testLast()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
-        $crawler = $this->createTestCrawler()->filter('ul.first li');
+        $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
         $this->assertNotSame($crawler, $crawler->last(), '->last() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->last() returns a new instance of a crawler');
 
@@ -488,11 +428,7 @@ EOF
 
     public function testFirst()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
-        $crawler = $this->createTestCrawler()->filter('li');
+        $crawler = $this->createTestCrawler()->filterXPath('//li');
         $this->assertNotSame($crawler, $crawler->first(), '->first() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->first() returns a new instance of a crawler');
 
@@ -501,11 +437,7 @@ EOF
 
     public function testSiblings()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
-        $crawler = $this->createTestCrawler()->filter('li')->eq(1);
+        $crawler = $this->createTestCrawler()->filterXPath('//li')->eq(1);
         $this->assertNotSame($crawler, $crawler->siblings(), '->siblings() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->siblings() returns a new instance of a crawler');
 
@@ -514,13 +446,13 @@ EOF
         $this->assertEquals('One', $nodes->eq(0)->text());
         $this->assertEquals('Three', $nodes->eq(1)->text());
 
-        $nodes = $this->createTestCrawler()->filter('li')->eq(0)->siblings();
+        $nodes = $this->createTestCrawler()->filterXPath('//li')->eq(0)->siblings();
         $this->assertEquals(2, $nodes->count());
         $this->assertEquals('Two', $nodes->eq(0)->text());
         $this->assertEquals('Three', $nodes->eq(1)->text());
 
         try {
-            $this->createTestCrawler()->filter('ol')->siblings();
+            $this->createTestCrawler()->filterXPath('//ol')->siblings();
             $this->fail('->siblings() throws an \InvalidArgumentException if the node list is empty');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->siblings() throws an \InvalidArgumentException if the node list is empty');
@@ -529,11 +461,7 @@ EOF
 
     public function testNextAll()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
-        $crawler = $this->createTestCrawler()->filter('li')->eq(1);
+        $crawler = $this->createTestCrawler()->filterXPath('//li')->eq(1);
         $this->assertNotSame($crawler, $crawler->nextAll(), '->nextAll() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->nextAll() returns a new instance of a crawler');
 
@@ -542,7 +470,7 @@ EOF
         $this->assertEquals('Three', $nodes->eq(0)->text());
 
         try {
-            $this->createTestCrawler()->filter('ol')->nextAll();
+            $this->createTestCrawler()->filterXPath('//ol')->nextAll();
             $this->fail('->nextAll() throws an \InvalidArgumentException if the node list is empty');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->nextAll() throws an \InvalidArgumentException if the node list is empty');
@@ -551,11 +479,7 @@ EOF
 
     public function testPreviousAll()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
-        $crawler = $this->createTestCrawler()->filter('li')->eq(2);
+        $crawler = $this->createTestCrawler()->filterXPath('//li')->eq(2);
         $this->assertNotSame($crawler, $crawler->previousAll(), '->previousAll() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->previousAll() returns a new instance of a crawler');
 
@@ -564,7 +488,7 @@ EOF
         $this->assertEquals('Two', $nodes->eq(0)->text());
 
         try {
-            $this->createTestCrawler()->filter('ol')->previousAll();
+            $this->createTestCrawler()->filterXPath('//ol')->previousAll();
             $this->fail('->previousAll() throws an \InvalidArgumentException if the node list is empty');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->previousAll() throws an \InvalidArgumentException if the node list is empty');
@@ -573,11 +497,7 @@ EOF
 
     public function testChildren()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
-        $crawler = $this->createTestCrawler()->filter('ul');
+        $crawler = $this->createTestCrawler()->filterXPath('//ul');
         $this->assertNotSame($crawler, $crawler->children(), '->children() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->children() returns a new instance of a crawler');
 
@@ -588,7 +508,7 @@ EOF
         $this->assertEquals('Three', $nodes->eq(2)->text());
 
         try {
-            $this->createTestCrawler()->filter('ol')->children();
+            $this->createTestCrawler()->filterXPath('//ol')->children();
             $this->fail('->children() throws an \InvalidArgumentException if the node list is empty');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->children() throws an \InvalidArgumentException if the node list is empty');
@@ -597,22 +517,18 @@ EOF
 
     public function testParents()
     {
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
-        $crawler = $this->createTestCrawler()->filter('li:first-child');
+        $crawler = $this->createTestCrawler()->filterXPath('//li[1]');
         $this->assertNotSame($crawler, $crawler->parents(), '->parents() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->parents() returns a new instance of a crawler');
 
         $nodes = $crawler->parents();
         $this->assertEquals(3, $nodes->count());
 
-        $nodes = $this->createTestCrawler()->filter('html')->parents();
+        $nodes = $this->createTestCrawler()->filterXPath('//html')->parents();
         $this->assertEquals(0, $nodes->count());
 
         try {
-            $this->createTestCrawler()->filter('ol')->parents();
+            $this->createTestCrawler()->filterXPath('//ol')->parents();
             $this->fail('->parents() throws an \InvalidArgumentException if the node list is empty');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->parents() throws an \InvalidArgumentException if the node list is empty');

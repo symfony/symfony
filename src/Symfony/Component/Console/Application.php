@@ -60,8 +60,8 @@ class Application
     /**
      * Constructor.
      *
-     * @param string  $name    The name of the application
-     * @param string  $version The version of the application
+     * @param string $name    The name of the application
+     * @param string $version The version of the application
      *
      * @api
      */
@@ -519,7 +519,7 @@ class Application
      * Contrary to get, this command tries to find the best
      * match if you give it an abbreviation of a name or alias.
      *
-     * @param  string $name A command name or a command alias
+     * @param string $name A command name or a command alias
      *
      * @return Command A Command instance
      *
@@ -590,7 +590,7 @@ class Application
      *
      * The array keys are the full names and the values the command instances.
      *
-     * @param  string  $namespace A namespace name
+     * @param string $namespace A namespace name
      *
      * @return array An array of Command instances
      *
@@ -619,7 +619,7 @@ class Application
      *
      * @return array An array of abbreviations
      */
-    static public function getAbbreviations($names)
+    public static function getAbbreviations($names)
     {
         $abbrevs = array();
         foreach ($names as $name) {
@@ -746,7 +746,7 @@ class Application
     }
 
     /**
-     * Renders a catched exception.
+     * Renders a caught exception.
      *
      * @param Exception       $e      An exception instance
      * @param OutputInterface $output An OutputInterface instance
@@ -834,12 +834,19 @@ class Application
      */
     protected function getTerminalWidth()
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD') && $ansicon = getenv('ANSICON')) {
-            return preg_replace('{^(\d+)x.*$}', '$1', $ansicon);
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            if ($ansicon = getenv('ANSICON')) {
+                return preg_replace('{^(\d+)x.*$}', '$1', $ansicon);
+            }
+
+            exec('mode CON', $execData);
+            if (preg_match('{columns:\s*(\d+)}i', $execData[4], $matches)) {
+                return $matches[1];
+            }
         }
 
         if (preg_match("{rows.(\d+);.columns.(\d+);}i", $this->getSttyColumns(), $match)) {
-            return $match[1];
+            return $match[2];
         }
     }
 
@@ -850,12 +857,19 @@ class Application
      */
     protected function getTerminalHeight()
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD') && $ansicon = getenv('ANSICON')) {
-            return preg_replace('{^\d+x\d+ \(\d+x(\d+)\)$}', '$1', trim($ansicon));
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            if ($ansicon = getenv('ANSICON')) {
+                return preg_replace('{^\d+x\d+ \(\d+x(\d+)\)$}', '$1', trim($ansicon));
+            }
+
+            exec('mode CON', $execData);
+            if (preg_match('{lines:\s*(\d+)}i', $execData[3], $matches)) {
+                return $matches[1];
+            }
         }
 
         if (preg_match("{rows.(\d+);.columns.(\d+);}i", $this->getSttyColumns(), $match)) {
-            return $match[2];
+            return $match[1];
         }
     }
 
@@ -868,7 +882,7 @@ class Application
      */
     protected function getCommandName(InputInterface $input)
     {
-        return $input->getFirstArgument('command');
+        return $input->getFirstArgument();
     }
 
     /**
@@ -921,6 +935,10 @@ class Application
      */
     private function getSttyColumns()
     {
+        if (!function_exists('proc_open')) {
+            return;
+        }
+
         $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
         $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
         if (is_resource($process)) {
@@ -991,8 +1009,8 @@ class Application
     /**
      * Finds alternative commands of $name
      *
-     * @param string $name      The full name of the command
-     * @param array  $abbrevs   The abbreviations
+     * @param string $name    The full name of the command
+     * @param array  $abbrevs The abbreviations
      *
      * @return array A sorted array of similar commands
      */
@@ -1008,8 +1026,8 @@ class Application
     /**
      * Finds alternative namespace of $name
      *
-     * @param string $name      The full name of the namespace
-     * @param array  $abbrevs   The abbreviations
+     * @param string $name    The full name of the namespace
+     * @param array  $abbrevs The abbreviations
      *
      * @return array A sorted array of similar namespace
      */
@@ -1022,14 +1040,15 @@ class Application
      * Finds alternative of $name among $collection,
      * if nothing is found in $collection, try in $abbrevs
      *
-     * @param string                $name       The string
-     * @param array|Traversable     $collection The collecion
-     * @param array                 $abbrevs    The abbreviations
-     * @param Closure|string|array  $callback   The callable to transform collection item before comparison
+     * @param string               $name       The string
+     * @param array|Traversable    $collection The collecion
+     * @param array                $abbrevs    The abbreviations
+     * @param Closure|string|array $callback   The callable to transform collection item before comparison
      *
      * @return array A sorted array of similar string
      */
-    private function findAlternatives($name, $collection, $abbrevs, $callback = null) {
+    private function findAlternatives($name, $collection, $abbrevs, $callback = null)
+    {
         $alternatives = array();
 
         foreach ($collection as $item) {

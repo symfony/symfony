@@ -106,4 +106,3 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate(array(), $constraint);
     }
 }
-

@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 /**
  * Implementation of ClassMetadataFactoryInterface
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ClassMetadataFactory implements ClassMetadataFactoryInterface
 {
@@ -45,6 +45,10 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
     {
         $class = ltrim($class, '\\');
 
+        if (isset($this->loadedClasses[$class])) {
+            return $this->loadedClasses[$class];
+        }
+
         if (null !== $this->cache && false !== ($this->loadedClasses[$class] = $this->cache->read($class))) {
             return $this->loadedClasses[$class];
         }
@@ -53,15 +57,15 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
 
         // Include constraints from the parent class
         if ($parent = $metadata->getReflectionClass()->getParentClass()) {
-            $metadata->mergeConstraints($this->getClassMetadata($parent->getName()));
+            $metadata->mergeConstraints($this->getClassMetadata($parent->name));
         }
 
         // Include constraints from all implemented interfaces
         foreach ($metadata->getReflectionClass()->getInterfaces() as $interface) {
-            if ('Symfony\Component\Validator\GroupSequenceProviderInterface' === $interface->getName()) {
+            if ('Symfony\Component\Validator\GroupSequenceProviderInterface' === $interface->name) {
                 continue;
             }
-            $metadata->mergeConstraints($this->getClassMetadata($interface->getName()));
+            $metadata->mergeConstraints($this->getClassMetadata($interface->name));
         }
 
         $this->loader->loadClassMetadata($metadata);

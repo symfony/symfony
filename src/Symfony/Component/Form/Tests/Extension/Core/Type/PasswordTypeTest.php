@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-
 class PasswordTypeTest extends TypeTestCase
 {
     public function testEmptyIfNotBound()
@@ -20,7 +19,7 @@ class PasswordTypeTest extends TypeTestCase
         $form->setData('pAs5w0rd');
         $view = $form->createView();
 
-        $this->assertSame('', $view->get('value'));
+        $this->assertSame('', $view->getVar('value'));
     }
 
     public function testEmptyIfBound()
@@ -29,7 +28,7 @@ class PasswordTypeTest extends TypeTestCase
         $form->bind('pAs5w0rd');
         $view = $form->createView();
 
-        $this->assertSame('', $view->get('value'));
+        $this->assertSame('', $view->getVar('value'));
     }
 
     public function testNotEmptyIfBoundAndNotAlwaysEmpty()
@@ -38,6 +37,6 @@ class PasswordTypeTest extends TypeTestCase
         $form->bind('pAs5w0rd');
         $view = $form->createView();
 
-        $this->assertSame('pAs5w0rd', $view->get('value'));
+        $this->assertSame('pAs5w0rd', $view->getVar('value'));
     }
 }

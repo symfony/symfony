@@ -51,6 +51,9 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $handler->handle(1, 'foo', 'foo.php', 12, 'foo');
         } catch (\ErrorException $e) {
             $this->assertSame('1: foo in foo.php line 12', $e->getMessage());
+            $this->assertSame(1, $e->getSeverity());
+            $this->assertSame('foo.php', $e->getFile());
+            $this->assertSame(12, $e->getLine());
         }
 
         restore_error_handler();

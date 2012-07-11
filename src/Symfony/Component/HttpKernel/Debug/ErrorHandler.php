@@ -39,7 +39,7 @@ class ErrorHandler
      *
      * @return The registered error handler
      */
-    static public function register($level = null)
+    public static function register($level = null)
     {
         $handler = new static();
         $handler->setLevel($level);
@@ -64,7 +64,7 @@ class ErrorHandler
         }
 
         if (error_reporting() & $level && $this->level & $level) {
-            throw new \ErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line));
+            throw new \ErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line);
         }
 
         return false;

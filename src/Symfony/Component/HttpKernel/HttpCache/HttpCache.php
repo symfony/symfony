@@ -581,7 +581,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private function restoreResponseBody(Request $request, Response $response)
     {
         if ('HEAD' === $request->getMethod() || 304 === $response->getStatusCode()) {
-            $response->setContent('');
+            $response->setContent(null);
             $response->headers->remove('X-Body-Eval');
             $response->headers->remove('X-Body-File');
 
@@ -647,7 +647,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Records that an event took place.
      *
      * @param Request $request A Request instance
-     * @param string  $event The event name
+     * @param string  $event   The event name
      */
     private function record(Request $request, $event)
     {

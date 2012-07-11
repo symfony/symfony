@@ -461,6 +461,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $this->skipIfICUVersionIsTooOld();
+
         $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
@@ -468,6 +469,54 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             $this->createDateTime(0)->format('Y-m-d H:i:s'),
             $formatter->format(0)
         );
+    }
+
+    public function testFormatWithDefaultTimezoneStubShouldUseTheTzEnvironmentVariableWhenAvailable()
+    {
+        $tz = getenv('TZ');
+        putenv('TZ=Europe/London');
+
+        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
+
+        $this->assertEquals(
+            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $formatter->format(0)
+        );
+
+        $this->assertEquals('Europe/London', getenv('TZ'));
+
+        // Restores TZ.
+        putenv('TZ='.$tz);
+    }
+
+    /**
+     * It seems IntlDateFormatter caches the timezone id when not explicitely set via constructor or by the
+     * setTimeZoneId() method. Since testFormatWithDefaultTimezoneIntl() runs using the default environment
+     * time zone, this test would use it too if not running in a separated process.
+     *
+     * @runInSeparateProcess
+     */
+    public function testFormatWithDefaultTimezoneIntlShouldUseTheTzEnvironmentVariableWhenAvailable()
+    {
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfICUVersionIsTooOld();
+
+        $tz = getenv('TZ');
+        putenv('TZ=Europe/Paris');
+
+        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
+
+        $this->assertEquals('Europe/Paris', getenv('TZ'));
+
+        $this->assertEquals(
+            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $formatter->format(0)
+        );
+
+        // Restores TZ.
+        putenv('TZ='.$tz);
     }
 
     /**
@@ -810,6 +859,24 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         );
     }
 
+    /*
+     * https://github.com/symfony/symfony/issues/4242
+     */
+    public function testParseAfterErrorIntl()
+    {
+        $this->testParseErrorIntl('y-MMMMM-d', '1970-J-1');
+        $this->testParseIntl('y-M-d', '1970-1-1', 0);
+    }
+
+    /*
+     * https://github.com/symfony/symfony/issues/4242
+     */
+    public function testParseAfterErrorStub()
+    {
+        $this->testParseErrorStub('y-MMMMM-d', '1970-J-1');
+        $this->testParseStub('y-M-d', '1970-1-1', 0);
+    }
+
     /**
      * Just to document the differences between the stub and the intl implementations. The intl can parse
      * any of the tested formats alone. The stub does not implement them as it would be needed to add more
@@ -906,7 +973,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     * @expectedException Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException
      */
     public function testSetLenient()
     {
@@ -992,11 +1059,13 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         return new \IntlDateFormatter('en', \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC', \IntlDateFormatter::GREGORIAN, $pattern);
     }
 
-    protected function createDateTime($timestamp = null, $timeZone = null)
+    protected function createDateTime($timestamp = null)
     {
+        $timeZone = getenv('TZ') ?: 'UTC';
+
         $dateTime = new \DateTime();
         $dateTime->setTimestamp(null === $timestamp ? time() : $timestamp);
-        $dateTime->setTimeZone(new \DateTimeZone(null === $timeZone ? date_default_timezone_get() : $timeZone));
+        $dateTime->setTimeZone(new \DateTimeZone($timeZone));
 
         return $dateTime;
     }

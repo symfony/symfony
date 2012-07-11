@@ -25,5 +25,5 @@ interface ListenerInterface
      *
      * @param GetResponseEvent $event
      */
-    function handle(GetResponseEvent $event);
+    public function handle(GetResponseEvent $event);
 }

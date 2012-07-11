@@ -7,30 +7,12 @@
             {{ form_label(form, label|default(null)) }}
         </td>
         <td>
-            {% if form.children|length == 0 %}
-                {{ form_errors(form) }}
-            {% endif %}
+            {{ form_errors(form) }}
             {{ form_widget(form) }}
         </td>
     </tr>
 {% endspaceless %}
 {% endblock form_row %}
-
-{% block form_errors %}
-{% spaceless %}
-    {% if form.children|length > 0 %}
-        {% if errors|length > 0 %}
-        <tr>
-            <td colspan="2">
-                {{ parent() }}
-            </td>
-        </tr>
-        {% endif %}
-    {% else %}
-        {{ parent() }}
-    {% endif %}
-{% endspaceless %}
-{% endblock form_errors %}
 
 {% block hidden_row %}
 {% spaceless %}
@@ -42,15 +24,18 @@
 {% endspaceless %}
 {% endblock hidden_row %}
 
-{% block form_widget %}
+{% block form_widget_compound %}
 {% spaceless %}
-    {% if form.children|length > 0 %}
-        <table {{ block('widget_container_attributes') }}>
-            {{ block('form_rows') }}
-            {{ form_rest(form) }}
-        </table>
-    {% else %}
-        {{ parent() }}
-    {% endif %}
+    <table {{ block('widget_container_attributes') }}>
+        {% if form.parent is empty and errors|length > 0 %}
+        <tr>
+            <td colspan="2">
+                {{ form_errors(form) }}
+            </td>
+        </tr>
+        {% endif %}
+        {{ block('form_rows') }}
+        {{ form_rest(form) }}
+    </table>
 {% endspaceless %}
-{% endblock form_widget %}
+{% endblock form_widget_compound %}

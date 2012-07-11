@@ -964,13 +964,15 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
         $form = $this->factory->createNamed('name', 'datetime', '2011-02-03 04:05:06', array(
             'input' => 'string',
             'widget' => 'single_text',
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="datetime"]
     [@name="name"]
-    [@value="2011-02-03T04:05:06+01:00"]
+    [@value="2011-02-03T04:05:06Z"]
 '
         );
     }
@@ -982,13 +984,15 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
             'date_widget' => 'choice',
             'time_widget' => 'choice',
             'widget' => 'single_text',
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
     [@type="datetime"]
     [@name="name"]
-    [@value="2011-02-03T04:05:06+01:00"]
+    [@value="2011-02-03T04:05:06Z"]
 '
         );
     }

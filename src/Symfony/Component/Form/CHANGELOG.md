@@ -156,3 +156,4 @@ CHANGELOG
    consumed by HTML5 browsers, if the widget is "single_text"
  * deprecated the options "data_timezone" and "user_timezone" in DateType, DateTimeType and TimeType
    and renamed them to "model_timezone" and "view_timezone"
+ * fixed: TransformationFailedExceptions thrown in the model transformer are now caught by the form

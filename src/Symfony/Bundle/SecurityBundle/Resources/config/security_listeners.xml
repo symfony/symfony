@@ -110,7 +110,6 @@
 
         <service id="security.authentication.success_handler" class="%security.authentication.success_handler.class%" abstract="true" public="false">
             <argument type="service" id="security.http_utils" />
-            <argument />
             <argument type="collection" /> <!-- Options -->
         </service>
 

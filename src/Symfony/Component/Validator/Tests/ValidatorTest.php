@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class ValidatorTest extends \PHPUnit_Framework_TestCase
@@ -198,6 +199,18 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals($violations, $this->validator->validateValue('Bernhard', new FailingConstraint()));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Validator\Exception\ValidatorException
+     */
+    public function testValidateValueRejectsValid()
+    {
+        $entity = new Entity();
+        $metadata = new ClassMetadata(get_class($entity));
+        $this->factory->addClassMetadata($metadata);
+
+        $this->validator->validateValue($entity, new Valid());
     }
 
     public function testGetMetadataFactory()

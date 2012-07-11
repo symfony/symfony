@@ -39,7 +39,9 @@ class TimeType extends AbstractType
         if ('single_text' === $options['widget']) {
             $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
         } else {
-            $hourOptions = $minuteOptions = $secondOptions = array();
+            $hourOptions = $minuteOptions = $secondOptions = array(
+                'error_bubbling' => true,
+            );
 
             if ('choice' === $options['widget']) {
                 $hours = $minutes = array();
@@ -52,14 +54,10 @@ class TimeType extends AbstractType
                 }
 
                 // Only pass a subset of the options to children
-                $hourOptions = array(
-                    'choices' => $hours,
-                    'empty_value' => $options['empty_value']['hour'],
-                );
-                $minuteOptions = array(
-                    'choices' => $minutes,
-                    'empty_value' => $options['empty_value']['minute'],
-                );
+                $hourOptions['choices'] = $hours;
+                $hourOptions['empty_value'] = $options['empty_value']['hour'];
+                $minuteOptions['choices'] = $minutes;
+                $minuteOptions['empty_value'] = $options['empty_value']['minute'];
 
                 if ($options['with_seconds']) {
                     $seconds = array();
@@ -68,10 +66,8 @@ class TimeType extends AbstractType
                         $seconds[$second] = str_pad($second, 2, '0', STR_PAD_LEFT);
                     }
 
-                    $secondOptions = array(
-                        'choices' => $seconds,
-                        'empty_value' => $options['empty_value']['second'],
-                    );
+                    $secondOptions['choices'] = $seconds;
+                    $secondOptions['empty_value'] = $options['empty_value']['second'];
                 }
 
                 // Append generic carry-along options

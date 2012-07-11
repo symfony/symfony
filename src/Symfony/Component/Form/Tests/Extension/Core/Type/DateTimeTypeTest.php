@@ -165,12 +165,12 @@ class DateTimeTypeTest extends LocalizedTestCase
 
         $outputTime = new \DateTime('2010-06-02 03:04:00 Pacific/Tahiti');
 
-        $form->bind('2010-06-02T03:04:00');
+        $form->bind('2010-06-02T03:04:00-10:00');
 
         $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
 
         $this->assertDateTimeEquals($outputTime, $form->getData());
-        $this->assertEquals('2010-06-02T03:04:00', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04:00-10:00', $form->getViewData());
     }
 
     public function testSubmit_stringSingleText()
@@ -182,10 +182,10 @@ class DateTimeTypeTest extends LocalizedTestCase
             'widget' => 'single_text',
         ));
 
-        $form->bind('2010-06-02T03:04:00');
+        $form->bind('2010-06-02T03:04:00Z');
 
         $this->assertEquals('2010-06-02 03:04:00', $form->getData());
-        $this->assertEquals('2010-06-02T03:04:00', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04:00Z', $form->getViewData());
     }
 
     public function testSubmit_stringSingleText_withSeconds()
@@ -198,10 +198,10 @@ class DateTimeTypeTest extends LocalizedTestCase
             'with_seconds' => true,
         ));
 
-        $form->bind('2010-06-02T03:04:05');
+        $form->bind('2010-06-02T03:04:05Z');
 
         $this->assertEquals('2010-06-02 03:04:05', $form->getData());
-        $this->assertEquals('2010-06-02T03:04:05', $form->getViewData());
+        $this->assertEquals('2010-06-02T03:04:05Z', $form->getViewData());
     }
 
     public function testSubmit_differentPattern()
@@ -354,5 +354,36 @@ class DateTimeTypeTest extends LocalizedTestCase
         $this->assertSame('Empty hour', $view->get('time')->get('hour')->getVar('empty_value'));
         $this->assertNull($view->get('time')->get('minute')->getVar('empty_value'));
         $this->assertSame('Empty second', $view->get('time')->get('second')->getVar('empty_value'));
+    }
+
+    public function testPassHtml5TypeIfSingleTextAndHtml5Format()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'widget' => 'single_text',
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('datetime', $view->getVar('type'));
+    }
+
+    public function testDontPassHtml5TypeIfNotHtml5Format()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'widget' => 'single_text',
+            'format' => 'yyyy-MM-dd HH:mm',
+        ));
+
+        $view = $form->createView();
+        $this->assertNull($view->getVar('datetime'));
+    }
+
+    public function testDontPassHtml5TypeIfNotSingleText()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'widget' => 'text',
+        ));
+
+        $view = $form->createView();
+        $this->assertNull($view->getVar('type'));
     }
 }

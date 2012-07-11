@@ -22,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransfo
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -44,8 +45,17 @@ class DateTimeType extends AbstractType
      * http://userguide.icu-project.org/formatparse/datetime#TOC-Date-Time-Format-Syntax
      * http://www.w3.org/TR/html-markup/input.datetime.html
      * http://tools.ietf.org/html/rfc3339
+     *
+     * An ICU ticket was created:
+     * http://icu-project.org/trac/ticket/9421
+     *
+     * To temporarily circumvent this issue, DateTimeToRfc3339Transformer is used
+     * when the format matches this constant.
+     *
+     * ("ZZZZZZ" is not recognized by ICU and used here to differentiate this
+     * pattern from custom patterns).
      */
-    const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZZZZZ";
 
     private static $acceptedFormats = array(
         \IntlDateFormatter::FULL,
@@ -78,18 +88,25 @@ class DateTimeType extends AbstractType
         }
 
         if (null !== $pattern && (false === strpos($pattern, 'y') || false === strpos($pattern, 'M') || false === strpos($pattern, 'd') || false === strpos($pattern, 'H') || false === strpos($pattern, 'm'))) {
-            throw new InvalidOptionsException(sprintf('The "format" option should contain the patterns "y", "M", "d", "H" and "m". Its current value is "%s".', $pattern));
+            throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M", "d", "H" and "m". Its current value is "%s".', $pattern));
         }
 
         if ('single_text' === $options['widget']) {
-            $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
-                $options['data_timezone'],
-                $options['user_timezone'],
-                $dateFormat,
-                $timeFormat,
-                $calendar,
-                $pattern
-            ));
+            if (self::HTML5_FORMAT === $pattern) {
+                $builder->addViewTransformer(new DateTimeToRfc3339Transformer(
+                    $options['data_timezone'],
+                    $options['user_timezone']
+                ));
+            } else {
+                $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
+                    $options['data_timezone'],
+                    $options['user_timezone'],
+                    $dateFormat,
+                    $timeFormat,
+                    $calendar,
+                    $pattern
+                ));
+            }
         } else {
             // Only pass a subset of the options to children
             $dateOptions = array_intersect_key($options, array_flip(array(

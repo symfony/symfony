@@ -37,7 +37,7 @@ class TimeType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            $builder->addViewTransformer(new DateTimeToStringTransformer($options['data_timezone'], $options['user_timezone'], $format));
+            $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
         } else {
             $hourOptions = $minuteOptions = $secondOptions = array();
 
@@ -92,20 +92,20 @@ class TimeType extends AbstractType
                 $builder->add('second', $options['widget'], $secondOptions);
             }
 
-            $builder->addViewTransformer(new DateTimeToArrayTransformer($options['data_timezone'], $options['user_timezone'], $parts, 'text' === $options['widget']));
+            $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget']));
         }
 
         if ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'H:i:s')
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], 'H:i:s')
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
+                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], $parts)
+                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], $parts)
             ));
         }
     }
@@ -155,6 +155,16 @@ class TimeType extends AbstractType
             );
         };
 
+        // BC until Symfony 2.3
+        $modelTimezone = function (Options $options) {
+            return $options['data_timezone'];
+        };
+
+        // BC until Symfony 2.3
+        $viewTimezone = function (Options $options) {
+            return $options['user_timezone'];
+        };
+
         $resolver->setDefaults(array(
             'hours'          => range(0, 23),
             'minutes'        => range(0, 59),
@@ -162,6 +172,9 @@ class TimeType extends AbstractType
             'widget'         => 'choice',
             'input'          => 'datetime',
             'with_seconds'   => false,
+            'model_timezone' => $modelTimezone,
+            'view_timezone'  => $viewTimezone,
+            // Deprecated timezone options
             'data_timezone'  => null,
             'user_timezone'  => null,
             'empty_value'    => $emptyValue,

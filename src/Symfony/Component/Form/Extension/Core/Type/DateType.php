@@ -58,8 +58,8 @@ class DateType extends AbstractType
 
         if ('single_text' === $options['widget']) {
             $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
-                $options['data_timezone'],
-                $options['user_timezone'],
+                $options['model_timezone'],
+                $options['view_timezone'],
                 $dateFormat,
                 $timeFormat,
                 $calendar,
@@ -104,7 +104,7 @@ class DateType extends AbstractType
                 ->add('month', $options['widget'], $monthOptions)
                 ->add('day', $options['widget'], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
-                    $options['data_timezone'], $options['user_timezone'], array('year', 'month', 'day')
+                    $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day')
                 ))
                 ->setAttribute('formatter', $formatter)
             ;
@@ -112,15 +112,15 @@ class DateType extends AbstractType
 
         if ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['data_timezone'], $options['data_timezone'], 'Y-m-d')
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], 'Y-m-d')
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['data_timezone'], $options['data_timezone'])
+                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['data_timezone'], $options['data_timezone'], array('year', 'month', 'day'))
+                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], array('year', 'month', 'day'))
             ));
         }
     }
@@ -185,6 +185,16 @@ class DateType extends AbstractType
             );
         };
 
+        // BC until Symfony 2.3
+        $modelTimezone = function (Options $options) {
+            return $options['data_timezone'];
+        };
+
+        // BC until Symfony 2.3
+        $viewTimezone = function (Options $options) {
+            return $options['user_timezone'];
+        };
+
         $resolver->setDefaults(array(
             'years'          => range(date('Y') - 5, date('Y') + 5),
             'months'         => range(1, 12),
@@ -192,6 +202,9 @@ class DateType extends AbstractType
             'widget'         => 'choice',
             'input'          => 'datetime',
             'format'         => self::HTML5_FORMAT,
+            'model_timezone' => $modelTimezone,
+            'view_timezone'  => $viewTimezone,
+            // Deprecated timezone options
             'data_timezone'  => null,
             'user_timezone'  => null,
             'empty_value'    => $emptyValue,

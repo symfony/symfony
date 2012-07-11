@@ -69,7 +69,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         return $validatorFactory;
     }
 
-    public function createValidator($entityManagerName, $em, $validateClass = null, $uniqueFields = null)
+    public function createValidator($entityManagerName, $em, $validateClass = null, $uniqueFields = null, $errorPath = null)
     {
         if (!$validateClass) {
             $validateClass = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity';
@@ -83,7 +83,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $uniqueValidator = new UniqueEntityValidator($registry);
 
         $metadata = new ClassMetadata($validateClass);
-        $metadata->addConstraint(new UniqueEntity(array('fields' => $uniqueFields, 'em' => $entityManagerName)));
+        $metadata->addConstraint(new UniqueEntity(array('fields' => $uniqueFields, 'em' => $entityManagerName, 'errorPath' => $errorPath)));
 
         $metadataFactory = $this->createMetadataFactoryMock($metadata);
         $validatorFactory = $this->createValidatorFactory($uniqueValidator);
@@ -129,6 +129,29 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $violation = $violationsList[0];
         $this->assertEquals('This value is already used.', $violation->getMessage());
         $this->assertEquals('name', $violation->getPropertyPath());
+        $this->assertEquals('Foo', $violation->getInvalidValue());
+    }
+
+    public function testValidateCustomErrorPath()
+    {
+        $entityManagerName = "foo";
+        $em = $this->createTestEntityManager();
+        $this->createSchema($em);
+        $validator = $this->createValidator($entityManagerName, $em, null, null, 'bar');
+
+        $entity1 = new SingleIdentEntity(1, 'Foo');
+
+        $em->persist($entity1);
+        $em->flush();
+
+        $entity2 = new SingleIdentEntity(2, 'Foo');
+
+        $violationsList = $validator->validate($entity2);
+        $this->assertEquals(1, $violationsList->count(), "No violations found on entity after it was saved to the database.");
+
+        $violation = $violationsList[0];
+        $this->assertEquals('This value is already used.', $violation->getMessage());
+        $this->assertEquals('bar', $violation->getPropertyPath());
         $this->assertEquals('Foo', $violation->getInvalidValue());
     }
 

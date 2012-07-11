@@ -13,13 +13,12 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
-class RangeValidator extends ConstraintValidator
+class MinCountValidator extends ConstraintValidator
 {
     /**
      * Checks if the passed value is valid.
@@ -27,9 +26,7 @@ class RangeValidator extends ConstraintValidator
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
      *
-     * @return Boolean Whether or not the value is valid
-     *
-     * @api
+     * @throws UnexpectedTypeException If the given value is no array or \Countable.
      */
     public function validate($value, Constraint $constraint)
     {
@@ -37,28 +34,17 @@ class RangeValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_numeric($value)) {
-            $this->context->addViolation($constraint->invalidMessage, array(
-                '{{ value }}' => $value,
-            ));
-
-            return;
+        if (!is_array($value) && !$value instanceof \Countable) {
+            throw new UnexpectedTypeException($value, 'array or \Countable');
         }
 
-        if ($value > $constraint->max) {
-            $this->context->addViolation($constraint->maxMessage, array(
-                '{{ value }}' => $value,
-                '{{ limit }}' => $constraint->max,
-            ));
+        $count = count($value);
 
-            return;
-        }
-
-        if ($value < $constraint->min) {
-            $this->context->addViolation($constraint->minMessage, array(
-                '{{ value }}' => $value,
-                '{{ limit }}' => $constraint->min,
-            ));
+        if ($count < $constraint->limit) {
+            $this->context->addViolation($constraint->message, array(
+                '{{ count }}' => $count,
+                '{{ limit }}' => $constraint->limit,
+            ), $value, (int) $constraint->limit);
         }
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -44,7 +45,7 @@ use Symfony\Component\ClassLoader\DebugClassLoader;
  *
  * @api
  */
-abstract class Kernel implements KernelInterface, TerminableInterface
+abstract class Kernel extends ContainerAware implements KernelInterface, TerminableInterface
 {
     protected $bundles;
     protected $bundleMap;
@@ -112,7 +113,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         }
 
         $this->booted = false;
-        $this->container = null;
+        $this->setContainer(null);
     }
 
     /**
@@ -130,10 +131,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $this->initializeBundles();
 
         // init container
-        $this->initializeContainer();
+        $container = $this->initializeContainer();
 
         foreach ($this->getBundles() as $bundle) {
-            $bundle->setContainer($this->container);
+            $bundle->setContainer($container);
             $bundle->boot();
         }
 
@@ -176,7 +177,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $bundle->setContainer(null);
         }
 
-        $this->container = null;
+        $this->setContainer(null);
     }
 
     /**
@@ -573,6 +574,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * The cached version of the service container is used when fresh, otherwise the
      * container is built.
+     *
+     * @return ContainerInterface A ContainerInterface instance
      */
     protected function initializeContainer()
     {
@@ -594,6 +597,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         if (!$fresh && $this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
+
+        return $this->container;
     }
 
     /**

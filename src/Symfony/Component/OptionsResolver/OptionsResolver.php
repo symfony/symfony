@@ -68,6 +68,14 @@ class OptionsResolver implements OptionsResolverInterface
     }
 
     /**
+     * Clones the resolver.
+     */
+    public function __clone()
+    {
+        $this->defaultOptions = clone $this->defaultOptions;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function setDefaults(array $defaultValues)
@@ -210,7 +218,7 @@ class OptionsResolver implements OptionsResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(array $options)
+    public function resolve(array $options = array())
     {
         $this->validateOptionsExistence($options);
         $this->validateOptionsCompleteness($options);

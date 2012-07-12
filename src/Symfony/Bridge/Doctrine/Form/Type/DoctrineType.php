@@ -29,6 +29,11 @@ abstract class DoctrineType extends AbstractType
      */
     protected $registry;
 
+    /**
+     * @var array
+     */
+    private $choiceListCache = array();
+
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
@@ -46,6 +51,7 @@ abstract class DoctrineType extends AbstractType
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $choiceListCache =& $this->choiceListCache;
         $registry = $this->registry;
         $type = $this;
 
@@ -59,17 +65,34 @@ abstract class DoctrineType extends AbstractType
             return null;
         };
 
-        $choiceList = function (Options $options) use ($registry) {
+        $choiceList = function (Options $options) use ($registry, &$choiceListCache, &$time) {
             $manager = $registry->getManager($options['em']);
 
-            return new EntityChoiceList(
-                $manager,
+            $choiceHashes = is_array($options['choices'])
+                ? array_map('spl_object_hash', $options['choices'])
+                : $options['choices'];
+
+            $hash = md5(json_encode(array(
+                spl_object_hash($manager),
                 $options['class'],
                 $options['property'],
                 $options['loader'],
-                $options['choices'],
+                $choiceHashes,
                 $options['group_by']
-            );
+            )));
+
+            if (!isset($choiceListCache[$hash])) {
+                $choiceListCache[$hash] = new EntityChoiceList(
+                    $manager,
+                    $options['class'],
+                    $options['property'],
+                    $options['loader'],
+                    $options['choices'],
+                    $options['group_by']
+                );
+            }
+
+            return $choiceListCache[$hash];
         };
 
         $resolver->setDefaults(array(

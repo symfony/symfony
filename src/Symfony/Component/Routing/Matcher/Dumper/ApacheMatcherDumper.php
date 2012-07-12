@@ -65,7 +65,7 @@ class ApacheMatcherDumper extends MatcherDumper
                 $variables[] = 'E=_ROUTING_'.$variable.':%'.($i + 1);
             }
             foreach ($route->getDefaults() as $key => $value) {
-                $variables[] = 'E=_ROUTING_'.$key.':'.strtr($value, array(
+                $variables[] = 'E=_ROUTING_DEFAULTS_'.$key.':'.strtr($value, array(
                     ':'  => '\\:',
                     '='  => '\\=',
                     '\\' => '\\\\',

@@ -213,11 +213,11 @@ interface FormConfigEditorInterface extends FormConfigInterface
     /**
      * Set the types.
      *
-     * @param array $types An array FormTypeInterface
+     * @param ResolvedFormTypeInterface $type The type of the form.
      *
      * @return self The configuration object.
      */
-    public function setTypes(array $types);
+    public function setType(ResolvedFormTypeInterface $type);
 
     /**
      * Sets the initial data of the form.

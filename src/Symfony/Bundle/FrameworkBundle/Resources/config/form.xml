@@ -6,13 +6,14 @@
 
     <parameters>
         <parameter key="form.extension.class">Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
+        <parameter key="form.registry.class">Symfony\Component\Form\FormRegistry</parameter>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
         <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
     </parameters>
 
     <services>
-        <!-- FormFactory -->
-        <service id="form.factory" class="%form.factory.class%">
+        <!-- FormRegistry -->
+        <service id="form.registry" class="%form.registry.class%">
             <argument type="collection">
                 <!--
                 We don't need to be able to add more extensions.
@@ -21,6 +22,11 @@
                 -->
                 <argument type="service" id="form.extension" />
             </argument>
+        </service>
+
+        <!-- FormFactory -->
+        <service id="form.factory" class="%form.factory.class%">
+            <argument type="service" id="form.registry" />
         </service>
 
         <!-- DependencyInjectionExtension -->

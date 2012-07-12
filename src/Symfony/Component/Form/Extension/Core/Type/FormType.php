@@ -20,7 +20,6 @@ use Symfony\Component\Form\FormViewInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\BindRequestListener;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -93,8 +92,8 @@ class FormType extends AbstractType
         }
 
         $types = array();
-        foreach ($form->getConfig()->getTypes() as $type) {
-            $types[] = $type->getName();
+        for ($type = $form->getConfig()->getType(); null !== $type; $type = $type->getParent()) {
+            array_unshift($types, $type->getName());
         }
 
         if (!$translationDomain) {
@@ -209,14 +208,6 @@ class FormType extends AbstractType
             'attr'       => 'array',
             'label_attr' => 'array',
         ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createBuilder($name, FormFactoryInterface $factory, array $options)
-    {
-        return new FormBuilder($name, $options['data_class'], new EventDispatcher(), $factory, $options);
     }
 
     /**

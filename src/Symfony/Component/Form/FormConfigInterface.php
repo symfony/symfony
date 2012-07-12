@@ -79,9 +79,9 @@ interface FormConfigInterface
     /**
      * Returns the form types used to construct the form.
      *
-     * @return array An array of {@link FormTypeInterface} instances.
+     * @return ResolvedFormTypeInterface The form's type.
      */
-    public function getTypes();
+    public function getType();
 
     /**
      * Returns the view transformers of the form.

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @Annotation
@@ -20,28 +21,6 @@ use Symfony\Component\Validator\Constraint;
  *
  * @author Oleg Stepura <github@oleg.stepura.com>
  */
-class AnyOf extends Constraint
+class AnyOf extends All
 {
-    public $message = 'Value "{{ value }}" did not pass validation against any of constraints in the list [{{ constraints }}]';
-
-    /**
-     * @var array
-     */
-    public $constraints = array();
-
-    /**
-     * @return string
-     */
-    public function getDefaultOption()
-    {
-        return 'constraints';
-    }
-
-    /**
-     * @return array
-     */
-    public function getRequiredOptions()
-    {
-        return array('constraints');
-    }
 }

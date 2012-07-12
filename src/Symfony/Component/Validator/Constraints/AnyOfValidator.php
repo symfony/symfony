@@ -17,10 +17,10 @@ use Symfony\Component\Validator\ConstraintValidator;
 /**
  * AnyValidator class.
  *
- * Validates against all constraint and fires a violation
- * only if not validated against any of given constraint.
- * If successfully validated against at least one constraint
- * value is considered to be valid.
+ * Validates against all constraints and leaves all violations only if not
+ * validated against any of given constraint. If successfully validated against
+ * at least one constraint value is considered to be valid and violations
+ * are rolled back.
  *
  * @author Oleg Stepura <github@oleg.stepura.com>
  */
@@ -31,21 +31,16 @@ class AnyOfValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        $violationListBefore = clone $this->context->getViolations();
-
-        // cannot simply cast to array, because then the object is converted to an
-        // array instead of wrapped inside
-        $constraints = is_array($constraint->constraints) ? $constraint->constraints : array($constraint->constraints);
-
         $walker = $this->context->getGraphWalker();
 
-        $violationCountPrevious = $violationListBefore->count();
-        $violationListAfter = $this->context->getViolations();
+        $violationList = $this->context->getViolations();
+        $violationListBefore = iterator_to_array($violationList);
+        $violationCountPrevious = $violationList->count();
         $validationFailed = true;
 
-        foreach ($constraints as $constr) {
+        foreach ($constraint->constraints as $constr) {
             $walker->walkConstraint($constr, $value, '', '');
-            $violationCount = $violationListAfter->count();
+            $violationCount = $violationList->count();
 
             if ($violationCount === $violationCountPrevious) {
                 // At least one constraint did not fail
@@ -55,25 +50,12 @@ class AnyOfValidator extends ConstraintValidator
             $violationCountPrevious = $violationCount;
         }
 
-        foreach ($violationListAfter as $id => $violation) {
-            if (!$violationListBefore->has($id)) {
-                $violationListAfter->remove($id);
+        if (!$validationFailed) {
+            foreach ($violationList as $id => $violation) {
+                if (!isset($violationListBefore[$id])) {
+                    $violationList->remove($id);
+                }
             }
-        }
-
-        if ($validationFailed) {
-            $constraintClassList = array();
-            foreach ($constraints as $constr) {
-                $constraintClassList[] = get_class($constr);
-            }
-
-            $this->context->addViolation(
-                $constraint->message,
-                array(
-                    '{{ value }}' => $value,
-                    '{{ constraints }}' => implode(', ', $constraintClassList)
-                )
-            );
         }
     }
 }

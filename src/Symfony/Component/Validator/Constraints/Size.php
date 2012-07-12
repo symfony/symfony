@@ -20,19 +20,13 @@ use Symfony\Component\Validator\Constraint;
  *
  * @deprecated Deprecated since version 2.1, to be removed in 2.3.
  */
-class Size extends Constraint
+class Size extends Range
 {
-    public $minMessage = 'This value should be {{ limit }} or more';
-    public $maxMessage = 'This value should be {{ limit }} or less';
-    public $invalidMessage = 'This value should be a valid number';
-    public $min;
-    public $max;
-
     /**
      * {@inheritDoc}
      */
-    public function getRequiredOptions()
+    public function validatedBy()
     {
-        return array('min', 'max');
+        return get_parent_class($this).'Validator';
     }
 }

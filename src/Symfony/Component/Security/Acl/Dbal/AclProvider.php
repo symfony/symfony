@@ -201,6 +201,74 @@ class AclProvider implements AclProviderInterface
     }
 
     /**
+     * Returns all the ACLs that belong to the given security identities
+     *
+     * @param  array  $sids
+     * @return \SplObjectStorage
+     */
+    public function findAclsBySids(array $sids)
+    {
+        $oids = array();
+        $currentBatch = array();
+
+        for ($offset=0, $total=count($sids); $offset < $total; $offset += self::MAX_BATCH_SIZE) {
+            $currentBatch = array_slice($sids, $offset, self::MAX_BATCH_SIZE);
+
+            $sql = $this->getObjectIdentitiesBySecurityIdentity($currentBatch);
+            $stmt = $this->connection->executeQuery($sql);
+
+            foreach ($stmt->fetchAll(\PDO::FETCH_NUM) as $data) {
+                list($objectIdentifier, $classType) = $data;
+                $oids[] = new ObjectIdentity($objectIdentifier, $classType);
+            }
+        }
+
+        return $this->findAcls($oids);
+    }
+
+    /**
+     * Constructs the query used to return all object identities that are
+     * associated with the $securityIds
+     *
+     * @param  array  $securityIds
+     * @return string
+     */
+    protected function getObjectIdentitiesBySecurityIdentity(array $securityIds)
+    {
+        $sql = <<<SELECTCLAUSE
+            SELECT
+                o.object_identifier,
+                c.class_type
+            FROM
+                {$this->options['oid_table_name']} o
+            INNER JOIN {$this->options['class_table_name']} c ON c.id = o.class_id
+            LEFT JOIN {$this->options['entry_table_name']} e ON (
+                e.class_id = o.class_id AND (e.object_identity_id = o.id OR {$this->connection->getDatabasePlatform()->getIsNullExpression('e.object_identity_id')})
+            )
+            LEFT JOIN {$this->options['sid_table_name']} s ON (
+                s.id = e.security_identity_id
+            )
+
+            WHERE
+SELECTCLAUSE;
+
+        $sids = array();
+
+        foreach ($securityIds as $sid) {
+            $sids[] = $this->connection->quote($sid->getClass() . '-' . $sid->getUsername());
+        }
+
+        if (!empty($ancestorIds)) {
+            $sql .= ' AND ';
+        }
+
+        $sql .= "(s.identifier = ";
+        $sql .= implode(' OR s.identifier = ', $sids).')';
+
+        return $sql;
+    }
+
+    /**
      * Constructs the query used for looking up object identities and associated
      * ACEs, and security identities.
      *

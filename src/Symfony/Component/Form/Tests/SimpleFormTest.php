@@ -577,13 +577,54 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertSame(array(), $this->form->getErrors());
     }
 
-    public function testCreateViewAcceptsParent()
+    public function testCreateView()
     {
-        $parent = new FormView('form');
+        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $view = $this->getMock('Symfony\Component\Form\Tests\FormViewInterface');
+        $form = $this->getBuilder()->setType($type)->getForm();
 
-        $view = $this->form->createView($parent);
+        $type->expects($this->once())
+            ->method('createView')
+            ->with($form)
+            ->will($this->returnValue($view));
 
-        $this->assertSame($parent, $view->getParent());
+        $this->assertSame($view, $form->createView());
+    }
+
+    public function testCreateViewWithParent()
+    {
+        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $view = $this->getMock('Symfony\Component\Form\Tests\FormViewInterface');
+        $parentForm = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $parentView = $this->getMock('Symfony\Component\Form\Tests\FormViewInterface');
+        $form = $this->getBuilder()->setType($type)->getForm();
+        $form->setParent($parentForm);
+
+        $parentForm->expects($this->once())
+            ->method('createView')
+            ->will($this->returnValue($parentView));
+
+        $type->expects($this->once())
+            ->method('createView')
+            ->with($form, $parentView)
+            ->will($this->returnValue($view));
+
+        $this->assertSame($view, $form->createView());
+    }
+
+    public function testCreateViewWithExplicitParent()
+    {
+        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $view = $this->getMock('Symfony\Component\Form\Tests\FormViewInterface');
+        $parentView = $this->getMock('Symfony\Component\Form\Tests\FormViewInterface');
+        $form = $this->getBuilder()->setType($type)->getForm();
+
+        $type->expects($this->once())
+            ->method('createView')
+            ->with($form, $parentView)
+            ->will($this->returnValue($view));
+
+        $this->assertSame($view, $form->createView($parentView));
     }
 
     public function testGetErrorsAsString()

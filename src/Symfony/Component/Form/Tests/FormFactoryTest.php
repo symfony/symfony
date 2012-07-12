@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\ValueGuess;
@@ -23,16 +24,29 @@ use Symfony\Component\Form\Tests\Fixtures\FooType;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBarExtension;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBazExtension;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 class FormFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    private $extension1;
-
-    private $extension2;
-
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     private $guesser1;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     private $guesser2;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $registry;
+
+    /**
+     * @var FormFactory
+     */
     private $factory;
 
     protected function setUp()
@@ -43,283 +57,252 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->guesser1 = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
         $this->guesser2 = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
-        $this->extension1 = new TestExtension($this->guesser1);
-        $this->extension2 = new TestExtension($this->guesser2);
-        $this->factory = new FormFactory(array($this->extension1, $this->extension2));
-    }
+        $this->registry = $this->getMock('Symfony\Component\Form\FormRegistryInterface');
+        $this->factory = new FormFactory($this->registry);
 
-    protected function tearDown()
-    {
-        $this->extension1 = null;
-        $this->extension2 = null;
-        $this->guesser1 = null;
-        $this->guesser2 = null;
-        $this->factory = null;
+        $this->registry->expects($this->any())
+            ->method('getTypeGuesser')
+            ->will($this->returnValue(new FormTypeGuesserChain(array(
+                $this->guesser1,
+                $this->guesser2,
+            ))));
     }
 
     public function testAddType()
     {
-        $this->assertFalse($this->factory->hasType('foo'));
-
         $type = new FooType();
-        $this->factory->addType($type);
+        $resolvedType = $this->getMockResolvedType();
 
-        $this->assertTrue($this->factory->hasType('foo'));
-        $this->assertSame($type, $this->factory->getType('foo'));
-    }
+        $this->registry->expects($this->once())
+            ->method('resolveType')
+            ->with($type)
+            ->will($this->returnValue($resolvedType));
 
-    public function testAddTypeAddsExtensions()
-    {
-        $type = new FooType();
-        $ext1 = new FooTypeBarExtension();
-        $ext2 = new FooTypeBazExtension();
-
-        $this->extension1->addTypeExtension($ext1);
-        $this->extension2->addTypeExtension($ext2);
+        $this->registry->expects($this->once())
+            ->method('addType')
+            ->with($resolvedType);
 
         $this->factory->addType($type);
-
-        $this->assertEquals(array($ext1, $ext2), $type->getExtensions());
     }
 
-    public function testGetTypeFromExtension()
+    public function testHasType()
+    {
+        $this->registry->expects($this->once())
+            ->method('hasType')
+            ->with('name')
+            ->will($this->returnValue('RESULT'));
+
+        $this->assertSame('RESULT', $this->factory->hasType('name'));
+    }
+
+    public function testGetType()
     {
         $type = new FooType();
-        $this->extension2->addType($type);
+        $resolvedType = $this->getMockResolvedType();
 
-        $this->assertSame($type, $this->factory->getType('foo'));
+        $resolvedType->expects($this->once())
+            ->method('getInnerType')
+            ->will($this->returnValue($type));
+
+        $this->registry->expects($this->once())
+            ->method('getType')
+            ->with('name')
+            ->will($this->returnValue($resolvedType));
+
+        $this->assertEquals($type, $this->factory->getType('name'));
     }
 
-    public function testGetTypeAddsExtensions()
+    public function testCreateNamedBuilderWithTypeName()
     {
-        $type = new FooType();
-        $ext1 = new FooTypeBarExtension();
-        $ext2 = new FooTypeBazExtension();
+        $options = array('a' => '1', 'b' => '2');
+        $resolvedType = $this->getMockResolvedType();
 
-        $this->extension1->addTypeExtension($ext1);
-        $this->extension2->addTypeExtension($ext2);
-        $this->extension2->addType($type);
+        $this->registry->expects($this->once())
+            ->method('getType')
+            ->with('type')
+            ->will($this->returnValue($resolvedType));
 
-        $type = $this->factory->getType('foo');
+        $resolvedType->expects($this->once())
+            ->method('createBuilder')
+            ->with($this->factory, 'name', $options)
+            ->will($this->returnValue('BUILDER'));
 
-        $this->assertEquals(array($ext1, $ext2), $type->getExtensions());
+        $this->assertSame('BUILDER', $this->factory->createNamedBuilder('name', 'type', null, $options));
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
-     */
-    public function testGetTypeExpectsExistingType()
+    public function testCreateNamedBuilderWithTypeInstance()
     {
-        $this->factory->getType('bar');
+        $options = array('a' => '1', 'b' => '2');
+        $type = $this->getMockType();
+        $resolvedType = $this->getMockResolvedType();
+
+        $this->registry->expects($this->once())
+            ->method('resolveType')
+            ->with($type)
+            ->will($this->returnValue($resolvedType));
+
+        // The type is also implicitely added to the registry
+        $this->registry->expects($this->once())
+            ->method('addType')
+            ->with($resolvedType);
+
+        $resolvedType->expects($this->once())
+            ->method('createBuilder')
+            ->with($this->factory, 'name', $options)
+            ->will($this->returnValue('BUILDER'));
+
+        $this->assertSame('BUILDER', $this->factory->createNamedBuilder('name', $type, null, $options));
     }
 
-    public function testCreateNamedBuilder()
+    public function testCreateNamedBuilderWithResolvedTypeInstance()
     {
-        $type = new FooType();
-        $this->extension1->addType($type);
+        $options = array('a' => '1', 'b' => '2');
+        $resolvedType = $this->getMockResolvedType();
 
-        $builder = $this->factory->createNamedBuilder('bar', 'foo');
+        // The type is also implicitely added to the registry
+        $this->registry->expects($this->once())
+            ->method('addType')
+            ->with($resolvedType);
 
-        $this->assertTrue($builder instanceof FormBuilder);
-        $this->assertEquals('bar', $builder->getName());
-        $this->assertNull($builder->getParent());
+        $resolvedType->expects($this->once())
+            ->method('createBuilder')
+            ->with($this->factory, 'name', $options)
+            ->will($this->returnValue('BUILDER'));
+
+        $this->assertSame('BUILDER', $this->factory->createNamedBuilder('name', $resolvedType, null, $options));
     }
 
-    public function testCreateNamedBuilderCallsBuildFormMethods()
+    public function testCreateNamedBuilderWithParentBuilder()
     {
-        $type = new FooType();
-        $ext1 = new FooTypeBarExtension();
-        $ext2 = new FooTypeBazExtension();
+        $options = array('a' => '1', 'b' => '2');
+        $parentBuilder = $this->getMockFormBuilder();
+        $resolvedType = $this->getMockResolvedType();
 
-        $this->extension1->addTypeExtension($ext1);
-        $this->extension2->addTypeExtension($ext2);
-        $this->extension2->addType($type);
+        $this->registry->expects($this->once())
+            ->method('getType')
+            ->with('type')
+            ->will($this->returnValue($resolvedType));
 
-        $builder = $this->factory->createNamedBuilder('bar', 'foo');
+        $resolvedType->expects($this->once())
+            ->method('createBuilder')
+            ->with($this->factory, 'name', $options, $parentBuilder)
+            ->will($this->returnValue('BUILDER'));
 
-        $this->assertTrue($builder->hasAttribute('foo'));
-        $this->assertTrue($builder->hasAttribute('bar'));
-        $this->assertTrue($builder->hasAttribute('baz'));
+        $this->assertSame('BUILDER', $this->factory->createNamedBuilder('name', 'type', null, $options, $parentBuilder));
     }
 
     public function testCreateNamedBuilderFillsDataOption()
     {
-        $type = new FooType();
-        $this->extension1->addType($type);
+        $givenOptions = array('a' => '1', 'b' => '2');
+        $expectedOptions = array_merge($givenOptions, array('data' => 'DATA'));
+        $resolvedType = $this->getMockResolvedType();
 
-        $builder = $this->factory->createNamedBuilder('bar', 'foo', 'xyz');
+        $this->registry->expects($this->once())
+            ->method('getType')
+            ->with('type')
+            ->will($this->returnValue($resolvedType));
 
-        // see FooType::buildForm()
-        $this->assertTrue($builder->getAttribute('data_option_set'));
-        $this->assertEquals('xyz', $builder->getAttribute('data_option'));
-    }
+        $resolvedType->expects($this->once())
+            ->method('createBuilder')
+            ->with($this->factory, 'name', $expectedOptions)
+            ->will($this->returnValue('BUILDER'));
 
-    public function testCreateNamedBuilderDoesNotSetDataOptionIfNull()
-    {
-        $type = new FooType();
-        $this->extension1->addType($type);
-
-        $builder = $this->factory->createNamedBuilder('bar', 'foo', null);
-
-        // see FooType::buildForm()
-        $this->assertFalse($builder->getAttribute('data_option_set'));
+        $this->assertSame('BUILDER', $this->factory->createNamedBuilder('name', 'type', 'DATA', $givenOptions));
     }
 
     public function testCreateNamedBuilderDoesNotOverrideExistingDataOption()
     {
-        $type = new FooType();
-        $this->extension1->addType($type);
+        $options = array('a' => '1', 'b' => '2', 'data' => 'CUSTOM');
+        $resolvedType = $this->getMockResolvedType();
 
-        $builder = $this->factory->createNamedBuilder('bar', 'foo', 'xyz', array(
-            'data' => 'abc',
-        ));
+        $this->registry->expects($this->once())
+            ->method('getType')
+            ->with('type')
+            ->will($this->returnValue($resolvedType));
 
-        // see FooType::buildForm()
-        $this->assertTrue($builder->getAttribute('data_option_set'));
-        $this->assertEquals('abc', $builder->getAttribute('data_option'));
-    }
-
-    /**
-     * @expectedException Symfony\Component\Form\Exception\TypeDefinitionException
-     */
-    public function testCreateNamedBuilderExpectsDataOptionToBeSupported()
-    {
-        $type = $this->getMock('Symfony\Component\Form\FormTypeInterface');
-        $type->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('foo'));
-        $type->expects($this->any())
-            ->method('getExtensions')
-            ->will($this->returnValue(array()));
-
-        $this->extension1->addType($type);
-
-        $this->factory->createNamedBuilder('bar', 'foo');
-    }
-
-    /**
-     * @expectedException Symfony\Component\Form\Exception\TypeDefinitionException
-     */
-    public function testCreateNamedBuilderExpectsRequiredOptionToBeSupported()
-    {
-        $type = $this->getMock('Symfony\Component\Form\FormTypeInterface');
-        $type->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('foo'));
-        $type->expects($this->any())
-            ->method('getExtensions')
-            ->will($this->returnValue(array()));
-
-        $this->extension1->addType($type);
-
-        $this->factory->createNamedBuilder('bar', 'foo');
-    }
-
-    /**
-     * @expectedException Symfony\Component\Form\Exception\TypeDefinitionException
-     */
-    public function testCreateNamedBuilderExpectsMaxLengthOptionToBeSupported()
-    {
-        $type = $this->getMock('Symfony\Component\Form\FormTypeInterface');
-        $type->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('foo'));
-        $type->expects($this->any())
-            ->method('getExtensions')
-            ->will($this->returnValue(array()));
-
-        $this->extension1->addType($type);
-
-        $this->factory->createNamedBuilder('bar', 'foo');
-    }
-
-    /**
-     * @expectedException Symfony\Component\Form\Exception\TypeDefinitionException
-     */
-    public function testCreateNamedBuilderExpectsBuilderToBeReturned()
-    {
-        $type = $this->getMock('Symfony\Component\Form\FormTypeInterface');
-        $type->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('foo'));
-        $type->expects($this->any())
-            ->method('getExtensions')
-            ->will($this->returnValue(array()));
-        $type->expects($this->any())
+        $resolvedType->expects($this->once())
             ->method('createBuilder')
-            ->will($this->returnValue(null));
+            ->with($this->factory, 'name', $options)
+            ->will($this->returnValue('BUILDER'));
 
-        $this->extension1->addType($type);
-
-        $this->factory->createNamedBuilder('bar', 'foo');
-    }
-
-    /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
-    public function testCreateNamedBuilderExpectsOptionsToExist()
-    {
-        $type = new FooType();
-        $this->extension1->addType($type);
-
-        $this->factory->createNamedBuilder('bar', 'foo', null, array(
-            'invalid' => 'xyz',
-        ));
-    }
-
-    /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     */
-    public function testCreateNamedBuilderExpectsOptionsToBeInValidRange()
-    {
-        $type = new FooType();
-        $this->extension1->addType($type);
-
-        $this->factory->createNamedBuilder('bar', 'foo', null, array(
-            'a_or_b' => 'c',
-        ));
-    }
-
-    public function testCreateNamedBuilderAllowsExtensionsToExtendAllowedOptionValues()
-    {
-        $type = new FooType();
-        $this->extension1->addType($type);
-        $this->extension1->addTypeExtension(new FooTypeBarExtension());
-
-        // no exception this time
-        $this->factory->createNamedBuilder('bar', 'foo', null, array(
-            'a_or_b' => 'c',
-        ));
-    }
-
-    public function testCreateNamedBuilderAddsTypeInstances()
-    {
-        $type = new FooType();
-        $this->assertFalse($this->factory->hasType('foo'));
-
-        $builder = $this->factory->createNamedBuilder('bar', $type);
-
-        $this->assertTrue($builder instanceof FormBuilder);
-        $this->assertTrue($this->factory->hasType('foo'));
+        $this->assertSame('BUILDER', $this->factory->createNamedBuilder('name', 'type', 'DATA', $options));
     }
 
     /**
      * @expectedException        Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string or Symfony\Component\Form\FormTypeInterface", "stdClass" given
+     * @expectedExceptionMessage Expected argument of type "string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface", "stdClass" given
      */
     public function testCreateNamedBuilderThrowsUnderstandableException()
     {
         $this->factory->createNamedBuilder('name', new \stdClass());
     }
 
-    public function testCreateUsesTypeNameAsName()
+    public function testCreateUsesTypeNameIfTypeGivenAsString()
     {
-        $type = new FooType();
-        $this->extension1->addType($type);
+        $options = array('a' => '1', 'b' => '2');
+        $resolvedType = $this->getMockResolvedType();
+        $builder = $this->getMockFormBuilder();
 
-        $builder = $this->factory->createBuilder('foo');
+        $this->registry->expects($this->once())
+            ->method('getType')
+            ->with('TYPE')
+            ->will($this->returnValue($resolvedType));
 
-        $this->assertEquals('foo', $builder->getName());
+        $resolvedType->expects($this->once())
+            ->method('createBuilder')
+            ->with($this->factory, 'TYPE', $options)
+            ->will($this->returnValue($builder));
+
+        $builder->expects($this->once())
+            ->method('getForm')
+            ->will($this->returnValue('FORM'));
+
+        $this->assertSame('FORM', $this->factory->create('TYPE', null, $options));
+    }
+
+    public function testCreateUsesTypeNameIfTypeGivenAsObject()
+    {
+        $options = array('a' => '1', 'b' => '2');
+        $resolvedType = $this->getMockResolvedType();
+        $builder = $this->getMockFormBuilder();
+
+        $resolvedType->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('TYPE'));
+
+        $resolvedType->expects($this->once())
+            ->method('createBuilder')
+            ->with($this->factory, 'TYPE', $options)
+            ->will($this->returnValue($builder));
+
+        $builder->expects($this->once())
+            ->method('getForm')
+            ->will($this->returnValue('FORM'));
+
+        $this->assertSame('FORM', $this->factory->create($resolvedType, null, $options));
+    }
+
+    public function testCreateNamed()
+    {
+        $options = array('a' => '1', 'b' => '2');
+        $resolvedType = $this->getMockResolvedType();
+        $builder = $this->getMockFormBuilder();
+
+        $this->registry->expects($this->once())
+            ->method('getType')
+            ->with('type')
+            ->will($this->returnValue($resolvedType));
+
+        $resolvedType->expects($this->once())
+            ->method('createBuilder')
+            ->with($this->factory, 'name', $options)
+            ->will($this->returnValue($builder));
+
+        $builder->expects($this->once())
+            ->method('getForm')
+            ->will($this->returnValue('FORM'));
+
+        $this->assertSame('FORM', $this->factory->createNamed('name', 'type', null, $options));
     }
 
     public function testCreateBuilderForPropertyCreatesFormWithHighestConfidence()
@@ -342,7 +325,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                 Guess::HIGH_CONFIDENCE
             )));
 
-        $factory = $this->createMockFactory(array('createNamedBuilder'));
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -361,7 +344,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                 ->with('Application\Author', 'firstName')
                 ->will($this->returnValue(null));
 
-        $factory = $this->createMockFactory(array('createNamedBuilder'));
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -384,7 +367,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::MEDIUM_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createNamedBuilder'));
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -419,7 +402,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::HIGH_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createNamedBuilder'));
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -452,7 +435,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::HIGH_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createNamedBuilder'));
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -487,7 +470,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::LOW_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createNamedBuilder'));
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -520,7 +503,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::HIGH_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createNamedBuilder'));
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -553,7 +536,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
                     Guess::HIGH_CONFIDENCE
                 )));
 
-        $factory = $this->createMockFactory(array('createNamedBuilder'));
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -568,41 +551,26 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $builder);
     }
 
-    public function testCreateNamedBuilderFromParentBuilder()
-    {
-        $type = new FooType();
-        $this->extension1->addType($type);
-
-        $parentBuilder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->setConstructorArgs(array('name', null, $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'), $this->factory))
-            ->getMock()
-        ;
-
-        $builder = $this->factory->createNamedBuilder('bar', 'foo', null, array(), $parentBuilder);
-
-        $this->assertNotEquals($builder, $builder->getParent());
-        $this->assertEquals($parentBuilder, $builder->getParent());
-    }
-
-    public function testFormTypeCreatesDefaultValueForEmptyDataOption()
-    {
-        $factory = new FormFactory(array(new \Symfony\Component\Form\Extension\Core\CoreExtension()));
-
-        $form = $factory->createNamedBuilder('author', new AuthorType())->getForm();
-        $form->bind(array('firstName' => 'John', 'lastName' => 'Smith'));
-
-        $author = new Author();
-        $author->firstName = 'John';
-        $author->setLastName('Smith');
-
-        $this->assertEquals($author, $form->getData());
-    }
-
-    private function createMockFactory(array $methods = array())
+    private function getMockFactory(array $methods = array())
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactory')
             ->setMethods($methods)
-            ->setConstructorArgs(array(array($this->extension1, $this->extension2)))
+            ->setConstructorArgs(array($this->registry))
             ->getMock();
+    }
+
+    private function getMockResolvedType()
+    {
+        return $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+    }
+
+    private function getMockType()
+    {
+        return $this->getMock('Symfony\Component\Form\FormTypeInterface');
+    }
+
+    private function getMockFormBuilder()
+    {
+        return $this->getMock('Symfony\Component\Form\Tests\FormBuilderInterface');
     }
 }

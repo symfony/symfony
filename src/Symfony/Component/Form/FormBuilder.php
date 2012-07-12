@@ -115,10 +115,10 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
         }
 
         if (null !== $type) {
-            return $this->getFormFactory()->createNamedBuilder($name, $type, null, $options, $this);
+            return $this->factory->createNamedBuilder($name, $type, null, $options, $this);
         }
 
-        return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, null, $options, $this);
+        return $this->factory->createBuilderForProperty($this->getDataClass(), $name, null, $options, $this);
     }
 
     /**
@@ -265,5 +265,24 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
     public function getIterator()
     {
         return new \ArrayIterator($this->children);
+    }
+
+    /**
+     * Returns the types used by this builder.
+     *
+     * @return array An array of FormTypeInterface
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link FormConfigInterface::getType()} instead.
+     */
+    public function getTypes()
+    {
+        $types = array();
+
+        for ($type = $this->getType(); null !== $type; $type = $type->getParent()) {
+            array_unshift($types, $type->getInnerType());
+        }
+
+        return $types;
     }
 }

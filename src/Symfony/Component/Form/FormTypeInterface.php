@@ -69,20 +69,6 @@ interface FormTypeInterface
     public function finishView(FormViewInterface $view, FormInterface $form, array $options);
 
     /**
-     * Returns a builder for the current type.
-     *
-     * The builder is retrieved by going up in the type hierarchy when a type does
-     * not provide one.
-     *
-     * @param string               $name    The name of the builder
-     * @param FormFactoryInterface $factory The form factory
-     * @param array                $options The options
-     *
-     * @return FormBuilderInterface|null A form builder or null when the type does not have a builder
-     */
-    public function createBuilder($name, FormFactoryInterface $factory, array $options);
-
-    /**
      * Sets the default options for this type.
      *
      * @param OptionsResolverInterface $resolver The resolver for the options.
@@ -102,20 +88,4 @@ interface FormTypeInterface
      * @return string The name of this type
      */
     public function getName();
-
-    /**
-     * Sets the extensions for this type.
-     *
-     * @param array $extensions An array of FormTypeExtensionInterface
-     *
-     * @throws Exception\UnexpectedTypeException if any extension does not implement FormTypeExtensionInterface
-     */
-    public function setExtensions(array $extensions);
-
-    /**
-     * Returns the extensions associated with this type.
-     *
-     * @return array An array of FormTypeExtensionInterface
-     */
-    public function getExtensions();
 }

@@ -57,9 +57,9 @@ class UnmodifiableFormConfig implements FormConfigInterface
     private $compound;
 
     /**
-     * @var array
+     * @var ResolvedFormTypeInterface
      */
-    private $types;
+    private $type;
 
     /**
      * @var array
@@ -145,7 +145,7 @@ class UnmodifiableFormConfig implements FormConfigInterface
         $this->byReference = $config->getByReference();
         $this->virtual = $config->getVirtual();
         $this->compound = $config->getCompound();
-        $this->types = $config->getTypes();
+        $this->type = $config->getType();
         $this->viewTransformers = $config->getViewTransformers();
         $this->modelTransformers = $config->getModelTransformers();
         $this->dataMapper = $config->getDataMapper();
@@ -220,9 +220,9 @@ class UnmodifiableFormConfig implements FormConfigInterface
     /**
      * {@inheritdoc}
      */
-    public function getTypes()
+    public function getType()
     {
-        return $this->types;
+        return $this->type;
     }
 
     /**

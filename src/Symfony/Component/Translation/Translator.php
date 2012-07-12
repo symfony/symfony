@@ -125,7 +125,23 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($locale);
         }
 
-        return strtr($this->catalogues[$locale]->get((string) $id, $domain), $parameters);
+        $message = $this->catalogues[$locale]->get((string) $id, $domain);
+
+        // if we have to select a message
+        if (preg_match('/^([^\|]+\|)?\s*([^\s\|]+)\s+((\d)(\s*([m|n|f]))?|([m|n|f])(\s*(\d))?)(,\s*([^\s\|]+)\s+((\d)(\s*([m|n|f]))?|([m|n|f])(\s*(\d))?))*\s*:\s*([^\|]*)(\|\s*([^\s\|]+)\s+((\d)(\s*([m|n|f]))?|([m|n|f])(\s*(\d))?)(,\s*([^\s\|]+)\s+((\d)(\s*([m|n|f]))?|([m|n|f])(\s*(\d))?))*\s*:\s*([^\|]*))*$/',$message)) {
+            $message = $this->selector->chooseByParams($message, $parameters, $locale);
+        }
+
+        // if the array is composed of other arrays we need to flatten it out in order to pass it to strtr
+        foreach ($parameters as &$parameter) {
+            if (is_array($parameter)) {
+                if (isset($parameter['string'])) {
+                    $parameter = $parameter['string'];
+                }
+            }
+        }
+
+        return strtr($message, $parameters);
     }
 
     /**

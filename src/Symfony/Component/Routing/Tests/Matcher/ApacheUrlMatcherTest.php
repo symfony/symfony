@@ -50,6 +50,35 @@ class ApacheUrlMatcherTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
             array(
+                'Route with params and defaults',
+                '/hello/hugo',
+                array(
+                    '_ROUTING__route' => 'hello',
+                    '_ROUTING__controller' => 'AcmeBundle:Default:index',
+                    '_ROUTING_name' => 'hugo',
+                    '_ROUTING_DEFAULTS_name' => 'world',
+                ),
+                array(
+                    'name' => 'hugo',
+                    '_route' => 'hello',
+                    '_controller' => 'AcmeBundle:Default:index',
+                ),
+            ),
+            array(
+                'Route with defaults only',
+                '/hello',
+                array(
+                    '_ROUTING__route' => 'hello',
+                    '_ROUTING__controller' => 'AcmeBundle:Default:index',
+                    '_ROUTING_DEFAULTS_name' => 'world',
+                ),
+                array(
+                    'name' => 'world',
+                    '_route' => 'hello',
+                    '_controller' => 'AcmeBundle:Default:index',
+                ),
+            ),
+            array(
                 'REDIRECT_ envs',
                 '/hello/world',
                 array(

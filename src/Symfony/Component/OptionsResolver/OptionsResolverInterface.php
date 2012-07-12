@@ -206,5 +206,5 @@ interface OptionsResolverInterface
      * @throws Exception\OptionDefinitionException If a cyclic dependency is detected
      *                                             between two lazy options.
      */
-    public function resolve(array $options);
+    public function resolve(array $options = array());
 }

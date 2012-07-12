@@ -49,7 +49,6 @@ class FormPerformanceTestCase extends FormIntegrationTestCase
     /**
      * @param  integer $maxRunningTime
      * @throws InvalidArgumentException
-     * @since  Method available since Release 2.3.0
      */
     public function setMaxRunningTime($maxRunningTime)
     {

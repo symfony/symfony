@@ -52,7 +52,7 @@ class JsonResponse extends Response
      */
     public function setCallback($callback = null)
     {
-        if ($callback) {
+        if (null !== $callback) {
             // taken from http://www.geekality.net/2011/08/03/valid-javascript-identifier/
             $pattern = '/^[$_\p{L}][$_\p{L}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*+$/u';
             $parts = explode('.', $callback);
@@ -95,7 +95,7 @@ class JsonResponse extends Response
      */
     protected function update()
     {
-        if ($this->callback) {
+        if (null !== $this->callback) {
             // Not using application/javascript for compatibility reasons with older browsers.
             $this->headers->set('Content-Type', 'text/javascript', true);
 

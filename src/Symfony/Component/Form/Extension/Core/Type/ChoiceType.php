@@ -32,6 +32,12 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ChoiceType extends AbstractType
 {
     /**
+     * Caches created choice lists.
+     * @var array
+     */
+    private $choiceListCache = array();
+
+    /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -123,12 +129,20 @@ class ChoiceType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $choiceList = function (Options $options) {
-            return new SimpleChoiceList(
-                // Harden against NULL values (like in EntityType and ModelType)
-                null !== $options['choices'] ? $options['choices'] : array(),
-                $options['preferred_choices']
-            );
+        $choiceListCache =& $this->choiceListCache;
+
+        $choiceList = function (Options $options) use (&$choiceListCache) {
+            // Harden against NULL values (like in EntityType and ModelType)
+            $choices = null !== $options['choices'] ? $options['choices'] : array();
+
+            // Reuse existing choice lists in order to increase performance
+            $hash = md5(json_encode(array($choices, $options['preferred_choices'])));
+
+            if (!isset($choiceListCache[$hash])) {
+                $choiceListCache[$hash] = new SimpleChoiceList($choices, $options['preferred_choices']);
+            }
+
+            return $choiceListCache[$hash];
         };
 
         $emptyData = function (Options $options) {

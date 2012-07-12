@@ -154,7 +154,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array('Default string when nothing to choose from', '%name% likes your %activity%', 'Default string when nothing to choose from|%name% m 1: A %name% piace la tua %activity%', array('%name%' => array('string' => 'James', 'gender' => 'm', 'number' => 1), '%activity%' => 'attivita'), 'it', ''),
             array('A James piace la tua %activity%', '%name% likes your %activity%', 'Default string when nothing to choose from|%name% m 1: A %name% piace la tua %activity%', array('%name%' => array('string' => 'James', 'gender' => 'm', 'number' => 0)), 'it', ''),
             array('Trying to confuse regexp|James m m: Whoa!', 'meaninful message', 'Trying to confuse regexp|James m m: Whoa!', array('%user%' => array('string' => 'James')), 'it', ''),
-            array('Trying to confuse regexp|James m m: Whoa!', 'meaninful message', 'Trying to confuse regexp|James m m: Whoa!', array('%user%' => array('string' => 'James')), 'it', ''),
+            array('Trying to confuse regexp|James 55: Whoa!', 'meaninful message', 'Trying to confuse regexp|James 55: Whoa!', array('%user%' => array('string' => 'James')), 'it', ''),
         );
     }
 

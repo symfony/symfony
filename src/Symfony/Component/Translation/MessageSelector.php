@@ -110,8 +110,6 @@ class MessageSelector
      * @return string
      *
      * @throws InvalidArgumentException
-     *
-     * @api
      */
     public function chooseByParams($message, $parameters, $locale)
     {

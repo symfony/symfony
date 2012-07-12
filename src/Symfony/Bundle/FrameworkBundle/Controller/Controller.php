@@ -126,6 +126,28 @@ class Controller extends ContainerAware
     }
 
     /**
+     * Returns a Response.
+     *
+     * This will return a Response with Content-Typ application/json for a ajax call.
+     *
+     * Usage example:
+     *   return $this->createJsonResponse(200,array('message'=>'Hello'))
+     *
+     * @param integer $status
+     * @param array $data
+     *
+     * @return Response
+     */
+    public function createJsonResponse($status,array $data=array())
+    {
+    	$data['status']=$status;
+    
+    	return new Response(json_encode($data),200,array(
+    			'Content-Type'=>'application/json'
+    	));
+    }
+    
+    /**
      * Returns a NotFoundHttpException.
      *
      * This will result in a 404 response code. Usage example:

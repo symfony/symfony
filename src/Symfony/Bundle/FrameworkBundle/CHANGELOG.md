@@ -38,3 +38,4 @@ CHANGELOG
    parser: TemplateFilenameParser::parse().
  * [BC BREAK] Kernel parameters are replaced by their value whereever they appear
    in Route patterns, requirements and defaults. Use '%%' as the escaped value for '%'.
+ * Added createJsonResponse() to the controller.

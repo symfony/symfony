@@ -142,15 +142,11 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
     public function setNextResponse($statusCode = 200, array $headers = array(), $body = 'Hello World', \Closure $customizer = null)
     {
         $this->kernel = new TestHttpKernel($body, $statusCode, $headers, $customizer);
-
-        return $this;
     }
 
     public function setNextResponses($responses)
     {
         $this->kernel = new TestMultipleHttpKernel($responses);
-
-        return $this;
     }
 
     public function catchExceptions($catch = true)

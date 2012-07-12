@@ -50,7 +50,5 @@ class KernelForTest extends Kernel
     public function setIsBooted($value)
     {
         $this->booted = (Boolean) $value;
-
-        return $this;
     }
 }

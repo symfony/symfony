@@ -49,6 +49,8 @@ class GetResponseEvent extends KernelEvent
      *
      * @param Symfony\Component\HttpFoundation\Response $response
      *
+     * @return GetResponseEvent The current instance
+     *
      * @api
      */
     public function setResponse(Response $response)
@@ -56,6 +58,8 @@ class GetResponseEvent extends KernelEvent
         $this->response = $response;
 
         $this->stopPropagation();
+
+        return $this;
     }
 
     /**

@@ -45,10 +45,14 @@ class Profile
      * Sets the token.
      *
      * @param string $token The token
+     *
+     * @return Profile The current instance
      */
     public function setToken($token)
     {
         $this->token = $token;
+
+        return $this;
     }
 
     /**
@@ -65,10 +69,14 @@ class Profile
      * Sets the parent token
      *
      * @param Profile $parent The parent Profile
+     *
+     * @return Profile The current instance
      */
     public function setParent(Profile $parent)
     {
         $this->parent = $parent;
+
+        return $this;
     }
 
     /**
@@ -104,6 +112,8 @@ class Profile
     public function setIp($ip)
     {
         $this->ip = $ip;
+
+        return $this;
     }
 
     /**
@@ -119,6 +129,8 @@ class Profile
     public function setMethod($method)
     {
         $this->method = $method;
+
+        return $this;
     }
 
     /**
@@ -134,6 +146,8 @@ class Profile
     public function setUrl($url)
     {
         $this->url = $url;
+
+        return $this;
     }
 
     /**
@@ -149,6 +163,8 @@ class Profile
     public function setTime($time)
     {
         $this->time = $time;
+
+        return $this;
     }
 
     /**
@@ -167,6 +183,8 @@ class Profile
         foreach ($children as $child) {
             $this->addChild($child);
         }
+
+        return $this;
     }
 
     /**
@@ -200,6 +218,8 @@ class Profile
         foreach ($collectors as $collector) {
             $this->addCollector($collector);
         }
+
+        return $this;
     }
 
     public function addCollector(DataCollectorInterface $collector)

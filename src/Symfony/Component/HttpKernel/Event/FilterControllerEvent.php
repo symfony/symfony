@@ -59,6 +59,8 @@ class FilterControllerEvent extends KernelEvent
      *
      * @param callable $controller
      *
+     * @return FilterControllerEvent The current instance
+     *
      * @api
      */
     public function setController($controller)
@@ -69,6 +71,8 @@ class FilterControllerEvent extends KernelEvent
         }
 
         $this->controller = $controller;
+
+        return $this;
     }
 
     private function varToString($var)

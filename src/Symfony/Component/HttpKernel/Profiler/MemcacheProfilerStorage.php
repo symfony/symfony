@@ -54,10 +54,14 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
      * Set instance of the Memcache
      *
      * @param Memcache $memcache
+     *
+     * @return MemcacheProfilerStorage The current instance
      */
     public function setMemcache($memcache)
     {
         $this->memcache = $memcache;
+
+        return $this;
     }
 
     /**

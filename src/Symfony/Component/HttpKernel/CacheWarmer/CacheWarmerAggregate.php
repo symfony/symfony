@@ -64,6 +64,8 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         foreach ($warmers as $warmer) {
             $this->add($warmer);
         }
+
+        return $this;
     }
 
     public function add(CacheWarmerInterface $warmer)

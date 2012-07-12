@@ -227,10 +227,14 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      * Set instance of the Redis
      *
      * @param Redis $redis
+     *
+     * @return RedisProfilerStorage The current instance
      */
     public function setRedis($redis)
     {
         $this->redis = $redis;
+
+        return $this;
     }
 
     private function createProfileFromData($token, $data, $parent = null)

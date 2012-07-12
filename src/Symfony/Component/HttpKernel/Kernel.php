@@ -49,7 +49,6 @@ abstract class Kernel extends ContainerAware implements KernelInterface, Termina
 {
     protected $bundles;
     protected $bundleMap;
-    protected $container;
     protected $rootDir;
     protected $environment;
     protected $debug;

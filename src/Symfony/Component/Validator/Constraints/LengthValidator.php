@@ -17,20 +17,14 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
- *
- * @deprecated Deprecated since version 2.1, to be removed in 2.3.
  */
-class MaxLengthValidator extends ConstraintValidator
+class LengthValidator extends ConstraintValidator
 {
     /**
      * Checks if the passed value is valid.
      *
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
-     *
-     * @api
      */
     public function validate($value, Constraint $constraint)
     {
@@ -52,11 +46,29 @@ class MaxLengthValidator extends ConstraintValidator
             $length = strlen($stringValue);
         }
 
-        if ($length > $constraint->limit) {
-            $this->context->addViolation($constraint->message, array(
+        if ($constraint->min == $constraint->max && $length != $constraint->min) {
+            $this->context->addViolation($constraint->exactMessage, array(
                 '{{ value }}' => $stringValue,
-                '{{ limit }}' => $constraint->limit,
-            ), $value, (int) $constraint->limit);
+                '{{ limit }}' => $constraint->min,
+            ), $value, (int) $constraint->min);
+
+            return;
+        }
+
+        if (null !== $constraint->max && $length > $constraint->max) {
+            $this->context->addViolation($constraint->maxMessage, array(
+                '{{ value }}' => $stringValue,
+                '{{ limit }}' => $constraint->max,
+            ), $value, (int) $constraint->max);
+
+            return;
+        }
+
+        if (null !== $constraint->min && $length < $constraint->min) {
+            $this->context->addViolation($constraint->minMessage, array(
+                '{{ value }}' => $stringValue,
+                '{{ limit }}' => $constraint->min,
+            ), $value, (int) $constraint->min);
         }
     }
 }

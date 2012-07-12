@@ -19,6 +19,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @deprecated Deprecated since version 2.1, to be removed in 2.3.
  */
 class MinLengthValidator extends ConstraintValidator
 {

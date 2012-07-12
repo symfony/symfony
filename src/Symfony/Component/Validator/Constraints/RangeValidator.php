@@ -16,12 +16,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
- *
- * @deprecated Deprecated since version 2.1, to be removed in 2.3.
  */
-class MinValidator extends ConstraintValidator
+class RangeValidator extends ConstraintValidator
 {
     /**
      * Checks if the passed value is valid.
@@ -29,27 +25,35 @@ class MinValidator extends ConstraintValidator
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
      *
-     * @api
+     * @return Boolean Whether or not the value is valid
      */
     public function validate($value, Constraint $constraint)
     {
-        if (null === $value || '' === $value) {
+        if (null === $value) {
             return;
         }
 
         if (!is_numeric($value)) {
             $this->context->addViolation($constraint->invalidMessage, array(
                 '{{ value }}' => $value,
-                '{{ limit }}' => $constraint->limit,
             ));
 
             return;
         }
 
-        if ($value < $constraint->limit) {
-            $this->context->addViolation($constraint->message, array(
+        if (null !== $constraint->max && $value > $constraint->max) {
+            $this->context->addViolation($constraint->maxMessage, array(
                 '{{ value }}' => $value,
-                '{{ limit }}' => $constraint->limit,
+                '{{ limit }}' => $constraint->max,
+            ));
+
+            return;
+        }
+
+        if (null !== $constraint->min && $value < $constraint->min) {
+            $this->context->addViolation($constraint->minMessage, array(
+                '{{ value }}' => $value,
+                '{{ limit }}' => $constraint->min,
             ));
         }
     }

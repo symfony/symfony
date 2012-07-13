@@ -90,7 +90,7 @@ class ExceptionListener implements EventSubscriberInterface
             $handling = false;
 
             // re-throw the exception as this is a catch-all
-            throw $exception;
+            return;
         }
 
         $event->setResponse($response);

@@ -9,6 +9,7 @@
  * file that was distributed with this source code.
  */
 
+
 namespace Symfony\Component\Console\Tests\Formatter;
 
 use Symfony\Component\Console\Formatter\OutputFormatter;
@@ -25,9 +26,15 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
     public function testLGCharEscaping()
     {
         $formatter = new OutputFormatter(true);
+
         $this->assertEquals("foo<bar", $formatter->format('foo\\<bar'));
         $this->assertEquals("<info>some info</info>", $formatter->format('\\<info>some info\\</info>'));
         $this->assertEquals("\\<info>some info\\</info>", OutputFormatter::escape('<info>some info</info>'));
+
+        $this->assertEquals(
+            "\033[33mSymfony\\Component\\Console does work very well!\033[0m",
+            $formatter->format('<comment>Symfony\Component\Console does work very well!</comment>')
+        );
     }
 
     public function testBundledStyles()

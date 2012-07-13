@@ -36,8 +36,13 @@ class FlattenException
         $e->setMessage($exception->getMessage());
         $e->setCode($exception->getCode());
 
+        if ($exception instanceof HttpExceptionInterface) {
+            $statusCode = $exception->getStatusCode();
+            $headers = array_merge($headers, $exception->getHeaders());
+        }
+
         if (null === $statusCode) {
-            $statusCode = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
+            $statusCode = 500;
         }
 
         $e->setStatusCode($statusCode);

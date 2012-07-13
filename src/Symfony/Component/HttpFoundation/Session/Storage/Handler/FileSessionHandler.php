@@ -29,6 +29,16 @@ class FileSessionHandler implements \SessionHandlerInterface
     private $prefix;
 
     /**
+     * @var resource
+     */
+    private $handle = null;
+
+    /**
+     * @var string
+     */
+    private $currentId = null;
+
+    /**
      * Constructor.
      *
      * @param string $savePath Path of directory to save session files.
@@ -61,6 +71,11 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function close()
     {
+        if (null !== $this->handle) {
+            flock($this->handle, LOCK_UN);
+            fclose($this->handle);
+            $this->currentId = null;
+        }
         return true;
     }
 
@@ -69,9 +84,14 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function read($id)
     {
-        $file = $this->getPath().$id;
+        $this->initSessionFile($id);
+        $data = '';
+        fseek($this->handle, 0);
+        while (!feof($this->handle)) {
+            $data .= fread($this->handle, 1048576);
+        }
 
-        return is_readable($file) ? file_get_contents($file) : '';
+        return $data;
     }
 
     /**
@@ -79,7 +99,21 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function write($id, $data)
     {
-        return false === file_put_contents($this->getPath().$id, $data) ? false : true;
+        $this->initSessionFile($id);
+        ftruncate($this->handle, 0);
+
+        return !(false === fwrite($this->handle, $data));
+    }
+
+    protected function initSessionFile($id)
+    {
+        if (null === $this->handle) {
+            $this->currentId = $id;
+            $this->handle = fopen($this->getPath() . $id, 'a+');
+            flock($this->handle, LOCK_EX);
+        } elseif ($id != $this->currentId) {
+            throw new \RuntimeException('You cannot manage two different sessions at the same time. Close current session before you start new one.');
+        }
     }
 
     /**

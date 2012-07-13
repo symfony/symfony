@@ -30,10 +30,15 @@ class FileSessionStorageTest extends \PHPUnit_Framework_TestCase
      */
     private $path;
 
+    /**
+     * @var string
+     */
+    private $prefix = 'mocksess_';
+
     public function setUp()
     {
         $this->path = sys_get_temp_dir().'/filesessionhandler';
-        $this->handler = new FileSessionHandler($this->path, 'mocksess_');
+        $this->handler = new FileSessionHandler($this->path, $this->prefix);
 
         parent::setUp();
     }
@@ -73,26 +78,27 @@ class FileSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testDestroy()
     {
-        $this->handler->write('456', 'data');
+        $pathPrefix = $this->path.'/'.$this->prefix;
+        file_put_contents($pathPrefix.'456', 'data');
         $this->handler->destroy('123');
-        $this->assertEquals('data', $this->handler->read('456'));
+        $this->assertEquals('data', file_get_contents($pathPrefix . '456'));
         $this->handler->destroy('456');
-        $this->assertEmpty($this->handler->read('456'));
+        $this->assertFalse(is_file($pathPrefix . '456'));
     }
 
     public function testGc()
     {
-        $prefix = $this->path.'/mocksess_';
-        $this->handler->write('1', 'data');
+        $prefix = $this->path.'/'.$this->prefix;
+        file_put_contents($prefix.'1', 'data');
         touch($prefix.'1', time()-86400);
 
-        $this->handler->write('2', 'data');
+        file_put_contents($prefix.'2', 'data');
         touch($prefix.'2', time()-3600);
 
-        $this->handler->write('3', 'data');
+        file_put_contents($prefix.'3', 'data');
         touch($prefix.'3', time()-300);
 
-        $this->handler->write('4', 'data');
+        file_put_contents($prefix.'4', 'data');
 
         $this->handler->gc(90000);
         $this->assertEquals(4, count(glob($this->path.'/*')));
@@ -102,5 +108,14 @@ class FileSessionStorageTest extends \PHPUnit_Framework_TestCase
 
         $this->handler->gc(200);
         $this->assertEquals(1, count(glob($this->path.'/*')));
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testOneSessionAtTime()
+    {
+        $this->handler->read(1);
+        $this->handler->read(2);
     }
 }

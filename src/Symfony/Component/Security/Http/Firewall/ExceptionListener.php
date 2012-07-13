@@ -97,6 +97,8 @@ class ExceptionListener
                 return;
             }
         } elseif ($exception instanceof AccessDeniedException) {
+            $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
+
             $token = $this->context->getToken();
             if (!$this->authenticationTrustResolver->isFullFledged($token)) {
                 if (null !== $this->logger) {
@@ -129,8 +131,6 @@ class ExceptionListener
                         $response = $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
                         $response->setStatusCode(403);
                     } else {
-                        $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
-
                         return;
                     }
                 } catch (\Exception $e) {
@@ -147,8 +147,6 @@ class ExceptionListener
             if (null !== $this->logger) {
                 $this->logger->info(sprintf('Logout exception occurred; wrapping with AccessDeniedHttpException (%s)', $exception->getMessage()));
             }
-
-            $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
 
             return;
         } else {

@@ -129,7 +129,6 @@ class ExceptionListener
                         $subRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $exception);
 
                         $response = $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
-                        $response->setStatusCode(403);
                     } else {
                         return;
                     }

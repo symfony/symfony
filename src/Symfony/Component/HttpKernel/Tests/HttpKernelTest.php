@@ -14,8 +14,11 @@ namespace Symfony\Component\HttpKernel\Tests;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class HttpKernelTest extends \PHPUnit_Framework_TestCase
@@ -59,8 +62,38 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         });
 
         $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { throw new \RuntimeException('foo'); }));
+        $response = $kernel->handle(new Request());
 
-        $this->assertEquals('foo', $kernel->handle(new Request())->getContent());
+        $this->assertEquals('500', $response->getStatusCode());
+        $this->assertEquals('foo', $response->getContent());
+    }
+
+    public function testHandleExceptionWithARedirectionResponse()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
+            $event->setResponse(new RedirectResponse('/login', 301));
+        });
+
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { throw new AccessDeniedHttpException(); }));
+        $response = $kernel->handle(new Request());
+
+        $this->assertEquals('301', $response->getStatusCode());
+        $this->assertEquals('/login', $response->headers->get('Location'));
+    }
+
+    public function testHandleHttpException()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
+            $event->setResponse(new Response($event->getException()->getMessage()));
+        });
+
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { throw new MethodNotAllowedHttpException(array('POST')); }));
+        $response = $kernel->handle(new Request());
+
+        $this->assertEquals('405', $response->getStatusCode());
+        $this->assertEquals('POST', $response->headers->get('Allow'));
     }
 
     public function testHandleWhenAListenerReturnsAResponse()

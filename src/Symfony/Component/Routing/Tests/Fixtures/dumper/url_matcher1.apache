@@ -4,7 +4,11 @@ RewriteRule .* - [QSA,L]
 
 # foo
 RewriteCond %{REQUEST_URI} ^/foo/(baz|symfony)$
-RewriteRule .* app.php [QSA,L,E=_ROUTING__route:foo,E=_ROUTING_bar:%1,E=_ROUTING_def:test]
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:foo,E=_ROUTING_bar:%1,E=_ROUTING_DEFAULTS_def:test]
+
+# foobar
+RewriteCond %{REQUEST_URI} ^/foo(?:/([^/]+))?$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:foobar,E=_ROUTING_bar:%1,E=_ROUTING_DEFAULTS_bar:toto]
 
 # bar
 RewriteCond %{REQUEST_URI} ^/bar/([^/]+)$
@@ -58,7 +62,7 @@ RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz5unsafe,E=_ROUTING_foo:%1]
 
 # baz6
 RewriteCond %{REQUEST_URI} ^/test/baz$
-RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz6,E=_ROUTING_foo:bar\ baz]
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz6,E=_ROUTING_DEFAULTS_foo:bar\ baz]
 
 # baz7
 RewriteCond %{REQUEST_URI} ^/te\ st/baz$

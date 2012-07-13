@@ -34,6 +34,7 @@ class ApacheUrlMatcher extends UrlMatcher
     public function match($pathinfo)
     {
         $parameters = array();
+        $defaults = array();
         $allow = array();
         $match = false;
 
@@ -44,26 +45,28 @@ class ApacheUrlMatcher extends UrlMatcher
                 $name = substr($name, 9);
             }
 
-            if (0 === strpos($name, '_ROUTING_')) {
+            if (0 === strpos($name, '_ROUTING_DEFAULTS_')) {
+                $name = substr($name, 18);
+                $defaults[$name] = $value;
+            } elseif (0 === strpos($name, '_ROUTING_')) {
                 $name = substr($name, 9);
+                if ('_route' == $name) {
+                    $match = true;
+                    $parameters[$name] = $value;
+                } elseif (0 === strpos($name, '_allow_')) {
+                    $allow[] = substr($name, 7);
+                } else {
+                    $parameters[$name] = $value;
+                }
             } else {
                 continue;
-            }
-
-            if ('_route' == $name) {
-                $match = true;
-                $parameters[$name] = $value;
-            } elseif (0 === strpos($name, '_allow_')) {
-                $allow[] = substr($name, 7);
-            } else {
-                $parameters[$name] = $value;
             }
 
             unset($_SERVER[$key]);
         }
 
         if ($match) {
-            return $parameters;
+            return $this->mergeDefaults($parameters, $defaults);
         } elseif (0 < count($allow)) {
             throw new MethodNotAllowedException($allow);
         } else {

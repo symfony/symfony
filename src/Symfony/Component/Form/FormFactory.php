@@ -145,7 +145,7 @@ class FormFactory implements FormFactoryInterface
      */
     public function createNamedBuilder($name, $type, $data = null, array $options = array(), FormBuilderInterface $parent = null)
     {
-        if (!array_key_exists('data', $options)) {
+        if (null !== $data && !array_key_exists('data', $options)) {
             $options['data'] = $data;
         }
 

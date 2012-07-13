@@ -249,6 +249,16 @@
     public function finishView(FormViewInterface $view, FormInterface $form, array $options)
     ```
 
+  * The method `createBuilder` was removed from `FormTypeInterface` for performance
+    reasons. It is now not possible anymore to use custom implementations of
+    `FormBuilderInterface` for specific form types.
+
+    If you are in such a situation, you can subclass `FormRegistry` instead and override
+    `resolveType` to return a custom `ResolvedFormTypeInterface` implementation, within
+    which you can create your own `FormBuilderInterface` implementation. You should
+    register this custom registry class under the service name "form.registry" in order
+    to replace the default implementation.
+
   * If you previously inherited from `FieldType`, you should now inherit from
     `FormType`. You should also set the option `compound` to `false` if your field
     is not supposed to contain child fields.
@@ -999,6 +1009,24 @@
         'model_timezone' => 'UTC',
         'view_timezone' => 'America/New_York',
     ));
+    ```
+
+  * The methods `addType`, `hasType` and `getType` in `FormFactory` are deprecated
+    and will be removed in Symfony 2.3. You should use the methods with the same
+    name on the `FormRegistry` instead.
+
+    Before:
+
+    ```
+    $this->get('form.factory')->addType(new MyFormType());
+    ```
+
+    After:
+
+    ```
+    $registry = $this->get('form.registry');
+
+    $registry->addType($registry->resolveType(new MyFormType()));
     ```
 
 ### Validator

@@ -112,33 +112,4 @@ interface FormFactoryInterface
      * @throws Exception\FormException if any given option is not applicable to the form type
      */
     public function createBuilderForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null);
-
-    /**
-     * Returns a type by name.
-     *
-     * This methods registers the type extensions from the form extensions.
-     *
-     * @param string $name The name of the type
-     *
-     * @return FormTypeInterface The type
-     *
-     * @throws Exception\FormException if the type can not be retrieved from any extension
-     */
-    public function getType($name);
-
-    /**
-     * Returns whether the given type is supported.
-     *
-     * @param string $name The name of the type
-     *
-     * @return Boolean Whether the type is supported
-     */
-    public function hasType($name);
-
-    /**
-     * Adds a type.
-     *
-     * @param FormTypeInterface $type The type
-     */
-    public function addType(FormTypeInterface $type);
 }

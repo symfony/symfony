@@ -68,17 +68,40 @@ abstract class DoctrineType extends AbstractType
         $choiceList = function (Options $options) use ($registry, &$choiceListCache, &$time) {
             $manager = $registry->getManager($options['em']);
 
-            $choiceHashes = is_array($options['choices'])
-                ? array_map('spl_object_hash', $options['choices'])
-                : $options['choices'];
+            // Support for closures
+            $propertyHash = is_object($options['property'])
+                ? spl_object_hash($options['property'])
+                : $options['property'];
+
+            $choiceHashes = $options['choices'];
+
+            // Support for recursive arrays
+            if (is_array($choiceHashes)) {
+                // A second parameter ($key) is passed, so we cannot use
+                // spl_object_hash() directly (which strictly requires
+                // one parameter)
+                array_walk_recursive($choiceHashes, function ($value) {
+                    return spl_object_hash($value);
+                });
+            }
+
+            // Support for custom loaders (with query builders)
+            $loaderHash = is_object($options['loader'])
+                ? spl_object_hash($options['loader'])
+                : $options['loader'];
+
+            // Support for closures
+            $groupByHash = is_object($options['group_by'])
+                ? spl_object_hash($options['group_by'])
+                : $options['group_by'];
 
             $hash = md5(json_encode(array(
                 spl_object_hash($manager),
                 $options['class'],
-                $options['property'],
-                $options['loader'],
+                $propertyHash,
+                $loaderHash,
                 $choiceHashes,
-                $options['group_by']
+                $groupByHash
             )));
 
             if (!isset($choiceListCache[$hash])) {

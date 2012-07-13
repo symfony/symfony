@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 
-abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractLayoutTest extends FormIntegrationTestCase
 {
     protected $csrfProvider;
 
@@ -33,10 +33,15 @@ abstract class AbstractLayoutTest extends \PHPUnit_Framework_TestCase
 
         $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
 
-        $this->factory = new FormFactory(array(
+        parent::setUp();
+    }
+
+    protected function getExtensions()
+    {
+        return array(
             new CoreExtension(),
             new CsrfExtension($this->csrfProvider),
-        ));
+        );
     }
 
     protected function tearDown()

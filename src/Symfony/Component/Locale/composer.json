@@ -16,10 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.4"
     },
     "suggest": {
-        "ext-intl": ">=5.3.3"
+        "ext-intl": ">=5.3.4"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Locale": "" }

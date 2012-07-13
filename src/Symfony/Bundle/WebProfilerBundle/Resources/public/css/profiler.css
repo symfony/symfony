@@ -309,6 +309,11 @@ ul.alt li.error {
     margin-bottom: 1px;
 }
 
+ul.alt li.warning {
+    background-color: #ffcc00;
+    margin-bottom: 1px;
+}
+
 td.main, td.menu {
     text-align: left;
     margin: 0;

@@ -41,7 +41,7 @@
                     <input type="hidden" name="panel" value="logger" />
                     <label for="priority">Priority</label>
                     <select id="priority" name="priority" onchange="document.getElementById('priority-form').submit(); ">
-                        {% for value, text in { 100: 'DEBUG', 200: 'INFO', 300: 'WARNING', 400: 'ERROR', 500: 'CRITICAL', 550: 'ALERT' } %}
+                        {% for value, text in { 100: 'DEBUG', 200: 'INFO', 250: 'NOTICE', 300: 'WARNING', 400: 'ERROR', 500: 'CRITICAL', 550: 'ALERT', 600: 'EMERGENCY' } %}
                         <option value="{{ value }}"{{ value == priority ? ' selected' : '' }}>{{ text }}</option>
                         {% endfor %}
                     </select>
@@ -56,8 +56,8 @@
     {% if collector.logs %}
         <ul class="alt">
             {% for log in collector.logs if log.priority >= priority %}
-                <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if 'ERR' == log.priorityName or 'ERROR' == log.priorityName %} error{% endif %}">
-                    {{ log.message }}
+                <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if log.priority >= 400 %} error{% elseif log.priority >= 300 %} warning{% endif %}">
+                    {{ log.priorityName }} - {{ log.message }}
                     {% if log.context is defined and log.context is not empty %}
                         <br />
                         <small>
@@ -65,6 +65,8 @@
                         </small>
                     {% endif %}
                 </li>
+            {% else %}
+                <li><em>No logs available for this priority.</em></li>
             {% endfor %}
         </ul>
     {% else %}

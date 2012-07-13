@@ -594,12 +594,14 @@ class Finder implements \IteratorAggregate, \Countable
             $this->exclude = array_merge($this->exclude, self::$vcsPatterns);
         }
 
+        $extraPatterns = array();
         if (static::IGNORE_DOT_FILES === (static::IGNORE_DOT_FILES & $this->ignore)) {
             $this->notNames[] = '/^\..+/';
+            $extraPatterns[] = '#(^|/)\.#';
         }
 
-        if ($this->exclude) {
-            $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
+        if ($this->exclude || $extraPatterns) {
+            $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude, $extraPatterns);
         }
 
         if ($this->names || $this->notNames) {

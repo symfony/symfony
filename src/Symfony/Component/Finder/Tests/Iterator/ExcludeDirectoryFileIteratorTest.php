@@ -19,11 +19,11 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
     /**
      * @dataProvider getAcceptData
      */
-    public function testAccept($directories, $expected)
+    public function testAccept($directories, $extraPatterns, $expected)
     {
         $inner = new \RecursiveIteratorIterator(new RecursiveDirectoryIterator(sys_get_temp_dir().'/symfony2_finder', \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
 
-        $iterator = new ExcludeDirectoryFilterIterator($inner, $directories);
+        $iterator = new ExcludeDirectoryFilterIterator($inner, $directories, $extraPatterns);
 
         $this->assertIterator($expected, $iterator);
     }
@@ -33,25 +33,34 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
         $tmpDir = sys_get_temp_dir().'/symfony2_finder';
 
         return array(
-            array(array('foo'), array(
+            array(array('foo'), array(), array(
                 $tmpDir.DIRECTORY_SEPARATOR.'.bar',
                 $tmpDir.DIRECTORY_SEPARATOR.'.foo',
                 $tmpDir.DIRECTORY_SEPARATOR.'.foo'.DIRECTORY_SEPARATOR.'.bar',
+                $tmpDir.DIRECTORY_SEPARATOR.'.foo'.DIRECTORY_SEPARATOR.'bar',
                 $tmpDir.DIRECTORY_SEPARATOR.'.git',
                 $tmpDir.DIRECTORY_SEPARATOR.'test.py',
                 $tmpDir.DIRECTORY_SEPARATOR.'test.php',
                 $tmpDir.DIRECTORY_SEPARATOR.'toto'
             )),
-            array(array('fo'), array(
+            array(array('fo'), array(), array(
                 $tmpDir.DIRECTORY_SEPARATOR.'.bar',
                 $tmpDir.DIRECTORY_SEPARATOR.'.foo',
                 $tmpDir.DIRECTORY_SEPARATOR.'.foo'.DIRECTORY_SEPARATOR.'.bar',
+                $tmpDir.DIRECTORY_SEPARATOR.'.foo'.DIRECTORY_SEPARATOR.'bar',
                 $tmpDir.DIRECTORY_SEPARATOR.'.git',
                 $tmpDir.DIRECTORY_SEPARATOR.'test.py',
                 $tmpDir.DIRECTORY_SEPARATOR.'foo',
                 $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp',
                 $tmpDir.DIRECTORY_SEPARATOR.'test.php',
                 $tmpDir.DIRECTORY_SEPARATOR.'toto'
+            )),
+            array(array('toto'), array('#^\.#'), array(
+                $tmpDir.DIRECTORY_SEPARATOR.'.bar',
+                $tmpDir.DIRECTORY_SEPARATOR.'test.py',
+                $tmpDir.DIRECTORY_SEPARATOR.'foo',
+                $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp',
+                $tmpDir.DIRECTORY_SEPARATOR.'test.php',
             )),
         );
     }

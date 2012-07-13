@@ -34,7 +34,8 @@ interface FormRegistryInterface
      *
      * @return ResolvedFormTypeInterface The type
      *
-     * @throws Exception\FormException if the type can not be retrieved from any extension
+     * @throws Exception\UnexpectedTypeException if the passed name is not a string
+     * @throws Exception\FormException           if the type can not be retrieved from any extension
      */
     public function getType($name);
 
@@ -53,6 +54,9 @@ interface FormRegistryInterface
      * @param FormTypeInterface $type
      *
      * @return ResolvedFormTypeInterface
+     *
+     * @throws Exception\UnexpectedTypeException if the types parent {@link FormTypeInterface::getParent()} is not a string
+     * @throws Exception\FormException           if the types parent can not be retrieved from any extension
      */
     public function resolveType(FormTypeInterface $type);
 

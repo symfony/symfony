@@ -18,15 +18,15 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class FooType extends AbstractType
+class FooSubType extends AbstractType
 {
     public function getName()
     {
-        return 'foo';
+        return 'foo_sub_type';
     }
 
     public function getParent()
     {
-        return null;
+        return 'foo';
     }
 }

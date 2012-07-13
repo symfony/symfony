@@ -195,11 +195,17 @@ class Form implements \IteratorAggregate, FormInterface
      * @return array An array of FormTypeInterface
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link getConfig()} and {@link FormConfigInterface::getTypes()} instead.
+     *             {@link getConfig()} and {@link FormConfigInterface::getType()} instead.
      */
     public function getTypes()
     {
-        return $this->config->getTypes();
+        $types = array();
+
+        for ($type = $this->config->getType(); null !== $type; $type = $type->getParent()) {
+            array_unshift($types, $type->getInnerType());
+        }
+
+        return $types;
     }
 
     /**
@@ -948,34 +954,7 @@ class Form implements \IteratorAggregate, FormInterface
             $parent = $this->parent->createView();
         }
 
-        $view = new FormView($this->config->getName());
-
-        $view->setParent($parent);
-
-        $types = (array) $this->config->getTypes();
-        $options = $this->config->getOptions();
-
-        foreach ($types as $type) {
-            $type->buildView($view, $this, $options);
-
-            foreach ($type->getExtensions() as $typeExtension) {
-                $typeExtension->buildView($view, $this, $options);
-            }
-        }
-
-        foreach ($this->children as $child) {
-            $view->add($child->createView($view));
-        }
-
-        foreach ($types as $type) {
-            $type->finishView($view, $this, $options);
-
-            foreach ($type->getExtensions() as $typeExtension) {
-                $typeExtension->finishView($view, $this, $options);
-            }
-        }
-
-        return $view;
+        return $this->config->getType()->createView($this, $parent);
     }
 
     /**

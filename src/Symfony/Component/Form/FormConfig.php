@@ -59,9 +59,9 @@ class FormConfig implements FormConfigEditorInterface
     private $compound = false;
 
     /**
-     * @var array
+     * @var ResolvedFormTypeInterface
      */
-    private $types = array();
+    private $type;
 
     /**
      * @var array
@@ -377,9 +377,9 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * {@inheritdoc}
      */
-    public function getTypes()
+    public function getType()
     {
-        return $this->types;
+        return $this->type;
     }
 
     /**
@@ -671,9 +671,9 @@ class FormConfig implements FormConfigEditorInterface
     /**
      * {@inheritdoc}
      */
-    public function setTypes(array $types)
+    public function setType(ResolvedFormTypeInterface $type)
     {
-        $this->types = $types;
+        $this->type = $type;
 
         return $this;
     }

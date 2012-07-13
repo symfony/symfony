@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Acl\Dbal;
 
+use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Driver\Statement;
 use Symfony\Component\Security\Acl\Model\AclInterface;
@@ -214,8 +215,7 @@ class AclProvider implements AclProviderInterface
         for ($offset=0, $total=count($sids); $offset < $total; $offset += self::MAX_BATCH_SIZE) {
             $currentBatch = array_slice($sids, $offset, self::MAX_BATCH_SIZE);
 
-            $sql = $this->getObjectIdentitiesBySecurityIdentity($currentBatch);
-            $stmt = $this->connection->executeQuery($sql);
+            $stmt = $this->getObjectIdentitiesBySecurityIdentityStatement($currentBatch);
 
             foreach ($stmt->fetchAll(\PDO::FETCH_NUM) as $data) {
                 list($objectIdentifier, $classType) = $data;
@@ -233,7 +233,7 @@ class AclProvider implements AclProviderInterface
      * @param  array  $securityIds
      * @return string
      */
-    protected function getObjectIdentitiesBySecurityIdentity(array $securityIds)
+    protected function getObjectIdentitiesBySecurityIdentityStatement(array $securityIds)
     {
         $sql = <<<SELECTCLAUSE
             SELECT
@@ -249,23 +249,18 @@ class AclProvider implements AclProviderInterface
                 s.id = e.security_identity_id
             )
 
-            WHERE
+            WHERE (s.identifier IN (?))
 SELECTCLAUSE;
 
-        $sids = array();
+        $sids = array_map(function($sid) {
+            return sprintf("%s-%s", $sid->getClass(), $sid->getUsername());
+        }, $securityIds);
 
-        foreach ($securityIds as $sid) {
-            $sids[] = $this->connection->quote($sid->getClass() . '-' . $sid->getUsername());
-        }
-
-        if (!empty($ancestorIds)) {
-            $sql .= ' AND ';
-        }
-
-        $sql .= "(s.identifier = ";
-        $sql .= implode(' OR s.identifier = ', $sids).')';
-
-        return $sql;
+        return $this->connection->executeQuery(
+            $sql,
+            array($sids),
+            array(DBALConnection::PARAM_STR_ARRAY)
+        );
     }
 
     /**

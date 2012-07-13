@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\Exception;
 
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,6 +27,12 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $flattened = FlattenException::create(new NotFoundHttpException());
         $this->assertEquals('404', $flattened->getStatusCode());
+    }
+
+    public function testHeadersForHttpException()
+    {
+        $flattened = FlattenException::create(new MethodNotAllowedHttpException(array('POST')));
+        $this->assertEquals(array('Allow' => 'POST'), $flattened->getHeaders());
     }
 
     /**

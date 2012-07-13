@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.3.4",
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
         "symfony/form": "self.version",

@@ -63,10 +63,14 @@ class GetResponseForExceptionEvent extends GetResponseEvent
      *
      * @param \Exception $exception The thrown exception
      *
+     * @return GetResponseForExceptionEvent The current instance
+     *
      * @api
      */
     public function setException(\Exception $exception)
     {
         $this->exception = $exception;
+
+        return $this;
     }
 }

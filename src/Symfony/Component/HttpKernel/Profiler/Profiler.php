@@ -197,6 +197,8 @@ class Profiler
      * Sets the Collectors associated with this profiler.
      *
      * @param array $collectors An array of collectors
+     *
+     * @return Profiler The current instance
      */
     public function set(array $collectors = array())
     {
@@ -204,6 +206,8 @@ class Profiler
         foreach ($collectors as $collector) {
             $this->add($collector);
         }
+
+        return $this;
     }
 
     /**

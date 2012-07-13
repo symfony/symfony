@@ -30,6 +30,8 @@ class EventDataCollector extends DataCollector
         if ($dispatcher instanceof TraceableEventDispatcherInterface) {
             $this->dispatcher = $dispatcher;
         }
+
+        return $this;
     }
 
     /**

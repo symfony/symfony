@@ -45,6 +45,8 @@ class TimeDataCollector extends DataCollector
      * Sets the request events.
      *
      * @param array $events The request events
+     *
+     * @return TimeDataCollector The current instance
      */
     public function setEvents(array $events)
     {
@@ -53,6 +55,8 @@ class TimeDataCollector extends DataCollector
         }
 
         $this->data['events'] = $events;
+
+        return $this;
     }
 
     /**

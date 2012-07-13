@@ -52,6 +52,8 @@ class ErrorHandler
     public function setLevel($level)
     {
         $this->level = null === $level ? error_reporting() : $level;
+
+        return $this;
     }
 
     /**

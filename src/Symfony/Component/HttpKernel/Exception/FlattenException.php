@@ -80,6 +80,8 @@ class FlattenException
     public function setStatusCode($code)
     {
         $this->statusCode = $code;
+
+        return $this;
     }
 
     public function getHeaders()
@@ -90,6 +92,8 @@ class FlattenException
     public function setHeaders(array $headers)
     {
         $this->headers = $headers;
+
+        return $this;
     }
 
     public function getClass()
@@ -100,6 +104,8 @@ class FlattenException
     public function setClass($class)
     {
         $this->class = $class;
+
+        return $this;
     }
 
     public function getFile()
@@ -110,6 +116,8 @@ class FlattenException
     public function setFile($file)
     {
         $this->file = $file;
+
+        return $this;
     }
 
     public function getLine()
@@ -120,6 +128,8 @@ class FlattenException
     public function setLine($line)
     {
         $this->line = $line;
+
+        return $this;
     }
 
     public function getMessage()
@@ -140,6 +150,8 @@ class FlattenException
     public function setCode($code)
     {
         $this->code = $code;
+
+        return $this;
     }
 
     public function getPrevious()
@@ -150,6 +162,8 @@ class FlattenException
     public function setPrevious(FlattenException $previous)
     {
         $this->previous = $previous;
+
+        return $this;
     }
 
     public function getAllPrevious()
@@ -201,6 +215,8 @@ class FlattenException
                 'args'        => isset($entry['args']) ? $this->flattenArgs($entry['args']) : array(),
             );
         }
+
+        return $this;
     }
 
     private function flattenArgs($args, $level = 0)

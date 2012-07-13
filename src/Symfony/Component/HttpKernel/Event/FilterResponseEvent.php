@@ -58,10 +58,14 @@ class FilterResponseEvent extends KernelEvent
      *
      * @param Symfony\Component\HttpFoundation\Response $response
      *
+     * @return FilterResponseEvent The current instance
+     *
      * @api
      */
     public function setResponse(Response $response)
     {
         $this->response = $response;
+
+        return $this;
     }
 }

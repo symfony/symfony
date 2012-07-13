@@ -100,7 +100,7 @@ class ExceptionHandler
             }
         }
 
-        return new Response($this->decorate($content, $title), $exception->getStatusCode());
+        return new Response($this->decorate($content, $title), $exception->getStatusCode(), $exception->getHeaders());
     }
 
     private function getContent($exception)

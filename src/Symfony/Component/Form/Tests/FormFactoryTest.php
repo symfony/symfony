@@ -150,7 +150,19 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $builder = $this->factory->createNamedBuilder('bar', 'foo', 'xyz');
 
         // see FooType::buildForm()
+        $this->assertTrue($builder->getAttribute('data_option_set'));
         $this->assertEquals('xyz', $builder->getAttribute('data_option'));
+    }
+
+    public function testCreateNamedBuilderDoesNotSetDataOptionIfNull()
+    {
+        $type = new FooType();
+        $this->extension1->addType($type);
+
+        $builder = $this->factory->createNamedBuilder('bar', 'foo', null);
+
+        // see FooType::buildForm()
+        $this->assertFalse($builder->getAttribute('data_option_set'));
     }
 
     public function testCreateNamedBuilderDoesNotOverrideExistingDataOption()
@@ -163,6 +175,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         ));
 
         // see FooType::buildForm()
+        $this->assertTrue($builder->getAttribute('data_option_set'));
         $this->assertEquals('abc', $builder->getAttribute('data_option'));
     }
 

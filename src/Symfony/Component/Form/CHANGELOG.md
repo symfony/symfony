@@ -170,3 +170,5 @@ CHANGELOG
    * `getExtensions`
    * `setExtensions`
  * ChoiceType now caches its created choice lists to improve performance
+ * [BC BREAK] Rows of a collection field cannot be themed individually anymore. All rows in the collection
+   field now have the same block names, which contains "entry" where it previously contained the row index.

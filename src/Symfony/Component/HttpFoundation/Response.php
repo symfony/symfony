@@ -299,6 +299,11 @@ class Response
 
         if (function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
+        } else {
+            while (0 < ob_get_level()) {
+                ob_end_flush();
+            }
+            flush();
         }
 
         return $this;

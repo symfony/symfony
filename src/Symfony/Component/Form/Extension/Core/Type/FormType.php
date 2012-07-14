@@ -59,6 +59,7 @@ class FormType extends AbstractType
     public function buildView(FormViewInterface $view, FormInterface $form, array $options)
     {
         $name = $form->getName();
+        $blockName = $options['block_name'] ?: $form->getName();
         $readOnly = $options['read_only'];
         $translationDomain = $options['translation_domain'];
 
@@ -67,23 +68,30 @@ class FormType extends AbstractType
                 throw new FormException('Form node with empty name can be used only as root form node.');
             }
 
-            if ('' !== ($parentFullName = $view->getParent()->getVar('full_name'))) {
-                $id = sprintf('%s_%s', $view->getParent()->getVar('id'), $name);
+            $parentView = $view->getParent();
+
+            if ('' !== ($parentFullName = $parentView->getVar('full_name'))) {
+                $id = sprintf('%s_%s', $parentView->getVar('id'), $name);
                 $fullName = sprintf('%s[%s]', $parentFullName, $name);
+                $fullBlockName = sprintf('%s_%s', $parentView->getVar('full_block_name'), $blockName);
             } else {
                 $id = $name;
                 $fullName = $name;
+                $fullBlockName = '_' . $blockName;
             }
 
-            // Complex fields are read-only if themselves or their parent is.
-            $readOnly = $readOnly || $view->getParent()->getVar('read_only');
+            // Complex fields are read-only if they themselves or their parents are.
+            if (!$readOnly) {
+                $readOnly = $parentView->getVar('read_only');
+            }
 
             if (!$translationDomain) {
-                $translationDomain = $view->getParent()->getVar('translation_domain');
+                $translationDomain = $parentView->getVar('translation_domain');
             }
         } else {
             $id = $name;
             $fullName = $name;
+            $fullBlockName = '_' . $blockName;
 
             // Strip leading underscores and digits. These are allowed in
             // form names, but not in HTML4 ID attributes.
@@ -105,6 +113,7 @@ class FormType extends AbstractType
             'id'                 => $id,
             'name'               => $name,
             'full_name'          => $fullName,
+            'full_block_name'    => $fullBlockName,
             'read_only'          => $readOnly,
             'errors'             => $form->getErrors(),
             'valid'              => $form->isBound() ? $form->isValid() : true,
@@ -177,7 +186,14 @@ class FormType extends AbstractType
             return false !== $options['property_path'];
         };
 
+        // If data is given, the form is locked to that data
+        // (independent of its value)
+        $resolver->setOptional(array(
+            'data',
+        ));
+
         $resolver->setDefaults(array(
+            'block_name'         => null,
             'data_class'         => $dataClass,
             'empty_data'         => $emptyData,
             'trim'               => true,
@@ -196,12 +212,6 @@ class FormType extends AbstractType
             'virtual'            => false,
             'compound'           => true,
             'translation_domain' => null,
-        ));
-
-        // If data is given, the form is locked to that data
-        // (independent of its value)
-        $resolver->setOptional(array(
-            'data',
         ));
 
         $resolver->setAllowedTypes(array(

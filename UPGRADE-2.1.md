@@ -576,6 +576,30 @@
     {% endblock %}
     ````
 
+  * Custom styling of individual rows of a collection form has been removed for
+    performance reasons. Instead, all rows now have the same block name, where
+    the word "entry" replaces the previous occurence of the row index.
+
+    Before:
+
+    ```
+    {% block _author_tags_0_label %}
+        {# ... #}
+    {% endblock %}
+
+    {% block _author_tags_1_label %}
+        {# ... #}
+    {% endblock %}
+    ```
+
+    After:
+
+    ```
+    {% block _author_tags_entry_label %}
+        {# ... #}
+    {% endblock %}
+    ```
+
 #### Other BC Breaks
 
   * The order of the first two arguments of the methods `createNamed` and

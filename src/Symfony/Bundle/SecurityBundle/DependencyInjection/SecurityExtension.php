@@ -279,18 +279,22 @@ class SecurityExtension extends Extension
         if (isset($firewall['logout'])) {
             $listenerId = 'security.logout_listener.'.$id;
             $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
-            $listener->replaceArgument(2, array(
+            $listener->replaceArgument(3, array(
                 'csrf_parameter' => $firewall['logout']['csrf_parameter'],
                 'intention'      => $firewall['logout']['intention'],
                 'logout_path'    => $firewall['logout']['path'],
-                'target_url'     => $firewall['logout']['target'],
             ));
             $listeners[] = new Reference($listenerId);
 
             // add logout success handler
             if (isset($firewall['logout']['success_handler'])) {
-                $listener->replaceArgument(3, new Reference($firewall['logout']['success_handler']));
+                $logoutSuccessHandlerId = $firewall['logout']['success_handler'];
+            } else {
+                $logoutSuccessHandlerId = 'security.logout.success_handler.'.$id;
+                $logoutSuccessHandler = $container->setDefinition($logoutSuccessHandlerId, new DefinitionDecorator('security.logout.success_handler'));
+                $logoutSuccessHandler->replaceArgument(1, $firewall['logout']['target']);
             }
+            $listener->replaceArgument(2, new Reference($logoutSuccessHandlerId));
 
             // add CSRF provider
             if (isset($firewall['logout']['csrf_provider'])) {

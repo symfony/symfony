@@ -21,6 +21,8 @@ class ChoiceTypePerformanceTest extends FormPerformanceTestCase
     /**
      * This test case is realistic in collection forms where each
      * row contains the same choice field.
+     *
+     * @group benchmark
      */
     public function testSameChoiceFieldCreatedMultipleTimes()
     {

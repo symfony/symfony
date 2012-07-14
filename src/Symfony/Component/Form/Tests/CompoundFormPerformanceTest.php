@@ -18,6 +18,8 @@ class CompoundFormPerformanceTest extends FormPerformanceTestCase
 {
     /**
      * Create a compound form multiple times, as happens in a collection form
+     *
+     * @group benchmark
      */
     public function testArrayBasedForm()
     {

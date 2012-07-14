@@ -41,8 +41,8 @@ class ProfilerController extends ContainerAware
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
-        $panel = $this->container->get('request')->query->get('panel', 'request');
-        $page = $this->container->get('request')->query->get('page', 'home');
+        $panel = $request->query->get('panel', 'request');
+        $page = $request->query->get('page', 'home');
 
         if (!$profile = $profiler->loadProfile($token)) {
             return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:info.html.twig', array('about' => 'no_token', 'token' => $token));
@@ -144,14 +144,14 @@ class ProfilerController extends ContainerAware
     /**
      * Renders the Web Debug Toolbar.
      *
-     * @param string $token    The profiler token
-     * @param string $position The toolbar position (top, bottom, normal, or null -- use the configuration)
+     * @param Request $request  The current Request
+     * @param string  $token    The profiler token
+     * @param string  $position The toolbar position (top, bottom, normal, or null -- use the configuration)
      *
      * @return Response A Response instance
      */
-    public function toolbarAction($token, $position = null)
+    public function toolbarAction(Request $request, $token, $position = null)
     {
-        $request = $this->container->get('request');
         $session = $request->getSession();
 
         if (null !== $session && $session->getFlashBag() instanceof AutoExpireFlashBag) {
@@ -192,14 +192,16 @@ class ProfilerController extends ContainerAware
     /**
      * Renders the profiler search bar.
      *
+     * @param Request $request  The current Request
+     *
      * @return Response A Response instance
      */
-    public function searchBarAction()
+    public function searchBarAction(Request $request)
     {
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
-        if (null === $session = $this->container->get('request')->getSession()) {
+        if (null === $session = $request->getSession()) {
             $ip     =
             $method =
             $url    =
@@ -225,21 +227,22 @@ class ProfilerController extends ContainerAware
     /**
      * Search results.
      *
-     * @param string $token The token
+     * @param Request $request  The current Request
+     * @param string  $token    The token
      *
      * @return Response A Response instance
      */
-    public function searchResultsAction($token)
+    public function searchResultsAction(Request $request, $token)
     {
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
         $profile = $profiler->loadProfile($token);
 
-        $ip     = $this->container->get('request')->query->get('ip');
-        $method = $this->container->get('request')->query->get('method');
-        $url    = $this->container->get('request')->query->get('url');
-        $limit  = $this->container->get('request')->query->get('limit');
+        $ip     = $request->query->get('ip');
+        $method = $request->query->get('method');
+        $url    = $request->query->get('url');
+        $limit  = $request->query->get('limit');
 
         return $this->container->get('templating')->renderResponse('WebProfilerBundle:Profiler:results.html.twig', array(
             'token'    => $token,
@@ -256,14 +259,14 @@ class ProfilerController extends ContainerAware
     /**
      * Narrow the search bar.
      *
+     * @param Request $request  The current Request
+     *
      * @return Response A Response instance
      */
-    public function searchAction()
+    public function searchAction(Request $request)
     {
         $profiler = $this->container->get('profiler');
         $profiler->disable();
-
-        $request = $this->container->get('request');
 
         $ip     = preg_replace('/[^:\d\.]/', '', $request->query->get('ip'));
         $method = $request->query->get('method');

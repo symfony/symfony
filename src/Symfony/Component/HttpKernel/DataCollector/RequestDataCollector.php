@@ -60,11 +60,17 @@ class RequestDataCollector extends DataCollector
         }
 
         $sessionMetadata = array();
-
+        $sessionAttributes = array();
+        $flashes = array();
         if ($request->hasSession()) {
-            $sessionMetadata['Created'] = date(DATE_RFC822, $request->getSession()->getMetadataBag()->getCreated());
-            $sessionMetadata['Last used'] = date(DATE_RFC822, $request->getSession()->getMetadataBag()->getLastUsed());
-            $sessionMetadata['Lifetime'] = $request->getSession()->getMetadataBag()->getLifetime();
+            $session = $request->getSession();
+            if ($session->isStarted()) {
+                $sessionMetadata['Created'] = date(DATE_RFC822, $session->getMetadataBag()->getCreated());
+                $sessionMetadata['Last used'] = date(DATE_RFC822, $session->getMetadataBag()->getLastUsed());
+                $sessionMetadata['Lifetime'] = $session->getMetadataBag()->getLifetime();
+                $sessionAttributes = $session->all();
+                $flashes = $session->getFlashBag()->peekAll();
+            }
         }
 
         $this->data = array(
@@ -80,8 +86,8 @@ class RequestDataCollector extends DataCollector
             'request_attributes' => $attributes,
             'response_headers'   => $responseHeaders,
             'session_metadata'   => $sessionMetadata,
-            'session_attributes' => $request->hasSession() ? $request->getSession()->all() : array(),
-            'flashes'            => $request->hasSession() ? $request->getSession()->getFlashBag()->peekAll() : array(),
+            'session_attributes' => $sessionAttributes,
+            'flashes'            => $flashes,
             'path_info'          => $request->getPathInfo(),
         );
     }

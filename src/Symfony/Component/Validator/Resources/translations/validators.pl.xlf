@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices.</source>
-                <target>Powinieneś wybrać co najmniej {{ limit }} opcji.</target>
+                <target>Powinieneś wybrać co najmniej {{ limit }} opcję.|Powinieneś wybrać co najmniej {{ limit }} opcje.|Powinieneś wybrać co najmniej {{ limit }} opcji.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choices.</source>
-                <target>Powinieneś wybrać maksymalnie {{ limit }} opcji.</target>
+                <target>Powinieneś wybrać maksymalnie {{ limit }} opcję.|Powinieneś wybrać maksymalnie {{ limit }} opcje.|Powinieneś wybrać maksymalnie {{ limit }} opcji.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
@@ -201,6 +201,18 @@
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail.</source>
                 <target>Rozszerzenie PHP spowodowało błąd podczas wgrywania.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} elements or more.</source>
+                <target>Ten zbiór powinien zawierać {{ limit }} lub więcej elementów.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} elements or less.</source>
+                <target>Ten zbiór powinien zawierać {{ limit }} lub mniej elementów.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} elements.</source>
+                <target>Ten zbiór powinien zawierać dokładnie {{ limit }} element.|Ten zbiór powinien zawierać dokładnie {{ limit }} elementy.|Ten zbiór powinien zawierać dokładnie {{ limit }} elementów.</target>
             </trans-unit>
         </body>
     </file>

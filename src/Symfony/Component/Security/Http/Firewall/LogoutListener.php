@@ -40,11 +40,11 @@ class LogoutListener implements ListenerInterface
      *
      * @param SecurityContextInterface      $securityContext
      * @param HttpUtils                     $httpUtils       An HttpUtilsInterface instance
-     * @param array                         $options         An array of options to process a logout attempt
      * @param LogoutSuccessHandlerInterface $successHandler  A LogoutSuccessHandlerInterface instance
+     * @param array                         $options         An array of options to process a logout attempt
      * @param CsrfProviderInterface         $csrfProvider    A CsrfProviderInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, HttpUtils $httpUtils, array $options = array(), LogoutSuccessHandlerInterface $successHandler = null, CsrfProviderInterface $csrfProvider = null)
+    public function __construct(SecurityContextInterface $securityContext, HttpUtils $httpUtils, LogoutSuccessHandlerInterface $successHandler, array $options = array(), CsrfProviderInterface $csrfProvider = null)
     {
         $this->securityContext = $securityContext;
         $this->httpUtils = $httpUtils;
@@ -52,7 +52,6 @@ class LogoutListener implements ListenerInterface
             'csrf_parameter' => '_csrf_token',
             'intention'      => 'logout',
             'logout_path'    => '/logout',
-            'target_url'     => '/',
         ), $options);
         $this->successHandler = $successHandler;
         $this->csrfProvider = $csrfProvider;
@@ -95,14 +94,9 @@ class LogoutListener implements ListenerInterface
             }
         }
 
-        if (null !== $this->successHandler) {
-            $response = $this->successHandler->onLogoutSuccess($request);
-
-            if (!$response instanceof Response) {
-                throw new \RuntimeException('Logout Success Handler did not return a Response.');
-            }
-        } else {
-            $response = $this->httpUtils->createRedirectResponse($request, $this->options['target_url']);
+        $response = $this->successHandler->onLogoutSuccess($request);
+        if (!$response instanceof Response) {
+            throw new \RuntimeException('Logout Success Handler did not return a Response.');
         }
 
         // handle multiple logout attempts gracefully

@@ -77,7 +77,7 @@ class BasicAuthenticationListener implements ListenerInterface
             $this->securityContext->setToken(null);
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Authentication request failed for user "%s": %s', $username, $failed->getMessage()));
+                $this->logger->warn(sprintf('Authentication request failed for user "%s": %s', $username, $failed->getMessage()));
             }
 
             if ($this->ignoreFailure) {

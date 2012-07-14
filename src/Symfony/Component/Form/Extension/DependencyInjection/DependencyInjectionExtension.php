@@ -43,7 +43,13 @@ class DependencyInjectionExtension implements FormExtensionInterface
             throw new \InvalidArgumentException(sprintf('The field type "%s" is not registered with the service container.', $name));
         }
 
-        return $this->container->get($this->typeServiceIds[$name]);
+        $type = $this->container->get($this->typeServiceIds[$name]);
+
+        if ($type->getName() !== $name) {
+            throw new \InvalidArgumentException(sprintf('The type name specified for the service %s does not match the actual name', $this->typeServiceIds[$name]));
+        }
+
+        return $type;
     }
 
     public function hasType($name)

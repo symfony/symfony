@@ -235,8 +235,7 @@ class FormExtension extends \Twig_Extension
             }
         }
 
-        $custom = '_'.$view->getVar('id');
-        $rendering = $custom.$section;
+        $rendering = $view->getVar('id').$section;
         $blocks = $this->getBlocks($view);
 
         if (isset($this->varStack[$rendering])) {
@@ -245,7 +244,7 @@ class FormExtension extends \Twig_Extension
             $this->varStack[$rendering]['variables'] = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
         } else {
             $types = $view->getVar('types');
-            $types[] = $custom;
+            $types[] = '_'.$view->getVar('theme_id');
             $typeIndex = count($types) - 1;
             $this->varStack[$rendering] = array(
                 'variables' => array_replace_recursive($view->getVars(), $variables),

@@ -83,6 +83,10 @@ build: 56
     color: #AA3333;
     background: #f9ecec;
 }
+.sf-exceptionreset #logs .traces li.warning {
+    font-style: normal;
+    background: #ffcc00;
+}
 /* fix for Opera not liking empty <li> */
 .sf-exceptionreset .traces li:after {
     content: "\00A0";

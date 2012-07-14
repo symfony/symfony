@@ -425,7 +425,7 @@ class SimpleFormTest extends AbstractFormTest
         )))
             ->getForm();
 
-        $form->setData('app');
+        $form->bind('client');
 
         $this->assertEquals('app', $form->getData());
         $this->assertEquals('filterednorm', $form->getNormData());

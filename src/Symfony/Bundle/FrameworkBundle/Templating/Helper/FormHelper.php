@@ -246,7 +246,7 @@ class FormHelper extends Helper
             $variables = array_replace_recursive($this->varStack[$rendering]['variables'], $variables);
         } else {
             $types = $view->getVar('types');
-            $types[] = $custom;
+            $types[] = $view->getVar('full_block_name');
             $typeIndex = count($types) - 1;
             $variables = array_replace_recursive($view->getVars(), $variables);
             $this->varStack[$rendering]['types'] = $types;

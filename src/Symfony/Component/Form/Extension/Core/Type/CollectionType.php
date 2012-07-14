@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormViewInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CollectionType extends AbstractType
@@ -73,6 +74,12 @@ class CollectionType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $optionsFilter = function (Options $options, $value) {
+            $value['block_name'] = 'entry';
+
+            return $value;
+        };
+
         $resolver->setDefaults(array(
             'allow_add'      => false,
             'allow_delete'   => false,
@@ -80,6 +87,10 @@ class CollectionType extends AbstractType
             'prototype_name' => '__name__',
             'type'           => 'text',
             'options'        => array(),
+        ));
+
+        $resolver->setFilters(array(
+            'options' => $optionsFilter,
         ));
     }
 

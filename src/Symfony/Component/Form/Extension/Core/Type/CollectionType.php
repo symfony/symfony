@@ -67,6 +67,19 @@ class CollectionType extends AbstractType
         if ($form->getConfig()->hasAttribute('prototype') && $view->getVar('prototype')->getVar('multipart')) {
             $view->setVar('multipart', true);
         }
+        
+        foreach($view as $rowName => $rowView) {
+            $rowTypes = $form->get($rowName)->getTypes();
+            $rowTypeName = end($rowTypes)->getName();
+
+            if ($rowView->getVar('compound')) {
+                foreach($rowView as $childName => $childView) {
+                    $types = $childView->getVar('types');
+                    $types[] = sprintf("_%s_%s", $rowTypeName, $childName);
+                    $childView->setVar('types', $types);
+                }
+            }
+        }
     }
 
     /**

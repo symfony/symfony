@@ -15,7 +15,6 @@ use Symfony\Component\Serializer\Encoder\ChainDecoder;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
-use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Exception\RuntimeException;
@@ -41,11 +40,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     protected $encoder;
     protected $decoder;
     protected $normalizers = array();
-    protected $encoders = array();
     protected $normalizerCache = array();
     protected $denormalizerCache = array();
-    protected $encoderByFormat = array();
-    protected $decoderByFormat = array();
 
     public function __construct(array $normalizers = array(), array $encoders = array())
     {
@@ -82,9 +78,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             throw new UnexpectedValueException('Serialization for the format '.$format.' is not supported');
         }
 
-        $encoder = $this->encoder->getEncoder($format);
-
-        if (!$encoder instanceof NormalizationAwareInterface) {
+        if ($this->encoder->needsNormalization($format)) {
             $data = $this->normalize($data, $format);
         }
 

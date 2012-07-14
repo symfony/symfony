@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Encoder;
 
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /**
@@ -54,6 +55,28 @@ class ChainEncoder implements EncoderInterface
     }
 
     /**
+     * Checks whether the normalization is needed for the given format.
+     *
+     * @param string $format
+     *
+     * @return Boolean
+     */
+    public function needsNormalization($format)
+    {
+        $encoder = $this->getEncoder($format);
+
+        if (!$encoder instanceof NormalizationAwareInterface) {
+            return true;
+        }
+
+        if ($encoder instanceof self) {
+            return $encoder->needsNormalization($format);
+        }
+
+        return false;
+    }
+
+    /**
      * Gets the encoder supporting the format.
      *
      * @param string $format
@@ -61,7 +84,7 @@ class ChainEncoder implements EncoderInterface
      * @return EncoderInterface
      * @throws RuntimeException if no encoder is found
      */
-    public function getEncoder($format)
+    private function getEncoder($format)
     {
         if (isset($this->encoderByFormat[$format])
             && isset($this->encoders[$this->encoderByFormat[$format]])

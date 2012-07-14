@@ -560,4 +560,25 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 '
         );
     }
+
+    /**
+     * The block "_name_child_label" should be overridden in the theme of the
+     * implemented driver.
+     */
+    public function testCollectionRowWithCustomBlock()
+    {
+        $collection = array('one', 'two', 'three');
+        $form = $this->factory->createNamedBuilder('name', 'collection', $collection)
+            ->getForm();
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./div[./label[.="Custom label: [trans]0[/trans]"]]
+        /following-sibling::div[./label[.="Custom label: [trans]1[/trans]"]]
+        /following-sibling::div[./label[.="Custom label: [trans]2[/trans]"]]
+    ]
+'
+        );
+    }
 }

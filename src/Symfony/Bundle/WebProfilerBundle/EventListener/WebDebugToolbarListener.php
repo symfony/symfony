@@ -12,10 +12,12 @@
 namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Bundle\TwigBundle\TwigEngine;
-use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
@@ -27,7 +29,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class WebDebugToolbarListener
+class WebDebugToolbarListener implements EventSubscriberInterface
 {
     const DISABLED        = 1;
     const ENABLED         = 2;
@@ -123,5 +125,12 @@ class WebDebugToolbarListener
             $content = $substrFunction($content, 0, $pos).$toolbar.$substrFunction($content, $pos);
             $response->setContent($content);
         }
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::RESPONSE => array('onKernelResponse', -128),
+        );
     }
 }

@@ -24,12 +24,12 @@ class RouterDataCollector extends BaseRouterDataCollector
 {
     public function guessRoute(Request $request, $controller)
     {
-        if (!$controller instanceof RedirectController) {
-            return parent::guessRoute($request, $controller);
-        }
-
         if (is_array($controller)) {
             $controller = $controller[0];
+        }
+
+        if (!$controller instanceof RedirectController) {
+            return parent::guessRoute($request, $controller);
         }
 
         if ($controller instanceof RedirectController) {

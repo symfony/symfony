@@ -18,7 +18,7 @@
     <services>
         <service id="data_collector.config" class="%data_collector.config.class%" public="false">
             <tag name="data_collector" template="WebProfilerBundle:Collector:config" id="config" priority="255" />
-            <argument type="service" id="kernel" />
+            <call method="setKernel"><argument type="service" id="kernel" /></call>
         </service>
 
         <service id="data_collector.request" class="%data_collector.request.class%">

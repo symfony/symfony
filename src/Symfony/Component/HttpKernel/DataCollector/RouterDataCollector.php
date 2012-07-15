@@ -47,12 +47,7 @@ class RouterDataCollector extends DataCollector
             $this->data['url'] = $response->getTargetUrl();
 
             if ($this->controllers->contains($request)) {
-                $controller = $this->controllers[$request];
-                if (is_array($controller)) {
-                    $controller = $controller[0];
-                }
-
-                $this->data['route'] = $this->guessRoute($request, $controller);
+                $this->data['route'] = $this->guessRoute($request, $this->controllers[$request]);
             }
         }
     }

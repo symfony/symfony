@@ -55,7 +55,6 @@ class ConfigDataCollector extends DataCollector
             'bundles'         => array(),
         );
 
-        $this->data['bundles'] = array();
         if (isset($this->kernel)) {
             foreach ($this->kernel->getBundles() as $name => $bundle) {
                 $this->data['bundles'][$name] = $bundle->getPath();

@@ -19,11 +19,33 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class UsernameNotFoundException extends AuthenticationException
 {
+    private $username;
+
     /**
      * {@inheritDoc}
      */
     public function getMessageKey()
     {
         return 'security.exception.username_not_found_exception';
+    }
+
+    /**
+     * Get the username.
+     *
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * Set the username.
+     *
+     * @param string $username
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
     }
 }

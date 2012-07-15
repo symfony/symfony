@@ -93,6 +93,8 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
     /**
      * This test case is realistic in collection forms where each
      * row contains the same entity field.
+     *
+     * @group benchmark
      */
     public function testCollapsedEntityField()
     {

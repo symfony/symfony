@@ -1,1 +1,1 @@
-<?php echo $view['form']->renderBlock('widget_container_attributes') ?>
+<?php echo $view['form']->block('widget_container_attributes') ?>

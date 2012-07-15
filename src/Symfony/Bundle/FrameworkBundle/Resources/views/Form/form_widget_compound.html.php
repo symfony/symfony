@@ -1,4 +1,4 @@
-<div <?php echo $view['form']->renderBlock('widget_container_attributes') ?>>
+<div <?php echo $view['form']->block('widget_container_attributes') ?>>
     <?php if (!$form->hasParent() && $errors): ?>
     <tr>
         <td colspan="2">
@@ -6,6 +6,6 @@
         </td>
     </tr>
     <?php endif ?>
-    <?php echo $view['form']->renderBlock('form_rows') ?>
+    <?php echo $view['form']->block('form_rows') ?>
     <?php echo $view['form']->rest($form) ?>
 </div>

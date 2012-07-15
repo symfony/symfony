@@ -1053,6 +1053,21 @@
     $registry->addType($registry->resolveType(new MyFormType()));
     ```
 
+  * The method `renderBlock()` of the helper for the PHP Templating component was
+    deprecated and will be removed in Symfony 2.3. You should use `block()` instead.
+
+    Before:
+
+    ```
+    <?php echo $view['form']->renderBlock('widget_attributes') ?>
+    ```
+
+    After:
+
+    ```
+    <?php echo $view['form']->block('widget_attributes') ?>
+    ```
+
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and

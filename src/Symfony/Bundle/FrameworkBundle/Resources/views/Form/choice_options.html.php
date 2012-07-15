@@ -1,1 +1,1 @@
-<?php echo $view['form']->renderBlock('choice_widget_options') ?>
+<?php echo $view['form']->block('choice_widget_options') ?>

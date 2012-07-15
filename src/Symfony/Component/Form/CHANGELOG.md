@@ -31,7 +31,6 @@ CHANGELOG
    * ArrayToChoicesTransformer to ChoicesToValuesTransformer
    * ScalarToChoiceTransformer to ChoiceToValueTransformer
    to be consistent with the naming in ChoiceListInterface.
- * [BC BREAK] removed FormUtil::toArrayKey() and FormUtil::toArrayKeys().
    They were merged into ChoiceList and have no public equivalent anymore.
  * choice fields now throw a FormException if neither the "choices" nor the
    "choice_list" option is set
@@ -173,3 +172,10 @@ CHANGELOG
  * [BC BREAK] Rows of a collection field cannot be themed individually anymore. All rows in the collection
    field now have the same block names, which contains "entry" where it previously contained the row index.
  * [BC BREAK] When registering a type through the DI extension, the tag alias has to match the actual type name.
+ * added FormRendererInterface, FormRendererEngineInterface and implementations of these interfaces
+ * [BC BREAK] removed the following methods from FormUtil:
+   * `toArrayKey`
+   * `toArrayKeys`
+   * `isChoiceGroup`
+   * `isChoiceSelected`
+ * added method `block` to FormHelper and deprecated `renderBlock` instead

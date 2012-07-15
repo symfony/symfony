@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Exception;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
 /**
  * AuthenticationException is the base class for all authentication exceptions.
  *
@@ -19,16 +21,26 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class AuthenticationException extends \RuntimeException implements \Serializable
 {
-    private $extraInformation;
+    private $token;
 
-    public function getExtraInformation()
+    /**
+     * Get the token.
+     *
+     * @return TokenInterface
+     */
+    public function getToken()
     {
-        return $this->extraInformation;
+        return $this->token;
     }
 
-    public function setExtraInformation($extraInformation)
+    /**
+     * Set the token.
+     *
+     * @param TokenInterface $token
+     */
+    public function setToken(TokenInterface $token)
     {
-        $this->extraInformation = $extraInformation;
+        $this->token = $token;
     }
 
     public function serialize()

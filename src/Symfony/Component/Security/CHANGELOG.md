@@ -35,5 +35,6 @@ CHANGELOG
  * [BC BREAK] moved the default logout success handling to a separate class. The
    order of arguments in the constructor of `LogoutListener` has changed.
  * [BC BREAK] The constructor of `AuthenticationException` and all child
-   classes now matches the constructor of `\Exception`. Extra information
-   should be passed via the `setExtraInformation` setter.
+   classes now matches the constructor of `\Exception`. The extra information
+   getters and setters are removed. There are now dedicated getters/setters for
+   token (`AuthenticationException') and user (`AccountStatusException`).

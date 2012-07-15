@@ -91,7 +91,7 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
             throw $notFound;
         } catch (\Exception $repositoryProblem) {
             $ex = new AuthenticationServiceException($repositoryProblem->getMessage(), 0, $repositoryProblem);
-            $ex->setExtraInformation($token);
+            $ex->setToken($token);
             throw $ex;
         }
     }

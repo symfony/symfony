@@ -46,7 +46,7 @@ class AuthenticationException extends \RuntimeException implements \Serializable
     public function serialize()
     {
         return serialize(array(
-            $this->extraInformation,
+            $this->token,
             $this->code,
             $this->message,
             $this->file,
@@ -57,7 +57,7 @@ class AuthenticationException extends \RuntimeException implements \Serializable
     public function unserialize($str)
     {
         list(
-            $this->extraInformation,
+            $this->token,
             $this->code,
             $this->message,
             $this->file,

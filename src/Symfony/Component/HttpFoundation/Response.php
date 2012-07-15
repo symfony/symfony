@@ -299,7 +299,7 @@ class Response
 
         if (function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
-        } else {
+        } elseif ('cli' !== PHP_SAPI) {
             // ob_get_level() never returns 0 on some Windows configurations, so if
             // the level is the same two times in a row, the loop should be stopped.
             $previous = null;

@@ -21,7 +21,15 @@ namespace Symfony\Component\Security\Core\Exception;
  *        request.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Alexander <iam.asm89@gmail.com>
  */
 class SessionUnavailableException extends AuthenticationException
 {
+    /**
+     * {@inheritDoc}
+     */
+    public function getMessageKey()
+    {
+        return 'security.exception.session_unavailable_exception';
+    }
 }

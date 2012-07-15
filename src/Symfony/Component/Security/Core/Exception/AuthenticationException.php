@@ -52,4 +52,24 @@ class AuthenticationException extends \RuntimeException implements \Serializable
             $this->line
         ) = unserialize($str);
     }
+
+    /**
+     * Message key to be used by the translation component.
+     *
+     * @return string
+     */
+    public function getMessageKey()
+    {
+        return 'security.exception.authentication_exception';
+    }
+
+    /**
+     * Message data to be used by the translation component.
+     *
+     * @return array
+     */
+    public function getMessageData()
+    {
+        return array();
+    }
 }

@@ -16,7 +16,15 @@ namespace Symfony\Component\Security\Core\Exception;
  * because no Token is available.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexander <iam.asm89@gmail.com>
  */
 class AuthenticationCredentialsNotFoundException extends AuthenticationException
 {
+    /**
+     * {@inheritDoc}
+     */
+    public function getMessageKey()
+    {
+        return 'security.exception.authentication_credentials_not_found_exception';
+    }
 }

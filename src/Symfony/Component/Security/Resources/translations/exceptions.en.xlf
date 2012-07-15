@@ -50,6 +50,22 @@
                 <source>security.exception.username_not_found_exception</source>
                 <target>Username could not be found.</target>
             </trans-unit>
+            <trans-unit id="13">
+                <source>security.exception.account_expired_exception</source>
+                <target>Account has expired.</target>
+            </trans-unit>
+            <trans-unit id="14">
+                <source>security.exception.credentials_expired_exception</source>
+                <target>Credentials have expired.</target>
+            </trans-unit>
+            <trans-unit id="15">
+                <source>security.exception.credentials_expired_exception</source>
+                <target>Account is disabled.</target>
+            </trans-unit>
+            <trans-unit id="16">
+                <source>security.exception.credentials_expired_exception</source>
+                <target>Account is locked.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

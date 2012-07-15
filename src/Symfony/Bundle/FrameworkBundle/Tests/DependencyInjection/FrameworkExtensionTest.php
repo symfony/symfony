@@ -205,6 +205,11 @@ abstract class FrameworkExtensionTest extends TestCase
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
+        $this->assertContains(
+            'Symfony/Component/Security/Resources/translations/exceptions.en.xlf',
+            $files,
+            '->registerTranslatorConfiguration() finds Security translation resources'
+        );
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
         $this->assertEquals('fr', $calls[0][1][0]);

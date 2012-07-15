@@ -146,19 +146,20 @@
         </tr>
     </table>
 
-    <h2>Active bundles</h2>
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Path</th>
-        </tr>
-        {% set bundles = collector.bundles %}
-        {% for name in bundles|keys|sort %}
-        <tr>
-            <th>{{ name }}</th>
-            <td>{{ bundles[name] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-
+    {% if collector.bundles %}
+        <h2>Active bundles</h2>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Path</th>
+            </tr>
+            {% set bundles = collector.bundles %}
+            {% for name in bundles|keys|sort %}
+            <tr>
+                <th>{{ name }}</th>
+                <td>{{ bundles[name] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
 {% endblock %}

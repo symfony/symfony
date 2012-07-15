@@ -64,9 +64,7 @@ class RequestDataCollector extends BaseRequestDataCollector
     }
 
     /**
-     * Gets the route.
-     *
-     * @return string The route
+     * {@inheritdoc}
      */
     public function getRoute()
     {
@@ -74,9 +72,7 @@ class RequestDataCollector extends BaseRequestDataCollector
     }
 
     /**
-     * Returns the route parameters.
-     *
-     * @return array The parameters
+     * {@inheritdoc}
      */
     public function getRouteParams()
     {
@@ -84,9 +80,7 @@ class RequestDataCollector extends BaseRequestDataCollector
     }
 
     /**
-     * Gets the controller.
-     *
-     * @return string The controller as a string
+     * {@inheritdoc}
      */
     public function getController()
     {

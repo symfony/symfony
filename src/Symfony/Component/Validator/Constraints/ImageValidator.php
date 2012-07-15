@@ -22,6 +22,9 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class ImageValidator extends FileValidator
 {
+    /**
+     * {@inheritDoc}
+     */
     public function validate($value, Constraint $constraint)
     {
         $violations = count($this->context->getViolations());

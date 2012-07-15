@@ -25,12 +25,7 @@ class TimeValidator extends ConstraintValidator
     const PATTERN = '/^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/';
 
     /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @api
+     * {@inheritDoc}
      */
     public function validate($value, Constraint $constraint)
     {

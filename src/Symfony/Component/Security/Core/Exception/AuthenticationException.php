@@ -15,17 +15,11 @@ namespace Symfony\Component\Security\Core\Exception;
  * AuthenticationException is the base class for all authentication exceptions.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexander <iam.asm89@gmail.com>
  */
 class AuthenticationException extends \RuntimeException implements \Serializable
 {
     private $extraInformation;
-
-    public function __construct($message, $extraInformation = null, $code = 0, \Exception $previous = null)
-    {
-        parent::__construct($message, $code, $previous);
-
-        $this->extraInformation = $extraInformation;
-    }
 
     public function getExtraInformation()
     {

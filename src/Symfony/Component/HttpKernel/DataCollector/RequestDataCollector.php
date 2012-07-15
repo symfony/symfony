@@ -167,6 +167,37 @@ class RequestDataCollector extends DataCollector
         return $this->data['format'];
     }
 
+
+    /**
+     * Gets the route.
+     *
+     * @return string The route
+     */
+    public function getRoute()
+    {
+        return 'n/a';
+    }
+
+    /**
+     * Returns the route parameters.
+     *
+     * @return array The parameters
+     */
+    public function getRouteParams()
+    {
+        return 'n/a';
+    }
+
+    /**
+     * Gets the controller.
+     *
+     * @return string The controller as a string
+     */
+    public function getController()
+    {
+        return 'n/a';
+    }
+
     /**
      * {@inheritdoc}
      */

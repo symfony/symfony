@@ -1,4 +1,4 @@
-<div <?php echo $view['form']->renderBlock('widget_container_attributes') ?>>
+<div <?php echo $view['form']->block('widget_container_attributes') ?>>
 <?php foreach ($form as $child): ?>
     <?php echo $view['form']->widget($child) ?>
     <?php echo $view['form']->label($child) ?>

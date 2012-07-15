@@ -104,14 +104,14 @@ class ProfilerController extends ContainerAware
      *
      * @return Response A Response instance
      */
-    public function importAction()
+    public function importAction(Request $request)
     {
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
         $router = $this->container->get('router');
 
-        $file = $this->container->get('request')->files->get('file');
+        $file = $request->files->get('file');
 
         if (empty($file) || !$file->isValid()) {
             return new RedirectResponse($router->generate('_profiler_info', array('about' => 'upload_error')));

@@ -17,7 +17,7 @@ namespace Symfony\Component\Security\Core\Role;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Role implements RoleInterface, \Serializable
+class Role implements RoleInterface
 {
     private $role;
 
@@ -37,21 +37,5 @@ class Role implements RoleInterface, \Serializable
     public function getRole()
     {
         return $this->role;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
-    {
-        return serialize($this->role);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
-    {
-        $this->role = unserialize($serialized);
     }
 }

@@ -45,22 +45,4 @@ class SwitchUserRole extends Role
     {
         return $this->source;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
-    {
-        return serialize(array(parent::serialize(), $this->source));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
-    {
-        list($parent, $this->source) = unserialize($serialized);
-
-        parent::unserialize($parent);
-    }
 }

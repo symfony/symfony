@@ -37,4 +37,5 @@ CHANGELOG
  * [BC BREAK] The constructor of `AuthenticationException` and all child
    classes now matches the constructor of `\Exception`. The extra information
    getters and setters are removed. There are now dedicated getters/setters for
-   token (`AuthenticationException') and user (`AccountStatusException`).
+   token (`AuthenticationException'), user (`AccountStatusException`) and
+   username (`UsernameNotFoundException`).

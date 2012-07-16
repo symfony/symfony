@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 
-class FormTest extends AbstractFormTest
+class CompoundFormTest extends AbstractFormTest
 {
     public function testValidIfAllChildrenAreValid()
     {

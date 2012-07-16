@@ -23,14 +23,14 @@ class ChoiceView
      *
      * @var string
      */
-    private $value;
+    public $value;
 
     /**
      * The label displayed to humans.
      *
      * @var string
      */
-    private $label;
+    public $label;
 
     /**
      * Creates a new ChoiceView.
@@ -42,25 +42,5 @@ class ChoiceView
     {
         $this->value = $value;
         $this->label = $label;
-    }
-
-    /**
-     * Returns the choice value.
-     *
-     * @return string The view representation of the choice.
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
-
-    /**
-     * Returns the choice label.
-     *
-     * @return string The label displayed to humans.
-     */
-    public function getLabel()
-    {
-        return $this->label;
     }
 }

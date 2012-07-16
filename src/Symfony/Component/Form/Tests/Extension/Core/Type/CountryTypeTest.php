@@ -38,7 +38,7 @@ class CountryTypeTest extends LocalizedTestCase
         $choices = $view->vars['choices'];
 
         foreach ($choices as $choice) {
-            if ('ZZ' === $choice->getValue()) {
+            if ('ZZ' === $choice->value) {
                 $this->fail('Should not contain choice "ZZ"');
             }
         }

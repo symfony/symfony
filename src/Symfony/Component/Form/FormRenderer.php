@@ -186,7 +186,7 @@ class FormRenderer implements FormRendererInterface
     public function isChoiceSelected(FormView $view, ChoiceView $choice)
     {
         $value = $view->vars['value'];
-        $choiceValue = $choice->getValue();
+        $choiceValue = $choice->value;
 
         if (is_array($value)) {
             return false !== array_search($choiceValue, $value, true);

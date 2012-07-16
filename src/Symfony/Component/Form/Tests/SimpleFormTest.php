@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\FormConfig;
 use Symfony\Component\Form\FormView;
@@ -727,6 +729,21 @@ class SimpleFormTest extends AbstractFormTest
             '' => '',
             'foo' => array('bar' => 'baz'),
         )));
+        $form = new Form($config);
+
+        $form->setData('foo');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testSetDataCannotInvokeItself()
+    {
+        // Cycle detection to prevent endless loops
+        $config = new FormConfig('name', 'stdClass', $this->dispatcher);
+        $config->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $event->getForm()->setData('bar');
+        });
         $form = new Form($config);
 
         $form->setData('foo');

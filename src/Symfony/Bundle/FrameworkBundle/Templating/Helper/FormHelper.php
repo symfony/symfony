@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Form\FormRendererInterface;
-use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
@@ -54,7 +54,7 @@ class FormHelper extends Helper
         return $this->renderer->isChoiceGroup($label);
     }
 
-    public function isChoiceSelected(FormViewInterface $view, ChoiceView $choice)
+    public function isChoiceSelected(FormView $view, ChoiceView $choice)
     {
         return $this->renderer->isChoiceSelected($view, $choice);
     }
@@ -64,10 +64,10 @@ class FormHelper extends Helper
      *
      * The theme format is "<Bundle>:<Controller>".
      *
-     * @param FormViewInterface     $view   A FormViewInterface instance
+     * @param FormView     $view   A FormView instance
      * @param string|array $themes A theme or an array of theme
      */
-    public function setTheme(FormViewInterface $view, $themes)
+    public function setTheme(FormView $view, $themes)
     {
         $this->renderer->setTheme($view, $themes);
     }
@@ -79,11 +79,11 @@ class FormHelper extends Helper
      *
      *     <form action="..." method="post" <?php echo $view['form']->enctype() ?>>
      *
-     * @param FormViewInterface $view The view for which to render the encoding type
+     * @param FormView $view The view for which to render the encoding type
      *
      * @return string The HTML markup
      */
-    public function enctype(FormViewInterface $view)
+    public function enctype(FormView $view)
     {
         return $this->renderer->renderEnctype($view);
     }
@@ -101,12 +101,12 @@ class FormHelper extends Helper
      *
      *     <?php echo view['form']->widget(array('separator' => '+++++)) ?>
      *
-     * @param FormViewInterface $view      The view for which to render the widget
+     * @param FormView $view      The view for which to render the widget
      * @param array             $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
-    public function widget(FormViewInterface $view, array $variables = array())
+    public function widget(FormView $view, array $variables = array())
     {
         return $this->renderer->renderWidget($view, $variables);
     }
@@ -114,12 +114,12 @@ class FormHelper extends Helper
     /**
      * Renders the entire form field "row".
      *
-     * @param FormViewInterface $view      The view for which to render the row
+     * @param FormView $view      The view for which to render the row
      * @param array             $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
-    public function row(FormViewInterface $view, array $variables = array())
+    public function row(FormView $view, array $variables = array())
     {
         return $this->renderer->renderRow($view, $variables);
     }
@@ -127,13 +127,13 @@ class FormHelper extends Helper
     /**
      * Renders the label of the given view.
      *
-     * @param FormViewInterface $view      The view for which to render the label
+     * @param FormView $view      The view for which to render the label
      * @param string            $label     The label
      * @param array             $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
-    public function label(FormViewInterface $view, $label = null, array $variables = array())
+    public function label(FormView $view, $label = null, array $variables = array())
     {
         return $this->renderer->renderLabel($view, $label, $variables);
     }
@@ -141,11 +141,11 @@ class FormHelper extends Helper
     /**
      * Renders the errors of the given view.
      *
-     * @param FormViewInterface $view The view to render the errors for
+     * @param FormView $view The view to render the errors for
      *
      * @return string The HTML markup
      */
-    public function errors(FormViewInterface $view)
+    public function errors(FormView $view)
     {
         return $this->renderer->renderErrors($view);
     }
@@ -153,12 +153,12 @@ class FormHelper extends Helper
     /**
      * Renders views which have not already been rendered.
      *
-     * @param FormViewInterface $view      The parent view
+     * @param FormView $view      The parent view
      * @param array             $variables An array of variables
      *
      * @return string The HTML markup
      */
-    public function rest(FormViewInterface $view, array $variables = array())
+    public function rest(FormView $view, array $variables = array())
     {
         return $this->renderer->renderRest($view, $variables);
     }

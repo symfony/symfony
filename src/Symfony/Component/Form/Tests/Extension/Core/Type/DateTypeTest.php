@@ -357,7 +357,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('2010', '2010'),
             new ChoiceView('2011', '2011'),
-        ), $view->get('year')->getVar('choices'));
+        ), $view['year']->vars['choices']);
     }
 
     public function testMonthsOption()
@@ -371,7 +371,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('6', '06'),
             new ChoiceView('7', '07'),
-        ), $view->get('month')->getVar('choices'));
+        ), $view['month']->vars['choices']);
     }
 
     public function testMonthsOptionShortFormat()
@@ -386,7 +386,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('1', 'Jän'),
             new ChoiceView('4', 'Apr')
-        ), $view->get('month')->getVar('choices'));
+        ), $view['month']->vars['choices']);
     }
 
     public function testMonthsOptionLongFormat()
@@ -401,7 +401,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('1', 'Jänner'),
             new ChoiceView('4', 'April'),
-        ), $view->get('month')->getVar('choices'));
+        ), $view['month']->vars['choices']);
     }
 
     public function testMonthsOptionLongFormatWithDifferentTimezone()
@@ -416,7 +416,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('1', 'Jänner'),
             new ChoiceView('4', 'April'),
-        ), $view->get('month')->getVar('choices'));
+        ), $view['month']->vars['choices']);
     }
 
     public function testIsDayWithinRangeReturnsTrueIfWithin()
@@ -430,7 +430,7 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('6', '06'),
             new ChoiceView('7', '07'),
-        ), $view->get('day')->getVar('choices'));
+        ), $view['day']->vars['choices']);
     }
 
     public function testIsPartiallyFilledReturnsFalseIfSingleText()
@@ -510,7 +510,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date');
         $view = $form->createView();
 
-        $this->assertSame('{{ year }}-{{ month }}-{{ day }}', $view->getVar('date_pattern'));
+        $this->assertSame('{{ year }}-{{ month }}-{{ day }}', $view->vars['date_pattern']);
     }
 
     public function testPassDatePatternToViewDifferentFormat()
@@ -521,7 +521,7 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->getVar('date_pattern'));
+        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->vars['date_pattern']);
     }
 
     public function testPassDatePatternToViewDifferentPattern()
@@ -532,7 +532,7 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame('{{ month }}*{{ year }}*{{ day }}', $view->getVar('date_pattern'));
+        $this->assertSame('{{ month }}*{{ year }}*{{ day }}', $view->vars['date_pattern']);
     }
 
     public function testDontPassDatePatternIfText()
@@ -542,7 +542,7 @@ class DateTypeTest extends LocalizedTestCase
         ));
         $view = $form->createView();
 
-        $this->assertNull($view->getVar('date_pattern'));
+        $this->assertFalse(isset($view->vars['date_pattern']));
     }
 
     public function testPassWidgetToView()
@@ -552,7 +552,7 @@ class DateTypeTest extends LocalizedTestCase
         ));
         $view = $form->createView();
 
-        $this->assertSame('single_text', $view->getVar('widget'));
+        $this->assertSame('single_text', $view->vars['widget']);
     }
 
     // Bug fix
@@ -570,7 +570,7 @@ class DateTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertEquals('date', $view->getVar('type'));
+        $this->assertEquals('date', $view->vars['type']);
     }
 
     public function testPassDefaultEmptyValueToViewIfNotRequired()
@@ -580,9 +580,9 @@ class DateTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertSame('', $view->get('year')->getVar('empty_value'));
-        $this->assertSame('', $view->get('month')->getVar('empty_value'));
-        $this->assertSame('', $view->get('day')->getVar('empty_value'));
+        $this->assertSame('', $view['year']->vars['empty_value']);
+        $this->assertSame('', $view['month']->vars['empty_value']);
+        $this->assertSame('', $view['day']->vars['empty_value']);
     }
 
     public function testPassNoEmptyValueToViewIfRequired()
@@ -592,9 +592,9 @@ class DateTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertNull($view->get('year')->getVar('empty_value'));
-        $this->assertNull($view->get('month')->getVar('empty_value'));
-        $this->assertNull($view->get('day')->getVar('empty_value'));
+        $this->assertNull($view['year']->vars['empty_value']);
+        $this->assertNull($view['month']->vars['empty_value']);
+        $this->assertNull($view['day']->vars['empty_value']);
     }
 
     public function testPassEmptyValueAsString()
@@ -604,9 +604,9 @@ class DateTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertSame('Empty', $view->get('year')->getVar('empty_value'));
-        $this->assertSame('Empty', $view->get('month')->getVar('empty_value'));
-        $this->assertSame('Empty', $view->get('day')->getVar('empty_value'));
+        $this->assertSame('Empty', $view['year']->vars['empty_value']);
+        $this->assertSame('Empty', $view['month']->vars['empty_value']);
+        $this->assertSame('Empty', $view['day']->vars['empty_value']);
     }
 
     public function testPassEmptyValueAsArray()
@@ -620,9 +620,9 @@ class DateTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertSame('Empty year', $view->get('year')->getVar('empty_value'));
-        $this->assertSame('Empty month', $view->get('month')->getVar('empty_value'));
-        $this->assertSame('Empty day', $view->get('day')->getVar('empty_value'));
+        $this->assertSame('Empty year', $view['year']->vars['empty_value']);
+        $this->assertSame('Empty month', $view['month']->vars['empty_value']);
+        $this->assertSame('Empty day', $view['day']->vars['empty_value']);
     }
 
     public function testPassEmptyValueAsPartialArray_addEmptyIfNotRequired()
@@ -636,9 +636,9 @@ class DateTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertSame('Empty year', $view->get('year')->getVar('empty_value'));
-        $this->assertSame('', $view->get('month')->getVar('empty_value'));
-        $this->assertSame('Empty day', $view->get('day')->getVar('empty_value'));
+        $this->assertSame('Empty year', $view['year']->vars['empty_value']);
+        $this->assertSame('', $view['month']->vars['empty_value']);
+        $this->assertSame('Empty day', $view['day']->vars['empty_value']);
     }
 
     public function testPassEmptyValueAsPartialArray_addNullIfRequired()
@@ -652,9 +652,9 @@ class DateTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertSame('Empty year', $view->get('year')->getVar('empty_value'));
-        $this->assertNull($view->get('month')->getVar('empty_value'));
-        $this->assertSame('Empty day', $view->get('day')->getVar('empty_value'));
+        $this->assertSame('Empty year', $view['year']->vars['empty_value']);
+        $this->assertNull($view['month']->vars['empty_value']);
+        $this->assertSame('Empty day', $view['day']->vars['empty_value']);
     }
 
     public function testPassHtml5TypeIfSingleTextAndHtml5Format()
@@ -664,7 +664,7 @@ class DateTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertSame('date', $view->getVar('type'));
+        $this->assertSame('date', $view->vars['type']);
     }
 
     public function testDontPassHtml5TypeIfNotHtml5Format()
@@ -675,7 +675,7 @@ class DateTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertNull($view->getVar('type'));
+        $this->assertFalse(isset($view->vars['type']));
     }
 
     public function testDontPassHtml5TypeIfNotSingleText()
@@ -685,7 +685,7 @@ class DateTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertNull($view->getVar('type'));
+        $this->assertFalse(isset($view->vars['type']));
     }
 
     public function provideCompoundWidgets()
@@ -705,9 +705,9 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'widget' => $widget,
         ));
-        $form->get('year')->addError($error);
+        $form['year']->addError($error);
 
-        $this->assertSame(array(), $form->get('year')->getErrors());
+        $this->assertSame(array(), $form['year']->getErrors());
         $this->assertSame(array($error), $form->getErrors());
     }
 
@@ -720,9 +720,9 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'widget' => $widget,
         ));
-        $form->get('month')->addError($error);
+        $form['month']->addError($error);
 
-        $this->assertSame(array(), $form->get('month')->getErrors());
+        $this->assertSame(array(), $form['month']->getErrors());
         $this->assertSame(array($error), $form->getErrors());
     }
 
@@ -735,9 +735,9 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date', null, array(
             'widget' => $widget,
         ));
-        $form->get('day')->addError($error);
+        $form['day']->addError($error);
 
-        $this->assertSame(array(), $form->get('day')->getErrors());
+        $this->assertSame(array(), $form['day']->getErrors());
         $this->assertSame(array($error), $form->getErrors());
     }
 }

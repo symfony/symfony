@@ -537,7 +537,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertTrue($view->getVar('required'));
+        $this->assertTrue($view->vars['required']);
     }
 
     public function testPassNonRequiredToView()
@@ -548,7 +548,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertFalse($view->getVar('required'));
+        $this->assertFalse($view->vars['required']);
     }
 
     public function testPassMultipleToView()
@@ -559,7 +559,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertTrue($view->getVar('multiple'));
+        $this->assertTrue($view->vars['multiple']);
     }
 
     public function testPassExpandedToView()
@@ -570,7 +570,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertTrue($view->getVar('expanded'));
+        $this->assertTrue($view->vars['expanded']);
     }
 
     public function testNotPassedEmptyValueToViewIsNull()
@@ -581,7 +581,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertNull($view->getVar('empty_value'));
+        $this->assertNull($view->vars['empty_value']);
     }
 
     public function testPassEmptyValueToViewIsEmpty()
@@ -593,7 +593,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertEmpty($view->getVar('empty_value'));
+        $this->assertEmpty($view->vars['empty_value']);
     }
 
     /**
@@ -610,7 +610,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertEquals($viewValue, $view->getVar('empty_value'));
+        $this->assertEquals($viewValue, $view->vars['empty_value']);
     }
 
     /**
@@ -627,7 +627,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertNull($view->getVar('empty_value'));
+        $this->assertNull($view->vars['empty_value']);
     }
 
     public function getOptionsWithEmptyValue()
@@ -658,7 +658,7 @@ class ChoiceTypeTest extends TypeTestCase
             new ChoiceView('b', 'B'),
             new ChoiceView('c', 'C'),
             new ChoiceView('d', 'D'),
-        ), $view->getVar('choices'));
+        ), $view->vars['choices']);
     }
 
     public function testPassPreferredChoicesToView()
@@ -673,11 +673,11 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertEquals(array(
             0 => new ChoiceView('a', 'A'),
             2 => new ChoiceView('c', 'C'),
-        ), $view->getVar('choices'));
+        ), $view->vars['choices']);
         $this->assertEquals(array(
             1 => new ChoiceView('b', 'B'),
             3 => new ChoiceView('d', 'D'),
-        ), $view->getVar('preferred_choices'));
+        ), $view->vars['preferred_choices']);
     }
 
     public function testPassHierarchicalChoicesToView()
@@ -696,7 +696,7 @@ class ChoiceTypeTest extends TypeTestCase
             'Doctrine' => array(
                 4 => new ChoiceView('e', 'Roman'),
             ),
-        ), $view->getVar('choices'));
+        ), $view->vars['choices']);
         $this->assertEquals(array(
             'Symfony' => array(
                 1 => new ChoiceView('b', 'Fabien'),
@@ -704,7 +704,7 @@ class ChoiceTypeTest extends TypeTestCase
             'Doctrine' => array(
                 3 => new ChoiceView('d', 'Jon'),
             ),
-        ), $view->getVar('preferred_choices'));
+        ), $view->vars['preferred_choices']);
     }
 
     public function testAdjustFullNameForMultipleNonExpanded()
@@ -716,7 +716,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
         $view = $form->createView();
 
-        $this->assertSame('name[]', $view->getVar('full_name'));
+        $this->assertSame('name[]', $view->vars['full_name']);
     }
 
     // https://github.com/symfony/symfony/issues/3298

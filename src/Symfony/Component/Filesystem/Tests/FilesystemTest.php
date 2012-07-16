@@ -826,6 +826,120 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getFilesToCreate
+     */
+    public function testCreateEmptyFile($prefix, $suffix, $extension, $maxTry, $pattern)
+    {
+        $createDir = $this->workspace . DIRECTORY_SEPARATOR . 'book-dir';
+        mkdir($createDir);
+
+        $file = $this->filesystem->createEmptyFile($createDir, $prefix, $suffix, $extension, $maxTry);
+        $this->assertTrue(file_exists($file));
+        $this->assertEquals($createDir, dirname($file));
+        $this->assertEquals(0, filesize($file));
+        $this->assertRegExp($pattern, basename($file));
+        unlink($file);
+    }
+
+    public function getFilesToCreate()
+    {
+        return array(
+            array(null, null, null, 10, '/\w{5}/'),
+            array('romain', null, null, 10, '/romain\w{5}/'),
+            array(null, 'neutron', null, 10, '/\w{5}neutron/'),
+            array(null, null, 'io', 10, '/\w{5}\.io/'),
+            array('romain', null, 'io', 10, '/romain\w{5}\.io/'),
+            array(null, 'neutron', 'io', 10, '/\w{5}neutron\.io/'),
+            array('romain', 'neutron', 'io', 10, '/romain\w{5}neutron\.io/'),
+        );
+    }
+
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testCreateEmptyFileInvalidDir()
+    {
+        $createDir = $this->workspace . DIRECTORY_SEPARATOR . 'invalid-book-dir';
+
+        $this->filesystem->createEmptyFile($createDir);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testCreateEmptyFileInvalidDirSecondMethod()
+    {
+        $createDir = $this->workspace . DIRECTORY_SEPARATOR . 'invalid-book-dir';
+
+        $this->filesystem->createEmptyFile($createDir, 'romain', 'neutron');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testCreateEmptyFileFails()
+    {
+        $createDir = $this->workspace . DIRECTORY_SEPARATOR . 'book-dir';
+        mkdir($createDir);
+
+        $this->filesystem->createEmptyFile($createDir, 'romain', 'neutron', null, 0);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testCreateEmptyFileOnFile()
+    {
+        $createDir = $this->workspace . DIRECTORY_SEPARATOR . 'book-dir';
+        touch($createDir);
+
+        $this->filesystem->createEmptyFile($createDir, null, null, null);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testCreateEmptyFileOnFileSecondMethod()
+    {
+        $createDir = $this->workspace . DIRECTORY_SEPARATOR . 'book-dir';
+        touch($createDir);
+
+        $this->filesystem->createEmptyFile($createDir, 'romain', 'neutron', 'io');
+    }
+
+    /**
+     * @dataProvider getFilesToCreate
+     */
+    public function testTemporaryFiles($prefix, $suffix, $extension, $maxTry, $pattern)
+    {
+        $files = $this->filesystem->getTemporaryFiles(3, $prefix, $suffix, $extension, $maxTry);
+        $this->assertEquals(3, count($files));
+
+        foreach ($files as $file) {
+            $this->assertTrue(file_exists($file));
+            $this->assertEquals(sys_get_temp_dir(), dirname($file));
+            $this->assertEquals(0, filesize($file));
+            $this->assertRegExp($pattern, basename($file));
+        }
+    }
+
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testTemporaryFilesFails()
+    {
+        $this->filesystem->getTemporaryFiles(3, 'prefix', 'suffix', null, 0);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\InvalidArgumentException
+     */
+    public function testTemporaryFilesInvalidQuantity()
+    {
+        $this->filesystem->getTemporaryFiles(0);
+    }
+
+    /**
      * Returns file permissions as three digits (i.e. 755)
      *
      * @return integer

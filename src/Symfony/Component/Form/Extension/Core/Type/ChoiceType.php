@@ -226,8 +226,8 @@ class ChoiceType extends AbstractType
                 $this->addSubForms($builder, $choiceView, $options);
             } else {
                 $choiceOpts = array(
-                    'value' => $choiceView->getValue(),
-                    'label' => $choiceView->getLabel(),
+                    'value' => $choiceView->value,
+                    'label' => $choiceView->label,
                     'translation_domain' => $options['translation_domain'],
                 );
 

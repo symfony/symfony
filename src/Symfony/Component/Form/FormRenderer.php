@@ -175,20 +175,6 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function isChoiceSelected(ChoiceView $choice, $selectedValue)
-    {
-        $choiceValue = $choice->value;
-
-        if (is_array($selectedValue)) {
-            return false !== array_search($choiceValue, $selectedValue, true);
-        }
-
-        return $choiceValue === $selectedValue;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function humanize($text)
     {
         return ucfirst(trim(strtolower(preg_replace('/[_\s]+/', ' ', $text))));

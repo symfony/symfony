@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Bridge\Twig\Form\TwigRendererInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 
 /**
@@ -80,8 +81,30 @@ class FormExtension extends \Twig_Extension
         return array(
             'humanize'           => new \Twig_Filter_Method($this, 'renderer->humanize'),
             'is_choice_group'    => new \Twig_Filter_Function('is_array', array('is_safe' => array('html'))),
-            'is_choice_selected' => new \Twig_Filter_Method($this, 'renderer->isChoiceSelected', array('is_safe' => array('html'))),
+            'is_choice_selected' => new \Twig_Filter_Method($this, 'isChoiceSelected'),
         );
+    }
+
+    /**
+     * Returns whether a choice is selected for a given form value.
+     *
+     * This method exists for the sole purpose that Twig performs (a lot) better
+     * with filters than with methods of an object.
+     *
+     * To give this some perspective, I'm currently testing this on a form with
+     * a large list of entity fields. Using the filter is around 220ms faster than
+     * accessing the method directly on the object in the Twig template.
+     *
+     * @param ChoiceView   $choice        The choice to check.
+     * @param string|array $selectedValue The selected value to compare.
+     *
+     * @return Boolean Whether the choice is selected.
+     *
+     * @see ChoiceView::isSelected()
+     */
+    public function isChoiceSelected(ChoiceView $choice, $selectedValue)
+    {
+        return $choice->isSelected($selectedValue);
     }
 
     /**

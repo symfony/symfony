@@ -246,7 +246,7 @@ class FormRenderer implements FormRendererInterface
         // to implement a custom "choice_widget" block (no matter in which theme),
         // or to fallback to the block of the parent type, which would be
         // "form_widget" in this example (again, no matter in which theme).
-        // If the designer wants to explicitely fallback to "form_widget" in his
+        // If the designer wants to explicitly fallback to "form_widget" in his
         // custom "choice_widget", for example because he only wants to wrap
         // a <div> around the original implementation, he can simply call the
         // widget() function again to render the block for the parent type.
@@ -264,7 +264,7 @@ class FormRenderer implements FormRendererInterface
             $hierarchyLevel = count($blockHierarchy) - 1;
 
             // The default variable scope contains all view variables, merged with
-            // the variables passed explicitely to the helper
+            // the variables passed explicitly to the helper
             $scopeVariables = $view->getVars();
         } else {
             // RECURSIVE CALL
@@ -273,7 +273,7 @@ class FormRenderer implements FormRendererInterface
             $blockHierarchy = $this->blockHierarchyMap[$mapKey];
             $hierarchyLevel = $this->hierarchyLevelMap[$mapKey] - 1;
 
-            // Reuse the current scope and merge it with the explicitely passed variables
+            // Reuse the current scope and merge it with the explicitly passed variables
             $scopeVariables = $this->variableMap[$mapKey];
         }
 

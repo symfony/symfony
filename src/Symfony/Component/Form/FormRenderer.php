@@ -155,7 +155,19 @@ class FormRenderer implements FormRendererInterface
             throw new FormException(sprintf('No block "%s" found while rendering the form.', $block));
         }
 
-        $variables = array_replace_recursive($scopeVariables, $variables);
+        // Merge the passed with the existing attributes
+        if (isset($variables['attr']) && isset($scopeVariables['attr'])) {
+            $variables['attr'] = array_replace($scopeVariables['attr'], $variables['attr']);
+        }
+
+        // Merge the passed with the exist *label* attributes
+        if (isset($variables['label_attr']) && isset($scopeVariables['label_attr'])) {
+            $variables['label_attr'] = array_replace($scopeVariables['label_attr'], $variables['label_attr']);
+        }
+
+        // Do not use array_replace_recursive(), otherwise array variables
+        // cannot be overwritten
+        $variables = array_replace($scopeVariables, $variables);
 
         return $this->engine->renderBlock($view, $resource, $block, $variables);
     }
@@ -253,7 +265,7 @@ class FormRenderer implements FormRendererInterface
 
             // The default variable scope contains all view variables, merged with
             // the variables passed explicitely to the helper
-            $variables = array_replace_recursive($view->getVars(), $variables);
+            $scopeVariables = $view->getVars();
         } else {
             // RECURSIVE CALL
             // If a block recursively calls renderSection() again, resume rendering
@@ -262,7 +274,7 @@ class FormRenderer implements FormRendererInterface
             $hierarchyLevel = $this->hierarchyLevelMap[$mapKey] - 1;
 
             // Reuse the current scope and merge it with the explicitely passed variables
-            $variables = array_replace_recursive($this->variableMap[$mapKey], $variables);
+            $scopeVariables = $this->variableMap[$mapKey];
         }
 
         // Load the resource where this block can be found
@@ -284,6 +296,20 @@ class FormRenderer implements FormRendererInterface
                 implode('", "', array_reverse($blockHierarchy))
             ));
         }
+
+        // Merge the passed with the existing attributes
+        if (isset($variables['attr']) && isset($scopeVariables['attr'])) {
+            $variables['attr'] = array_replace($scopeVariables['attr'], $variables['attr']);
+        }
+
+        // Merge the passed with the exist *label* attributes
+        if (isset($variables['label_attr']) && isset($scopeVariables['label_attr'])) {
+            $variables['label_attr'] = array_replace($scopeVariables['label_attr'], $variables['label_attr']);
+        }
+
+        // Do not use array_replace_recursive(), otherwise array variables
+        // cannot be overwritten
+        $variables = array_replace($scopeVariables, $variables);
 
         // In order to make recursive calls possible, we need to store the block hierarchy,
         // the current level of the hierarchy and the variables so that this method can

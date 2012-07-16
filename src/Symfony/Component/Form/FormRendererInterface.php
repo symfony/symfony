@@ -147,16 +147,6 @@ interface FormRendererInterface
     public function renderCsrfToken($intention);
 
     /**
-     * Returns whether the given choice is selected.
-     *
-     * @param ChoiceView   $choice        The choice to check.
-     * @param string|array $selectedValue The selected value(s).
-     *
-     * @return Boolean Whether the choice is selected
-     */
-    public function isChoiceSelected(ChoiceView $choice, $selectedValue);
-
-    /**
      * Makes a technical name human readable.
      *
      * Sequences of underscores are replaced by single spaces. The first letter

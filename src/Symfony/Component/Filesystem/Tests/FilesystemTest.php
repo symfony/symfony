@@ -354,6 +354,24 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->filesystem->exists($basePath.'file1'));
         $this->assertTrue($this->filesystem->exists($basePath.'folder'));
+
+        rmdir($basePath.'folder');
+        unlink($basePath.'file1');
+    }
+
+    public function testsFilesDoesNotExist()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
+
+        mkdir($basePath);
+        touch($basePath.'file1');
+        mkdir($basePath.'folder');
+        $this->assertFalse($this->filesystem->isAbsent($basePath.'folder'));
+        $this->assertFalse($this->filesystem->isAbsent($basePath.'file1'));
+        rmdir($basePath.'folder');
+        $this->assertTrue($this->filesystem->isAbsent($basePath.'folder'));
+        unlink($basePath.'file1');
+        $this->assertTrue($this->filesystem->isAbsent($basePath.'file1'));
     }
 
     public function testFilesExistsTraversableObjectOfFilesAndDirectories()
@@ -368,6 +386,29 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertTrue($this->filesystem->exists($files));
+
+        unlink($basePath.'file');
+        rmdir($basePath.'dir');
+
+        $this->assertFalse($this->filesystem->exists($files));
+    }
+
+    public function testFilesDoesNotExistsTraversableObject()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+
+        mkdir($basePath.'dir');
+        touch($basePath.'file');
+
+        $files = new \ArrayObject(array(
+            $basePath.'dir', $basePath.'file'
+        ));
+
+        $this->assertFalse($this->filesystem->isAbsent($files));
+        unlink($basePath.'file');
+        $this->assertFalse($this->filesystem->isAbsent($files));
+        rmdir($basePath.'dir');
+        $this->assertTrue($this->filesystem->isAbsent($files));
     }
 
     public function testFilesNotExistsTraversableObjectOfFilesAndDirectories()
@@ -385,6 +426,9 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         unlink($basePath.'file');
 
         $this->assertFalse($this->filesystem->exists($files));
+
+        unlink($basePath.'file2');
+        rmdir($basePath.'dir');
     }
 
     public function testInvalidFileNotExists()

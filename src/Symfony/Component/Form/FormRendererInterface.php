@@ -147,23 +147,14 @@ interface FormRendererInterface
     public function renderCsrfToken($intention);
 
     /**
-     * Returns whether the given choice is a group.
-     *
-     * @param mixed $choice A choice
-     *
-     * @return Boolean Whether the choice is a group
-     */
-    public function isChoiceGroup($choice);
-
-    /**
      * Returns whether the given choice is selected.
      *
-     * @param FormView $view   The view of the choice field
-     * @param ChoiceView        $choice The choice to check
+     * @param ChoiceView   $choice        The choice to check.
+     * @param string|array $selectedValue The selected value(s).
      *
      * @return Boolean Whether the choice is selected
      */
-    public function isChoiceSelected(FormView $view, ChoiceView $choice);
+    public function isChoiceSelected(ChoiceView $choice, $selectedValue);
 
     /**
      * Makes a technical name human readable.

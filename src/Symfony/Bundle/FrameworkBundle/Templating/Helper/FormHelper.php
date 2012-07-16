@@ -49,14 +49,9 @@ class FormHelper extends Helper
         return 'form';
     }
 
-    public function isChoiceGroup($label)
+    public function isChoiceSelected(ChoiceView $choice, $selectedValue)
     {
-        return $this->renderer->isChoiceGroup($label);
-    }
-
-    public function isChoiceSelected(FormView $view, ChoiceView $choice)
-    {
-        return $this->renderer->isChoiceSelected($view, $choice);
+        return $this->renderer->isChoiceSelected($choice, $selectedValue);
     }
 
     /**
@@ -176,7 +171,7 @@ class FormHelper extends Helper
      */
     public function renderBlock($block, array $variables = array())
     {
-        return $this->block($block, $variables);
+        return $this->renderer->renderBlock($block, $variables);
     }
 
     /**

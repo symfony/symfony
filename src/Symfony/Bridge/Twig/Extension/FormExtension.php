@@ -69,8 +69,6 @@ class FormExtension extends \Twig_Extension
             'form_row'                 => new \Twig_Function_Method($this, 'renderer->renderRow', array('is_safe' => array('html'))),
             'form_rest'                => new \Twig_Function_Method($this, 'renderer->renderRest', array('is_safe' => array('html'))),
             'csrf_token'               => new \Twig_Function_Method($this, 'renderer->renderCsrfToken'),
-            '_form_is_choice_group'    => new \Twig_Function_Method($this, 'renderer->isChoiceGroup', array('is_safe' => array('html'))),
-            '_form_is_choice_selected' => new \Twig_Function_Method($this, 'renderer->isChoiceSelected', array('is_safe' => array('html'))),
         );
     }
 
@@ -80,7 +78,9 @@ class FormExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            'humanize' => new \Twig_Filter_Method($this, 'renderer->humanize'),
+            'humanize'           => new \Twig_Filter_Method($this, 'renderer->humanize'),
+            'is_choice_group'    => new \Twig_Filter_Function('is_array', array('is_safe' => array('html'))),
+            'is_choice_selected' => new \Twig_Filter_Method($this, 'renderer->isChoiceSelected', array('is_safe' => array('html'))),
         );
     }
 

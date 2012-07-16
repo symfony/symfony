@@ -175,24 +175,15 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function isChoiceGroup($choice)
+    public function isChoiceSelected(ChoiceView $choice, $selectedValue)
     {
-        return is_array($choice) || $choice instanceof \Traversable;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isChoiceSelected(FormView $view, ChoiceView $choice)
-    {
-        $value = $view->vars['value'];
         $choiceValue = $choice->value;
 
-        if (is_array($value)) {
-            return false !== array_search($choiceValue, $value, true);
+        if (is_array($selectedValue)) {
+            return false !== array_search($choiceValue, $selectedValue, true);
         }
 
-        return $choiceValue === $value;
+        return $choiceValue === $selectedValue;
     }
 
     /**

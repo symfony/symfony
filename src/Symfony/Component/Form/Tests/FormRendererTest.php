@@ -40,34 +40,6 @@ class FormRendererTest extends \PHPUnit_Framework_TestCase
         $this->renderer = new FormRenderer($this->engine, $this->csrfProvider);
     }
 
-    public function isChoiceGroupProvider()
-    {
-        return array(
-            array(false, 0),
-            array(false, '0'),
-            array(false, '1'),
-            array(false, 1),
-            array(false, ''),
-            array(false, null),
-            array(false, true),
-
-            array(true, array()),
-        );
-    }
-
-    /**
-     * @dataProvider isChoiceGroupProvider
-     */
-    public function testIsChoiceGroup($expected, $value)
-    {
-        $this->assertSame($expected, $this->renderer->isChoiceGroup($value));
-    }
-
-    public function testIsChoiceGroupPart2()
-    {
-        $this->assertTrue($this->renderer->isChoiceGroup(new \SplFixedArray(1)));
-    }
-
     public function isChoiceSelectedProvider()
     {
         // The commented cases should not be necessary anymore, because the
@@ -96,10 +68,8 @@ class FormRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsChoiceSelected($expected, $choice, $value)
     {
-        $view = new FormView();
-        $view->vars['value'] = $value;
         $choice = new ChoiceView($choice, $choice . ' label');
 
-        $this->assertSame($expected, $this->renderer->isChoiceSelected($view, $choice));
+        $this->assertSame($expected, $this->renderer->isChoiceSelected($choice, $value));
     }
 }

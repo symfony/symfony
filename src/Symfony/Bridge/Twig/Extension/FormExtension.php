@@ -88,12 +88,18 @@ class FormExtension extends \Twig_Extension
     /**
      * Returns whether a choice is selected for a given form value.
      *
-     * This method exists for the sole purpose that Twig performs (a lot) better
-     * with filters than with methods of an object.
+     * Unfortunately Twig does not support an efficient way to execute the
+     * "is_selected" closure passed to the template by ChoiceType. It is faster
+     * to implement the logic here (around 65ms for a specific form).
      *
-     * To give this some perspective, I'm currently testing this on a form with
-     * a large list of entity fields. Using the filter is around 220ms faster than
-     * accessing the method directly on the object in the Twig template.
+     * Directly implementing the logic here is also faster than doing so in
+     * ChoiceView (around 30ms).
+     *
+     * The worst option tested so far is to implement the logic in ChoiceView
+     * and access the ChoiceView method directly in the template. Doing so is
+     * around 220ms slower than doing the method call here in the filter. Twig
+     * seems to be much more efficient at executing filters than at executing
+     * methods of an object.
      *
      * @param ChoiceView   $choice        The choice to check.
      * @param string|array $selectedValue The selected value to compare.
@@ -104,7 +110,11 @@ class FormExtension extends \Twig_Extension
      */
     public function isChoiceSelected(ChoiceView $choice, $selectedValue)
     {
-        return $choice->isSelected($selectedValue);
+        if (is_array($selectedValue)) {
+            return false !== array_search($choice->value, $selectedValue, true);
+        }
+
+        return $choice->value === $selectedValue;
     }
 
     /**

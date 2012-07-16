@@ -90,6 +90,20 @@ class ChoiceType extends AbstractType
             'empty_value'       => null,
         ));
 
+        // The decision, whether a choice is selected, is potentially done
+        // thousand of times during the rendering of a template. Provide a
+        // closure here that is optimized for the value of the form, to
+        // avoid making the type check inside the closure.
+        if ($options['multiple']) {
+            $view->vars['is_selected'] = function ($choice, array $values) {
+                return false !== array_search($choice, $values, true);
+            };
+        } else {
+            $view->vars['is_selected'] = function ($choice, $value) {
+                return $choice === $value;
+            };
+        }
+
         // Check if the choices already contain the empty value
         // Only add the empty value option if this is not the case
         if (0 === count($options['choice_list']->getIndicesForValues(array('')))) {

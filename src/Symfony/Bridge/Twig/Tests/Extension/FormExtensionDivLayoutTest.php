@@ -18,6 +18,7 @@ use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
@@ -103,6 +104,39 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             $this->renderWidget($view),
             '/input[@type="email"][@rel="theme"]'
         );
+    }
+
+    public function isChoiceSelectedProvider()
+    {
+        // The commented cases should not be necessary anymore, because the
+        // choice lists should assure that both values passed here are always
+        // strings
+        return array(
+//             array(true, 0, 0),
+            array(true, '0', '0'),
+            array(true, '1', '1'),
+//             array(true, false, 0),
+//             array(true, true, 1),
+            array(true, '', ''),
+//             array(true, null, ''),
+            array(true, '1.23', '1.23'),
+            array(true, 'foo', 'foo'),
+            array(true, 'foo10', 'foo10'),
+            array(true, 'foo', array(1, 'foo', 'foo10')),
+
+            array(false, 10, array(1, 'foo', 'foo10')),
+            array(false, 0, array(1, 'foo', 'foo10')),
+        );
+    }
+
+    /**
+     * @dataProvider isChoiceSelectedProvider
+     */
+    public function testIsChoiceSelected($expected, $choice, $value)
+    {
+        $choice = new ChoiceView($choice, $choice . ' label');
+
+        $this->assertSame($expected, $this->extension->isChoiceSelected($choice, $value));
     }
 
     protected function renderEnctype(FormView $view)

@@ -33,22 +33,22 @@ class LazyOption
     /**
      * Creates a new lazy option.
      *
-     * @param Closure $closure The closure used for initializing the
-     *                               option value.
+     * @param \Closure $closure    The closure used for initializing the
+     *                             option value.
      * @param mixed $previousValue The previous value of the option. This
-     *                               value is passed to the closure when it is
-     *                               evaluated.
+     *                             value is passed to the closure when it is
+     *                             evaluated.
      *
      * @see evaluate()
      */
-    public function __construct(\Closure $closure, $previousValue)
+    public function __construct(\Closure $closure, $previousValue = null)
     {
         $this->closure = $closure;
         $this->previousValue = $previousValue;
     }
 
     /**
-     * Evaluates the underyling closure and returns its result.
+     * Evaluates the underlying closure and returns its result.
      *
      * The given Options instance is passed to the closure as first argument.
      * The previous default value set in the constructor is passed as second
@@ -60,10 +60,14 @@ class LazyOption
      */
     public function evaluate(Options $options)
     {
-        if ($this->previousValue instanceof self) {
-            $this->previousValue = $this->previousValue->evaluate($options);
+        $previousValue = $this->previousValue;
+        $closure = $this->closure;
+
+        if ($previousValue instanceof self) {
+            $previousValue = $this->previousValue->evaluate($options);
         }
 
-        return $this->closure->__invoke($options, $this->previousValue);
+        // Performs a bit better than __invoke() and call_user_func()
+        return $closure($options, $previousValue);
     }
 }

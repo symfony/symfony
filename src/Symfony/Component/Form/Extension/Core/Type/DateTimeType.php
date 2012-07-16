@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
@@ -174,15 +174,15 @@ class DateTimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->setVar('widget', $options['widget']);
+        $view->vars['widget'] = $options['widget'];
 
         // Change the input to a HTML5 date input if
         //  * the widget is set to "single_text"
         //  * the format matches the one expected by HTML5
         if ('single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
-            $view->setVar('type', 'datetime');
+            $view->vars['type'] = 'datetime';
         }
     }
 

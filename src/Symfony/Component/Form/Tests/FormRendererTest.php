@@ -96,8 +96,8 @@ class FormRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsChoiceSelected($expected, $choice, $value)
     {
-        $view = new FormView('name');
-        $view->setVar('value', $value);
+        $view = new FormView();
+        $view->vars['value'] = $value;
         $choice = new ChoiceView($choice, $choice . ' label');
 
         $this->assertSame($expected, $this->renderer->isChoiceSelected($view, $choice));

@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class FileType extends AbstractType
@@ -21,9 +21,9 @@ class FileType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->addVars(array(
+        $view->vars = array_replace($view->vars, array(
             'type'  => 'file',
             'value' => '',
         ));
@@ -32,10 +32,10 @@ class FileType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view
-            ->setVar('multipart', true)
+            ->vars['multipart'] = true
         ;
     }
 

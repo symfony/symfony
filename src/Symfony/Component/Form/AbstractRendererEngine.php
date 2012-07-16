@@ -19,7 +19,7 @@ namespace Symfony\Component\Form;
 abstract class AbstractRendererEngine implements FormRendererEngineInterface
 {
     /**
-     * The variable in {@link FormViewInterface} used as cache key.
+     * The variable in {@link FormView} used as cache key.
      */
     const CACHE_KEY_VAR = 'full_block_name';
     
@@ -57,9 +57,9 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function setTheme(FormViewInterface $view, $themes)
+    public function setTheme(FormView $view, $themes)
     {
-        $cacheKey = $view->getVar(self::CACHE_KEY_VAR);
+        $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
         // Do not cast, as casting turns objects into arrays of properties
         $this->themes[$cacheKey] = is_array($themes) ? $themes : array($themes);
@@ -74,9 +74,9 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceForBlock(FormViewInterface $view, $block)
+    public function getResourceForBlock(FormView $view, $block)
     {
-        $cacheKey = $view->getVar(self::CACHE_KEY_VAR);
+        $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
         if (!isset($this->resources[$cacheKey][$block])) {
             $this->loadResourceForBlock($cacheKey, $view, $block);
@@ -88,9 +88,9 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceForBlockHierarchy(FormViewInterface $view, array $blockHierarchy, $hierarchyLevel)
+    public function getResourceForBlockHierarchy(FormView $view, array $blockHierarchy, $hierarchyLevel)
     {
-        $cacheKey = $view->getVar(self::CACHE_KEY_VAR);
+        $cacheKey = $view->vars[self::CACHE_KEY_VAR];
         $block = $blockHierarchy[$hierarchyLevel];
 
         if (!isset($this->resources[$cacheKey][$block])) {
@@ -103,9 +103,9 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceHierarchyLevel(FormViewInterface $view, array $blockHierarchy, $hierarchyLevel)
+    public function getResourceHierarchyLevel(FormView $view, array $blockHierarchy, $hierarchyLevel)
     {
-        $cacheKey = $view->getVar(self::CACHE_KEY_VAR);
+        $cacheKey = $view->vars[self::CACHE_KEY_VAR];
         $block = $blockHierarchy[$hierarchyLevel];
 
         if (!isset($this->resources[$cacheKey][$block])) {
@@ -128,12 +128,12 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      * @see getResourceForBlock()
      *
      * @param string            $cacheKey The cache key of the form view.
-     * @param FormViewInterface $view     The form view for finding the applying themes.
+     * @param FormView $view     The form view for finding the applying themes.
      * @param string            $block    The name of the block to load.
      *
      * @return Boolean True if the resource could be loaded, false otherwise.
      */
-    abstract protected function loadResourceForBlock($cacheKey, FormViewInterface $view, $block);
+    abstract protected function loadResourceForBlock($cacheKey, FormView $view, $block);
 
     /**
      * Loads the cache with the resource for a specific level of a block hierarchy.
@@ -142,7 +142,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *
      * @param string            $cacheKey       The cache key used for storing the
      *                                          resource.
-     * @param FormViewInterface $view           The form view for finding the applying
+     * @param FormView $view           The form view for finding the applying
      *                                          themes.
      * @param array             $blockHierarchy The block hierarchy, with the most
      *                                          specific block name at the end.
@@ -151,7 +151,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *
      * @return Boolean True if the resource could be loaded, false otherwise.
      */
-    private function loadResourceForBlockHierarchy($cacheKey, FormViewInterface $view, array $blockHierarchy, $hierarchyLevel)
+    private function loadResourceForBlockHierarchy($cacheKey, FormView $view, array $blockHierarchy, $hierarchyLevel)
     {
         $block = $blockHierarchy[$hierarchyLevel];
 

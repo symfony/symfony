@@ -246,7 +246,7 @@ class TimeTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('6', '06'),
             new ChoiceView('7', '07'),
-        ), $view->get('hour')->getVar('choices'));
+        ), $view['hour']->vars['choices']);
     }
 
     public function testIsMinuteWithinRange_returnsTrueIfWithin()
@@ -260,7 +260,7 @@ class TimeTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('6', '06'),
             new ChoiceView('7', '07'),
-        ), $view->get('minute')->getVar('choices'));
+        ), $view['minute']->vars['choices']);
     }
 
     public function testIsSecondWithinRange_returnsTrueIfWithin()
@@ -275,7 +275,7 @@ class TimeTypeTest extends LocalizedTestCase
         $this->assertEquals(array(
             new ChoiceView('6', '06'),
             new ChoiceView('7', '07'),
-        ), $view->get('second')->getVar('choices'));
+        ), $view['second']->vars['choices']);
     }
 
     public function testIsPartiallyFilled_returnsFalseIfCompletelyEmpty()
@@ -415,7 +415,7 @@ class TimeTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertEquals('time', $view->getVar('type'));
+        $this->assertEquals('time', $view->vars['type']);
     }
 
     public function testPassDefaultEmptyValueToViewIfNotRequired()
@@ -426,9 +426,9 @@ class TimeTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertSame('', $view->get('hour')->getVar('empty_value'));
-        $this->assertSame('', $view->get('minute')->getVar('empty_value'));
-        $this->assertSame('', $view->get('second')->getVar('empty_value'));
+        $this->assertSame('', $view['hour']->vars['empty_value']);
+        $this->assertSame('', $view['minute']->vars['empty_value']);
+        $this->assertSame('', $view['second']->vars['empty_value']);
     }
 
     public function testPassNoEmptyValueToViewIfRequired()
@@ -439,9 +439,9 @@ class TimeTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertNull($view->get('hour')->getVar('empty_value'));
-        $this->assertNull($view->get('minute')->getVar('empty_value'));
-        $this->assertNull($view->get('second')->getVar('empty_value'));
+        $this->assertNull($view['hour']->vars['empty_value']);
+        $this->assertNull($view['minute']->vars['empty_value']);
+        $this->assertNull($view['second']->vars['empty_value']);
     }
 
     public function testPassEmptyValueAsString()
@@ -452,9 +452,9 @@ class TimeTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertSame('Empty', $view->get('hour')->getVar('empty_value'));
-        $this->assertSame('Empty', $view->get('minute')->getVar('empty_value'));
-        $this->assertSame('Empty', $view->get('second')->getVar('empty_value'));
+        $this->assertSame('Empty', $view['hour']->vars['empty_value']);
+        $this->assertSame('Empty', $view['minute']->vars['empty_value']);
+        $this->assertSame('Empty', $view['second']->vars['empty_value']);
     }
 
     public function testPassEmptyValueAsArray()
@@ -469,9 +469,9 @@ class TimeTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertSame('Empty hour', $view->get('hour')->getVar('empty_value'));
-        $this->assertSame('Empty minute', $view->get('minute')->getVar('empty_value'));
-        $this->assertSame('Empty second', $view->get('second')->getVar('empty_value'));
+        $this->assertSame('Empty hour', $view['hour']->vars['empty_value']);
+        $this->assertSame('Empty minute', $view['minute']->vars['empty_value']);
+        $this->assertSame('Empty second', $view['second']->vars['empty_value']);
     }
 
     public function testPassEmptyValueAsPartialArray_addEmptyIfNotRequired()
@@ -486,9 +486,9 @@ class TimeTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertSame('Empty hour', $view->get('hour')->getVar('empty_value'));
-        $this->assertSame('', $view->get('minute')->getVar('empty_value'));
-        $this->assertSame('Empty second', $view->get('second')->getVar('empty_value'));
+        $this->assertSame('Empty hour', $view['hour']->vars['empty_value']);
+        $this->assertSame('', $view['minute']->vars['empty_value']);
+        $this->assertSame('Empty second', $view['second']->vars['empty_value']);
     }
 
     public function testPassEmptyValueAsPartialArray_addNullIfRequired()
@@ -503,9 +503,9 @@ class TimeTypeTest extends LocalizedTestCase
         ));
 
         $view = $form->createView();
-        $this->assertSame('Empty hour', $view->get('hour')->getVar('empty_value'));
-        $this->assertNull($view->get('minute')->getVar('empty_value'));
-        $this->assertSame('Empty second', $view->get('second')->getVar('empty_value'));
+        $this->assertSame('Empty hour', $view['hour']->vars['empty_value']);
+        $this->assertNull($view['minute']->vars['empty_value']);
+        $this->assertSame('Empty second', $view['second']->vars['empty_value']);
     }
 
     public function provideCompoundWidgets()
@@ -525,9 +525,9 @@ class TimeTypeTest extends LocalizedTestCase
         $form = $this->factory->create('time', null, array(
             'widget' => $widget,
         ));
-        $form->get('hour')->addError($error);
+        $form['hour']->addError($error);
 
-        $this->assertSame(array(), $form->get('hour')->getErrors());
+        $this->assertSame(array(), $form['hour']->getErrors());
         $this->assertSame(array($error), $form->getErrors());
     }
 
@@ -540,9 +540,9 @@ class TimeTypeTest extends LocalizedTestCase
         $form = $this->factory->create('time', null, array(
             'widget' => $widget,
         ));
-        $form->get('minute')->addError($error);
+        $form['minute']->addError($error);
 
-        $this->assertSame(array(), $form->get('minute')->getErrors());
+        $this->assertSame(array(), $form['minute']->getErrors());
         $this->assertSame(array($error), $form->getErrors());
     }
 
@@ -556,9 +556,9 @@ class TimeTypeTest extends LocalizedTestCase
             'widget' => $widget,
             'with_seconds' => true,
         ));
-        $form->get('second')->addError($error);
+        $form['second']->addError($error);
 
-        $this->assertSame(array(), $form->get('second')->getErrors());
+        $this->assertSame(array(), $form['second']->getErrors());
         $this->assertSame(array($error), $form->getErrors());
     }
 }

@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
-use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class MoneyType extends AbstractType
@@ -40,9 +40,9 @@ class MoneyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->setVar('money_pattern', self::getPattern($options['currency']));
+        $view->vars['money_pattern'] = self::getPattern($options['currency']);
     }
 
     /**

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Extension\Templating;
 
 use Symfony\Component\Form\AbstractRendererEngine;
-use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Templating\EngineInterface;
 
 /**
@@ -35,7 +35,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormViewInterface $view, $resource, $block, array $variables = array())
+    public function renderBlock(FormView $view, $resource, $block, array $variables = array())
     {
         return trim($this->engine->render($resource, $variables));
     }
@@ -49,12 +49,12 @@ class TemplatingRendererEngine extends AbstractRendererEngine
      * @see getResourceForBlock()
      *
      * @param string            $cacheKey The cache key of the form view.
-     * @param FormViewInterface $view     The form view for finding the applying themes.
+     * @param FormView $view     The form view for finding the applying themes.
      * @param string            $block    The name of the block to load.
      *
      * @return Boolean True if the resource could be loaded, false otherwise.
      */
-    protected function loadResourceForBlock($cacheKey, FormViewInterface $view, $block)
+    protected function loadResourceForBlock($cacheKey, FormView $view, $block)
     {
         // Recursively try to find the block in the themes assigned to $view,
         // then of its parent form, then of the parent form of the parent and so on.
@@ -71,7 +71,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
         }
 
         // Check the default themes once we reach the root form without success
-        if (!$view->hasParent()) {
+        if (!$view->parent) {
             for ($i = count($this->defaultThemes) - 1; $i >= 0; --$i) {
                 if ($this->loadResourceFromTheme($cacheKey, $block, $this->defaultThemes[$i])) {
                     return true;
@@ -81,11 +81,11 @@ class TemplatingRendererEngine extends AbstractRendererEngine
 
         // If we did not find anything in the themes of the current view, proceed
         // with the themes of the parent view
-        if ($view->hasParent()) {
-            $parentCacheKey = $view->getParent()->getVar(self::CACHE_KEY_VAR);
+        if ($view->parent) {
+            $parentCacheKey = $view->parent->vars[self::CACHE_KEY_VAR];
 
             if (!isset($this->resources[$parentCacheKey][$block])) {
-                $this->loadResourceForBlock($parentCacheKey, $view->getParent(), $block);
+                $this->loadResourceForBlock($parentCacheKey, $view->parent, $block);
             }
 
             // If a template exists in the parent themes, cache that template

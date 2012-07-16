@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class PasswordType extends AbstractType
@@ -21,10 +21,10 @@ class PasswordType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['always_empty'] || !$form->isBound()) {
-            $view->setVar('value', '');
+            $view->vars['value'] = '';
         }
     }
 

@@ -30,11 +30,11 @@ interface FormRendererInterface
     /**
      * Sets the theme(s) to be used for rendering a view and its children.
      *
-     * @param FormViewInterface $view   The view to assign the theme(s) to.
+     * @param FormView $view   The view to assign the theme(s) to.
      * @param mixed             $themes The theme(s). The type of these themes
      *                                  is open to the implementation.
      */
-    public function setTheme(FormViewInterface $view, $themes);
+    public function setTheme(FormView $view, $themes);
 
     /**
      * Renders the HTML enctype in the form tag, if necessary.
@@ -43,33 +43,33 @@ interface FormRendererInterface
      *
      *     <form action="..." method="post" <?php echo $renderer->renderEnctype($form) ?>>
      *
-     * @param FormViewInterface $view The view for which to render the encoding type
+     * @param FormView $view The view for which to render the encoding type
      *
      * @return string The HTML markup
      */
-    public function renderEnctype(FormViewInterface $view);
+    public function renderEnctype(FormView $view);
 
     /**
      * Renders the entire row for a form field.
      *
      * A row typically contains the label, errors and widget of a field.
      *
-     * @param FormViewInterface $view      The view for which to render the row
+     * @param FormView $view      The view for which to render the row
      * @param array             $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
-    public function renderRow(FormViewInterface $view, array $variables = array());
+    public function renderRow(FormView $view, array $variables = array());
 
     /**
      * Renders views which have not already been rendered.
      *
-     * @param FormViewInterface $view      The parent view
+     * @param FormView $view      The parent view
      * @param array             $variables An array of variables
      *
      * @return string The HTML markup
      */
-    public function renderRest(FormViewInterface $view, array $variables = array());
+    public function renderRest(FormView $view, array $variables = array());
 
     /**
      * Renders the HTML for a given view.
@@ -84,32 +84,32 @@ interface FormRendererInterface
      *
      *     <?php echo $renderer->renderWidget($form, array('separator' => '+++++)) ?>
      *
-     * @param FormViewInterface $view      The view for which to render the widget
+     * @param FormView $view      The view for which to render the widget
      * @param array             $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
-    public function renderWidget(FormViewInterface $view, array $variables = array());
+    public function renderWidget(FormView $view, array $variables = array());
 
     /**
      * Renders the errors of the given view.
      *
-     * @param FormViewInterface $view The view to render the errors for
+     * @param FormView $view The view to render the errors for
      *
      * @return string The HTML markup
      */
-    public function renderErrors(FormViewInterface $view);
+    public function renderErrors(FormView $view);
 
     /**
      * Renders the label of the given view.
      *
-     * @param FormViewInterface $view      The view for which to render the label
+     * @param FormView $view      The view for which to render the label
      * @param string            $label     The label
      * @param array             $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
-    public function renderLabel(FormViewInterface $view, $label = null, array $variables = array());
+    public function renderLabel(FormView $view, $label = null, array $variables = array());
 
     /**
      * Renders a named block of the form theme.
@@ -158,12 +158,12 @@ interface FormRendererInterface
     /**
      * Returns whether the given choice is selected.
      *
-     * @param FormViewInterface $view   The view of the choice field
+     * @param FormView $view   The view of the choice field
      * @param ChoiceView        $choice The choice to check
      *
      * @return Boolean Whether the choice is selected
      */
-    public function isChoiceSelected(FormViewInterface $view, ChoiceView $choice);
+    public function isChoiceSelected(FormView $view, ChoiceView $choice);
 
     /**
      * Makes a technical name human readable.

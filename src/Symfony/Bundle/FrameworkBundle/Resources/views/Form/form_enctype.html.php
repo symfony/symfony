@@ -1,1 +1,1 @@
-<?php if ($form->getVar('multipart')): ?>enctype="multipart/form-data"<?php endif ?>
+<?php if ($form->vars['multipart']): ?>enctype="multipart/form-data"<?php endif ?>

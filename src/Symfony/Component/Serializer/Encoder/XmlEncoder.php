@@ -39,11 +39,11 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         $this->format = $format;
 
         if (null !== $data && !is_scalar($data)) {
-            $root = $this->dom->createElement($this->rootNodeName);
+            $root = $this->dom->createElement($this->getRealRootNodeName());
             $this->dom->appendChild($root);
             $this->buildXml($root, $data);
         } else {
-            $this->appendNode($this->dom, $data, $this->rootNodeName);
+            $this->appendNode($this->dom, $data, $this->getRealRootNodeName());
         }
 
         return $this->dom->saveXML();
@@ -301,7 +301,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                 $root = $parentNode->parentNode;
                 $root->removeChild($parentNode);
 
-                return $this->appendNode($root, $data, $this->rootNodeName);
+                return $this->appendNode($root, $data, $this->getRealRootNodeName());
             }
 
             return $this->appendNode($parentNode, $data, 'data');
@@ -380,4 +380,21 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         return true;
     }
+
+    /**
+     * Get real XML root node name, taking serializer options into account.
+     */
+    private function getRealRootNodeName()
+    {
+        if ( ! $this->serializer) {
+            return $this->rootNodeName;
+        }
+
+        $options = $this->serializer->getOptions();
+
+        return isset($options['xml_root_node_name'])
+            ? $options['xml_root_node_name']
+            : $this->rootNodeName;
+    }
+
 }

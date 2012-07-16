@@ -21,11 +21,13 @@ interface SerializerInterface
     /**
      * Serializes data in the appropriate format
      *
-     * @param mixed  $data   any data
-     * @param string $format format name
+     * @param mixed  $data    any data
+     * @param string $format  format name
+     * @param array  $options options normalizers/encoders have access to
+     *
      * @return string
      */
-    public function serialize($data, $format);
+    function serialize($data, $format, array $options = array());
 
     /**
      * Deserializes data into the given type.
@@ -33,6 +35,16 @@ interface SerializerInterface
      * @param mixed  $data
      * @param string $type
      * @param string $format
+     * @param array  $options
+     *
+     * @return mixed
      */
-    public function deserialize($data, $type, $format);
+    function deserialize($data, $type, $format, array $options = array());
+
+    /**
+     * Get current options of the serializer
+     *
+     * @return array
+     */
+    function getOptions();
 }

@@ -39,11 +39,12 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 {
     protected $encoder;
     protected $decoder;
-    protected $normalizers = array();
-    protected $normalizerCache = array();
+    protected $normalizers       = array();
+    protected $normalizerCache   = array();
     protected $denormalizerCache = array();
+    protected $options           = array();
 
-    public function __construct(array $normalizers = array(), array $encoders = array())
+    public function __construct(array $normalizers = array(), array $encoders = array(), array $options = array())
     {
         foreach ($normalizers as $normalizer) {
             if ($normalizer instanceof SerializerAwareInterface) {
@@ -67,16 +68,19 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         }
         $this->encoder = new ChainEncoder($realEncoders);
         $this->decoder = new ChainDecoder($decoders);
+        $this->options = $options;
     }
 
     /**
      * {@inheritdoc}
      */
-    final public function serialize($data, $format)
+    final public function serialize($data, $format, array $options = array())
     {
         if (!$this->supportsEncoding($format)) {
             throw new UnexpectedValueException('Serialization for the format '.$format.' is not supported');
         }
+
+        $this->options = array_merge($this->options, $options);
 
         if ($this->encoder->needsNormalization($format)) {
             $data = $this->normalize($data, $format);
@@ -88,11 +92,13 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    final public function deserialize($data, $type, $format)
+    final public function deserialize($data, $type, $format, array $options = array())
     {
         if (!$this->supportsDecoding($format)) {
             throw new UnexpectedValueException('Deserialization for the format '.$format.' is not supported');
         }
+
+        $this->options = array_merge($this->options, $options);
 
         $data = $this->decode($data, $format);
 
@@ -287,5 +293,13 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     public function supportsDecoding($format)
     {
         return $this->decoder->supportsDecoding($format);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOptions()
+    {
+        return $this->options;
     }
 }

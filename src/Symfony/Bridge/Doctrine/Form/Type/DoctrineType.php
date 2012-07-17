@@ -55,19 +55,15 @@ abstract class DoctrineType extends AbstractType
         $registry = $this->registry;
         $type = $this;
 
-        $loader = function (Options $options) use ($type, $registry) {
+        $loader = function (Options $options) use ($type) {
             if (null !== $options['query_builder']) {
-                $manager = $registry->getManager($options['em']);
-
-                return $type->getLoader($manager, $options['query_builder'], $options['class']);
+                return $type->getLoader($options['em'], $options['query_builder'], $options['class']);
             }
 
             return null;
         };
 
-        $choiceList = function (Options $options) use ($registry, &$choiceListCache, &$time) {
-            $manager = $registry->getManager($options['em']);
-
+        $choiceList = function (Options $options) use (&$choiceListCache, &$time) {
             // Support for closures
             $propertyHash = is_object($options['property'])
                 ? spl_object_hash($options['property'])
@@ -96,7 +92,7 @@ abstract class DoctrineType extends AbstractType
                 : $options['group_by'];
 
             $hash = md5(json_encode(array(
-                spl_object_hash($manager),
+                spl_object_hash($options['em']),
                 $options['class'],
                 $propertyHash,
                 $loaderHash,
@@ -106,7 +102,7 @@ abstract class DoctrineType extends AbstractType
 
             if (!isset($choiceListCache[$hash])) {
                 $choiceListCache[$hash] = new EntityChoiceList(
-                    $manager,
+                    $options['em'],
                     $options['class'],
                     $options['property'],
                     $options['loader'],
@@ -118,6 +114,15 @@ abstract class DoctrineType extends AbstractType
             return $choiceListCache[$hash];
         };
 
+        $emFilter = function (Options $options, $em) use ($registry) {
+            /* @var ManagerRegistry $registry */
+            if (null !== $em) {
+                return $registry->getManager($em);
+            }
+
+            return $registry->getManagerForClass($options['class']);
+        };
+
         $resolver->setDefaults(array(
             'em'                => null,
             'class'             => null,
@@ -127,6 +132,10 @@ abstract class DoctrineType extends AbstractType
             'choices'           => null,
             'choice_list'       => $choiceList,
             'group_by'          => null,
+        ));
+
+        $resolver->setFilters(array(
+            'em' => $emFilter,
         ));
     }
 

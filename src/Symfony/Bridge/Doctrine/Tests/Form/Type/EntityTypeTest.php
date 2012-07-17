@@ -32,7 +32,15 @@ class EntityTypeTest extends TypeTestCase
     const COMPOSITE_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIdentEntity';
     const COMPOSITE_STRING_IDENT_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeStringIdentEntity';
 
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
     private $em;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $emRegistry;
 
     protected function setUp()
     {
@@ -53,6 +61,7 @@ class EntityTypeTest extends TypeTestCase
         }
 
         $this->em = DoctrineOrmTestCase::createTestEntityManager();
+        $this->emRegistry = $this->createRegistryMock('default', $this->em);
 
         parent::setUp();
 
@@ -86,7 +95,7 @@ class EntityTypeTest extends TypeTestCase
     protected function getExtensions()
     {
         return array_merge(parent::getExtensions(), array(
-            new DoctrineOrmExtension($this->createRegistryMock('default', $this->em)),
+            new DoctrineOrmExtension($this->emRegistry),
         ));
     }
 
@@ -682,6 +691,23 @@ class EntityTypeTest extends TypeTestCase
         $this->assertTrue($field->isSynchronized());
         $this->assertSame($entity1, $field->getData());
         $this->assertSame('0', $field->getClientData());
+    }
+
+    public function testGetManagerForClassIfNoEm()
+    {
+        $this->emRegistry->expects($this->never())
+            ->method('getManager');
+
+        $this->emRegistry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(self::SINGLE_IDENT_CLASS)
+            ->will($this->returnValue($this->em));
+
+        $this->factory->createNamed('name', 'entity', null, array(
+            'class' => self::SINGLE_IDENT_CLASS,
+            'required' => false,
+            'property' => 'name'
+        ));
     }
 
     protected function createRegistryMock($name, $em)

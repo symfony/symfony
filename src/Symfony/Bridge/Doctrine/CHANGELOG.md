@@ -8,3 +8,4 @@ CHANGELOG
  * added a session storage for Doctrine DBAL
  * DoctrineOrmTypeGuesser now guesses "collection" for array Doctrine type
  * DoctrineType now caches its choice lists in order to improve performance
+ * DoctrineType now uses ManagerRegistry::getManagerForClass() if the option "em" is not set

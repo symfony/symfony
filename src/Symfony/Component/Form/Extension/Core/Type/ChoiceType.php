@@ -157,7 +157,7 @@ class ChoiceType extends AbstractType
             return $options['required'] ? null : '';
         };
 
-        $emptyValueFilter = function (Options $options, $emptyValue) {
+        $emptyValueNormalizer = function (Options $options, $emptyValue) {
             if ($options['multiple'] || $options['expanded']) {
                 // never use an empty value for these cases
                 return null;
@@ -186,8 +186,8 @@ class ChoiceType extends AbstractType
             'compound'          => $compound,
         ));
 
-        $resolver->setFilters(array(
-            'empty_value' => $emptyValueFilter,
+        $resolver->setNormalizers(array(
+            'empty_value' => $emptyValueNormalizer,
         ));
 
         $resolver->setAllowedTypes(array(

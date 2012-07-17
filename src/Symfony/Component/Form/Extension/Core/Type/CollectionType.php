@@ -74,7 +74,7 @@ class CollectionType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $optionsFilter = function (Options $options, $value) {
+        $optionsNormalizer = function (Options $options, $value) {
             $value['block_name'] = 'entry';
 
             return $value;
@@ -89,8 +89,8 @@ class CollectionType extends AbstractType
             'options'        => array(),
         ));
 
-        $resolver->setFilters(array(
-            'options' => $optionsFilter,
+        $resolver->setNormalizers(array(
+            'options' => $optionsNormalizer,
         ));
     }
 

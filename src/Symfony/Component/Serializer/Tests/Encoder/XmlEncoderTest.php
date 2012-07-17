@@ -179,7 +179,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     {
         $options = array('xml_root_node_name' => 'test');
         $this->encoder = new XmlEncoder;
-        $serializer = new Serializer(array(), array('xml' => new XmlEncoder()), $options);
+        $serializer = new Serializer(array(), array('xml' => new XmlEncoder()));
         $this->encoder->setSerializer($serializer);
 
         $array = array(
@@ -189,7 +189,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $expected = '<?xml version="1.0"?>'."\n".
             '<test><person gender="M">Peter</person></test>'."\n";
 
-        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+        $this->assertEquals($expected, $serializer->serialize($array, 'xml', $options));
     }
 
     public function testDecode()

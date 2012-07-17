@@ -27,7 +27,7 @@ interface SerializerInterface
      *
      * @return string
      */
-    function serialize($data, $format, array $options = array());
+    public function serialize($data, $format, array $options = array());
 
     /**
      * Deserializes data into the given type.
@@ -39,12 +39,12 @@ interface SerializerInterface
      *
      * @return mixed
      */
-    function deserialize($data, $type, $format, array $options = array());
+    public function deserialize($data, $type, $format, array $options = array());
 
     /**
      * Get current options of the serializer
      *
      * @return array
      */
-    function getOptions();
+    public function getOptions();
 }

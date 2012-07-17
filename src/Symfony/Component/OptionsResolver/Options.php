@@ -139,22 +139,31 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             throw new OptionDefinitionException('Options cannot be overloaded anymore once options have been read.');
         }
 
+        // If an option is a closure that should be evaluated lazily, store it
+        // inside a LazyOption instance.
+        if ($value instanceof \Closure) {
+            $reflClosure = new \ReflectionFunction($value);
+            $params = $reflClosure->getParameters();
+
+            if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && __CLASS__ === $class->name) {
+                $currentValue = isset($this->options[$option]) ? $this->options[$option] : null;
+                $value = new LazyOption($value, $currentValue);
+
+                // Store locks for lazy options to detect cyclic dependencies
+                $this->lock[$option] = false;
+
+                // Store which options are lazy for more efficient resolving
+                $this->lazy[$option] = true;
+
+                $this->options[$option] = $value;
+
+                return;
+            }
+        }
+
         // Reset lazy flag and locks by default
         unset($this->lock[$option]);
         unset($this->lazy[$option]);
-
-        // If an option is a closure that should be evaluated lazily, store it
-        // inside a LazyOption instance.
-        if (self::isEvaluatedLazily($value)) {
-            $currentValue = isset($this->options[$option]) ? $this->options[$option] : null;
-            $value = new LazyOption($value, $currentValue);
-
-            // Store locks for lazy options to detect cyclic dependencies
-            $this->lock[$option] = false;
-
-            // Store which options are lazy for more efficient resolving
-            $this->lazy[$option] = true;
-        }
 
         $this->options[$option] = $value;
     }
@@ -251,8 +260,14 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         // Create a copy because resolve() modifies the array
         $lazy = $this->lazy;
 
+        // Performance-wise this is slightly better than
+        // while (null !== $option = key($this->lazy))
         foreach ($lazy as $option => $isLazy) {
-            $this->resolve($option);
+            // When resolve() is called, potentially multiple lazy options
+            // are evaluated, so check again if the option is still lazy.
+            if (isset($this->lazy[$option])) {
+                $this->resolve($option);
+            }
         }
 
         return $this->options;
@@ -329,7 +344,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      */
     public function current()
     {
-        return $this->offsetGet($this->key());
+        return $this->get($this->key());
     }
 
     /**
@@ -385,52 +400,23 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      */
     private function resolve($option)
     {
-        if ($this->options[$option] instanceof LazyOption) {
-            if ($this->lock[$option]) {
-                $conflicts = array_keys(array_filter($this->lock, function ($locked) {
-                    return $locked;
-                }));
+        if ($this->lock[$option]) {
+            $conflicts = array();
 
-                throw new OptionDefinitionException('The options "' . implode('", "',
-                    $conflicts) . '" have a cyclic dependency.');
+            foreach ($this->lock as $option => $locked) {
+                if ($locked) {
+                    $conflicts[] = $option;
+                }
             }
 
-            $this->lock[$option] = true;
-            $this->options[$option] = $this->options[$option]->evaluate($this);
-            $this->lock[$option] = false;
-
-            // The option now isn't lazy anymore
-            unset($this->lazy[$option]);
-        }
-    }
-
-    /**
-     * Returns whether the option is a lazy option closure.
-     *
-     * Lazy option closure expect an {@link Options} instance
-     * in their first parameter.
-     *
-     * @param mixed $value The option value to test.
-     *
-     * @return Boolean Whether it is a lazy option closure.
-     */
-    private static function isEvaluatedLazily($value)
-    {
-        if (!$value instanceof \Closure) {
-            return false;
+            throw new OptionDefinitionException('The options "' . implode('", "', $conflicts) . '" have a cyclic dependency.');
         }
 
-        $reflClosure = new \ReflectionFunction($value);
-        $params = $reflClosure->getParameters();
+        $this->lock[$option] = true;
+        $this->options[$option] = $this->options[$option]->evaluate($this);
+        $this->lock[$option] = false;
 
-        if (count($params) < 1) {
-            return false;
-        }
-
-        if (null === $params[0]->getClass()) {
-            return false;
-        }
-
-        return __CLASS__ === $params[0]->getClass()->name;
+        // The option now isn't lazy anymore
+        unset($this->lazy[$option]);
     }
 }

@@ -78,6 +78,19 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
      */
     protected function loadResourceForBlock($cacheKey, FormViewInterface $view, $block)
     {
+        // The caller guarantees that $this->resources[$cacheKey][$block] is
+        // not set, but it doesn't have to check whether $this->resources[$cacheKey]
+        // is set. If $this->resources[$cacheKey] is set, all themes for this
+        // $cacheKey are already loaded (due to the eager population, see doc comment).
+        if (isset($this->resources[$cacheKey])) {
+            // As said in the previous, the caller guarantees that
+            // $this->resources[$cacheKey][$block] is not set. Since the themes are
+            // already loaded, it can only be a non-existing block.
+            $this->resources[$cacheKey][$block] = false;
+
+            return false;
+        }
+
         // Recursively try to find the block in the themes assigned to $view,
         // then of its parent view, then of the parent view of the parent and so on.
         // When the root view is reached in this recursion, also the default
@@ -99,8 +112,7 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
             }
         }
 
-        // If we did not find anything in the themes of the current view, proceed
-        // with the themes of the parent view
+        // Proceed with the themes of the parent view
         if ($view->hasParent()) {
             $parentCacheKey = $view->getParent()->getVar(self::CACHE_KEY_VAR);
 
@@ -116,6 +128,8 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
             }
         }
 
+        // Even though we loaded the themes, it can happen that none of them
+        // contains the searched block
         if (!isset($this->resources[$cacheKey][$block])) {
             // Cache that we didn't find anything to speed up further accesses
             $this->resources[$cacheKey][$block] = false;
@@ -149,12 +163,21 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
             $this->template = $theme;
         }
 
-        foreach ($theme->getBlocks() as $block => $blockData) {
-            if (!isset($this->resources[$cacheKey][$block])) {
-                // The resource given back is the key to the bucket that
-                // contains this block.
-                $this->resources[$cacheKey][$block] = $blockData;
+        // Use a separate variable for the inheritance traversal, because
+        // theme is a reference and we don't want to change it.
+        $currentTheme = $theme;
+
+        // The do loop takes care of template inheritance.
+        // Add blocks from all templates in the inheritance tree, but avoid
+        // overriding blocks already set.
+        do {
+            foreach ($currentTheme->getBlocks() as $block => $blockData) {
+                if (!isset($this->resources[$cacheKey][$block])) {
+                    // The resource given back is the key to the bucket that
+                    // contains this block.
+                    $this->resources[$cacheKey][$block] = $blockData;
+                }
             }
-        }
+        } while (false !== $currentTheme = $currentTheme->getParent(array()));
     }
 }

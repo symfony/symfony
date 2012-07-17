@@ -63,8 +63,12 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
 
         // Do not cast, as casting turns objects into arrays of properties
         $this->themes[$cacheKey] = is_array($themes) ? $themes : array($themes);
-        $this->resources[$cacheKey] = array();
-        $this->resourceHierarchyLevels[$cacheKey] = array();
+
+        // Unset instead of resetting to an empty array, in order to allow
+        // implementations (like TwigRendererEngine) to check whether $cacheKey
+        // is set at all.
+        unset($this->resources[$cacheKey]);
+        unset($this->resourceHierarchyLevels[$cacheKey]);
     }
 
     /**

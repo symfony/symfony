@@ -405,7 +405,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      */
     private function getRealRootNodeName()
     {
-        if ( ! $this->serializer) {
+        if (!$this->serializer) {
             return $this->rootNodeName;
         }
 

@@ -46,7 +46,7 @@ class DependencyInjectionExtension implements FormExtensionInterface
         $type = $this->container->get($this->typeServiceIds[$name]);
 
         if ($type->getName() !== $name) {
-            throw new \InvalidArgumentException(sprintf('The type name specified for the service %s does not match the actual name', $this->typeServiceIds[$name]));
+            throw new \InvalidArgumentException(sprintf('The type name specified for the service %s does not match the actual type name: %s', $this->typeServiceIds[$name], $name));
         }
 
         return $type;

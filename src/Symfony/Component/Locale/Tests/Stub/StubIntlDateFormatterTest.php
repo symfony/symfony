@@ -491,7 +491,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * It seems IntlDateFormatter caches the timezone id when not explicitely set via constructor or by the
+     * It seems IntlDateFormatter caches the timezone id when not explicitly set via constructor or by the
      * setTimeZoneId() method. Since testFormatWithDefaultTimezoneIntl() runs using the default environment
      * time zone, this test would use it too if not running in a separated process.
      *

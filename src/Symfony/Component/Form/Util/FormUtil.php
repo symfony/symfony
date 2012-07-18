@@ -192,35 +192,6 @@ abstract class FormUtil
     }
 
     /**
-     * Returns whether the given choice is a group.
-     *
-     * @param mixed $choice A choice
-     *
-     * @return Boolean Whether the choice is a group
-     */
-    public static function isChoiceGroup($choice)
-    {
-        return is_array($choice) || $choice instanceof \Traversable;
-    }
-
-    /**
-     * Returns whether the given choice is selected.
-     *
-     * @param mixed $choice The choice
-     * @param mixed $value  the value
-     *
-     * @return Boolean Whether the choice is selected
-     */
-    public static function isChoiceSelected($choice, $value)
-    {
-        if (is_array($value)) {
-            return false !== array_search($choice, $value, true);
-        }
-
-        return $choice === $value;
-    }
-
-    /**
      * Returns whether the given data is empty.
      *
      * This logic is reused multiple times throughout the processing of

@@ -1056,7 +1056,7 @@
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and
-    `getMessageParameters()` in the Constraint class were deprecated and will
+    `getMessageParameters()` in the `ConstraintValidator` class were deprecated and will
     be removed in Symfony 2.3.
 
     If you have implemented custom validators, you should use the

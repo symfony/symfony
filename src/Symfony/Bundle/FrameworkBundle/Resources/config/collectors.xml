@@ -6,7 +6,7 @@
 
     <parameters>
         <parameter key="data_collector.config.class">Symfony\Component\HttpKernel\DataCollector\ConfigDataCollector</parameter>
-        <parameter key="data_collector.request.class">Symfony\Bundle\FrameworkBundle\DataCollector\RequestDataCollector</parameter>
+        <parameter key="data_collector.request.class">Symfony\Component\HttpKernel\DataCollector\RequestDataCollector</parameter>
         <parameter key="data_collector.exception.class">Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector</parameter>
         <parameter key="data_collector.events.class">Symfony\Component\HttpKernel\DataCollector\EventDataCollector</parameter>
         <parameter key="data_collector.logger.class">Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector</parameter>
@@ -22,7 +22,7 @@
         </service>
 
         <service id="data_collector.request" class="%data_collector.request.class%">
-            <tag name="kernel.event_listener" event="kernel.controller" method="onKernelController"/>
+            <tag name="kernel.event_subscriber" />
             <tag name="data_collector" template="WebProfilerBundle:Collector:request" id="request" priority="255" />
         </service>
 

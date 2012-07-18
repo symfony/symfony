@@ -364,7 +364,7 @@ class SimpleFormTest extends AbstractFormTest
 
     /*
      * NULL remains NULL in app and norm format to remove the need to treat
-     * empty values and NULL explicitely in the application
+     * empty values and NULL explicitly in the application
      */
     public function testSetDataConvertsNullToStringIfNoTransformer()
     {

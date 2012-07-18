@@ -226,7 +226,7 @@ class DateTimeTypeTest extends LocalizedTestCase
     // Bug fix
     public function testInitializeWithDateTime()
     {
-        // Throws an exception if "data_class" option is not explicitely set
+        // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
         $this->factory->create('datetime', new \DateTime());
     }

@@ -545,7 +545,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             ]
         /following-sibling::div
             [
-                ./label
+                ./label[.="child"]
                 /following-sibling::div
                     [
                         ./div

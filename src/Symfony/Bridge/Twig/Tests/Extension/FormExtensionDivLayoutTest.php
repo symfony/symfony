@@ -12,6 +12,8 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\FormExtension;
+use Symfony\Bridge\Twig\Form\TwigRenderer;
+use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
@@ -20,6 +22,9 @@ use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 {
+    /**
+     * @var FormExtension
+     */
     protected $extension;
 
     protected function setUp()
@@ -42,20 +47,23 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
         parent::setUp();
 
-        $loader = new StubFilesystemLoader(array(
-            __DIR__.'/../../../../../../src/Symfony/Bridge/Twig/Resources/views/Form',
-            __DIR__,
-        ));
-
-        $this->extension = new FormExtension($this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'), array(
+        $rendererEngine = new TwigRendererEngine(array(
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
         ));
+        $renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'));
+
+        $this->extension = new FormExtension($renderer);
+
+        $loader = new StubFilesystemLoader(array(
+            __DIR__.'/../../Resources/views/Form',
+            __DIR__,
+        ));
 
         $environment = new \Twig_Environment($loader, array('strict_variables' => true));
-        $environment->addExtension($this->extension);
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addGlobal('global', '');
+        $environment->addExtension($this->extension);
 
         $this->extension->initRuntime($environment);
     }
@@ -99,37 +107,37 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     protected function renderEnctype(FormView $view)
     {
-        return (string) $this->extension->renderEnctype($view);
+        return (string) $this->extension->renderer->renderEnctype($view);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        return (string) $this->extension->renderLabel($view, $label, $vars);
+        return (string) $this->extension->renderer->renderLabel($view, $label, $vars);
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string) $this->extension->renderErrors($view);
+        return (string) $this->extension->renderer->renderErrors($view);
     }
 
     protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderWidget($view, $vars);
+        return (string) $this->extension->renderer->renderWidget($view, $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderRow($view, $vars);
+        return (string) $this->extension->renderer->renderRow($view, $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderRest($view, $vars);
+        return (string) $this->extension->renderer->renderRest($view, $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)
     {
-        $this->extension->setTheme($view, $themes);
+        $this->extension->renderer->setTheme($view, $themes);
     }
 
     public static function themeBlockInheritanceProvider()

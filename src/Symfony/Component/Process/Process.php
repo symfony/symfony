@@ -290,7 +290,7 @@ class Process
             }
         }
 
-        $this->processInformation = proc_get_status($this->process);
+        $this->updateStatus();
     }
 
     /**
@@ -308,7 +308,7 @@ class Process
      */
     public function wait($callback = null)
     {
-        $this->processInformation = proc_get_status($this->process);
+        $this->updateStatus();
         $callback = $this->buildCallback($callback);
         while ($this->pipes || (defined('PHP_WINDOWS_VERSION_BUILD') && $this->fileHandles)) {
             if (defined('PHP_WINDOWS_VERSION_BUILD') && $this->fileHandles) {

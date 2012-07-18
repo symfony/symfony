@@ -117,7 +117,8 @@ class ProfilerListener implements EventSubscriberInterface
             array_pop($this->requests);
 
             $parent = end($this->requests);
-            
+
+            // when simulating requests, we might not have the parent
             if ($parent) {
                 $profiles = isset($this->children[$parent]) ? $this->children[$parent] : array();
                 $profiles[] = $profile;

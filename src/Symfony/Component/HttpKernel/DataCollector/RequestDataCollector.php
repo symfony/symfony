@@ -17,14 +17,24 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * RequestDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RequestDataCollector extends DataCollector
+class RequestDataCollector extends DataCollector implements EventSubscriberInterface
 {
+    protected $controllers;
+
+    public function __construct()
+    {
+        $this->controllers = new \SplObjectStorage();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -89,7 +99,26 @@ class RequestDataCollector extends DataCollector
             'session_attributes' => $sessionAttributes,
             'flashes'            => $flashes,
             'path_info'          => $request->getPathInfo(),
+            'controller'         => 'n/a',
         );
+
+        if (isset($this->controllers[$request])) {
+            $controller = $this->controllers[$request];
+            if (is_array($controller)) {
+                $r = new \ReflectionMethod($controller[0], $controller[1]);
+                $this->data['controller'] = array(
+                    'class'  => get_class($controller[0]),
+                    'method' => $controller[1],
+                    'file'   => $r->getFilename(),
+                    'line'   => $r->getStartLine(),
+                );
+            } elseif ($controller instanceof \Closure) {
+                $this->data['controller'] = 'Closure';
+            } else {
+                $this->data['controller'] = (string) $controller ?: 'n/a';
+            }
+            unset($this->controllers[$request]);
+        }
     }
 
     public function getPathInfo()
@@ -167,25 +196,28 @@ class RequestDataCollector extends DataCollector
         return $this->data['format'];
     }
 
-
     /**
-     * Gets the route.
+     * Gets the route name.
+     *
+     * The _route request attributes is automatically set by the Router Matcher.
      *
      * @return string The route
      */
     public function getRoute()
     {
-        return 'n/a';
+        return isset($this->data['request_attributes']['_route']) ? $this->data['request_attributes']['_route'] : '';
     }
 
     /**
-     * Returns the route parameters.
+     * Gets the route parameters.
+     *
+     * The _route_params request attributes is automatically set by the RouterListener.
      *
      * @return array The parameters
      */
     public function getRouteParams()
     {
-        return 'n/a';
+        return isset($this->data['request_attributes']['_route_params']) ? $this->data['request_attributes']['_route_params'] : array();
     }
 
     /**
@@ -195,7 +227,17 @@ class RequestDataCollector extends DataCollector
      */
     public function getController()
     {
-        return 'n/a';
+        return $this->data['controller'];
+    }
+
+    public function onKernelController(FilterControllerEvent $event)
+    {
+        $this->controllers[$event->getRequest()] = $event->getController();
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return array(KernelEvents::CONTROLLER => 'onKernelController');
     }
 
     /**

@@ -51,11 +51,11 @@
         definitions.
       ]]></xsd:documentation>
     </xsd:annotation>
-    <xsd:sequence>
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
       <xsd:element name="constraint" type="constraint" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="getter" type="getter" minOccurs="0" maxOccurs="unbounded" />
-    </xsd:sequence>
+    </xsd:choice>
     <xsd:attribute name="name" type="xsd:string" use="required" />
   </xsd:complexType>
   

@@ -214,7 +214,7 @@ class FormRenderer implements FormRendererInterface
      *
      * @throws Exception\FormException If no fitting template was found.
      */
-    protected function renderSection(FormViewInterface $view, $section, array $variables = array())
+    public function renderSection(FormViewInterface $view, $section, array $variables = array())
     {
         $renderOnlyOnce = in_array($section, array('row', 'widget'));
 

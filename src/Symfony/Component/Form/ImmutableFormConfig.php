@@ -12,14 +12,14 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Util\PropertyPath;
-use Symfony\Component\EventDispatcher\UnmodifiableEventDispatcher;
+use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 
 /**
  * A read-only form configuration.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class UnmodifiableFormConfig implements FormConfigInterface
+class ImmutableFormConfig implements FormConfigInterface
 {
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
@@ -134,8 +134,8 @@ class UnmodifiableFormConfig implements FormConfigInterface
     public function __construct(FormConfigInterface $config)
     {
         $dispatcher = $config->getEventDispatcher();
-        if (!$dispatcher instanceof UnmodifiableEventDispatcher) {
-            $dispatcher = new UnmodifiableEventDispatcher($dispatcher);
+        if (!$dispatcher instanceof ImmutableEventDispatcher) {
+            $dispatcher = new ImmutableEventDispatcher($dispatcher);
         }
 
         $this->dispatcher = $dispatcher;

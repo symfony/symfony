@@ -13,4 +13,4 @@ CHANGELOG
  * added GenericEvent event class
  * added the possibility for subscribers to subscribe several times for the
    same event
- * added UnmodifiableEventDispatcher
+ * added ImmutableEventDispatcher

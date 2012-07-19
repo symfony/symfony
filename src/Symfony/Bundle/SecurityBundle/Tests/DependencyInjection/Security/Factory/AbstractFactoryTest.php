@@ -54,7 +54,7 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
 
         $definition = $container->getDefinition('abstract_listener.foo');
         $arguments = $definition->getArguments();
-        $this->assertEquals(new Reference('security.authentication.failure_handler.foo'), $arguments['index_6']);
+        $this->assertEquals(new Reference('security.authentication.failure_handler.foo.abstract_factory'), $arguments['index_6']);
     }
 
     public function testDefaultSuccessHandler()
@@ -67,7 +67,7 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
 
         $definition = $container->getDefinition('abstract_listener.foo');
         $arguments = $definition->getArguments();
-        $this->assertEquals(new Reference('security.authentication.success_handler.foo'), $arguments['index_5']);
+        $this->assertEquals(new Reference('security.authentication.success_handler.foo.abstract_factory'), $arguments['index_5']);
     }
 
     protected function callFactory($id, $config, $userProviderId, $defaultEntryPointId)
@@ -83,6 +83,11 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
             ->expects($this->atLeastOnce())
             ->method('getListenerId')
             ->will($this->returnValue('abstract_listener'))
+        ;
+        $factory
+            ->expects($this->any())
+            ->method('getKey')
+            ->will($this->returnValue('abstract_factory'))
         ;
 
         $container = new ContainerBuilder();

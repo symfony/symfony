@@ -27,15 +27,11 @@ class TrueValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (null === $value) {
-            return true;
+            return;
         }
 
-        if (true === $value || 1 === $value || '1' === $value) {
-            return true;
+        if (true !== $value && 1 !== $value && '1' !== $value) {
+            $this->context->addViolation($constraint->message);
         }
-
-        $this->context->addViolation($constraint->message);
-
-        return false;
     }
 }

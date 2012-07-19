@@ -95,7 +95,7 @@ class ClassCollectionLoader
         $files = array();
         $content = '';
         foreach (self::getOrderedClasses($classes) as $class) {
-            if (in_array($class->getName(), $declared)) {
+            if ($adaptive && in_array($class->getName(), $declared)) {
                 continue;
             }
 

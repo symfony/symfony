@@ -49,7 +49,10 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
 
     protected function createRepositoryMock()
     {
-        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
+            ->setMethods(array('findByCustom', 'find', 'findAll', 'findOneBy', 'findBy', 'getClassName'))
+            ->getMock()
+        ;
 
         return $repository;
     }
@@ -73,6 +76,11 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $refl = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionProperty')
             ->disableOriginalConstructor()
             ->getMock()
+        ;
+        $refl
+            ->expects($this->any())
+            ->method('getValue')
+            ->will($this->returnValue(true))
         ;
         $classMetadata->reflFields = array('name' => $refl);
         $em->expects($this->any())
@@ -119,12 +127,13 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $uniqueValidator = new UniqueEntityValidator($registry);
 
         $metadata = new ClassMetadata($validateClass);
-        $metadata->addConstraint(new UniqueEntity(array(
+        $constraint = new UniqueEntity(array(
             'fields' => $uniqueFields,
             'em' => $entityManagerName,
             'errorPath' => $errorPath,
             'repositoryMethod' => $repositoryMethod
-        )));
+        ));
+        $metadata->addConstraint($constraint);
 
         $metadataFactory = $this->createMetadataFactoryMock($metadata);
         $validatorFactory = $this->createValidatorFactory($uniqueValidator);
@@ -235,11 +244,11 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $this->assertEquals(1, $violationsList->count(), 'Violation found on entity with conflicting entity existing in the database.');
     }
 
-    public function testValidateUniquenessUsingCustiomRepositoryMethod()
+    public function testValidateUniquenessUsingCustomRepositoryMethod()
     {
         $entityManagerName = 'foo';
         $repository = $this->createRepositoryMock();
-        $repository->expects($this->any())
+        $repository->expects($this->once())
              ->method('findByCustom')
              ->will($this->returnValue(array()))
         ;

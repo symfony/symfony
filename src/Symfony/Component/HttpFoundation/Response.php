@@ -254,7 +254,10 @@ class Response
      * Sets the response status code.
      *
      * @param integer $code HTTP status code
-     * @param string  $text HTTP status text
+     * @param mixed   $text HTTP status text
+     *
+     * If the status text is null it will be automatically populated for the known
+     * status codes and left empty otherwise.
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      *
@@ -262,12 +265,24 @@ class Response
      */
     public function setStatusCode($code, $text = null)
     {
-        $this->statusCode = (int) $code;
+        $this->statusCode = $code = (int) $code;
         if ($this->isInvalid()) {
             throw new \InvalidArgumentException(sprintf('The HTTP status code "%s" is not valid.', $code));
         }
 
-        $this->statusText = false === $text ? '' : (null === $text ? self::$statusTexts[$this->statusCode] : $text);
+        if (null === $text) {
+            $this->statusText = isset(self::$statusTexts[$code]) ? self::$statusTexts[$code] : '';
+
+            return;
+        }
+
+        if (false === $text) {
+            $this->statusText = '';
+
+            return;
+        }
+
+        $this->statusText = $text;
     }
 
     /**

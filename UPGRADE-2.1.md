@@ -107,7 +107,7 @@
            if ($locale = $request->attributes->get('_locale')) {
                $request->getSession()->set('_locale', $locale);
            } else {
-               $request->setDefaultLocale($request->getSession()->get('_locale', $this->defaultLocale));
+               $request->setLocale($request->getSession()->get('_locale', $this->defaultLocale));
            }
        }
 

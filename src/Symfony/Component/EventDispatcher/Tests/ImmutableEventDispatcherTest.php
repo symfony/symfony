@@ -12,13 +12,13 @@
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\UnmodifiableEventDispatcher;
+use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class UnmodifiableEventDispatcherTest extends \PHPUnit_Framework_TestCase
+class ImmutableEventDispatcherTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -26,14 +26,14 @@ class UnmodifiableEventDispatcherTest extends \PHPUnit_Framework_TestCase
     private $innerDispatcher;
 
     /**
-     * @var UnmodifiableEventDispatcher
+     * @var ImmutableEventDispatcher
      */
     private $dispatcher;
 
     protected function setUp()
     {
         $this->innerDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->dispatcher = new UnmodifiableEventDispatcher($this->innerDispatcher);
+        $this->dispatcher = new ImmutableEventDispatcher($this->innerDispatcher);
     }
 
     public function testDispatchDelegates()

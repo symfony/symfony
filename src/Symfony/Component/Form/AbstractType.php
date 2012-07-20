@@ -57,7 +57,7 @@ abstract class AbstractType implements FormTypeInterface
      * Builds the form view.
      *
      * This method gets called for each type in the hierarchy starting from the
-     * top most type.
+     * bottommost type.
      * Type extensions can further modify the view.
      *
      * Children views have been built while this method gets called so you get

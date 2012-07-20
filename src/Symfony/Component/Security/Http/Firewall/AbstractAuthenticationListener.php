@@ -177,7 +177,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      *
      * @param Request $request A Request instance
      *
-     * @return TokenInterface The authenticated token, or null if full authentication is not possible
+     * @return TokenInterface|Response|null The authenticated token, null if full authentication is not possible, or a Response
      *
      * @throws AuthenticationException if the authentication fails
      */

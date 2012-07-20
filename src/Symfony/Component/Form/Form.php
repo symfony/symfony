@@ -126,8 +126,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function __construct(FormConfigInterface $config)
     {
-        if (!$config instanceof UnmodifiableFormConfig) {
-            $config = new UnmodifiableFormConfig($config);
+        if (!$config instanceof ImmutableFormConfig) {
+            $config = new ImmutableFormConfig($config);
         }
 
         // Compound forms always need a data mapper, otherwise calls to
@@ -152,7 +152,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the configuration of the form.
      *
-     * @return UnmodifiableFormConfig The form's immutable configuration.
+     * @return ImmutableFormConfig The form's immutable configuration.
      */
     public function getConfig()
     {
@@ -562,7 +562,7 @@ class Form implements \IteratorAggregate, FormInterface
             // Synchronize representations - must not change the content!
             $modelData = $this->normToModel($normData);
             $viewData = $this->normToView($normData);
-            
+
             $synchronized = true;
         } catch (TransformationFailedException $e) {
         }

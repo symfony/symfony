@@ -16,7 +16,7 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DepthRangeFilterIterator extends \FilterIterator
+class DepthRangeFilterIterator extends FilterIterator
 {
     private $minDepth = 0;
 

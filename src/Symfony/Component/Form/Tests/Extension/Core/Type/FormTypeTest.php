@@ -107,9 +107,9 @@ class FormTypeTest extends TypeTestCase
         $form = $this->factory->createNamed('name', 'form');
         $view = $form->createView();
 
-        $this->assertEquals('name', $view->getVar('id'));
-        $this->assertEquals('name', $view->getVar('name'));
-        $this->assertEquals('name', $view->getVar('full_name'));
+        $this->assertEquals('name', $view->vars['id']);
+        $this->assertEquals('name', $view->vars['name']);
+        $this->assertEquals('name', $view->vars['full_name']);
     }
 
     public function testStripLeadingUnderscoresAndDigitsFromId()
@@ -117,9 +117,9 @@ class FormTypeTest extends TypeTestCase
         $form = $this->factory->createNamed('_09name', 'form');
         $view = $form->createView();
 
-        $this->assertEquals('name', $view->getVar('id'));
-        $this->assertEquals('_09name', $view->getVar('name'));
-        $this->assertEquals('_09name', $view->getVar('full_name'));
+        $this->assertEquals('name', $view->vars['id']);
+        $this->assertEquals('_09name', $view->vars['name']);
+        $this->assertEquals('_09name', $view->vars['full_name']);
     }
 
     public function testPassIdAndNameToViewWithParent()
@@ -128,9 +128,9 @@ class FormTypeTest extends TypeTestCase
         $parent->add($this->factory->createNamed('child', 'form'));
         $view = $parent->createView();
 
-        $this->assertEquals('parent_child', $view['child']->getVar('id'));
-        $this->assertEquals('child', $view['child']->getVar('name'));
-        $this->assertEquals('parent[child]', $view['child']->getVar('full_name'));
+        $this->assertEquals('parent_child', $view['child']->vars['id']);
+        $this->assertEquals('child', $view['child']->vars['name']);
+        $this->assertEquals('parent[child]', $view['child']->vars['full_name']);
     }
 
     public function testPassIdAndNameToViewWithGrandParent()
@@ -140,9 +140,9 @@ class FormTypeTest extends TypeTestCase
         $parent['child']->add($this->factory->createNamed('grand_child', 'form'));
         $view = $parent->createView();
 
-        $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->getVar('id'));
-        $this->assertEquals('grand_child', $view['child']['grand_child']->getVar('name'));
-        $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->getVar('full_name'));
+        $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->vars['id']);
+        $this->assertEquals('grand_child', $view['child']['grand_child']->vars['name']);
+        $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->vars['full_name']);
     }
 
     public function testNonReadOnlyFormWithReadOnlyParentBeingReadOnly()
@@ -151,7 +151,7 @@ class FormTypeTest extends TypeTestCase
         $child  = $this->factory->createNamed('child', 'form');
         $view   = $parent->add($child)->createView();
 
-        $this->assertTrue($view['child']->getVar('read_only'));
+        $this->assertTrue($view['child']->vars['read_only']);
     }
 
     public function testReadOnlyFormWithNonReadOnlyParentBeingReadOnly()
@@ -160,7 +160,7 @@ class FormTypeTest extends TypeTestCase
         $child  = $this->factory->createNamed('child', 'form', null, array('read_only' => true));
         $view   = $parent->add($child)->createView();
 
-        $this->assertTrue($view['child']->getVar('read_only'));
+        $this->assertTrue($view['child']->vars['read_only']);
     }
 
     public function testNonReadOnlyFormWithNonReadOnlyParentBeingNonReadOnly()
@@ -169,7 +169,7 @@ class FormTypeTest extends TypeTestCase
         $child  = $this->factory->createNamed('child', 'form');
         $view   = $parent->add($child)->createView();
 
-        $this->assertFalse($view['child']->getVar('read_only'));
+        $this->assertFalse($view['child']->vars['read_only']);
     }
 
     public function testPassMaxLengthToView()
@@ -177,7 +177,7 @@ class FormTypeTest extends TypeTestCase
         $form = $this->factory->create('form', null, array('max_length' => 10));
         $view = $form->createView();
 
-        $this->assertSame(10, $view->getVar('max_length'));
+        $this->assertSame(10, $view->vars['max_length']);
     }
 
     public function testPassTranslationDomainToView()
@@ -185,7 +185,7 @@ class FormTypeTest extends TypeTestCase
         $form = $this->factory->create('form', null, array('translation_domain' => 'test'));
         $view = $form->createView();
 
-        $this->assertSame('test', $view->getVar('translation_domain'));
+        $this->assertSame('test', $view->vars['translation_domain']);
     }
 
     public function testNonTranslationDomainFormWithTranslationDomainParentBeingTranslationDomain()
@@ -194,7 +194,7 @@ class FormTypeTest extends TypeTestCase
         $child  = $this->factory->createNamed('child', 'form');
         $view   = $parent->add($child)->createView();
 
-        $this->assertEquals('test', $view['child']->getVar('translation_domain'));
+        $this->assertEquals('test', $view['child']->vars['translation_domain']);
     }
 
     public function testTranslationDomainFormWithNonTranslationDomainParentBeingTranslationDomain()
@@ -203,7 +203,7 @@ class FormTypeTest extends TypeTestCase
         $child  = $this->factory->createNamed('child', 'form', null, array('translation_domain' => 'test'));
         $view   = $parent->add($child)->createView();
 
-        $this->assertEquals('test', $view['child']->getVar('translation_domain'));
+        $this->assertEquals('test', $view['child']->vars['translation_domain']);
     }
 
     public function testNonTranlsationDomainFormWithNonTranslationDomainParentBeingTranslationDomainDefault()
@@ -212,7 +212,7 @@ class FormTypeTest extends TypeTestCase
         $child  = $this->factory->createNamed('child', 'form');
         $view   = $parent->add($child)->createView();
 
-        $this->assertEquals('messages', $view['child']->getVar('translation_domain'));
+        $this->assertEquals('messages', $view['child']->vars['translation_domain']);
     }
 
     public function testPassLabelToView()
@@ -220,7 +220,7 @@ class FormTypeTest extends TypeTestCase
         $form = $this->factory->createNamed('__test___field', 'form', null, array('label' => 'My label'));
         $view = $form->createView();
 
-        $this->assertSame('My label', $view->getVar('label'));
+        $this->assertSame('My label', $view->vars['label']);
     }
 
     public function testDefaultTranslationDomain()
@@ -228,7 +228,7 @@ class FormTypeTest extends TypeTestCase
         $form = $this->factory->create('form');
         $view = $form->createView();
 
-        $this->assertSame('messages', $view->getVar('translation_domain'));
+        $this->assertSame('messages', $view->vars['translation_domain']);
     }
 
     public function testBindWithEmptyDataCreatesObjectIfClassAvailable()
@@ -386,7 +386,7 @@ class FormTypeTest extends TypeTestCase
 
         $this->assertFalse($form->isEmpty());
 
-        $this->assertSame($dataAsString, $view->getVar('value'));
+        $this->assertSame($dataAsString, $view->vars['value']);
         $this->assertSame($dataAsString, $form->getData());
     }
 
@@ -526,7 +526,7 @@ class FormTypeTest extends TypeTestCase
         $form = $this->factory->create('form');
         $view = $form->createView();
 
-        $this->assertFalse($view->getVar('multipart'));
+        $this->assertFalse($view->vars['multipart']);
     }
 
     public function testPassMultipartTrueIfAnyChildIsMultipartToView()
@@ -536,7 +536,7 @@ class FormTypeTest extends TypeTestCase
         $form->add($this->factory->create('file'));
         $view = $form->createView();
 
-        $this->assertTrue($view->getVar('multipart'));
+        $this->assertTrue($view->vars['multipart']);
     }
 
     public function testCreateViewDoNoMarkItAsRendered()
@@ -622,7 +622,7 @@ class FormTypeTest extends TypeTestCase
     {
         $form = $this->factory->create('form');
         $view = $form->createView();
-        $this->assertTrue($view->getVar('valid'));
+        $this->assertTrue($view->vars['valid']);
     }
 
     public function testViewNotValidBound()
@@ -631,7 +631,7 @@ class FormTypeTest extends TypeTestCase
         $form->bind(array());
         $form->addError(new FormError('An error'));
         $view = $form->createView();
-        $this->assertFalse($view->getVar('valid'));
+        $this->assertFalse($view->vars['valid']);
     }
 
     public function testDataOptionSupersedesSetDataCalls()

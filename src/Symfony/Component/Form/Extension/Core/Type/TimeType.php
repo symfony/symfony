@@ -18,7 +18,7 @@ use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
-use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -109,15 +109,15 @@ class TimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->addVars(array(
+        $view->vars = array_replace($view->vars, array(
             'widget'       => $options['widget'],
             'with_seconds' => $options['with_seconds'],
         ));
 
         if ('single_text' === $options['widget']) {
-            $view->setVar('type', 'time');
+            $view->vars['type'] = 'time';
         }
     }
 

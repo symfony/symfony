@@ -23,14 +23,14 @@ class ChoiceView
      *
      * @var string
      */
-    private $value;
+    public $value;
 
     /**
      * The label displayed to humans.
      *
      * @var string
      */
-    private $label;
+    public $label;
 
     /**
      * Creates a new ChoiceView.
@@ -45,22 +45,18 @@ class ChoiceView
     }
 
     /**
-     * Returns the choice value.
+     * Returns whether this choice is selected for the given value.
      *
-     * @return string The view representation of the choice.
+     * @param string|array $value The selected choice value.
+     *
+     * @return Boolean Whether the choice is selected.
      */
-    public function getValue()
+    public function isSelected($value)
     {
-        return $this->value;
-    }
+        if (is_array($value)) {
+            return false !== array_search($this->value, $value, true);
+        }
 
-    /**
-     * Returns the choice label.
-     *
-     * @return string The label displayed to humans.
-     */
-    public function getLabel()
-    {
-        return $this->label;
+        return $this->value === $value;
     }
 }

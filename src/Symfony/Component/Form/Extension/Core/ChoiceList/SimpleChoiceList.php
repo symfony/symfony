@@ -89,7 +89,7 @@ class SimpleChoiceList extends ChoiceList
      *
      * @see parent::addChoices
      */
-    protected function addChoices(&$bucketForPreferred, &$bucketForRemaining, $choices, $labels, array $preferredChoices)
+    protected function addChoices(&$bucketForPreferred, &$bucketForRemaining, array $choices, array $labels, array $preferredChoices)
     {
         // Add choices to the nested buckets
         foreach ($choices as $choice => $label) {
@@ -126,8 +126,10 @@ class SimpleChoiceList extends ChoiceList
      *
      * @param mixed $choice           The choice to test.
      * @param array $preferredChoices An array of preferred choices.
+     *
+     * @return Boolean Whether the choice is preferred.
      */
-    protected function isPreferred($choice, $preferredChoices)
+    protected function isPreferred($choice, array $preferredChoices)
     {
         // Optimize performance over the default implementation
         return isset($preferredChoices[$choice]);

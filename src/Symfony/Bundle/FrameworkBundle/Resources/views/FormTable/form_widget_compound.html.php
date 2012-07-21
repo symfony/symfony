@@ -1,5 +1,5 @@
 <table <?php echo $view['form']->block('widget_container_attributes') ?>>
-    <?php if (!$form->hasParent()): ?>
+    <?php if (!$form->parent): ?>
     <?php echo $view['form']->errors($form) ?>
     <?php endif ?>
     <?php echo $view['form']->block('form_rows') ?>

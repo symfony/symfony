@@ -989,6 +989,10 @@ class Response
      */
     public function isNotModified(Request $request)
     {
+        if (!$request->isMethodSafe()) {
+            return false;
+        }
+
         $lastModified = $request->headers->get('If-Modified-Since');
         $notModified = false;
         if ($etags = $request->getEtags()) {

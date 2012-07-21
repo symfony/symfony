@@ -559,6 +559,22 @@
     {% endblock %}
     ```
 
+  * The method `renderBlock()` of the helper for the PHP Templating component was
+    renamed to `block()`. Its first argument is now expected to be a `FormView`
+    instance.
+
+    Before:
+
+    ```
+    <?php echo $view['form']->renderBlock('widget_attributes') ?>
+    ```
+
+    After:
+
+    ```
+    <?php echo $view['form']->block($form, 'widget_attributes') ?>
+    ```
+
 #### Other BC Breaks
 
   * The order of the first two arguments of the methods `createNamed` and
@@ -1010,21 +1026,6 @@
     $registry = $this->get('form.registry');
 
     $registry->addType($registry->resolveType(new MyFormType()));
-    ```
-
-  * The method `renderBlock()` of the helper for the PHP Templating component was
-    deprecated and will be removed in Symfony 2.3. You should use `block()` instead.
-
-    Before:
-
-    ```
-    <?php echo $view['form']->renderBlock('widget_attributes') ?>
-    ```
-
-    After:
-
-    ```
-    <?php echo $view['form']->block('widget_attributes') ?>
     ```
 
   * The following methods in class `FormView` were deprecated and will be

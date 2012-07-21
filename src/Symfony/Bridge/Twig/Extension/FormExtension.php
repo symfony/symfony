@@ -80,8 +80,16 @@ class FormExtension extends \Twig_Extension
     {
         return array(
             'humanize'           => new \Twig_Filter_Method($this, 'renderer->humanize'),
-            'is_choice_group'    => new \Twig_Filter_Function('is_array', array('is_safe' => array('html'))),
-            'is_choice_selected' => new \Twig_Filter_Method($this, 'isChoiceSelected'),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTests()
+    {
+        return array(
+            'selectedchoice' => new \Twig_Test_Method($this, 'isSelectedChoice'),
         );
     }
 
@@ -108,7 +116,7 @@ class FormExtension extends \Twig_Extension
      *
      * @see ChoiceView::isSelected()
      */
-    public function isChoiceSelected(ChoiceView $choice, $selectedValue)
+    public function isSelectedChoice(ChoiceView $choice, $selectedValue)
     {
         if (is_array($selectedValue)) {
             return false !== array_search($choice->value, $selectedValue, true);

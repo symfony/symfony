@@ -49,11 +49,6 @@ class FormHelper extends Helper
         return 'form';
     }
 
-    public function isChoiceSelected(ChoiceView $choice, $selectedValue)
-    {
-        return $this->renderer->isChoiceSelected($choice, $selectedValue);
-    }
-
     /**
      * Sets a theme for a given view.
      *

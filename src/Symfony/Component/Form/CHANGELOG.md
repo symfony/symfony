@@ -134,8 +134,6 @@ CHANGELOG
    FormEvents::BIND_NORM_DATA
  * [BC BREAK] reversed the order of the first two arguments to `createNamed`
    and `createNamedBuilder` in `FormFactoryInterface`
- * [BC BREAK] adapted methods of FormView to match the naming used in
-   FormInterface and FormBuilder
  * deprecated `getChildren` in Form and FormBuilder in favor of `all`
  * deprecated `hasChildren` in Form and FormBuilder in favor of `count`
  * FormBuilder now implements \IteratorAggregate
@@ -179,3 +177,4 @@ CHANGELOG
    * `isChoiceGroup`
    * `isChoiceSelected`
  * added method `block` to FormHelper and deprecated `renderBlock` instead
+ * made FormView properties public and deprecated their accessor methods

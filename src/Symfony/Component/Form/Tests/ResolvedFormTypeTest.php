@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormViewInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormConfig;
 use Symfony\Component\Form\Form;
@@ -171,7 +170,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
         $i = 0;
 
         $assertIndexAndNbOfChildViews = function ($index, $nbOfChildViews) use (&$i, $test) {
-            return function (FormViewInterface $view) use (&$i, $test, $index, $nbOfChildViews) {
+            return function (FormView $view) use (&$i, $test, $index, $nbOfChildViews) {
                 /* @var \PHPUnit_Framework_TestCase $test */
                 $test->assertEquals($index, $i, 'Executed at index ' . $index);
                 $test->assertCount($nbOfChildViews, $view);
@@ -242,10 +241,10 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
             ->with($this->anything(), $form, $options)
             ->will($this->returnCallback($assertIndexAndNbOfChildViews(11, 2)));
 
-        $parentView = new FormView('parent');
+        $parentView = new FormView();
         $view = $resolvedType->createView($form, $parentView);
 
-        $this->assertSame($parentView, $view->getParent());
+        $this->assertSame($parentView, $view->parent);
     }
 
     /**

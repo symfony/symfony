@@ -69,7 +69,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function setTheme(FormViewInterface $view, $themes)
+    public function setTheme(FormView $view, $themes)
     {
         $this->engine->setTheme($view, $themes);
     }
@@ -77,7 +77,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderEnctype(FormViewInterface $view)
+    public function renderEnctype(FormView $view)
     {
         return $this->renderSection($view, 'enctype');
     }
@@ -85,7 +85,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderRow(FormViewInterface $view, array $variables = array())
+    public function renderRow(FormView $view, array $variables = array())
     {
         return $this->renderSection($view, 'row', $variables);
     }
@@ -93,7 +93,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderRest(FormViewInterface $view, array $variables = array())
+    public function renderRest(FormView $view, array $variables = array())
     {
         return $this->renderSection($view, 'rest', $variables);
     }
@@ -101,7 +101,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderWidget(FormViewInterface $view, array $variables = array())
+    public function renderWidget(FormView $view, array $variables = array())
     {
         return $this->renderSection($view, 'widget', $variables);
     }
@@ -109,7 +109,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderErrors(FormViewInterface $view)
+    public function renderErrors(FormView $view)
     {
         return $this->renderSection($view, 'errors');
     }
@@ -117,7 +117,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderLabel(FormViewInterface $view, $label = null, array $variables = array())
+    public function renderLabel(FormView $view, $label = null, array $variables = array())
     {
         if ($label !== null) {
             $variables += array('label' => $label);
@@ -175,29 +175,6 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function isChoiceGroup($choice)
-    {
-        return is_array($choice) || $choice instanceof \Traversable;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isChoiceSelected(FormViewInterface $view, ChoiceView $choice)
-    {
-        $value = $view->getVar('value');
-        $choiceValue = $choice->getValue();
-
-        if (is_array($value)) {
-            return false !== array_search($choiceValue, $value, true);
-        }
-
-        return $choiceValue === $value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function humanize($text)
     {
         return ucfirst(trim(strtolower(preg_replace('/[_\s]+/', ' ', $text))));
@@ -206,7 +183,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * Renders the given section of a form view.
      *
-     * @param FormViewInterface $view      The form view.
+     * @param FormView $view      The form view.
      * @param string            $section   The name of the section to render.
      * @param array             $variables The variables to pass to the template.
      *
@@ -214,7 +191,7 @@ class FormRenderer implements FormRendererInterface
      *
      * @throws Exception\FormException If no fitting template was found.
      */
-    protected function renderSection(FormViewInterface $view, $section, array $variables = array())
+    protected function renderSection(FormView $view, $section, array $variables = array())
     {
         $renderOnlyOnce = in_array($section, array('row', 'widget'));
 
@@ -223,7 +200,7 @@ class FormRenderer implements FormRendererInterface
         }
 
         // The cache key for storing the variables and types
-        $mapKey = $uniqueBlockName = $view->getVar('full_block_name') . '_' . $section;
+        $mapKey = $uniqueBlockName = $view->vars['full_block_name'] . '_' . $section;
 
         // In templates, we have to deal with two kinds of block hierarchies:
         //
@@ -257,7 +234,7 @@ class FormRenderer implements FormRendererInterface
             // Calculate the hierarchy of template blocks and start on
             // the bottom level of the hierarchy (= "_<id>_<section>" block)
             $blockHierarchy = array();
-            foreach ($view->getVar('types') as $type) {
+            foreach ($view->vars['types'] as $type) {
                 $blockHierarchy[] = $type . '_' . $section;
             }
             $blockHierarchy[] = $uniqueBlockName;
@@ -265,7 +242,7 @@ class FormRenderer implements FormRendererInterface
 
             // The default variable scope contains all view variables, merged with
             // the variables passed explicitly to the helper
-            $scopeVariables = $view->getVars();
+            $scopeVariables = $view->vars;
         } else {
             // RECURSIVE CALL
             // If a block recursively calls renderSection() again, resume rendering

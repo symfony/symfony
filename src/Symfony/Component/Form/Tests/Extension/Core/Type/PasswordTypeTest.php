@@ -19,7 +19,7 @@ class PasswordTypeTest extends TypeTestCase
         $form->setData('pAs5w0rd');
         $view = $form->createView();
 
-        $this->assertSame('', $view->getVar('value'));
+        $this->assertSame('', $view->vars['value']);
     }
 
     public function testEmptyIfBound()
@@ -28,7 +28,7 @@ class PasswordTypeTest extends TypeTestCase
         $form->bind('pAs5w0rd');
         $view = $form->createView();
 
-        $this->assertSame('', $view->getVar('value'));
+        $this->assertSame('', $view->vars['value']);
     }
 
     public function testNotEmptyIfBoundAndNotAlwaysEmpty()
@@ -37,6 +37,6 @@ class PasswordTypeTest extends TypeTestCase
         $form->bind('pAs5w0rd');
         $view = $form->createView();
 
-        $this->assertSame('pAs5w0rd', $view->getVar('value'));
+        $this->assertSame('pAs5w0rd', $view->vars['value']);
     }
 }

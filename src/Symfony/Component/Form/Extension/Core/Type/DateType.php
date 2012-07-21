@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Exception\CreationException;
-use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
@@ -124,15 +124,15 @@ class DateType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $view->setVar('widget', $options['widget']);
+        $view->vars['widget'] = $options['widget'];
 
         // Change the input to a HTML5 date input if
         //  * the widget is set to "single_text"
         //  * the format matches the one expected by HTML5
         if ('single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
-            $view->setVar('type', 'date');
+            $view->vars['type'] = 'date';
         }
 
         if ($form->getConfig()->hasAttribute('formatter')) {
@@ -147,7 +147,7 @@ class DateType extends AbstractType
                 $pattern = '{{ year }}-{{ month }}-{{ day }}';
             }
 
-            $view->setVar('date_pattern', $pattern);
+            $view->vars['date_pattern'] = $pattern;
         }
     }
 

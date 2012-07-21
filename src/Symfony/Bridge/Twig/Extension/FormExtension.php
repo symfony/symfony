@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Bridge\Twig\Form\TwigRendererInterface;
-use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 
 /**
@@ -62,15 +62,13 @@ class FormExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'form_enctype'             => new \Twig_Function_Method($this, 'renderer->renderEnctype', array('is_safe' => array('html'))),
-            'form_widget'              => new \Twig_Function_Method($this, 'renderer->renderWidget', array('is_safe' => array('html'))),
-            'form_errors'              => new \Twig_Function_Method($this, 'renderer->renderErrors', array('is_safe' => array('html'))),
-            'form_label'               => new \Twig_Function_Method($this, 'renderer->renderLabel', array('is_safe' => array('html'))),
-            'form_row'                 => new \Twig_Function_Method($this, 'renderer->renderRow', array('is_safe' => array('html'))),
-            'form_rest'                => new \Twig_Function_Method($this, 'renderer->renderRest', array('is_safe' => array('html'))),
-            'csrf_token'               => new \Twig_Function_Method($this, 'renderer->renderCsrfToken'),
-            '_form_is_choice_group'    => new \Twig_Function_Method($this, 'renderer->isChoiceGroup', array('is_safe' => array('html'))),
-            '_form_is_choice_selected' => new \Twig_Function_Method($this, 'renderer->isChoiceSelected', array('is_safe' => array('html'))),
+            'form_enctype' => new \Twig_Function_Method($this, 'renderer->renderEnctype', array('is_safe' => array('html'))),
+            'form_widget'  => new \Twig_Function_Method($this, 'renderer->renderWidget', array('is_safe' => array('html'))),
+            'form_errors'  => new \Twig_Function_Method($this, 'renderer->renderErrors', array('is_safe' => array('html'))),
+            'form_label'   => new \Twig_Function_Method($this, 'renderer->renderLabel', array('is_safe' => array('html'))),
+            'form_row'     => new \Twig_Function_Method($this, 'renderer->renderRow', array('is_safe' => array('html'))),
+            'form_rest'    => new \Twig_Function_Method($this, 'renderer->renderRest', array('is_safe' => array('html'))),
+            'csrf_token'   => new \Twig_Function_Method($this, 'renderer->renderCsrfToken'),
         );
     }
 
@@ -82,6 +80,48 @@ class FormExtension extends \Twig_Extension
         return array(
             'humanize' => new \Twig_Filter_Method($this, 'renderer->humanize'),
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTests()
+    {
+        return array(
+            'selectedchoice' => new \Twig_Test_Method($this, 'isSelectedChoice'),
+        );
+    }
+
+    /**
+     * Returns whether a choice is selected for a given form value.
+     *
+     * Unfortunately Twig does not support an efficient way to execute the
+     * "is_selected" closure passed to the template by ChoiceType. It is faster
+     * to implement the logic here (around 65ms for a specific form).
+     *
+     * Directly implementing the logic here is also faster than doing so in
+     * ChoiceView (around 30ms).
+     *
+     * The worst option tested so far is to implement the logic in ChoiceView
+     * and access the ChoiceView method directly in the template. Doing so is
+     * around 220ms slower than doing the method call here in the filter. Twig
+     * seems to be much more efficient at executing filters than at executing
+     * methods of an object.
+     *
+     * @param ChoiceView   $choice        The choice to check.
+     * @param string|array $selectedValue The selected value to compare.
+     *
+     * @return Boolean Whether the choice is selected.
+     *
+     * @see ChoiceView::isSelected()
+     */
+    public function isSelectedChoice(ChoiceView $choice, $selectedValue)
+    {
+        if (is_array($selectedValue)) {
+            return false !== array_search($choice->value, $selectedValue, true);
+        }
+
+        return $choice->value === $selectedValue;
     }
 
     /**

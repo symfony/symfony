@@ -138,7 +138,7 @@ class CollectionTypeTest extends TypeTestCase
             ))
         ;
 
-        $this->assertTrue($form->createView()->getVar('multipart'));
+        $this->assertTrue($form->createView()->vars['multipart']);
     }
 
     public function testGetDataDoesNotContainsProtypeNameBeforeDataAreSet()
@@ -195,6 +195,6 @@ class CollectionTypeTest extends TypeTestCase
             'prototype_name' => '__test__',
         ));
 
-        $this->assertSame('__test__label__', $form->createView()->getVar('prototype')->getVar('label'));
+        $this->assertSame('__test__label__', $form->createView()->vars['prototype']->vars['label']);
     }
 }

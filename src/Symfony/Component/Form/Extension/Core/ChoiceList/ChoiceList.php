@@ -240,27 +240,19 @@ class ChoiceList implements ChoiceListInterface
      *                                  view objects.
      * @param array $bucketForRemaining The bucket where to store the
      *                                  non-preferred view objects.
-     * @param array $choices          The list of choices.
-     * @param array $labels           The labels corresponding to the choices.
-     * @param array $preferredChoices The preferred choices.
+     * @param array $choices            The list of choices.
+     * @param array $labels             The labels corresponding to the choices.
+     * @param array $preferredChoices   The preferred choices.
      *
      * @throws UnexpectedTypeException If the structure of the $labels array
      *                                 does not match the structure of the
      *                                 $choices array.
      */
-    protected function addChoices(&$bucketForPreferred, &$bucketForRemaining, $choices, $labels, array $preferredChoices)
+    protected function addChoices(&$bucketForPreferred, &$bucketForRemaining, array $choices, array $labels, array $preferredChoices)
     {
-        if (!is_array($choices) && !$choices instanceof \Traversable) {
-            throw new UnexpectedTypeException($choices, 'array or \Traversable');
-        }
-
         // Add choices to the nested buckets
         foreach ($choices as $group => $choice) {
             if (is_array($choice)) {
-                if (!is_array($labels)) {
-                    throw new UnexpectedTypeException($labels, 'array');
-                }
-
                 // Don't do the work if the array is empty
                 if (count($choice) > 0) {
                     $this->addChoiceGroup(
@@ -292,11 +284,11 @@ class ChoiceList implements ChoiceListInterface
      *                                  view objects.
      * @param array $bucketForRemaining The bucket where to store the
      *                                  non-preferred view objects.
-     * @param array $choices          The list of choices in the group.
-     * @param array $labels           The labels corresponding to the choices in the group.
-     * @param array $preferredChoices The preferred choices.
+     * @param array $choices            The list of choices in the group.
+     * @param array $labels             The labels corresponding to the choices in the group.
+     * @param array $preferredChoices   The preferred choices.
      */
-    protected function addChoiceGroup($group, &$bucketForPreferred, &$bucketForRemaining, $choices, $labels, array $preferredChoices)
+    protected function addChoiceGroup($group, &$bucketForPreferred, &$bucketForRemaining, array $choices, array $labels, array $preferredChoices)
     {
         // If this is a choice group, create a new level in the choice
         // key hierarchy
@@ -323,13 +315,15 @@ class ChoiceList implements ChoiceListInterface
     /**
      * Adds a new choice.
      *
-     * @param array $bucketForPreferred The bucket where to store the preferred
-     *                                  view objects.
-     * @param array $bucketForRemaining The bucket where to store the
-     *                                  non-preferred view objects.
-     * @param mixed  $choice           The choice to add.
-     * @param string $label            The label for the choice.
-     * @param array  $preferredChoices The preferred choices.
+     * @param array  $bucketForPreferred The bucket where to store the preferred
+     *                                   view objects.
+     * @param array  $bucketForRemaining The bucket where to store the
+     *                                   non-preferred view objects.
+     * @param mixed  $choice             The choice to add.
+     * @param string $label              The label for the choice.
+     * @param array  $preferredChoices   The preferred choices.
+     *
+     * @throws InvalidConfigurationException If no valid value or index could be created.
      */
     protected function addChoice(&$bucketForPreferred, &$bucketForRemaining, $choice, $label, array $preferredChoices)
     {
@@ -366,8 +360,10 @@ class ChoiceList implements ChoiceListInterface
      *
      * @param mixed $choice           The choice to test.
      * @param array $preferredChoices An array of preferred choices.
+     *
+     * @return Boolean Whether the choice is preferred.
      */
-    protected function isPreferred($choice, $preferredChoices)
+    protected function isPreferred($choice, array $preferredChoices)
     {
         return false !== array_search($choice, $preferredChoices, true);
     }

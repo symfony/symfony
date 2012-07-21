@@ -21,7 +21,7 @@ class CountryTypeTest extends LocalizedTestCase
 
         $form = $this->factory->create('country');
         $view = $form->createView();
-        $choices = $view->getVar('choices');
+        $choices = $view->vars['choices'];
 
         // Don't check objects for identity
         $this->assertContains(new ChoiceView('DE', 'Deutschland'), $choices, '', false, false);
@@ -35,10 +35,10 @@ class CountryTypeTest extends LocalizedTestCase
     {
         $form = $this->factory->create('country', 'country');
         $view = $form->createView();
-        $choices = $view->getVar('choices');
+        $choices = $view->vars['choices'];
 
         foreach ($choices as $choice) {
-            if ('ZZ' === $choice->getValue()) {
+            if ('ZZ' === $choice->value) {
                 $this->fail('Should not contain choice "ZZ"');
             }
         }

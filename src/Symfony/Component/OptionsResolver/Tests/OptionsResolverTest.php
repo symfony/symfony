@@ -538,13 +538,13 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->resolver->isRequired('foo'));
     }
 
-    public function testFiltersTransformFinalOptions()
+    public function testNormalizersTransformFinalOptions()
     {
         $this->resolver->setDefaults(array(
             'foo' => 'bar',
             'bam' => 'baz',
         ));
-        $this->resolver->setFilters(array(
+        $this->resolver->setNormalizers(array(
             'foo' => function (Options $options, $value) {
                 return $options['bam'] . '[' . $value . ']';
             },

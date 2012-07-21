@@ -66,7 +66,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public static function create()
     {
-        return new self();
+        return new static();
     }
 
     /**

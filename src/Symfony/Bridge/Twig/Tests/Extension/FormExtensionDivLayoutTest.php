@@ -106,7 +106,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         );
     }
 
-    public function isChoiceSelectedProvider()
+    public function isSelectedChoiceProvider()
     {
         // The commented cases should not be necessary anymore, because the
         // choice lists should assure that both values passed here are always
@@ -130,13 +130,13 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     }
 
     /**
-     * @dataProvider isChoiceSelectedProvider
+     * @dataProvider isSelectedChoiceProvider
      */
     public function testIsChoiceSelected($expected, $choice, $value)
     {
         $choice = new ChoiceView($choice, $choice . ' label');
 
-        $this->assertSame($expected, $this->extension->isChoiceSelected($choice, $value));
+        $this->assertSame($expected, $this->extension->isSelectedChoice($choice, $value));
     }
 
     protected function renderEnctype(FormView $view)

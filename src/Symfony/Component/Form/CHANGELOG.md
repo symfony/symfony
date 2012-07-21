@@ -113,10 +113,9 @@ CHANGELOG
  * deprecated the methods `getDefaultOptions` and `getAllowedOptionValues`
    in FormTypeInterface and FormTypeExtensionInterface
  * options passed during construction can now be accessed from FormConfigInterface
- * added FormBuilderInterface, FormView and FormConfigEditorInterface
- * [BC BREAK] the methods in FormTypeInterface and FormTypeExtensionInterface now
-   receive FormBuilderInterface and FormView instead of FormBuilder and
-   FormView
+ * added FormBuilderInterface and FormConfigEditorInterface
+ * [BC BREAK] the method `buildForm` in FormTypeInterface and FormTypeExtensionInterface
+   now receives a FormBuilderInterface instead of a FormBuilder instance
  * [BC BREAK] the method `buildViewBottomUp` was renamed to `finishView` in
    FormTypeInterface and FormTypeExtensionInterface
  * [BC BREAK] the options array is now passed as last argument of the

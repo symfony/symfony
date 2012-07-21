@@ -175,5 +175,5 @@ CHANGELOG
    * `toArrayKeys`
    * `isChoiceGroup`
    * `isChoiceSelected`
- * added method `block` to FormHelper and deprecated `renderBlock` instead
+ * [BC BREAK] renamed method `renderBlock` in FormHelper to `block` and changed its signature
  * made FormView properties public and deprecated their accessor methods

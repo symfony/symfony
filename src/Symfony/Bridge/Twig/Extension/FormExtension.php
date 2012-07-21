@@ -62,12 +62,12 @@ class FormExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'form_enctype' => new \Twig_Function_Method($this, 'renderer->renderEnctype', array('is_safe' => array('html'))),
-            'form_widget'  => new \Twig_Function_Method($this, 'renderer->renderWidget', array('is_safe' => array('html'))),
-            'form_errors'  => new \Twig_Function_Method($this, 'renderer->renderErrors', array('is_safe' => array('html'))),
-            'form_label'   => new \Twig_Function_Method($this, 'renderer->renderLabel', array('is_safe' => array('html'))),
-            'form_row'     => new \Twig_Function_Method($this, 'renderer->renderRow', array('is_safe' => array('html'))),
-            'form_rest'    => new \Twig_Function_Method($this, 'renderer->renderRest', array('is_safe' => array('html'))),
+            'form_enctype' => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', array('is_safe' => array('html'))),
+            'form_widget'  => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', array('is_safe' => array('html'))),
+            'form_errors'  => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', array('is_safe' => array('html'))),
+            'form_label'   => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', array('is_safe' => array('html'))),
+            'form_row'     => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', array('is_safe' => array('html'))),
+            'form_rest'    => new \Twig_Function_Node('Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', array('is_safe' => array('html'))),
             'csrf_token'   => new \Twig_Function_Method($this, 'renderer->renderCsrfToken'),
         );
     }

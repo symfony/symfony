@@ -141,32 +141,36 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     protected function renderEnctype(FormView $view)
     {
-        return (string) $this->extension->renderer->renderEnctype($view);
+        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'enctype');
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderLabel($view, $label, $vars);
+        if ($label !== null) {
+            $vars += array('label' => $label);
+        }
+
+        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'label', $vars);
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string) $this->extension->renderer->renderErrors($view);
+        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'errors');
     }
 
     protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderWidget($view, $vars);
+        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'widget', $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderRow($view, $vars);
+        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'row', $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderRest($view, $vars);
+        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'rest', $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)

@@ -75,7 +75,7 @@ class FormHelper extends Helper
      */
     public function enctype(FormView $view)
     {
-        return $this->renderer->renderEnctype($view);
+        return $this->renderer->searchAndRenderBlock($view, 'enctype');
     }
 
     /**
@@ -92,40 +92,44 @@ class FormHelper extends Helper
      *     <?php echo view['form']->widget(array('separator' => '+++++)) ?>
      *
      * @param FormView $view      The view for which to render the widget
-     * @param array             $variables Additional variables passed to the template
+     * @param array    $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
     public function widget(FormView $view, array $variables = array())
     {
-        return $this->renderer->renderWidget($view, $variables);
+        return $this->renderer->searchAndRenderBlock($view, 'widget', $variables);
     }
 
     /**
      * Renders the entire form field "row".
      *
      * @param FormView $view      The view for which to render the row
-     * @param array             $variables Additional variables passed to the template
+     * @param array    $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
     public function row(FormView $view, array $variables = array())
     {
-        return $this->renderer->renderRow($view, $variables);
+        return $this->renderer->searchAndRenderBlock($view, 'row', $variables);
     }
 
     /**
      * Renders the label of the given view.
      *
      * @param FormView $view      The view for which to render the label
-     * @param string            $label     The label
-     * @param array             $variables Additional variables passed to the template
+     * @param string   $label     The label
+     * @param array    $variables Additional variables passed to the template
      *
      * @return string The HTML markup
      */
     public function label(FormView $view, $label = null, array $variables = array())
     {
-        return $this->renderer->renderLabel($view, $label, $variables);
+        if ($label !== null) {
+            $variables += array('label' => $label);
+        }
+
+        return $this->renderer->searchAndRenderBlock($view, 'label', $variables);
     }
 
     /**
@@ -137,49 +141,34 @@ class FormHelper extends Helper
      */
     public function errors(FormView $view)
     {
-        return $this->renderer->renderErrors($view);
+        return $this->renderer->searchAndRenderBlock($view, 'errors');
     }
 
     /**
      * Renders views which have not already been rendered.
      *
      * @param FormView $view      The parent view
-     * @param array             $variables An array of variables
+     * @param array    $variables An array of variables
      *
      * @return string The HTML markup
      */
     public function rest(FormView $view, array $variables = array())
     {
-        return $this->renderer->renderRest($view, $variables);
-    }
-
-    /**
-     * Alias of {@link block()}
-     *
-     * @param string $block     The name of the block to render.
-     * @param array  $variables The variable to pass to the template.
-     *
-     * @return string The HTML markup
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link block()} instead.
-     */
-    public function renderBlock($block, array $variables = array())
-    {
-        return $this->renderer->renderBlock($block, $variables);
+        return $this->renderer->searchAndRenderBlock($view, 'rest', $variables);
     }
 
     /**
      * Renders a block of the template.
      *
-     * @param string $block     The name of the block to render.
-     * @param array  $variables The variable to pass to the template.
+     * @param FormView $view      The view for determining the used themes.
+     * @param string   $blockName The name of the block to render.
+     * @param array    $variables The variable to pass to the template.
      *
      * @return string The HTML markup
      */
-    public function block($block, array $variables = array())
+    public function block(FormView $view, $blockName, array $variables = array())
     {
-        return $this->renderer->renderBlock($block, $variables);
+        return $this->renderer->renderBlock($view, $blockName, $variables);
     }
 
     /**

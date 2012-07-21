@@ -35,7 +35,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * @var array
      */
-    private $blockHierarchyMap = array();
+    private $blockNameHierarchyMap = array();
 
     /**
      * @var array
@@ -50,7 +50,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * @var array
      */
-    private $stack = array();
+    private $variableStack = array();
 
     public function __construct(FormRendererEngineInterface $engine, CsrfProviderInterface $csrfProvider = null)
     {
@@ -77,58 +77,6 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderEnctype(FormView $view)
-    {
-        return $this->renderSection($view, 'enctype');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renderRow(FormView $view, array $variables = array())
-    {
-        return $this->renderSection($view, 'row', $variables);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renderRest(FormView $view, array $variables = array())
-    {
-        return $this->renderSection($view, 'rest', $variables);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renderWidget(FormView $view, array $variables = array())
-    {
-        return $this->renderSection($view, 'widget', $variables);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renderErrors(FormView $view)
-    {
-        return $this->renderSection($view, 'errors');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renderLabel(FormView $view, $label = null, array $variables = array())
-    {
-        if ($label !== null) {
-            $variables += array('label' => $label);
-        }
-
-        return $this->renderSection($view, 'label', $variables);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function renderCsrfToken($intention)
     {
         if (null === $this->csrfProvider) {
@@ -141,18 +89,18 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderBlock($block, array $variables = array())
+    public function renderBlock(FormView $view, $blockName, array $variables = array())
     {
-        if (0 == count($this->stack)) {
+        if (0 == count($this->variableStack)) {
             throw new FormException('This method should only be called while rendering a form element.');
         }
 
-        list($view, $scopeVariables) = end($this->stack);
+        $scopeVariables = end($this->variableStack);
 
-        $resource = $this->engine->getResourceForBlock($view, $block);
+        $resource = $this->engine->getResourceForBlockName($view, $blockName);
 
         if (!$resource) {
-            throw new FormException(sprintf('No block "%s" found while rendering the form.', $block));
+            throw new FormException(sprintf('No block "%s" found while rendering the form.', $blockName));
         }
 
         // Merge the passed with the existing attributes
@@ -169,38 +117,30 @@ class FormRenderer implements FormRendererInterface
         // cannot be overwritten
         $variables = array_replace($scopeVariables, $variables);
 
-        return $this->engine->renderBlock($view, $resource, $block, $variables);
+        $this->variableStack[] = $variables;
+
+        // Do the rendering
+        $html = $this->engine->renderBlock($view, $resource, $blockName, $variables);
+
+        // Clear the stack
+        array_pop($this->variableStack);
+
+        return $html;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function humanize($text)
+    public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = array())
     {
-        return ucfirst(trim(strtolower(preg_replace('/[_\s]+/', ' ', $text))));
-    }
-
-    /**
-     * Renders the given section of a form view.
-     *
-     * @param FormView $view      The form view.
-     * @param string            $section   The name of the section to render.
-     * @param array             $variables The variables to pass to the template.
-     *
-     * @return string The HTML markup.
-     *
-     * @throws Exception\FormException If no fitting template was found.
-     */
-    protected function renderSection(FormView $view, $section, array $variables = array())
-    {
-        $renderOnlyOnce = in_array($section, array('row', 'widget'));
+        $renderOnlyOnce = in_array($blockNameSuffix, array('row', 'widget'));
 
         if ($renderOnlyOnce && $view->isRendered()) {
             return '';
         }
 
         // The cache key for storing the variables and types
-        $mapKey = $uniqueBlockName = $view->vars['full_block_name'] . '_' . $section;
+        $mapKey = $uniqueBlockName = $view->vars['full_block_name'] . '_' . $blockNameSuffix;
 
         // In templates, we have to deal with two kinds of block hierarchies:
         //
@@ -229,16 +169,16 @@ class FormRenderer implements FormRendererInterface
         // widget() function again to render the block for the parent type.
         //
         // The second kind is implemented in the following blocks.
-        if (!isset($this->blockHierarchyMap[$mapKey])) {
+        if (!isset($this->blockNameHierarchyMap[$mapKey])) {
             // INITIAL CALL
             // Calculate the hierarchy of template blocks and start on
             // the bottom level of the hierarchy (= "_<id>_<section>" block)
-            $blockHierarchy = array();
+            $blockNameHierarchy = array();
             foreach ($view->vars['types'] as $type) {
-                $blockHierarchy[] = $type . '_' . $section;
+                $blockNameHierarchy[] = $type . '_' . $blockNameSuffix;
             }
-            $blockHierarchy[] = $uniqueBlockName;
-            $hierarchyLevel = count($blockHierarchy) - 1;
+            $blockNameHierarchy[] = $uniqueBlockName;
+            $hierarchyLevel = count($blockNameHierarchy) - 1;
 
             // The default variable scope contains all view variables, merged with
             // the variables passed explicitly to the helper
@@ -247,7 +187,7 @@ class FormRenderer implements FormRendererInterface
             // RECURSIVE CALL
             // If a block recursively calls renderSection() again, resume rendering
             // using the parent type in the hierarchy.
-            $blockHierarchy = $this->blockHierarchyMap[$mapKey];
+            $blockNameHierarchy = $this->blockNameHierarchyMap[$mapKey];
             $hierarchyLevel = $this->hierarchyLevelMap[$mapKey] - 1;
 
             // Reuse the current scope and merge it with the explicitly passed variables
@@ -255,22 +195,22 @@ class FormRenderer implements FormRendererInterface
         }
 
         // Load the resource where this block can be found
-        $resource = $this->engine->getResourceForBlockHierarchy($view, $blockHierarchy, $hierarchyLevel);
+        $resource = $this->engine->getResourceForBlockNameHierarchy($view, $blockNameHierarchy, $hierarchyLevel);
 
         // Update the current hierarchy level to the one at which the resource was
         // found. For example, if looking for "choice_widget", but only a resource
         // is found for its parent "form_widget", then the level is updated here
         // to the parent level.
-        $hierarchyLevel = $this->engine->getResourceHierarchyLevel($view, $blockHierarchy, $hierarchyLevel);
+        $hierarchyLevel = $this->engine->getResourceHierarchyLevel($view, $blockNameHierarchy, $hierarchyLevel);
 
         // The actually existing block name in $resource
-        $block = $blockHierarchy[$hierarchyLevel];
+        $blockName = $blockNameHierarchy[$hierarchyLevel];
 
         // Escape if no resource exists for this block
         if (!$resource) {
             throw new FormException(sprintf(
                 'Unable to render the form as none of the following blocks exist: "%s".',
-                implode('", "', array_reverse($blockHierarchy))
+                implode('", "', array_reverse($blockNameHierarchy))
             ));
         }
 
@@ -295,7 +235,7 @@ class FormRenderer implements FormRendererInterface
         // We need to store these values in maps (associative arrays) because within a
         // call to widget() another call to widget() can be made, but for a different view
         // object. These nested calls should not override each other.
-        $this->blockHierarchyMap[$mapKey] = $blockHierarchy;
+        $this->blockNameHierarchyMap[$mapKey] = $blockNameHierarchy;
         $this->hierarchyLevelMap[$mapKey] = $hierarchyLevel;
         $this->variableMap[$mapKey] = $variables;
 
@@ -305,16 +245,16 @@ class FormRenderer implements FormRendererInterface
         //
         // A stack is sufficient for this purpose, because renderBlock() always accesses
         // the immediate next outer scope, which is always stored at the end of the stack.
-        $this->stack[] = array($view, $variables);
+        $this->variableStack[] = $variables;
 
         // Do the rendering
-        $html = $this->engine->renderBlock($view, $resource, $block, $variables);
+        $html = $this->engine->renderBlock($view, $resource, $blockName, $variables);
 
         // Clear the stack
-        array_pop($this->stack);
+        array_pop($this->variableStack);
 
         // Clear the maps
-        unset($this->blockHierarchyMap[$mapKey]);
+        unset($this->blockNameHierarchyMap[$mapKey]);
         unset($this->hierarchyLevelMap[$mapKey]);
         unset($this->variableMap[$mapKey]);
 
@@ -323,5 +263,13 @@ class FormRenderer implements FormRendererInterface
         }
 
         return $html;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function humanize($text)
+    {
+        return ucfirst(trim(strtolower(preg_replace('/[_\s]+/', ' ', $text))));
     }
 }

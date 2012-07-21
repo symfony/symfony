@@ -37,89 +37,33 @@ interface FormRendererInterface
     public function setTheme(FormView $view, $themes);
 
     /**
-     * Renders the HTML enctype in the form tag, if necessary.
-     *
-     * Example usage templates:
-     *
-     *     <form action="..." method="post" <?php echo $renderer->renderEnctype($form) ?>>
-     *
-     * @param FormView $view The view for which to render the encoding type
-     *
-     * @return string The HTML markup
-     */
-    public function renderEnctype(FormView $view);
-
-    /**
-     * Renders the entire row for a form field.
-     *
-     * A row typically contains the label, errors and widget of a field.
-     *
-     * @param FormView $view      The view for which to render the row
-     * @param array             $variables Additional variables passed to the template
-     *
-     * @return string The HTML markup
-     */
-    public function renderRow(FormView $view, array $variables = array());
-
-    /**
-     * Renders views which have not already been rendered.
-     *
-     * @param FormView $view      The parent view
-     * @param array             $variables An array of variables
-     *
-     * @return string The HTML markup
-     */
-    public function renderRest(FormView $view, array $variables = array());
-
-    /**
-     * Renders the HTML for a given view.
-     *
-     * Example usage:
-     *
-     *     <?php echo $renderer->renderWidget($form) ?>
-     *
-     * You can pass options during the call:
-     *
-     *     <?php echo $renderer->renderWidget($form, array('attr' => array('class' => 'foo'))) ?>
-     *
-     *     <?php echo $renderer->renderWidget($form, array('separator' => '+++++)) ?>
-     *
-     * @param FormView $view      The view for which to render the widget
-     * @param array             $variables Additional variables passed to the template
-     *
-     * @return string The HTML markup
-     */
-    public function renderWidget(FormView $view, array $variables = array());
-
-    /**
-     * Renders the errors of the given view.
-     *
-     * @param FormView $view The view to render the errors for
-     *
-     * @return string The HTML markup
-     */
-    public function renderErrors(FormView $view);
-
-    /**
-     * Renders the label of the given view.
-     *
-     * @param FormView $view      The view for which to render the label
-     * @param string            $label     The label
-     * @param array             $variables Additional variables passed to the template
-     *
-     * @return string The HTML markup
-     */
-    public function renderLabel(FormView $view, $label = null, array $variables = array());
-
-    /**
      * Renders a named block of the form theme.
      *
-     * @param string $block     The name of the block.
-     * @param array  $variables The variables to pass to the template.
+     * @param FormView $view      The view for which to render the block.
+     * @param string   $blockName The name of the block.
+     * @param array    $variables The variables to pass to the template.
      *
      * @return string The HTML markup
      */
-    public function renderBlock($block, array $variables = array());
+    public function renderBlock(FormView $view, $blockName, array $variables = array());
+
+    /**
+     * Searches and renders a block for a given name suffix.
+     *
+     * The block is searched by combining the block names stored in the
+     * form view with the given suffix. If a block name is found, that
+     * block is rendered.
+     *
+     * If this method is called recursively, the block search is continued
+     * where a block was found before.
+     *
+     * @param FormView $view            The view for which to render the block.
+     * @param string   $blockNameSuffix The suffix of the block name.
+     * @param array    $variables       The variables to pass to the template.
+     *
+     * @return string The HTML markup
+     */
+    public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = array());
 
     /**
      * Renders a CSRF token.

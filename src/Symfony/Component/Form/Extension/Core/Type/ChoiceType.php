@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
@@ -79,9 +79,9 @@ class ChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->addVars(array(
+        $view->vars = array_replace($view->vars, array(
             'multiple'          => $options['multiple'],
             'expanded'          => $options['expanded'],
             'preferred_choices' => $options['choice_list']->getPreferredViews(),
@@ -90,28 +90,42 @@ class ChoiceType extends AbstractType
             'empty_value'       => null,
         ));
 
+        // The decision, whether a choice is selected, is potentially done
+        // thousand of times during the rendering of a template. Provide a
+        // closure here that is optimized for the value of the form, to
+        // avoid making the type check inside the closure.
+        if ($options['multiple']) {
+            $view->vars['is_selected'] = function ($choice, array $values) {
+                return false !== array_search($choice, $values, true);
+            };
+        } else {
+            $view->vars['is_selected'] = function ($choice, $value) {
+                return $choice === $value;
+            };
+        }
+
         // Check if the choices already contain the empty value
         // Only add the empty value option if this is not the case
         if (0 === count($options['choice_list']->getIndicesForValues(array('')))) {
-            $view->setVar('empty_value', $options['empty_value']);
+            $view->vars['empty_value'] = $options['empty_value'];
         }
 
         if ($options['multiple'] && !$options['expanded']) {
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the
             // POST request.
-            $view->setVar('full_name', $view->getVar('full_name').'[]');
+            $view->vars['full_name'] = $view->vars['full_name'].'[]';
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['expanded']) {
             // Radio buttons should have the same name as the parent
-            $childName = $view->getVar('full_name');
+            $childName = $view->vars['full_name'];
 
             // Checkboxes should append "[]" to allow multiple selection
             if ($options['multiple']) {
@@ -119,7 +133,7 @@ class ChoiceType extends AbstractType
             }
 
             foreach ($view as $childView) {
-                $childView->setVar('full_name', $childName);
+                $childView->vars['full_name'] = $childName;
             }
         }
     }
@@ -226,8 +240,8 @@ class ChoiceType extends AbstractType
                 $this->addSubForms($builder, $choiceView, $options);
             } else {
                 $choiceOpts = array(
-                    'value' => $choiceView->getValue(),
-                    'label' => $choiceView->getLabel(),
+                    'value' => $choiceView->value,
+                    'label' => $choiceView->label,
                     'translation_domain' => $options['translation_domain'],
                 );
 

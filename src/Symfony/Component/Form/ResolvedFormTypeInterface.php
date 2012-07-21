@@ -62,9 +62,9 @@ interface ResolvedFormTypeInterface
      * Creates a new form view for a form of this type.
      *
      * @param FormInterface     $form   The form to create a view for.
-     * @param FormViewInterface $parent The parent view or null.
+     * @param FormView $parent The parent view or null.
      *
-     * @return FormViewInterface The created form view.
+     * @return FormView The created form view.
      */
-    public function createView(FormInterface $form, FormViewInterface $parent = null);
+    public function createView(FormInterface $form, FormView $parent = null);
 }

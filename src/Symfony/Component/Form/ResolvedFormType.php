@@ -130,18 +130,17 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(FormInterface $form, FormViewInterface $parent = null)
+    public function createView(FormInterface $form, FormView $parent = null)
     {
         $options = $form->getConfig()->getOptions();
 
-        $view = new FormView($form->getConfig()->getName());
-        $view->setParent($parent);
+        $view = new FormView($parent);
 
         $this->buildView($view, $form, $options);
 
-        foreach ($form as $child) {
+        foreach ($form as $name => $child) {
             /* @var FormInterface $child */
-            $view->add($child->createView($view));
+            $view->children[$name] = $child->createView($view);
         }
 
         $this->finishView($view, $form, $options);
@@ -163,7 +162,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
     }
 
-    private function buildView(FormViewInterface $view, FormInterface $form, array $options)
+    private function buildView(FormView $view, FormInterface $form, array $options)
     {
         if (null !== $this->parent) {
             $this->parent->buildView($view, $form, $options);
@@ -177,7 +176,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
     }
 
-    private function finishView(FormViewInterface $view, FormInterface $form, array $options)
+    private function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (null !== $this->parent) {
             $this->parent->finishView($view, $form, $options);

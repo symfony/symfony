@@ -582,7 +582,7 @@ class SimpleFormTest extends AbstractFormTest
     public function testCreateView()
     {
         $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $view = $this->getMock('Symfony\Component\Form\Tests\FormViewInterface');
+        $view = $this->getMock('Symfony\Component\Form\FormView');
         $form = $this->getBuilder()->setType($type)->getForm();
 
         $type->expects($this->once())
@@ -596,9 +596,9 @@ class SimpleFormTest extends AbstractFormTest
     public function testCreateViewWithParent()
     {
         $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $view = $this->getMock('Symfony\Component\Form\Tests\FormViewInterface');
+        $view = $this->getMock('Symfony\Component\Form\FormView');
         $parentForm = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
-        $parentView = $this->getMock('Symfony\Component\Form\Tests\FormViewInterface');
+        $parentView = $this->getMock('Symfony\Component\Form\FormView');
         $form = $this->getBuilder()->setType($type)->getForm();
         $form->setParent($parentForm);
 
@@ -617,8 +617,8 @@ class SimpleFormTest extends AbstractFormTest
     public function testCreateViewWithExplicitParent()
     {
         $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $view = $this->getMock('Symfony\Component\Form\Tests\FormViewInterface');
-        $parentView = $this->getMock('Symfony\Component\Form\Tests\FormViewInterface');
+        $view = $this->getMock('Symfony\Component\Form\FormView');
+        $parentView = $this->getMock('Symfony\Component\Form\FormView');
         $form = $this->getBuilder()->setType($type)->getForm();
 
         $type->expects($this->once())

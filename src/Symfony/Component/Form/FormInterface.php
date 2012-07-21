@@ -238,9 +238,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Creates a view.
      *
-     * @param FormViewInterface $parent The parent view
+     * @param FormView $parent The parent view
      *
-     * @return FormViewInterface The view
+     * @return FormView The view
      */
-    public function createView(FormViewInterface $parent = null);
+    public function createView(FormView $parent = null);
 }

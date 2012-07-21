@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Bridge\Twig\Form\TwigRendererInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 
@@ -63,13 +62,13 @@ class FormExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'form_enctype'             => new \Twig_Function_Method($this, 'renderer->renderEnctype', array('is_safe' => array('html'))),
-            'form_widget'              => new \Twig_Function_Method($this, 'renderer->renderWidget', array('is_safe' => array('html'))),
-            'form_errors'              => new \Twig_Function_Method($this, 'renderer->renderErrors', array('is_safe' => array('html'))),
-            'form_label'               => new \Twig_Function_Method($this, 'renderer->renderLabel', array('is_safe' => array('html'))),
-            'form_row'                 => new \Twig_Function_Method($this, 'renderer->renderRow', array('is_safe' => array('html'))),
-            'form_rest'                => new \Twig_Function_Method($this, 'renderer->renderRest', array('is_safe' => array('html'))),
-            'csrf_token'               => new \Twig_Function_Method($this, 'renderer->renderCsrfToken'),
+            'form_enctype' => new \Twig_Function_Method($this, 'renderer->renderEnctype', array('is_safe' => array('html'))),
+            'form_widget'  => new \Twig_Function_Method($this, 'renderer->renderWidget', array('is_safe' => array('html'))),
+            'form_errors'  => new \Twig_Function_Method($this, 'renderer->renderErrors', array('is_safe' => array('html'))),
+            'form_label'   => new \Twig_Function_Method($this, 'renderer->renderLabel', array('is_safe' => array('html'))),
+            'form_row'     => new \Twig_Function_Method($this, 'renderer->renderRow', array('is_safe' => array('html'))),
+            'form_rest'    => new \Twig_Function_Method($this, 'renderer->renderRest', array('is_safe' => array('html'))),
+            'csrf_token'   => new \Twig_Function_Method($this, 'renderer->renderCsrfToken'),
         );
     }
 
@@ -79,7 +78,7 @@ class FormExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            'humanize'           => new \Twig_Filter_Method($this, 'renderer->humanize'),
+            'humanize' => new \Twig_Filter_Method($this, 'renderer->humanize'),
         );
     }
 

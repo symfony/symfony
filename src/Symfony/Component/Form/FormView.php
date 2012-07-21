@@ -68,6 +68,64 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return FormView The current view
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
+     */
+    public function set($name, $value)
+    {
+        $this->vars[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param $name
+     *
+     * @return Boolean
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
+     */
+    public function has($name)
+    {
+        return array_key_exists($name, $this->vars);
+    }
+
+    /**
+     * @param $name
+     * @param $default
+     *
+     * @return mixed
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
+     */
+    public function get($name, $default = null)
+    {
+        if (false === $this->has($name)) {
+            return $default;
+        }
+
+        return $this->vars[$name];
+    }
+
+    /**
+     * @return array
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
+     */
+    public function all()
+    {
+        return $this->vars;
+    }
+
+    /**
      * Returns the values of all view variables.
      *
      * @return array The values of all variables.
@@ -178,6 +236,51 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     public function hasParent()
     {
         return null !== $this->parent;
+    }
+
+    /**
+     * Sets the children view.
+     *
+     * @param array $children The children as instances of FormView
+     *
+     * @return FormView The current view
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link children} instead.
+     */
+    public function setChildren(array $children)
+    {
+        $this->children = $children;
+
+        return $this;
+    }
+
+    /**
+     * Returns the children.
+     *
+     * @return array The children as instances of FormView
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link children} instead.
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * Returns a given child.
+     *
+     * @param string $name The name of the child
+     *
+     * @return FormView The child view
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link children} instead.
+     */
+    public function getChild($name)
+    {
+        return $this->children[$name];
     }
 
     /**

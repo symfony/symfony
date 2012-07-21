@@ -54,10 +54,10 @@ class OptionsResolver implements OptionsResolverInterface
     private $allowedTypes = array();
 
     /**
-     * A list of filters transforming each resolved options.
+     * A list of normalizers transforming each resolved options.
      * @var array
      */
-    private $filters = array();
+    private $normalizers = array();
 
     /**
      * Creates a new instance.
@@ -190,11 +190,11 @@ class OptionsResolver implements OptionsResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function setFilters(array $filters)
+    public function setNormalizers(array $normalizers)
     {
-        $this->validateOptionsExistence($filters);
+        $this->validateOptionsExistence($normalizers);
 
-        $this->filters = array_replace($this->filters, $filters);
+        $this->normalizers = array_replace($this->normalizers, $normalizers);
 
         return $this;
     }
@@ -232,7 +232,7 @@ class OptionsResolver implements OptionsResolverInterface
         }
 
         // Apply filters
-        foreach ($this->filters as $option => $filter) {
+        foreach ($this->normalizers as $option => $filter) {
             $combinedOptions->overload($option, $filter);
         }
 

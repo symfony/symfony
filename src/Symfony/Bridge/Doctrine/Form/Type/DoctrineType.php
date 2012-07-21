@@ -114,7 +114,7 @@ abstract class DoctrineType extends AbstractType
             return $choiceListCache[$hash];
         };
 
-        $emFilter = function (Options $options, $em) use ($registry) {
+        $emNormalizer = function (Options $options, $em) use ($registry) {
             /* @var ManagerRegistry $registry */
             if (null !== $em) {
                 return $registry->getManager($em);
@@ -134,8 +134,8 @@ abstract class DoctrineType extends AbstractType
             'group_by'          => null,
         ));
 
-        $resolver->setFilters(array(
-            'em' => $emFilter,
+        $resolver->setNormalizers(array(
+            'em' => $emNormalizer,
         ));
     }
 

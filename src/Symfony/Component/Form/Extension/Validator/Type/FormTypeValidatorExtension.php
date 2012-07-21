@@ -59,7 +59,7 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
         };
 
         // Make sure that validation groups end up as null, closure or array
-        $validationGroupsFilter = function (Options $options, $groups) {
+        $validationGroupsNormalizer = function (Options $options, $groups) {
             if (empty($groups)) {
                 return null;
             }
@@ -72,7 +72,7 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
         };
 
         // Constraint should always be converted to an array
-        $constraintsFilter = function (Options $options, $constraints) {
+        $constraintsNormalizer = function (Options $options, $constraints) {
             return is_object($constraints) ? array($constraints) : (array) $constraints;
         };
 
@@ -88,9 +88,9 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
         ));
 
-        $resolver->setFilters(array(
-            'validation_groups' => $validationGroupsFilter,
-            'constraints'       => $constraintsFilter,
+        $resolver->setNormalizers(array(
+            'validation_groups' => $validationGroupsNormalizer,
+            'constraints'       => $constraintsNormalizer,
         ));
     }
 

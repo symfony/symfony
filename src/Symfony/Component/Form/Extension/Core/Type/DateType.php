@@ -164,7 +164,7 @@ class DateType extends AbstractType
             return $options['required'] ? null : '';
         };
 
-        $emptyValueFilter = function (Options $options, $emptyValue) use ($emptyValueDefault) {
+        $emptyValueNormalizer = function (Options $options, $emptyValue) use ($emptyValueDefault) {
             if (is_array($emptyValue)) {
                 $default = $emptyValueDefault($options);
 
@@ -216,8 +216,8 @@ class DateType extends AbstractType
             'compound'       => $compound,
         ));
 
-        $resolver->setFilters(array(
-            'empty_value' => $emptyValueFilter,
+        $resolver->setNormalizers(array(
+            'empty_value' => $emptyValueNormalizer,
         ));
 
         $resolver->setAllowedValues(array(

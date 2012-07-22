@@ -211,6 +211,8 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testSetValueCallsCustomAdderAndRemover()
     {
+        $this->markTestSkipped('This feature is temporarily disabled as of 2.1');
+
         $car = $this->getMock(__CLASS__ . '_CarCustomSingular');
         $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
         $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
@@ -300,6 +302,9 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
         );
         $data[] = array($car, $propertyPath, $expectedMessage);
 
+        /*
+        Temporarily disabled in 2.1
+
         $propertyPath = new PropertyPath('axes|boo');
         $expectedMessage = sprintf(
             'Neither element "axes" nor method "setAxes()" exists in class '
@@ -309,6 +314,7 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
             'boo'
         );
         $data[] = array($car, $propertyPath, $expectedMessage);
+         */
 
         $car = $this->getMock(__CLASS__ . '_CarNoAdderAndRemoverWithProperty');
         $propertyPath = new PropertyPath('axes');

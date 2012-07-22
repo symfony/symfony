@@ -28,8 +28,6 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
 
     protected function setUp()
     {
-        ini_set('xdebug.max_nesting_level', 120);
-
         parent::setUp();
 
         $root = realpath(__DIR__.'/../../../Resources/views');

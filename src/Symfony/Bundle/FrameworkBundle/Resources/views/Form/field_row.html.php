@@ -1,1 +1,1 @@
-<?php echo $view['form']->block('form_row') ?>
+<?php echo $view['form']->block($form, 'form_row') ?>

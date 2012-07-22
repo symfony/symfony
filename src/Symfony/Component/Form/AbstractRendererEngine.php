@@ -74,52 +74,52 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceForBlock(FormView $view, $block)
+    public function getResourceForBlockName(FormView $view, $blockName)
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
-        if (!isset($this->resources[$cacheKey][$block])) {
-            $this->loadResourceForBlock($cacheKey, $view, $block);
+        if (!isset($this->resources[$cacheKey][$blockName])) {
+            $this->loadResourceForBlockName($cacheKey, $view, $blockName);
         }
 
-        return $this->resources[$cacheKey][$block];
+        return $this->resources[$cacheKey][$blockName];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResourceForBlockHierarchy(FormView $view, array $blockHierarchy, $hierarchyLevel)
+    public function getResourceForBlockNameHierarchy(FormView $view, array $blockNameHierarchy, $hierarchyLevel)
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
-        $block = $blockHierarchy[$hierarchyLevel];
+        $blockName = $blockNameHierarchy[$hierarchyLevel];
 
-        if (!isset($this->resources[$cacheKey][$block])) {
-            $this->loadResourceForBlockHierarchy($cacheKey, $view, $blockHierarchy, $hierarchyLevel);
+        if (!isset($this->resources[$cacheKey][$blockName])) {
+            $this->loadResourceForBlockNameHierarchy($cacheKey, $view, $blockNameHierarchy, $hierarchyLevel);
         }
 
-        return $this->resources[$cacheKey][$block];
+        return $this->resources[$cacheKey][$blockName];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResourceHierarchyLevel(FormView $view, array $blockHierarchy, $hierarchyLevel)
+    public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, $hierarchyLevel)
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
-        $block = $blockHierarchy[$hierarchyLevel];
+        $blockName = $blockNameHierarchy[$hierarchyLevel];
 
-        if (!isset($this->resources[$cacheKey][$block])) {
-            $this->loadResourceForBlockHierarchy($cacheKey, $view, $blockHierarchy, $hierarchyLevel);
+        if (!isset($this->resources[$cacheKey][$blockName])) {
+            $this->loadResourceForBlockNameHierarchy($cacheKey, $view, $blockNameHierarchy, $hierarchyLevel);
         }
 
         // If $block was previously rendered loaded with loadTemplateForBlock(), the template
         // is cached but the hierarchy level is not. In this case, we know that the  block
         // exists at this very hierarchy level, so we can just set it.
-        if (!isset($this->resourceHierarchyLevels[$cacheKey][$block])) {
-            $this->resourceHierarchyLevels[$cacheKey][$block] = $hierarchyLevel;
+        if (!isset($this->resourceHierarchyLevels[$cacheKey][$blockName])) {
+            $this->resourceHierarchyLevels[$cacheKey][$blockName] = $hierarchyLevel;
         }
 
-        return $this->resourceHierarchyLevels[$cacheKey][$block];
+        return $this->resourceHierarchyLevels[$cacheKey][$blockName];
     }
 
     /**
@@ -127,79 +127,79 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *
      * @see getResourceForBlock()
      *
-     * @param string            $cacheKey The cache key of the form view.
-     * @param FormView $view     The form view for finding the applying themes.
-     * @param string            $block    The name of the block to load.
+     * @param string   $cacheKey  The cache key of the form view.
+     * @param FormView $view      The form view for finding the applying themes.
+     * @param string   $blockName The name of the block to load.
      *
      * @return Boolean True if the resource could be loaded, false otherwise.
      */
-    abstract protected function loadResourceForBlock($cacheKey, FormView $view, $block);
+    abstract protected function loadResourceForBlockName($cacheKey, FormView $view, $blockName);
 
     /**
      * Loads the cache with the resource for a specific level of a block hierarchy.
      *
      * @see getResourceForBlockHierarchy()
      *
-     * @param string            $cacheKey       The cache key used for storing the
-     *                                          resource.
-     * @param FormView $view           The form view for finding the applying
-     *                                          themes.
-     * @param array             $blockHierarchy The block hierarchy, with the most
-     *                                          specific block name at the end.
-     * @param integer           $hierarchyLevel The level in the block hierarchy that
-     *                                          should be loaded.
+     * @param string   $cacheKey           The cache key used for storing the
+     *                                     resource.
+     * @param FormView $view               The form view for finding the applying
+     *                                     themes.
+     * @param array    $blockNameHierarchy The block hierarchy, with the most
+     *                                     specific block name at the end.
+     * @param integer  $hierarchyLevel     The level in the block hierarchy that
+     *                                     should be loaded.
      *
      * @return Boolean True if the resource could be loaded, false otherwise.
      */
-    private function loadResourceForBlockHierarchy($cacheKey, FormView $view, array $blockHierarchy, $hierarchyLevel)
+    private function loadResourceForBlockNameHierarchy($cacheKey, FormView $view, array $blockNameHierarchy, $hierarchyLevel)
     {
-        $block = $blockHierarchy[$hierarchyLevel];
+        $blockName = $blockNameHierarchy[$hierarchyLevel];
 
         // Try to find a template for that block
-        if ($this->loadResourceForBlock($cacheKey, $view, $block)) {
+        if ($this->loadResourceForBlockName($cacheKey, $view, $blockName)) {
             // If loadTemplateForBlock() returns true, it was able to populate the
             // cache. The only missing thing is to set the hierarchy level at which
             // the template was found.
-            $this->resourceHierarchyLevels[$cacheKey][$block] = $hierarchyLevel;
+            $this->resourceHierarchyLevels[$cacheKey][$blockName] = $hierarchyLevel;
 
             return true;
         }
 
         if ($hierarchyLevel > 0) {
             $parentLevel = $hierarchyLevel - 1;
-            $parentBlock = $blockHierarchy[$parentLevel];
+            $parentBlockName = $blockNameHierarchy[$parentLevel];
 
             // The next two if statements contain slightly duplicated code. This is by intention
             // and tries to avoid execution of unnecessary checks in order to increase performance.
 
-            if (isset($this->resources[$cacheKey][$parentBlock])) {
+            if (isset($this->resources[$cacheKey][$parentBlockName])) {
                 // It may happen that the parent block is already loaded, but its level is not.
                 // In this case, the parent block must have been loaded by loadResourceForBlock(),
                 // which does not check the hierarchy of the block. Subsequently the block must have
                 // been found directly on the parent level.
-                if (!isset($this->resourceHierarchyLevels[$cacheKey][$parentBlock])) {
-                    $this->resourceHierarchyLevels[$cacheKey][$parentBlock] = $parentLevel;
+                if (!isset($this->resourceHierarchyLevels[$cacheKey][$parentBlockName])) {
+                    $this->resourceHierarchyLevels[$cacheKey][$parentBlockName] = $parentLevel;
                 }
 
                 // Cache the shortcuts for further accesses
-                $this->resources[$cacheKey][$block] = $this->resources[$cacheKey][$parentBlock];
-                $this->resourceHierarchyLevels[$cacheKey][$block] = $this->resourceHierarchyLevels[$cacheKey][$parentBlock];
+                $this->resources[$cacheKey][$blockName] = $this->resources[$cacheKey][$parentBlockName];
+                $this->resourceHierarchyLevels[$cacheKey][$blockName] = $this->resourceHierarchyLevels[$cacheKey][$parentBlockName];
 
                 return true;
             }
 
-            if ($this->loadResourceForBlockHierarchy($cacheKey, $view, $blockHierarchy, $parentLevel)) {
+            if ($this->loadResourceForBlockNameHierarchy($cacheKey, $view, $blockNameHierarchy, $parentLevel)) {
                 // Cache the shortcuts for further accesses
-                $this->resources[$cacheKey][$block] = $this->resources[$cacheKey][$parentBlock];
-                $this->resourceHierarchyLevels[$cacheKey][$block] = $this->resourceHierarchyLevels[$cacheKey][$parentBlock];
+                $this->resources[$cacheKey][$blockName] = $this->resources[$cacheKey][$parentBlockName];
+                $this->resourceHierarchyLevels[$cacheKey][$blockName] = $this->resourceHierarchyLevels[$cacheKey][$parentBlockName];
 
                 return true;
             }
         }
 
         // Cache the result for further accesses
-        $this->resources[$cacheKey][$block] = false;
-        $this->resourceHierarchyLevels[$cacheKey][$block] = false;
+        $this->resources[$cacheKey][$blockName] = false;
+        $this->resourceHierarchyLevels[$cacheKey][$blockName] = false;
 
         return false;
     }

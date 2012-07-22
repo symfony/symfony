@@ -35,7 +35,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormView $view, $resource, $block, array $variables = array())
+    public function renderBlock(FormView $view, $resource, $blockName, array $variables = array())
     {
         return trim($this->engine->render($resource, $variables));
     }
@@ -48,13 +48,13 @@ class TemplatingRendererEngine extends AbstractRendererEngine
      *
      * @see getResourceForBlock()
      *
-     * @param string            $cacheKey The cache key of the form view.
-     * @param FormView $view     The form view for finding the applying themes.
-     * @param string            $block    The name of the block to load.
+     * @param string   $cacheKey  The cache key of the form view.
+     * @param FormView $view      The form view for finding the applying themes.
+     * @param string   $blockName The name of the block to load.
      *
      * @return Boolean True if the resource could be loaded, false otherwise.
      */
-    protected function loadResourceForBlock($cacheKey, FormView $view, $block)
+    protected function loadResourceForBlockName($cacheKey, FormView $view, $blockName)
     {
         // Recursively try to find the block in the themes assigned to $view,
         // then of its parent form, then of the parent form of the parent and so on.
@@ -64,7 +64,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
         // Check each theme whether it contains the searched block
         if (isset($this->themes[$cacheKey])) {
             for ($i = count($this->themes[$cacheKey]) - 1; $i >= 0; --$i) {
-                if ($this->loadResourceFromTheme($cacheKey, $block, $this->themes[$cacheKey][$i])) {
+                if ($this->loadResourceFromTheme($cacheKey, $blockName, $this->themes[$cacheKey][$i])) {
                     return true;
                 }
             }
@@ -73,7 +73,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
         // Check the default themes once we reach the root form without success
         if (!$view->parent) {
             for ($i = count($this->defaultThemes) - 1; $i >= 0; --$i) {
-                if ($this->loadResourceFromTheme($cacheKey, $block, $this->defaultThemes[$i])) {
+                if ($this->loadResourceFromTheme($cacheKey, $blockName, $this->defaultThemes[$i])) {
                     return true;
                 }
             }
@@ -84,21 +84,21 @@ class TemplatingRendererEngine extends AbstractRendererEngine
         if ($view->parent) {
             $parentCacheKey = $view->parent->vars[self::CACHE_KEY_VAR];
 
-            if (!isset($this->resources[$parentCacheKey][$block])) {
-                $this->loadResourceForBlock($parentCacheKey, $view->parent, $block);
+            if (!isset($this->resources[$parentCacheKey][$blockName])) {
+                $this->loadResourceForBlockName($parentCacheKey, $view->parent, $blockName);
             }
 
             // If a template exists in the parent themes, cache that template
             // for the current theme as well to speed up further accesses
-            if ($this->resources[$parentCacheKey][$block]) {
-                $this->resources[$cacheKey][$block] = $this->resources[$parentCacheKey][$block];
+            if ($this->resources[$parentCacheKey][$blockName]) {
+                $this->resources[$cacheKey][$blockName] = $this->resources[$parentCacheKey][$blockName];
 
                 return true;
             }
         }
 
         // Cache that we didn't find anything to speed up further accesses
-        $this->resources[$cacheKey][$block] = false;
+        $this->resources[$cacheKey][$blockName] = false;
 
         return false;
     }
@@ -106,16 +106,16 @@ class TemplatingRendererEngine extends AbstractRendererEngine
     /**
      * Tries to load the resource for a block from a theme.
      *
-     * @param string $cacheKey The cache key for storing the resource.
-     * @param string $block    The name of the block to load a resource for.
-     * @param mixed  $theme    The theme to load the block from.
+     * @param string $cacheKey  The cache key for storing the resource.
+     * @param string $blockName The name of the block to load a resource for.
+     * @param mixed  $theme     The theme to load the block from.
      *
      * @return Boolean True if the resource could be loaded, false otherwise.
      */
-    protected function loadResourceFromTheme($cacheKey, $block, $theme)
+    protected function loadResourceFromTheme($cacheKey, $blockName, $theme)
     {
-        if ($this->engine->exists($templateName = $theme . ':' . $block . '.html.php')) {
-            $this->resources[$cacheKey][$block] = $templateName;
+        if ($this->engine->exists($templateName = $theme . ':' . $blockName . '.html.php')) {
+            $this->resources[$cacheKey][$blockName] = $templateName;
 
             return true;
         }

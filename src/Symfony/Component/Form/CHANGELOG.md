@@ -106,8 +106,6 @@ CHANGELOG
  * removed superfluous methods from DataMapperInterface
    * `mapFormToData`
    * `mapDataToForm`
- * [BC BREAK] FormType::getDefaultOptions() and FormType::getAllowedOptionValues()
-   don't receive an options array anymore.
  * added `setDefaultOptions` to FormTypeInterface and FormTypeExtensionInterface
    which accepts an OptionsResolverInterface instance
  * deprecated the methods `getDefaultOptions` and `getAllowedOptionValues`

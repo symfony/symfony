@@ -244,8 +244,8 @@ class TimeTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('6', '06'),
-            new ChoiceView('7', '07'),
+            new ChoiceView('6', '6', '06'),
+            new ChoiceView('7', '7', '07'),
         ), $view['hour']->vars['choices']);
     }
 
@@ -258,8 +258,8 @@ class TimeTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('6', '06'),
-            new ChoiceView('7', '07'),
+            new ChoiceView('6', '6', '06'),
+            new ChoiceView('7', '7', '07'),
         ), $view['minute']->vars['choices']);
     }
 
@@ -273,8 +273,8 @@ class TimeTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('6', '06'),
-            new ChoiceView('7', '07'),
+            new ChoiceView('6', '6', '06'),
+            new ChoiceView('7', '7', '07'),
         ), $view['second']->vars['choices']);
     }
 

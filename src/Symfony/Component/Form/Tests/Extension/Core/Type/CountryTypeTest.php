@@ -24,11 +24,11 @@ class CountryTypeTest extends LocalizedTestCase
         $choices = $view->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContains(new ChoiceView('DE', 'Deutschland'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('GB', 'Vereinigtes Königreich'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('US', 'Vereinigte Staaten'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('FR', 'Frankreich'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('MY', 'Malaysia'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('DE', 'DE', 'Deutschland'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('GB', 'GB', 'Vereinigtes Königreich'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('US', 'US', 'Vereinigte Staaten'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('FR', 'FR', 'Frankreich'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('MY', 'MY', 'Malaysia'), $choices, '', false, false);
     }
 
     public function testUnknownCountryIsNotIncluded()

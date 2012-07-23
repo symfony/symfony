@@ -19,6 +19,13 @@ namespace Symfony\Component\Form\Extension\Core\View;
 class ChoiceView
 {
     /**
+     * The original choice value.
+     *
+     * @var mixed
+     */
+    public $data;
+
+    /**
      * The view representation of the choice.
      *
      * @var string
@@ -35,11 +42,13 @@ class ChoiceView
     /**
      * Creates a new ChoiceView.
      *
+     * @param mixed  $data  The original choice.
      * @param string $value The view representation of the choice.
      * @param string $label The label displayed to humans.
      */
-    public function __construct($value, $label)
+    public function __construct($data, $value, $label)
     {
+        $this->data = $data;
         $this->value = $value;
         $this->label = $label;
     }

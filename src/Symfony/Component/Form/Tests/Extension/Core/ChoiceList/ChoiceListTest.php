@@ -73,6 +73,38 @@ class ChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(0 => new ChoiceView($this->obj1, '0', 'A'), 2 => new ChoiceView($this->obj3, '2', 'C'), 3 => new ChoiceView($this->obj4, '3', 'D')), $this->list->getRemainingViews());
     }
 
+    /**
+     * Necessary for interoperability with MongoDB cursors or ORM relations as
+     * choices parameter. A choice itself that is an object implementing \Traversable
+     * is not treated as hierarchical structure, but as-is.
+     */
+    public function testInitNestedTraversable()
+    {
+        $traversableChoice = new \ArrayIterator(array($this->obj3, $this->obj4));
+
+        $this->list = new ChoiceList(
+            new \ArrayIterator(array(
+                'Group' => array($this->obj1, $this->obj2),
+                'Not a Group' => $traversableChoice
+            )),
+            array(
+                'Group' => array('A', 'B'),
+                'Not a Group' => 'C',
+            ),
+            array($this->obj2)
+        );
+
+        $this->assertSame(array($this->obj1, $this->obj2, $traversableChoice), $this->list->getChoices());
+        $this->assertSame(array('0', '1', '2'), $this->list->getValues());
+        $this->assertEquals(array(
+            'Group' => array(1 => new ChoiceView($this->obj2, '1', 'B'))
+        ), $this->list->getPreferredViews());
+        $this->assertEquals(array(
+            'Group' => array(0 => new ChoiceView($this->obj1, '0', 'A')),
+            2 => new ChoiceView($traversableChoice, '2', 'C')
+        ), $this->list->getRemainingViews());
+    }
+
     public function testInitNestedArray()
     {
         $this->assertSame(array($this->obj1, $this->obj2, $this->obj3, $this->obj4), $this->list->getChoices());

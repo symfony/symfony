@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
  */
 class NativeFileSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstruct()
+    public function test__Construct()
     {
         $storage = new NativeSessionStorage(array('name' => 'TESTING'), new NativeFileSessionHandler(sys_get_temp_dir()));
 
@@ -37,6 +37,37 @@ class NativeFileSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(sys_get_temp_dir(), ini_get('session.save_path'));
         $this->assertEquals('TESTING', ini_get('session.name'));
+    }
+
+    /**
+     * @dataProvider savePathDataProvider
+     */
+    public function test__ConstructSavePath($savePath, $expectedSavePath, $path)
+    {
+        $handler = new NativeFileSessionHandler($savePath);
+        $this->assertEquals($expectedSavePath, ini_get('session.save_path'));
+        $dir = realpath('/'.$path);
+        $this->assertTrue(is_dir(realpath($dir)));
+
+        rmdir($dir);
+    }
+
+    public function savePathDataProvider()
+    {
+        $base = sys_get_temp_dir();
+        return array(
+            array("$base/foo", "$base/foo", "$base/foo"),
+            array("5;$base/foo", "5;$base/foo", "$base/foo"),
+            array("5;0600;$base/foo", "5;0600;$base/foo", "$base/foo"),
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function test__ConstructException()
+    {
+        $handler = new NativeFileSessionHandler('something;invalid;with;too-many-args');
     }
 
     public function testConstructDefault()

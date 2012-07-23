@@ -39,14 +39,13 @@ class NativeFileSessionHandler extends NativeSessionHandler
 
         $baseDir = $savePath;
 
-        if (strpos($baseDir, ';') !== false) {
-            $parts = explode(';', $baseDir);
-            if (count($parts) > 3) {
+        if ($count = substr_count($savePath, ';')) {
+            if ($count > 2) {
                 throw new \InvalidArgumentException(sprintf('Invalid argument $savePath \'%s\'', $savePath));
             }
 
-            // characters after last ';' is the path
-            $baseDir = substr($baseDir, strrpos($baseDir, ';')+1, strlen($baseDir));
+            // characters after last ';' are the path
+            $baseDir = ltrim(strrchr($savePath, ';'), ';');
         }
 
         if ($baseDir && !is_dir($baseDir)) {

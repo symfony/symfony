@@ -49,12 +49,12 @@ class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPreferredViews()
     {
-        $this->assertEquals(array(1 => new ChoiceView('b', 'B')), $this->list->getPreferredViews());
+        $this->assertEquals(array(1 => new ChoiceView('b', 'b', 'B')), $this->list->getPreferredViews());
     }
 
     public function testGetRemainingViews()
     {
-        $this->assertEquals(array(0 => new ChoiceView('a', 'A'), 2 => new ChoiceView('c', 'C')), $this->list->getRemainingViews());
+        $this->assertEquals(array(0 => new ChoiceView('a', 'a', 'A'), 2 => new ChoiceView('c', 'c', 'C')), $this->list->getRemainingViews());
     }
 
     public function testGetIndicesForChoices()

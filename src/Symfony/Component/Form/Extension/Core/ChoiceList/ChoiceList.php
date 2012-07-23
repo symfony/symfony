@@ -20,7 +20,10 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
  * A choice list for choices of arbitrary data types.
  *
  * Choices and labels are passed in two arrays. The indices of the choices
- * and the labels should match.
+ * and the labels should match. Choices may also be given as hierarchy of
+ * unlimited depth by creating nested arrays. The title of the sub-hierarchy
+ * can be stored in the array key pointing to the nested array. The topmost
+ * level of the hierarchy may also be a \Traversable.
  *
  * <code>
  * $choices = array(true, false);
@@ -69,14 +72,21 @@ class ChoiceList implements ChoiceListInterface
      *                                    as hierarchy of unlimited depth. Hierarchies are
      *                                    created by creating nested arrays. The title of
      *                                    the sub-hierarchy can be stored in the array
-     *                                    key pointing to the nested array.
+     *                                    key pointing to the nested array. The topmost
+     *                                    level of the hierarchy may also be a \Traversable.
      * @param array $labels The array of labels. The structure of this array
      *                      should match the structure of $choices.
      * @param array $preferredChoices A flat array of choices that should be
      *                                presented to the user with priority.
+     *
+     * @throws UnexpectedTypeException If the choices are not an array or \Traversable.
      */
     public function __construct($choices, array $labels, array $preferredChoices = array())
     {
+        if (!is_array($choices) && !$choices instanceof \Traversable) {
+            throw new UnexpectedTypeException($choices, 'array or \Traversable');
+        }
+
         $this->initialize($choices, $labels, $preferredChoices);
     }
 
@@ -236,17 +246,17 @@ class ChoiceList implements ChoiceListInterface
     /**
      * Recursively adds the given choices to the list.
      *
-     * @param array $bucketForPreferred The bucket where to store the preferred
-     *                                  view objects.
-     * @param array $bucketForRemaining The bucket where to store the
-     *                                  non-preferred view objects.
-     * @param array $choices            The list of choices.
-     * @param array $labels             The labels corresponding to the choices.
-     * @param array $preferredChoices   The preferred choices.
+     * @param array              $bucketForPreferred The bucket where to store the preferred
+     *                                               view objects.
+     * @param array              $bucketForRemaining The bucket where to store the
+     *                                               non-preferred view objects.
+     * @param array|\Traversable $choices            The list of choices.
+     * @param array              $labels             The labels corresponding to the choices.
+     * @param array              $preferredChoices   The preferred choices.
      *
      * @throws InvalidConfigurationException If no valid value or index could be created for a choice.
      */
-    protected function addChoices(&$bucketForPreferred, &$bucketForRemaining, array $choices, array $labels, array $preferredChoices)
+    protected function addChoices(&$bucketForPreferred, &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
     {
         // Add choices to the nested buckets
         foreach ($choices as $group => $choice) {
@@ -278,13 +288,13 @@ class ChoiceList implements ChoiceListInterface
      * Recursively adds a choice group.
      *
      * @param string $group              The name of the group.
-     * @param array $bucketForPreferred The bucket where to store the preferred
-     *                                  view objects.
-     * @param array $bucketForRemaining The bucket where to store the
-     *                                  non-preferred view objects.
-     * @param array $choices            The list of choices in the group.
-     * @param array $labels             The labels corresponding to the choices in the group.
-     * @param array $preferredChoices   The preferred choices.
+     * @param array  $bucketForPreferred The bucket where to store the preferred
+     *                                   view objects.
+     * @param array  $bucketForRemaining The bucket where to store the
+     *                                   non-preferred view objects.
+     * @param array  $choices            The list of choices in the group.
+     * @param array  $labels             The labels corresponding to the choices in the group.
+     * @param array  $preferredChoices   The preferred choices.
      *
      * @throws InvalidConfigurationException If no valid value or index could be created for a choice.
      */

@@ -21,7 +21,7 @@
     },
     "suggest": {
         "doctrine/dbal": ">=2.1,<2.3",
-        "doctrine/orm": ">=2.1,<2.3"
+        "doctrine/orm": ">=2.1,<2.3",
         "symfony/form": "self.version",
         "symfony/validator": "self.version"
     },

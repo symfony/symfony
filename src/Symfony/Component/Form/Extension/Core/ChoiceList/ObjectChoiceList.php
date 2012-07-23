@@ -78,9 +78,9 @@ class ObjectChoiceList extends ChoiceList
      */
     public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null)
     {
-        $this->labelPath = $labelPath ? new PropertyPath($labelPath) : null;
-        $this->groupPath = $groupPath ? new PropertyPath($groupPath) : null;
-        $this->valuePath = $valuePath ? new PropertyPath($valuePath) : null;
+        $this->labelPath = null !== $labelPath ? new PropertyPath($labelPath) : null;
+        $this->groupPath = null !== $groupPath ? new PropertyPath($groupPath) : null;
+        $this->valuePath = null !== $valuePath ? new PropertyPath($valuePath) : null;
 
         parent::__construct($choices, array(), $preferredChoices);
     }

@@ -57,11 +57,11 @@ class ObjectChoiceList extends ChoiceList
     /**
      * Creates a new object choice list.
      *
-     * @param array $choices The array of choices. Choices may also be given
-     *                       as hierarchy of unlimited depth. Hierarchies are
-     *                       created by creating nested arrays. The title of
-     *                       the sub-hierarchy can be stored in the array
-     *                       key pointing to the nested array.
+     * @param array|\Traversable $choices The array of choices. Choices may also be given
+     *                                    as hierarchy of unlimited depth. Hierarchies are
+     *                                    created by creating nested arrays. The title of
+     *                                    the sub-hierarchy can be stored in the array
+     *                                    key pointing to the nested array.
      * @param string $labelPath A property path pointing to the property used
      *                          for the choice labels. The value is obtained
      *                          by calling the getter on the object. If the

@@ -35,13 +35,13 @@ class SimpleChoiceList extends ChoiceList
      * Creates a new simple choice list.
      *
      * @param array $choices The array of choices with the choices as keys and
-     *                                  the labels as values. Choices may also be given
-     *                                  as hierarchy of unlimited depth. Hierarchies are
-     *                                  created by creating nested arrays. The title of
-     *                                  the sub-hierarchy is stored in the array
-     *                                  key pointing to the nested array.
+     *                       the labels as values. Choices may also be given
+     *                       as hierarchy of unlimited depth. Hierarchies are
+     *                       created by creating nested arrays. The title of
+     *                       the sub-hierarchy is stored in the array
+     *                       key pointing to the nested array.
      * @param array $preferredChoices A flat array of choices that should be
-     *                                  presented to the user with priority.
+     *                                presented to the user with priority.
      */
     public function __construct(array $choices, array $preferredChoices = array())
     {
@@ -74,20 +74,10 @@ class SimpleChoiceList extends ChoiceList
     }
 
     /**
-     * Recursively adds the given choices to the list.
+     * {@inheritdoc}
      *
      * Takes care of splitting the single $choices array passed in the
      * constructor into choices and labels.
-     *
-     * @param array $bucketForPreferred
-     * @param array $bucketForRemaining
-     * @param array $choices
-     * @param array $labels
-     * @param array $preferredChoices
-     *
-     * @throws UnexpectedTypeException
-     *
-     * @see parent::addChoices
      */
     protected function addChoices(&$bucketForPreferred, &$bucketForRemaining, array $choices, array $labels, array $preferredChoices)
     {

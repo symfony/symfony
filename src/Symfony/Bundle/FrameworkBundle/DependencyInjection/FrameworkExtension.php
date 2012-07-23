@@ -256,7 +256,6 @@ class FrameworkExtension extends Extension
         $container->setParameter('request_listener.https_port', $config['https_port']);
 
         $this->addClassesToCompile(array(
-            'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
             'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
             'Symfony\\Component\\Routing\\RequestContext',
             'Symfony\\Component\\Routing\\Router',

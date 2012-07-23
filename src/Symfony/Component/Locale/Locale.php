@@ -67,7 +67,12 @@ class Locale extends \Locale
                 $countries = array_merge(self::getDisplayCountries($fallbackLocale), $countries);
             }
 
-            $collator->asort($countries);
+            if ($collator instanceof \Collator) {
+                $collator->asort($countries);
+            }
+            else {
+                asort($countries);
+            }
 
             self::$countries[$locale] = $countries;
         }

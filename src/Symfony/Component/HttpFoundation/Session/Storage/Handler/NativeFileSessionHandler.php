@@ -23,7 +23,13 @@ class NativeFileSessionHandler extends NativeSessionHandler
     /**
      * Constructor.
      *
-     * @param string $savePath Path of directory to save session files.  Default null will leave setting as defined by PHP.
+     * @param string $savePath Path of directory to save session files.
+     *                         Default null will leave setting as defined by PHP.
+     *                         '/path', 'N;/path', or 'N;octal-mode;/path
+     *
+     * @see http://php.net/session.configuration.php#ini.session.save-path for further details.
+     *
+     * @throws \InvalidArgumentException On invalid $savePath
      */
     public function __construct($savePath = null)
     {
@@ -31,11 +37,23 @@ class NativeFileSessionHandler extends NativeSessionHandler
             $savePath = ini_get('session.save_path');
         }
 
-        if ($savePath && !is_dir($savePath)) {
-            mkdir($savePath, 0777, true);
+        $baseDir = $savePath;
+
+        if (strpos($baseDir, ';') !== false) {
+            $parts = explode(';', $baseDir);
+            if (count($parts) > 3) {
+                throw new \InvalidArgumentException(sprintf('Invalid argument $savePath \'%s\'', $savePath));
+            }
+
+            // characters after last ';' is the path
+            $baseDir = substr($baseDir, strrpos($baseDir, ';')+1, strlen($baseDir));
         }
 
-        ini_set('session.save_handler', 'files');
+        if ($baseDir && !is_dir($baseDir)) {
+            mkdir($baseDir, 0777, true);
+        }
+
         ini_set('session.save_path', $savePath);
+        ini_set('session.save_handler', 'files');
     }
 }

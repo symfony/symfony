@@ -1199,8 +1199,8 @@
     }
     ```
 
-  * Core translation messages are changed. Dot is added at the end of each message.
-    Overwritten core translations should be fixed if any. More info here.
+  * Core translation messages changed. A dot is added at the end of each message.
+    Overwritten core translations need to be fixed.
 
   * Collections (arrays or instances of `\Traversable`) in properties
     annotated with `Valid` are not traversed recursively by default anymore.

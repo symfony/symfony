@@ -168,7 +168,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @api
      */
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = HttpKernelInterface::EXCEPTIONS_AUTOTUNE)
     {
         // FIXME: catch exceptions and implement a 500 error page here? -> in Varnish, there is a built-in error page mechanism
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
@@ -437,7 +437,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return Response A Response instance
      */
-    protected function forward(Request $request, $catch = false, Response $entry = null)
+    protected function forward(Request $request, $catch = HttpKernelInterface::EXCEPTIONS_OFF, Response $entry = null)
     {
         if ($this->esi) {
             $this->esi->addSurrogateEsiCapability($request);

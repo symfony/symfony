@@ -149,7 +149,7 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
         $this->kernel = new TestMultipleHttpKernel($responses);
     }
 
-    public function catchExceptions($catch = true)
+    public function catchExceptions($catch = HttpKernelInterface::EXCEPTIONS_AUTOTUNE)
     {
         $this->catch = $catch;
     }

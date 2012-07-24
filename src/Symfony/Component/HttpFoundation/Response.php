@@ -303,9 +303,12 @@ class Response
             // ob_get_level() never returns 0 on some Windows configurations, so if
             // the level is the same two times in a row, the loop should be stopped.
             $previous = null;
+            $obStatus = ob_get_status(1);
             while (($level = ob_get_level()) > 0 && $level !== $previous) {
                 $previous = $level;
-                ob_end_flush();
+                if ($obStatus[$level-1] && $obStatus[$level-1]['del']) {
+                    ob_end_flush();
+                }
             }
             flush();
         }

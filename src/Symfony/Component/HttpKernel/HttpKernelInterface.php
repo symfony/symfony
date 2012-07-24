@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 interface HttpKernelInterface
 {
     const EXCEPTIONS_OFF = false;
-    const EXCEPTIONS_ON = 'on';
+    const EXCEPTIONS_ON = "on";
     const EXCEPTIONS_AUTOTUNE = true;
 
     const MASTER_REQUEST = 1;

@@ -14,6 +14,8 @@ spl_autoload_register(function ($class) {
         'SYMFONY_HTTP_FOUNDATION' => 'HttpFoundation',
         'SYMFONY_HTTP_KERNEL'     => 'HttpKernel',
         'SYMFONY_FORM'            => 'Form',
+        'SYMFONY_EVENT_DISPATCHER'     => 'EventDispatcher',
+        'SYMFONY_OPTIONS_RESOLVER' => 'OptionsResolver',
     ) as $env => $name) {
         if (isset($_SERVER[$env]) && 0 === strpos(ltrim($class, '/'), 'Symfony\Component\\'.$name)) {
             if (file_exists($file = $_SERVER[$env].'/'.substr(str_replace('\\', '/', $class), strlen('Symfony\Component\\'.$name)).'.php')) {

@@ -24,6 +24,8 @@ class PropelExtension extends AbstractExtension
     {
         return array(
             new Type\ModelType(),
+            new Type\TranslatableCollectionType(),
+            new Type\TranslationType()
         );
     }
 

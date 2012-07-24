@@ -158,7 +158,16 @@ class RequestMatcher implements RequestMatcherInterface
             throw new \RuntimeException('Unable to check Ipv6. Check that PHP was not compiled with option "disable-ipv6".');
         }
 
-        list($address, $netmask) = explode('/', $ip, 2);
+        if (false !== strpos($ip, '/')) {
+            list($address, $netmask) = explode('/', $ip, 2);
+            
+            if ($netmask < 1 || $netmask > 128) {
+                return false;
+            }
+        } else {
+            $address = $ip;
+            $netmask = 128;
+        }
 
         $bytes_addr = unpack("n*", inet_pton($address));
         $bytes_test = unpack("n*", inet_pton($requestIp));

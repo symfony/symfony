@@ -18,3 +18,5 @@ PHPUnit:
     export SYMFONY_HTTP_FOUNDATION=../path/to/HttpFoundation
     export SYMFONY_HTTP_KERNEL=../path/to/HttpKernel
     export SYMFONY_FORM=../path/to/Form
+    export SYMFONY_EVENT_DISPATCHER=../path/to/EventDispatcher
+    export SYMFONY_OPTIONS_RESOLVER=../path/to/OptionsResolver

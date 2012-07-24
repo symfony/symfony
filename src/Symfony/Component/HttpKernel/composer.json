@@ -18,11 +18,11 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/event-dispatcher": "2.1.*",
-        "symfony/http-foundation": "2.1.*"
+        "symfony/http-foundation": "2.1.*",
+        "symfony/class-loader": "2.1.*"
     },
     "require-dev": {
         "symfony/browser-kit": "2.1.*",
-        "symfony/class-loader": "2.1.*",
         "symfony/config": "2.1.*",
         "symfony/console": "2.1.*",
         "symfony/dependency-injection": "2.1.*",
@@ -30,6 +30,7 @@
         "symfony/process": "2.1.*",
         "symfony/routing": "2.1.*"
     },
+    "minimum-stability": "dev",
     "suggest": {
         "symfony/browser-kit": "self.version",
         "symfony/class-loader": "self.version",

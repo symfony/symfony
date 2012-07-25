@@ -23,8 +23,8 @@ class LocaleTypeTest extends LocalizedTestCase
         $view = $form->createView();
         $choices = $view->vars['choices'];
 
-        $this->assertContains(new ChoiceView('en', 'Englisch'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('en_GB', 'Englisch (Vereinigtes Königreich)'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('zh_Hant_MO', 'Chinesisch (traditionell, Sonderverwaltungszone Macao)'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en', 'en', 'Englisch'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'Englisch (Vereinigtes Königreich)'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'Chinesisch (traditionell, Sonderverwaltungszone Macao)'), $choices, '', false, false);
     }
 }

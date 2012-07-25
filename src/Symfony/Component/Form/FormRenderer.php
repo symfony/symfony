@@ -22,7 +22,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
  */
 class FormRenderer implements FormRendererInterface
 {
-    const CACHE_KEY_VAR = 'full_block_name';
+    const CACHE_KEY_VAR = 'unique_block_prefix';
 
     /**
      * @var FormRendererEngineInterface
@@ -173,10 +173,9 @@ class FormRenderer implements FormRendererInterface
             // Calculate the hierarchy of template blocks and start on
             // the bottom level of the hierarchy (= "_<id>_<section>" block)
             $blockNameHierarchy = array();
-            foreach ($view->vars['types'] as $type) {
-                $blockNameHierarchy[] = $type . '_' . $blockNameSuffix;
+            foreach ($view->vars['block_prefixes'] as $blockNamePrefix) {
+                $blockNameHierarchy[] = $blockNamePrefix . '_' . $blockNameSuffix;
             }
-            $blockNameHierarchy[] = $view->vars['full_block_name'] . '_' . $blockNameSuffix;
             $hierarchyLevel = count($blockNameHierarchy) - 1;
 
             $hierarchyInit = true;

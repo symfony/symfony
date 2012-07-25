@@ -306,7 +306,7 @@ class Response
             $obStatus = ob_get_status(1);
             while (($level = ob_get_level()) > 0 && $level !== $previous) {
                 $previous = $level;
-                if ($obStatus[$level-1] && $obStatus[$level-1]['del']) {
+                if ($obStatus[$level - 1] && $obStatus[$level - 1]['del']) {
                     ob_end_flush();
                 }
             }

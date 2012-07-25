@@ -75,6 +75,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         ;
         $refl = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionProperty')
             ->disableOriginalConstructor()
+            ->setMethods(array('getValue'))
             ->getMock()
         ;
         $refl

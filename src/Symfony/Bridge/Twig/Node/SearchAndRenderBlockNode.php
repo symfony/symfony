@@ -32,22 +32,44 @@ class SearchAndRenderBlockNode extends \Twig_Node_Expression_Function
             $compiler->raw(', \'' . $blockNameSuffix . '\'');
 
             if (isset($arguments[1])) {
-                $compiler->raw(', ');
-
-                // The "label" function allows one extra argument here, the label
                 if ('label' === $blockNameSuffix) {
-                    if (isset($arguments[2])) {
-                        $compiler->subcompile($arguments[2]);
-                        $compiler->raw(' + ');
+                    // The "label" function expects the label in the second argument.
+                    // The array of variables is given in the third argument
+                    $lineno = $arguments[1]->getLine();
+                    $variables = new \Twig_Node_Expression_Array(array(), $lineno);
+                    $givenVariables = isset($arguments[2]) ? $arguments[2] : $variables;
+                    $labelKey = new \Twig_Node_Expression_Constant('label', $lineno);
+                    $found = false;
+
+                    // If the label is listed in the variables, the label given
+                    // in the arguments should take precedence in the following form:
+                    // labelInArgs|default(labelInAttr)
+                    foreach ($givenVariables->getKeyValuePairs() as $pair) {
+                        if ((string) $labelKey === (string) $pair['key']) {
+                            $pair['value'] = new \Twig_Node_Expression_Filter_Default(
+                                $arguments[1],
+                                new \Twig_Node_Expression_Constant('default', $lineno),
+                                new \Twig_Node(array($pair['value']), array(), $lineno),
+                                $lineno
+                            );
+                            $found = true;
+                        }
+
+                        $variables->addElement($pair['value'], $pair['key']);
                     }
 
-                    // Add the label to the variable array
-                    $compiler->raw('array(\'label\' => ');
-                    $compiler->subcompile($arguments[1]);
-                    $compiler->raw(')');
+                    // If the label does not exist in the variables, simply add it
+                    if (!$found) {
+                        $variables->addElement($arguments[1], $labelKey);
+                    }
                 } else {
-                    $compiler->subcompile($arguments[1]);
+                    // All other functions than "label" expect the variables
+                    // in the second argument
+                    $variables = $arguments[1];
                 }
+
+                $compiler->raw(', ');
+                $compiler->subcompile($variables);
             }
         }
 

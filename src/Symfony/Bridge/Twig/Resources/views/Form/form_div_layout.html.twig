@@ -249,7 +249,7 @@
 {% block form_row %}
 {% spaceless %}
     <div>
-        {{ form_label(form, label|default(null)) }}
+        {{ form_label(form) }}
         {{ form_errors(form) }}
         {{ form_widget(form) }}
     </div>

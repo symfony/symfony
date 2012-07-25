@@ -98,9 +98,33 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $compiler = new \Twig_Compiler(new \Twig_Environment());
 
+        // "label" => null must not be included in the output!
+        // Otherwise the default label is overwritten with null.
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("label" => null))',
+                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\')',
+                $this->getVariableGetter('form')
+            ),
+            trim($compiler->compile($node)->getSource())
+        );
+    }
+
+    public function testCompileLabelWithEmptyStringLabel()
+    {
+        $arguments = new \Twig_Node(array(
+            new \Twig_Node_Expression_Name('form', 0),
+            new \Twig_Node_Expression_Constant('', 0),
+        ));
+
+        $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+
+        $compiler = new \Twig_Compiler(new \Twig_Environment());
+
+        // "label" => null must not be included in the output!
+        // Otherwise the default label is overwritten with null.
+        $this->assertEquals(
+            sprintf(
+                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\')',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -141,9 +165,12 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $compiler = new \Twig_Compiler(new \Twig_Environment());
 
+        // "label" => null must not be included in the output!
+        // Otherwise the default label is overwritten with null.
+        // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => null))',
+                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar"))',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -169,7 +196,75 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => _twig_default_filter("value in argument", "value in attributes")))',
+                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in argument"))',
+                $this->getVariableGetter('form')
+            ),
+            trim($compiler->compile($node)->getSource())
+        );
+    }
+
+    public function testCompileLabelWithLabelThatEvaluatesToNull()
+    {
+        $arguments = new \Twig_Node(array(
+            new \Twig_Node_Expression_Name('form', 0),
+            new \Twig_Node_Expression_Conditional(
+                // if
+                new \Twig_Node_Expression_Constant(true, 0),
+                // then
+                new \Twig_Node_Expression_Constant(null, 0),
+                // else
+                new \Twig_Node_Expression_Constant(null, 0),
+                0
+            ),
+        ));
+
+        $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+
+        $compiler = new \Twig_Compiler(new \Twig_Environment());
+
+        // "label" => null must not be included in the output!
+        // Otherwise the default label is overwritten with null.
+        // https://github.com/symfony/symfony/issues/5029
+        $this->assertEquals(
+            sprintf(
+                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
+                $this->getVariableGetter('form')
+            ),
+            trim($compiler->compile($node)->getSource())
+        );
+    }
+
+    public function testCompileLabelWithLabelThatEvaluatesToNullAndAttributes()
+    {
+        $arguments = new \Twig_Node(array(
+            new \Twig_Node_Expression_Name('form', 0),
+            new \Twig_Node_Expression_Conditional(
+                // if
+                new \Twig_Node_Expression_Constant(true, 0),
+                // then
+                new \Twig_Node_Expression_Constant(null, 0),
+                // else
+                new \Twig_Node_Expression_Constant(null, 0),
+                0
+            ),
+            new \Twig_Node_Expression_Array(array(
+                new \Twig_Node_Expression_Constant('foo', 0),
+                new \Twig_Node_Expression_Constant('bar', 0),
+                new \Twig_Node_Expression_Constant('label', 0),
+                new \Twig_Node_Expression_Constant('value in attributes', 0),
+            ), 0),
+        ));
+
+        $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+
+        $compiler = new \Twig_Compiler(new \Twig_Environment());
+
+        // "label" => null must not be included in the output!
+        // Otherwise the default label is overwritten with null.
+        // https://github.com/symfony/symfony/issues/5029
+        $this->assertEquals(
+            sprintf(
+                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in attributes") + (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())

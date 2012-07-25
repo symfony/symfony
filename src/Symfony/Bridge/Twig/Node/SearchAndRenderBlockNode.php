@@ -33,43 +33,71 @@ class SearchAndRenderBlockNode extends \Twig_Node_Expression_Function
 
             if (isset($arguments[1])) {
                 if ('label' === $blockNameSuffix) {
-                    // The "label" function expects the label in the second argument.
-                    // The array of variables is given in the third argument
-                    $lineno = $arguments[1]->getLine();
-                    $variables = new \Twig_Node_Expression_Array(array(), $lineno);
-                    $givenVariables = isset($arguments[2]) ? $arguments[2] : $variables;
-                    $labelKey = new \Twig_Node_Expression_Constant('label', $lineno);
-                    $found = false;
+                    // The "label" function expects the label in the second and
+                    // the variables in the third argument
+                    $label = $arguments[1];
+                    $variables = isset($arguments[2]) ? $arguments[2] : null;
+                    $lineno = $label->getLine();
 
-                    // If the label is listed in the variables, the label given
-                    // in the arguments should take precedence in the following form:
-                    // labelInArgs|default(labelInAttr)
-                    foreach ($givenVariables->getKeyValuePairs() as $pair) {
-                        if ((string) $labelKey === (string) $pair['key']) {
-                            $pair['value'] = new \Twig_Node_Expression_Filter_Default(
-                                $arguments[1],
-                                new \Twig_Node_Expression_Constant('default', $lineno),
-                                new \Twig_Node(array($pair['value']), array(), $lineno),
-                                $lineno
-                            );
-                            $found = true;
+                    if ($label instanceof \Twig_Node_Expression_Constant) {
+                        // If the label argument is given as a constant, we can either
+                        // strip it away if it is empty, or integrate it into the array
+                        // of variables at compile time.
+                        $labelIsExpression = false;
+
+                        // Only insert the label into the array if it is not empty
+                        if (!twig_test_empty($label->getAttribute('value'))) {
+                            $originalVariables = $variables;
+                            $variables = new \Twig_Node_Expression_Array(array(), $lineno);
+                            $labelKey = new \Twig_Node_Expression_Constant('label', $lineno);
+
+                            if (null !== $originalVariables) {
+                                foreach ($originalVariables->getKeyValuePairs() as $pair) {
+                                    // Don't copy the original label attribute over if it exists
+                                    if ((string) $labelKey !== (string) $pair['key']) {
+                                        $variables->addElement($pair['value'], $pair['key']);
+                                    }
+                                }
+                            }
+
+                            // Insert the label argument into the array
+                            $variables->addElement($label, $labelKey);
                         }
-
-                        $variables->addElement($pair['value'], $pair['key']);
-                    }
-
-                    // If the label does not exist in the variables, simply add it
-                    if (!$found) {
-                        $variables->addElement($arguments[1], $labelKey);
+                    } else {
+                        // The label argument is not a constant, but some kind of
+                        // expression. This expression needs to be evaluated at runtime.
+                        // Depending on the result (whether it is null or not), the
+                        // label in the arguments should take precedence over the label
+                        // in the attributes or not.
+                        $labelIsExpression = true;
                     }
                 } else {
                     // All other functions than "label" expect the variables
                     // in the second argument
+                    $label = null;
                     $variables = $arguments[1];
+                    $labelIsExpression = false;
                 }
 
-                $compiler->raw(', ');
-                $compiler->subcompile($variables);
+                if (null !== $variables || $labelIsExpression) {
+                    $compiler->raw(', ');
+
+                    if (null !== $variables) {
+                        $compiler->subcompile($variables);
+                    }
+
+                    if ($labelIsExpression) {
+                        if (null !== $variables) {
+                            $compiler->raw(' + ');
+                        }
+
+                        // Check at runtime whether the label is empty.
+                        // If not, add it to the array at runtime.
+                        $compiler->raw('(twig_test_empty($_label_ = ');
+                        $compiler->subcompile($label);
+                        $compiler->raw(') ? array() : array("label" => $_label_))');
+                    }
+                }
             }
         }
 

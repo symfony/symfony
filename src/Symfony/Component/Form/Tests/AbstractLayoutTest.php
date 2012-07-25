@@ -225,7 +225,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
-    public function testLabelWithCustomOptionsPassedDirectly()
+    public function testLabelWithCustomAttributesPassedDirectly()
     {
         $form = $this->factory->createNamed('name', 'text');
         $html = $this->renderLabel($form->createView(), null, array(
@@ -242,7 +242,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
-    public function testLabelWithCustomTextAndCustomOptionsPassedDirectly()
+    public function testLabelWithCustomTextAndCustomAttributesPassedDirectly()
     {
         $form = $this->factory->createNamed('name', 'text');
         $html = $this->renderLabel($form->createView(), 'Custom label', array(
@@ -253,6 +253,27 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $this->assertMatchesXpath($html,
 '/label
+    [@for="name"]
+    [@class="my&class required"]
+    [.="[trans]Custom label[/trans]"]
+'
+        );
+    }
+
+    // https://github.com/symfony/symfony/issues/5029
+    public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
+    {
+        $form = $this->factory->createNamed('name', 'text', null, array(
+            'label' => 'Custom label',
+        ));
+        $html = $this->renderLabel($form->createView(), null, array(
+            'label_attr' => array(
+                'class' => 'my&class'
+            ),
+        ));
+
+        $this->assertMatchesXpath($html,
+            '/label
     [@for="name"]
     [@class="my&class required"]
     [.="[trans]Custom label[/trans]"]

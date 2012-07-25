@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Tests\Fixtures\AlternatingRowType;
 
 abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 {
@@ -279,6 +280,29 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         /following-sibling::div[./input[@type="text"][@value="b"]]
     ]
     [count(./div[./input])=2]
+'
+        );
+    }
+
+    // https://github.com/symfony/symfony/issues/5038
+    public function testCollectionWithAlternatingRowTypes()
+    {
+        $data = array(
+            array('title' => 'a'),
+            array('title' => 'b'),
+        );
+        $form = $this->factory->createNamed('name', 'collection', $data, array(
+            'type' => new AlternatingRowType(),
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./div[./div/div/input[@type="text"][@value="a"]]
+        /following-sibling::div[./div/div/textarea[.="b"]]
+    ]
+    [count(./div[./div/div/input])=1]
+    [count(./div[./div/div/textarea])=1]
 '
         );
     }

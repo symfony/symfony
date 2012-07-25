@@ -54,6 +54,10 @@ class YamlFileLoader extends FileLoader
         if (isset($this->classes[$metadata->getClassName()])) {
             $yaml = $this->classes[$metadata->getClassName()];
 
+            if (isset($yaml['group_sequence'])) {
+                $metadata->setGroupSequence($yaml['group_sequence']);
+            }
+
             if (isset($yaml['constraints'])) {
                 foreach ($this->parseNodes($yaml['constraints']) as $constraint) {
                     $metadata->addConstraint($constraint);

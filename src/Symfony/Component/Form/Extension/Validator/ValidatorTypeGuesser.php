@@ -125,10 +125,10 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 return new TypeGuess('country', array(), Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Date':
-                return new TypeGuess('date', array('type' => 'string'), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess('date', array('input' => 'string'), Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\DateTime':
-                return new TypeGuess('datetime', array('type' => 'string'), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess('datetime', array('input' => 'string'), Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Email':
                 return new TypeGuess('email', array(), Guess::HIGH_CONFIDENCE);
@@ -144,7 +144,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 return new TypeGuess('locale', array(), Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Time':
-                return new TypeGuess('time', array('type' => 'string'), Guess::HIGH_CONFIDENCE);
+                return new TypeGuess('time', array('input' => 'string'), Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\Url':
                 return new TypeGuess('url', array(), Guess::HIGH_CONFIDENCE);

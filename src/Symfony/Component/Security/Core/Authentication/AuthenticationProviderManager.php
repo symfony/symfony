@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Authentication;
 
+use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
+use Symfony\Component\Security\Core\Event\AuthenticationEvent;
+use Symfony\Component\Security\Core\AuthenticationEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
@@ -27,6 +31,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
 {
     private $providers;
     private $eraseCredentials;
+    private $eventDispatcher;
 
     /**
      * Constructor.
@@ -44,6 +49,11 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
         $this->eraseCredentials = (Boolean) $eraseCredentials;
     }
 
+    public function setEventDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->eventDispatcher = $dispatcher;
+    }
+    
     /**
      * {@inheritdoc}
      */
@@ -77,6 +87,10 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
                 $result->eraseCredentials();
             }
 
+            if (null !== $this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(AuthenticationEvents::AUTHENTICATION_SUCCESS, new AuthenticationEvent($result));
+            }
+            
             return $result;
         }
 
@@ -84,6 +98,10 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
             $lastException = new ProviderNotFoundException(sprintf('No Authentication Provider found for token of class "%s".', get_class($token)));
         }
 
+        if (null !== $this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(AuthenticationEvents::AUTHENTICATION_FAILURE, new AuthenticationFailureEvent($token, $lastException));
+        }
+        
         $lastException->setExtraInformation($token);
 
         throw $lastException;

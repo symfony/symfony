@@ -52,6 +52,9 @@
         <!-- Authentication related services -->
         <service id="security.authentication.manager" class="%security.authentication.manager.class%" public="false">
             <argument type="collection" />
+            <call method="setEventDispatcher">
+                <argument type="service" id="event_dispatcher" />
+            </call>
         </service>
 
         <service id="security.authentication.trust_resolver" class="%security.authentication.trust_resolver.class%" public="false">

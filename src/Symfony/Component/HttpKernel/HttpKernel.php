@@ -201,7 +201,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
                 $response->setStatusCode($e->getStatusCode());
                 $response->headers->add($e->getHeaders());
             } else {
-                $response->setStatusCode(500);
+                $response->setStatusCode($response->headers->get(HttpKernelInterface::HEADER_STATUSCODE, 500));
             }
         }
 

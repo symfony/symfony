@@ -339,7 +339,7 @@ class ChoiceList implements ChoiceListInterface
             throw new InvalidConfigurationException('The value created by the choice list is of type "' . gettype($value) . '", but should be a string.');
         }
 
-        $view = new ChoiceView($value, $label);
+        $view = new ChoiceView($choice, $value, $label);
 
         $this->choices[$index] = $this->fixChoice($choice);
         $this->values[$index] = $value;

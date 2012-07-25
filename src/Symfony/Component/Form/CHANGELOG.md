@@ -175,3 +175,5 @@ CHANGELOG
    * `isChoiceSelected`
  * [BC BREAK] renamed method `renderBlock` in FormHelper to `block` and changed its signature
  * made FormView properties public and deprecated their accessor methods
+ * made the normalized data of a form accessible in the template through the variable "form.vars.data"
+ * made the original data of a choice accessible in the template through the property "choice.data"

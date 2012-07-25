@@ -355,8 +355,8 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('2010', '2010'),
-            new ChoiceView('2011', '2011'),
+            new ChoiceView('2010', '2010', '2010'),
+            new ChoiceView('2011', '2011', '2011'),
         ), $view['year']->vars['choices']);
     }
 
@@ -369,8 +369,8 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('6', '06'),
-            new ChoiceView('7', '07'),
+            new ChoiceView('6', '6', '06'),
+            new ChoiceView('7', '7', '07'),
         ), $view['month']->vars['choices']);
     }
 
@@ -384,8 +384,8 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('1', 'Jän'),
-            new ChoiceView('4', 'Apr')
+            new ChoiceView('1', '1', 'Jän'),
+            new ChoiceView('4', '4', 'Apr')
         ), $view['month']->vars['choices']);
     }
 
@@ -399,8 +399,8 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('1', 'Jänner'),
-            new ChoiceView('4', 'April'),
+            new ChoiceView('1', '1', 'Jänner'),
+            new ChoiceView('4', '4', 'April'),
         ), $view['month']->vars['choices']);
     }
 
@@ -414,8 +414,8 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('1', 'Jänner'),
-            new ChoiceView('4', 'April'),
+            new ChoiceView('1', '1', 'Jänner'),
+            new ChoiceView('4', '4', 'April'),
         ), $view['month']->vars['choices']);
     }
 
@@ -428,8 +428,8 @@ class DateTypeTest extends LocalizedTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('6', '06'),
-            new ChoiceView('7', '07'),
+            new ChoiceView('6', '6', '06'),
+            new ChoiceView('7', '7', '07'),
         ), $view['day']->vars['choices']);
     }
 

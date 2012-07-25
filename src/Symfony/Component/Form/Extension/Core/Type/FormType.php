@@ -129,6 +129,13 @@ class FormType extends AbstractType
             'compound'           => $form->getConfig()->getCompound(),
             'types'              => $types,
             'translation_domain' => $translationDomain,
+            // Using the block name here speeds up performance in collection
+            // forms, where each entry has the same full block name.
+            // Including the type is important too, because if rows of a
+            // collection form have different types (dynamically), they should
+            // be rendered differently.
+            // https://github.com/symfony/symfony/issues/5038
+            'cache_key'          => $fullBlockName . '_' . $form->getConfig()->getType()->getName(),
         ));
     }
 

@@ -645,4 +645,18 @@ class FormTypeTest extends TypeTestCase
 
         $this->assertSame('default', $form->getData());
     }
+
+    public function testNormDataIsPassedToView()
+    {
+        $view = $this->factory->createBuilder('form')
+            ->addViewTransformer(new FixedDataTransformer(array(
+                'foo' => 'bar',
+            )))
+            ->setData('foo')
+            ->getForm()
+            ->createView();
+
+        $this->assertSame('foo', $view->vars['data']);
+        $this->assertSame('bar', $view->vars['value']);
+    }
 }

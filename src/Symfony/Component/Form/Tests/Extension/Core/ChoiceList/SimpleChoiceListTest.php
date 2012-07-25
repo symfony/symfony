@@ -55,8 +55,8 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c'), $this->list->getChoices());
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c'), $this->list->getValues());
-        $this->assertEquals(array(1 => new ChoiceView('b', 'B')), $this->list->getPreferredViews());
-        $this->assertEquals(array(0 => new ChoiceView('a', 'A'), 2 => new ChoiceView('c', 'C')), $this->list->getRemainingViews());
+        $this->assertEquals(array(1 => new ChoiceView('b', 'b', 'B')), $this->list->getPreferredViews());
+        $this->assertEquals(array(0 => new ChoiceView('a', 'a', 'A'), 2 => new ChoiceView('c', 'c', 'C')), $this->list->getRemainingViews());
     }
 
     public function testInitNestedArray()
@@ -64,12 +64,12 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c', 3 => 'd'), $this->list->getChoices());
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c', 3 => 'd'), $this->list->getValues());
         $this->assertEquals(array(
-            'Group 1' => array(1 => new ChoiceView('b', 'B')),
-            'Group 2' => array(2 => new ChoiceView('c', 'C'))
+            'Group 1' => array(1 => new ChoiceView('b', 'b', 'B')),
+            'Group 2' => array(2 => new ChoiceView('c', 'c', 'C'))
         ), $this->list->getPreferredViews());
         $this->assertEquals(array(
-            'Group 1' => array(0 => new ChoiceView('a', 'A')),
-            'Group 2' => array(3 => new ChoiceView('d', 'D'))
+            'Group 1' => array(0 => new ChoiceView('a', 'a', 'A')),
+            'Group 2' => array(3 => new ChoiceView('d', 'd', 'D'))
         ), $this->list->getRemainingViews());
     }
 

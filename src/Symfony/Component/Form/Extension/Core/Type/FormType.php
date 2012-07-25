@@ -116,6 +116,7 @@ class FormType extends AbstractType
             'errors'             => $form->getErrors(),
             'valid'              => $form->isBound() ? $form->isValid() : true,
             'value'              => $form->getViewData(),
+            'data'               => $form->getNormData(),
             'disabled'           => $form->isDisabled(),
             'required'           => $form->isRequired(),
             'max_length'         => $options['max_length'],

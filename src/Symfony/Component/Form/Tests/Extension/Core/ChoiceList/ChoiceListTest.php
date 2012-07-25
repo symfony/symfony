@@ -173,4 +173,15 @@ class ChoiceListTest extends \PHPUnit_Framework_TestCase
         $choices = array($this->obj2, $this->obj3, 'foobar');
         $this->assertSame(array('1', '2'), $this->list->getValuesForChoices($choices));
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testNonMatchingLabels()
+    {
+        $this->list = new ChoiceList(
+            array($this->obj1, $this->obj2),
+            array('A')
+        );
+    }
 }

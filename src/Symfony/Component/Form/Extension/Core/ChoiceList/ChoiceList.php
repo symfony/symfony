@@ -254,12 +254,17 @@ class ChoiceList implements ChoiceListInterface
      * @param array              $labels             The labels corresponding to the choices.
      * @param array              $preferredChoices   The preferred choices.
      *
+     * @throws \InvalidArgumentException     If the structures of the choices and labels array do not match.
      * @throws InvalidConfigurationException If no valid value or index could be created for a choice.
      */
     protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
     {
         // Add choices to the nested buckets
         foreach ($choices as $group => $choice) {
+            if (!isset($labels[$group])) {
+                throw new \InvalidArgumentException('The structures of the choices and labels array do not match.');
+            }
+
             if (is_array($choice)) {
                 // Don't do the work if the array is empty
                 if (count($choice) > 0) {

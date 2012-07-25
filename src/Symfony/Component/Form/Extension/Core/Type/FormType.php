@@ -71,11 +71,11 @@ class FormType extends AbstractType
             if ('' !== ($parentFullName = $view->parent->vars['full_name'])) {
                 $id = sprintf('%s_%s', $view->parent->vars['id'], $name);
                 $fullName = sprintf('%s[%s]', $parentFullName, $name);
-                $fullBlockName = sprintf('%s_%s', $view->parent->vars['full_block_name'], $blockName);
+                $uniqueBlockPrefix = sprintf('%s_%s', $view->parent->vars['unique_block_prefix'], $blockName);
             } else {
                 $id = $name;
                 $fullName = $name;
-                $fullBlockName = '_' . $blockName;
+                $uniqueBlockPrefix = '_' . $blockName;
             }
 
             // Complex fields are read-only if they themselves or their parents are.
@@ -89,7 +89,7 @@ class FormType extends AbstractType
         } else {
             $id = $name;
             $fullName = $name;
-            $fullBlockName = '_' . $blockName;
+            $uniqueBlockPrefix = '_' . $blockName;
 
             // Strip leading underscores and digits. These are allowed in
             // form names, but not in HTML4 ID attributes.
@@ -97,45 +97,46 @@ class FormType extends AbstractType
             $id = ltrim($id, '_0123456789');
         }
 
-        $types = array();
+        $blockPrefixes = array();
         for ($type = $form->getConfig()->getType(); null !== $type; $type = $type->getParent()) {
-            array_unshift($types, $type->getName());
+            array_unshift($blockPrefixes, $type->getName());
         }
+        $blockPrefixes[] = $uniqueBlockPrefix;
 
         if (!$translationDomain) {
             $translationDomain = 'messages';
         }
 
         $view->vars = array_replace($view->vars, array(
-            'form'               => $view,
-            'id'                 => $id,
-            'name'               => $name,
-            'full_name'          => $fullName,
-            'full_block_name'    => $fullBlockName,
-            'read_only'          => $readOnly,
-            'errors'             => $form->getErrors(),
-            'valid'              => $form->isBound() ? $form->isValid() : true,
-            'value'              => $form->getViewData(),
-            'data'               => $form->getNormData(),
-            'disabled'           => $form->isDisabled(),
-            'required'           => $form->isRequired(),
-            'max_length'         => $options['max_length'],
-            'pattern'            => $options['pattern'],
-            'size'               => null,
-            'label'              => $options['label'],
-            'multipart'          => false,
-            'attr'               => $options['attr'],
-            'label_attr'         => $options['label_attr'],
-            'compound'           => $form->getConfig()->getCompound(),
-            'types'              => $types,
-            'translation_domain' => $translationDomain,
+            'form'                => $view,
+            'id'                  => $id,
+            'name'                => $name,
+            'full_name'           => $fullName,
+            'read_only'           => $readOnly,
+            'errors'              => $form->getErrors(),
+            'valid'               => $form->isBound() ? $form->isValid() : true,
+            'value'               => $form->getViewData(),
+            'data'                => $form->getNormData(),
+            'disabled'            => $form->isDisabled(),
+            'required'            => $form->isRequired(),
+            'max_length'          => $options['max_length'],
+            'pattern'             => $options['pattern'],
+            'size'                => null,
+            'label'               => $options['label'],
+            'multipart'           => false,
+            'attr'                => $options['attr'],
+            'label_attr'          => $options['label_attr'],
+            'compound'            => $form->getConfig()->getCompound(),
+            'block_prefixes'      => $blockPrefixes,
+            'unique_block_prefix' => $uniqueBlockPrefix,
+            'translation_domain'  => $translationDomain,
             // Using the block name here speeds up performance in collection
             // forms, where each entry has the same full block name.
             // Including the type is important too, because if rows of a
             // collection form have different types (dynamically), they should
             // be rendered differently.
             // https://github.com/symfony/symfony/issues/5038
-            'cache_key'          => $fullBlockName . '_' . $form->getConfig()->getType()->getName(),
+            'cache_key'           => $uniqueBlockPrefix . '_' . $form->getConfig()->getType()->getName(),
         ));
     }
 

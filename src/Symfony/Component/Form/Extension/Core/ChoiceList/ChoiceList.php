@@ -256,7 +256,7 @@ class ChoiceList implements ChoiceListInterface
      *
      * @throws InvalidConfigurationException If no valid value or index could be created for a choice.
      */
-    protected function addChoices(&$bucketForPreferred, &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
+    protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
     {
         // Add choices to the nested buckets
         foreach ($choices as $group => $choice) {
@@ -298,7 +298,7 @@ class ChoiceList implements ChoiceListInterface
      *
      * @throws InvalidConfigurationException If no valid value or index could be created for a choice.
      */
-    protected function addChoiceGroup($group, &$bucketForPreferred, &$bucketForRemaining, array $choices, array $labels, array $preferredChoices)
+    protected function addChoiceGroup($group, array &$bucketForPreferred, array &$bucketForRemaining, array $choices, array $labels, array $preferredChoices)
     {
         // If this is a choice group, create a new level in the choice
         // key hierarchy
@@ -335,7 +335,7 @@ class ChoiceList implements ChoiceListInterface
      *
      * @throws InvalidConfigurationException If no valid value or index could be created.
      */
-    protected function addChoice(&$bucketForPreferred, &$bucketForRemaining, $choice, $label, array $preferredChoices)
+    protected function addChoice(array &$bucketForPreferred, array &$bucketForRemaining, $choice, $label, array $preferredChoices)
     {
         $index = $this->createIndex($choice);
 

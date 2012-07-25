@@ -86,7 +86,7 @@ class SimpleChoiceList extends ChoiceList
      * @param array              $labels             Ignored.
      * @param array              $preferredChoices   The preferred choices.
      */
-    protected function addChoices(&$bucketForPreferred, &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
+    protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
     {
         // Add choices to the nested buckets
         foreach ($choices as $choice => $label) {

@@ -125,7 +125,7 @@ class FormHelper extends Helper
      */
     public function label(FormView $view, $label = null, array $variables = array())
     {
-        if ($label !== null) {
+        if (null !== $label) {
             $variables += array('label' => $label);
         }
 

@@ -837,6 +837,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     private function getFileOwner($filepath)
     {
+        $this->markAsSkippedIfPosixIsMissing();
+
         $infos = stat($filepath);
         if ($datas = posix_getpwuid($infos['uid'])) {
             return $datas['name'];
@@ -845,6 +847,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     private function getFileGroup($filepath)
     {
+        $this->markAsSkippedIfPosixIsMissing();
+
         $infos = stat($filepath);
         if ($datas = posix_getgrgid($infos['gid'])) {
             return $datas['name'];
@@ -867,8 +871,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     private function markAsSkippedIfPosixIsMissing()
     {
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
-            $this->markTestSkipped('Posix uids are not available on windows');
+        if (defined('PHP_WINDOWS_VERSION_MAJOR') || !function_exists('posix_isatty')) {
+            $this->markTestSkipped('Posix is not supported');
         }
     }
 }

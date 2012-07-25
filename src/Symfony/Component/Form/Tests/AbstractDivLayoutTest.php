@@ -38,13 +38,17 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testRowOverrideVariables()
     {
         $view = $this->factory->createNamed('name', 'text')->createView();
-        $html = $this->renderRow($view, array('label' => 'foo&bar'));
+        $html = $this->renderRow($view, array(
+            'attr' => array('class' => 'my&class'),
+            'label' => 'foo&bar',
+            'label_attr' => array('class' => 'my&label&class'),
+        ));
 
         $this->assertMatchesXpath($html,
 '/div
     [
-        ./label[@for="name"][.="[trans]foo&bar[/trans]"]
-        /following-sibling::input[@id="name"]
+        ./label[@for="name"][@class="my&label&class required"][.="[trans]foo&bar[/trans]"]
+        /following-sibling::input[@id="name"][@class="my&class"]
     ]
 '
         );

@@ -22,6 +22,8 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
  */
 class FormRenderer implements FormRendererInterface
 {
+    const CACHE_KEY_VAR = 'full_block_name';
+
     /**
      * @var FormRendererEngineInterface
      */
@@ -41,11 +43,6 @@ class FormRenderer implements FormRendererInterface
      * @var array
      */
     private $hierarchyLevelMap = array();
-
-    /**
-     * @var array
-     */
-    private $variableMap = array();
 
     /**
      * @var array
@@ -95,7 +92,8 @@ class FormRenderer implements FormRendererInterface
             throw new FormException('This method should only be called while rendering a form element.');
         }
 
-        $scopeVariables = end($this->variableStack);
+        $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
+        $scopeVariables = end($this->variableStack[$viewCacheKey]);
 
         $resource = $this->engine->getResourceForBlockName($view, $blockName);
 
@@ -117,13 +115,13 @@ class FormRenderer implements FormRendererInterface
         // cannot be overwritten
         $variables = array_replace($scopeVariables, $variables);
 
-        $this->variableStack[] = $variables;
+        $this->variableStack[$viewCacheKey][] = $variables;
 
         // Do the rendering
         $html = $this->engine->renderBlock($view, $resource, $blockName, $variables);
 
         // Clear the stack
-        array_pop($this->variableStack);
+        array_pop($this->variableStack[$viewCacheKey]);
 
         return $html;
     }
@@ -140,7 +138,8 @@ class FormRenderer implements FormRendererInterface
         }
 
         // The cache key for storing the variables and types
-        $mapKey = $uniqueBlockName = $view->vars['full_block_name'] . '_' . $blockNameSuffix;
+        $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
+        $viewAndSuffixCacheKey = $viewCacheKey . $blockNameSuffix;
 
         // In templates, we have to deal with two kinds of block hierarchies:
         //
@@ -169,7 +168,7 @@ class FormRenderer implements FormRendererInterface
         // widget() function again to render the block for the parent type.
         //
         // The second kind is implemented in the following blocks.
-        if (!isset($this->blockNameHierarchyMap[$mapKey])) {
+        if (!isset($this->blockNameHierarchyMap[$viewAndSuffixCacheKey])) {
             // INITIAL CALL
             // Calculate the hierarchy of template blocks and start on
             // the bottom level of the hierarchy (= "_<id>_<section>" block)
@@ -177,21 +176,33 @@ class FormRenderer implements FormRendererInterface
             foreach ($view->vars['types'] as $type) {
                 $blockNameHierarchy[] = $type . '_' . $blockNameSuffix;
             }
-            $blockNameHierarchy[] = $uniqueBlockName;
+            $blockNameHierarchy[] = $view->vars['full_block_name'] . '_' . $blockNameSuffix;
             $hierarchyLevel = count($blockNameHierarchy) - 1;
 
-            // The default variable scope contains all view variables, merged with
-            // the variables passed explicitly to the helper
-            $scopeVariables = $view->vars;
+            $hierarchyInit = true;
         } else {
             // RECURSIVE CALL
             // If a block recursively calls renderSection() again, resume rendering
             // using the parent type in the hierarchy.
-            $blockNameHierarchy = $this->blockNameHierarchyMap[$mapKey];
-            $hierarchyLevel = $this->hierarchyLevelMap[$mapKey] - 1;
+            $blockNameHierarchy = $this->blockNameHierarchyMap[$viewAndSuffixCacheKey];
+            $hierarchyLevel = $this->hierarchyLevelMap[$viewAndSuffixCacheKey] - 1;
 
+            $hierarchyInit = false;
+        }
+
+        // The variables are cached globally for a view (instead of for the
+        // current suffix)
+        if (!isset($this->variableStack[$viewCacheKey])) {
+            // The default variable scope contains all view variables, merged with
+            // the variables passed explicitly to the helper
+            $scopeVariables = $view->vars;
+
+            $varInit = true;
+        } else {
             // Reuse the current scope and merge it with the explicitly passed variables
-            $scopeVariables = $this->variableMap[$mapKey];
+            $scopeVariables = end($this->variableStack[$viewCacheKey]);
+
+            $varInit = false;
         }
 
         // Load the resource where this block can be found
@@ -235,28 +246,29 @@ class FormRenderer implements FormRendererInterface
         // We need to store these values in maps (associative arrays) because within a
         // call to widget() another call to widget() can be made, but for a different view
         // object. These nested calls should not override each other.
-        $this->blockNameHierarchyMap[$mapKey] = $blockNameHierarchy;
-        $this->hierarchyLevelMap[$mapKey] = $hierarchyLevel;
-        $this->variableMap[$mapKey] = $variables;
+        $this->blockNameHierarchyMap[$viewAndSuffixCacheKey] = $blockNameHierarchy;
+        $this->hierarchyLevelMap[$viewAndSuffixCacheKey] = $hierarchyLevel;
 
-        // We also need to store the view and the variables so that we can render custom
-        // blocks with renderBlock() using the same themes and variables as in the outer
-        // block.
-        //
-        // A stack is sufficient for this purpose, because renderBlock() always accesses
-        // the immediate next outer scope, which is always stored at the end of the stack.
-        $this->variableStack[] = $variables;
+        // We also need to store the variables for the view so that we can render other
+        // blocks for the same view using the same variables as in the outer block.
+        $this->variableStack[$viewCacheKey][] = $variables;
 
         // Do the rendering
         $html = $this->engine->renderBlock($view, $resource, $blockName, $variables);
 
         // Clear the stack
-        array_pop($this->variableStack);
+        array_pop($this->variableStack[$viewCacheKey]);
 
-        // Clear the maps
-        unset($this->blockNameHierarchyMap[$mapKey]);
-        unset($this->hierarchyLevelMap[$mapKey]);
-        unset($this->variableMap[$mapKey]);
+        // Clear the caches if they were filled for the first time within
+        // this function call
+        if ($hierarchyInit) {
+            unset($this->blockNameHierarchyMap[$viewAndSuffixCacheKey]);
+            unset($this->hierarchyLevelMap[$viewAndSuffixCacheKey]);
+        }
+
+        if ($varInit) {
+            unset($this->variableStack[$viewCacheKey]);
+        }
 
         if ($renderOnlyOnce) {
             $view->setRendered();

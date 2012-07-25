@@ -168,7 +168,13 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
 
-        return $event->getResponse();
+        $response = $event->getResponse();
+        
+        if ($response->headers->has(HttpKernelInterface::HEADER_STATUSCODE)) {
+            $response->headers->remove(HttpKernelInterface::HEADER_STATUSCODE);
+        }
+
+        return $response;
     }
 
     /**

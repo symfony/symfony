@@ -82,6 +82,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('foo', $response->getContent());
+        $this->assertFalse($response->headers->has(HttpKernelInterface::HEADER_STATUSCODE));
     }
 
     public function testHandleExceptionWithARedirectionResponse()

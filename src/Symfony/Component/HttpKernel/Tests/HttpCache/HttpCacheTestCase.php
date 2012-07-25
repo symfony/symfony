@@ -99,12 +99,12 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
 
     public function assertExceptionsAreCaught()
     {
-        $this->assertTrue($this->kernel->isCatchingExceptions());
+        $this->assertEquals(HttpKernelInterface::EXCEPTIONS_AUTOTUNE, $this->kernel->isCatchingExceptions());
     }
 
     public function assertExceptionsAreNotCaught()
     {
-        $this->assertFalse($this->kernel->isCatchingExceptions());
+        $this->assertEquals(HttpKernelInterface::EXCEPTIONS_OFF, $this->kernel->isCatchingExceptions());
     }
 
     public function request($method, $uri = '/', $server = array(), $cookies = array(), $esi = false)
@@ -149,7 +149,7 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
         $this->kernel = new TestMultipleHttpKernel($responses);
     }
 
-    public function catchExceptions($catch = true)
+    public function catchExceptions($catch = HttpKernelInterface::EXCEPTIONS_AUTOTUNE)
     {
         $this->catch = $catch;
     }

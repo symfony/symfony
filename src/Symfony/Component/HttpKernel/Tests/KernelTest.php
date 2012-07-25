@@ -164,7 +164,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
     public function testHandleCallsHandleOnHttpKernel()
     {
         $type = HttpKernelInterface::MASTER_REQUEST;
-        $catch = true;
+        $catch = HttpKernelInterface::EXCEPTIONS_AUTOTUNE;
         $request = new Request();
 
         $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernel')
@@ -190,7 +190,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
     public function testHandleBootsTheKernel()
     {
         $type = HttpKernelInterface::MASTER_REQUEST;
-        $catch = true;
+        $catch = HttpKernelInterface::EXCEPTIONS_AUTOTUNE;
         $request = new Request();
 
         $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernel')

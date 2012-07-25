@@ -23,6 +23,10 @@ use Symfony\Component\HttpFoundation\Response;
  */
 interface HttpKernelInterface
 {
+    const EXCEPTIONS_OFF = false;
+    const EXCEPTIONS_ON = "on";
+    const EXCEPTIONS_AUTOTUNE = true;
+
     const MASTER_REQUEST = 1;
     const SUB_REQUEST = 2;
 
@@ -35,7 +39,9 @@ interface HttpKernelInterface
      * @param Request $request A Request instance
      * @param integer $type    The type of the request
      *                          (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
-     * @param Boolean $catch Whether to catch exceptions or not
+     * @param Boolean $mode    The exception handling mode, one of the HttpKernelInterface::EXCEPTIONS_OFF
+     *                          HttpKernelInterface::EXCEPTIONS_ON or HttpKernelInterface::EXCEPTIONS_AUTOTUNE)
+     *                          Default to HttpKernelInterface::EXCEPTIONS_AUTOTUNE
      *
      * @return Response A Response instance
      *
@@ -43,5 +49,5 @@ interface HttpKernelInterface
      *
      * @api
      */
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true);
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $mode = HttpKernelInterface::EXCEPTIONS_AUTOTUNE);
 }

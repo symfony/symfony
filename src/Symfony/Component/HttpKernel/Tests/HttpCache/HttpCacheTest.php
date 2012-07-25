@@ -936,7 +936,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testShouldNotCatchExceptions()
     {
-        $this->catchExceptions(false);
+        $this->catchExceptions(HttpKernelInterface::EXCEPTIONS_OFF);
 
         $this->setNextResponse();
         $this->request('GET', '/');

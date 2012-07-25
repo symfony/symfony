@@ -73,7 +73,7 @@ class ExceptionListener implements EventSubscriberInterface
         $request->setMethod('GET');
 
         try {
-            $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
+            $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, HttpKernelInterface::EXCEPTIONS_ON);
         } catch (\Exception $e) {
             $message = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
             if (null !== $this->logger) {

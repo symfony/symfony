@@ -128,7 +128,7 @@ class ExceptionListener
                         $subRequest = $this->httpUtils->createRequest($request, $this->errorPage);
                         $subRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $exception);
 
-                        $response = $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
+                        $response = $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, HttpKernelInterface::EXCEPTIONS_AUTOTUNE);
                     } else {
                         return;
                     }

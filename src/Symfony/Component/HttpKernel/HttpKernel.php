@@ -51,32 +51,18 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Handles a Request to convert it to a Response.
-     *
-     * When $catch is true, the implementation must catch all exceptions
-     * and do its best to convert them to a Response instance.
-     *
-     * @param Request $request A Request instance
-     * @param integer $type    The type of the request
-     *                          (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
-     * @param Boolean $catch Whether to catch exceptions or not
-     *
-     * @return Response A Response instance
-     *
-     * @throws \Exception When an Exception occurs during processing
-     *
-     * @api
+     * {@inheritdoc}
      */
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $mode = HttpKernelInterface::EXCEPTIONS_AUTOTUNE)
     {
         try {
             return $this->handleRaw($request, $type);
         } catch (\Exception $e) {
-            if (false === $catch) {
+            if (HttpKernelInterface::EXCEPTIONS_OFF === $mode) {
                 throw $e;
             }
 
-            return $this->handleException($e, $request, $type);
+            return $this->handleException($e, $request, $type, $mode);
         }
     }
 
@@ -180,7 +166,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      *
      * @return Response A Response instance
      */
-    private function handleException(\Exception $e, $request, $type)
+    private function handleException(\Exception $e, $request, $type, $mode)
     {
         $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
         $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
@@ -195,7 +181,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $response = $event->getResponse();
 
         // ensure that we actually have an error response
-        if (!$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {
+        if ($mode === HttpKernelInterface::EXCEPTIONS_AUTOTUNE && !$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {
             if ($e instanceof HttpExceptionInterface) {
                 // keep the HTTP status code and headers
                 $response->setStatusCode($e->getStatusCode());

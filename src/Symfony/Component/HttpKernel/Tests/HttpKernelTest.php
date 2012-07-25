@@ -41,7 +41,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     {
         $kernel = new HttpKernel(new EventDispatcher(), $this->getResolver(function () { throw new \RuntimeException(); }));
 
-        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::EXCEPTIONS_ON);
     }
 
     /**
@@ -51,7 +51,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     {
         $kernel = new HttpKernel(new EventDispatcher(), $this->getResolver(function () { throw new \RuntimeException(); }));
 
-        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, false);
+        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::EXCEPTIONS_OFF);
     }
 
     public function testHandleWhenControllerThrowsAnExceptionAndRawIsFalse()
@@ -65,6 +65,20 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $response = $kernel->handle(new Request());
 
         $this->assertEquals('500', $response->getStatusCode());
+        $this->assertEquals('foo', $response->getContent());
+    }
+
+    public function testHandleWhenControllerThrowsAnExceptionAndRawIsFalseAndModeIsNotAuto()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
+            $event->setResponse(new Response($event->getException()->getMessage()));
+        });
+
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { throw new \RuntimeException('foo'); }));
+        $response = $kernel->handle(new Request(),HttpKernelInterface::MASTER_REQUEST, HttpKernelInterface::EXCEPTIONS_ON);
+
+        $this->assertEquals('200', $response->getStatusCode());
         $this->assertEquals('foo', $response->getContent());
     }
 

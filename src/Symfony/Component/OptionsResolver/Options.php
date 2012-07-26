@@ -190,7 +190,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             $params = $reflClosure->getParameters();
 
             if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && __CLASS__ === $class->name) {
-                $currentValue = isset($this->options[$option]) ? $this->options[$option] : null;
+                $currentValue = isset($params[1]) && isset($this->options[$option]) ? $this->options[$option] : null;
                 $value = new LazyOption($value, $currentValue);
 
                 // Store which options are lazy for more efficient resolving

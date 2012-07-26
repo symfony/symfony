@@ -126,4 +126,16 @@ class StreamedResponse extends Response
     {
         return false;
     }
+
+    /**
+     * Is the response allowed to be partial?
+     *
+     * @param Boolean
+     *
+     * @return Response
+     */
+    public function allowPartial($allow)
+    {
+        throw new \RuntimeException('Partial responses are not implemented for SteamedResponse');
+    }
 }

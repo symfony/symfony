@@ -152,7 +152,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         $this->options = array();
 
         foreach ($options as $option => $value) {
-            $this->set($option, $value);
+            $this->overload($option, $value);
         }
     }
 

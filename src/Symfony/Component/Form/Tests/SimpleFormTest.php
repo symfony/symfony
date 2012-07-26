@@ -45,6 +45,28 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertSame('bar', $form->getViewData());
     }
 
+    // https://github.com/symfony/symfony/commit/d4f4038f6daf7cf88ca7c7ab089473cce5ebf7d8#commitcomment-1632879
+    public function testDataIsInitializedFromBind()
+    {
+        $mock = $this->getMockBuilder('\stdClass')
+            ->setMethods(array('preSetData', 'preBind'))
+            ->getMock();
+        $mock->expects($this->at(0))
+            ->method('preSetData');
+        $mock->expects($this->at(1))
+            ->method('preBind');
+
+        $config = new FormConfig('name', null, $this->dispatcher);
+        $config->addEventListener(FormEvents::PRE_SET_DATA, array($mock, 'preSetData'));
+        $config->addEventListener(FormEvents::PRE_BIND, array($mock, 'preBind'));
+        $form = new Form($config);
+
+        // no call to setData() or similar where the object would be
+        // initialized otherwise
+
+        $form->bind('foobar');
+    }
+
     /**
      * @expectedException Symfony\Component\Form\Exception\AlreadyBoundException
      */

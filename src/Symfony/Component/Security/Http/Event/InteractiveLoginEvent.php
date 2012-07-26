@@ -27,11 +27,17 @@ class InteractiveLoginEvent extends Event
         $this->authenticationToken = $authenticationToken;
     }
 
+    /**
+     * @return Request
+     */
     public function getRequest()
     {
         return $this->request;
     }
 
+    /**
+     * @return TokenInterface
+     */
     public function getAuthenticationToken()
     {
         return $this->authenticationToken;

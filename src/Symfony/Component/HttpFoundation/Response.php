@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation;
 
-use Symfony\Component\HttpKernel\Exception\NotSatisfiableRangeHttpException;
-
 /**
  * Response represents an HTTP response.
  *
@@ -235,7 +233,12 @@ class Response
 
         if ($this->isOk() && $headers->has('Accept-Ranges') && !$headers->has('Content-Range')) {
             if (preg_match('/bytes=(\d*)-(\d*)/i', $request->headers->get('Range'), $matches)) {
-                $this->parseRange($matches[1] === '' ? null : $matches[1], $matches[2] === '' ? null : $matches[2]);
+                try {
+                    $this->parseRange($matches[1] === '' ? null : $matches[1], $matches[2] === '' ? null : $matches[2]);
+                } catch (\InvalidArgumentException $e) {
+                    $this->setStatusCode(416, $e->getMessage());
+                    $this->setContent(null);
+                }
             }
         }
 
@@ -263,14 +266,13 @@ class Response
         }
 
         if ($start === null || $end === null) {
-            throw new \InvalidArguemntException("Couldn't build range from request range $start-$end");
+            throw new \InvalidArgumentException("Couldn't build range from request range $start-$end");
         }
-
         if ($start > $end) {
-            throw new NotSatisfiableRangeHttpException();
+            throw new \InvalidArgumentException('The range is invalid');
         }
         if (strlen($this->content) < $start + 1 || strlen($this->content) < $end + 1) {
-            throw new NotSatisfiableRangeHttpException();
+            throw new \InvalidArgumentException('The range is outside the content bounds');
         }
 
         $this->headers->set('Content-Range', sprintf('bytes %d-%d/%d', $start, $end, strlen($this->content)));

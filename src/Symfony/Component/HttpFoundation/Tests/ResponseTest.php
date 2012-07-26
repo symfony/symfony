@@ -568,7 +568,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider invalidPartialRequestProvider
-     * @expectedException Symfony\Component\HttpKernel\Exception\NotSatisfiableRangeHttpException
      */
     public function testPartialRequestNotSatisfiable($requestRange)
     {
@@ -579,6 +578,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response->setContent('abcdefghijklm');
         $response->allowPartial(true);
         $response->prepare($request);
+
+        $this->assertEquals(416, $response->getStatusCode());
+        $this->assertEquals(null, $response->getContent());
+        $this->assertEquals(0, $response->headers->get('content-length', 0));
     }
 
     public function invalidPartialRequestProvider()

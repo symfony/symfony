@@ -1353,6 +1353,11 @@
     decoded twice before. Note that the `urldecode()` calls have been changed for a
     single `rawurldecode()` in order to support `+` for input paths.
 
+  * Two new parameters have been added to the DIC: `router.request_context.host`
+    and `router.request_context.scheme`.  You can customize them for your
+    functional tests or for generating urls with the right host and scheme
+    when your are in the cli context.
+
 ### FrameworkBundle
 
   * session options: lifetime, path, domain, secure, httponly were deprecated.

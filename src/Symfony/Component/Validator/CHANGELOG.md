@@ -26,3 +26,4 @@ CHANGELOG
  * added Range constraint
  * deprecated the Min and Max constraints
  * deprecated the MinLength and MaxLength constraints
+ * fixed StaticMethodLoader not to invoke interface methods

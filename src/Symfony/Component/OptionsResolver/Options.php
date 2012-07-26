@@ -27,6 +27,18 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     private $options = array();
 
     /**
+     * A list of normalizer closures.
+     * @var array
+     */
+    private $normalizers = array();
+
+    /**
+     * A list storing the names of all options that need to be normalized.
+     * @var array
+     */
+    private $normalization = array();
+
+    /**
      * A list storing the names of all LazyOption instances as keys.
      * @var array
      */
@@ -85,6 +97,38 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         unset($this->options[$option]);
 
         $this->overload($option, $value);
+    }
+
+    /**
+     * Sets the normalizer for a given option.
+     *
+     * Normalizers should be closures with the following signature:
+     *
+     * <code>
+     * function (Options $options, $value)
+     * </code>
+     *
+     * This closure will be evaluated once the option is read using
+     * {@link get()}. The closure has access to the resolved values of
+     * other options through the passed {@link Options} instance.
+     *
+     * @param string   $option     The name of the option.
+     * @param \Closure $normalizer The normalizer.
+     *
+     * @throws OptionDefinitionException If options have already been read.
+     *                                   Once options are read, the container
+     *                                   becomes immutable.
+     */
+    public function setNormalizer($option, \Closure $normalizer)
+    {
+        if ($this->reading) {
+            throw new OptionDefinitionException('Normalizers cannot be added anymore once options have been read.');
+        }
+
+        $this->normalizers[$option] = $normalizer;
+
+        // Each option for which a normalizer exists needs to be normalized
+        $this->normalization[$option] = true;
     }
 
     /**
@@ -149,9 +193,6 @@ class Options implements \ArrayAccess, \Iterator, \Countable
                 $currentValue = isset($this->options[$option]) ? $this->options[$option] : null;
                 $value = new LazyOption($value, $currentValue);
 
-                // Store locks for lazy options to detect cyclic dependencies
-                $this->lock[$option] = false;
-
                 // Store which options are lazy for more efficient resolving
                 $this->lazy[$option] = true;
 
@@ -162,7 +203,6 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         }
 
         // Reset lazy flag and locks by default
-        unset($this->lock[$option]);
         unset($this->lazy[$option]);
 
         $this->options[$option] = $value;
@@ -191,6 +231,10 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
         if (isset($this->lazy[$option])) {
             $this->resolve($option);
+        }
+
+        if (isset($this->normalization[$option])) {
+            $this->normalize($option);
         }
 
         return $this->options[$option];
@@ -224,7 +268,6 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         }
 
         unset($this->options[$option]);
-        unset($this->lock[$option]);
         unset($this->lazy[$option]);
     }
 
@@ -242,7 +285,6 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         }
 
         $this->options = array();
-        $this->lock = array();
         $this->lazy = array();
     }
 
@@ -257,16 +299,17 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     {
         $this->reading = true;
 
-        // Create a copy because resolve() modifies the array
-        $lazy = $this->lazy;
-
         // Performance-wise this is slightly better than
         // while (null !== $option = key($this->lazy))
-        foreach ($lazy as $option => $isLazy) {
-            // When resolve() is called, potentially multiple lazy options
-            // are evaluated, so check again if the option is still lazy.
+        foreach ($this->lazy as $option => $isLazy) {
             if (isset($this->lazy[$option])) {
                 $this->resolve($option);
+            }
+        }
+
+        foreach ($this->normalization as $option => $normalize) {
+            if (isset($this->normalization[$option])) {
+                $this->normalize($option);
             }
         }
 
@@ -388,7 +431,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * Evaluates the given option if it is a lazy option.
+     * Evaluates the given lazy option.
      *
      * The evaluated value is written into the options array. The closure for
      * evaluating the option is discarded afterwards.
@@ -400,7 +443,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      */
     private function resolve($option)
     {
-        if ($this->lock[$option]) {
+        if (isset($this->lock[$option])) {
             $conflicts = array();
 
             foreach ($this->lock as $option => $locked) {
@@ -414,9 +457,44 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
         $this->lock[$option] = true;
         $this->options[$option] = $this->options[$option]->evaluate($this);
-        $this->lock[$option] = false;
+        unset($this->lock[$option]);
 
         // The option now isn't lazy anymore
         unset($this->lazy[$option]);
+    }
+
+    /**
+     * Normalizes the given  option.
+     *
+     * The evaluated value is written into the options array.
+     *
+     * @param string $option The option to normalizer.
+     *
+     * @throws OptionDefinitionException If the option has a cyclic dependency
+     *                                   on another option.
+     */
+    private function normalize($option)
+    {
+        if (isset($this->lock[$option])) {
+            $conflicts = array();
+
+            foreach ($this->lock as $option => $locked) {
+                if ($locked) {
+                    $conflicts[] = $option;
+                }
+            }
+
+            throw new OptionDefinitionException('The options "' . implode('", "', $conflicts) . '" have a cyclic dependency.');
+        }
+
+        /** @var \Closure $normalizer */
+        $normalizer = $this->normalizers[$option];
+
+        $this->lock[$option] = true;
+        $this->options[$option] = $normalizer($this, $this->options[$option]);
+        unset($this->lock[$option]);
+
+        // The option is now normalized
+        unset($this->normalization[$option]);
     }
 }

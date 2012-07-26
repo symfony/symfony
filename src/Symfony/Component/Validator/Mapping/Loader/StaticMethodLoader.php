@@ -28,9 +28,10 @@ class StaticMethodLoader implements LoaderInterface
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {
+        /** @var \ReflectionClass $reflClass */
         $reflClass = $metadata->getReflectionClass();
 
-        if ($reflClass->hasMethod($this->methodName)) {
+        if (!$reflClass->isInterface() && $reflClass->hasMethod($this->methodName)) {
             $reflMethod = $reflClass->getMethod($this->methodName);
 
             if (!$reflMethod->isStatic()) {

@@ -17,21 +17,15 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class InteractiveLoginEvent extends Event
 {
-    /**
-     * @var Request
-     */
     private $request;
 
-    /**
-     * @var TokenInterface
-     */
     private $authenticationToken;
 
     /**
      * Constructor.
      *
-     * @param Request        $request
-     * @param TokenInterface $authenticationToken
+     * @param Request        $request             A Request instance
+     * @param TokenInterface $authenticationToken A TokenInterface instance
      */
     public function __construct(Request $request, TokenInterface $authenticationToken)
     {
@@ -42,7 +36,7 @@ class InteractiveLoginEvent extends Event
     /**
      * Gets the request.
      *
-     * @return Request
+     * @return Request A Request instance
      */
     public function getRequest()
     {
@@ -52,7 +46,7 @@ class InteractiveLoginEvent extends Event
     /**
      * Gets the authentication token.
      *
-     * @return TokenInterface
+     * @return TokenInterface A TokenInterface instance
      */
     public function getAuthenticationToken()
     {

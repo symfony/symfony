@@ -104,7 +104,7 @@ class ObjectChoiceList extends ChoiceList
 
             foreach ($choices as $i => $choice) {
                 if (is_array($choice)) {
-                    throw new \InvalidArgumentException('You should pass a plain object array (without groups, $code, $previous) when using the "groupPath" option.');
+                    throw new \InvalidArgumentException('You should pass a plain object array (without groups) when using the "groupPath" option.');
                 }
 
                 try {

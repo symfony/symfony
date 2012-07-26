@@ -181,7 +181,8 @@ class PdoSessionStorage extends NativeSessionStorage
             $sessionRows = $stmt->fetchAll(\PDO::FETCH_NUM);
 
             if (count($sessionRows) == 1) {
-                return base64_decode($sessionRows[0][0]);
+                $session = is_resource($sessionRows[0][0]) ? stream_get_contents($sessionRows[0][0]) : $sessionRows[0][0];
+                return base64_decode($session);
             }
 
             // session does not exist, create it

@@ -156,6 +156,23 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('dynamic', $this->options->get('foo'));
     }
 
+    public function testPreviousValueIsNotEvaluatedIfNoSecondArgument()
+    {
+        $test = $this;
+
+        // defined by superclass
+        $this->options->set('foo', function (Options $options) use ($test) {
+            $test->fail('Should not be called');
+        });
+
+        // defined by subclass, no $previousValue argument defined!
+        $this->options->overload('foo', function (Options $options) use ($test) {
+            return 'dynamic';
+        });
+
+        $this->assertEquals('dynamic', $this->options->get('foo'));
+    }
+
     public function testLazyOptionCanAccessOtherOptions()
     {
         $test = $this;

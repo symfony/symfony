@@ -526,6 +526,13 @@ class Form implements \IteratorAggregate, FormInterface
             return $this;
         }
 
+        // The data must be initialized if it was not initialized yet.
+        // This is necessary to guarantee that the *_SET_DATA listeners
+        // are always invoked before bind() takes place.
+        if (!$this->initialized) {
+            $this->setData($this->config->getData());
+        }
+
         // Don't convert NULL to a string here in order to determine later
         // whether an empty value has been submitted or whether no value has
         // been submitted at all. This is important for processing checkboxes
@@ -630,7 +637,6 @@ class Form implements \IteratorAggregate, FormInterface
         $this->viewData = $viewData;
         $this->extraData = $extraData;
         $this->synchronized = $synchronized;
-        $this->initialized = true;
 
         $event = new FormEvent($this, $viewData);
         $this->config->getEventDispatcher()->dispatch(FormEvents::POST_BIND, $event);

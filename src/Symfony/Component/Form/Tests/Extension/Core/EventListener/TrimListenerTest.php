@@ -60,10 +60,10 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
         $data = $data."ab\ncd".$data;
 
         $form  = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
-        $event = new FilterDataEvent($form, $data);
+        $event = new FormEvent($form, $data);
 
         $filter = new TrimListener();
-        $filter->onBindClientData($event);
+        $filter->preBind($event);
 
         $this->assertSame("ab\ncd", $event->getData(), 'TrimListener should trim character(s): '.$description.': '.implode(', ', $chars));
     }

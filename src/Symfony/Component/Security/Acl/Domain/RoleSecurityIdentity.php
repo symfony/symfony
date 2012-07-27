@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Acl\Domain;
 
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
-use Symfony\Component\Security\Core\Role\Role;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 
 /**
  * A SecurityIdentity implementation for roles
@@ -31,7 +31,7 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
      */
     public function __construct($role)
     {
-        if ($role instanceof Role) {
+        if ($role instanceof RoleInterface) {
             $role = $role->getRole();
         }
 

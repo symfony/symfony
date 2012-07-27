@@ -11,76 +11,40 @@
 
 namespace Symfony\Bridge\Propel1\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\Form\Event\DataEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Bridge\Propel1\Form\EventListener\TranslationCollectionFormListener;
 
 /**
  * form type for i18n-columns in propel
  *
  * @author Patrick Kaufmann
  */
-class TranslationCollectionType extends CollectionType
+class TranslationCollectionType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $languages = $options['languages'];
-        $i18nClass = $options['i18n_class'];
-
-        $options['options']['data_class'] = $i18nClass;
-        $options['options']['columns'] = $options['columns'];
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function(DataEvent $event) use ($builder, $languages, $i18nClass) {
-            $form = $event->getForm();
-            $data = $event->getData();
-
-            if ($data == null) {
-                return;
-            }
-
-            //get the class name of the i18nClass
-            $temp = explode('\\', $i18nClass);
-            $dataClass = end($temp);
-
-            $rootData = $form->getRoot()->getData();
-
-            //add a row for every needed language
-            foreach ($languages as $lang) {
-                $found = false;
-
-                foreach ($data as $i18n) {
-                    if ($i18n->getLocale() == $lang) {
-                        $found = true;
-                        break;
-                    }
-                }
-
-                if (!$found) {
-                    $newTranslation = new $i18nClass();
-                    $newTranslation->setLocale($lang);
-
-                    $addFunction = 'add'.$dataClass;
-                    $rootData->$addFunction($newTranslation);
-                }
-            }
-        });
-
-        parent::buildForm($builder, $options);
+        $listener = new TranslationCollectionFormListener($options['languages'], $options['options']['data_class']);
+        $builder->addEventSubscriber($listener);
     }
-
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
-        return 'translatable_collection';
+        return 'propel1_translatable_collection';
+    }
+
+    public function getParent()
+    {
+        return 'collection';
     }
 
     /**
@@ -88,12 +52,10 @@ class TranslationCollectionType extends CollectionType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        parent::setDefaultOptions($resolver);
         $resolver->setDefaults(array(
             'languages' => array(),
-            'i18n_class' => '',
             'columns' => array(),
-            'type' => 'translation_type',
+            'type' => 'propel1_translation',
             'allow_add' => false,
             'allow_delete' => false
         ));

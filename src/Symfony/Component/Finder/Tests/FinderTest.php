@@ -443,14 +443,14 @@ class FinderTest extends Iterator\RealIteratorTestCase
     /**
      * Searching in multiple locations involves AppendIterator which does an unnecessary rewind which leaves FilterIterator
      * with inner FilesystemIterator in an ivalid state.
+     *
+     * @see https://bugs.php.net/bug.php?id=49104
      */
     public function testMultipleLocations()
     {
-        $tmpDir = sys_get_temp_dir() . '/symfony2_finder';
-
         $locations = array(
-                $tmpDir . '/',
-                $tmpDir . '/toto/',
+            self::$tmpDir.'/',
+            self::$tmpDir.'/toto/',
         );
 
         // it is expected that there are test.py test.php in the tmpDir

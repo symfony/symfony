@@ -17,6 +17,18 @@ use Symfony\Component\Routing\Matcher\ApacheUrlMatcher;
 
 class ApacheUrlMatcherTest extends \PHPUnit_Framework_TestCase
 {
+    protected $server;
+
+    protected function setUp()
+    {
+        $this->server = $_SERVER;
+    }
+
+    protected function tearDown()
+    {
+        $_SERVER = $this->server;
+    }
+
     /**
      * @dataProvider getMatchData
      */

@@ -40,6 +40,14 @@ class RedirectResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo.bar', $response->getTargetUrl());
     }
 
+    public function testSetTargetUrl()
+    {
+        $response = new RedirectResponse('foo.bar');
+        $response->setTargetUrl('baz.beep');
+
+        $this->assertEquals('baz.beep', $response->getTargetUrl());
+    }
+
     public function testCreate()
     {
         $response = RedirectResponse::create('foo', 301);

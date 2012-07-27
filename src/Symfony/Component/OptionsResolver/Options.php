@@ -33,12 +33,6 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     private $normalizers = array();
 
     /**
-     * A list storing the names of all options that need to be normalized.
-     * @var array
-     */
-    private $normalization = array();
-
-    /**
      * A list storing the names of all LazyOption instances as keys.
      * @var array
      */
@@ -125,10 +119,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             throw new OptionDefinitionException('Normalizers cannot be added anymore once options have been read.');
         }
 
-        $this->normalizers[$option] = $normalizer;
-
         // Each option for which a normalizer exists needs to be normalized
-        $this->normalization[$option] = true;
+        $this->normalizers[$option] = $normalizer;
     }
 
     /**
@@ -233,7 +225,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             $this->resolve($option);
         }
 
-        if (isset($this->normalization[$option])) {
+        if (isset($this->normalizers[$option])) {
             $this->normalize($option);
         }
 
@@ -307,8 +299,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             }
         }
 
-        foreach ($this->normalization as $option => $normalize) {
-            if (isset($this->normalization[$option])) {
+        foreach ($this->normalizers as $option => $normalizer) {
+            if (isset($this->normalizers[$option])) {
                 $this->normalize($option);
             }
         }
@@ -495,6 +487,6 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         unset($this->lock[$option]);
 
         // The option is now normalized
-        unset($this->normalization[$option]);
+        unset($this->normalizers[$option]);
     }
 }

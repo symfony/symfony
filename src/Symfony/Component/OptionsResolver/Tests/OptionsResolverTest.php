@@ -633,4 +633,12 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             'three' => '3',
         ), $clone->resolve());
     }
+
+    public function testResolveOnAllowEmpty()
+    {
+        $this->resolver->setRequired(array('one'));
+        $this->resolver->setAllowEmpty(true);
+
+        $this->assertEquals(array(), $this->resolver->resolve(array()));
+    }
 }

@@ -54,6 +54,14 @@ class OptionsResolver implements OptionsResolverInterface
     private $allowedTypes = array();
 
     /**
+     * A flag to indicate whether the resolve phase should be ignored when the input
+     * array is empty
+     *
+     * @var bool
+     */
+    private $allowEmpty = false;
+
+    /**
      * Creates a new instance.
      */
     public function __construct()
@@ -196,6 +204,27 @@ class OptionsResolver implements OptionsResolverInterface
     }
 
     /**
+     * Updates the flag to allow empty input arrays to ignore the
+     * resolve phase
+     *
+     * @param boolean $allowEmpty
+     */
+    public function setAllowEmpty($allowEmpty)
+    {
+        $this->allowEmpty = $allowEmpty;
+    }
+
+    /**
+     * Returns the current value of the "allow empty" flag
+     *
+     * @return boolean
+     */
+    public function getAllowEmpty()
+    {
+        return $this->allowEmpty;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function isKnown($option)
@@ -216,6 +245,10 @@ class OptionsResolver implements OptionsResolverInterface
      */
     public function resolve(array $options = array())
     {
+        if ($this->getAllowEmpty() && !sizeof($options)) {
+            return $options;
+        }
+
         $this->validateOptionsExistence($options);
         $this->validateOptionsCompleteness($options);
 

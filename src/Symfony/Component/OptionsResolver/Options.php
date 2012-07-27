@@ -423,17 +423,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      */
     private function resolve($option)
     {
-        if (isset($this->lock[$option])) {
-            $conflicts = array();
-
-            foreach ($this->lock as $option => $locked) {
-                if ($locked) {
-                    $conflicts[] = $option;
-                }
-            }
-
-            throw new OptionDefinitionException('The options "' . implode('", "', $conflicts) . '" have a cyclic dependency.');
-        }
+        $this->checkCyclicDependency($option);
 
         $this->lock[$option] = true;
         $this->options[$option] = $this->options[$option]->evaluate($this);
@@ -441,7 +431,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * Normalizes the given  option.
+     * Normalizes the given option.
      *
      * The evaluated value is written into the options array.
      *
@@ -451,6 +441,28 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *                                   on another option.
      */
     private function normalize($option)
+    {
+        $this->checkCyclicDependency($option);
+
+        /** @var \Closure $normalizer */
+        $normalizer = $this->normalizers[$option];
+
+        $this->lock[$option] = true;
+        $this->options[$option] = $normalizer($this, $this->options[$option]);
+        unset($this->lock[$option]);
+
+        // The option is now normalized
+        unset($this->normalizers[$option]);
+    }
+
+    /**
+     * Checks if there is cyclic dependency for the option by examining the locks.
+     *
+     * @param string $option The option
+     *
+     * @throws OptionDefinitionException If there is a cyclic dependency for the option.
+     */
+    private function checkCyclicDependency($option)
     {
         if (isset($this->lock[$option])) {
             $conflicts = array();
@@ -463,15 +475,5 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
             throw new OptionDefinitionException('The options "' . implode('", "', $conflicts) . '" have a cyclic dependency.');
         }
-
-        /** @var \Closure $normalizer */
-        $normalizer = $this->normalizers[$option];
-
-        $this->lock[$option] = true;
-        $this->options[$option] = $normalizer($this, $this->options[$option]);
-        unset($this->lock[$option]);
-
-        // The option is now normalized
-        unset($this->normalizers[$option]);
     }
 }

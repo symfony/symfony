@@ -93,7 +93,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     {
         $test = $this;
 
-        $this->options->set('foo', function (Options $options) use ($test) {
+        $this->options->set('foo', function (Options $options) {
            return 'dynamic';
         });
 
@@ -166,7 +166,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         });
 
         // defined by subclass, no $previousValue argument defined!
-        $this->options->overload('foo', function (Options $options) use ($test) {
+        $this->options->overload('foo', function (Options $options) {
             return 'dynamic';
         });
 

@@ -200,9 +200,9 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Assert that the given test builder, will return the given value
-     * @param mixed $value      The value to test
-     * @param TreeBuilder $test The tree builder to finalize
-     * @param mixed $config     The config values that new to be finalized
+     * @param mixed       $value       The value to test
+     * @param TreeBuilder $treeBuilder The tree builder to finalize
+     * @param mixed       $config      The config values that new to be finalized
      */
     protected function assertFinalizedValueIs($value, $treeBuilder, $config=null)
     {

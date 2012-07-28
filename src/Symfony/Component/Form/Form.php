@@ -372,13 +372,16 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         $this->lockSetData = true;
+        $dispatcher = $this->config->getEventDispatcher();
 
         // Hook to change content of the data
-        $event = new FormEvent($this, $modelData);
-        $this->config->getEventDispatcher()->dispatch(FormEvents::PRE_SET_DATA, $event);
-        // BC until 2.3
-        $this->config->getEventDispatcher()->dispatch(FormEvents::SET_DATA, $event);
-        $modelData = $event->getData();
+        if ($dispatcher->hasListeners(FormEvents::PRE_SET_DATA) || $dispatcher->hasListeners(FormEvents::SET_DATA)) {
+            $event = new FormEvent($this, $modelData);
+            $dispatcher->dispatch(FormEvents::PRE_SET_DATA, $event);
+            // BC until 2.3
+            $dispatcher->dispatch(FormEvents::SET_DATA, $event);
+            $modelData = $event->getData();
+        }
 
         // Treat data as strings unless a value transformer exists
         if (!$this->config->getViewTransformers() && !$this->config->getModelTransformers() && is_scalar($modelData)) {
@@ -432,8 +435,10 @@ class Form implements \IteratorAggregate, FormInterface
             $this->config->getDataMapper()->mapDataToForms($viewData, $this->children);
         }
 
-        $event = new FormEvent($this, $modelData);
-        $this->config->getEventDispatcher()->dispatch(FormEvents::POST_SET_DATA, $event);
+        if ($dispatcher->hasListeners(FormEvents::POST_SET_DATA)) {
+            $event = new FormEvent($this, $modelData);
+            $dispatcher->dispatch(FormEvents::POST_SET_DATA, $event);
+        }
 
         return $this;
     }
@@ -549,13 +554,16 @@ class Form implements \IteratorAggregate, FormInterface
         $normData = null;
         $extraData = array();
         $synchronized = false;
+        $dispatcher = $this->config->getEventDispatcher();
 
         // Hook to change content of the data bound by the browser
-        $event = new FormEvent($this, $submittedData);
-        $this->config->getEventDispatcher()->dispatch(FormEvents::PRE_BIND, $event);
-        // BC until 2.3
-        $this->config->getEventDispatcher()->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
-        $submittedData = $event->getData();
+        if ($dispatcher->hasListeners(FormEvents::PRE_BIND) || $dispatcher->hasListeners(FormEvents::BIND_CLIENT_DATA)) {
+            $event = new FormEvent($this, $submittedData);
+            $dispatcher->dispatch(FormEvents::PRE_BIND, $event);
+            // BC until 2.3
+            $dispatcher->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
+            $submittedData = $event->getData();
+        }
 
         // By default, the submitted data is also the data in view format
         $viewData = $submittedData;
@@ -617,11 +625,13 @@ class Form implements \IteratorAggregate, FormInterface
 
             // Hook to change content of the data into the normalized
             // representation
-            $event = new FormEvent($this, $normData);
-            $this->config->getEventDispatcher()->dispatch(FormEvents::BIND, $event);
-            // BC until 2.3
-            $this->config->getEventDispatcher()->dispatch(FormEvents::BIND_NORM_DATA, $event);
-            $normData = $event->getData();
+            if ($dispatcher->hasListeners(FormEvents::BIND) || $dispatcher->hasListeners(FormEvents::BIND_NORM_DATA)) {
+                $event = new FormEvent($this, $normData);
+                $dispatcher->dispatch(FormEvents::BIND, $event);
+                // BC until 2.3
+                $dispatcher->dispatch(FormEvents::BIND_NORM_DATA, $event);
+                $normData = $event->getData();
+            }
 
             // Synchronize representations - must not change the content!
             $modelData = $this->normToModel($normData);
@@ -638,8 +648,10 @@ class Form implements \IteratorAggregate, FormInterface
         $this->extraData = $extraData;
         $this->synchronized = $synchronized;
 
-        $event = new FormEvent($this, $viewData);
-        $this->config->getEventDispatcher()->dispatch(FormEvents::POST_BIND, $event);
+        if ($dispatcher->hasListeners(FormEvents::POST_BIND)) {
+            $event = new FormEvent($this, $viewData);
+            $dispatcher->dispatch(FormEvents::POST_BIND, $event);
+        }
 
         foreach ($this->config->getValidators() as $validator) {
             $validator->validate($this);

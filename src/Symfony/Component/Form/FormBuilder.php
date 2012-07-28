@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderInterface
+class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormBuilderInterface
 {
     /**
      * The form factory.
@@ -56,6 +56,7 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
      * @param string                   $dataClass
      * @param EventDispatcherInterface $dispatcher
      * @param FormFactoryInterface     $factory
+     * @param array                    $options
      */
     public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory, array $options = array())
     {
@@ -77,6 +78,10 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
      */
     public function add($child, $type = null, array $options = array())
     {
+        if ($this->locked) {
+            throw new FormException('The form builder cannot be modified anymore.');
+        }
+
         if ($child instanceof self) {
             $child->setParent($this);
             $this->children[$child->getName()] = $child;
@@ -110,6 +115,10 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
      */
     public function create($name, $type = null, array $options = array())
     {
+        if ($this->locked) {
+            throw new FormException('The form builder cannot be modified anymore.');
+        }
+
         if (null === $type && null === $this->getDataClass()) {
             $type = 'text';
         }
@@ -142,6 +151,10 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
      */
     public function remove($name)
     {
+        if ($this->locked) {
+            throw new FormException('The form builder cannot be modified anymore.');
+        }
+
         unset($this->unresolvedChildren[$name]);
 
         if (array_key_exists($name, $this->children)) {
@@ -195,7 +208,7 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
     {
         $this->resolveChildren();
 
-        $form = new Form($this);
+        $form = new Form($this->getFormConfig());
 
         foreach ($this->children as $child) {
             $form->add($child->getForm());
@@ -217,6 +230,10 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
      */
     public function setParent(FormBuilderInterface $parent = null)
     {
+        if ($this->locked) {
+            throw new FormException('The form builder cannot be modified anymore.');
+        }
+
         $this->parent = $parent;
 
         return $this;

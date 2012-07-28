@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
 use Symfony\Component\Form\Extension\Core\EventListener\BindRequestListener;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormConfig;
+use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -96,7 +96,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $config = new FormConfig('author', null, $dispatcher);
+        $config = new FormConfigBuilder('author', null, $dispatcher);
         $form = new Form($config);
         $event = new FormEvent($form, $request);
 
@@ -123,7 +123,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $config = new FormConfig('', null, $dispatcher);
+        $config = new FormConfigBuilder('', null, $dispatcher);
         $form = new Form($config);
         $event = new FormEvent($form, $request);
 
@@ -150,7 +150,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $config = new FormConfig('author', null, $dispatcher);
+        $config = new FormConfigBuilder('author', null, $dispatcher);
         $config->setCompound(true);
         $config->setDataMapper($this->getMock('Symfony\Component\Form\DataMapperInterface'));
         $form = new Form($config);
@@ -177,7 +177,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $config = new FormConfig('author', null, $dispatcher);
+        $config = new FormConfigBuilder('author', null, $dispatcher);
         $config->setCompound(false);
         $form = new Form($config);
         $event = new FormEvent($form, $request);
@@ -201,7 +201,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $config = new FormConfig('author', null, $dispatcher);
+        $config = new FormConfigBuilder('author', null, $dispatcher);
         $form = new Form($config);
         $event = new FormEvent($form, $request);
 
@@ -225,7 +225,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $config = new FormConfig('', null, $dispatcher);
+        $config = new FormConfigBuilder('', null, $dispatcher);
         $form = new Form($config);
         $event = new FormEvent($form, $request);
 
@@ -249,7 +249,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $config = new FormConfig('author', null, $dispatcher);
+        $config = new FormConfigBuilder('author', null, $dispatcher);
         $config->setCompound(true);
         $config->setDataMapper($this->getMock('Symfony\Component\Form\DataMapperInterface'));
         $form = new Form($config);
@@ -272,7 +272,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $config = new FormConfig('author', null, $dispatcher);
+        $config = new FormConfigBuilder('author', null, $dispatcher);
         $config->setCompound(false);
         $form = new Form($config);
         $event = new FormEvent($form, $request);

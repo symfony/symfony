@@ -11,18 +11,25 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 
 /**
  * A basic form configuration.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormConfig implements FormConfigEditorInterface
+class FormConfigBuilder implements FormConfigBuilderInterface
 {
+    /**
+     * @var Boolean
+     */
+    protected $locked = false;
+
     /**
      * @var EventDispatcherInterface
      */
@@ -161,6 +168,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function addEventListener($eventName, $listener, $priority = 0)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->dispatcher->addListener($eventName, $listener, $priority);
 
         return $this;
@@ -171,6 +182,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function addEventSubscriber(EventSubscriberInterface $subscriber)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->dispatcher->addSubscriber($subscriber);
 
         return $this;
@@ -181,6 +196,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function addValidator(FormValidatorInterface $validator)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->validators[] = $validator;
 
         return $this;
@@ -191,6 +210,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function addViewTransformer(DataTransformerInterface $viewTransformer, $forcePrepend = false)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         if ($forcePrepend) {
             array_unshift($this->viewTransformers, $viewTransformer);
         } else {
@@ -205,6 +228,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function resetViewTransformers()
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->viewTransformers = array();
 
         return $this;
@@ -215,13 +242,17 @@ class FormConfig implements FormConfigEditorInterface
      *
      * @param DataTransformerInterface $viewTransformer
      *
-     * @return self The configuration object.
+     * @return FormConfigBuilder The configuration object.
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link addViewTransformer()} instead.
      */
     public function appendClientTransformer(DataTransformerInterface $viewTransformer)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         return $this->addViewTransformer($viewTransformer);
     }
 
@@ -230,25 +261,33 @@ class FormConfig implements FormConfigEditorInterface
      *
      * @param DataTransformerInterface $viewTransformer
      *
-     * @return self The configuration object.
+     * @return FormConfigBuilder The configuration object.
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function prependClientTransformer(DataTransformerInterface $viewTransformer)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         return $this->addViewTransformer($viewTransformer, true);
     }
 
     /**
      * Alias of {@link resetViewTransformers()}.
      *
-     * @return self The configuration object.
+     * @return FormConfigBuilder The configuration object.
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link resetViewTransformers()} instead.
      */
     public function resetClientTransformers()
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         return $this->resetViewTransformers();
     }
 
@@ -257,6 +296,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function addModelTransformer(DataTransformerInterface $modelTransformer, $forceAppend = false)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         if ($forceAppend) {
             $this->modelTransformers[] = $modelTransformer;
         } else {
@@ -271,6 +314,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function resetModelTransformers()
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->modelTransformers = array();
 
         return $this;
@@ -281,12 +328,16 @@ class FormConfig implements FormConfigEditorInterface
      *
      * @param DataTransformerInterface $modelTransformer
      *
-     * @return self The configuration object.
+     * @return FormConfigBuilder The configuration object.
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function appendNormTransformer(DataTransformerInterface $modelTransformer)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         return $this->addModelTransformer($modelTransformer, true);
     }
 
@@ -295,26 +346,34 @@ class FormConfig implements FormConfigEditorInterface
      *
      * @param DataTransformerInterface $modelTransformer
      *
-     * @return self The configuration object.
+     * @return FormConfigBuilder The configuration object.
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link addModelTransformer()} instead.
      */
     public function prependNormTransformer(DataTransformerInterface $modelTransformer)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         return $this->addModelTransformer($modelTransformer);
     }
 
     /**
      * Alias of {@link resetModelTransformers()}.
      *
-     * @return self The configuration object.
+     * @return FormConfigBuilder The configuration object.
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link resetModelTransformers()} instead.
      */
     public function resetNormTransformers()
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         return $this->resetModelTransformers();
     }
 
@@ -549,6 +608,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setAttribute($name, $value)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->attributes[$name] = $value;
 
         return $this;
@@ -559,6 +622,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setAttributes(array $attributes)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->attributes = $attributes;
 
         return $this;
@@ -569,6 +636,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setDataMapper(DataMapperInterface $dataMapper = null)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->dataMapper = $dataMapper;
 
         return $this;
@@ -579,6 +650,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setDisabled($disabled)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->disabled = (Boolean) $disabled;
 
         return $this;
@@ -589,6 +664,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setEmptyData($emptyData)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->emptyData = $emptyData;
 
         return $this;
@@ -599,6 +678,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setErrorBubbling($errorBubbling)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->errorBubbling = null === $errorBubbling ? null : (Boolean) $errorBubbling;
 
         return $this;
@@ -609,6 +692,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setRequired($required)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->required = (Boolean) $required;
 
         return $this;
@@ -619,6 +706,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setPropertyPath($propertyPath)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         if (null !== $propertyPath && !$propertyPath instanceof PropertyPath) {
             $propertyPath = new PropertyPath($propertyPath);
         }
@@ -633,6 +724,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setMapped($mapped)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->mapped = $mapped;
 
         return $this;
@@ -643,6 +738,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setByReference($byReference)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->byReference = $byReference;
 
         return $this;
@@ -653,6 +752,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setVirtual($virtual)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->virtual = $virtual;
 
         return $this;
@@ -663,6 +766,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setCompound($compound)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->compound = $compound;
 
         return $this;
@@ -673,6 +780,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setType(ResolvedFormTypeInterface $type)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->type = $type;
 
         return $this;
@@ -683,6 +794,10 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setData($data)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->data = $data;
 
         return $this;
@@ -693,9 +808,29 @@ class FormConfig implements FormConfigEditorInterface
      */
     public function setDataLocked($locked)
     {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
         $this->dataLocked = $locked;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormConfig()
+    {
+        // This method should be idempotent, so clone the builder
+        $config = clone $this;
+        $config->locked = true;
+
+        if (!$config->dispatcher instanceof ImmutableEventDispatcher) {
+            $config->dispatcher = new ImmutableEventDispatcher($config->dispatcher);
+        }
+
+        return $config;
     }
 
     /**

@@ -205,6 +205,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             if (!array_key_exists($name, $value)) {
                 if ($child->isRequired()) {
                     $msg = sprintf('The child node "%s" at path "%s" must be configured.', $name, $this->getPath());
+                    if (null !== $this->getInfo()) {
+                        $msg .= sprintf("\nHint: %s.", $this->getInfo());
+                    }
                     $ex = new InvalidConfigurationException($msg);
                     $ex->setPath($this->getPath());
 
@@ -238,11 +241,15 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected function validateType($value)
     {
         if (!is_array($value) && (!$this->allowFalse || false !== $value)) {
-            $ex = new InvalidTypeException(sprintf(
+            $msg = sprintf(
                 'Invalid type for path "%s". Expected array, but got %s',
                 $this->getPath(),
                 gettype($value)
-            ));
+            );
+            if (null !== $this->getInfo()) {
+                $msg .= sprintf("\nHint: %s.", $this->getInfo());
+            }
+            $ex = new InvalidTypeException($msg);
             $ex->setPath($this->getPath());
 
             throw $ex;
@@ -275,6 +282,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         // if extra fields are present, throw exception
         if (count($value) && !$this->ignoreExtraKeys) {
             $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', array_keys($value)), $this->getPath());
+            if (null !== $this->getInfo()) {
+                $msg .= sprintf("\nHint: %s.", $this->getInfo());
+            }
             $ex = new InvalidConfigurationException($msg);
             $ex->setPath($this->getPath());
 

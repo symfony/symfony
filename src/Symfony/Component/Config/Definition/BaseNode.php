@@ -287,11 +287,15 @@ abstract class BaseNode implements NodeInterface
             } catch (Exception $correctEx) {
                 throw $correctEx;
             } catch (\Exception $invalid) {
-                throw new InvalidConfigurationException(sprintf(
+                $message = sprintf(
                     'Invalid configuration for path "%s": %s',
                     $this->getPath(),
                     $invalid->getMessage()
-                ), $invalid->getCode(), $invalid);
+                );
+                if (null !== $this->getInfo()) {
+                    $message .= sprintf("\nHint: %s.", $this->getInfo());
+                }
+                throw new InvalidConfigurationException($message, $invalid->getCode(), $invalid);
             }
         }
 

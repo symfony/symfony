@@ -45,6 +45,9 @@ class NumericNode extends ScalarNode
             $errorMsg = sprintf('The value %s is too big for path "%s". Should be less than: %s', $value, $this->getPath(), $this->max);
         }
         if (isset($errorMsg)) {
+            if (null !== $this->getInfo()) {
+                $errorMsg .= sprintf("\nHint: %s.", $this->getInfo());
+            }
             $ex = new InvalidConfigurationException($errorMsg);
             $ex->setPath($this->getPath());
             throw $ex;

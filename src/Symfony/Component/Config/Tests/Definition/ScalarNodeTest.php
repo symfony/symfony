@@ -57,4 +57,42 @@ class ScalarNodeTest extends \PHPUnit_Framework_TestCase
             array(new \stdClass()),
         );
     }
+
+    public function testNormalizeThrowsExceptionWithoutErrorMessage()
+    {
+        $value = array(array('foo' => 'bar'));
+        $node = new ScalarNode('test');
+
+        $expectedMessage = sprintf(
+            'Invalid type for path "%s". Expected scalar, but got %s.',
+            $node->getPath(),
+            gettype($value)
+        );
+
+        $this->setExpectedException(
+            'Symfony\Component\Config\Definition\Exception\InvalidTypeException', $expectedMessage
+        );
+
+        $node->normalize($value);
+    }
+
+    public function testNormalizeThrowsExceptionWithErrorMessage()
+    {
+        $value = array(array('foo' => 'bar'));
+        $node = new ScalarNode('test');
+        $node->setInfo('This is a custom error message');
+
+        $expectedMessage = sprintf(
+            'Invalid type for path "%s". Expected scalar, but got %s.'.
+                "\nHint: ".$node->getInfo(),
+            $node->getPath(),
+            gettype($value)
+        );
+
+        $this->setExpectedException(
+            'Symfony\Component\Config\Definition\Exception\InvalidTypeException', $expectedMessage
+        );
+
+        $node->normalize($value);
+    }
 }

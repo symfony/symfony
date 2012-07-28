@@ -262,12 +262,12 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      * Iterates over the constraints of a property, executes a constraints on
      * them and returns the best guess
      *
-     * @param string   $class    The class to read the constraints from
-     * @param string   $property The property for which to find constraints
-     * @param \Closure $closure  The closure that returns a guess
-     *                             for a given constraint
-     * @param mixed $default The default value assumed if no other value
-     *                             can be guessed.
+     * @param string   $class        The class to read the constraints from
+     * @param string   $property     The property for which to find constraints
+     * @param \Closure $closure      The closure that returns a guess
+     *                               for a given constraint
+     * @param mixed    $defaultValue The default value assumed if no other value
+     *                               can be guessed.
      *
      * @return Guess The guessed value with the highest confidence
      */

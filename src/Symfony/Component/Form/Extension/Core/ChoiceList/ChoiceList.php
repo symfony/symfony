@@ -496,7 +496,7 @@ class ChoiceList implements ChoiceListInterface
     /**
     * Fixes the data type of the given choices to avoid comparison problems.
      *
-    * @param array $choice The choices.
+    * @param array $choices The choices.
     *
     * @return array The fixed choices.
     *

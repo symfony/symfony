@@ -525,7 +525,7 @@ class Process
      *
      * @param float $timeout The timeout in seconds
      *
-     * @return int The exitcode of the process
+     * @return integer The exitcode of the process
      *
      * @throws \RuntimeException if the process got signaled
      */

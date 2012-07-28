@@ -31,7 +31,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->filesystem = new Filesystem();
-        $this->workspace = sys_get_temp_dir().DIRECTORY_SEPARATOR.time().rand(0, 1000);
+        $this->workspace = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.time().rand(0, 1000);
         mkdir($this->workspace, 0777, true);
     }
 
@@ -319,7 +319,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         mkdir($basePath);
         mkdir($basePath.'dir');
         // create symlink to unexisting file
-        symlink($basePath.'file', $basePath.'link');
+        @symlink($basePath.'file', $basePath.'link');
 
         $this->filesystem->remove($basePath);
 
@@ -700,6 +700,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         $link1 = $this->workspace.DIRECTORY_SEPARATOR.'dir'.DIRECTORY_SEPARATOR.'link';
         $link2 = $this->workspace.DIRECTORY_SEPARATOR.'dir'.DIRECTORY_SEPARATOR.'subdir'.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
 
         $this->filesystem->symlink($file, $link1);
         $this->filesystem->symlink($file, $link2);

@@ -139,9 +139,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
             }
 
-            // overriden
+            // overridden
             if (preg_match('#^/a/(?<var>.*)$#s', $pathinfo, $matches)) {
-                $matches['_route'] = 'overriden';
+                $matches['_route'] = 'overridden';
 
                 return $matches;
             }
@@ -171,9 +171,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 return array_merge($this->mergeDefaults($matches, array (  'who' => 'World!',)), array('_route' => 'helloWorld'));
             }
 
-            // overriden2
+            // overridden2
             if ($pathinfo === '/multi/new') {
-                return array('_route' => 'overriden2');
+                return array('_route' => 'overridden2');
             }
 
             // hey

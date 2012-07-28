@@ -180,7 +180,7 @@ class Process
      * the output in real-time while writing the standard input to the process.
      * It allows to have feedback from the independent process during execution.
      * If there is no callback passed, the wait() method can be called
-     * with true as a second parameter then the callback will get all data occured
+     * with true as a second parameter then the callback will get all data occurred
      * in (and since) the start call.
      *
      * @param Closure|string|array $callback A PHP callback to run whenever there is some
@@ -662,8 +662,8 @@ class Process
     /**
      * Builds up the callback used by wait().
      *
-     * The callbacks adds all occured output to the specific buffer and calls
-     * the usercallback (if present) with the received output.
+     * The callbacks adds all occurred output to the specific buffer and calls
+     * the user callback (if present) with the received output.
      *
      * @param mixed $callback The user defined PHP callback
      *

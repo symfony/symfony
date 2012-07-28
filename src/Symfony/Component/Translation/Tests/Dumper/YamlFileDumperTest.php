@@ -30,7 +30,7 @@ class YamlFileDumperTest extends \PHPUnit_Framework_TestCase
 
         $tempDir = sys_get_temp_dir();
         $dumper = new YamlFileDumper();
-        $dumperString = $dumper->dump($catalogue, array('path' => $tempDir));
+        $dumper->dump($catalogue, array('path' => $tempDir));
 
         $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.yml'), file_get_contents($tempDir.'/messages.en.yml'));
 

@@ -178,7 +178,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('_route' => 'foo', 'foo' => "\n"), $matcher->match('/'.urlencode("\n").'/bar'), 'linefeed character is matched');
     }
 
-    public function testMatchOverridenRoute()
+    public function testMatchOverriddenRoute()
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));

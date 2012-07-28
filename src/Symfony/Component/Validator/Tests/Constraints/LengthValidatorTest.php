@@ -108,7 +108,7 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidValuesMin($value, $mbOnly = false)
     {
         if ($mbOnly && !function_exists('mb_strlen')) {
-            return $this->markTestSkipped('mb_strlen does not exist');
+            $this->markTestSkipped('mb_strlen does not exist');
         }
 
         $this->context->expects($this->never())
@@ -124,7 +124,7 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidValuesMax($value, $mbOnly = false)
     {
         if ($mbOnly && !function_exists('mb_strlen')) {
-            return $this->markTestSkipped('mb_strlen does not exist');
+            $this->markTestSkipped('mb_strlen does not exist');
         }
 
         $this->context->expects($this->never())
@@ -140,7 +140,7 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidValuesExact($value, $mbOnly = false)
     {
         if ($mbOnly && !function_exists('mb_strlen')) {
-            return $this->markTestSkipped('mb_strlen does not exist');
+            $this->markTestSkipped('mb_strlen does not exist');
         }
 
         $this->context->expects($this->never())
@@ -156,7 +156,7 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
     public function testInvalidValuesMin($value, $mbOnly = false)
     {
         if ($mbOnly && !function_exists('mb_strlen')) {
-            return $this->markTestSkipped('mb_strlen does not exist');
+            $this->markTestSkipped('mb_strlen does not exist');
         }
 
         $constraint = new Length(array(
@@ -180,7 +180,7 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
     public function testInvalidValuesMax($value, $mbOnly = false)
     {
         if ($mbOnly && !function_exists('mb_strlen')) {
-            return $this->markTestSkipped('mb_strlen does not exist');
+            $this->markTestSkipped('mb_strlen does not exist');
         }
 
         $constraint = new Length(array(
@@ -204,7 +204,7 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
     public function testInvalidValuesExact($value, $mbOnly = false)
     {
         if ($mbOnly && !function_exists('mb_strlen')) {
-            return $this->markTestSkipped('mb_strlen does not exist');
+            $this->markTestSkipped('mb_strlen does not exist');
         }
 
         $constraint = new Length(array(

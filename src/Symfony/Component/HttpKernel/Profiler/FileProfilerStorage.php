@@ -205,7 +205,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
      *
      * @param resource $file The file resource, with the pointer placed at the end of the line to read
      *
-     * @return mixed A string representating the line or FALSE if beginning of file is reached
+     * @return mixed A string representing the line or FALSE if beginning of file is reached
      */
     protected function readLineFromFile($file)
     {

@@ -173,7 +173,7 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function setId($id)
     {
-        return $this->saveHandler->setId($id);
+        $this->saveHandler->setId($id);
     }
 
     /**

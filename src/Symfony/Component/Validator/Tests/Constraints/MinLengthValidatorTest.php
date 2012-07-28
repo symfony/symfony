@@ -62,7 +62,7 @@ class MinLengthValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidValues($value, $mbOnly = false)
     {
         if ($mbOnly && !function_exists('mb_strlen')) {
-            return $this->markTestSkipped('mb_strlen does not exist');
+            $this->markTestSkipped('mb_strlen does not exist');
         }
 
         $this->context->expects($this->never())
@@ -88,7 +88,7 @@ class MinLengthValidatorTest extends \PHPUnit_Framework_TestCase
     public function testInvalidValues($value, $mbOnly = false)
     {
         if ($mbOnly && !function_exists('mb_strlen')) {
-            return $this->markTestSkipped('mb_strlen does not exist');
+            $this->markTestSkipped('mb_strlen does not exist');
         }
 
         $constraint = new MinLength(array(

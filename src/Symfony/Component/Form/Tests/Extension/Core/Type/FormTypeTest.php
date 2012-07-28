@@ -206,7 +206,7 @@ class FormTypeTest extends TypeTestCase
         $this->assertEquals('test', $view['child']->vars['translation_domain']);
     }
 
-    public function testNonTranlsationDomainFormWithNonTranslationDomainParentBeingTranslationDomainDefault()
+    public function testNonTranslationDomainFormWithNonTranslationDomainParentBeingTranslationDomainDefault()
     {
         $parent = $this->factory->createNamed('parent', 'form');
         $child  = $this->factory->createNamed('child', 'form');

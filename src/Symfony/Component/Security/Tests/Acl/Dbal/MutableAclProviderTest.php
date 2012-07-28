@@ -267,7 +267,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
         $provider->updateAcl($acl);
     }
 
-    public function testUpdateAclThrowsExceptionOnConcurrentModifcationOfSharedProperties()
+    public function testUpdateAclThrowsExceptionOnConcurrentModificationOfSharedProperties()
     {
         $provider = $this->getProvider();
         $acl1 = $provider->createAcl(new ObjectIdentity(1, 'Foo'));

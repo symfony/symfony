@@ -308,7 +308,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     {
         // It is ensured by the adders (->add and ->addCollection) that there can
         // only be one route per name in all connected collections. So we can stop
-        // interating recursively on the first hit.
+        // iterating recursively on the first hit.
         if (isset($this->routes[$name])) {
             unset($this->routes[$name]);
 

@@ -141,7 +141,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->with($type)
             ->will($this->returnValue($resolvedType));
 
-        // The type is also implicitely added to the registry
+        // The type is also implicitly added to the registry
         $this->registry->expects($this->once())
             ->method('addType')
             ->with($resolvedType);
@@ -159,7 +159,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $options = array('a' => '1', 'b' => '2');
         $resolvedType = $this->getMockResolvedType();
 
-        // The type is also implicitely added to the registry
+        // The type is also implicitly added to the registry
         $this->registry->expects($this->once())
             ->method('addType')
             ->with($resolvedType);

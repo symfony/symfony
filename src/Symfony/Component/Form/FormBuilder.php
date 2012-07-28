@@ -56,6 +56,7 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
      * @param string                   $dataClass
      * @param EventDispatcherInterface $dispatcher
      * @param FormFactoryInterface     $factory
+     * @param array                    $options
      */
     public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory, array $options = array())
     {

@@ -116,7 +116,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             ->getForm()
             ->createView();
 
-        // Render field2 row -> does not implicitely call renderWidget because
+        // Render field2 row -> does not implicitly call renderWidget because
         // it is a repeated field!
         $this->renderRow($view['field2']);
 

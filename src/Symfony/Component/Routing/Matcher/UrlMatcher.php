@@ -151,7 +151,7 @@ class UrlMatcher implements UrlMatcherInterface
      *
      * @param string $pathinfo The path
      * @param string $name     The route name
-     * @param string $route    The route
+     * @param Route  $route    The route
      *
      * @return array The first element represents the status, the second contains additional information
      */

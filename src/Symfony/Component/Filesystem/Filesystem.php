@@ -27,9 +27,9 @@ class Filesystem
      *
      * By default, if the target already exists, it is not overridden.
      *
-     * @param string $originFile The original filename
-     * @param string $targetFile The target filename
-     * @param array  $override   Whether to override an existing file or not
+     * @param string  $originFile The original filename
+     * @param string  $targetFile The target filename
+     * @param boolean $override   Whether to override an existing file or not
      *
      * @throws IOException When copy fails
      */

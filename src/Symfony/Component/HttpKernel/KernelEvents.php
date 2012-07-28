@@ -93,7 +93,7 @@ final class KernelEvents
     const RESPONSE = 'kernel.response';
 
     /**
-     * The TERMINATE event occurs once a reponse was sent
+     * The TERMINATE event occurs once a response was sent
      *
      * This event allows you to run expensive post-response jobs.
      * The event listener method receives a

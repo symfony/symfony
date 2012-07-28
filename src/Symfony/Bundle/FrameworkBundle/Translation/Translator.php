@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
 
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Config\ConfigCache;
 
@@ -75,29 +76,31 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
-    protected function loadCatalogue($locale)
+    protected function loadCatalogue($locale, $domain)
     {
-        if (isset($this->catalogues[$locale])) {
+        if (isset($this->catalogues[$locale]) && $this->catalogues[$locale]->hasDomain($domain)) {
             return;
         }
 
         if (null === $this->options['cache_dir']) {
             $this->initialize();
 
-            return parent::loadCatalogue($locale);
+            return parent::loadCatalogue($locale, $domain);
         }
 
-        $cache = new ConfigCache($this->options['cache_dir'].'/catalogue.'.$locale.'.php', $this->options['debug']);
+        $cache = new ConfigCache($this->options['cache_dir'].'/'.$locale.'/'.$domain.'.php', $this->options['debug']);
         if (!$cache->isFresh()) {
             $this->initialize();
 
-            parent::loadCatalogue($locale);
+            parent::loadCatalogue($locale, $domain);
 
             $fallbackContent = '';
             $current = '';
             foreach ($this->computeFallbackLocales($locale) as $fallback) {
                 $fallbackContent .= sprintf(<<<EOF
-\$catalogue%s = new MessageCatalogue('%s', %s);
+\$catalogue%s = new MessageCatalogue('%s', array(
+  '%s' => %s
+ ));
 \$catalogue%s->addFallbackCatalogue(\$catalogue%s);
 
 
@@ -105,7 +108,8 @@ EOF
                     ,
                     ucfirst($fallback),
                     $fallback,
-                    var_export($this->catalogues[$fallback]->all(), true),
+                    $domain,
+                    var_export($this->catalogues[$fallback]->all($domain), true),
                     ucfirst($current),
                     ucfirst($fallback)
                 );
@@ -117,15 +121,15 @@ EOF
 
 use Symfony\Component\Translation\MessageCatalogue;
 
-\$catalogue = new MessageCatalogue('%s', %s);
+\$catalogue->add(%s, '%s');
 
 %s
 return \$catalogue;
 
 EOF
                 ,
-                $locale,
-                var_export($this->catalogues[$locale]->all(), true),
+                var_export($this->catalogues[$locale]->all($domain), true),
+                $domain,
                 $fallbackContent
             );
 
@@ -134,6 +138,12 @@ EOF
             return;
         }
 
+        if(!isset($this->catalogues[$locale])){
+            $catalogue = new MessageCatalogue($locale);
+        } else {
+            $catalogue = $this->catalogues[$locale];
+        }
+        
         $this->catalogues[$locale] = include $cache;
     }
 

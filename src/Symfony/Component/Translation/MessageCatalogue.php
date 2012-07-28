@@ -64,6 +64,18 @@ class MessageCatalogue implements MessageCatalogueInterface
     }
 
     /**
+     * Checks if catalogue has a given domain.
+     *
+     * @param string $domain
+     *
+     * @return Boolean
+     */
+    public function hasDomain($domain)
+    {
+        return isset($this->messages[$domain]);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @api

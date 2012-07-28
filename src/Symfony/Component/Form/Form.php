@@ -146,10 +146,6 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function __construct(FormConfigInterface $config)
     {
-        if (!$config instanceof ImmutableFormConfig) {
-            $config = new ImmutableFormConfig($config);
-        }
-
         // Compound forms always need a data mapper, otherwise calls to
         // `setData` and `add` will not lead to the correct population of
         // the child forms.
@@ -170,7 +166,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the configuration of the form.
      *
-     * @return ImmutableFormConfig The form's immutable configuration.
+     * @return FormConfigInterface The form's configuration.
      */
     public function getConfig()
     {

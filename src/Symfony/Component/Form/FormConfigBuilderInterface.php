@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface FormConfigEditorInterface extends FormConfigInterface
+interface FormConfigBuilderInterface extends FormConfigInterface
 {
     /**
      * Adds an event listener to an event on this form.
@@ -240,4 +240,11 @@ interface FormConfigEditorInterface extends FormConfigInterface
      * @return self The configuration object.
      */
     public function setDataLocked($locked);
+
+    /**
+     * Builds and returns the form configuration.
+     *
+     * @return FormConfigInterface
+     */
+    public function getFormConfig();
 }

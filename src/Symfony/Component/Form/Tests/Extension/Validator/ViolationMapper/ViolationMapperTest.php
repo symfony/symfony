@@ -15,7 +15,7 @@ use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormConfig;
+use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -67,7 +67,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
     protected function getForm($name = 'name', $propertyPath = null, $dataClass = null, $errorMapping = array(), $virtual = false, $synchronized = true)
     {
-        $config = new FormConfig($name, $dataClass, $this->dispatcher, array(
+        $config = new FormConfigBuilder($name, $dataClass, $this->dispatcher, array(
             'error_mapping' => $errorMapping,
         ));
         $config->setMapped(true);

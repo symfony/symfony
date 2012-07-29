@@ -93,7 +93,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     {
         $test = $this;
 
-        $this->options->set('foo', function (Options $options) use ($test) {
+        $this->options->set('foo', function (Options $options) {
            return 'dynamic';
         });
 
@@ -166,7 +166,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         });
 
         // defined by subclass, no $previousValue argument defined!
-        $this->options->overload('foo', function (Options $options) use ($test) {
+        $this->options->overload('foo', function (Options $options) {
             return 'dynamic';
         });
 
@@ -458,8 +458,58 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     {
         $this->options->set('foo', 'bar');
         $this->options->set('foo1', 'bar1');
+
         $expectedResult = array('foo' => 'bar', 'foo1' => 'bar1');
 
         $this->assertEquals($expectedResult, iterator_to_array($this->options, true));
+    }
+
+    /**
+     * Calls the methods of the Options class many times.
+     *
+     * @group benchmark
+     */
+    public function testPerformance()
+    {
+        $s = microtime(true);
+
+        for ($n = 0; $n < 1000; $n++) {
+            for ($i = 0; $i < 50; $i++) {
+                $this->options->set('temp'.$i, 'foo');
+            }
+            $this->options->clear();
+        }
+
+        for ($i = 0; $i < 5000; $i++) {
+            $this->options->overload('static', function (Options $options) {
+                return 'test';
+            });
+            $this->options->set('static', 'bar');
+            $this->options->setNormalizer('static', function (Options $options) {
+                return 'BAR';
+            });
+
+            $this->options->set('foo', 'bar');
+            $this->options->remove('foo');
+
+            $opt = 'opt'.($i % 300);
+            $this->options->overload($opt, 'bar');
+            $this->options->overload($opt, function (Options $options, $previousValue) {
+                return $previousValue . 'test';
+
+            });
+            $this->options->setNormalizer($opt, function (Options $options, $previousValue) {
+                return $previousValue . $options->get('static');
+            });
+        }
+
+        for ($i = 0; $i < 3000; $i++) {
+            $this->options->get('opt0');
+            $this->options->all();
+            $this->options->get('opt'.($i % 300));
+        }
+
+        $time = microtime(true) - $s;
+        $this->assertTrue($time < 1);
     }
 }

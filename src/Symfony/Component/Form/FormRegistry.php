@@ -38,13 +38,19 @@ class FormRegistry implements FormRegistryInterface
     private $guesser;
 
     /**
+     * @var ResolvedFormTypeFactoryInterface
+     */
+    private $resolvedTypeFactory;
+
+    /**
      * Constructor.
      *
-     * @param array $extensions An array of FormExtensionInterface
+     * @param array                            $extensions          An array of FormExtensionInterface
+     * @param ResolvedFormTypeFactoryInterface $resolvedTypeFactory The factory for resolved form types.
      *
      * @throws UnexpectedTypeException if any extension does not implement FormExtensionInterface
      */
-    public function __construct(array $extensions)
+    public function __construct(array $extensions, ResolvedFormTypeFactoryInterface $resolvedTypeFactory)
     {
         foreach ($extensions as $extension) {
             if (!$extension instanceof FormExtensionInterface) {
@@ -53,26 +59,7 @@ class FormRegistry implements FormRegistryInterface
         }
 
         $this->extensions = $extensions;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function resolveType(FormTypeInterface $type)
-    {
-        $typeExtensions = array();
-
-        foreach ($this->extensions as $extension) {
-            /* @var FormExtensionInterface $extension */
-            $typeExtensions = array_merge(
-                $typeExtensions,
-                $extension->getTypeExtensions($type->getName())
-            );
-        }
-
-        $parent = $type->getParent() ? $this->getType($type->getParent()) : null;
-
-        return new ResolvedFormType($type, $typeExtensions, $parent);
+        $this->resolvedTypeFactory = $resolvedTypeFactory;
     }
 
     /**
@@ -93,6 +80,7 @@ class FormRegistry implements FormRegistryInterface
         }
 
         if (!isset($this->types[$name])) {
+            /** @var FormTypeInterface $type */
             $type = null;
 
             foreach ($this->extensions as $extension) {
@@ -107,7 +95,22 @@ class FormRegistry implements FormRegistryInterface
                 throw new FormException(sprintf('Could not load type "%s"', $name));
             }
 
-            $this->addType($this->resolveType($type));
+            $parentType = $type->getParent();
+            $typeExtensions = array();
+
+            foreach ($this->extensions as $extension) {
+                /* @var FormExtensionInterface $extension */
+                $typeExtensions = array_merge(
+                    $typeExtensions,
+                    $extension->getTypeExtensions($name)
+                );
+            }
+
+            $this->addType($this->resolvedTypeFactory->createResolvedType(
+                $type,
+                $typeExtensions,
+                $parentType ? $this->getType($parentType) : null
+            ));
         }
 
         return $this->types[$name];

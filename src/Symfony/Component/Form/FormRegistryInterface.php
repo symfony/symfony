@@ -22,6 +22,10 @@ interface FormRegistryInterface
      * Adds a form type.
      *
      * @param ResolvedFormTypeInterface $type The type
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             form extensions or type registration in the Dependency
+     *             Injection Container instead.
      */
     public function addType(ResolvedFormTypeInterface $type);
 
@@ -47,18 +51,6 @@ interface FormRegistryInterface
      * @return Boolean Whether the type is supported
      */
     public function hasType($name);
-
-    /**
-     * Resolves a form type.
-     *
-     * @param FormTypeInterface $type
-     *
-     * @return ResolvedFormTypeInterface
-     *
-     * @throws Exception\UnexpectedTypeException if the types parent {@link FormTypeInterface::getParent()} is not a string
-     * @throws Exception\FormException           if the types parent can not be retrieved from any extension
-     */
-    public function resolveType(FormTypeInterface $type);
 
     /**
      * Returns the guesser responsible for guessing types.

@@ -131,7 +131,7 @@ class FormRenderer implements FormRendererInterface
      */
     public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = array())
     {
-        $renderOnlyOnce = in_array($blockNameSuffix, array('row', 'widget'));
+        $renderOnlyOnce = 'row' === $blockNameSuffix || 'widget' === $blockNameSuffix;
 
         if ($renderOnlyOnce && $view->isRendered()) {
             return '';

@@ -66,7 +66,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             // the top level
             $dom->loadXml('<root>'.$html.'</root>');
         } catch (\Exception $e) {
-            return $this->fail(sprintf(
+            $this->fail(sprintf(
                 "Failed loading HTML:\n\n%s\n\nError: %s",
                 $html,
                 $e->getMessage()

@@ -587,9 +587,9 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * Searches for add and remove methods.
      *
      * @param \ReflectionClass $reflClass The reflection class for the given object
-     * @param string|null      $singular  The singular form of the property name or null.
+     * @param string|null      $singulars The singular form of the property name or null.
      *
-     * @return array|null An array containin the adder and remover when found, null otherwise.
+     * @return array|null An array containing the adder and remover when found, null otherwise.
      *
      * @throws InvalidPropertyException      If the property does not exist.
      */

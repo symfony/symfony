@@ -37,7 +37,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection->add('f o o', $route);
     }
 
-    public function testOverridenRoute()
+    public function testOverriddenRoute()
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));
@@ -46,7 +46,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo1', $collection->get('foo')->getPattern());
     }
 
-    public function testDeepOverridenRoute()
+    public function testDeepOverriddenRoute()
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));
@@ -64,7 +64,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo2', $collection->get('foo')->getPattern());
     }
 
-    public function testIteratorWithOverridenRoutes()
+    public function testIteratorWithOverriddenRoutes()
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));

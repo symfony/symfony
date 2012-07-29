@@ -388,8 +388,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->chmod($file, 0400);
         $this->filesystem->chmod($dir, 0753);
 
-        $this->assertEquals(753, $this->getFilePermisions($dir));
-        $this->assertEquals(400, $this->getFilePermisions($file));
+        $this->assertEquals(753, $this->getFilePermissions($dir));
+        $this->assertEquals(400, $this->getFilePermissions($file));
     }
 
     public function testChmodWrongMod()
@@ -414,8 +414,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->chmod($file, 0400, 0000, true);
         $this->filesystem->chmod($dir, 0753, 0000, true);
 
-        $this->assertEquals(753, $this->getFilePermisions($dir));
-        $this->assertEquals(753, $this->getFilePermisions($file));
+        $this->assertEquals(753, $this->getFilePermissions($dir));
+        $this->assertEquals(753, $this->getFilePermissions($file));
     }
 
     public function testChmodAppliesUmask()
@@ -426,7 +426,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         touch($file);
 
         $this->filesystem->chmod($file, 0770, 0022);
-        $this->assertEquals(750, $this->getFilePermisions($file));
+        $this->assertEquals(750, $this->getFilePermissions($file));
     }
 
     public function testChmodChangesModeOfArrayOfFiles()
@@ -442,8 +442,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->filesystem->chmod($files, 0753);
 
-        $this->assertEquals(753, $this->getFilePermisions($file));
-        $this->assertEquals(753, $this->getFilePermisions($directory));
+        $this->assertEquals(753, $this->getFilePermissions($file));
+        $this->assertEquals(753, $this->getFilePermissions($directory));
     }
 
     public function testChmodChangesModeOfTraversableFileObject()
@@ -459,8 +459,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->filesystem->chmod($files, 0753);
 
-        $this->assertEquals(753, $this->getFilePermisions($file));
-        $this->assertEquals(753, $this->getFilePermisions($directory));
+        $this->assertEquals(753, $this->getFilePermissions($file));
+        $this->assertEquals(753, $this->getFilePermissions($directory));
     }
 
     public function testChown()
@@ -832,7 +832,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
      *
      * @return integer
      */
-    private function getFilePermisions($filePath)
+    private function getFilePermissions($filePath)
     {
         return (int) substr(sprintf('%o', fileperms($filePath)), -3);
     }

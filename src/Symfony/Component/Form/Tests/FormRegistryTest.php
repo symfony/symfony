@@ -30,6 +30,11 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    private $resolvedTypeFactory;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     private $guesser1;
 
     /**
@@ -49,6 +54,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->resolvedTypeFactory = $this->getMock('Symfony\Component\Form\ResolvedFormTypeFactory');
         $this->guesser1 = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
         $this->guesser2 = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
         $this->extension1 = new TestExtension($this->guesser1);
@@ -56,53 +62,16 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry = new FormRegistry(array(
             $this->extension1,
             $this->extension2,
-        ));
-    }
-
-    public function testResolveType()
-    {
-        $type = new FooType();
-        $ext1 = new FooTypeBarExtension();
-        $ext2 = new FooTypeBazExtension();
-
-        $this->extension1->addTypeExtension($ext1);
-        $this->extension2->addTypeExtension($ext2);
-
-        $resolvedType = $this->registry->resolveType($type);
-
-        $this->assertEquals($type, $resolvedType->getInnerType());
-        $this->assertEquals(array($ext1, $ext2), $resolvedType->getTypeExtensions());
-    }
-
-    public function testResolveTypeConnectsParent()
-    {
-        $parentType = new FooType();
-        $type = new FooSubType();
-
-        $resolvedParentType = $this->registry->resolveType($parentType);
-
-        $this->registry->addType($resolvedParentType);
-
-        $resolvedType = $this->registry->resolveType($type);
-
-        $this->assertSame($resolvedParentType, $resolvedType->getParent());
-    }
-
-    /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
-     */
-    public function testResolveTypeThrowsExceptionIfParentNotFound()
-    {
-        $type = new FooSubType();
-
-        $this->registry->resolveType($type);
+        ), $this->resolvedTypeFactory);
     }
 
     public function testGetTypeReturnsAddedType()
     {
-        $type = new FooType();
+        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
 
-        $resolvedType = $this->registry->resolveType($type);
+        $resolvedType->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('foo'));
 
         $this->registry->addType($resolvedType);
 
@@ -112,13 +81,88 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetTypeFromExtension()
     {
         $type = new FooType();
+        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
 
         $this->extension2->addType($type);
 
+        $this->resolvedTypeFactory->expects($this->once())
+            ->method('createResolvedType')
+            ->with($type)
+            ->will($this->returnValue($resolvedType));
+
+        $resolvedType->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('foo'));
+
         $resolvedType = $this->registry->getType('foo');
 
-        $this->assertInstanceOf('Symfony\Component\Form\ResolvedFormTypeInterface', $resolvedType);
-        $this->assertSame($type, $resolvedType->getInnerType());
+        $this->assertSame($resolvedType, $this->registry->getType('foo'));
+    }
+
+    public function testGetTypeWithTypeExtensions()
+    {
+        $type = new FooType();
+        $ext1 = new FooTypeBarExtension();
+        $ext2 = new FooTypeBazExtension();
+        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+
+        $this->extension2->addType($type);
+        $this->extension1->addTypeExtension($ext1);
+        $this->extension2->addTypeExtension($ext2);
+
+        $this->resolvedTypeFactory->expects($this->once())
+            ->method('createResolvedType')
+            ->with($type, array($ext1, $ext2))
+            ->will($this->returnValue($resolvedType));
+
+        $resolvedType->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('foo'));
+
+        $this->assertSame($resolvedType, $this->registry->getType('foo'));
+    }
+
+    public function testGetTypeConnectsParent()
+    {
+        $parentType = new FooType();
+        $type = new FooSubType();
+        $parentResolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+
+        $this->extension1->addType($parentType);
+        $this->extension2->addType($type);
+
+        $this->resolvedTypeFactory->expects($this->at(0))
+            ->method('createResolvedType')
+            ->with($parentType)
+            ->will($this->returnValue($parentResolvedType));
+
+        $this->resolvedTypeFactory->expects($this->at(1))
+            ->method('createResolvedType')
+            ->with($type, array(), $parentResolvedType)
+            ->will($this->returnValue($resolvedType));
+
+        $parentResolvedType->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('foo'));
+
+        $resolvedType->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('foo_sub_type'));
+
+        $this->assertSame($resolvedType, $this->registry->getType('foo_sub_type'));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Form\Exception\FormException
+     */
+    public function testGetTypeThrowsExceptionIfParentNotFound()
+    {
+        $type = new FooSubType();
+
+        $this->extension1->addType($type);
+
+        $this->registry->getType($type);
     }
 
     /**
@@ -139,9 +183,11 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testHasTypeAfterAdding()
     {
-        $type = new FooType();
+        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
 
-        $resolvedType = $this->registry->resolveType($type);
+        $resolvedType->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('foo'));
 
         $this->assertFalse($this->registry->hasType('foo'));
 
@@ -153,6 +199,16 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     public function testHasTypeAfterLoadingFromExtension()
     {
         $type = new FooType();
+        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+
+        $this->resolvedTypeFactory->expects($this->once())
+            ->method('createResolvedType')
+            ->with($type)
+            ->will($this->returnValue($resolvedType));
+
+        $resolvedType->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('foo'));
 
         $this->assertFalse($this->registry->hasType('foo'));
 

@@ -146,7 +146,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $this->markTestSkipped('Can course php to hang');
 
-        // Sleep dont work as it will allow the process to handle signals and close
+        // Sleep doesn't work as it will allow the process to handle signals and close
         // file handles from the other end.
         $process = new Process('php -r "while (true) {}"');
         $process->start();

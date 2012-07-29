@@ -430,7 +430,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->options->clear();
     }
 
-    public function testOverloadCannotBeEvaluatedLazilyWithoutExpectedClousureParams()
+    public function testOverloadCannotBeEvaluatedLazilyWithoutExpectedClosureParams()
     {
         $this->options->set('foo', 'bar');
 

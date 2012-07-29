@@ -312,7 +312,7 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * Otherwise a new integer is generated.
      *
-     * @param mixed $choice The choice to create an index for
+     * @param mixed $entity The choice to create an index for
      *
      * @return integer|string A unique index containing only ASCII letters,
      *                        digits and underscores.
@@ -333,7 +333,7 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * Otherwise a new integer is generated.
      *
-     * @param mixed $choice The choice to create a value for
+     * @param mixed $entity The choice to create a value for
      *
      * @return integer|string A unique value without character limitations.
      */

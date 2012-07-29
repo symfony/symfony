@@ -196,9 +196,10 @@ class HttpKernel extends BaseHttpKernel
      *
      * This method uses the "_internal" route, which should be available.
      *
-     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
-     * @param array  $attributes An array of request attributes
-     * @param array  $query      An array of request query parameters
+     * @param string  $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
+     * @param array   $attributes An array of request attributes
+     * @param array   $query      An array of request query parameters
+     * @param boolean $secure
      *
      * @return string An internal URI
      */
@@ -226,6 +227,7 @@ class HttpKernel extends BaseHttpKernel
      * Renders an HInclude tag.
      *
      * @param string $uri A URI
+     * @param string $defaultContent Default content
      */
     public function renderHIncludeTag($uri, $defaultContent = null)
     {

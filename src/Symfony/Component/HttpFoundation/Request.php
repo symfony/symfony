@@ -515,7 +515,7 @@ class Request
      *  * slow
      *  * prefer to get from a "named" source
      *
-     * It is better to explicity get request parameters from the appropriate
+     * It is better to explicitly get request parameters from the appropriate
      * public property instead (query, request, attributes, ...).
      *
      * @param string  $key     the key

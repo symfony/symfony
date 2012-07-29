@@ -165,7 +165,7 @@ EOF;
     /**
      * Compiles a single Route to PHP code used to match it against the path info.
      *
-     * @param Route       $routes               A Route instance
+     * @param Route       $route                A Route instance
      * @param string      $name                 The name of the Route
      * @param Boolean     $supportsRedirections Whether redirections are supported by the base class
      * @param string|null $parentPrefix         The prefix of the parent collection used to optimize the code

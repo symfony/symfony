@@ -152,12 +152,12 @@ CHANGELOG
  * deprecated the options "data_timezone" and "user_timezone" in DateType, DateTimeType and TimeType
    and renamed them to "model_timezone" and "view_timezone"
  * fixed: TransformationFailedExceptions thrown in the model transformer are now caught by the form
- * added FormRegistry and ResolvedFormTypeInterface
+ * added FormRegistryInterface, ResolvedFormTypeInterface and ResolvedFormTypeFactoryInterface
  * deprecated FormFactory methods
    * `addType`
    * `hasType`
    * `getType`
- * [BC BREAK] FormFactory now expects a FormRegistryInterface as constructor argument
+ * [BC BREAK] FormFactory now expects a FormRegistryInterface and a ResolvedFormTypeFactoryInterface as constructor argument
  * [BC BREAK] The method `createBuilder` in FormTypeInterface is not supported anymore for performance reasons
  * [BC BREAK] Removed `setTypes` from FormBuilder
  * deprecated AbstractType methods

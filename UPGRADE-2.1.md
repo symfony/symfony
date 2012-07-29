@@ -247,11 +247,10 @@
     reasons. It is now not possible anymore to use custom implementations of
     `FormBuilderInterface` for specific form types.
 
-    If you are in such a situation, you can subclass `FormRegistry` instead and override
-    `resolveType` to return a custom `ResolvedFormTypeInterface` implementation, within
-    which you can create your own `FormBuilderInterface` implementation. You should
-    register this custom registry class under the service name "form.registry" in order
-    to replace the default implementation.
+    If you are in such a situation, you can implement a custom `ResolvedFormTypeInterface`
+    where you create your own `FormBuilderInterface` implementation. You also need to
+    register a custom `ResolvedFormTypeFactoryInterface` implementation under the service
+    name "form.resolved_type_factory" in order to replace the default implementation.
 
   * If you previously inherited from `FieldType`, you should now inherit from
     `FormType`. You should also set the option `compound` to `false` if your field

@@ -35,7 +35,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     private $typeExtensions;
 
     /**
-     * @var ResolvedFormType
+     * @var ResolvedFormTypeInterface
      */
     private $parent;
 
@@ -44,7 +44,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      */
     private $optionsResolver;
 
-    public function __construct(FormTypeInterface $innerType, array $typeExtensions = array(), ResolvedFormType $parent = null)
+    public function __construct(FormTypeInterface $innerType, array $typeExtensions = array(), ResolvedFormTypeInterface $parent = null)
     {
         if (!preg_match('/^[a-z0-9_]*$/i', $innerType->getName())) {
             throw new FormException(sprintf(
@@ -148,7 +148,16 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         return $view;
     }
 
-    private function buildForm(FormBuilderInterface $builder, array $options)
+    /**
+     * Configures a form builder for the type hierarchy.
+     *
+     * This method is protected in order to allow implementing classes
+     * to change or call it in re-implementations of {@link createBuilder()}.
+     *
+     * @param FormBuilderInterface $builder The builder to configure.
+     * @param array                $options The options used for the configuration.
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (null !== $this->parent) {
             $this->parent->buildForm($builder, $options);
@@ -162,7 +171,19 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
     }
 
-    private function buildView(FormView $view, FormInterface $form, array $options)
+    /**
+     * Configures a form view for the type hierarchy.
+     *
+     * This method is protected in order to allow implementing classes
+     * to change or call it in re-implementations of {@link createView()}.
+     *
+     * It is called before the children of the view are built.
+     *
+     * @param FormView      $view    The form view to configure.
+     * @param FormInterface $form    The form corresponding to the view.
+     * @param array         $options The options used for the configuration.
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if (null !== $this->parent) {
             $this->parent->buildView($view, $form, $options);
@@ -176,7 +197,19 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
     }
 
-    private function finishView(FormView $view, FormInterface $form, array $options)
+    /**
+     * Finishes a form view for the type hierarchy.
+     *
+     * This method is protected in order to allow implementing classes
+     * to change or call it in re-implementations of {@link createView()}.
+     *
+     * It is called after the children of the view have been built.
+     *
+     * @param FormView      $view    The form view to configure.
+     * @param FormInterface $form    The form corresponding to the view.
+     * @param array         $options The options used for the configuration.
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (null !== $this->parent) {
             $this->parent->finishView($view, $form, $options);
@@ -190,7 +223,15 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
     }
 
-    private function getOptionsResolver()
+    /**
+     * Returns the configured options resolver used for this type.
+     *
+     * This method is protected in order to allow implementing classes
+     * to change or call it in re-implementations of {@link createBuilder()}.
+     *
+     * @return \Symfony\Component\OptionsResolver\OptionsResolverInterface The options resolver.
+     */
+    public function getOptionsResolver()
     {
         if (null === $this->optionsResolver) {
             if (null !== $this->parent) {

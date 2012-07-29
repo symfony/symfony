@@ -5,13 +5,17 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="form.extension.class">Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
+        <parameter key="form.resolved_type_factory.class">Symfony\Component\Form\ResolvedFormTypeFactory</parameter>
         <parameter key="form.registry.class">Symfony\Component\Form\FormRegistry</parameter>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
+        <parameter key="form.extension.class">Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
         <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
     </parameters>
 
     <services>
+        <!-- ResolvedFormTypeFactory -->
+        <service id="form.resolved_type_factory" class="%form.resolved_type_factory.class%" />
+
         <!-- FormRegistry -->
         <service id="form.registry" class="%form.registry.class%">
             <argument type="collection">
@@ -23,11 +27,13 @@
                 -->
                 <argument type="service" id="form.extension" />
             </argument>
+            <argument type="service" id="form.resolved_type_factory" />
         </service>
 
         <!-- FormFactory -->
         <service id="form.factory" class="%form.factory.class%">
             <argument type="service" id="form.registry" />
+            <argument type="service" id="form.resolved_type_factory" />
         </service>
 
         <!-- DependencyInjectionExtension -->

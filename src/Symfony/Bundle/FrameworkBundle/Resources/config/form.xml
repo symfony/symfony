@@ -18,6 +18,7 @@
                 <!--
                 We don't need to be able to add more extensions.
                  * more types can be registered with the form.type tag
+                 * more type extensions can be registered with the form.type_extension tag
                  * more type_guessers can be registered with the form.type.type_guesser tag
                 -->
                 <argument type="service" id="form.extension" />
@@ -32,20 +33,11 @@
         <!-- DependencyInjectionExtension -->
         <service id="form.extension" class="%form.extension.class%" public="false">
             <argument type="service" id="service_container" />
-            <!--
-            All services with tag "form.type" are inserted here by
-            InitFormsPass
-            -->
+            <!-- All services with tag "form.type" are inserted here by FormPass -->
             <argument type="collection" />
-            <!--
-            All services with tag "form.type_extension" are inserted here by
-            InitFormsPass
-            -->
+            <!-- All services with tag "form.type_extension" are inserted here by FormPass -->
             <argument type="collection" />
-            <!--
-            All services with tag "form.type_guesser" are inserted here by
-            InitFormsPass
-            -->
+            <!-- All services with tag "form.type_guesser" are inserted here by FormPass -->
             <argument type="collection" />
         </service>
 
@@ -136,6 +128,11 @@
         </service>
         <service id="form.type.url" class="Symfony\Component\Form\Extension\Core\Type\UrlType">
             <tag name="form.type" alias="url" />
+        </service>
+
+        <!-- FormTypeHttpFoundationExtension -->
+        <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension">
+            <tag name="form.type_extension" alias="form" />
         </service>
 
         <!-- FormTypeValidatorExtension -->

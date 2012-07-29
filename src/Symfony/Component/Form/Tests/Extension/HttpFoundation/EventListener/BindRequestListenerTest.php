@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
+namespace Symfony\Component\Form\Tests\Extension\HttpFoundation\EventListener;
 
-use Symfony\Component\Form\Extension\Core\EventListener\BindRequestListener;
+use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormEvent;

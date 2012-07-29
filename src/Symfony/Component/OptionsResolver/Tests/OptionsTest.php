@@ -469,4 +469,49 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->options->has('foo'));
     }
+
+    public function testRemoveOptionAndNormalizer()
+    {
+        $this->options->set('foo1', 'bar');
+        $this->options->setNormalizer('foo1', function (Options $options) {
+            return '';
+        });
+        $this->options->set('foo2', 'bar');
+        $this->options->setNormalizer('foo2', function (Options $options) {
+            return '';
+        });
+
+        $this->options->remove('foo2');
+        $this->assertEquals(array('foo1' => ''), $this->options->all());
+    }
+
+    public function testReplaceOptionAndNormalizer()
+    {
+        $this->options->set('foo1', 'bar');
+        $this->options->setNormalizer('foo1', function (Options $options) {
+            return '';
+        });
+        $this->options->set('foo2', 'bar');
+        $this->options->setNormalizer('foo2', function (Options $options) {
+            return '';
+        });
+
+        $this->options->replace(array('foo1' => 'new'));
+        $this->assertEquals(array('foo1' => 'new'), $this->options->all());
+    }
+
+    public function testClearOptionAndNormalizer()
+    {
+        $this->options->set('foo1', 'bar');
+        $this->options->setNormalizer('foo1', function (Options $options) {
+            return '';
+        });
+        $this->options->set('foo2', 'bar');
+        $this->options->setNormalizer('foo2', function (Options $options) {
+            return '';
+        });
+
+        $this->options->clear();
+        $this->assertEmpty($this->options->all());
+    }
 }

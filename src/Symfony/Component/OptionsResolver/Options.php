@@ -143,6 +143,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
         $this->options = array();
         $this->lazy = array();
+        $this->normalizers = array();
 
         foreach ($options as $option => $value) {
             $this->overload($option, $value);

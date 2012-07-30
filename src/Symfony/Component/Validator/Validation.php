@@ -40,4 +40,11 @@ final class Validation
     {
         return new ValidatorBuilder();
     }
+
+    /**
+     * This class cannot be instantiated.
+     */
+    private function __construct()
+    {
+    }
 }

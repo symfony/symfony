@@ -27,7 +27,7 @@ class CsrfExtension extends AbstractExtension
      *
      * @param CsrfProviderInterface $csrfProvider The CSRF provider
      */
-    public function __construct(CsrfProviderInterface $csrfProvider = null)
+    public function __construct(CsrfProviderInterface $csrfProvider)
     {
         $this->csrfProvider = $csrfProvider;
     }

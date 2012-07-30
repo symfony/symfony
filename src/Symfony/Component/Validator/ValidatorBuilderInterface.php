@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
+use Doctrine\Common\Annotations\Reader;
 
 /**
  * A configurable builder for ValidatorInterface objects.
@@ -78,11 +79,16 @@ interface ValidatorBuilderInterface
     public function addMethodMappings(array $methodNames);
 
     /**
-     * Enables or disables annotation based constraint mapping.
+     * Enables annotation based constraint mapping.
      *
-     * @param Boolean $enabled Whether annotation mapping should be enabled.
+     * @param Reader $annotationReader The annotation reader to be used.
      */
-    public function setAnnotationMapping($enabled);
+    public function enableAnnotationMapping(Reader $annotationReader = null);
+
+    /**
+     * Disables annotation based constraint mapping.
+     */
+    public function disableAnnotationMapping();
 
     /**
      * Sets the class metadata factory used by the validator.

@@ -36,6 +36,7 @@
         "symfony/routing": "2.2.*",
         "doctrine/dbal": "to use the built-in ACL implementation"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security\\": "" }
     },

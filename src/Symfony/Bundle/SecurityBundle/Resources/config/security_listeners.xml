@@ -35,6 +35,7 @@
         <parameter key="security.context_listener.class">Symfony\Component\Security\Http\Firewall\ContextListener</parameter>
 
         <parameter key="security.authentication.provider.dao.class">Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider</parameter>
+        <parameter key="security.authentication.provider.ldap.class">Symfony\Component\Security\Core\Authentication\Provider\LdapAuthenticationProvider</parameter>
         <parameter key="security.authentication.provider.pre_authenticated.class">Symfony\Component\Security\Core\Authentication\Provider\PreAuthenticatedAuthenticationProvider</parameter>
 
         <parameter key="security.authentication.provider.anonymous.class">Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider</parameter>
@@ -167,6 +168,13 @@
             <argument type="service" id="security.user_checker" />
             <argument /> <!-- Provider-shared Key -->
             <argument type="service" id="security.encoder_factory" />
+            <argument>%security.authentication.hide_user_not_found%</argument>
+        </service>
+
+        <service id="security.authentication.provider.ldap" class="%security.authentication.provider.ldap.class%" abstract="true" public="false">
+            <argument /> <!-- User Provider -->
+            <argument type="service" id="security.user_checker" />
+            <argument /> <!-- Provider-shared Key -->
             <argument>%security.authentication.hide_user_not_found%</argument>
         </service>
 

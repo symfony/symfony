@@ -15,6 +15,7 @@
 
         <parameter key="security.user.provider.in_memory.class">Symfony\Component\Security\Core\User\InMemoryUserProvider</parameter>
         <parameter key="security.user.provider.in_memory.user.class">Symfony\Component\Security\Core\User\User</parameter>
+        <parameter key="security.user.provider.ldap.class">Symfony\Component\Security\Core\User\LdapUserProvider</parameter>
         <parameter key="security.user.provider.chain.class">Symfony\Component\Security\Core\User\ChainUserProvider</parameter>
 
         <parameter key="security.authentication.trust_resolver.class">Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver</parameter>
@@ -41,6 +42,8 @@
         <parameter key="security.http_utils.class">Symfony\Component\Security\Http\HttpUtils</parameter>
 
         <parameter key="security.validator.user_password.class">Symfony\Component\Security\Core\Validator\Constraint\UserPasswordValidator</parameter>
+
+        <parameter key="security.ldap.ldap.class">Symfony\Component\Security\Ldap\Ldap</parameter>
     </parameters>
 
     <services>
@@ -124,6 +127,10 @@
         <service id="security.user.provider.in_memory" class="%security.user.provider.in_memory.class%" abstract="true" public="false" />
         <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />
 
+        <service id="security.user.provider.ldap" class="%security.user.provider.ldap.class%" abstract="true" public="false">
+            <argument /> <!-- security.ldap.ldap -->
+        </service>
+
         <service id="security.user.provider.chain" class="%security.user.provider.chain.class%" abstract="true" public="false" />
 
         <service id="security.http_utils" class="%security.http_utils.class%" public="false">
@@ -137,5 +144,8 @@
             <argument type="service" id="security.context" />
             <argument type="service" id="security.encoder_factory" />
         </service>
+
+        <!-- Other -->
+        <service id="security.ldap.ldap" class="%security.ldap.ldap.class%" abstract="true" public="false"/>
     </services>
 </container>

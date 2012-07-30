@@ -462,4 +462,11 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedResult, iterator_to_array($this->options, true));
     }
+
+    public function testHasWithNullValue()
+    {
+        $this->options->set('foo', null);
+
+        $this->assertTrue($this->options->has('foo'));
+    }
 }

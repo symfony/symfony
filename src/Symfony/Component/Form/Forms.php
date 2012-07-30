@@ -93,10 +93,10 @@ use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
  * This extension needs a validator object to function properly:
  *
  * <code>
- * use Symfony\Component\Validator\ValidatorFactory;
+ * use Symfony\Component\Validator\Validation;
  * use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
  *
- * $validator = ValidatorFactory::buildDefault()->getValidator();
+ * $validator = Validation::createValidator();
  * $formFactory = Forms::createFormFactoryBuilder()
  *     ->addExtension(new ValidatorExtension($validator))
  *     ->getFormFactory();

@@ -23,9 +23,15 @@ class FormFactory implements FormFactoryInterface
      */
     private $registry;
 
-    public function __construct(FormRegistryInterface $registry)
+    /**
+     * @var ResolvedFormTypeFactoryInterface
+     */
+    private $resolvedTypeFactory;
+
+    public function __construct(FormRegistryInterface $registry, ResolvedFormTypeFactoryInterface $resolvedTypeFactory)
     {
         $this->registry = $registry;
+        $this->resolvedTypeFactory = $resolvedTypeFactory;
     }
 
     /**
@@ -73,14 +79,20 @@ class FormFactory implements FormFactoryInterface
             $options['data'] = $data;
         }
 
-        if ($type instanceof ResolvedFormTypeInterface) {
-            $this->registry->addType($type);
-        } elseif ($type instanceof FormTypeInterface) {
-            $type = $this->registry->resolveType($type);
-            $this->registry->addType($type);
+        if ($type instanceof FormTypeInterface) {
+            // An unresolved type instance was passed. Type extensions
+            // are not supported for these. If you want to use type
+            // extensions, you should create form extensions or register
+            // your type in the Dependency Injection configuration instead.
+            $parentType = $type->getParent();
+            $type = $this->resolvedTypeFactory->createResolvedType(
+                $type,
+                array(),
+                $parentType ? $this->registry->getType($parentType) : null
+            );
         } elseif (is_string($type)) {
             $type = $this->registry->getType($type);
-        } else {
+        } elseif (!$type instanceof ResolvedFormTypeInterface) {
             throw new UnexpectedTypeException($type, 'string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface');
         }
 
@@ -152,12 +164,18 @@ class FormFactory implements FormFactoryInterface
      * @param FormTypeInterface $type The type
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link FormRegistryInterface::resolveType()} and
-     *             {@link FormRegistryInterface::addType()} instead.
+     *             form extensions or type registration in the Dependency
+     *             Injection Container instead.
      */
     public function addType(FormTypeInterface $type)
     {
-        $this->registry->addType($this->registry->resolveType($type));
+        $parentType = $type->getParent();
+
+        $this->registry->addType($this->resolvedTypeFactory->createResolvedType(
+            $type,
+            array(),
+            $parentType ? $this->registry->getType($parentType) : null
+        ));
     }
 
     /**

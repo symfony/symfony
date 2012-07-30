@@ -43,7 +43,7 @@ class Locale extends \Locale
     public static function getDisplayCountries($locale)
     {
         if (!isset(self::$countries[$locale])) {
-            $bundle = \ResourceBundle::create($locale, __DIR__.'/Resources/data/region');
+            $bundle = \ResourceBundle::create($locale, self::getDataDirectory().'/region');
 
             if (null === $bundle) {
                 throw new \RuntimeException(sprintf('The country resource bundle could not be loaded for locale "%s"', $locale));
@@ -98,7 +98,7 @@ class Locale extends \Locale
     public static function getDisplayLanguages($locale)
     {
         if (!isset(self::$languages[$locale])) {
-            $bundle = \ResourceBundle::create($locale, __DIR__.'/Resources/data/lang');
+            $bundle = \ResourceBundle::create($locale, self::getDataDirectory().'/lang');
 
             if (null === $bundle) {
                 throw new \RuntimeException(sprintf('The language resource bundle could not be loaded for locale "%s"', $locale));
@@ -149,7 +149,7 @@ class Locale extends \Locale
     public static function getDisplayLocales($locale)
     {
         if (!isset(self::$locales[$locale])) {
-            $bundle = \ResourceBundle::create($locale, __DIR__.'/Resources/data/names');
+            $bundle = \ResourceBundle::create($locale, self::getDataDirectory().'/names');
 
             if (null === $bundle) {
                 throw new \RuntimeException(sprintf('The locale resource bundle could not be loaded for locale "%s"', $locale));
@@ -235,6 +235,28 @@ class Locale extends \Locale
         preg_match('/^ICU Data version (?:=>)?(.*)$/m', $output, $matches);
 
         return trim($matches[1]);
+    }
+
+    public static function getDataVersion()
+    {
+        static $dataVersion;
+
+        if (null === $dataVersion) {
+            $dataVersion = 'current';
+
+            if (getenv('ICU_DATA_VERSION')) {
+                $dataVersion = getenv('ICU_DATA_VERSION');
+            } elseif (file_exists(__DIR__.'/../Resources/data/data-version.php')) {
+                $dataVersion = include __DIR__.'/../Resources/data/data-version.php';
+            }
+        }
+
+        return $dataVersion;
+    }
+
+    public static function getDataDirectory()
+    {
+        return __DIR__.'/Resources/data/'.self::getDataVersion();
     }
 
     /**

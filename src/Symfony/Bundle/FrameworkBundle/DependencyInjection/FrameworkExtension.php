@@ -246,7 +246,7 @@ class FrameworkExtension extends Extension
         $router = $container->findDefinition('router.default');
 
         $argument = $router->getArgument(2);
-        $argument['strict_parameters'] = $config['strict_parameters'];
+        $argument['strict_requirements'] = $config['strict_requirements'];
         if (isset($config['type'])) {
             $argument['resource_type'] = $config['type'];
         }

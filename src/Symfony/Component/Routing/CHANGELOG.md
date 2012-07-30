@@ -22,5 +22,5 @@ CHANGELOG
    been used anyway without creating inconsistencies
  * [BC BREAK] RouteCollection::remove also removes a route from parent
    collections (not only from its children)
- * added strict_parameters option to disable exceptions (and generate empty
+ * added strict_requirements option to disable exceptions (and generate empty
    URLs instead) when generating a route with an invalid parameter value

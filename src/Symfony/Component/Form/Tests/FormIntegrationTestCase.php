@@ -11,9 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\ResolvedFormTypeFactory;
-use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 
 /**
@@ -22,17 +20,7 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
 class FormIntegrationTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ResolvedFormTypeFactory
-     */
-    protected $resolvedTypeFactory;
-
-    /**
-     * @var FormRegistry
-     */
-    protected $registry;
-
-    /**
-     * @var FormFactory
+     * @var \Symfony\Component\Form\FormFactoryInterface
      */
     protected $factory;
 
@@ -42,15 +30,13 @@ class FormIntegrationTestCase extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('The "EventDispatcher" component is not available');
         }
 
-        $this->resolvedTypeFactory = new ResolvedFormTypeFactory();
-        $this->registry = new FormRegistry($this->getExtensions(), $this->resolvedTypeFactory);
-        $this->factory = new FormFactory($this->registry, $this->resolvedTypeFactory);
+        $this->factory = Forms::createFormFactoryBuilder()
+            ->addExtensions($this->getExtensions())
+            ->getFormFactory();
     }
 
     protected function getExtensions()
     {
-        return array(
-            new CoreExtension(),
-        );
+        return array();
     }
 }

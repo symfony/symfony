@@ -9,18 +9,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
+namespace Symfony\Component\Form\Tests\Extension\Templating;
 
-use Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper;
-use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
-use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTemplateNameParser;
-use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
-use Symfony\Component\Templating\PhpEngine;
-use Symfony\Component\Templating\Loader\FilesystemLoader;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormRenderer;
+use Symfony\Component\Form\Extension\Templating\FormHelper;
 use Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine;
 use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
+use Symfony\Component\Form\Tests\Extension\Templating\Fixtures\StubTemplateNameParser;
+use Symfony\Component\Form\Tests\Extension\Templating\Fixtures\StubTranslator;
+use Symfony\Component\Templating\PhpEngine;
+use Symfony\Component\Templating\Loader\FilesystemLoader;
+
+// should probably be moved to the Translation component
+use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
 
 class FormHelperDivLayoutTest extends AbstractDivLayoutTest
 {
@@ -28,9 +30,20 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
 
     protected function setUp()
     {
+        if (!class_exists('Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper')) {
+            $this->markTestSkipped('The "FrameworkBundle" is not available');
+        }
+
+        if (!class_exists('Symfony\Component\Templating\PhpEngine')) {
+            $this->markTestSkipped('The "Templating" component is not available');
+        }
+
         parent::setUp();
 
-        $root = realpath(__DIR__.'/../../../Resources/views');
+        // should be moved to the Form component once absolute file paths are supported
+        // by the default name parser in the Templating component
+        $reflClass = new \ReflectionClass('Symfony\Bundle\FrameworkBundle\FrameworkBundle');
+        $root = realpath(dirname($reflClass->getFileName()) . '/Resources/views');
         $rootTheme = realpath(__DIR__.'/Resources');
         $templateNameParser = new StubTemplateNameParser($root, $rootTheme);
         $loader = new FilesystemLoader(array());

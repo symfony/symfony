@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Locale\Stub;
 
+use Symfony\Component\Locale\Locale;
 use Symfony\Component\Locale\Exception\NotImplementedException;
 use Symfony\Component\Locale\Exception\MethodNotImplementedException;
 
@@ -480,12 +481,14 @@ class StubLocale
      */
     private static function getStubData($locale, $cacheVariable, $stubDataDir)
     {
+        $dataDirectory = Locale::getDataDirectory();
+
         if ('en' !== $locale) {
             throw new \InvalidArgumentException(sprintf('Only the \'en\' locale is supported. %s', NotImplementedException::INTL_INSTALL_MESSAGE));
         }
 
         if (empty(self::${$cacheVariable})) {
-            self::${$cacheVariable} = include __DIR__.'/../Resources/data/stub/'.$stubDataDir.'/en.php';
+            self::${$cacheVariable} = include __DIR__.'/../Resources/data/'.$dataDirectory.'/stub/'.$stubDataDir.'/en.php';
         }
 
         return self::${$cacheVariable};

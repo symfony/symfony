@@ -12,9 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Templating;
 
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormRenderer;
-use Symfony\Component\Form\Extension\Templating\FormHelper;
-use Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine;
+use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
 use Symfony\Component\Form\Tests\AbstractTableLayoutTest;
 use Symfony\Component\Form\Tests\Extension\Templating\Fixtures\StubTemplateNameParser;
 use Symfony\Component\Form\Tests\Extension\Templating\Fixtures\StubTranslator;
@@ -26,7 +24,10 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
 
 class FormHelperTableLayoutTest extends AbstractTableLayoutTest
 {
-    protected $helper;
+    /**
+     * @var PhpEngine
+     */
+    protected $engine;
 
     protected function setUp()
     {
@@ -39,7 +40,10 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         }
 
         parent::setUp();
+    }
 
+    protected function getExtensions()
+    {
         // should be moved to the Form component once absolute file paths are supported
         // by the default name parser in the Templating component
         $reflClass = new \ReflectionClass('Symfony\Bundle\FrameworkBundle\FrameworkBundle');
@@ -47,59 +51,58 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         $rootTheme = realpath(__DIR__.'/Resources');
         $templateNameParser = new StubTemplateNameParser($root, $rootTheme);
         $loader = new FilesystemLoader(array());
-        $engine = new PhpEngine($templateNameParser, $loader);
-        $engine->addGlobal('global', '');
-        $rendererEngine = new TemplatingRendererEngine($engine, array(
-            'FrameworkBundle:Form',
-            'FrameworkBundle:FormTable'
-        ));
-        $renderer = new FormRenderer($rendererEngine, $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'));
 
-        $this->helper = new FormHelper($renderer);
-
-        $engine->setHelpers(array(
-            $this->helper,
+        $this->engine = new PhpEngine($templateNameParser, $loader);
+        $this->engine->addGlobal('global', '');
+        $this->engine->setHelpers(array(
             new TranslatorHelper(new StubTranslator()),
+        ));
+
+        return array_merge(parent::getExtensions(), array(
+            new TemplatingExtension($this->engine, $this->csrfProvider, array(
+                'FrameworkBundle:Form',
+                'FrameworkBundle:FormTable',
+            )),
         ));
     }
 
     protected function tearDown()
     {
-        $this->helper = null;
+        $this->engine = null;
     }
 
     protected function renderEnctype(FormView $view)
     {
-        return (string) $this->helper->enctype($view);
+        return (string) $this->engine->get('form')->enctype($view);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        return (string) $this->helper->label($view, $label, $vars);
+        return (string) $this->engine->get('form')->label($view, $label, $vars);
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string) $this->helper->errors($view);
+        return (string) $this->engine->get('form')->errors($view);
     }
 
     protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string) $this->helper->widget($view, $vars);
+        return (string) $this->engine->get('form')->widget($view, $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string) $this->helper->row($view, $vars);
+        return (string) $this->engine->get('form')->row($view, $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string) $this->helper->rest($view, $vars);
+        return (string) $this->engine->get('form')->rest($view, $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)
     {
-        $this->helper->setTheme($view, $themes);
+        $this->engine->get('form')->setTheme($view, $themes);
     }
 }

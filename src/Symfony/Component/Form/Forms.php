@@ -102,6 +102,54 @@ use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
  *     ->getFormFactory();
  * </code>
  *
+ * Support for the Templating component is provided by TemplatingExtension.
+ * This extension needs a PhpEngine object for rendering forms. As second
+ * argument you should pass the names of the default themes. Here is an
+ * example for using the default layout with "<div>" tags:
+ *
+ * <code>
+ * use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
+ *
+ * $formFactory = Forms::createFormFactoryBuilder()
+ *     ->addExtension(new TemplatingExtension($engine, null, array(
+ *         'FrameworkBundle:Form',
+ *     )))
+ *     ->getFormFactory();
+ * </code>
+ *
+ * The next example shows how to include the "<table>" layout:
+ *
+ * <code>
+ * use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
+ *
+ * $formFactory = Forms::createFormFactoryBuilder()
+ *     ->addExtension(new TemplatingExtension($engine, null, array(
+ *         'FrameworkBundle:Form',
+ *         'FrameworkBundle:FormTable',
+ *     )))
+ *     ->getFormFactory();
+ * </code>
+ *
+ * If you also loaded the CsrfExtension, you should pass the CSRF provider
+ * to the extension so that you can render CSRF tokens in your templates
+ * more easily:
+ *
+ * <code>
+ * use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
+ * use Symfony\Component\Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider;
+ * use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
+ *
+ *
+ * $secret = 'V8a5Z97e...';
+ * $csrfProvider = new DefaultCsrfProvider($secret);
+ * $formFactory = Forms::createFormFactoryBuilder()
+ *     ->addExtension(new CsrfExtension($csrfProvider))
+ *     ->addExtension(new TemplatingExtension($engine, $csrfProvider, array(
+ *         'FrameworkBundle:Form',
+ *     )))
+ *     ->getFormFactory();
+ * </code>
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 final class Forms

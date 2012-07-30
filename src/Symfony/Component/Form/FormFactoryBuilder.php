@@ -12,10 +12,6 @@
 namespace Symfony\Component\Form;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
- */
-
-/**
  * The default implementation of FormFactoryBuilderInterface.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>

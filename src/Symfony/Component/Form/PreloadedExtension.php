@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-/**
- * @author Bernhard Schussek <bschussek@gmail.com>
- */
 use Symfony\Component\Form\Exception\FormException;
 
 /**
@@ -87,7 +84,7 @@ class PreloadedExtension implements FormExtensionInterface
      */
     public function hasTypeExtensions($name)
     {
-        return isset($this->typeExtensions[$name]) && count($this->typeExtensions[$name]) > 0;
+        return !empty($this->typeExtensions[$name]);
     }
 
     /**

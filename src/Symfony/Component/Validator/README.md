@@ -85,7 +85,7 @@ method results are matched against the constraints.
     }
 
     $validator = Validation::createValidatorBuilder()
-        ->setAnnotationMapping(true)
+        ->enableAnnotationMapping()
         ->getValidator();
 
     $user = new User('John Doe', 'john@example.com');
@@ -94,8 +94,9 @@ method results are matched against the constraints.
 
 This example uses the annotation support of Doctrine Common to
 map constraints to properties and methods. You can also map constraints
-using XML, YAML or plain PHP. Check the documentation for more information
-about these drivers.
+using XML, YAML or plain PHP, if you dislike annotations or don't want
+to include Doctrine. Check the documentation for more information about
+these drivers.
 
 Resources
 ---------

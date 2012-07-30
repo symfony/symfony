@@ -23,7 +23,10 @@ use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader;
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Cache\ArrayCache;
 
 /**
  * The default implementation of {@link ValidatorBuilderInterface}.
@@ -53,9 +56,9 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     private $methodMappings = array();
 
     /**
-     * @var Boolean
+     * @var Reader
      */
-    private $annotationMapping = false;
+    private $annotationReader = null;
 
     /**
      * @var ClassMetadataFactoryInterface
@@ -163,13 +166,29 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setAnnotationMapping($enabled)
+    public function enableAnnotationMapping(Reader $annotationReader = null)
     {
-        if ($enabled && null !== $this->metadataFactory) {
+        if (null !== $this->metadataFactory) {
             throw new ValidatorException('You cannot enable annotation mapping after setting a custom metadata factory. Configure your metadata factory instead.');
         }
 
-        $this->annotationMapping = $enabled;
+        if (null === $annotationReader) {
+            if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
+                throw new \RuntimeException('Requested a ValidatorFactory with an AnnotationLoader, but the AnnotationReader was not found. You should add Doctrine Common to your project.');
+            }
+
+            $annotationReader = new CachedReader(new AnnotationReader(), new ArrayCache());
+        }
+
+        $this->annotationReader = $annotationReader;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function disableAnnotationMapping()
+    {
+        $this->annotationReader = null;
     }
 
     /**
@@ -177,7 +196,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function setMetadataFactory(ClassMetadataFactoryInterface $metadataFactory)
     {
-        if (count($this->xmlMappings) > 0 || count($this->yamlMappings) > 0 || count($this->methodMappings) > 0 || $this->annotationMapping) {
+        if (count($this->xmlMappings) > 0 || count($this->yamlMappings) > 0 || count($this->methodMappings) > 0 || null !== $this->annotationReader) {
             throw new ValidatorException('You cannot set a custom metadata factory after adding custom mappings. You should do either of both.');
         }
 
@@ -226,18 +245,12 @@ class ValidatorBuilder implements ValidatorBuilderInterface
                 $loaders[] = new YamlFileLoader($this->yamlMappings[0]);
             }
 
-            if (count($this->methodMappings) > 0) {
-                foreach ($this->methodMappings as $methodName) {
-                    $loaders[] = new StaticMethodLoader($methodName);
-                }
+            foreach ($this->methodMappings as $methodName) {
+                $loaders[] = new StaticMethodLoader($methodName);
             }
 
-            if ($this->annotationMapping) {
-                if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-                    throw new \RuntimeException('Requested a ValidatorFactory with an AnnotationLoader, but the AnnotationReader was not found. You should add Doctrine Common to your project.');
-                }
-
-                $loaders[] = new AnnotationLoader(new AnnotationReader());
+            if ($this->annotationReader) {
+                $loaders[] = new AnnotationLoader($this->annotationReader);
             }
 
             $loader = null;

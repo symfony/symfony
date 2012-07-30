@@ -224,6 +224,25 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() clicks on links');
     }
 
+    public function testClickForm()
+    {
+        if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
+            $this->markTestSkipped('The "DomCrawler" component is not available');
+        }
+
+        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
+            $this->markTestSkipped('The "CssSelector" component is not available');
+        }
+
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
+        $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $client->click($crawler->filter('input')->form());
+
+        $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() Form submit forms');
+    }
+
     public function testSubmit()
     {
         if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {

@@ -504,7 +504,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         $normalizer = $this->normalizers[$option];
 
         $this->lock[$option] = true;
-        $this->options[$option] = $normalizer($this, $this->options[$option]);
+        $this->options[$option] = $normalizer($this, array_key_exists($option, $this->options) ? $this->options[$option] : null);
         unset($this->lock[$option]);
 
         // The option is now normalized

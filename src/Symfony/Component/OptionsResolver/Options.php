@@ -247,7 +247,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      */
     public function has($option)
     {
-        return isset($this->options[$option]);
+        return array_key_exists($option, $this->options);
     }
 
     /**

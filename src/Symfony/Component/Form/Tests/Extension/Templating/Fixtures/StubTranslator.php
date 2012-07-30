@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures;
+namespace Symfony\Component\Form\Tests\Extension\Templating\Fixtures;
 
 use Symfony\Component\Translation\TranslatorInterface;
 

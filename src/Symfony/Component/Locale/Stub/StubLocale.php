@@ -468,6 +468,23 @@ class StubLocale
         throw new MethodNotImplementedException(__METHOD__);
     }
 
+    public static function getDataDirectory()
+    {
+        static $dataDirectory;
+
+        if (null === $dataDirectory) {
+            $dataDirectory = 'current';
+
+            if (getenv('ICU_DATA_VERSION')) {
+                $dataDirectory = getenv('ICU_DATA_VERSION');
+            } elseif (file_exists(__DIR__.'/../Resources/data/data-version.php')) {
+                $dataDirectory = include __DIR__.'/../Resources/data/data-version.php';
+            }
+        }
+
+        return __DIR__.'/../Resources/data/'.$dataDirectory;
+    }
+
     /**
      * Returns the stub ICU data
      *
@@ -488,7 +505,7 @@ class StubLocale
         }
 
         if (empty(self::${$cacheVariable})) {
-            self::${$cacheVariable} = include __DIR__.'/../Resources/data/'.$dataDirectory.'/stub/'.$stubDataDir.'/en.php';
+            self::${$cacheVariable} = include $dataDirectory.'/stub/'.$stubDataDir.'/en.php';
         }
 
         return self::${$cacheVariable};

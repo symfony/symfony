@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Locale\Tests\Stub;
 
+use Symfony\Component\Locale\Locale;
 use Symfony\Component\Locale\Stub\StubLocale;
+use Symfony\Component\Locale\Tests\TestCase as LocaleTestCase;
 
-class StubLocaleTest extends \PHPUnit_Framework_TestCase
+class StubLocaleTest extends LocaleTestCase
 {
     /**
      * @expectedException InvalidArgumentException
@@ -65,8 +67,10 @@ class StubLocaleTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCurrenciesData()
     {
+        $symbol = $this->isSameAsIcuVersion('4.8') ? 'BR$' : 'R$';
+
         $currencies = StubLocale::getCurrenciesData('en');
-        $this->assertEquals('R$', $currencies['BRL']['symbol']);
+        $this->assertEquals($symbol, $currencies['BRL']['symbol']);
         $this->assertEquals('Brazilian Real', $currencies['BRL']['name']);
         $this->assertEquals(2, $currencies['BRL']['fractionDigits']);
         $this->assertEquals(0, $currencies['BRL']['roundingIncrement']);

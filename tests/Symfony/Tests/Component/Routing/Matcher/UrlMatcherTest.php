@@ -118,6 +118,30 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher = new UrlMatcher($collection, new RequestContext(), array());
         $this->assertEquals(array('_route' => 'bar', 'bar' => 'foo'), $matcher->match('/foo'));
         $this->assertEquals(array('_route' => 'bar', 'bar' => 'bar'), $matcher->match('/'));
+
+        // Route with 1 optional variable and text suffix at the end
+        $collection = new RouteCollection();
+        $collection->add('bar', new Route('/bar-{foo}.html', array('foo' => 'foo'), array('foo' => 'foo|bar')));
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'bar', 'foo' => 'foo'), $matcher->match('/bar.html'));
+        $this->assertEquals(array('_route' => 'bar', 'foo' => 'foo'), $matcher->match('/bar-foo.html'));
+        $this->assertEquals(array('_route' => 'bar', 'foo' => 'bar'), $matcher->match('/bar-bar.html'));
+
+        // Route with 2 optional variables and text suffix at the end
+        $collection = new RouteCollection();
+        $collection->add(
+            'bar',
+            new Route(
+                '/bar-{foo}-{baz}.html',
+                array('foo' => 'foo', 'baz' => '1'),
+                array('foo' => 'foo|bar', 'baz' => '\d')
+            )
+        );
+        $matcher = new UrlMatcher($collection, new RequestContext(), array());
+        $this->assertEquals(array('_route' => 'bar', 'foo' => 'foo', 'baz' => 1), $matcher->match('/bar.html'));
+        $this->assertEquals(array('_route' => 'bar', 'foo' => 'foo', 'baz' => 1), $matcher->match('/bar-foo.html'));
+        $this->assertEquals(array('_route' => 'bar', 'foo' => 'foo', 'baz' => 2), $matcher->match('/bar-foo-2.html'));
+        $this->assertEquals(array('_route' => 'bar', 'foo' => 'foo', 'baz' => 2), $matcher->match('/bar-2.html'));
     }
 
     public function testMatchWithPrefixes()

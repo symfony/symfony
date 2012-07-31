@@ -96,6 +96,33 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('POST', $response->headers->get('Allow'));
     }
 
+    /**
+     * @dataProvider getStatusCodes
+     */
+    public function testHandleWhenAnExceptionIsHandledWithASpecificStatusCode($responseStatusCode, $expectedStatusCode)
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) use ($responseStatusCode, $expectedStatusCode) {
+            $event->setResponse(new Response('', $responseStatusCode, array('X-Status-Code' => $expectedStatusCode)));
+        });
+
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { throw new \RuntimeException(); }));
+        $response = $kernel->handle(new Request());
+
+        $this->assertEquals($expectedStatusCode, $response->getStatusCode());
+        $this->assertFalse($response->headers->has('X-Status-Code'));
+    }
+
+    public function getStatusCodes()
+    {
+        return array(
+            array(200, 404),
+            array(404, 200),
+            array(301, 200),
+            array(500, 200),
+        );
+    }
+
     public function testHandleWhenAListenerReturnsAResponse()
     {
         $dispatcher = new EventDispatcher();

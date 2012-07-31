@@ -11,6 +11,7 @@
 namespace Symfony\Bridge\Propel1\Form\EventListener;
 
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 
@@ -43,9 +44,14 @@ class TranslationCollectionFormListener implements EventSubscriberInterface
         $form = $event->getForm();
         $data = $event->getData();
 
-        if(null == $data)
-        {
+        if (null === $data) {
             return;
+        }
+
+        if (!is_array($data)) {
+            if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
+                throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
+            }
         }
 
         //get the class name of the i18nClass
@@ -54,26 +60,31 @@ class TranslationCollectionFormListener implements EventSubscriberInterface
 
         $rootData = $form->getRoot()->getData();
 
+        $addFunction = 'add'.$dataClass;
+
         //add a database row for every needed language
-        foreach($this->languages as $lang)
-        {
+        foreach ($this->languages as $lang) {
             $found = false;
 
-            foreach($data as $i18n)
-            {
-                if($i18n->getLocale() == $lang)
-                {
+            foreach ($data as $i18n) {
+                if (!method_exists($i18n, 'getLocale')) {
+                    throw new UnexpectedTypeException($i18n, 'Propel i18n object');
+                }
+
+                if ($i18n->getLocale() == $lang) {
                     $found = true;
                     break;
                 }
             }
 
-            if(!$found)
-            {
+            if (!$found) {
+                if (!method_exists($rootData, $addFunction)) {
+                    throw new UnexpectedTypeException($rootData, 'Propel i18n object');
+                }
+
                 $newTranslation = new $this->i18nClass();
                 $newTranslation->setLocale($lang);
 
-                $addFunction = 'add'.$dataClass;
                 $rootData->$addFunction($newTranslation);
             }
         }

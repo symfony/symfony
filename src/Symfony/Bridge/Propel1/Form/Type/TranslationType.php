@@ -12,14 +12,13 @@
 namespace Symfony\Bridge\Propel1\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Bridge\Propel1\Form\EventListener\TranslationFormListener;
 
 /**
  * Translation type class
- * 
+ *
  * @author Patrick Kaufmann
  */
 class TranslationType extends AbstractType
@@ -46,9 +45,9 @@ class TranslationType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'columns' => array(),
-            'language' => ''
+        $resolver->setRequired(array(
+            'data_class',
+            'columns'
         ));
     }
 }

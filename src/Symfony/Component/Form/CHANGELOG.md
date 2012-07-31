@@ -177,3 +177,4 @@ CHANGELOG
  * made FormView properties public and deprecated their accessor methods
  * made the normalized data of a form accessible in the template through the variable "form.vars.data"
  * made the original data of a choice accessible in the template through the property "choice.data"
+ * added convenience class Forms and FormFactoryBuilderInterface

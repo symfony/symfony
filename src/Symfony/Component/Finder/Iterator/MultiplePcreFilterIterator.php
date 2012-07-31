@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Finder\Iterator;
 
-use Symfony\Component\Finder\Expr;
+use Symfony\Component\Finder\Expression\Expression;
 
 /**
  * MultiplePcreFilterIterator filters files using patterns (regexps, globs or strings).
@@ -54,7 +54,7 @@ abstract class MultiplePcreFilterIterator extends FilterIterator
      */
     protected function isRegex($str)
     {
-        return Expr::create($str)->isRegex();
+        return Expression::create($str)->isRegex();
     }
 
     /**

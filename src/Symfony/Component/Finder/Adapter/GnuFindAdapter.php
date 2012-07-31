@@ -13,7 +13,7 @@ namespace Symfony\Component\Finder\Adapter;
 
 use Symfony\Component\Finder\Iterator;
 use Symfony\Component\Finder\Shell;
-use Symfony\Component\Finder\Expr;
+use Symfony\Component\Finder\Expression\Expression;
 use Symfony\Component\Finder\Command;
 use Symfony\Component\Finder\Iterator\SortableIterator;
 
@@ -142,7 +142,7 @@ class GnuFindAdapter extends AbstractAdapter
         $command->add($not ? '-not' : null)->cmd('(');
 
         foreach ($names as $i => $name) {
-            $expr = Expr::create($name);
+            $expr = Expression::create($name);
 
             $command
                 ->add($i > 0 ? '-or' : null)
@@ -150,7 +150,7 @@ class GnuFindAdapter extends AbstractAdapter
                     ? ($expr->isCaseSensitive() ? '-regex' : '-iregex')
                     : ($expr->isCaseSensitive() ? '-name' : '-iname')
                 )
-                ->arg($expr->getBody());
+                ->arg($expr->render());
         }
 
         $command->cmd(')');
@@ -250,16 +250,14 @@ class GnuFindAdapter extends AbstractAdapter
     private function buildContainsCommand(Command $command, array $contains, $not = false)
     {
         foreach ($contains as $contain) {
-            $expr  = Expr::create($contain);
-            $regex = $expr->isRegex()
-                ? $expr->getBody()
-                : trim(Expr::create($expr->getRegex(false, false))->getBody(), '^$');
+            $expr = Expression::create($contain);
+            $pattern = $expr->isRegex() ? $expr->setStartFlag(false)->setEndFlag(false)->renderPattern() : $expr->render();
 
             $command
                 ->add('| xargs -r grep -I')
                 ->add($expr->isCaseSensitive() ? null : '-i')
                 ->add($not ? '-L' : '-l')
-                ->add('-Ee')->arg($regex);
+                ->add('-Ee')->arg($pattern);
         }
     }
 

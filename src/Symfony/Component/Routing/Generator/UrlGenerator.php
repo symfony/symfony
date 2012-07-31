@@ -26,10 +26,10 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  *
  * @api
  */
-class UrlGenerator implements UrlGeneratorInterface
+class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
 {
     protected $context;
-    protected $strictParameters = true;
+    protected $strictRequirements = true;
     protected $logger;
 
     /**
@@ -95,23 +95,19 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * Enables or disables the exception on incorrect parameters.
-     *
-     * @param Boolean $enabled
+     * {@inheritdoc}
      */
-    public function setStrictParameters($enabled)
+    public function setStrictRequirements($enabled)
     {
-        $this->strictParameters = $enabled;
+        $this->strictRequirements = (Boolean) $enabled;
     }
 
     /**
-     * Gets the strict check of incorrect parameters.
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
-    public function getStrictParameters()
+    public function isStrictRequirements()
     {
-        return $this->strictParameters;
+        return $this->strictRequirements;
     }
 
     /**
@@ -155,7 +151,7 @@ class UrlGenerator implements UrlGeneratorInterface
                         // check requirement
                         if ($tparams[$token[3]] && !preg_match('#^'.$token[2].'$#', $tparams[$token[3]])) {
                             $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $tparams[$token[3]]);
-                            if ($this->strictParameters) {
+                            if ($this->strictRequirements) {
                                 throw new InvalidParameterException($message);
                             }
 

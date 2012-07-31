@@ -169,7 +169,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('type')->end()
                         ->scalarNode('http_port')->defaultValue(80)->end()
                         ->scalarNode('https_port')->defaultValue(443)->end()
-                        ->scalarNode('strict_parameters')
+                        ->scalarNode('strict_requirements')
                             ->info(
                                 'set to false to disable exceptions when a route is '.
                                 'generated with invalid parameters (and return null instead)'

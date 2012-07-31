@@ -27,6 +27,12 @@ interface HttpKernelInterface
     const SUB_REQUEST = 2;
 
     /**
+     * Use this header to customize the Response StatusCode in case an exception
+     * is catch in an error handler
+     */
+    const HEADER_STATUSCODE = 'Symfony-StatusCode';
+
+    /**
      * Handles a Request to convert it to a Response.
      *
      * When $catch is true, the implementation must catch all exceptions

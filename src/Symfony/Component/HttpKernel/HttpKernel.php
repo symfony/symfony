@@ -168,7 +168,13 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
 
-        return $event->getResponse();
+        $response = $event->getResponse();
+        
+        if ($response->headers->has(HttpKernelInterface::HEADER_STATUSCODE)) {
+            $response->headers->remove(HttpKernelInterface::HEADER_STATUSCODE);
+        }
+
+        return $response;
     }
 
     /**
@@ -201,7 +207,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
                 $response->setStatusCode($e->getStatusCode());
                 $response->headers->add($e->getHeaders());
             } else {
-                $response->setStatusCode(500);
+                $response->setStatusCode($response->headers->get(HttpKernelInterface::HEADER_STATUSCODE, 500));
             }
         }
 

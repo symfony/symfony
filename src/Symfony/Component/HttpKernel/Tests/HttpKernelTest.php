@@ -68,6 +68,23 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $response->getContent());
     }
 
+    public function testHandleWhenControllerThrowsAnExceptionAndGotHeader()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
+            $response = new Response($event->getException()->getMessage());
+            $response->headers->set(HttpKernelInterface::HEADER_STATUSCODE, 200);
+            $event->setResponse($response);
+        });
+
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { throw new \RuntimeException('foo'); }));
+        $response = $kernel->handle(new Request());
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('foo', $response->getContent());
+        $this->assertFalse($response->headers->has(HttpKernelInterface::HEADER_STATUSCODE));
+    }
+
     public function testHandleExceptionWithARedirectionResponse()
     {
         $dispatcher = new EventDispatcher();

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Extension\Templating\Fixtures;
+namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures;
 
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Templating\TemplateReference;

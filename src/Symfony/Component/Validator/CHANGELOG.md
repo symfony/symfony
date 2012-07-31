@@ -26,3 +26,5 @@ CHANGELOG
  * added Range constraint
  * deprecated the Min and Max constraints
  * deprecated the MinLength and MaxLength constraints
+ * added Validation and ValidatorBuilderInterface
+ * deprecated ValidatorContext, ValidatorContextInterface and ValidatorFactory

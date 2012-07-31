@@ -1271,6 +1271,25 @@
     private $password;
     ```
 
+  * The classes `ValidatorContext` and `ValidatorFactory` were deprecated and
+    will be removed in Symfony 2.3. You should use the new entry point
+    `Validation` instead.
+
+    Before:
+
+    ```
+    $validator = ValidatorFactory::buildDefault(array('path/to/mapping.xml'))
+        ->getValidator();
+    ```
+
+    After:
+
+    ```
+    $validator = Validation::createValidatorBuilder()
+        ->addXmlMapping('path/to/mapping.xml')
+        ->getValidator();
+    ```
+
 ### Session
 
   * Flash messages now return an array based on their type. The old method is

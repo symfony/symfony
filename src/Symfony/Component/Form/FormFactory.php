@@ -37,7 +37,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create($type, $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function create($type = 'form', $data = null, array $options = array(), FormBuilderInterface $parent = null)
     {
         return $this->createBuilder($type, $data, $options, $parent)->getForm();
     }
@@ -45,7 +45,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createNamed($name, $type, $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function createNamed($name, $type = 'form', $data = null, array $options = array(), FormBuilderInterface $parent = null)
     {
         return $this->createNamedBuilder($name, $type, $data, $options, $parent)->getForm();
     }
@@ -61,7 +61,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createBuilder($type, $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function createBuilder($type = 'form', $data = null, array $options = array(), FormBuilderInterface $parent = null)
     {
         $name = $type instanceof FormTypeInterface || $type instanceof ResolvedFormTypeInterface
             ? $type->getName()
@@ -73,7 +73,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createNamedBuilder($name, $type, $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function createNamedBuilder($name, $type = 'form', $data = null, array $options = array(), FormBuilderInterface $parent = null)
     {
         if (null !== $data && !array_key_exists('data', $options)) {
             $options['data'] = $data;

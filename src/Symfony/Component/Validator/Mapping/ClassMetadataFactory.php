@@ -35,7 +35,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
 
     protected $loadedClasses = array();
 
-    public function __construct(LoaderInterface $loader, CacheInterface $cache = null)
+    public function __construct(LoaderInterface $loader = null, CacheInterface $cache = null)
     {
         $this->loader = $loader;
         $this->cache = $cache;
@@ -68,9 +68,11 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
             $metadata->mergeConstraints($this->getClassMetadata($interface->name));
         }
 
-        $this->loader->loadClassMetadata($metadata);
+        if (null !== $this->loader) {
+            $this->loader->loadClassMetadata($metadata);
+        }
 
-        if ($this->cache !== null) {
+        if (null !== $this->cache) {
             $this->cache->write($metadata);
         }
 

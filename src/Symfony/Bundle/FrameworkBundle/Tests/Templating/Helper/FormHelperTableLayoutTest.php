@@ -9,20 +9,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Extension\Templating;
+namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
-use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
-use Symfony\Component\Form\Tests\Extension\Templating\Fixtures\StubTemplateNameParser;
-use Symfony\Component\Form\Tests\Extension\Templating\Fixtures\StubTranslator;
+use Symfony\Component\Form\Tests\AbstractTableLayoutTest;
+use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTemplateNameParser;
+use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
 
 // should probably be moved to the Translation component
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
 
-class FormHelperDivLayoutTest extends AbstractDivLayoutTest
+class FormHelperTableLayoutTest extends AbstractTableLayoutTest
 {
     /**
      * @var PhpEngine
@@ -61,6 +61,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         return array_merge(parent::getExtensions(), array(
             new TemplatingExtension($this->engine, $this->csrfProvider, array(
                 'FrameworkBundle:Form',
+                'FrameworkBundle:FormTable',
             )),
         ));
     }
@@ -103,19 +104,5 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
     protected function setTheme(FormView $view, array $themes)
     {
         $this->engine->get('form')->setTheme($view, $themes);
-    }
-
-    public static function themeBlockInheritanceProvider()
-    {
-        return array(
-            array(array('TestBundle:Parent'))
-        );
-    }
-
-    public static function themeInheritanceProvider()
-    {
-        return array(
-            array(array('TestBundle:Parent'), array('TestBundle:Child'))
-        );
     }
 }

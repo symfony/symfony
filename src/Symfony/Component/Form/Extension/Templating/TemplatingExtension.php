@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Templating\PhpEngine;
+use Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper;
 
 /**
  * Integrates the Templating component with the Form library.

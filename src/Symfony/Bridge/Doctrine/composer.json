@@ -24,7 +24,7 @@
         "symfony/validator": "self.version",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": ">=2.2,<2.4-dev",
-        "doctrine/orm": ">=2.2,<2.4-dev"
+        "doctrine/orm": ">=2.2.3,<2.4-dev"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Doctrine": "" }

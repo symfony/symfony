@@ -102,47 +102,54 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         }
 
         $this->pathAsString = $propertyPath;
-        $position = 0;
-        $remaining = $propertyPath;
 
-        // first element is evaluated differently - no leading dot for properties
-        $pattern = '/^(([^\.\[]+)|\[([^\]]+)\])(.*)/';
-
-        while (preg_match($pattern, $remaining, $matches)) {
-            $this->positions[] = $position;
-
-            if ('' !== $matches[2]) {
-                $element = $matches[2];
-                $this->isIndex[] = false;
-            } else {
-                $element = $matches[3];
-                $this->isIndex[] = true;
-            }
-            // Disabled this behaviour as the syntax is not yet final
-            //$pos = strpos($element, self::SINGULAR_SEPARATOR);
-            $pos = false;
-            $singular = null;
-
-            if (false !== $pos) {
-                $singular = substr($element, $pos + 1);
-                $element = substr($element, 0, $pos);
-            }
-
-            $this->elements[] = $element;
-            $this->singulars[] = $singular;
-
-            $position += strlen($matches[1]);
-            $remaining = $matches[4];
-            $pattern = '/^(\.(\w+)|\[([^\]]+)\])(.*)/';
+        if ('.' === $propertyPath{0}) {
+            throw new InvalidPropertyPathException(sprintf(
+                'Cannot parse property path "%s". It must not contain a leading dot.',
+                $propertyPath)
+            );
         }
 
-        if (!empty($remaining)) {
+        $offset = 0;
+        if ('[' !== $propertyPath{0}) {
+            $propertyPath = '.'.$propertyPath;
+            $offset = 1;
+        }
+
+        preg_match_all('/\G(?:\.([^\.\[]+)|\[([^\]]+)\]|.+)/', $propertyPath, $matches, \PREG_SET_ORDER|\PREG_OFFSET_CAPTURE);
+
+        $last = end($matches);
+        if (!isset($last[1]) && !isset($last[2])) {
             throw new InvalidPropertyPathException(sprintf(
-                'Could not parse property path "%s". Unexpected token "%s" at position %d',
+                'Could not parse property path "%s". Unexpected token at position %d',
                 $propertyPath,
-                $remaining{0},
-                $position
+                $last[0][0],
+                $last[0][1] - $offset
             ));
+        }
+
+        foreach ($matches as $match) {
+            $this->positions[] = 0 === $match[0][1] ? 0 : $match[0][1] - $offset;
+
+            if (isset($match[2])) {
+                $this->elements[] = $match[2][0];
+                $this->isIndex[] = true;
+            } else {
+                $this->elements[] = $match[1][0];
+                $this->isIndex[] = false;
+            }
+
+            // Disabled this behaviour as the syntax is not yet final
+            // $pos = strpos($element, self::SINGULAR_SEPARATOR);
+//            $pos = false;
+            $singular = null;
+
+//            if (false !== $pos) {
+//                $singular = substr($element, $pos + 1);
+//                $element = substr($element, 0, $pos);
+//            }
+
+            $this->singulars[] = $singular;
         }
 
         $this->length = count($this->elements);

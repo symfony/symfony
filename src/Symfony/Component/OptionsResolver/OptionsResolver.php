@@ -312,6 +312,10 @@ class OptionsResolver implements OptionsResolverInterface
     private function validateOptionTypes(array $options)
     {
         foreach ($this->allowedTypes as $option => $allowedTypes) {
+            if (!isset($options[$option])) {
+                continue;
+            }
+
             $value = $options[$option];
             $allowedTypes = (array) $allowedTypes;
 

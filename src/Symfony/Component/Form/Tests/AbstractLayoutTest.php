@@ -39,7 +39,6 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     protected function getExtensions()
     {
         return array(
-            new CoreExtension(),
             new CsrfExtension($this->csrfProvider),
         );
     }

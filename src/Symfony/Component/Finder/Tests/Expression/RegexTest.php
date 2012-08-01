@@ -13,9 +13,6 @@ namespace Symfony\Component\Finder\Tests;
 
 use Symfony\Component\Finder\Expression\Expression;
 
-/**
- * @author Jean-François Simon <contact@jfsimon.fr>
- */
 class RegexTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -25,8 +22,8 @@ class RegexTest extends \PHPUnit_Framework_TestCase
     {
         $expr = new Expression($regex);
 
-        $this->assertEquals($start, $expr->hasStartFlag());
-        $this->assertEquals($end,   $expr->hasEndFlag());
+        $this->assertEquals($start, $expr->getRegex()->hasStartFlag());
+        $this->assertEquals($end,   $expr->getRegex()->hasEndFlag());
     }
 
     /**
@@ -36,8 +33,8 @@ class RegexTest extends \PHPUnit_Framework_TestCase
     {
         $expr = new Expression($regex);
 
-        $this->assertEquals($start, $expr->hasStartJoker());
-        $this->assertEquals($end,   $expr->hasEndJoker());
+        $this->assertEquals($start, $expr->getRegex()->hasStartJoker());
+        $this->assertEquals($end,   $expr->getRegex()->hasEndJoker());
     }
 
     /**
@@ -46,7 +43,7 @@ class RegexTest extends \PHPUnit_Framework_TestCase
     public function testSetFlags($regex, $start, $end, $expected)
     {
         $expr = new Expression($regex);
-        $expr->setStartFlag($start)->setEndFlag($end);
+        $expr->getRegex()->setStartFlag($start)->setEndFlag($end);
 
         $this->assertEquals($expected, $expr->render());
     }
@@ -57,7 +54,7 @@ class RegexTest extends \PHPUnit_Framework_TestCase
     public function testSetJokers($regex, $start, $end, $expected)
     {
         $expr = new Expression($regex);
-        $expr->setStartJoker($start)->setEndJoker($end);
+        $expr->getRegex()->setStartJoker($start)->setEndJoker($end);
 
         $this->assertEquals($expected, $expr->render());
     }
@@ -65,7 +62,7 @@ class RegexTest extends \PHPUnit_Framework_TestCase
     public function testOptions()
     {
         $expr = new Expression('~abc~is');
-        $expr->removeOption('i')->addOption('m');
+        $expr->getRegex()->removeOption('i')->addOption('m');
 
         $this->assertEquals('~abc~sm', $expr->render());
     }
@@ -74,10 +71,10 @@ class RegexTest extends \PHPUnit_Framework_TestCase
     {
         $expr = new Expression('~^.*abc.*$~is');
 
-        $expr->setStartFlag(false)->setEndFlag(false)->setStartJoker(false)->setEndJoker(false);
+        $expr->getRegex()->setStartFlag(false)->setEndFlag(false)->setStartJoker(false)->setEndJoker(false);
         $this->assertEquals('~abc~is', $expr->render());
 
-        $expr->setStartFlag(true)->setEndFlag(true)->setStartJoker(true)->setEndJoker(true);
+        $expr->getRegex()->setStartFlag(true)->setEndFlag(true)->setStartJoker(true)->setEndJoker(true);
         $this->assertEquals('~^.*abc.*$~is', $expr->render());
     }
 

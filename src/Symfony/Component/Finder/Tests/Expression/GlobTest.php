@@ -13,9 +13,6 @@ namespace Symfony\Component\Finder\Tests;
 
 use Symfony\Component\Finder\Expression\Expression;
 
-/**
- * @author Jean-François Simon <contact@jfsimon.fr>
- */
 class GlobTest extends \PHPUnit_Framework_TestCase
 {
     /**

@@ -154,10 +154,11 @@ class GnuFindAdapter extends AbstractAdapter
 
             // Fixes 'not search' regex problem.
             if ($expr->isRegex()) {
-                $expr->prepend($expr->hasStartFlag() ? '/' : '/.*')->setStartFlag(false)->setStartJoker(true);
+                $regex = $expr->getRegex();
+                $regex->prepend($regex->hasStartFlag() ? '/' : '/.*')->setStartFlag(false)->setStartJoker(true);
 
-                if (!$expr->hasEndFlag()) {
-                    $expr->setEndJoker(true);
+                if (!$regex->hasEndFlag()) {
+                    $regex->setEndJoker(true);
                 }
             }
 
@@ -280,12 +281,23 @@ class GnuFindAdapter extends AbstractAdapter
     private function buildSortCommand(Command $command, $sort)
     {
         switch ($sort) {
-            case SortableIterator::SORT_BY_NAME:          $format = null;  break;
-            case SortableIterator::SORT_BY_TYPE:          $format = '%y';  break;
-            case SortableIterator::SORT_BY_ACCESSED_TIME: $format = '%A@'; break;
-            case SortableIterator::SORT_BY_CHANGED_TIME:  $format = '%C@'; break;
-            case SortableIterator::SORT_BY_MODIFIED_TIME: $format = '%T@'; break;
-            default: throw new \InvalidArgumentException('Unknown sort options: '.$sort.'.');
+            case SortableIterator::SORT_BY_NAME:
+                $format = null;
+                break;
+            case SortableIterator::SORT_BY_TYPE:
+                $format = '%y';
+                break;
+            case SortableIterator::SORT_BY_ACCESSED_TIME:
+                $format = '%A@';
+                break;
+            case SortableIterator::SORT_BY_CHANGED_TIME:
+                $format = '%C@';
+                break;
+            case SortableIterator::SORT_BY_MODIFIED_TIME:
+                $format = '%T@';
+                break;
+            default:
+                throw new \InvalidArgumentException('Unknown sort options: '.$sort.'.');
         }
 
         $command->get('find')->add('-printf')->arg($format.' %h/%f\\n');

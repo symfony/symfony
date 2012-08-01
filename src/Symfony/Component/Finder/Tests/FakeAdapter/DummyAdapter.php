@@ -51,7 +51,7 @@ class DummyAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    function getName()
+    public function getName()
     {
         return 'yes';
     }

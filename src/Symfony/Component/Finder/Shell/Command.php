@@ -60,7 +60,7 @@ class Command
      *
      * @return Command New Command instance
      */
-    static public function create(Command $parent = null)
+    public static function create(Command $parent = null)
     {
         return new self($parent);
     }
@@ -72,7 +72,7 @@ class Command
      *
      * @return string The escaped string
      */
-    static public function escape($input)
+    public static function escape($input)
     {
         return escapeshellcmd($input);
     }
@@ -84,7 +84,7 @@ class Command
      *
      * @return string The quoted string
      */
-    static public function quote($input)
+    public static function quote($input)
     {
         return escapeshellarg($input);
     }

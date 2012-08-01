@@ -18,7 +18,7 @@ use Symfony\Component\Finder\Adapter\AdapterInterface;
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class AdapterFailureException extends \RuntimeException
+class AdapterFailureException extends \RuntimeException implements ExceptionInterface
 {
     /**
      * @var \Symfony\Component\Finder\Adapter\AdapterInterface
@@ -26,9 +26,9 @@ class AdapterFailureException extends \RuntimeException
     private $adapter;
 
     /**
-     * @param \Symfony\Component\Finder\Adapter\AdapterInterface $adapter
-     * @param string|null                                        $message
-     * @param \Exception|null                                    $previous
+     * @param AdapterInterface $adapter
+     * @param string|null      $message
+     * @param \Exception|null  $previous
      */
     public function __construct(AdapterInterface $adapter, $message = null, \Exception $previous = null)
     {
@@ -37,7 +37,7 @@ class AdapterFailureException extends \RuntimeException
     }
 
     /**
-     * @return \Symfony\Component\Finder\Adapter\AdapterInterface
+     * {@inheritdoc}
      */
     public function getAdapter()
     {

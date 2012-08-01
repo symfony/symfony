@@ -55,17 +55,6 @@ class Expression implements ValueInterface
     }
 
     /**
-     * @param string $method
-     * @param array  $arguments
-     *
-     * @return mixed
-     */
-    public function __call($method, array $arguments)
-    {
-        return call_user_func_array(array($this->value, $method), $arguments);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function render()

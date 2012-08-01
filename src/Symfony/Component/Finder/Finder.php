@@ -12,7 +12,7 @@
 namespace Symfony\Component\Finder;
 
 use Symfony\Component\Finder\Adapter;
-use Symfony\Component\Finder\Exception\AdapterFailureException;
+use Symfony\Component\Finder\Exception\ExceptionInterface;
 
 /**
  * Finder allows to build rules to find files and directories.
@@ -82,7 +82,7 @@ class Finder implements \IteratorAggregate, \Countable
      * @param Adapter\AdapterInterface $adapter  An adapter instance
      * @param int                      $priority Highest is selected first
      *
-     * @return \Symfony\Component\Finder\Finder The current Finder instance
+     * @return Finder The current Finder instance
      */
     public function register(Adapter\AdapterInterface $adapter, $priority = 0)
     {
@@ -97,7 +97,7 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Removes all adapters registered in the finder.
      *
-     * @return \Symfony\Component\Finder\Finder The current Finder instance
+     * @return Finder The current Finder instance
      */
     public function removeAdapters()
     {
@@ -107,7 +107,7 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Returns reegistered adapters ordered by priority without extra informations.
+     * Returns registered adapters ordered by priority without extra information.
      *
      * @return \Symfony\Component\Finder\Adapter\AdapterInterface[]
      */
@@ -654,7 +654,7 @@ class Finder implements \IteratorAggregate, \Countable
                 return $this
                     ->buildAdapter($adapter['adapter'])
                     ->searchInDirectory($dir);
-            } catch(AdapterFailureException $e) {
+            } catch(ExceptionInterface $e) {
                 continue;
             }
         }

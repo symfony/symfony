@@ -29,9 +29,26 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
 
     public function getAcceptData()
     {
+        $onlyFiles = array(
+            'test.py',
+            'foo/bar.tmp',
+            'test.php',
+            '.bar',
+            '.foo/.bar',
+            '.foo/bar',
+            'foo bar',
+        );
+
+        $onlyDirectories = array(
+            '.git',
+            'foo',
+            'toto',
+            '.foo',
+        );
+
         return array(
-            array(FileTypeFilterIterator::ONLY_FILES, array(sys_get_temp_dir().'/symfony2_finder/test.py', sys_get_temp_dir().'/symfony2_finder/foo/bar.tmp', sys_get_temp_dir().'/symfony2_finder/test.php', sys_get_temp_dir().'/symfony2_finder/.bar', sys_get_temp_dir().'/symfony2_finder/.foo/.bar', sys_get_temp_dir().'/symfony2_finder/foo bar', sys_get_temp_dir().'/symfony2_finder/.foo/bar')),
-            array(FileTypeFilterIterator::ONLY_DIRECTORIES, array(sys_get_temp_dir().'/symfony2_finder/.git', sys_get_temp_dir().'/symfony2_finder/foo', sys_get_temp_dir().'/symfony2_finder/toto', sys_get_temp_dir().'/symfony2_finder/.foo')),
+            array(FileTypeFilterIterator::ONLY_FILES, $this->toAbsolute($onlyFiles)),
+            array(FileTypeFilterIterator::ONLY_DIRECTORIES, $this->toAbsolute($onlyDirectories)),
         );
     }
 }

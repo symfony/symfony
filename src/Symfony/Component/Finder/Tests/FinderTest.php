@@ -17,14 +17,6 @@ use Symfony\Component\Finder\Tests\FakeAdapter;
 
 class FinderTest extends Iterator\RealIteratorTestCase
 {
-    protected static $tmpDir;
-
-    public static function setUpBeforeClass()
-    {
-        parent::setUpBeforeClass();
-
-        self::$tmpDir = realpath(sys_get_temp_dir().'/symfony2_finder');
-    }
 
     public function testCreate()
     {
@@ -501,26 +493,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = Finder::create()->files();
         count($finder);
-    }
-
-    protected function toAbsolute($files)
-    {
-        $f = array();
-        foreach ($files as $file) {
-            $f[] = self::$tmpDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file);
-        }
-
-        return $f;
-    }
-
-    protected function toAbsoluteFixtures($files)
-    {
-        $f = array();
-        foreach ($files as $file) {
-            $f[] = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$file;
-        }
-
-        return $f;
     }
 
     /**

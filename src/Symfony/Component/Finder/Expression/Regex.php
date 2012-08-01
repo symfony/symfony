@@ -107,7 +107,7 @@ class Regex implements ValueInterface
     public function renderPattern()
     {
         return ($this->startFlag ? self::START_FLAG : '')
-            .($this->startFlag ? self::JOKER : '')
+            .($this->startJoker ? self::JOKER : '')
             .$this->pattern
             .($this->endJoker ? self::JOKER : '')
             .($this->endFlag ? self::END_FLAG : '');
@@ -180,7 +180,7 @@ class Regex implements ValueInterface
     /**
      * @return bool
      */
-    public function getStartFlag()
+    public function hasStartFlag()
     {
         return $this->startFlag;
     }
@@ -220,7 +220,7 @@ class Regex implements ValueInterface
     /**
      * @return bool
      */
-    public function getStartJoker()
+    public function hasStartJoker()
     {
         return $this->startJoker;
     }
@@ -258,12 +258,12 @@ class Regex implements ValueInterface
             $pattern = substr($pattern, 2);
         }
 
-        if ($this->endFlag = self::END_FLAG === substr($pattern, 0, -1)) {
+        if ($this->endFlag = self::END_FLAG === substr($pattern, -1)) {
             $pattern = substr($pattern, 0, -1);
         }
 
-        if ($this->endJoker = self::JOKER === substr($pattern, 0, -2)) {
-            $pattern = substr($pattern, 2);
+        if ($this->endJoker = self::JOKER === substr($pattern, -2)) {
+            $pattern = substr($pattern, 0, -2);
         }
 
         $this->pattern = $pattern;

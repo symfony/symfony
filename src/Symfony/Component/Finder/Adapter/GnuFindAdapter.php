@@ -83,13 +83,8 @@ class GnuFindAdapter extends AbstractAdapter
             $this->buildSortCommand($command, $this->sort);
         }
 
-        if ($this->shell->testCommand('uniq')) {
-            $paths = $command->add('| uniq')->execute();
-        } else {
-            $paths = array_unique($command->execute());
-        }
-
-        $iterator = new Iterator\FilePathsIterator($command->execute(), $dir);
+        $paths = $this->shell->testCommand('uniq') ? $command->add('| uniq')->execute() : array_unique($command->execute());
+        $iterator = new Iterator\FilePathsIterator($paths, $dir);
 
         if ($this->exclude) {
             $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
@@ -251,13 +246,12 @@ class GnuFindAdapter extends AbstractAdapter
     {
         foreach ($contains as $contain) {
             $expr = Expression::create($contain);
-            $pattern = $expr->isRegex() ? $expr->setStartFlag(false)->setEndFlag(false)->renderPattern() : $expr->render();
 
             $command
                 ->add('| xargs -r grep -I')
                 ->add($expr->isCaseSensitive() ? null : '-i')
                 ->add($not ? '-L' : '-l')
-                ->add('-Ee')->arg($pattern);
+                ->add('-Ee')->arg($expr->renderPattern());
         }
     }
 

@@ -88,6 +88,7 @@ class RegexTest extends \PHPUnit_Framework_TestCase
             array('~abc$~', false, true),
             array('~abc~', false, false),
             array('~^abc$~', true, true),
+            array('~^abc\\$~', true, false),
         );
     }
 
@@ -98,6 +99,7 @@ class RegexTest extends \PHPUnit_Framework_TestCase
             array('~abc.*~', false, true),
             array('~abc~', false, false),
             array('~.*abc.*~', true, true),
+            array('~.*abc\\.*~', true, false),
         );
     }
 

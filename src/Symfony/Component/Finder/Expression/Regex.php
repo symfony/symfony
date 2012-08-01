@@ -20,6 +20,7 @@ class Regex implements ValueInterface
     const END_FLAG   = '$';
     const BOUNDARY   = '~';
     const JOKER      = '.*';
+    const ESCAPING   = '\\';
 
     /**
      * @var string
@@ -246,6 +247,30 @@ class Regex implements ValueInterface
     }
 
     /**
+     * @param string $expr
+     *
+     * @return Regex
+     */
+    public function prepend($expr)
+    {
+        $this->pattern = $expr.$this->pattern;
+
+        return $this;
+    }
+
+    /**
+     * @param string $expr
+     *
+     * @return Regex
+     */
+    public function append($expr)
+    {
+        $this->pattern .= $expr;
+
+        return $this;
+    }
+
+    /**
      * @param string $pattern
      */
     private function parsePattern($pattern)
@@ -258,11 +283,11 @@ class Regex implements ValueInterface
             $pattern = substr($pattern, 2);
         }
 
-        if ($this->endFlag = self::END_FLAG === substr($pattern, -1)) {
+        if ($this->endFlag = (self::END_FLAG === substr($pattern, -1) && self::ESCAPING !== substr($pattern, -2, -1))) {
             $pattern = substr($pattern, 0, -1);
         }
 
-        if ($this->endJoker = self::JOKER === substr($pattern, -2)) {
+        if ($this->endJoker = (self::JOKER === substr($pattern, -2) && self::ESCAPING !== substr($pattern, -3, -2))) {
             $pattern = substr($pattern, 0, -2);
         }
 

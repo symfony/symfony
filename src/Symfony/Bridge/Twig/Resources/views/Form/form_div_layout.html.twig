@@ -31,8 +31,18 @@
 
 {% block collection_widget %}
 {% spaceless %}
+    {% set attr = attr|merge({'data-collection': true}) %}
+
     {% if prototype is defined %}
-        {% set attr = attr|merge({'data-prototype': form_row(prototype) }) %}
+        {% set attr = attr|merge({'data-collection-prototype': form_row(prototype)}) %}
+    {% endif %}
+
+    {% if allow_delete is defined %}
+        {% set attr = attr|merge({'data-collection-delete': allow_delete}) %}
+    {% endif %}
+
+    {% if allow_add is defined %}
+        {% set attr = attr|merge({'data-collection-add': allow_add}) %}
     {% endif %}
     {{ block('form_widget') }}
 {% endspaceless %}

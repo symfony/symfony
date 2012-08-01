@@ -250,7 +250,7 @@ abstract class Client
         $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
-        $request = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
+        $request = $this->createRequest($method, $uri, $parameters, $files, $server, $content);
 
         $this->request = $this->filterRequest($request);
 
@@ -275,6 +275,23 @@ abstract class Client
         }
 
         return $this->crawler = $this->createCrawlerFromContent($request->getUri(), $response->getContent(), $response->getHeader('Content-Type'));
+    }
+
+    /**
+     * Create a new request instance.
+     *
+     * @param string  $method        The request method
+     * @param string  $uri           The URI to fetch
+     * @param array   $parameters    The Request parameters
+     * @param array   $files         The files
+     * @param array   $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
+     * @param string  $content       The raw body data
+     *
+     * @return Request A request instance
+     */
+    protected function createRequest($method, $uri, $parameters, $files, $server, $content)
+    {
+        return new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
     }
 
     /**

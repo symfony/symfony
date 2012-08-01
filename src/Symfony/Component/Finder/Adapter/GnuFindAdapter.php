@@ -16,6 +16,8 @@ use Symfony\Component\Finder\Shell\Shell;
 use Symfony\Component\Finder\Expression\Expression;
 use Symfony\Component\Finder\Shell\Command;
 use Symfony\Component\Finder\Iterator\SortableIterator;
+use Symfony\Component\Finder\Comparator\NumberComparator;
+use Symfony\Component\Finder\Comparator\DateComparator;
 
 /**
  * Shell engine implementation using GNU find command.
@@ -73,13 +75,16 @@ class GnuFindAdapter extends AbstractAdapter
         $this->buildSizesCommand($find, $this->sizes);
         $this->buildDatesCommand($find, $this->dates);
 
-        if (($useGrep = $this->shell->testCommand('grep') && $this->shell->testCommand('xargs')) && ($this->contains || $this->notContains)) {
+        $useGrep = $this->shell->testCommand('grep') && $this->shell->testCommand('xargs');
+        $useSort = is_int($this->sort) && $this->shell->testCommand('sort') && $this->shell->testCommand('awk');
+
+        if ($useGrep && ($this->contains || $this->notContains)) {
             $grep = $command->ins('grep');
             $this->buildContainsCommand($grep, $this->contains);
             $this->buildContainsCommand($grep, $this->notContains, true);
         }
 
-        if ($useSort = is_int($this->sort) && $this->shell->testCommand('sort') && $this->shell->testCommand('awk')) {
+        if ($useSort) {
             $this->buildSortCommand($command, $this->sort);
         }
 
@@ -124,9 +129,9 @@ class GnuFindAdapter extends AbstractAdapter
     }
 
     /**
-     * @param \Symfony\Component\Finder\Command $command
-     * @param string[]                          $names
-     * @param bool                              $not
+     * @param Command  $command
+     * @param string[] $names
+     * @param bool     $not
      */
     private function buildNamesCommand(Command $command, array $names, $not = false)
     {
@@ -139,21 +144,26 @@ class GnuFindAdapter extends AbstractAdapter
         foreach ($names as $i => $name) {
             $expr = Expression::create($name);
 
+            // Fixes 'not search' regex problem.
+            if ($expr->isRegex()) {
+                $expr->setStartJoker(true)->setEndJoker(true);
+            }
+
             $command
                 ->add($i > 0 ? '-or' : null)
                 ->add($expr->isRegex()
                     ? ($expr->isCaseSensitive() ? '-regex' : '-iregex')
                     : ($expr->isCaseSensitive() ? '-name' : '-iname')
                 )
-                ->arg($expr->render());
+                ->arg($expr->renderPattern());
         }
 
         $command->cmd(')');
     }
 
     /**
-     * @param \Symfony\Component\Finder\Command                       $command
-     * @param \Symfony\Component\Finder\Comparator\NumberComparator[] $sizes
+     * @param Command            $command
+     * @param NumberComparator[] $sizes
      */
     private function buildSizesCommand(Command $command, array $sizes)
     {
@@ -191,8 +201,8 @@ class GnuFindAdapter extends AbstractAdapter
     }
 
     /**
-     * @param \Symfony\Component\Finder\Command                     $command
-     * @param \Symfony\Component\Finder\Comparator\DateComparator[] $dates
+     * @param Command          $command
+     * @param DateComparator[] $dates
      */
     private function buildDatesCommand(Command $command, array $dates)
     {
@@ -238,9 +248,9 @@ class GnuFindAdapter extends AbstractAdapter
     }
 
     /**
-     * @param \Symfony\Component\Finder\Command $command
-     * @param array                             $contains
-     * @param bool                              $not
+     * @param Command $command
+     * @param array   $contains
+     * @param bool    $not
      */
     private function buildContainsCommand(Command $command, array $contains, $not = false)
     {

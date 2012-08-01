@@ -6,3 +6,4 @@ CHANGELOG
 
  * [BC BREAK] The CookieJar internals have changed to allow cookies with the
    same name on different sub-domains/sub-paths
+ * added new createRequest method to Client

@@ -26,10 +26,11 @@ class Inline
      * Converts a YAML string to a PHP array.
      *
      * @param string $value A YAML string
+     * @param integer &$i The last index that was parsed
      *
      * @return array A PHP array representing the YAML string
      */
-    public static function parse($value)
+    public static function parse($value, &$i = 0)
     {
         $value = trim($value);
 
@@ -44,13 +45,12 @@ class Inline
 
         switch ($value[0]) {
             case '[':
-                $result = self::parseSequence($value);
+                $result = self::parseSequence($value, $i);
                 break;
             case '{':
-                $result = self::parseMapping($value);
+                $result = self::parseMapping($value, $i);
                 break;
             default:
-                $i = 0;
                 $result = self::parseScalar($value, null, array('"', "'"), $i);
 
                 // some comment can end the scalar

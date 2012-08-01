@@ -21,6 +21,13 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         foreach ($this->getTestsForParse() as $yaml => $value) {
             $this->assertEquals($value, Inline::parse($yaml), sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
         }
+
+        foreach ($this->getTestsForParseIndex() as $yaml => $index) {
+            $actualIndex = 0;
+            Inline::parse($yaml, $actualIndex);
+
+            $this->assertEquals($index, $actualIndex, sprintf('::parse() sets $i to the last index parsed (%s)', $yaml));
+        }
     }
 
     public function testDump()
@@ -161,6 +168,29 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
             '[foo, bar: { foo: bar }]' => array('foo', '1' => array('bar' => array('foo' => 'bar'))),
             '[foo, \'@foo.baz\', { \'%foo%\': \'foo is %foo%\', bar: \'%foo%\' }, true, \'@service_container\']' => array('foo', '@foo.baz', array('%foo%' => 'foo is %foo%', 'bar' => '%foo%',), true, '@service_container',),
+        );
+    }
+
+    protected function getTestsForParseIndex()
+    {
+        return array(
+            '' => 0,
+            ' ' => 0,
+            'null' => 4,
+            'false' => 5,
+            'true' => 4,
+            '12' => 2,
+            '"quoted string"' => 15,
+
+            // sequences
+            '[foo, bar]' => 9,
+            '[foo, bar] baz' => 9,
+            '[foo, bar, baz]' => 14,
+
+            // mappings
+            '{foo: bar}' => 9,
+            '{foo: bar} baz' => 9,
+            '{foo: bar, baz: qux}' => 19,
         );
     }
 

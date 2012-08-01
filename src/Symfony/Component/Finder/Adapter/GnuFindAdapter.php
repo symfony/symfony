@@ -44,6 +44,9 @@ class GnuFindAdapter extends AbstractAdapter
      */
     public function searchInDirectory($dir)
     {
+        // having "/../" in path make find fail
+        $dir = realpath($dir);
+
         // searching directories containing or not containing strings leads to no result
         if (Iterator\FileTypeFilterIterator::ONLY_DIRECTORIES === $this->mode && ($this->contains || $this->notContains)) {
             return new Iterator\FilePathsIterator(array(), $dir);

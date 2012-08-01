@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Finder;
+namespace Symfony\Component\Finder\Shell;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -17,7 +17,7 @@ namespace Symfony\Component\Finder;
 class Shell
 {
     const TYPE_UNIX    = 1;
-    const TYPE_MAC     = 2;
+    const TYPE_DARWIN  = 2;
     const TYPE_CYGWIN  = 3;
     const TYPE_WINDOWS = 4;
 
@@ -54,6 +54,7 @@ class Shell
             return true;
         }
 
+        // todo: find a better way (command could not be available)
         exec('command -v '.$command, $output, $code);
 
         return 0 === $code && count($output) > 0;
@@ -73,7 +74,7 @@ class Shell
         }
 
         if (false !== strpos($os, 'darwin')) {
-            return self::TYPE_MAC;
+            return self::TYPE_DARWIN;
         }
 
         if (0 === strpos($os, 'win')) {

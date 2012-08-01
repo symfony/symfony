@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Finder;
+namespace Symfony\Component\Finder\Shell;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -58,7 +58,7 @@ class Command
      *
      * @param Command $parent Parent command
      *
-     * @return \Symfony\Component\Finder\Command New Command instance
+     * @return Command New Command instance
      */
     static public function create(Command $parent = null)
     {
@@ -94,7 +94,7 @@ class Command
      *
      * @param string|Command $bit
      *
-     * @return \Symfony\Component\Finder\Command The current Command instance
+     * @return Command The current Command instance
      */
     public function add($bit)
     {
@@ -108,7 +108,7 @@ class Command
      *
      * @param string|Command $bit
      *
-     * @return \Symfony\Component\Finder\Command The current Command instance
+     * @return Command The current Command instance
      */
     public function top($bit)
     {
@@ -126,7 +126,7 @@ class Command
      *
      * @param string $arg
      *
-     * @return \Symfony\Component\Finder\Command The current Command instance
+     * @return Command The current Command instance
      */
     public function arg($arg)
     {
@@ -140,7 +140,7 @@ class Command
      *
      * @param string $esc
      *
-     * @return \Symfony\Component\Finder\Command The current Command instance
+     * @return Command The current Command instance
      */
     public function cmd($esc)
     {
@@ -154,7 +154,7 @@ class Command
      *
      * @param string $label The unique label
      *
-     * @return \Symfony\Component\Finder\Command The current Command instance
+     * @return Command The current Command instance
      *
      * @throws \RuntimeException If label already exists
      */
@@ -175,7 +175,7 @@ class Command
      *
      * @param string $label
      *
-     * @return \Symfony\Component\Finder\Command The labeled command
+     * @return Command The labeled command
      */
     public function get($label)
     {

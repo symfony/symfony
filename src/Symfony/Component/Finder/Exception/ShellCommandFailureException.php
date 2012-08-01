@@ -12,7 +12,7 @@
 namespace Symfony\Component\Finder\Exception;
 
 use Symfony\Component\Finder\Adapter\AdapterInterface;
-use Symfony\Component\Finder\Command;
+use Symfony\Component\Finder\Shell\Command;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -20,14 +20,14 @@ use Symfony\Component\Finder\Command;
 class ShellCommandFailureException extends AdapterFailureException
 {
     /**
-     * @var \Symfony\Component\Finder\Command
+     * @var Command
      */
     private $command;
 
     /**
-     * @param \Symfony\Component\Finder\Adapter\AdapterInterface $adapter
-     * @param \Symfony\Component\Finder\Command                  $command
-     * @param \Exception|null                                    $previous
+     * @param AdapterInterface $adapter
+     * @param Command          $command
+     * @param \Exception|null  $previous
      */
     public function __construct(AdapterInterface $adapter, Command $command, \Exception $previous = null)
     {
@@ -36,7 +36,7 @@ class ShellCommandFailureException extends AdapterFailureException
     }
 
     /**
-     * @return \Symfony\Component\Finder\Command
+     * @return Command
      */
     public function getCommand()
     {

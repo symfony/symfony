@@ -12,9 +12,9 @@
 namespace Symfony\Component\Finder\Adapter;
 
 use Symfony\Component\Finder\Iterator;
-use Symfony\Component\Finder\Shell;
+use Symfony\Component\Finder\Shell\Shell;
 use Symfony\Component\Finder\Expression\Expression;
-use Symfony\Component\Finder\Command;
+use Symfony\Component\Finder\Shell\Command;
 use Symfony\Component\Finder\Iterator\SortableIterator;
 
 /**
@@ -25,7 +25,7 @@ use Symfony\Component\Finder\Iterator\SortableIterator;
 class GnuFindAdapter extends AbstractAdapter
 {
     /**
-     * @var \Symfony\Component\Finder\Shell
+     * @var Shell
      */
     private $shell;
 

@@ -493,7 +493,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
      */
     public function testContainsOnDirectory(Adapter\AdapterInterface $adapter)
     {
-        $finder = Finder::create()->using($adapter);
+        $finder = $this->buildFinder($adapter);
         $finder->in(__DIR__)
             ->directories()
             ->name('Fixtures')
@@ -506,7 +506,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
      */
     public function testNotContainsOnDirectory(Adapter\AdapterInterface $adapter)
     {
-        $finder = Finder::create()->using($adapter);
+        $finder = $this->buildFinder($adapter);
         $finder->in(__DIR__)
             ->directories()
             ->name('Fixtures')
@@ -519,6 +519,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
      * with inner FilesystemIterator in an ivalid state.
      *
      * @see https://bugs.php.net/bug.php?id=49104
+     *
+     * @dataProvider getAdaptersTestData
      */
     public function testMultipleLocations(Adapter\AdapterInterface $adapter)
     {
@@ -528,7 +530,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         );
 
         // it is expected that there are test.py test.php in the tmpDir
-        $finder = new Finder();
+        $finder = $this->buildFinder($adapter);
         $finder->in($locations)->depth('< 1')->name('test.php');
 
         $this->assertEquals(1, count($finder));

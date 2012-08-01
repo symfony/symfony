@@ -44,6 +44,11 @@ class GnuFindAdapter extends AbstractAdapter
      */
     public function searchInDirectory($dir)
     {
+        // searching directories containing or not containing strings leads to no result
+        if (Iterator\FileTypeFilterIterator::ONLY_DIRECTORIES === $this->mode && ($this->contains || $this->notContains)) {
+            return new Iterator\FilePathsIterator(array(), $dir);
+        }
+
         $command = Command::create();
 
         $find = $command
@@ -146,7 +151,11 @@ class GnuFindAdapter extends AbstractAdapter
 
             // Fixes 'not search' regex problem.
             if ($expr->isRegex()) {
-                $expr->setStartJoker(true)->setEndJoker(true);
+                $expr->prepend($expr->hasStartFlag() ? '/' : '/.*')->setStartFlag(false)->setStartJoker(true);
+
+                if (!$expr->hasEndFlag()) {
+                    $expr->setEndJoker(true);
+                }
             }
 
             $command

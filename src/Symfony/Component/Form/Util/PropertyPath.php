@@ -276,7 +276,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      */
     public function getValue($objectOrArray)
     {
-        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $this->length - 1);
+        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $this->length);
 
         return $propertyValues[count($propertyValues) - 1][self::VALUE];
     }
@@ -312,7 +312,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      */
     public function setValue(&$objectOrArray, $value)
     {
-        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $this->length - 2);
+        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $this->length - 1);
         $overwrite = true;
 
         // Add the root object to the list
@@ -356,7 +356,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     {
         $propertyValues = array();
 
-        for ($i = 0; $i <= $lastIndex; ++$i) {
+        for ($i = 0; $i < $lastIndex; ++$i) {
             if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
                 throw new UnexpectedTypeException($objectOrArray, 'object or array');
             }

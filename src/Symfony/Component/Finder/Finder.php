@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Finder;
 
-use Symfony\Component\Finder\Adapter;
+use Symfony\Component\Finder\Adapter\AdapterInterface;
+use Symfony\Component\Finder\Adapter\GnuFindAdapter;
+use Symfony\Component\Finder\Adapter\PhpAdapter;
 use Symfony\Component\Finder\Exception\ExceptionInterface;
 
 /**
@@ -60,8 +62,8 @@ class Finder implements \IteratorAggregate, \Countable
     {
         $this->ignore = static::IGNORE_VCS_FILES | static::IGNORE_DOT_FILES;
 
-        $this->register(new Adapter\GnuFindAdapter());
-        $this->register(new Adapter\PhpAdapter(), -50);
+        $this->register(new GnuFindAdapter());
+        $this->register(new PhpAdapter(), -50);
     }
 
     /**
@@ -79,8 +81,8 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Registers a finder engine implementation.
      *
-     * @param Adapter\AdapterInterface $adapter  An adapter instance
-     * @param int                      $priority Highest is selected first
+     * @param AdapterInterface $adapter  An adapter instance
+     * @param int              $priority Highest is selected first
      *
      * @return Finder The current Finder instance
      */
@@ -109,7 +111,7 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Returns registered adapters ordered by priority without extra information.
      *
-     * @return \Symfony\Component\Finder\Adapter\AdapterInterface[]
+     * @return AdapterInterface[]
      */
     public function getAdapters()
     {
@@ -663,11 +665,11 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param Adapter\AdapterInterface $adapter
+     * @param AdapterInterface $adapter
      *
-     * @return Adapter\AdapterInterface
+     * @return AdapterInterface
      */
-    private function buildAdapter(Adapter\AdapterInterface $adapter)
+    private function buildAdapter(AdapterInterface $adapter)
     {
         return $adapter
             ->setFollowLinks($this->followLinks)

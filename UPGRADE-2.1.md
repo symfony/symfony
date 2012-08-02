@@ -162,6 +162,44 @@
     by the end-user. This means that you will you need to remove the 'factories'
     keys in your security configuration.
 
+    Before:
+
+     ``` yaml
+     security:
+       factories:
+         - "%kernel.root_dir%/../src/Acme/DemoBundle/Resources/config/security_factories.yml"
+     ```
+
+     ``` yaml
+     # src/Acme/DemoBundle/Resources/config/security_factories.yml
+     services:
+         security.authentication.factory.custom:
+             class:  Acme\DemoBundle\DependencyInjection\Security\Factory\CustomFactory
+             tags:
+                 - { name: security.listener.factory }
+     ```
+
+     After:
+
+      ```
+      namespace Acme\DemoBundle;
+
+      use Symfony\Component\HttpKernel\Bundle\Bundle;
+      use Symfony\Component\DependencyInjection\ContainerBuilder;
+      use Acme\DemoBundle\DependencyInjection\Security\Factory\CustomFactory;
+
+      class AcmeDemoBundle extends Bundle
+      {
+          public function build(ContainerBuilder $container)
+          {
+              parent::build($container);
+
+              $extension = $container->getExtension('security');
+              $extension->addSecurityListenerFactory(new CustomFactory());
+          }
+      }
+      ```
+
   * The Firewall listener is now registered after the Router listener. This
     means that specific Firewall URLs (like /login_check and /logout) must now
     have proper routes defined in your routing configuration.

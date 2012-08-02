@@ -78,22 +78,22 @@ class GnuFindAdapter extends AbstractAdapter
             $find->add('-type f');
         }
 
-        $this->buildNamesCommand($find, $this->names);
-        $this->buildNamesCommand($find, $this->notNames, true);
-        $this->buildSizesCommand($find, $this->sizes);
-        $this->buildDatesCommand($find, $this->dates);
+        $this->buildNamesFiltering($find, $this->names);
+        $this->buildNamesFiltering($find, $this->notNames, true);
+        $this->buildSizesFiltering($find, $this->sizes);
+        $this->buildDatesFiltering($find, $this->dates);
 
         $useGrep = $this->shell->testCommand('grep') && $this->shell->testCommand('xargs');
         $useSort = is_int($this->sort) && $this->shell->testCommand('sort') && $this->shell->testCommand('awk');
 
         if ($useGrep && ($this->contains || $this->notContains)) {
             $grep = $command->ins('grep');
-            $this->buildContainsCommand($grep, $this->contains);
-            $this->buildContainsCommand($grep, $this->notContains, true);
+            $this->buildContentFiltering($grep, $this->contains);
+            $this->buildContentFiltering($grep, $this->notContains, true);
         }
 
         if ($useSort) {
-            $this->buildSortCommand($command, $this->sort);
+            $this->buildSorting($command, $this->sort);
         }
 
         $paths = $this->shell->testCommand('uniq') ? $command->add('| uniq')->execute() : array_unique($command->execute());
@@ -141,7 +141,7 @@ class GnuFindAdapter extends AbstractAdapter
      * @param string[] $names
      * @param bool     $not
      */
-    private function buildNamesCommand(Command $command, array $names, $not = false)
+    private function buildNamesFiltering(Command $command, array $names, $not = false)
     {
         if (0 === count($names)) {
             return;
@@ -178,7 +178,7 @@ class GnuFindAdapter extends AbstractAdapter
      * @param Command            $command
      * @param NumberComparator[] $sizes
      */
-    private function buildSizesCommand(Command $command, array $sizes)
+    private function buildSizesFiltering(Command $command, array $sizes)
     {
         foreach ($sizes as $i => $size) {
             $command->add($i > 0 ? '-and' : null);
@@ -217,7 +217,7 @@ class GnuFindAdapter extends AbstractAdapter
      * @param Command          $command
      * @param DateComparator[] $dates
      */
-    private function buildDatesCommand(Command $command, array $dates)
+    private function buildDatesFiltering(Command $command, array $dates)
     {
         foreach ($dates as $i => $date) {
             $command->add($i > 0 ? '-and' : null);
@@ -265,11 +265,12 @@ class GnuFindAdapter extends AbstractAdapter
      * @param array   $contains
      * @param bool    $not
      */
-    private function buildContainsCommand(Command $command, array $contains, $not = false)
+    private function buildContentFiltering(Command $command, array $contains, $not = false)
     {
         foreach ($contains as $contain) {
             $expr = Expression::create($contain);
 
+            // todo: avoid forking process for each $pattern by using multiple -e options
             $command
                 ->add('| xargs -r grep -I')
                 ->add($expr->isCaseSensitive() ? null : '-i')
@@ -278,7 +279,7 @@ class GnuFindAdapter extends AbstractAdapter
         }
     }
 
-    private function buildSortCommand(Command $command, $sort)
+    private function buildSorting(Command $command, $sort)
     {
         switch ($sort) {
             case SortableIterator::SORT_BY_NAME:

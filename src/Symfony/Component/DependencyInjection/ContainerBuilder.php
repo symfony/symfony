@@ -33,7 +33,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $aliases          = array();
     private $resources        = array();
     private $extensionConfigs = array();
-    private $injectors        = array();
     private $compiler;
 
     /**

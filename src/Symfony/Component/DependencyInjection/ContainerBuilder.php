@@ -33,7 +33,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $aliases          = array();
     private $resources        = array();
     private $extensionConfigs = array();
-    private $injectors        = array();
     private $compiler;
 
     /**
@@ -548,7 +547,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $id The service identifier
      *
-     * @return string The aliased service identifier
+     * @return Definition A Definition instance
      *
      * @throws \InvalidArgumentException if the alias does not exist
      *

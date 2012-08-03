@@ -30,7 +30,23 @@ class RoleSecurityIdentityTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('ROLE_FOO', $id->getRole());
     }
-
+    
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidParameterThrowsException()
+    {
+        $id = new RoleSecurityIdentity(0);
+    }
+    
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEmptyParameterThrowsException()
+    {
+        $id = new RoleSecurityIdentity('');
+    }
+        
     /**
      * @dataProvider getCompareData
      */

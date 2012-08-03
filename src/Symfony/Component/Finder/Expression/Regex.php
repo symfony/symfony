@@ -271,6 +271,25 @@ class Regex implements ValueInterface
     }
 
     /**
+     * @param array $replacements
+     *
+     * @return Regex
+     */
+    public function replaceJokers($replacement)
+    {
+        $replace = function ($subject) use ($replacement) {
+            $subject = $subject[0];
+            $replace = 0 === substr_count($subject, '\\') % 2;
+
+            return $replace ? str_replace('.', $replacement, $subject) : $subject;
+        };
+
+        $this->pattern = preg_replace_callback('~[\\\\]*\\.~', $replace, $this->pattern);
+
+        return $this;
+    }
+
+    /**
      * @param string $pattern
      */
     private function parsePattern($pattern)

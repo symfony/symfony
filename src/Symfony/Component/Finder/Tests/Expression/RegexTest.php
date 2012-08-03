@@ -78,6 +78,17 @@ class RegexTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('~^.*abc.*$~is', $expr->render());
     }
 
+    /**
+     * @dataProvider getReplaceJokersTestData
+     */
+    public function testReplaceJokers($regex, $expected)
+    {
+        $expr = new Expression($regex);
+        $expr = $expr->getRegex()->replaceJokers('@');
+
+        $this->assertEquals($expected, $expr->renderPattern());
+    }
+
     public function getHasFlagsData()
     {
         return array(
@@ -117,6 +128,16 @@ class RegexTest extends \PHPUnit_Framework_TestCase
             array('~abc~', false, true, '~abc.*~'),
             array('~abc~', false, false, '~abc~'),
             array('~abc~', true, true, '~.*abc.*~'),
+        );
+    }
+
+    public function getReplaceJokersTestData()
+    {
+        return array(
+            array('~.abc~', '@abc'),
+            array('~\\.abc~', '\\.abc'),
+            array('~\\\\.abc~', '\\\\@abc'),
+            array('~\\\\\\.abc~', '\\\\\\.abc'),
         );
     }
 }

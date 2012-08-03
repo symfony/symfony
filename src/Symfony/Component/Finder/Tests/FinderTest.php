@@ -134,6 +134,18 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
+     * @dataProvider getRegexNameTestData
+     *
+     * @group regexName
+     */
+    public function testRegexName($adapter, $regex)
+    {
+        $finder = $this->buildFinder($adapter);
+        $finder->name($regex);
+        $this->assertIterator($this->toAbsolute(array('test.py', 'test.php')), $finder->in(self::$tmpDir)->getIterator());
+    }
+
+    /**
      * @dataProvider getAdaptersTestData
      */
     public function testSize($adapter)
@@ -595,14 +607,17 @@ class FinderTest extends Iterator\RealIteratorTestCase
             array('ipsum dolor sit amet', '/^IPSUM/m', array('lorem.txt')),
         );
 
-        $data = array();
-        foreach ($this->getValidAdapters() as $adapter) {
-            foreach ($tests as $test) {
-                $data[] = array_merge(array($adapter), $test);
-            }
-        }
+        return $this->buildTestData($tests);
+    }
 
-        return $data;
+    public function getRegexNameTestData()
+    {
+        $tests = array(
+            array('~.+\\.p.+~i'),
+            array('~t.*s~i'),
+        );
+
+        return $this->buildTestData($tests);
     }
 
     private function buildFinder(Adapter\AdapterInterface $adapter)
@@ -618,5 +633,17 @@ class FinderTest extends Iterator\RealIteratorTestCase
             array(new Adapter\GnuFindAdapter(), new Adapter\PhpAdapter()),
             function (Adapter\AdapterInterface $adapter)  { return $adapter->isSupported(); }
         );
+    }
+
+    private function buildTestData(array $tests)
+    {
+        $data = array();
+        foreach ($this->getValidAdapters() as $adapter) {
+            foreach ($tests as $test) {
+                $data[] = array_merge(array($adapter), $test);
+            }
+        }
+
+        return $data;
     }
 }

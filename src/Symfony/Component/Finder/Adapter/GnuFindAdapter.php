@@ -152,13 +152,17 @@ class GnuFindAdapter extends AbstractAdapter
         foreach ($names as $i => $name) {
             $expr = Expression::create($name);
 
-            // Fixes 'not search' regex problem.
+            // Fixes 'not search' and 'fuls path matching' regex problems.
+            // - Jokers '.' are replaced by [^/].
+            // - We add '[^/]*' before and after regex (if no ^|$ flags are present).
             if ($expr->isRegex()) {
                 $regex = $expr->getRegex();
-                $regex->prepend($regex->hasStartFlag() ? '/' : '/.*')->setStartFlag(false)->setStartJoker(true);
-
-                if (!$regex->hasEndFlag()) {
-                    $regex->setEndJoker(true);
+                $regex->prepend($regex->hasStartFlag() ? '/' : '/[^/]*')
+                    ->setStartFlag(false)
+                    ->setStartJoker(true)
+                    ->replaceJokers('[^/]');
+                if (!$regex->hasEndFlag() || $regex->hasEndJoker()) {
+                    $regex->setEndJoker(false)->append('[^/]*');
                 }
             }
 

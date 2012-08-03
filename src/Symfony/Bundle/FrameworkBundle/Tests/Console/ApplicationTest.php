@@ -22,14 +22,32 @@ class ApplicationTest extends TestCase
     {
         $bundle = $this->getMock("Symfony\Component\HttpKernel\Bundle\BundleInterface");
 
+        $kernel = $this->getKernel(array($bundle));
+
+        $application = new Application($kernel);
+        $application->doRun(new ArrayInput(array('list')), new NullOutput());
+    }
+
+    public function testBundleCommandsAreRegistered()
+    {
+        $bundle = $this->getMock("Symfony\Component\HttpKernel\Bundle\Bundle");
+        $bundle->expects($this->once())->method('registerCommands');
+
+        $kernel = $this->getKernel(array($bundle));
+
+        $application = new Application($kernel);
+        $application->doRun(new ArrayInput(array('list')), new NullOutput());
+    }
+
+    private function getKernel(array $bundles)
+    {
         $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
         $kernel
             ->expects($this->any())
             ->method('getBundles')
-            ->will($this->returnValue(array($bundle)))
+            ->will($this->returnValue($bundles))
         ;
 
-        $application = new Application($kernel);
-        $application->doRun(new ArrayInput(array('list')), new NullOutput());
+        return $kernel;
     }
 }

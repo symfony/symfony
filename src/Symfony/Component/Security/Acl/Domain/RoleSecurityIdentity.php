@@ -30,10 +30,16 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
      */
     public function __construct($role)
     {
+        if (!is_string($role) && !($role instanceof RoleInterface)) {
+            throw new \InvalidArgumentException('$role must be a string or object implementing RoleInterface.');
+        }
         if ($role instanceof RoleInterface) {
             $role = $role->getRole();
         }
-
+        if (empty($role)) {
+            throw new \InvalidArgumentException('$role must not be empty.');
+        }
+        
         $this->role = $role;
     }
 

@@ -45,4 +45,27 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
             array('SQL', array('foo' => 'bar'), array('foo' => 'bar'))
         );
     }
+
+    public function testLogNonUtf8()
+    {
+        $logger = $this->getMock('Symfony\\Component\\HttpKernel\\Log\\LoggerInterface');
+
+        $dbalLogger = $this
+            ->getMockBuilder('Symfony\\Bridge\\Doctrine\\Logger\\DbalLogger')
+            ->setConstructorArgs(array($logger, null))
+            ->setMethods(array('log'))
+            ->getMock()
+        ;
+
+        $dbalLogger
+            ->expects($this->once())
+            ->method('log')
+            ->with('SQL ({"utf8":"foo","nonutf8":null})')
+        ;
+
+        $dbalLogger->startQuery('SQL', array(
+            'utf8'    => 'foo',
+            'nonutf8' => "\x7F\xFF"
+        ));
+    }
 }

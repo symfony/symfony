@@ -19,6 +19,23 @@ namespace Symfony\Component\Yaml;
 class Dumper
 {
     /**
+     * The amount of spaces to use for indentation of nested nodes.
+     *
+     * @var integer
+     */
+    protected $indentation = 2;
+
+    /**
+     * Sets the indentation.
+     *
+     * @param integer $num The amount of spaces to use for intendation of nested nodes.
+     */
+    public function setIndentation($num)
+    {
+        $this->indentation = $num;
+    }
+
+    /**
      * Dumps a PHP value to YAML.
      *
      * @param mixed   $input                  The PHP value
@@ -46,7 +63,7 @@ class Dumper
                     $prefix,
                     $isAHash ? Inline::dump($key, $exceptionOnInvalidType, $objectSupport).':' : '-',
                     $willBeInlined ? ' ' : "\n",
-                    $this->dump($value, $inline - 1, $exceptionOnInvalidType, $objectSupport, $willBeInlined ? 0 : $indent + 2)
+                    $this->dump($value, $inline - 1, $exceptionOnInvalidType, $objectSupport, $willBeInlined ? 0 : $indent + $this->indentation)
                 ).($willBeInlined ? "\n" : '');
             }
         }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\Process\Exception\ProcessFailedException;
+
 /**
  * Process is a thin wrapper around proc_* functions to ease
  * start independent PHP processes.
@@ -166,6 +168,29 @@ class Process
         $this->start($callback);
 
         return $this->wait($callback);
+    }
+
+    /**
+     * Runs the process.
+     *
+     * In contrast to run(), this method will throw an exception if the program
+     * does not execute successfully.
+     *
+     * @param callable $callback
+     *
+     * @throws ProcessFailedException
+     *
+     * @return integer
+     */
+    public function runOrException($callback = null)
+    {
+        $exitCode = $this->run($callback);
+
+        if (!$this->isSuccessful()) {
+            throw new ProcessFailedException($this);
+        }
+
+        return $exitCode;
     }
 
     /**

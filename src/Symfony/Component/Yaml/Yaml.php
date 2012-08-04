@@ -97,14 +97,16 @@ class Yaml
      *
      * @param array   $array  PHP array
      * @param integer $inline The level where you switch to inline YAML
+     * @param integer $indent The amount of spaces to use for indentation of nested nodes.
      *
      * @return string A YAML string representing the original PHP array
      *
      * @api
      */
-    public static function dump($array, $inline = 2)
+    public static function dump($array, $inline = 2, $indent = 4)
     {
         $yaml = new Dumper();
+        $yaml->setIndentation($indent);
 
         return $yaml->dump($array, $inline);
     }

@@ -96,8 +96,8 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
     public function testTransformFullTime()
     {
-        if ($this->isLowerThanIcuVersion(3.8)) {
-            $this->markTestSkipped('Please upgrade ICU version to 3.8+');
+        if ($this->isLowerThanIcuVersion('4.0')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.0+');
         }
 
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::FULL);
@@ -213,8 +213,8 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
     public function testReverseTransformFullTime()
     {
-        if ($this->isLowerThanIcuVersion(3.8)) {
-            $this->markTestSkipped('Please upgrade ICU version to 3.8+');
+        if ($this->isLowerThanIcuVersion('4.0')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.0+');
         }
 
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::FULL);

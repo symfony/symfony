@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choices.</source>
-                <target>Ha de seleccionar almenys {{ limit }} opcions.</target>
+                <target>Ha de seleccionar almenys {{ limit }} opció.|Ha de seleccionar almenys {{ limit }} opcions.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choices.</source>
-                <target>Ha de seleccionar com a màxim {{ limit }} opcions.</target>
+                <target>Ha de seleccionar com a màxim {{ limit }} opció.|Ha de seleccionar com a màxim {{ limit }} opcions.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
@@ -76,7 +76,7 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} characters or less.</source>
-                <target>Aquest valor és massa llarg.  Hauria de tenir {{ limit }} caràcters o menys.</target>
+                <target>Aquest valor és massa llarg. Hauria de tenir {{ limit }} caràcter o menys.|Aquest valor és massa llarg. Hauria de tenir {{ limit }} caràcters o menys.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>
@@ -180,7 +180,39 @@
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} characters.</source>
-                <target>Aquest valor hauria de tenir exactament {{ limit }} caràcters.</target>
+                <target>Aquest valor hauria de tenir exactament {{ limit }} caràcter.|Aquest valor hauria de tenir exactament {{ limit }} caràcters.</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded.</source>
+                <target>L'arxiu va ser només pujat parcialment.</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded.</source>
+                <target>Cap arxiu va ser pujat.</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini.</source>
+                <target>Cap carpeta temporal va ser configurada en php.ini.</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk.</source>
+                <target>No es va poder escriure l'arxiu temporal en el disc.</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail.</source>
+                <target>Una extensió de PHP va fer que la pujada fallara.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} elements or more.</source>
+                <target>Aquesta col·lecció ha de contenir {{ limit }} element o més.|Aquesta col·lecció ha de contenir {{ limit }} elements o més.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} elements or less.</source>
+                <target>Aquesta col·lecció ha de contenir {{ limit }} element o menys.|Aquesta col·lecció ha de contenir {{ limit }} elements o menys.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} elements.</source>
+                <target>Aquesta col·lecció ha de contenir exactament {{ limit }} element.|Aquesta col·lecció ha de contenir exactament {{ limit }} elements.</target>
             </trans-unit>
         </body>
     </file>

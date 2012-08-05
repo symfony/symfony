@@ -60,7 +60,7 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
         $dbalLogger
             ->expects($this->once())
             ->method('log')
-            ->with('SQL ({"utf8":"foo","nonutf8":null})')
+            ->with('SQL', array('utf8' => 'foo', 'nonutf8' => "\x7F\xFF"))
         ;
 
         $dbalLogger->startQuery('SQL', array(

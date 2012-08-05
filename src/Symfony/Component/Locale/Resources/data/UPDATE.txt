@@ -7,8 +7,8 @@ the ICU binaries. Both arguments are optional, if not provided, the script will
 try to build the latest available ICU data using the binaries available in the
 environment path:
 
-   $ php update-data.php 49
-   $ php update-data.php 49 /path/to/icu/bin
+   $ php build-data.php 49
+   $ php build-data.php 49 /path/to/icu/bin
 
 It is recommended to use the ICU binaries in the same version of the desired
 version to build the data files.

@@ -234,7 +234,7 @@ SVN_INFO_DATA;
 
 if ($GLOBALS['argc'] < 1) {
     bailout(<<<MESSAGE
-Usage: php update-data.php [icu-version] [icu-binaries-path]
+Usage: php build-data.php [icu-version] [icu-binaries-path]
 
 Builds or update the ICU data in Symfony2 for a specific ICU version. If the
 ICU version or the path to the binaries are not provided, it will build the
@@ -242,10 +242,10 @@ latest version released using the genrb found in the environment path.
 
 Examples:
 
-    php update-data.php 4.2
+    php build-data.php 4.2
     It will build the ICU data using the 49 version data
 
-    php update-data.php 4.2 /path/to/icu/bin
+    php build-data.php 4.2 /path/to/icu/bin
     It will build the ICU data using the 49 version data and the genrb and
     icu-config binaries found in the environment path
 

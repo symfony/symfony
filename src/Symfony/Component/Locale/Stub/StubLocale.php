@@ -498,7 +498,7 @@ class StubLocale
      */
     private static function getStubData($locale, $cacheVariable, $stubDataDir)
     {
-        $dataDirectory = Locale::getDataDirectory();
+        $dataDirectory = Locale::getIcuDataDirectory();
 
         if ('en' !== $locale) {
             throw new \InvalidArgumentException(sprintf('Only the \'en\' locale is supported. %s', NotImplementedException::INTL_INSTALL_MESSAGE));

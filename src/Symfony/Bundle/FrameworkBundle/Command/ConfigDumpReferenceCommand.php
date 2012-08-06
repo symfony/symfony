@@ -62,7 +62,7 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->output = $output;
-        $kernel = $this->getContainer()->get('kernel');
+        $bundles = $this->getContainer()->get('kernel')->getBundles();
         $containerBuilder = $this->getContainerBuilder();
 
         $name = $input->getArgument('name');
@@ -71,7 +71,10 @@ EOF
 
         if (preg_match('/Bundle$/', $name)) {
             // input is bundle name
-            $extension = $kernel->getBundle($name)->getContainerExtension();
+
+            if (isset($bundles[$name])) {
+                $extension = $bundles[$name]->getContainerExtension();
+            }
 
             if (!$extension) {
                 throw new \LogicException('No extensions with configuration available for "'.$name.'"');
@@ -79,7 +82,7 @@ EOF
 
             $message = 'Default configuration for "'.$name.'"';
         } else {
-            foreach ($kernel->getBundles() as $bundle) {
+            foreach ($bundles as $bundle) {
                 $extension = $bundle->getContainerExtension();
 
                 if ($extension && $extension->getAlias() === $name) {

@@ -406,13 +406,13 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         new PropertyPath('.property');
     }
 
-    /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException
-     */
-    public function testInvalidPropertyPath_unexpectedCharacters()
-    {
-        new PropertyPath('property.$form');
-    }
+//    /**
+//     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException
+//     */
+//    public function testInvalidPropertyPath_unexpectedCharacters()
+//    {
+//        new PropertyPath('property.$form');
+//    }
 
     /**
      * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException

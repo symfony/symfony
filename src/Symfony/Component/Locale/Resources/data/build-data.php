@@ -164,17 +164,6 @@ function is_42_or_earlier($version)
     return version_compare($version, '4.4', '<');
 }
 
-function is_latest_version($version)
-{
-    $icu = parse_ini_file(__DIR__.DIRECTORY_SEPARATOR.'icu.ini');
-
-    if (!isset($icu[$version])) {
-        bailout('The version '.$version.' is not available in the icu.ini file.');
-    }
-
-    return $icu['latest version'] == $version;
-}
-
 function create_stub_datafile($locale, $target, $data)
 {
     $template = <<<TEMPLATE
@@ -291,7 +280,7 @@ if (!is_42_or_earlier($version)) {
 check_dir($source.DIRECTORY_SEPARATOR.'locales');
 
 // Convert the *.txt resource bundles to *.res files
-$target = is_latest_version($version) ? 'current' : $version;
+$target = $version;
 $target = __DIR__.DIRECTORY_SEPARATOR.$target;
 $currDir = $target.DIRECTORY_SEPARATOR.'curr';
 $langDir = $target.DIRECTORY_SEPARATOR.'lang';
@@ -637,19 +626,3 @@ create_stub_datafile($defaultLocale, $stubRegionDir, $countries);
 // Clean up
 clear_directory($currDir);
 rmdir($currDir);
-
-// Creates the data version file, used in CI environments
-$dataVersion = __DIR__.DIRECTORY_SEPARATOR.'data-version.php';
-
-if (!is_latest_version($version)) {
-    $data = <<<DATA_VERSION
-<?php
-
-return $version;
-
-DATA_VERSION;
-
-    file_put_contents($dataVersion, $data);
-} elseif (file_exists($dataVersion)) {
-    unlink($dataVersion);
-}

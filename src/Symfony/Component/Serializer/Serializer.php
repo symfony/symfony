@@ -42,7 +42,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     protected $normalizers       = array();
     protected $normalizerCache   = array();
     protected $denormalizerCache = array();
-    protected $options;
+    protected $context;
 
     public function __construct(array $normalizers = array(), array $encoders = array())
     {
@@ -73,13 +73,13 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    final public function serialize($data, $format, array $options = array())
+    final public function serialize($data, $format, array $context = array())
     {
         if (!$this->supportsEncoding($format)) {
             throw new UnexpectedValueException('Serialization for the format '.$format.' is not supported');
         }
 
-        $this->options = $options;
+        $this->context = $context;
 
         if ($this->encoder->needsNormalization($format)) {
             $data = $this->normalize($data, $format);
@@ -91,13 +91,13 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    final public function deserialize($data, $type, $format, array $options = array())
+    final public function deserialize($data, $type, $format, array $context = array())
     {
         if (!$this->supportsDecoding($format)) {
             throw new UnexpectedValueException('Deserialization for the format '.$format.' is not supported');
         }
 
-        $this->options = $options;
+        $this->context = $context;
 
         $data = $this->decode($data, $format);
 
@@ -297,8 +297,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public function getOptions()
+    public function getContext()
     {
-        return $this->options;
+        return $this->context;
     }
 }

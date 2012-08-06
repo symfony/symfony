@@ -390,10 +390,10 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             return $this->rootNodeName;
         }
 
-        $options = $this->serializer->getOptions();
+        $context = $this->serializer->getContext();
 
-        return isset($options['xml_root_node_name'])
-            ? $options['xml_root_node_name']
+        return isset($context['xml_root_node_name'])
+            ? $context['xml_root_node_name']
             : $this->rootNodeName;
     }
 

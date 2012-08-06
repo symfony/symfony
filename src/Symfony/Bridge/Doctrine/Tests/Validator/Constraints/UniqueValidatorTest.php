@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
 use Symfony\Bridge\Doctrine\Tests\DoctrineOrmTestCase;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleIdentEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIdentEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -114,7 +115,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         return $validatorFactory;
     }
 
-    public function createValidator($entityManagerName, $em, $validateClass = null, $uniqueFields = null, $errorPath = null, $repositoryMethod = 'findBy')
+    public function createValidator($entityManagerName, $em, $validateClass = null, $uniqueFields = null, $errorPath = null, $repositoryMethod = 'findBy', $ignoreNull = true)
     {
         if (!$validateClass) {
             $validateClass = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity';
@@ -132,7 +133,8 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
             'fields' => $uniqueFields,
             'em' => $entityManagerName,
             'errorPath' => $errorPath,
-            'repositoryMethod' => $repositoryMethod
+            'repositoryMethod' => $repositoryMethod,
+            'ignoreNull' => $ignoreNull
         ));
         $metadata->addConstraint($constraint);
 
@@ -147,6 +149,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $schemaTool = new SchemaTool($em);
         $schemaTool->createSchema(array(
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity'),
+            $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleIdentEntity'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIdentEntity'),
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity'),
         ));
@@ -222,6 +225,35 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
 
         $violationsList = $validator->validate($entity1);
         $this->assertEquals(0, $violationsList->count(), "No violations found on entity having a null value.");
+    }
+
+    public function testValidateUniquenessWithIgnoreNull()
+    {
+        $entityManagerName = "foo";
+        $validateClass = 'Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleIdentEntity';
+        $em = $this->createTestEntityManager();
+        $this->createSchema($em);
+        $validator = $this->createValidator($entityManagerName, $em, $validateClass, array('name', 'name2'), 'bar', 'findby', false);
+
+        $entity1 = new DoubleIdentEntity(1, 'Foo', null);
+        $violationsList = $validator->validate($entity1);
+        $this->assertEquals(0, $violationsList->count(), "No violations found on entity before it is saved to the database.");
+
+        $em->persist($entity1);
+        $em->flush();
+
+        $violationsList = $validator->validate($entity1);
+        $this->assertEquals(0, $violationsList->count(), "No violations found on entity after it was saved to the database.");
+
+        $entity2 = new DoubleIdentEntity(2, 'Foo', null);
+
+        $violationsList = $validator->validate($entity2);
+        $this->assertEquals(1, $violationsList->count(), "Violation found on entity with conflicting entity existing in the database.");
+
+        $violation = $violationsList[0];
+        $this->assertEquals('This value is already used.', $violation->getMessage());
+        $this->assertEquals('bar', $violation->getPropertyPath());
+        $this->assertEquals('Foo', $violation->getInvalidValue());
     }
 
     public function testValidateUniquenessAfterConsideringMultipleQueryResults()

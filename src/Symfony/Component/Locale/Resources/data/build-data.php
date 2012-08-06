@@ -159,7 +159,7 @@ function download_icu_data($version) {
     return $checkoutPath;
 }
 
-function is_42_or_earlier($version)
+function is_icu_version_42_or_earlier($version)
 {
     return version_compare($version, '4.4', '<');
 }
@@ -271,7 +271,7 @@ check_dir($source.DIRECTORY_SEPARATOR.'.svn');
 $source = realpath($source);
 
 // Currency, language and region data are bundled in the locales directory in ICU <= 4.2
-if (!is_42_or_earlier($version)) {
+if (!is_icu_version_42_or_earlier($version)) {
     check_dir($source.DIRECTORY_SEPARATOR.'curr');
     check_dir($source.DIRECTORY_SEPARATOR.'lang');
     check_dir($source.DIRECTORY_SEPARATOR.'region');
@@ -298,7 +298,7 @@ clear_directory($currDir);
 
 // Currency data is available at the locales data files in ICU <= 4.2 and the supplementalData file is available at the
 // misc directory
-if (is_42_or_earlier($version)) {
+if (is_icu_version_42_or_earlier($version)) {
     genrb_file($currDir, $source.DIRECTORY_SEPARATOR.'locales', 'en', $icuBinPath);
     genrb_file($currDir, $source.DIRECTORY_SEPARATOR.'misc', 'supplementalData', $icuBinPath);
 } else {
@@ -319,7 +319,7 @@ make_directory($langDir);
 clear_directory($langDir);
 
 // Language data is available at the locales data files in ICU <= 4.2
-if (is_42_or_earlier($version)) {
+if (is_icu_version_42_or_earlier($version)) {
     genrb($source.DIRECTORY_SEPARATOR.'locales', $langDir, $icuBinPath);
 } else {
     genrb($source.DIRECTORY_SEPARATOR.'lang', $langDir, $icuBinPath);
@@ -333,7 +333,7 @@ make_directory($regionDir);
 clear_directory($regionDir);
 
 // Region data is available at the locales data files in ICU <= 4.2
-if (is_42_or_earlier($version)) {
+if (is_icu_version_42_or_earlier($version)) {
     genrb($source.DIRECTORY_SEPARATOR.'locales', $regionDir, $icuBinPath);
 } else {
     genrb($source.DIRECTORY_SEPARATOR.'region', $regionDir, $icuBinPath);
@@ -518,7 +518,7 @@ foreach ($translatedLocales as $translatedLocale) {
 // Even if the source and generated file are UTF-8 encoded, for some reason the data seems not correctly encoded, leading to
 // a parse error in genrb (Stopped parsing resource with U_ILLEGAL_CHAR_FOUND). So we call the genrb passing that the source
 // files are UTF-8 encoded.
-if (is_42_or_earlier($version)) {
+if (is_icu_version_42_or_earlier($version)) {
     genrb($namesGeneratedDir, $namesDir, $icuBinPath, '-e UTF-8');
 } else {
     genrb($namesGeneratedDir, $namesDir, $icuBinPath);

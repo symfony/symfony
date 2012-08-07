@@ -115,9 +115,6 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("\033[34;41msome text\033[0m", $formatter->format('<fg=blue;bg=red>some text</fg=blue;bg=red>'));
     }
 
-    /**
-     * @group nst
-     */
     public function testNonStyleTag()
     {
         $formatter = new OutputFormatter(true);

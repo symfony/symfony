@@ -31,7 +31,7 @@ the HTTP specification.
 Loading
 -------
 
-If you are using PHP 5.3.x you must add the following to your autoloader:
+If you are not using Composer but are using PHP 5.3.x, you must add the following to your autoloader:
 
     // SessionHandlerInterface
     if (!interface_exists('SessionHandlerInterface')) {

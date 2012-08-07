@@ -215,6 +215,52 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFindAlternativeExceptionMessage()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+
+        // Command + singular
+        try {
+            $application->find('foo:baR');
+            $this->fail('->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
+            $this->assertRegExp('/Did you mean this/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
+        }
+
+        // Namespace + singular
+        try {
+            $application->find('foO:bar');
+            $this->fail('->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
+            $this->assertRegExp('/Did you mean this/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
+        }
+
+
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+
+        // Command + plural
+        try {
+            $application->find('foo:baR');
+            $this->fail('->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+        }
+
+        // Namespace + plural
+        try {
+            $application->find('foo2:bar');
+            $this->fail('->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+        }
+    }
+
     public function testFindAlternativeCommands()
     {
         $application = new Application();

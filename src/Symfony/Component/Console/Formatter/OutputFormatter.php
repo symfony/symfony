@@ -171,7 +171,7 @@ class OutputFormatter implements OutputFormatterInterface
     {
         // we got "\<" escaped char
         if ('\\' === $match[1]) {
-            return $match[0];
+            return $this->applyCurrentStyle($match[0]);
         }
 
         if ('' === $match[3]) {
@@ -179,11 +179,11 @@ class OutputFormatter implements OutputFormatterInterface
                 // we got "</>" tag
                 $this->styleStack->pop();
 
-                return $this->applyStyle($this->styleStack->getCurrent(), $match[4]);
+                return $this->applyCurrentStyle($match[4]);
             }
 
             // we got "<>" tag
-            return '<>'.$match[4];
+            return '<>'.$this->applyCurrentStyle($match[4]);
         }
 
         if (isset($this->styles[strtolower($match[3])])) {
@@ -192,7 +192,7 @@ class OutputFormatter implements OutputFormatterInterface
             $style = $this->createStyleFromString($match[3]);
 
             if (false === $style) {
-                return $match[0];
+                return $this->applyCurrentStyle($match[0]);
             }
         }
 
@@ -202,7 +202,7 @@ class OutputFormatter implements OutputFormatterInterface
             $this->styleStack->push($style);
         }
 
-        return $this->applyStyle($this->styleStack->getCurrent(), $match[4]);
+        return $this->applyCurrentStyle($match[4]);
     }
 
     /**
@@ -235,15 +235,14 @@ class OutputFormatter implements OutputFormatterInterface
     }
 
     /**
-     * Applies style to text if must be applied.
+     * Applies current style from stack to text, if must be applied.
      *
-     * @param OutputFormatterStyleInterface $style Style to apply
-     * @param string                        $text  Input text
+     * @param string $text Input text
      *
      * @return string string Styled text
      */
-    private function applyStyle(OutputFormatterStyleInterface $style, $text)
+    private function applyCurrentStyle($text)
     {
-        return $this->isDecorated() && strlen($text) > 0 ? $style->apply($text) : $text;
+        return $this->isDecorated() && strlen($text) > 0 ? $this->styleStack->getCurrent()->apply($text) : $text;
     }
 }

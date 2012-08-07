@@ -121,10 +121,8 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $formatData = array(
             /* general */
             array('y-M-d', 0, '1970-1-1'),
-            array("yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 GMT+00:00'),
             array("EEE, MMM d, ''yy", 0, "Thu, Jan 1, '70"),
             array('h:mm a', 0, '12:00 AM'),
-            array('K:mm a, z', 0, '0:00 AM, GMT+00:00'),
             array('yyyyy.MMMM.dd hh:mm aaa', 0, '01970.January.01 12:00 AM'),
 
             /* escaping */
@@ -285,14 +283,21 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('s', 3601, '1'),
             array('s', 3630, '30'),
             array('s', 43200, '0'), // 12 hours
-
-            /* timezone */
-            array('z', 0, 'GMT+00:00'),
-            array('zz', 0, 'GMT+00:00'),
-            array('zzz', 0, 'GMT+00:00'),
-            array('zzzz', 0, 'GMT+00:00'),
-            array('zzzzz', 0, 'GMT+00:00'),
         );
+
+        // Timezone
+        if ($this->isIntlExtensionLoaded() && $this->isGreaterOrEqualThanIcuVersion('4.8')) {
+            // general
+            $formatData[] = array("yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 GMT');
+            $formatData[] = array('K:mm a, z', 0, '0:00 AM, GMT');
+
+            // timezone
+            $formatData[] = array('z', 0, 'GMT');
+            $formatData[] = array('zz', 0, 'GMT');
+            $formatData[] = array('zzz', 0, 'GMT');
+            $formatData[] = array('zzzz', 0, 'GMT');
+            $formatData[] = array('zzzzz', 0, 'GMT');
+        }
 
         // As of PHP 5.3.4, IntlDateFormatter::format() accepts DateTime instances
         if ($this->isGreaterOrEqualThanPhpVersion('5.3.4')) {
@@ -300,11 +305,14 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
             /* general, DateTime */
             $formatData[] = array('y-M-d', $dateTime, '1970-1-1');
-            $formatData[] = array("yyyy.MM.dd 'at' HH:mm:ss zzz", $dateTime, '1970.01.01 at 00:00:00 GMT+00:00');
             $formatData[] = array("EEE, MMM d, ''yy", $dateTime, "Thu, Jan 1, '70");
             $formatData[] = array('h:mm a', $dateTime, '12:00 AM');
-            $formatData[] = array('K:mm a, z', $dateTime, '0:00 AM, GMT+00:00');
             $formatData[] = array('yyyyy.MMMM.dd hh:mm aaa', $dateTime, '01970.January.01 12:00 AM');
+
+            if ($this->isIntlExtensionLoaded() && $this->isGreaterOrEqualThanIcuVersion('4.8')) {
+                $formatData[] = array("yyyy.MM.dd 'at' HH:mm:ss zzz", $dateTime, '1970.01.01 at 00:00:00 GMT');
+                $formatData[] = array('K:mm a, z', $dateTime, '0:00 AM, GMT');
+            }
         }
 
         return $formatData;
@@ -428,7 +436,9 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->createIntlFormatter('zzzz');
         $formatter->setTimeZoneId('Pacific/Fiji');
-        $this->assertEquals('Fiji Time', $formatter->format(0));
+
+        $expected = $this->isGreaterOrEqualThanIcuVersion('49') ? 'Fiji Standard Time' : 'Fiji Time';
+        $this->assertEquals($expected, $formatter->format(0));
     }
 
     public function testFormatWithGmtTimezoneStub()
@@ -559,17 +569,22 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function dateAndTimeTypeProvider()
     {
-        return array(
+        $data = array(
             array(0, StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, 'Thursday, January 1, 1970'),
             array(0, StubIntlDateFormatter::LONG, StubIntlDateFormatter::NONE, 'January 1, 1970'),
             array(0, StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::NONE, 'Jan 1, 1970'),
             array(0, StubIntlDateFormatter::SHORT, StubIntlDateFormatter::NONE, '1/1/70'),
-
-            array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::FULL, '12:00:00 AM GMT+00:00'),
-            array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::LONG, '12:00:00 AM GMT+00:00'),
-            array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::MEDIUM, '12:00:00 AM'),
-            array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::SHORT, '12:00 AM'),
         );
+
+        if ($this->isIntlExtensionLoaded() && $this->isGreaterOrEqualThanIcuVersion('4.8')) {
+            $data[] = array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::FULL, '12:00:00 AM GMT');
+            $data[] = array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::LONG, '12:00:00 AM GMT');
+        }
+
+        $data[] = array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::MEDIUM, '12:00:00 AM');
+        $data[] = array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::SHORT, '12:00 AM');
+
+        return $data;
     }
 
     public function testGetCalendar()
@@ -668,7 +683,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function parseProvider()
     {
-        return array(
+        $data = array(
             // years
             array('y-M-d', '1970-1-1', 0),
             array('yy-M-d', '70-1-1', 0),
@@ -807,6 +822,15 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array("''y", "'1970", 0),
             array("H 'o'' clock'", "0 o' clock", 0),
         );
+
+        if ($this->isIntlExtensionLoaded() && $this->isGreaterOrEqualThanIcuVersion('4.8')) {
+            $data[] = array('y-M-d', '1970/1/1', 0);
+            $data[] = array('yy-M-d', '70/1/1', 0);
+            $data[] = array('y/M/d', '1970-1-1', 0);
+            $data[] = array('yy/M/d', '70-1-1', 0);
+        }
+
+        return $data;
     }
 
     /**
@@ -846,9 +870,6 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function parseErrorProvider()
     {
         return array(
-            array('y-M-d', '1970/1/1'),
-            array('yy-M-d', '70/1/1'),
-
             // 1 char month
             array('y-MMMMM-d', '1970-J-1'),
             array('y-MMMMM-d', '1970-S-1'),

@@ -177,6 +177,10 @@ class FullTransformer
 
         $escapedPattern = preg_quote($pattern, '/');
 
+        // ICU 4.8 recognizes slash ("/") in a value to be parsed as a dash ("-") and vice-versa
+        // when parsing a date/time value
+        $escapedPattern = preg_replace('/\\\[\-|\/]/', '[\/\-]', $escapedPattern);
+
         $reverseMatchingRegExp = preg_replace_callback($this->regExp, function($matches) use ($that) {
             $length = strlen($matches[0]);
             $transformerIndex = $matches[0][0];

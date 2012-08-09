@@ -64,9 +64,10 @@ class TranslationCollectionTypeTest extends TypeTestCase
         $this->assertEquals($item->getTranslation('en'), $translations['en']->getData());
         $this->assertEquals($item->getTranslation('fr'), $translations['fr']->getData());
 
-        $this->assertEquals('value', $translations['fr']->getConfig()->getOption('columns')[0]);
-        $this->assertEquals('textarea', $translations['fr']->getConfig()->getOption('columns')['value2']['type']);
-        $this->assertEquals('Label', $translations['fr']->getConfig()->getOption('columns')['value2']['label']);
+        $columnOptions = $translations['fr']->getConfig()->getOption('columns');
+        $this->assertEquals('value', $columnOptions[0]);
+        $this->assertEquals('textarea', $columnOptions['value2']['type']);
+        $this->assertEquals('Label', $columnOptions['value2']['label']);
     }
 
     public function testNotPresentTranslationsAdded()

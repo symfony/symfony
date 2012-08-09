@@ -272,6 +272,21 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testLoadWithPrefixedNamespace()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services14.xml');
+
+        $this->assertEquals(array('foo1' => 'bar1', 'foo2' => 'bar2'), $container->getParameter('foo'));
+
+        $this->assertCount(3, $container->getDefinitions());
+        $fooService = $container->getDefinition('foo');
+        $this->assertSame('Foo', $fooService->getClass());
+        $this->assertTrue($fooService->getArgument(1) instanceof Reference);
+        $this->assertTrue($container->getDefinition((string) $fooService->getArgument(1))->hasMethodCall('setFoo'));
+    }
+
     public function testExtensionInPhar()
     {
         if (extension_loaded('suhosin') && false === strpos(ini_get('suhosin.executor.include.whitelist'), 'phar')) {

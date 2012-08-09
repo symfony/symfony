@@ -59,6 +59,7 @@ class TranslationCollectionFormListener implements EventSubscriberInterface
         $dataClass = end($temp);
 
         $rootData = $form->getRoot()->getData();
+        $foundData = false;
 
         $addFunction = 'add'.$dataClass;
 
@@ -78,9 +79,19 @@ class TranslationCollectionFormListener implements EventSubscriberInterface
             }
 
             if (!$found) {
-                if (!method_exists($rootData, $addFunction)) {
-                    throw new UnexpectedTypeException($rootData, 'Propel i18n object');
+                $currentForm = $form;
+                while (!$foundData) {
+                    if (method_exists($rootData, $addFunction)) {
+                        $foundData = true;
+                        break;
+                    } elseif ($currentForm->hasParent()) {
+                        $currentForm = $currentForm->getParent();
+                        $rootData = $currentForm->getData();
+                    } else {
+                        break;
+                    }
                 }
+                if(!$foundData) throw new UnexpectedTypeException($rootData, 'Propel i18n object');;
 
                 $newTranslation = new $this->i18nClass();
                 $newTranslation->setLocale($lang);

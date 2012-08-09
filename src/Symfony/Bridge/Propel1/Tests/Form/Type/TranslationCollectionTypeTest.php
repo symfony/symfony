@@ -39,28 +39,34 @@ class TranslationCollectionTypeTest extends TypeTestCase
         $item->addTranslatableItemI18n(new TranslatableItemI18n(1, 'fr', 'val1'));
         $item->addTranslatableItemI18n(new TranslatableItemI18n(2, 'en', 'val2'));
 
-        $form = $this->factory->createNamed('translatableItemI18ns', 'propel1_translation_collection', null, array(
+        $builder = $this->factory->createBuilder('form', null, array(
+            'data_class' => self::TRANSLATION_CLASS
+        ));
+
+        $builder->add('translatableItemI18ns', 'propel1_translation_collection', array(
             'languages' => array('en', 'fr'),
             'options' => array(
                 'data_class' => self::TRANSLATABLE_I18N_CLASS,
                 'columns' => array('value', 'value2' => array('label' => 'Label', 'type' => 'textarea'))
             )
         ));
-        $form->setData($item->getTranslatableItemI18ns());
+        $form = $builder->getForm();
+        $form->setData($item);
+        $translations = $form->get('translatableItemI18ns');
 
-        $this->assertCount(2, $form);
-        $this->assertInstanceOf('Symfony\Component\Form\Form', $form['en']);
-        $this->assertInstanceOf('Symfony\Component\Form\Form', $form['fr']);
+        $this->assertCount(2, $translations);
+        $this->assertInstanceOf('Symfony\Component\Form\Form', $translations['en']);
+        $this->assertInstanceOf('Symfony\Component\Form\Form', $translations['fr']);
 
-        $this->assertInstanceOf(self::TRANSLATABLE_I18N_CLASS, $form['en']->getData());
-        $this->assertInstanceOf(self::TRANSLATABLE_I18N_CLASS, $form['fr']->getData());
+        $this->assertInstanceOf(self::TRANSLATABLE_I18N_CLASS, $translations['en']->getData());
+        $this->assertInstanceOf(self::TRANSLATABLE_I18N_CLASS, $translations['fr']->getData());
 
-        $this->assertEquals($item->getTranslation('en'), $form['en']->getData());
-        $this->assertEquals($item->getTranslation('fr'), $form['fr']->getData());
+        $this->assertEquals($item->getTranslation('en'), $translations['en']->getData());
+        $this->assertEquals($item->getTranslation('fr'), $translations['fr']->getData());
 
-        $this->assertEquals('value', $form['fr']->getConfig()->getOption('columns')[0]);
-        $this->assertEquals('textarea', $form['fr']->getConfig()->getOption('columns')['value2']['type']);
-        $this->assertEquals('Label', $form['fr']->getConfig()->getOption('columns')['value2']['label']);
+        $this->assertEquals('value', $translations['fr']->getConfig()->getOption('columns')[0]);
+        $this->assertEquals('textarea', $translations['fr']->getConfig()->getOption('columns')['value2']['type']);
+        $this->assertEquals('Label', $translations['fr']->getConfig()->getOption('columns')['value2']['label']);
     }
 
     public function testNotPresentTranslationsAdded()
@@ -109,7 +115,7 @@ class TranslationCollectionTypeTest extends TypeTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @exssspectedException Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testTranslationClassHasNoGetLocaleMethod()
     {
@@ -122,7 +128,8 @@ class TranslationCollectionTypeTest extends TypeTestCase
                 'columns' => array('value', 'value2' => array('label' => 'Label', 'type' => 'textarea'))
             )
         ));
-        $form->setData($item->getValue());
+        $form->bind($item->getValue());
+        //$form->setData($item->getValue());
     }
 
     /**

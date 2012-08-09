@@ -349,7 +349,7 @@ class NativeSessionStorage implements SessionStorageInterface
         if (!$saveHandler instanceof AbstractProxy && $saveHandler instanceof \SessionHandlerInterface) {
             $saveHandler = new SessionHandlerProxy($saveHandler);
         } elseif (!$saveHandler instanceof AbstractProxy) {
-            $saveHandler = new NativeProxy($saveHandler);
+            $saveHandler = new NativeProxy();
         }
 
         $this->saveHandler = $saveHandler;

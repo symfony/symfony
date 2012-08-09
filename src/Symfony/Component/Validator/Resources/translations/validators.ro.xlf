@@ -202,6 +202,18 @@
                 <source>A PHP extension caused the upload to fail.</source>
                 <target>O extensie PHP a prevenit încărcarea cu succes a fișierului.</target>
             </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} elements or more.</source>
+                <target>Această colecție trebuie să conțină cel puțin {{ limit }} elemente.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} elements or less.</source>
+                <target>Această colecție trebuie să conțină cel mult {{ limit }} elemente.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} elements.</source>
+                <target>Această colecție trebuie să conțină {{ limit }} elemente.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

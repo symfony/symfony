@@ -81,7 +81,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
 
         $xml = $m->invoke($loader, self::$fixturesPath.'/xml/services1.xml');
-        $this->assertEquals('Symfony\\Component\\DependencyInjection\\SimpleXMLElement', get_class($xml), '->parseFile() returns an SimpleXMLElement object');
+        $this->assertEquals('DOMDocument', get_class($xml), '->parseFile() returns an DOMDocument object');
     }
 
     public function testLoadParameters()

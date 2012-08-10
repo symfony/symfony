@@ -46,10 +46,9 @@ class NativeFileSessionHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $handler = new NativeFileSessionHandler($savePath);
         $this->assertEquals($expectedSavePath, ini_get('session.save_path'));
-        $dir = realpath('/'.$path);
-        $this->assertTrue(is_dir(realpath($dir)));
+        $this->assertTrue(is_dir(realpath($path)));
 
-        rmdir($dir);
+        rmdir($path);
     }
 
     public function savePathDataProvider()

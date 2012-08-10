@@ -694,7 +694,13 @@ EOF;
      */
     public function __construct()
     {
-        \$this->parameters = \$this->getDefaultParameters();
+EOF;
+
+        if ($this->container->getParameterBag()->all()) {
+            $code .= "\n        \$this->parameters = \$this->getDefaultParameters();\n";
+        }
+
+        $code .= <<<EOF
 
         \$this->services =
         \$this->scopedServices =

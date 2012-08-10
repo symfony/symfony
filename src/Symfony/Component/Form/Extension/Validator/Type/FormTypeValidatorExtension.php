@@ -82,7 +82,7 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
             // "validation_constraint" is deprecated. Use "constraints".
             'validation_constraint' => null,
             'constraints'           => $constraints,
-            'cascade_validation'    => false,
+            'cascade_validation'    => true,
             'invalid_message'       => 'This value is not valid.',
             'extra_fields_message'  => 'This form should not contain extra fields.',
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',

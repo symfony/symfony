@@ -17,28 +17,15 @@ use Symfony\Component\EventDispatcher\Event;
 
 
 /**
- * Allows to edit input and output of a command.
- *
- * Call setOutput if you need to modify the output object. The propagation of
- * this event is stopped as soon as a new output is set.
+ * Allows to inspect input and output of a command.
  *
  * @author Francesco Levorato <git@flevour.net>
  */
 class ConsoleInitEvent extends Event
 {
 
-    /**
-     * The input received by the command.
-     *
-     * @var Symfony\Component\Console\Input\InputInterface
-     */
     private $input;
 
-    /**
-     * The output object used by the command.
-     *
-     * @var Symfony\Component\Console\Output\OutputInterface
-     */
     private $output;
 
     public function __construct(InputInterface $input, OutputInterface $output)
@@ -48,21 +35,9 @@ class ConsoleInitEvent extends Event
     }
 
     /**
-     * Sets an output object and stops event propagation
-     *
-     * @param Symfony\Component\Console\Output\OutputInterface $output
-     */
-    public function setOutput(OutputInterface $output)
-    {
-        $this->output = $output;
-
-        $this->stopPropagation();
-    }
-
-    /**
      * Returns the input object
      *
-     * @return Symfony\Component\Console\Input\InputInterface
+     * @return InputInterface
      */
     public function getInput()
     {
@@ -72,7 +47,7 @@ class ConsoleInitEvent extends Event
     /**
      * Returns the output object
      *
-     * @return Symfony\Component\Console\Output\OutputInterface
+     * @return OutputInterface
      */
     public function getOutput()
     {

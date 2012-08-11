@@ -15,13 +15,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 
-
 /**
  * Allows to inspect input and output of a command.
  *
  * @author Francesco Levorato <git@flevour.net>
  */
-class ConsoleInitEvent extends Event
+class ConsoleEvent extends Event
 {
 
     private $input;

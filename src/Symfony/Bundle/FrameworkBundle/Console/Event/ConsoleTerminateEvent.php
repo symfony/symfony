@@ -11,15 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
-
 /**
  * Allows to receive the exit code of a command after its execution.
  *
  * @author Francesco Levorato <git@flevour.net>
  */
-class ConsoleTerminateEvent extends Event
+class ConsoleTerminateEvent extends ConsoleEvent
 {
 
     /**

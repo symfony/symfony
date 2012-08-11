@@ -24,19 +24,18 @@ final class ConsoleEvents
      * executed by the console. It also allows you to modify the input and output
      * before they are handled to the command.
      *
-     * The event listener method receives a Symfony\Bundle\FrameworkBundle\Console\Event\ConsoleInitEvent
+     * The event listener method receives a \Symfony\Bundle\FrameworkBundle\Console\Event\ConsoleEvent
      * instance.
      *
      * @var string
      */
     const INIT = 'console.init';
 
-
     /**
      * The TERMINATE event allows you to attach listeners after a command is
      * executed by the console.
      *
-     * The event listener method receives a Symfony\Bundle\FrameworkBundle\Console\Event\ConsoleTerminateEvent
+     * The event listener method receives a \Symfony\Bundle\FrameworkBundle\Console\Event\ConsoleTerminateEvent
      * instance.
      *
      * @var string

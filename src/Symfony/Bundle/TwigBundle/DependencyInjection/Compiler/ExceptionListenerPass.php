@@ -27,6 +27,10 @@ class ExceptionListenerPass implements CompilerPassInterface
             return;
         }
 
+        if (false === $container->hasDefinition('templating.engines')) {
+            return;
+        }
+
         // register the exception controller only if Twig is enabled
         $engines = $container->getParameter('templating.engines');
         if (!in_array('twig', $engines)) {

@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\ConsoleEvents;
-use Symfony\Bundle\FrameworkBundle\Console\Event\ConsoleInitEvent;
+use Symfony\Bundle\FrameworkBundle\Console\Event\ConsoleEvent;
 use Symfony\Bundle\FrameworkBundle\Console\Event\ConsoleTerminateEvent;
 
 /**
@@ -80,7 +80,7 @@ class Application extends BaseApplication
 
         $dispatcher = $this->kernel->getContainer()->get('event_dispatcher');
 
-        $initEvent = new ConsoleInitEvent($input, $output);
+        $initEvent = new ConsoleEvent($input, $output);
         $dispatcher->dispatch(ConsoleEvents::INIT, $initEvent);
 
         $exitCode = parent::doRun($input, $output);

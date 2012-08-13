@@ -66,7 +66,7 @@ final class Schema extends BaseSchema
     protected function addClassTable()
     {
         $table = $this->createTable($this->options['class_table_name']);
-        $table->addColumn('id', 'integer', array('unsigned' => true, 'autoincrement' => 'auto'));
+        $table->addColumn('id', 'integer', array('autoincrement' => 'auto'));
         $table->addColumn('class_type', 'string', array('length' => 200));
         $table->setPrimaryKey(array('id'));
         $table->addUniqueIndex(array('class_type'));
@@ -79,12 +79,12 @@ final class Schema extends BaseSchema
     {
         $table = $this->createTable($this->options['entry_table_name']);
 
-        $table->addColumn('id', 'integer', array('unsigned' => true, 'autoincrement' => 'auto'));
-        $table->addColumn('class_id', 'integer', array('unsigned' => true));
-        $table->addColumn('object_identity_id', 'integer', array('unsigned' => true, 'notnull' => false));
+        $table->addColumn('id', 'integer', array('autoincrement' => 'auto'));
+        $table->addColumn('class_id', 'integer');
+        $table->addColumn('object_identity_id', 'integer', array('notnull' => false));
         $table->addColumn('field_name', 'string', array('length' => 50, 'notnull' => false));
-        $table->addColumn('ace_order', 'smallint', array('unsigned' => true));
-        $table->addColumn('security_identity_id', 'integer', array('unsigned' => true));
+        $table->addColumn('ace_order', 'smallint');
+        $table->addColumn('security_identity_id', 'integer');
         $table->addColumn('mask', 'integer');
         $table->addColumn('granting', 'boolean');
         $table->addColumn('granting_strategy', 'string', array('length' => 30));
@@ -107,10 +107,10 @@ final class Schema extends BaseSchema
     {
         $table = $this->createTable($this->options['oid_table_name']);
 
-        $table->addColumn('id', 'integer', array('unsigned' => true, 'autoincrement' => 'auto'));
-        $table->addColumn('class_id', 'integer', array('unsigned' => true));
+        $table->addColumn('id', 'integer', array('autoincrement' => 'auto'));
+        $table->addColumn('class_id', 'integer');
         $table->addColumn('object_identifier', 'string', array('length' => 100));
-        $table->addColumn('parent_object_identity_id', 'integer', array('unsigned' => true, 'notnull' => false));
+        $table->addColumn('parent_object_identity_id', 'integer', array('notnull' => false));
         $table->addColumn('entries_inheriting', 'boolean');
 
         $table->setPrimaryKey(array('id'));
@@ -127,8 +127,8 @@ final class Schema extends BaseSchema
     {
         $table = $this->createTable($this->options['oid_ancestors_table_name']);
 
-        $table->addColumn('object_identity_id', 'integer', array('unsigned' => true));
-        $table->addColumn('ancestor_id', 'integer', array('unsigned' => true));
+        $table->addColumn('object_identity_id', 'integer');
+        $table->addColumn('ancestor_id', 'integer');
 
         $table->setPrimaryKey(array('object_identity_id', 'ancestor_id'));
 
@@ -144,7 +144,7 @@ final class Schema extends BaseSchema
     {
         $table = $this->createTable($this->options['sid_table_name']);
 
-        $table->addColumn('id', 'integer', array('unsigned' => true, 'autoincrement' => 'auto'));
+        $table->addColumn('id', 'integer', array('autoincrement' => 'auto'));
         $table->addColumn('identifier', 'string', array('length' => 200));
         $table->addColumn('username', 'boolean');
 

@@ -29,9 +29,7 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-    }
+    public abstract function buildForm(FormBuilderInterface $builder, array $options);
 
     /**
      * {@inheritdoc}

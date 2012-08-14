@@ -1,21 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Propel1\Tests\Fixtures;
 
-use Edge5\PageBundle\Model\om\BaseArticleI18n;
 use PropelPDO;
 
-/**
- * Skeleton subclass for representing a row from the 'Article_i18n' table.
- *
- * 
- *
- * You should add additional methods to this class to meet the
- * application requirements.  This class will only be generated as
- * long as it does not already exist in the output directory.
- *
- * @package    propel.generator.src.Edge5.PageBundle.Model
- */
 class TranslatableItemI18n implements \Persistent {
 
     private $id;

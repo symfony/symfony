@@ -510,7 +510,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
                     if (is_array($previousValue) || $previousValue instanceof Traversable) {
                         foreach ($previousValue as $previousItem) {
-                            foreach ($value as $key => $item) {
+                            foreach ($itemsToAdd as $key => $item) {
                                 if ($item === $previousItem) {
                                     // Item found, don't add
                                     unset($itemsToAdd[$key]);

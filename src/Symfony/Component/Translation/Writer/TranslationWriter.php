@@ -59,7 +59,7 @@ class TranslationWriter
     public function writeTranslations(MessageCatalogue $catalogue, $format, $options = array())
     {
         if (!isset($this->dumpers[$format])) {
-            throw new \InvalidArgumentException('There is no dumper associated with this format.');
+            throw new \InvalidArgumentException(sprintf('There is no dumper associated with format "%s".', $format));
         }
 
         // get the right dumper

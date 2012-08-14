@@ -63,7 +63,7 @@ class TranslationCollectionType extends AbstractType
         ));
 
         $resolver->setDefaults(array(
-            'type' => 'propel1_translation',
+            'type' => new Symfony\Bridge\Propel1\Form\Type\TranslationType(),
             'allow_add' => false,
             'allow_delete' => false,
             'options' => array(

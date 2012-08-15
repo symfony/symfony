@@ -33,6 +33,13 @@ class NativeFileSessionHandler extends NativeSessionHandler
      */
     public function __construct($savePath = null)
     {
+        // We don't want to override the server settings in case the server is configured to handle sessions
+        // in something else that files. This makes it easy to configure servers to have sessions stored in
+        // memcached/redis or anything else from PHP.ini
+        if ('files' != ini_get('session.save_handler')) {
+            return;
+        }
+
         if (null === $savePath) {
             $savePath = ini_get('session.save_path');
         }

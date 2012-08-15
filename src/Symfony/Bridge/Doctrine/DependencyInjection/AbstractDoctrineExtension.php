@@ -331,9 +331,24 @@ abstract class AbstractDoctrineExtension extends Extension
                 $container->setDefinition($this->getObjectManagerElementName(sprintf('%s_memcached_instance', $objectManager['name'])), $memcachedInstance);
                 $cacheDef->addMethodCall('setMemcached', array(new Reference($this->getObjectManagerElementName(sprintf('%s_memcached_instance', $objectManager['name'])))));
                 break;
+             case 'redis':
+                $redisClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%'.$this->getObjectManagerElementName('cache.redis.class').'%';
+                $redisInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%'.$this->getObjectManagerElementName('cache.redis_instance.class').'%';
+                $redisHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%'.$this->getObjectManagerElementName('cache.redis_host').'%';
+                $redisPort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.redis_port').'%';
+                $cacheDef = new Definition($redisClass);
+                $redisInstance = new Definition($redisInstanceClass);
+                $redisInstance->addMethodCall('connect', array(
+                    $redisHost, $redisPort
+                ));
+                $container->setDefinition($this->getObjectManagerElementName(sprintf('%s_redis_instance', $objectManager['name'])), $redisInstance);
+                $cacheDef->addMethodCall('setRedis', array(new Reference($this->getObjectManagerElementName(sprintf('%s_redis_instance', $objectManager['name'])))));
+                break;
             case 'apc':
             case 'array':
             case 'xcache':
+            case 'wincache':
+            case 'zenddata':
                 $cacheDef = new Definition('%'.$this->getObjectManagerElementName(sprintf('cache.%s.class', $cacheDriver['type'])).'%');
                 break;
             default:

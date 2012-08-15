@@ -34,7 +34,7 @@ class GenericEventTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->subject = new \StdClass();
-        $this->event = new GenericEvent($this->subject, array('name' => 'Event'), 'foo');
+        $this->event = new GenericEvent(array('name' => 'Event'), $this->subject);
     }
 
     /**
@@ -50,7 +50,7 @@ class GenericEventTest extends \PHPUnit_Framework_TestCase
 
     public function test__construct()
     {
-        $this->assertEquals($this->event, new GenericEvent($this->subject, array('name' => 'Event')));
+        $this->assertEquals($this->event, new GenericEvent(array('name' => 'Event'), $this->subject));
     }
 
     /**

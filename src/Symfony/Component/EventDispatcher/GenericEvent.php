@@ -37,10 +37,10 @@ class GenericEvent extends Event implements \ArrayAccess
     /**
      * Encapsulate an event with $subject, $args, and $data.
      *
-     * @param mixed $subject   The subject of the event, usually an object.
      * @param array $arguments Arguments to store in the event.
+     * @param mixed $subject   The subject of the event, usually an object.
      */
-    public function __construct($subject = null, array $arguments = array())
+    public function __construct(array $arguments = array(), $subject = null)
     {
         $this->subject = $subject;
         $this->arguments = $arguments;
@@ -161,9 +161,7 @@ class GenericEvent extends Event implements \ArrayAccess
      */
     public function offsetUnset($key)
     {
-        if ($this->hasArgument($key)) {
-            unset($this->arguments[$key]);
-        }
+        unset($this->arguments[$key]);
     }
 
     /**

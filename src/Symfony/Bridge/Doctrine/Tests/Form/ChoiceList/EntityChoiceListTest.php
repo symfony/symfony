@@ -181,7 +181,8 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
             array(
                 'group1' => array($entity1),
                 'group2' => array($entity2),
-            )
+            ),
+            array()
         );
 
         $this->assertSame(array(1 => $entity1, 2 => $entity2), $choiceList->getChoices());
@@ -214,6 +215,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
                 $item3,
                 $item4,
             ),
+            array(),
             'groupName'
         );
 
@@ -242,6 +244,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
                 $item1,
                 $item2,
             ),
+            array(),
             'child.that.does.not.exist'
         );
 
@@ -267,6 +270,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
             null,
             null,
             null,
+            array(),
             null
         );
 

@@ -108,6 +108,8 @@ class DateTimeType extends AbstractType
                 ));
             }
         } else {
+            $options['error_bubbling'] = true;
+            
             // Only pass a subset of the options to children
             $dateOptions = array_intersect_key($options, array_flip(array(
                 'years',
@@ -116,6 +118,7 @@ class DateTimeType extends AbstractType
                 'empty_value',
                 'required',
                 'translation_domain',
+                'error_bubbling',
             )));
 
             $timeOptions = array_intersect_key($options, array_flip(array(
@@ -126,6 +129,7 @@ class DateTimeType extends AbstractType
                 'empty_value',
                 'required',
                 'translation_domain',
+                'error_bubbling',
             )));
 
             if (null !== $options['date_widget']) {
@@ -231,6 +235,7 @@ class DateTimeType extends AbstractType
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'   => false,
+            'error_bubbling' => false,
             // If initialized with a \DateTime object, FormType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset

@@ -550,7 +550,7 @@
 
     ```
     {% for choice, label in choices %}
-        <option value="{{ choice }}"{% if choice is selectedchoice(form) %} selected="selected"{% endif %}>
+        <option value="{{ choice.value }}"{% if choice is selectedchoice(choice.value) %} selected="selected"{% endif %}>
             {{ label }}
         </option>
     {% endfor %}

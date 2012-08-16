@@ -20,6 +20,13 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class FooSubType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+    }
+
     public function getName()
     {
         return 'foo_sub_type';

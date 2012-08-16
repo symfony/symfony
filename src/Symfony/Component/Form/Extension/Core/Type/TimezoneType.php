@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class TimezoneType extends AbstractType
@@ -21,6 +22,13 @@ class TimezoneType extends AbstractType
      * @var array
      */
     private static $timezones;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+    }
 
     /**
      * {@inheritdoc}

@@ -12,11 +12,19 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Locale\Locale;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class LocaleType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+    }
+
     /**
      * {@inheritdoc}
      */

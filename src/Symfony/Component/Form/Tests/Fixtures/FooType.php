@@ -20,6 +20,10 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class FooType extends AbstractType
 {
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+    }
+
     public function getName()
     {
         return 'foo';

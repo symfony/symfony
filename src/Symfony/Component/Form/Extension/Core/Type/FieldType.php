@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Deprecated. You should extend FormType instead.
@@ -22,6 +23,14 @@ use Symfony\Component\Form\AbstractType;
  */
 class FieldType extends AbstractType
 {
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+    }
+
     /**
      * {@inheritdoc}
      */

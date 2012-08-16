@@ -87,7 +87,7 @@ class FormValidator extends ConstraintValidator
             // Mark the form with an error if it is not synchronized
             $this->context->addViolation(
                 $config->getOption('invalid_message'),
-                array('{{ value }}' => $clientDataAsString),
+                array_replace(array('{{ value }}' => $clientDataAsString), $config->getOption('invalid_message_parameters')),
                 $form->getViewData(),
                 null,
                 Form::ERR_INVALID

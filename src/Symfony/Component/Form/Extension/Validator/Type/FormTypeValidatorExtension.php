@@ -77,15 +77,16 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
         };
 
         $resolver->setDefaults(array(
-            'error_mapping'         => array(),
-            'validation_groups'     => null,
+            'error_mapping'              => array(),
+            'validation_groups'          => null,
             // "validation_constraint" is deprecated. Use "constraints".
-            'validation_constraint' => null,
-            'constraints'           => $constraints,
-            'cascade_validation'    => false,
-            'invalid_message'       => 'This value is not valid.',
-            'extra_fields_message'  => 'This form should not contain extra fields.',
-            'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
+            'validation_constraint'      => null,
+            'constraints'                => $constraints,
+            'cascade_validation'         => false,
+            'invalid_message'            => 'This value is not valid.',
+            'invalid_message_parameters' => array(),
+            'extra_fields_message'       => 'This form should not contain extra fields.',
+            'post_max_size_message'      => 'The uploaded file was too large. Please try to upload a smaller file.',
         ));
 
         $resolver->setNormalizers(array(

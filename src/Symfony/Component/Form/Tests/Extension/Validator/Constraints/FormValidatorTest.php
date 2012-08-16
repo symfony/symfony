@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Constraints;
 
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormInterface;
@@ -182,7 +183,13 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $graphWalker = $context->getGraphWalker();
         $object = $this->getMock('\stdClass');
 
-        $form = $this->getBuilder('name', '\stdClass', array('invalid_message' => 'Invalid!'))
+        $form = $this->getBuilder('name', '\stdClass', array(
+                'invalid_message' => 'invalid_message_key',
+                // Invalid message parameters must be supported, because the
+                // invalid message can be a translation key
+                // see https://github.com/symfony/symfony/issues/5144
+                'invalid_message_parameters' => array('{{ foo }}' => 'bar'),
+            ))
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
                 function ($data) { return $data; },
@@ -191,7 +198,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
             ->getForm();
 
         // Launch transformer
-        $form->bind(array());
+        $form->bind('foo');
 
         $graphWalker->expects($this->never())
             ->method('walkReference');
@@ -199,8 +206,18 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
 
+        $expectedViolation = new ConstraintViolation(
+            'invalid_message_key',
+            array('{{ value }}' => 'foo', '{{ foo }}' => 'bar'),
+            'Root',
+            null,
+            'foo',
+            null,
+            Form::ERR_INVALID
+        );
+
         $this->assertCount(1, $context->getViolations());
-        $this->assertEquals('Invalid!', $context->getViolations()->get(0)->getMessage());
+        $this->assertEquals($expectedViolation, $context->getViolations()->get(0));
     }
 
     public function testDontValidateConstraintsIfNotSynchronized()
@@ -517,6 +534,7 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $options = array_replace(array(
             'constraints' => array(),
+            'invalid_message_parameters' => array(),
         ), $options);
 
         return new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory, $options);

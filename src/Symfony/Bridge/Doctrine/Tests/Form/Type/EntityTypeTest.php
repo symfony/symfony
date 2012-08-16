@@ -536,6 +536,45 @@ class EntityTypeTest extends TypeTestCase
         ), $field->createView()->vars['choices']);
     }
 
+    public function testPreferredChoices()
+    {
+        $entity1 = new SingleIdentEntity(1, 'Foo');
+        $entity2 = new SingleIdentEntity(2, 'Bar');
+        $entity3 = new SingleIdentEntity(3, 'Baz');
+
+        $this->persist(array($entity1, $entity2, $entity3));
+
+        $field = $this->factory->createNamed('name', 'entity', null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'preferred_choices' => array($entity3, $entity2),
+            'property' => 'name',
+        ));
+
+        $this->assertEquals(array(3 => new ChoiceView($entity3, '3', 'Baz'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['preferred_choices']);
+        $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo')), $field->createView()->vars['choices']);
+    }
+
+    public function testOverrideChoicesWithPreferredChoices()
+    {
+        $entity1 = new SingleIdentEntity(1, 'Foo');
+        $entity2 = new SingleIdentEntity(2, 'Bar');
+        $entity3 = new SingleIdentEntity(3, 'Baz');
+
+        $this->persist(array($entity1, $entity2, $entity3));
+
+        $field = $this->factory->createNamed('name', 'entity', null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'choices' => array($entity2, $entity3),
+            'preferred_choices' => array($entity3),
+            'property' => 'name',
+        ));
+
+        $this->assertEquals(array(3 => new ChoiceView($entity3, '3', 'Baz')), $field->createView()->vars['preferred_choices']);
+        $this->assertEquals(array(2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
+    }
+
     public function testDisallowChoicesThatAreNotIncluded_choicesSingleIdentifier()
     {
         $entity1 = new SingleIdentEntity(1, 'Foo');

@@ -77,6 +77,13 @@ class EntityChoiceList extends ObjectChoiceList
     private $loaded = false;
 
     /**
+     * The preferred entities.
+     *
+     * @var array
+     */
+    private $preferredEntities = array();
+
+    /**
      * Creates a new entity choice list.
      *
      * @param ObjectManager         $manager      An EntityManager instance
@@ -88,13 +95,14 @@ class EntityChoiceList extends ObjectChoiceList
      *                                            to group the choices. Only allowed if
      *                                            the choices are given as flat array.
      */
-    public function __construct(ObjectManager $manager, $class, $labelPath = null, EntityLoaderInterface $entityLoader = null, $entities = null, $groupPath = null)
+    public function __construct(ObjectManager $manager, $class, $labelPath = null, EntityLoaderInterface $entityLoader = null, $entities = null,  array $preferredEntities = array(), $groupPath = null)
     {
         $this->em = $manager;
         $this->entityLoader = $entityLoader;
         $this->classMetadata = $manager->getClassMetadata($class);
         $this->class = $this->classMetadata->getName();
         $this->loaded = is_array($entities) || $entities instanceof \Traversable;
+        $this->preferredEntities = $preferredEntities;
 
         $identifier = $this->classMetadata->getIdentifierFieldNames();
 
@@ -113,7 +121,7 @@ class EntityChoiceList extends ObjectChoiceList
             $entities = array();
         }
 
-        parent::__construct($entities, $labelPath, array(), $groupPath);
+        parent::__construct($entities, $labelPath, $preferredEntities, $groupPath);
     }
 
     /**
@@ -359,8 +367,7 @@ class EntityChoiceList extends ObjectChoiceList
 
         try {
             // The second parameter $labels is ignored by ObjectChoiceList
-            // The third parameter $preferredChoices is currently not supported
-            parent::initialize($entities, array(), array());
+            parent::initialize($entities, array(), $this->preferredEntities);
         } catch (StringCastException $e) {
             throw new StringCastException(str_replace('argument $labelPath', 'option "property"', $e->getMessage()), null, $e);
         }

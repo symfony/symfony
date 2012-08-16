@@ -532,11 +532,9 @@
     by default. Take care if your JavaScript relies on that. If you want to
     read the actual choice value, read the `value` attribute instead.
 
-  * In the choice field type's template, the structure of the `choices` variable
-    has changed.
-
-    The `choices` variable now contains `ChoiceView` objects with two getters,
-    `getValue()` and `getLabel()`, to access the choice data.
+  * In the choice field type's template, the `_form_is_choice_selected` method
+    used to identify a selected choice has been replaced with the `selectedchoice`
+    filter.
 
     Before:
 
@@ -551,9 +549,9 @@
     After:
 
     ```
-    {% for choice in choices %}
-        <option value="{{ choice.value }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
-            {{ choice.label }}
+    {% for choice, label in choices %}
+        <option value="{{ choice }}"{% if choice is selectedchoice(form) %} selected="selected"{% endif %}>
+            {{ label }}
         </option>
     {% endfor %}
     ```

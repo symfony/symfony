@@ -81,6 +81,14 @@ abstract class DoctrineType extends AbstractType
                 });
             }
 
+            $preferredChoiceHashes = $options['preferred_choices'];
+
+            if (is_array($preferredChoiceHashes)) {
+                array_walk_recursive($preferredChoiceHashes, function ($value) {
+                    return spl_object_hash($value);
+                });
+            }
+
             // Support for custom loaders (with query builders)
             $loaderHash = is_object($options['loader'])
                 ? spl_object_hash($options['loader'])
@@ -97,6 +105,7 @@ abstract class DoctrineType extends AbstractType
                 $propertyHash,
                 $loaderHash,
                 $choiceHashes,
+                $preferredChoiceHashes,
                 $groupByHash
             )));
 
@@ -107,6 +116,7 @@ abstract class DoctrineType extends AbstractType
                     $options['property'],
                     $options['loader'],
                     $options['choices'],
+                    $options['preferred_choices'],
                     $options['group_by']
                 );
             }

@@ -79,7 +79,9 @@
 
  * The current locale for the user is not stored anymore in the session
 
-   You can simulate the old behavior by registering a listener that looks like the following, if the parameter which handle locale value in the request is `_locale`:
+   You can simulate the old behavior by registering a listener that looks like
+   the following if the parameter which handles the locale value in the
+   request is `_locale`:
 
    ```
    namespace XXX;

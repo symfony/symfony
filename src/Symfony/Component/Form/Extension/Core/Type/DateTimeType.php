@@ -108,8 +108,6 @@ class DateTimeType extends AbstractType
                 ));
             }
         } else {
-            $options['error_bubbling'] = true;
-            
             // Only pass a subset of the options to children
             $dateOptions = array_intersect_key($options, array_flip(array(
                 'years',
@@ -118,7 +116,6 @@ class DateTimeType extends AbstractType
                 'empty_value',
                 'required',
                 'translation_domain',
-                'error_bubbling',
             )));
 
             $timeOptions = array_intersect_key($options, array_flip(array(
@@ -129,7 +126,6 @@ class DateTimeType extends AbstractType
                 'empty_value',
                 'required',
                 'translation_domain',
-                'error_bubbling',
             )));
 
             if (null !== $options['date_widget']) {
@@ -144,8 +140,8 @@ class DateTimeType extends AbstractType
                 $dateOptions['format'] = $options['date_format'];
             }
 
-            $dateOptions['input'] = 'array';
-            $timeOptions['input'] = 'array';
+            $dateOptions['input'] = $timeOptions['input'] = 'array';
+            $dateOptions['error_bubbling'] = $timeOptions['error_bubbling'] = true;
 
             $builder
                 ->addViewTransformer(new DataTransformerChain(array(

@@ -157,7 +157,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     {
         $key = strtr(strtolower($key), '_', '-');
 
-        $values = (array) $values;
+        $values = array_values((array) $values);
 
         if (true === $replace || !isset($this->headers[$key])) {
             $this->headers[$key] = $values;

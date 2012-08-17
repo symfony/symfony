@@ -68,6 +68,14 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals( array('bar', 'bor'), $bag->get('foo', 'nope', false), '->get return all values as array');
     }
 
+    public function testSetAssociativeArray()
+    {
+        $bag = new HeaderBag();
+        $bag->set('foo', array('bad-assoc-index' => 'value'));
+        $this->assertSame('value', $bag->get('foo'));
+        $this->assertEquals(array('value'), $bag->get('foo', 'nope', false), 'assoc indices of multi-valued headers are ignored');
+    }
+
     /**
      * @covers Symfony\Component\HttpFoundation\HeaderBag::contains
      */

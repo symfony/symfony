@@ -16,16 +16,6 @@ namespace Symfony\Component\Form\Util;
  */
 abstract class FormUtil
 {
-    const PLURAL_SUFFIX = 0;
-
-    const PLURAL_SUFFIX_LENGTH = 1;
-
-    const PLURAL_SUFFIX_AFTER_VOCAL = 2;
-
-    const PLURAL_SUFFIX_AFTER_CONS = 3;
-
-    const SINGULAR_SUFFIX = 4;
-
     /**
      * Map english plural to singular suffixes
      *
@@ -128,8 +118,8 @@ abstract class FormUtil
         // in the plural table to compare them with the characters of the actual
         // given plural suffix
         for ($i = 0, $numPlurals = count(self::$pluralMap); $i < $numPlurals; ++$i) {
-            $suffix = self::$pluralMap[$i][self::PLURAL_SUFFIX];
-            $suffixLength = self::$pluralMap[$i][self::PLURAL_SUFFIX_LENGTH];
+            $suffix = self::$pluralMap[$i][0];
+            $suffixLength = self::$pluralMap[$i][1];
             $j = 0;
 
             // Compare characters in the plural table and of the suffix of the
@@ -145,17 +135,19 @@ abstract class FormUtil
                     if ($j < $pluralLength) {
                         $nextIsVocal = false !== strpos('aeiou', $lowerPluralRev[$j]);
 
-                        if (!self::$pluralMap[$i][self::PLURAL_SUFFIX_AFTER_VOCAL] && $nextIsVocal) {
+                        if (!self::$pluralMap[$i][2] && $nextIsVocal) {
+                            // suffix may not succeed a vocal but next char is one
                             break;
                         }
 
-                        if (!self::$pluralMap[$i][self::PLURAL_SUFFIX_AFTER_CONS] && !$nextIsVocal) {
+                        if (!self::$pluralMap[$i][3] && !$nextIsVocal) {
+                            // suffix may not succeed a consonant but next char is one
                             break;
                         }
                     }
 
                     $newBase = substr($plural, 0, $pluralLength - $suffixLength);
-                    $newSuffix = self::$pluralMap[$i][self::SINGULAR_SUFFIX];
+                    $newSuffix = self::$pluralMap[$i][4];
 
                     // Check whether the first character in the plural suffix
                     // is uppercased. If yes, uppercase the first character in

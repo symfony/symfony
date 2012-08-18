@@ -128,4 +128,13 @@ class GenericEventTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame($this->subject, $this->event->getSubject());
     }
+
+    public function testHasIterator()
+    {
+        $data = array();
+        foreach ($this->event as $key => $value) {
+            $data[$key] = $value;
+        }
+        $this->assertEquals(array('name' => 'Event'), $data);
+    }
 }

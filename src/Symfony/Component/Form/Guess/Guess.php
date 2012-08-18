@@ -83,7 +83,7 @@ abstract class Guess
             return $b->getConfidence() - $a->getConfidence();
         });
 
-        return count($guesses) > 0 ? $guesses[0] : null;
+        return isset($guesses[0]) ? $guesses[0] : null;
     }
 
     /**

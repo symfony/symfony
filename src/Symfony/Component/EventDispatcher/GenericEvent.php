@@ -18,7 +18,7 @@ namespace Symfony\Component\EventDispatcher;
  *
  * @author Drak <drak@zikula.org>
  */
-class GenericEvent extends Event implements \ArrayAccess
+class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * Observer pattern subject.
@@ -176,5 +176,15 @@ class GenericEvent extends Event implements \ArrayAccess
     public function offsetExists($key)
     {
         return $this->hasArgument($key);
+    }
+
+    /**
+     * IteratorAggregate for iterating over the object like an array
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->arguments);
     }
 }

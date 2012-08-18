@@ -294,7 +294,12 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.storage.options', $options);
 
         // session handler (the internal callback registered with PHP session management)
-        $container->setAlias('session.handler', $config['handler_id']);
+        if (null == $config['handler_id']) {
+            // Set the handler class to be null
+            $container->getDefinition('session.storage.native')->replaceArgument(1, null);
+        } else {
+            $container->setAlias('session.handler', $config['handler_id']);
+        }
 
         $container->setParameter('session.save_path', $config['save_path']);
 

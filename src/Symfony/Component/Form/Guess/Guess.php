@@ -79,11 +79,17 @@ abstract class Guess
      */
     public static function getBestGuess(array $guesses)
     {
-        usort($guesses, function ($a, $b) {
-            return $b->getConfidence() - $a->getConfidence();
-        });
+        $result = null;
+        $maxConfidence = -1;
 
-        return count($guesses) > 0 ? $guesses[0] : null;
+        foreach ($guesses as $guess) {
+            if ($maxConfidence < $confidence = $guess->getConfidence()) {
+                $maxConfidence = $confidence;
+                $result = $guess;
+            }
+        }
+
+        return $result;
     }
 
     /**

@@ -51,13 +51,20 @@ class ResizeFormListener implements EventSubscriberInterface
      */
     protected $allowDelete;
 
-    public function __construct(FormFactoryInterface $factory, $type, array $options = array(), $allowAdd = false, $allowDelete = false)
+    /**
+     * Optional handler that gets called upon deletion of an item
+     * @var \Closure
+     */
+    protected $deletionHandler;
+
+    public function __construct(FormFactoryInterface $factory, $type, array $options = array(), $allowAdd = false, $allowDelete = false, $deletionHandler = null)
     {
         $this->factory = $factory;
         $this->type = $type;
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
         $this->options = $options;
+        $this->deletionHandler = $deletionHandler;
     }
 
     public static function getSubscribedEvents()
@@ -148,6 +155,10 @@ class ResizeFormListener implements EventSubscriberInterface
         if ($this->allowDelete) {
             foreach ($data as $name => $child) {
                 if (!$form->has($name)) {
+                    if (null != $this->deletionHandler) {
+                        $deletionHandler = $this->deletionHandler;
+                        $deletionHandler ($data[$name]);
+                    }
                     unset($data[$name]);
                 }
             }

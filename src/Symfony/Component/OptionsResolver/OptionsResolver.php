@@ -54,12 +54,6 @@ class OptionsResolver implements OptionsResolverInterface
     private $allowedTypes = array();
 
     /**
-     * A list of filters transforming each resolved options.
-     * @var array
-     */
-    private $filters = array();
-
-    /**
      * Creates a new instance.
      */
     public function __construct()
@@ -190,11 +184,13 @@ class OptionsResolver implements OptionsResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function setFilters(array $filters)
+    public function setNormalizers(array $normalizers)
     {
-        $this->validateOptionsExistence($filters);
+        $this->validateOptionsExistence($normalizers);
 
-        $this->filters = array_replace($this->filters, $filters);
+        foreach ($normalizers as $option => $normalizer) {
+            $this->defaultOptions->setNormalizer($option, $normalizer);
+        }
 
         return $this;
     }
@@ -229,11 +225,6 @@ class OptionsResolver implements OptionsResolverInterface
         // Override options set by the user
         foreach ($options as $option => $value) {
             $combinedOptions->set($option, $value);
-        }
-
-        // Apply filters
-        foreach ($this->filters as $option => $filter) {
-            $combinedOptions->overload($option, $filter);
         }
 
         // Resolve options
@@ -321,6 +312,10 @@ class OptionsResolver implements OptionsResolverInterface
     private function validateOptionTypes(array $options)
     {
         foreach ($this->allowedTypes as $option => $allowedTypes) {
+            if (!array_key_exists($option, $options)) {
+                continue;
+            }
+
             $value = $options[$option];
             $allowedTypes = (array) $allowedTypes;
 

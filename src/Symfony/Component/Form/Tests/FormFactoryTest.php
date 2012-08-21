@@ -45,6 +45,11 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     private $registry;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $resolvedTypeFactory;
+
+    /**
      * @var FormFactory
      */
     private $factory;
@@ -55,10 +60,11 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('The "EventDispatcher" component is not available');
         }
 
+        $this->resolvedTypeFactory = $this->getMock('Symfony\Component\Form\ResolvedFormTypeFactoryInterface');
         $this->guesser1 = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
         $this->guesser2 = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
         $this->registry = $this->getMock('Symfony\Component\Form\FormRegistryInterface');
-        $this->factory = new FormFactory($this->registry);
+        $this->factory = new FormFactory($this->registry, $this->resolvedTypeFactory);
 
         $this->registry->expects($this->any())
             ->method('getTypeGuesser')
@@ -73,8 +79,8 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $type = new FooType();
         $resolvedType = $this->getMockResolvedType();
 
-        $this->registry->expects($this->once())
-            ->method('resolveType')
+        $this->resolvedTypeFactory->expects($this->once())
+            ->method('createResolvedType')
             ->with($type)
             ->will($this->returnValue($resolvedType));
 
@@ -136,15 +142,10 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $type = $this->getMockType();
         $resolvedType = $this->getMockResolvedType();
 
-        $this->registry->expects($this->once())
-            ->method('resolveType')
+        $this->resolvedTypeFactory->expects($this->once())
+            ->method('createResolvedType')
             ->with($type)
             ->will($this->returnValue($resolvedType));
-
-        // The type is also implicitely added to the registry
-        $this->registry->expects($this->once())
-            ->method('addType')
-            ->with($resolvedType);
 
         $resolvedType->expects($this->once())
             ->method('createBuilder')
@@ -158,11 +159,6 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $options = array('a' => '1', 'b' => '2');
         $resolvedType = $this->getMockResolvedType();
-
-        // The type is also implicitely added to the registry
-        $this->registry->expects($this->once())
-            ->method('addType')
-            ->with($resolvedType);
 
         $resolvedType->expects($this->once())
             ->method('createBuilder')
@@ -555,7 +551,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactory')
             ->setMethods($methods)
-            ->setConstructorArgs(array($this->registry))
+            ->setConstructorArgs(array($this->registry, $this->resolvedTypeFactory))
             ->getMock();
     }
 

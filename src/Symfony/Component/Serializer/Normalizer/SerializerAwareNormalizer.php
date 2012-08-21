@@ -21,6 +21,9 @@ use Symfony\Component\Serializer\SerializerAwareInterface;
  */
 abstract class SerializerAwareNormalizer implements SerializerAwareInterface
 {
+    /**
+     * @var SerializerInterface
+     */
     protected $serializer;
 
     /**

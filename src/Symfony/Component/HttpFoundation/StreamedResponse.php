@@ -76,7 +76,7 @@ class StreamedResponse extends Response
      */
     public function prepare(Request $request)
     {
-        if ('1.0' != $request->server->get('SERVER_PROTOCOL')) {
+        if ('HTTP/1.0' != $request->server->get('SERVER_PROTOCOL')) {
             $this->setProtocolVersion('1.1');
         }
 

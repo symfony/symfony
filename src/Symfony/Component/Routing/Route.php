@@ -59,7 +59,7 @@ class Route implements \Serializable
     {
         return serialize(array(
             'pattern' => $this->pattern,
-            'default' => $this->default,
+            'defaults' => $this->defaults,
             'requirements' => $this->requirements,
             'options' => $this->options,
         ));
@@ -69,7 +69,7 @@ class Route implements \Serializable
     {
         $data = unserialize($data);
         $this->pattern = $data['pattern'];
-        $this->default = $data['default'];
+        $this->defaults = $data['defaults'];
         $this->requirements = $data['requirements'];
         $this->options = $data['options'];
     }

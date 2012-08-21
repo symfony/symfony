@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Application.
@@ -80,8 +81,11 @@ class Application extends BaseApplication
     protected function registerCommands()
     {
         $this->kernel->boot();
+
         foreach ($this->kernel->getBundles() as $bundle) {
-            $bundle->registerCommands($this);
+            if ($bundle instanceof Bundle) {
+                $bundle->registerCommands($this);
+            }
         }
     }
 }

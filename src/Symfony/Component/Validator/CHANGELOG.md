@@ -23,6 +23,8 @@ CHANGELOG
    which enables the BC behavior.
  * added Count constraint
  * added Length constraint
- * deprecated the Size constraint and renamed it to Range
+ * added Range constraint
  * deprecated the Min and Max constraints
  * deprecated the MinLength and MaxLength constraints
+ * added Validation and ValidatorBuilderInterface
+ * deprecated ValidatorContext, ValidatorContextInterface and ValidatorFactory

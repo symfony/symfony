@@ -78,7 +78,8 @@ class LocaleValidatorTest extends LocalizedTestCase
         return array(
             array('en'),
             array('en_US'),
-            array('my'),
+            array('pt'),
+            array('pt_PT'),
             array('zh_Hans'),
         );
     }

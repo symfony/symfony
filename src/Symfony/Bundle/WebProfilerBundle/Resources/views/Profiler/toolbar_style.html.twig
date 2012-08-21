@@ -17,6 +17,10 @@
         bottom: 0;
         border-top: 1px solid #bbb;
     }
+    .sf-toolbarreset span, 
+    .sf-toolbarreset div {
+        font-size: 11px;
+    }
     .sf-toolbarreset img {
         width: auto;
         display: inline;
@@ -86,7 +90,7 @@
         margin-left: -1px;
 
         bottom: 38px;
-        border-bottom: 1px solid #fff;
+        border-bottom-width: 0;
     }
 
     .sf-toolbar-block .sf-toolbar-info:empty {
@@ -103,6 +107,11 @@
         vertical-align: middle;
         min-width: 6px;
         min-height: 13px;
+    }
+
+    .sf-toolbar-block .sf-toolbar-status abbr {
+        color: #fff;
+        border-bottom: 1px dotted black;
     }
 
     .sf-toolbar-block .sf-toolbar-status-green {
@@ -216,9 +225,9 @@
         }
 
         .sf-toolbar-block .sf-toolbar-info {
-            top: 38px;
+            top: 39px;
             bottom: auto;
-            border-top: 1px solid #fff;
+            border-top-width: 0;
             border-bottom: 1px solid #bbb;
         }
     {% endif %}

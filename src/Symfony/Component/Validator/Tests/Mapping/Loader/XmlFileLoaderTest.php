@@ -47,6 +47,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->loadClassMetadata($metadata);
 
         $expected = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $expected->setGroupSequence(array('Foo', 'Entity'));
         $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new ConstraintB());
         $expected->addPropertyConstraint('firstName', new NotNull());

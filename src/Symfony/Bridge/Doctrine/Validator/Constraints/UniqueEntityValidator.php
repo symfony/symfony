@@ -75,7 +75,7 @@ class UniqueEntityValidator extends ConstraintValidator
 
             $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
 
-            if (null === $criteria[$fieldName]) {
+            if ($constraint->ignoreNull && null === $criteria[$fieldName]) {
                 return;
             }
 
@@ -100,7 +100,7 @@ class UniqueEntityValidator extends ConstraintValidator
         }
 
         $repository = $em->getRepository($className);
-        $result = $repository->findBy($criteria);
+        $result = $repository->{$constraint->repositoryMethod}($criteria);
 
         /* If the result is a MongoCursor, it must be advanced to the first
          * element. Rewinding should have no ill effect if $result is another

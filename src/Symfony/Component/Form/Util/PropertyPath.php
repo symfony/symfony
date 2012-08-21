@@ -118,8 +118,9 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 $element = $matches[3];
                 $this->isIndex[] = true;
             }
-
-            $pos = strpos($element, self::SINGULAR_SEPARATOR);
+            // Disabled this behaviour as the syntax is not yet final
+            //$pos = strpos($element, self::SINGULAR_SEPARATOR);
+            $pos = false;
             $singular = null;
 
             if (false !== $pos) {
@@ -586,9 +587,9 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      * Searches for add and remove methods.
      *
      * @param \ReflectionClass $reflClass The reflection class for the given object
-     * @param string|null      $singular  The singular form of the property name or null.
+     * @param string|null      $singulars The singular form of the property name or null.
      *
-     * @return array|null An array containin the adder and remover when found, null otherwise.
+     * @return array|null An array containing the adder and remover when found, null otherwise.
      *
      * @throws InvalidPropertyException      If the property does not exist.
      */

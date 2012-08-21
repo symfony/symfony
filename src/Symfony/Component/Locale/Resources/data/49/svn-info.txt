@@ -1,0 +1,7 @@
+SVN info data
+=============
+
+URL: http://source.icu-project.org/repos/icu/icu/tags/release-49-1-2/source/data
+Revision: 31869
+Author: mow
+Date: 2012-05-29T14:09:58.982057Z

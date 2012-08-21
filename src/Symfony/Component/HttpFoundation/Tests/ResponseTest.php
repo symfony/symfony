@@ -367,6 +367,33 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($response->isInvalid());
     }
 
+    /**
+     * @dataProvider getStatusCodeFixtures
+     */
+    public function testSetStatusCode($code, $text, $expectedText)
+    {
+        $response = new Response();
+
+        $response->setStatusCode($code, $text);
+
+        $statusText = new \ReflectionProperty($response, 'statusText');
+        $statusText->setAccessible(true);
+
+        $this->assertEquals($expectedText, $statusText->getValue($response));
+    }
+
+    public function getStatusCodeFixtures()
+    {
+        return array(
+            array('200', null, 'OK'),
+            array('200', false, ''),
+            array('200', 'foo', 'foo'),
+            array('199', null, ''),
+            array('199', false, ''),
+            array('199', 'foo', 'foo')
+        );
+    }
+
     public function testIsInformational()
     {
         $response = new Response('', 100);

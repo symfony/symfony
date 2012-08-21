@@ -66,7 +66,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public static function create()
     {
-        return new self();
+        return new static();
     }
 
     /**
@@ -218,7 +218,6 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * $finder->notContains('Lorem ipsum')
      * $finder->notContains('/Lorem ipsum/i')
-
      *
      * @param string $pattern A pattern (string or regexp)
      *

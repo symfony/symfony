@@ -13,14 +13,15 @@
     configuration (i.e. `config.yml`), merging could yield a set of base URL's
     for multiple environments.
 
- * The priorities for the built-in listeners have changed:
-
-                                       2.0         2.1
-   security.firewall   request         64          8
-   locale listener     early_request   253         255
-                       request         -1          16
-   router listener     early_request   255         128
-                       request         10          32
+  * The priorities for the built-in listeners have changed.
+ 
+    ```
+                                            2.0         2.1
+        security.firewall   kernel.request  64          8
+        locale listener     kernel.request  0           16
+        router listener     early_request   255         n/a
+                            request         0           32
+   ```
 
 ### Doctrine
 
@@ -78,7 +79,9 @@
 
  * The current locale for the user is not stored anymore in the session
 
-   You can simulate the old behavior by registering a listener that looks like the following, if the paramater which handle locale value in the request is `_locale`:
+   You can simulate the old behavior by registering a listener that looks like
+   the following if the parameter which handles the locale value in the
+   request is `_locale`:
 
    ```
    namespace XXX;
@@ -106,7 +109,7 @@
            if ($locale = $request->attributes->get('_locale')) {
                $request->getSession()->set('_locale', $locale);
            } else {
-               $request->setDefaultLocale($request->getSession()->get('_locale', $this->defaultLocale));
+               $request->setLocale($request->getSession()->get('_locale', $this->defaultLocale));
            }
        }
 
@@ -160,6 +163,44 @@
     registered during the build method of bundles instead of being registered
     by the end-user. This means that you will you need to remove the 'factories'
     keys in your security configuration.
+
+    Before:
+
+     ``` yaml
+     security:
+       factories:
+         - "%kernel.root_dir%/../src/Acme/DemoBundle/Resources/config/security_factories.yml"
+     ```
+
+     ``` yaml
+     # src/Acme/DemoBundle/Resources/config/security_factories.yml
+     services:
+         security.authentication.factory.custom:
+             class:  Acme\DemoBundle\DependencyInjection\Security\Factory\CustomFactory
+             tags:
+                 - { name: security.listener.factory }
+     ```
+
+     After:
+
+      ```
+      namespace Acme\DemoBundle;
+
+      use Symfony\Component\HttpKernel\Bundle\Bundle;
+      use Symfony\Component\DependencyInjection\ContainerBuilder;
+      use Acme\DemoBundle\DependencyInjection\Security\Factory\CustomFactory;
+
+      class AcmeDemoBundle extends Bundle
+      {
+          public function build(ContainerBuilder $container)
+          {
+              parent::build($container);
+
+              $extension = $container->getExtension('security');
+              $extension->addSecurityListenerFactory(new CustomFactory());
+          }
+      }
+      ```
 
   * The Firewall listener is now registered after the Router listener. This
     means that specific Firewall URLs (like /login_check and /logout) must now
@@ -223,41 +264,33 @@
     `buildViewBottomUp()` in `FormTypeInterface` and `FormTypeExtensionInterface`.
     Furthermore, `buildViewBottomUp()` was renamed to `finishView()`. At last,
     all methods in these types now receive instances of `FormBuilderInterface`
-    and `FormViewInterface` where they received instances of `FormBuilder` and
-    `FormView` before. You need to change the method signatures in your
-     form types and extensions as shown below.
+    where they received instances of `FormBuilder` before. You need to change the
+    method signatures in your form types and extensions as shown below.
 
     Before:
 
     ```
     use Symfony\Component\Form\FormBuilder;
-    use Symfony\Component\Form\FormView;
 
     public function buildForm(FormBuilder $builder, array $options)
-    public function buildView(FormView $view, FormInterface $form)
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
     ```
 
     After:
 
     ```
     use Symfony\Component\Form\FormBuilderInterface;
-    use Symfony\Component\Form\FormViewInterface;
 
     public function buildForm(FormBuilderInterface $builder, array $options)
-    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
-    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
     ```
 
   * The method `createBuilder` was removed from `FormTypeInterface` for performance
     reasons. It is now not possible anymore to use custom implementations of
     `FormBuilderInterface` for specific form types.
 
-    If you are in such a situation, you can subclass `FormRegistry` instead and override
-    `resolveType` to return a custom `ResolvedFormTypeInterface` implementation, within
-    which you can create your own `FormBuilderInterface` implementation. You should
-    register this custom registry class under the service name "form.registry" in order
-    to replace the default implementation.
+    If you are in such a situation, you can implement a custom `ResolvedFormTypeInterface`
+    where you create your own `FormBuilderInterface` implementation. You also need to
+    register a custom `ResolvedFormTypeFactoryInterface` implementation under the service
+    name "form.resolved_type_factory" in order to replace the default implementation.
 
   * If you previously inherited from `FieldType`, you should now inherit from
     `FormType`. You should also set the option `compound` to `false` if your field
@@ -382,41 +415,6 @@
     If address is an object in this case, the code given in "Before"
     works without changes.
 
-  * The methods in class `FormView` were renamed to match the naming used in
-    `Form` and `FormBuilder`. The following list shows the old names on the
-    left and the new names on the right:
-
-      * `set`: `setVar`
-      * `has`: `hasVar`
-      * `get`: `getVar`
-      * `all`: `getVars`
-      * `addChild`: `add`
-      * `getChild`: `get`
-      * `getChildren`: `all`
-      * `removeChild`: `remove`
-      * `hasChild`: `has`
-
-    The new method `addVars` was added to make the definition of multiple
-    variables at once more convenient.
-
-    The method `hasChildren` was deprecated. You should use `count` instead.
-
-    Before:
-
-    ```
-    $view->set('help', 'A text longer than six characters');
-    $view->set('error_class', 'max_length_error');
-    ```
-
-    After:
-
-    ```
-    $view->addVars(array(
-        'help'        => 'A text longer than six characters',
-        'error_class' => 'max_length_error',
-    ));
-    ```
-
   * Form and field names must now start with a letter, digit or underscore
     and only contain letters, digits, underscores, hyphens and colons.
 
@@ -534,11 +532,9 @@
     by default. Take care if your JavaScript relies on that. If you want to
     read the actual choice value, read the `value` attribute instead.
 
-  * In the choice field type's template, the structure of the `choices` variable
-    has changed.
-
-    The `choices` variable now contains `ChoiceView` objects with two getters,
-    `getValue()` and `getLabel()`, to access the choice data.
+  * In the choice field type's template, the `_form_is_choice_selected` method
+    used to identify a selected choice has been replaced with the `selectedchoice`
+    filter.
 
     Before:
 
@@ -553,9 +549,9 @@
     After:
 
     ```
-    {% for choice in choices %}
-        <option value="{{ choice.value }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
-            {{ choice.label }}
+    {% for choice, label in choices %}
+        <option value="{{ choice.value }}"{% if choice is selectedchoice(choice.value) %} selected="selected"{% endif %}>
+            {{ label }}
         </option>
     {% endfor %}
     ```
@@ -598,6 +594,22 @@
     {% block _author_tags_entry_label %}
         {# ... #}
     {% endblock %}
+    ```
+
+  * The method `renderBlock()` of the helper for the PHP Templating component was
+    renamed to `block()`. Its first argument is now expected to be a `FormView`
+    instance.
+
+    Before:
+
+    ```
+    <?php echo $view['form']->renderBlock('widget_attributes') ?>
+    ```
+
+    After:
+
+    ```
+    <?php echo $view['form']->block($form, 'widget_attributes') ?>
     ```
 
 #### Other BC Breaks
@@ -1053,10 +1065,71 @@
     $registry->addType($registry->resolveType(new MyFormType()));
     ```
 
+  * The following methods in class `FormView` were deprecated and will be
+    removed in Symfony 2.3:
+
+      * `set`
+      * `has`
+      * `get`
+      * `all`
+      * `getVars`
+      * `addChild`
+      * `getChild`
+      * `getChildren`
+      * `removeChild`
+      * `hasChild`
+      * `hasChildren`
+      * `getParent`
+      * `hasParent`
+      * `setParent`
+
+    You should access the public properties `vars`, `children` and `parent`
+    instead.
+
+    Before:
+
+    ```
+    $view->set('help', 'A text longer than six characters');
+    $view->set('error_class', 'max_length_error');
+    ```
+
+    After:
+
+    ```
+    $view->vars = array_replace($view->vars, array(
+        'help'        => 'A text longer than six characters',
+        'error_class' => 'max_length_error',
+    ));
+    ```
+
+    Before:
+
+    ```
+    echo $view->get('error_class');
+    ```
+
+    After:
+
+    ```
+    echo $view->vars['error_class'];
+    ```
+
+    Before:
+
+    ```
+    if ($view->hasChildren()) { ...
+    ```
+
+    After:
+
+    ```
+    if (count($view->children)) { ...
+    ```
+
 ### Validator
 
   * The methods `setMessage()`, `getMessageTemplate()` and
-    `getMessageParameters()` in the Constraint class were deprecated and will
+    `getMessageParameters()` in the `ConstraintValidator` class were deprecated and will
     be removed in Symfony 2.3.
 
     If you have implemented custom validators, you should use the
@@ -1163,8 +1236,8 @@
     }
     ```
 
-  * Core translation messages are changed. Dot is added at the end of each message.
-    Overwritten core translations should be fixed if any. More info here.
+  * Core translation messages changed. A dot is added at the end of each message.
+    Overwritten core translations need to be fixed.
 
   * Collections (arrays or instances of `\Traversable`) in properties
     annotated with `Valid` are not traversed recursively by default anymore.
@@ -1234,6 +1307,25 @@
     ```
     /** @Assert\Length(min = 8) */
     private $password;
+    ```
+
+  * The classes `ValidatorContext` and `ValidatorFactory` were deprecated and
+    will be removed in Symfony 2.3. You should use the new entry point
+    `Validation` instead.
+
+    Before:
+
+    ```
+    $validator = ValidatorFactory::buildDefault(array('path/to/mapping.xml'))
+        ->getValidator();
+    ```
+
+    After:
+
+    ```
+    $validator = Validation::createValidatorBuilder()
+        ->addXmlMapping('path/to/mapping.xml')
+        ->getValidator();
     ```
 
 ### Session
@@ -1316,6 +1408,11 @@
   * The UrlMatcher urldecodes the route parameters only once, they were
     decoded twice before. Note that the `urldecode()` calls have been changed for a
     single `rawurldecode()` in order to support `+` for input paths.
+
+  * Two new parameters have been added to the DIC: `router.request_context.host`
+    and `router.request_context.scheme`.  You can customize them for your
+    functional tests or for generating urls with the right host and scheme
+    when your are in the cli context.
 
 ### FrameworkBundle
 

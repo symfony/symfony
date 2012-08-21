@@ -36,14 +36,14 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
     }
 
@@ -52,19 +52,21 @@ abstract class AbstractType implements FormTypeInterface
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults($this->getDefaultOptions());
-        $resolver->addAllowedValues($this->getAllowedOptionValues());
+        $resolver->setDefaults($this->getDefaultOptions(array()));
+        $resolver->addAllowedValues($this->getAllowedOptionValues(array()));
     }
 
     /**
      * Returns the default options for this type.
+     *
+     * @param array $options Unsupported as of Symfony 2.1.
      *
      * @return array The default options
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      *             Use {@link setDefaultOptions()} instead.
      */
-    public function getDefaultOptions()
+    public function getDefaultOptions(array $options)
     {
         return array();
     }
@@ -72,12 +74,14 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * Returns the allowed option values for each option (if any).
      *
+     * @param array $options Unsupported as of Symfony 2.1.
+     *
      * @return array The allowed option values
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      *             Use {@link setDefaultOptions()} instead.
      */
-    public function getAllowedOptionValues()
+    public function getAllowedOptionValues(array $options)
     {
         return array();
     }

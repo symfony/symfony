@@ -246,7 +246,7 @@ class FrameworkExtension extends Extension
         $router = $container->findDefinition('router.default');
 
         $argument = $router->getArgument(2);
-        $argument['strict_parameters'] = $config['strict_parameters'];
+        $argument['strict_requirements'] = $config['strict_requirements'];
         if (isset($config['type'])) {
             $argument['resource_type'] = $config['type'];
         }
@@ -256,7 +256,6 @@ class FrameworkExtension extends Extension
         $container->setParameter('request_listener.https_port', $config['https_port']);
 
         $this->addClassesToCompile(array(
-            'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
             'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
             'Symfony\\Component\\Routing\\RequestContext',
             'Symfony\\Component\\Routing\\Router',
@@ -295,7 +294,12 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.storage.options', $options);
 
         // session handler (the internal callback registered with PHP session management)
-        $container->setAlias('session.handler', $config['handler_id']);
+        if (null == $config['handler_id']) {
+            // Set the handler class to be null
+            $container->getDefinition('session.storage.native')->replaceArgument(1, null);
+        } else {
+            $container->setAlias('session.handler', $config['handler_id']);
+        }
 
         $container->setParameter('session.save_path', $config['save_path']);
 

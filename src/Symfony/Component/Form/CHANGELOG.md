@@ -31,7 +31,6 @@ CHANGELOG
    * ArrayToChoicesTransformer to ChoicesToValuesTransformer
    * ScalarToChoiceTransformer to ChoiceToValueTransformer
    to be consistent with the naming in ChoiceListInterface.
- * [BC BREAK] removed FormUtil::toArrayKey() and FormUtil::toArrayKeys().
    They were merged into ChoiceList and have no public equivalent anymore.
  * choice fields now throw a FormException if neither the "choices" nor the
    "choice_list" option is set
@@ -107,17 +106,14 @@ CHANGELOG
  * removed superfluous methods from DataMapperInterface
    * `mapFormToData`
    * `mapDataToForm`
- * [BC BREAK] FormType::getDefaultOptions() and FormType::getAllowedOptionValues()
-   don't receive an options array anymore.
  * added `setDefaultOptions` to FormTypeInterface and FormTypeExtensionInterface
    which accepts an OptionsResolverInterface instance
  * deprecated the methods `getDefaultOptions` and `getAllowedOptionValues`
    in FormTypeInterface and FormTypeExtensionInterface
  * options passed during construction can now be accessed from FormConfigInterface
- * added FormBuilderInterface, FormViewInterface and FormConfigEditorInterface
- * [BC BREAK] the methods in FormTypeInterface and FormTypeExtensionInterface now
-   receive FormBuilderInterface and FormViewInterface instead of FormBuilder and
-   FormView
+ * added FormBuilderInterface and FormConfigEditorInterface
+ * [BC BREAK] the method `buildForm` in FormTypeInterface and FormTypeExtensionInterface
+   now receives a FormBuilderInterface instead of a FormBuilder instance
  * [BC BREAK] the method `buildViewBottomUp` was renamed to `finishView` in
    FormTypeInterface and FormTypeExtensionInterface
  * [BC BREAK] the options array is now passed as last argument of the
@@ -135,13 +131,11 @@ CHANGELOG
    FormEvents::BIND_NORM_DATA
  * [BC BREAK] reversed the order of the first two arguments to `createNamed`
    and `createNamedBuilder` in `FormFactoryInterface`
- * [BC BREAK] adapted methods of FormView to match the naming used in
-   FormInterface and FormBuilder
  * deprecated `getChildren` in Form and FormBuilder in favor of `all`
  * deprecated `hasChildren` in Form and FormBuilder in favor of `count`
  * FormBuilder now implements \IteratorAggregate
  * [BC BREAK] compound forms now always need a data mapper
- * FormBuilder now maintains the order when explicitely adding form builders as children
+ * FormBuilder now maintains the order when explicitly adding form builders as children
  * ChoiceType now doesn't add the empty value anymore if the choices already contain an empty element
  * DateType, TimeType and DateTimeType now show empty values again if not required
  * [BC BREAK] fixed rendering of errors for DateType, BirthdayType and similar ones
@@ -158,12 +152,12 @@ CHANGELOG
  * deprecated the options "data_timezone" and "user_timezone" in DateType, DateTimeType and TimeType
    and renamed them to "model_timezone" and "view_timezone"
  * fixed: TransformationFailedExceptions thrown in the model transformer are now caught by the form
- * added FormRegistry and ResolvedFormTypeInterface
+ * added FormRegistryInterface, ResolvedFormTypeInterface and ResolvedFormTypeFactoryInterface
  * deprecated FormFactory methods
    * `addType`
    * `hasType`
    * `getType`
- * [BC BREAK] FormFactory now expects a FormRegistryInterface as constructor argument
+ * [BC BREAK] FormFactory now expects a FormRegistryInterface and a ResolvedFormTypeFactoryInterface as constructor argument
  * [BC BREAK] The method `createBuilder` in FormTypeInterface is not supported anymore for performance reasons
  * [BC BREAK] Removed `setTypes` from FormBuilder
  * deprecated AbstractType methods
@@ -173,3 +167,14 @@ CHANGELOG
  * [BC BREAK] Rows of a collection field cannot be themed individually anymore. All rows in the collection
    field now have the same block names, which contains "entry" where it previously contained the row index.
  * [BC BREAK] When registering a type through the DI extension, the tag alias has to match the actual type name.
+ * added FormRendererInterface, FormRendererEngineInterface and implementations of these interfaces
+ * [BC BREAK] removed the following methods from FormUtil:
+   * `toArrayKey`
+   * `toArrayKeys`
+   * `isChoiceGroup`
+   * `isChoiceSelected`
+ * [BC BREAK] renamed method `renderBlock` in FormHelper to `block` and changed its signature
+ * made FormView properties public and deprecated their accessor methods
+ * made the normalized data of a form accessible in the template through the variable "form.vars.data"
+ * made the original data of a choice accessible in the template through the property "choice.data"
+ * added convenience class Forms and FormFactoryBuilderInterface

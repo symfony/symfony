@@ -560,7 +560,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $id The service identifier
      *
-     * @return string The aliased service identifier
+     * @return Alias An Alias instance
      *
      * @throws InvalidArgumentException if the alias does not exist
      *

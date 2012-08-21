@@ -125,4 +125,47 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($request->hasSession());
     }
+
+    /**
+     * @dataProvider provideInvalidToken
+     */
+    public function testInvalidTokenInSession($token)
+    {
+        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $event->expects($this->any())
+            ->method('getRequest')
+            ->will($this->returnValue($request));
+        $request->expects($this->any())
+            ->method('hasPreviousSession')
+            ->will($this->returnValue(true));
+        $request->expects($this->any())
+            ->method('getSession')
+            ->will($this->returnValue($session));
+        $session->expects($this->any())
+            ->method('get')
+            ->with('_security_key123')
+            ->will($this->returnValue(serialize($token)));
+        $context->expects($this->once())
+            ->method('setToken')
+            ->with(null);
+
+        $listener = new ContextListener($context, array(), 'key123');
+        $listener->handle($event);
+    }
+
+    public function provideInvalidToken()
+    {
+        return array(
+            array(new \__PHP_Incomplete_Class()),
+            array(null),
+        );
+    }
 }

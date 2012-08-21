@@ -19,48 +19,53 @@ namespace Symfony\Component\Form\Extension\Core\View;
 class ChoiceView
 {
     /**
+     * The original choice value.
+     *
+     * @var mixed
+     */
+    public $data;
+
+    /**
      * The view representation of the choice.
      *
      * @var string
      */
-    private $value;
+    public $value;
 
     /**
      * The label displayed to humans.
      *
      * @var string
      */
-    private $label;
+    public $label;
 
     /**
      * Creates a new ChoiceView.
      *
+     * @param mixed  $data  The original choice.
      * @param string $value The view representation of the choice.
      * @param string $label The label displayed to humans.
      */
-    public function __construct($value, $label)
+    public function __construct($data, $value, $label)
     {
+        $this->data = $data;
         $this->value = $value;
         $this->label = $label;
     }
 
     /**
-     * Returns the choice value.
+     * Returns whether this choice is selected for the given value.
      *
-     * @return string The view representation of the choice.
+     * @param string|array $value The selected choice value.
+     *
+     * @return Boolean Whether the choice is selected.
      */
-    public function getValue()
+    public function isSelected($value)
     {
-        return $this->value;
-    }
+        if (is_array($value)) {
+            return false !== array_search($this->value, $value, true);
+        }
 
-    /**
-     * Returns the choice label.
-     *
-     * @return string The label displayed to humans.
-     */
-    public function getLabel()
-    {
-        return $this->label;
+        return $this->value === $value;
     }
 }

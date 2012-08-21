@@ -24,7 +24,7 @@ foo', 'foo;foo' => 'bar'));
 
         $tempDir = sys_get_temp_dir();
         $dumper = new CsvFileDumper();
-        $dumperString = $dumper->dump($catalogue, array('path' => $tempDir));
+        $dumper->dump($catalogue, array('path' => $tempDir));
 
         $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/valid.csv'), file_get_contents($tempDir.'/messages.en.csv'));
 

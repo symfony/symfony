@@ -43,7 +43,7 @@ class ExceptionHandler
     /**
      * Register the exception handler.
      *
-     * @return The registered exception handler
+     * @return ExceptionHandler The registered exception handler
      */
     public static function register($debug = true)
     {

@@ -169,7 +169,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', array('foo' => '1'), array('foo' => 'd+')));
         $generator = $this->getGenerator($routes);
-        $generator->setStrictParameters(false);
+        $generator->setStrictRequirements(false);
         $this->assertNull($generator->generate('test', array('foo' => 'bar'), true));
     }
 
@@ -184,14 +184,14 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $logger->expects($this->once())
             ->method('err');
         $generator = $this->getGenerator($routes, array(), $logger);
-        $generator->setStrictParameters(false);
+        $generator->setStrictRequirements(false);
         $this->assertNull($generator->generate('test', array('foo' => 'bar'), true));
     }
 
     /**
      * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
      */
-    public function testGenerateForRouteWithInvalidManditoryParameter()
+    public function testGenerateForRouteWithInvalidMandatoryParameter()
     {
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', array(), array('foo' => 'd+')));
         $this->getGenerator($routes)->generate('test', array('foo' => 'bar'), true);

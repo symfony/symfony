@@ -21,21 +21,21 @@ class LanguageTypeTest extends LocalizedTestCase
 
         $form = $this->factory->create('language');
         $view = $form->createView();
-        $choices = $view->getVar('choices');
+        $choices = $view->vars['choices'];
 
-        $this->assertContains(new ChoiceView('en', 'Englisch'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('en_GB', 'Britisches Englisch'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('en_US', 'Amerikanisches Englisch'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('fr', 'Französisch'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('my', 'Birmanisch'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en', 'en', 'Englisch'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'Britisches Englisch'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_US', 'en_US', 'Amerikanisches Englisch'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('fr', 'fr', 'Französisch'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('my', 'my', 'Birmanisch'), $choices, '', false, false);
     }
 
     public function testMultipleLanguagesIsNotIncluded()
     {
         $form = $this->factory->create('language', 'language');
         $view = $form->createView();
-        $choices = $view->getVar('choices');
+        $choices = $view->vars['choices'];
 
-        $this->assertNotContains(new ChoiceView('mul', 'Mehrsprachig'), $choices, '', false, false);
+        $this->assertNotContains(new ChoiceView('mul', 'mul', 'Mehrsprachig'), $choices, '', false, false);
     }
 }

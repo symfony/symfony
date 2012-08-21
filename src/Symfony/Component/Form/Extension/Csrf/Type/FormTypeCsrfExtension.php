@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -56,12 +56,13 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     /**
      * Adds a CSRF field to the root form view.
      *
-     * @param FormView      $view The form view
-     * @param FormInterface $form The form
+     * @param FormView      $view    The form view
+     * @param FormInterface $form    The form
+     * @param array         $options The options
      */
-    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        if ($options['csrf_protection'] && !$view->hasParent() && $options['compound']) {
+        if ($options['csrf_protection'] && !$view->parent && $options['compound']) {
             $factory = $form->getConfig()->getAttribute('csrf_factory');
             $data = $options['csrf_provider']->generateCsrfToken($options['intention']);
 
@@ -69,7 +70,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
                 'mapped' => false,
             ));
 
-            $view->add($csrfForm->createView($view));
+            $view->children[$options['csrf_field_name']] = $csrfForm->createView($view);
         }
     }
 

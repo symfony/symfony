@@ -8,3 +8,5 @@ php:
 before_script:
     - curl -s http://getcomposer.org/installer | php
     - COMPOSER_ROOT_VERSION=dev-master php composer.phar --dev install
+    - php src/Symfony/Component/Locale/Resources/data/build-data.php
+    - export USE_INTL_ICU_DATA_VERSION=1

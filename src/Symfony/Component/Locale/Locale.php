@@ -14,6 +14,11 @@ namespace Symfony\Component\Locale;
 class Locale extends \Locale
 {
     /**
+     * The ICU data version that ships with Symfony
+     */
+    const ICU_DATA_VERSION = '49';
+
+    /**
      * Caches the countries in different locales
      * @var array
      */
@@ -43,7 +48,7 @@ class Locale extends \Locale
     public static function getDisplayCountries($locale)
     {
         if (!isset(self::$countries[$locale])) {
-            $bundle = \ResourceBundle::create($locale, __DIR__.'/Resources/data/region');
+            $bundle = \ResourceBundle::create($locale, self::getIcuDataDirectory().'/region');
 
             if (null === $bundle) {
                 throw new \RuntimeException(sprintf('The country resource bundle could not be loaded for locale "%s"', $locale));
@@ -98,7 +103,7 @@ class Locale extends \Locale
     public static function getDisplayLanguages($locale)
     {
         if (!isset(self::$languages[$locale])) {
-            $bundle = \ResourceBundle::create($locale, __DIR__.'/Resources/data/lang');
+            $bundle = \ResourceBundle::create($locale, self::getIcuDataDirectory().'/lang');
 
             if (null === $bundle) {
                 throw new \RuntimeException(sprintf('The language resource bundle could not be loaded for locale "%s"', $locale));
@@ -149,7 +154,7 @@ class Locale extends \Locale
     public static function getDisplayLocales($locale)
     {
         if (!isset(self::$locales[$locale])) {
-            $bundle = \ResourceBundle::create($locale, __DIR__.'/Resources/data/names');
+            $bundle = \ResourceBundle::create($locale, self::getIcuDataDirectory().'/names');
 
             if (null === $bundle) {
                 throw new \RuntimeException(sprintf('The locale resource bundle could not be loaded for locale "%s"', $locale));
@@ -188,11 +193,11 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns the ICU version
+     * Returns the ICU version as defined by the intl extension
      *
      * @return string|null The ICU version
      */
-    public static function getIcuVersion()
+    public static function getIntlIcuVersion()
     {
         if (defined('INTL_ICU_VERSION')) {
             return INTL_ICU_VERSION;
@@ -213,11 +218,11 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns the ICU Data version
+     * Returns the ICU Data version as defined by the intl extension
      *
      * @return string|null The ICU Data version
      */
-    public static function getIcuDataVersion()
+    public static function getIntlIcuDataVersion()
     {
         if (defined('INTL_ICU_DATA_VERSION')) {
             return INTL_ICU_DATA_VERSION;
@@ -235,6 +240,41 @@ class Locale extends \Locale
         preg_match('/^ICU Data version (?:=>)?(.*)$/m', $output, $matches);
 
         return trim($matches[1]);
+    }
+
+    /**
+     * Returns the ICU data version that ships with Symfony. If the environment variable USE_INTL_ICU_DATA_VERSION is
+     * defined, it will try use the ICU data version as defined by the intl extension, if available.
+     *
+     * @return string The ICU data version that ships with Symfony
+     */
+    public static function getIcuDataVersion()
+    {
+        static $dataVersion;
+
+        if (null === $dataVersion) {
+            $dataVersion = self::ICU_DATA_VERSION;
+
+            if (getenv('USE_INTL_ICU_DATA_VERSION') && self::getIntlIcuVersion()) {
+                $dataVersion = self::getIntlIcuVersion();
+
+                preg_match('/^(?P<version>[0-9]\.[0-9]|[0-9]{2,})/', $dataVersion, $matches);
+
+                $dataVersion = $matches['version'];
+            }
+        }
+
+        return $dataVersion;
+    }
+
+    /**
+     * Returns the directory path of the ICU data that ships with Symfony
+     *
+     * @return string The path to the ICU data directory
+     */
+    public static function getIcuDataDirectory()
+    {
+        return __DIR__.'/Resources/data/'.self::getIcuDataVersion();
     }
 
     /**

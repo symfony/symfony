@@ -28,7 +28,7 @@ class RedirectController extends ContainerAware
      * It expects a route path parameter.
      * By default, the response status code is 301.
      *
-     * If the route empty, the status code will be 410.
+     * If the route is empty, the status code will be 410.
      * If the permanent path parameter is set, the status code will be 302.
      *
      * @param string  $route     The route pattern to redirect to

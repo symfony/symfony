@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,6 +40,9 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $flattened = FlattenException::create(new NotAcceptableHttpException());
         $this->assertEquals('406', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new ConflictHttpException());
+        $this->assertEquals('409', $flattened->getStatusCode());
     }
 
     public function testHeadersForHttpException()

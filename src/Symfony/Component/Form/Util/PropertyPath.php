@@ -420,7 +420,13 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             $isser = 'is'.$camelProp;
             $hasser = 'has'.$camelProp;
 
-            if ($reflClass->hasMethod($getter)) {
+            if (is_callable(array($objectOrArray, $getter))) {
+                $result[self::VALUE] = $objectOrArray->$getter();
+            } elseif (is_callable(array($objectOrArray, $isser))) {
+                $result[self::VALUE] = $objectOrArray->$isser();
+            } elseif (is_callable(array($objectOrArray, $hasser))) {
+                $result[self::VALUE] = $objectOrArray->$hasser();
+            } elseif ($reflClass->hasMethod($getter)) {
                 if (!$reflClass->getMethod($getter)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $getter, $reflClass->name));
                 }
@@ -437,15 +443,6 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                     throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $hasser, $reflClass->name));
                 }
 
-                $result[self::VALUE] = $objectOrArray->$hasser();
-            } elseif ($reflClass->hasMethod('__call') &&
-                      is_callable(array($objectOrArray, $getter))) {
-                $result[self::VALUE] = $objectOrArray->$getter();
-            } elseif ($reflClass->hasMethod('__call') &&
-                      is_callable(array($objectOrArray, $isser))) {
-                $result[self::VALUE] = $objectOrArray->$isser();
-            } elseif ($reflClass->hasMethod('__call') &&
-                      is_callable(array($objectOrArray, $hasser))) {
                 $result[self::VALUE] = $objectOrArray->$hasser();
             } elseif ($reflClass->hasMethod('__get')) {
                 // needed to support magic method __get

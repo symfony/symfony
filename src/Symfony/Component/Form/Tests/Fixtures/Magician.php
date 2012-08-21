@@ -29,6 +29,5 @@ class Magician
         if (preg_match('/^(get|is|has)([A-Z].*)$/', $method, $matches)) {
             return $this->{lcfirst($matches[2])};
         }
-        return null;
     }
 }

@@ -438,17 +438,15 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 }
 
                 $result[self::VALUE] = $objectOrArray->$hasser();
-            } elseif ($reflClass->hasMethod('__call')) {
-                // needed to support magic getters
-                if (is_callable(array($objectOrArray, $getter))) {
-                    $result[self::VALUE] = $objectOrArray->$getter();
-                } elseif (is_callable(array($objectOrArray, $isser))) {
-                    $result[self::VALUE] = $objectOrArray->$isser();
-                } elseif (is_callable(array($objectOrArray, $hasser))) {
-                    $result[self::VALUE] = $objectOrArray->$hasser();
-                } else {
-                    throw new InvalidPropertyException(sprintf('Neither property "%s" nor method "%s()" nor method "%s()" exists in class "%s"', $property, $getter, $isser, $reflClass->name));
-                }
+            } elseif ($reflClass->hasMethod('__call') &&
+                      is_callable(array($objectOrArray, $getter))) {
+                $result[self::VALUE] = $objectOrArray->$getter();
+            } elseif ($reflClass->hasMethod('__call') &&
+                      is_callable(array($objectOrArray, $isser))) {
+                $result[self::VALUE] = $objectOrArray->$isser();
+            } elseif ($reflClass->hasMethod('__call') &&
+                      is_callable(array($objectOrArray, $hasser))) {
+                $result[self::VALUE] = $objectOrArray->$hasser();
             } elseif ($reflClass->hasMethod('__get')) {
                 // needed to support magic method __get
                 $result[self::VALUE] = $objectOrArray->$property;

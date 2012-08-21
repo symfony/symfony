@@ -420,13 +420,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             $isser = 'is'.$camelProp;
             $hasser = 'has'.$camelProp;
 
-            if (is_callable(array($objectOrArray, $getter))) {
-                $result[self::VALUE] = $objectOrArray->$getter();
-            } elseif (is_callable(array($objectOrArray, $isser))) {
-                $result[self::VALUE] = $objectOrArray->$isser();
-            } elseif (is_callable(array($objectOrArray, $hasser))) {
-                $result[self::VALUE] = $objectOrArray->$hasser();
-            } elseif ($reflClass->hasMethod($getter)) {
+            if ($reflClass->hasMethod($getter)) {
                 if (!$reflClass->getMethod($getter)->isPublic()) {
                     throw new PropertyAccessDeniedException(sprintf('Method "%s()" is not public in class "%s"', $getter, $reflClass->name));
                 }
@@ -458,6 +452,12 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 // needed to support \stdClass instances
                 $result[self::VALUE] =& $objectOrArray->$property;
                 $result[self::IS_REF] = true;
+            } elseif (is_callable(array($objectOrArray, $getter))) {
+                $result[self::VALUE] = $objectOrArray->$getter();
+            } elseif (is_callable(array($objectOrArray, $isser))) {
+                $result[self::VALUE] = $objectOrArray->$isser();
+            } elseif (is_callable(array($objectOrArray, $hasser))) {
+                $result[self::VALUE] = $objectOrArray->$hasser();
             } else {
                 throw new InvalidPropertyException(sprintf('Neither property "%s" nor method "%s()" nor method "%s()" exists in class "%s"', $property, $getter, $isser, $reflClass->name));
             }

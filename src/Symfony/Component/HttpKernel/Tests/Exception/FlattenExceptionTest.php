@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\GoneHttpException;
 
 class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,6 +51,9 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $flattened = FlattenException::create(new AccessDeniedHttpException());
         $this->assertEquals('403', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new GoneHttpException());
+        $this->assertEquals('410', $flattened->getStatusCode());
     }
 
     public function testHeadersForHttpException()

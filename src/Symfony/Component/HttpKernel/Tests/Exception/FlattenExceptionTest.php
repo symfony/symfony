@@ -43,6 +43,9 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $flattened = FlattenException::create(new ConflictHttpException());
         $this->assertEquals('409', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new MethodNotAllowedHttpException(array('POST')));
+        $this->assertEquals('405', $flattened->getStatusCode());
     }
 
     public function testHeadersForHttpException()

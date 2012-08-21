@@ -24,6 +24,7 @@ use Symfony\Component\HttpKernel\Exception\LengthRequiredHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\Exception\InternalServerErrorHttpException;
 
 class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
@@ -72,6 +73,9 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
         $flattened = FlattenException::create(new ServiceUnavailableHttpException());
         $this->assertEquals('503', $flattened->getStatusCode());
 
+        $flattened = FlattenException::create(new TooManyRequestsHttpException());
+        $this->assertEquals('429', $flattened->getStatusCode());
+
         $flattened = FlattenException::create(new InternalServerErrorHttpException());
         $this->assertEquals('500', $flattened->getStatusCode());
     }
@@ -88,6 +92,12 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('Retry-After' => 'Fri, 31 Dec 1999 23:59:59 GMT'), $flattened->getHeaders());
 
         $flattened = FlattenException::create(new ServiceUnavailableHttpException(120));
+        $this->assertEquals(array('Retry-After' => 120), $flattened->getHeaders());
+
+        $flattened = FlattenException::create(new TooManyRequestsHttpException('Fri, 31 Dec 1999 23:59:59 GMT'));
+        $this->assertEquals(array('Retry-After' => 'Fri, 31 Dec 1999 23:59:59 GMT'), $flattened->getHeaders());
+
+        $flattened = FlattenException::create(new TooManyRequestsHttpException(120));
         $this->assertEquals(array('Retry-After' => 120), $flattened->getHeaders());
     }
 

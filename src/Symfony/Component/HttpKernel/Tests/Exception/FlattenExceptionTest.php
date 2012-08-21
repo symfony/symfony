@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\Exception;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,12 +28,18 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $flattened = FlattenException::create(new NotFoundHttpException());
         $this->assertEquals('404', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new UnauthorizedHttpException('Basic realm="My Realm"'));
+        $this->assertEquals('401', $flattened->getStatusCode());
     }
 
     public function testHeadersForHttpException()
     {
         $flattened = FlattenException::create(new MethodNotAllowedHttpException(array('POST')));
         $this->assertEquals(array('Allow' => 'POST'), $flattened->getHeaders());
+
+        $flattened = FlattenException::create(new UnauthorizedHttpException('Basic realm="My Realm"'));
+        $this->assertEquals(array('WWW-Authenticate' => 'Basic realm="My Realm"'), $flattened->getHeaders());
     }
 
     /**

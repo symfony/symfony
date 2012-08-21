@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\GoneHttpException;
 use Symfony\Component\HttpKernel\Exception\LengthRequiredHttpException;
+use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 use Symfony\Component\HttpKernel\Exception\InternalServerErrorHttpException;
 
 class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
@@ -59,6 +60,9 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $flattened = FlattenException::create(new LengthRequiredHttpException());
         $this->assertEquals('411', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new PreconditionFailedHttpException());
+        $this->assertEquals('412', $flattened->getStatusCode());
 
         $flattened = FlattenException::create(new InternalServerErrorHttpException());
         $this->assertEquals('500', $flattened->getStatusCode());

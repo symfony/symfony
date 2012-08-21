@@ -32,6 +32,7 @@
     },
     "suggest": {
         "symfony/console": "self.version",
+        "symfony/finder": "self.version",
         "symfony/form": "self.version",
         "symfony/validator": "self.version"
     },

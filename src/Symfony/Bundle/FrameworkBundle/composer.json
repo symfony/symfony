@@ -27,6 +27,9 @@
         "symfony/translation": "self.version",
         "doctrine/common": ">=2.2,<2.4-dev"
     },
+    "require-dev": {
+        "symfony/finder": "self.version"
+    },
     "suggest": {
         "symfony/console": "self.version",
         "symfony/finder": "self.version",

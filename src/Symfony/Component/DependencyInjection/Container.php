@@ -238,7 +238,7 @@ class Container implements IntrospectableContainerInterface
     {
         $id = strtolower($id);
 
-        if (isset($this->services[$id])) {
+        if (array_key_exists($id, $this->services)) {
             return $this->services[$id];
         }
 

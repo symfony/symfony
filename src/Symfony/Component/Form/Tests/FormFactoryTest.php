@@ -21,6 +21,8 @@ use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 use Symfony\Component\Form\Tests\Fixtures\TestExtension;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
+use Symfony\Component\Form\Tests\Fixtures\FooSubType;
+use Symfony\Component\Form\Tests\Fixtures\FooSubTypeWithParentInstance;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBarExtension;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBazExtension;
 
@@ -139,12 +141,62 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateNamedBuilderWithTypeInstance()
     {
         $options = array('a' => '1', 'b' => '2');
-        $type = $this->getMockType();
+        $type = new FooType();
         $resolvedType = $this->getMockResolvedType();
 
         $this->resolvedTypeFactory->expects($this->once())
             ->method('createResolvedType')
             ->with($type)
+            ->will($this->returnValue($resolvedType));
+
+        $resolvedType->expects($this->once())
+            ->method('createBuilder')
+            ->with($this->factory, 'name', $options)
+            ->will($this->returnValue('BUILDER'));
+
+        $this->assertSame('BUILDER', $this->factory->createNamedBuilder('name', $type, null, $options));
+    }
+
+    public function testCreateNamedBuilderWithTypeInstanceWithParentType()
+    {
+        $options = array('a' => '1', 'b' => '2');
+        $type = new FooSubType();
+        $resolvedType = $this->getMockResolvedType();
+        $parentResolvedType = $this->getMockResolvedType();
+
+        $this->registry->expects($this->once())
+            ->method('getType')
+            ->with('foo')
+            ->will($this->returnValue($parentResolvedType));
+
+        $this->resolvedTypeFactory->expects($this->once())
+            ->method('createResolvedType')
+            ->with($type, array(), $parentResolvedType)
+            ->will($this->returnValue($resolvedType));
+
+        $resolvedType->expects($this->once())
+            ->method('createBuilder')
+            ->with($this->factory, 'name', $options)
+            ->will($this->returnValue('BUILDER'));
+
+        $this->assertSame('BUILDER', $this->factory->createNamedBuilder('name', $type, null, $options));
+    }
+
+    public function testCreateNamedBuilderWithTypeInstanceWithParentTypeInstance()
+    {
+        $options = array('a' => '1', 'b' => '2');
+        $type = new FooSubTypeWithParentInstance();
+        $resolvedType = $this->getMockResolvedType();
+        $parentResolvedType = $this->getMockResolvedType();
+
+        $this->resolvedTypeFactory->expects($this->at(0))
+            ->method('createResolvedType')
+            ->with($type->getParent())
+            ->will($this->returnValue($parentResolvedType));
+
+        $this->resolvedTypeFactory->expects($this->at(1))
+            ->method('createResolvedType')
+            ->with($type, array(), $parentResolvedType)
             ->will($this->returnValue($resolvedType));
 
         $resolvedType->expects($this->once())

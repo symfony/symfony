@@ -95,25 +95,44 @@ class FormRegistry implements FormRegistryInterface
                 throw new FormException(sprintf('Could not load type "%s"', $name));
             }
 
-            $parentType = $type->getParent();
-            $typeExtensions = array();
-
-            foreach ($this->extensions as $extension) {
-                /* @var FormExtensionInterface $extension */
-                $typeExtensions = array_merge(
-                    $typeExtensions,
-                    $extension->getTypeExtensions($name)
-                );
-            }
-
-            $this->addType($this->resolvedTypeFactory->createResolvedType(
-                $type,
-                $typeExtensions,
-                $parentType ? $this->getType($parentType) : null
-            ));
+            $this->resolveAndAddType($type);
         }
 
         return $this->types[$name];
+    }
+
+    /**
+     * Wraps a type into a ResolvedFormTypeInterface implementation and connects
+     * it with its parent type.
+     *
+     * @param FormTypeInterface $type The type to resolve.
+     *
+     * @return ResolvedFormTypeInterface The resolved type.
+     */
+    private function resolveAndAddType(FormTypeInterface $type)
+    {
+        $parentType = $type->getParent();
+
+        if ($parentType instanceof FormTypeInterface) {
+            $this->resolveAndAddType($parentType);
+            $parentType = $parentType->getName();
+        }
+
+        $typeExtensions = array();
+
+        foreach ($this->extensions as $extension) {
+            /* @var FormExtensionInterface $extension */
+            $typeExtensions = array_merge(
+                $typeExtensions,
+                $extension->getTypeExtensions($type->getName())
+            );
+        }
+
+        $this->addType($this->resolvedTypeFactory->createResolvedType(
+            $type,
+            $typeExtensions,
+            $parentType ? $this->getType($parentType) : null
+        ));
     }
 
     /**

@@ -166,6 +166,18 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE));
     }
 
+    /**
+     * @covers Symfony\Component\DependencyInjection\Container::get
+     */
+    public function testGetAfterSetNull()
+    {
+        $sc = new ProjectServiceContainer();
+        $this->assertNotNull($sc->get('bar'));
+
+        $sc->set('bar' , null);
+        $this->assertNull($sc->get('bar'));
+    }
+
     public function testGetCircularReference()
     {
 

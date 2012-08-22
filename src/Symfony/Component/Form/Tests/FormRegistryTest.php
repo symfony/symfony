@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Tests\Fixtures\TestExtension;
+use Symfony\Component\Form\Tests\Fixtures\FooSubTypeWithParentInstance;
 use Symfony\Component\Form\Tests\Fixtures\FooSubType;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBazExtension;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBarExtension;
@@ -151,6 +152,35 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('foo_sub_type'));
 
         $this->assertSame($resolvedType, $this->registry->getType('foo_sub_type'));
+    }
+
+    public function testGetTypeConnectsParentIfGetParentReturnsInstance()
+    {
+        $type = new FooSubTypeWithParentInstance();
+        $parentResolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+
+        $this->extension1->addType($type);
+
+        $this->resolvedTypeFactory->expects($this->at(0))
+            ->method('createResolvedType')
+            ->with($this->isInstanceOf('Symfony\Component\Form\Tests\Fixtures\FooType'))
+            ->will($this->returnValue($parentResolvedType));
+
+        $this->resolvedTypeFactory->expects($this->at(1))
+            ->method('createResolvedType')
+            ->with($type, array(), $parentResolvedType)
+            ->will($this->returnValue($resolvedType));
+
+        $parentResolvedType->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('foo'));
+
+        $resolvedType->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('foo_sub_type_parent_instance'));
+
+        $this->assertSame($resolvedType, $this->registry->getType('foo_sub_type_parent_instance'));
     }
 
     /**

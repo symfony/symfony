@@ -13,11 +13,11 @@ containing the rules for the validation. Let's validate a simple string
 as an example:
 
     use Symfony\Component\Validator\Validation;
-    use Symfony\Component\Validator\Constraints\MinLength;
+    use Symfony\Component\Validator\Constraints\Length;
 
     $validator = Validation::createValidator();
 
-    $violations = $validator->validateValue('Bernhard', new MinLength(10));
+    $violations = $validator->validateValue('Bernhard', new Length(array('min' => 10)));
 
 This validation will fail because the given string is shorter than ten
 characters. The precise errors, here called "constraint violations",  are
@@ -33,14 +33,14 @@ Validation of arrays is possible using the `Collection` constraint:
 
     $constraint = new Assert\Collection(array(
         'name' => new Assert\Collection(array(
-            'first_name' => new Assert\MinLength(101),
-            'last_name'  => new Assert\MinLength(1),
+            'first_name' => new Assert\Length(array('min' => 101)),
+            'last_name'  => new Assert\Length(array('min' => 1)),
         )),
         'email'    => new Assert\Email(),
-        'simple'   => new Assert\MinLength(102),
+        'simple'   => new Assert\Length(array('min' => 102)),
         'gender'   => new Assert\Choice(array(3, 4)),
         'file'     => new Assert\File(),
-        'password' => new Assert\MinLength(60),
+        'password' => new Assert\Length(array('min' => 60)),
     ));
 
     $violations = $validator->validateValue($input, $constraint);
@@ -58,7 +58,7 @@ method results are matched against the constraints.
     class User
     {
         /**
-         * @Assert\MinLength(3)
+         * @Assert\Length(min = 3)
          * @Assert\NotBlank
          */
         private $name;

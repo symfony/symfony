@@ -23,6 +23,7 @@
         "psr-0": { "Symfony\\Bundle\\TwigBundle": "" }
     },
     "target-dir": "Symfony/Bundle/TwigBundle",
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "2.1-dev"

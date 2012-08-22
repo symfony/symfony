@@ -26,6 +26,7 @@
         "psr-0": { "Symfony\\Component\\ClassLoader": "" }
     },
     "target-dir": "Symfony/Component/ClassLoader",
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "2.1-dev"

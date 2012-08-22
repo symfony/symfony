@@ -24,6 +24,7 @@
         "psr-0": { "Symfony\\Bridge\\Monolog": "" }
     },
     "target-dir": "Symfony/Bridge/Monolog",
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "2.1-dev"

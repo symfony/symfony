@@ -66,12 +66,6 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     private $pathAsString;
 
     /**
-     * Positions where the individual elements start in the string representation
-     * @var array
-     */
-    private $positions;
-
-    /**
      * Constructs a property path from a string.
      *
      * @param PropertyPath|string $propertyPath The property path as string or instance.
@@ -89,7 +83,6 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             $this->length = $propertyPath->length;
             $this->isIndex = $propertyPath->isIndex;
             $this->pathAsString = $propertyPath->pathAsString;
-            $this->positions = $propertyPath->positions;
 
             return;
         }
@@ -109,8 +102,6 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         $pattern = '/^(([^\.\[]+)|\[([^\]]+)\])(.*)/';
 
         while (preg_match($pattern, $remaining, $matches)) {
-            $this->positions[] = $position;
-
             if ('' !== $matches[2]) {
                 $element = $matches[2];
                 $this->isIndex[] = false;
@@ -136,7 +127,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
             $pattern = '/^(\.(\w+)|\[([^\]]+)\])(.*)/';
         }
 
-        if (!empty($remaining)) {
+        if ('' !== $remaining) {
             throw new InvalidPropertyPathException(sprintf(
                 'Could not parse property path "%s". Unexpected token "%s" at position %d',
                 $propertyPath,
@@ -159,14 +150,6 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * {@inheritdoc}
      */
-    public function getPositions()
-    {
-        return $this->positions;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getLength()
     {
         return $this->length;
@@ -184,11 +167,10 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
         $parent = clone $this;
 
         --$parent->length;
-        $parent->pathAsString = substr($parent->pathAsString, 0, $parent->positions[$parent->length]);
+        $parent->pathAsString = substr($parent->pathAsString, 0, max(strrpos($parent->pathAsString, '.'), strrpos($parent->pathAsString, '[')));
         array_pop($parent->elements);
         array_pop($parent->singulars);
         array_pop($parent->isIndex);
-        array_pop($parent->positions);
 
         return $parent;
     }

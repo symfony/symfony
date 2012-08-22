@@ -33,6 +33,7 @@
         "psr-0": { "Symfony\\Component\\Form": "" }
     },
     "target-dir": "Symfony/Component/Form",
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "2.1-dev"

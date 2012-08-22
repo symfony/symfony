@@ -32,6 +32,7 @@
         "psr-0": { "Symfony\\Component\\Validator": "" }
     },
     "target-dir": "Symfony/Component/Validator",
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "2.1-dev"

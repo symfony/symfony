@@ -56,6 +56,32 @@ class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
         set_include_path($includePath);
     }
 
+    public function testGetNamespaces()
+    {
+        $loader = new UniversalClassLoader();
+        $loader->registerNamespace('Foo', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerNamespace('Bar', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerNamespace('Bas', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $namespaces = $loader->getNamespaces();
+        $this->assertArrayHasKey('Foo', $namespaces);
+        $this->assertArrayNotHasKey('Foo1', $namespaces);
+        $this->assertArrayHasKey('Bar', $namespaces);
+        $this->assertArrayHasKey('Bas', $namespaces);
+    }
+
+    public function testGetPrefixes()
+    {
+        $loader = new UniversalClassLoader();
+        $loader->registerPrefix('Foo', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerPrefix('Bar', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->registerPrefix('Bas', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $prefixes = $loader->getPrefixes();
+        $this->assertArrayHasKey('Foo', $prefixes);
+        $this->assertArrayNotHasKey('Foo1', $prefixes);
+        $this->assertArrayHasKey('Bar', $prefixes);
+        $this->assertArrayHasKey('Bas', $prefixes);
+    }
+
     /**
      * @dataProvider getLoadClassFromFallbackTests
      */

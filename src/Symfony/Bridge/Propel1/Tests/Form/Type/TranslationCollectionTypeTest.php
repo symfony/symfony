@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Propel1\Tests\Form\Type;
 
 use Symfony\Bridge\Propel1\Tests\Fixtures\Item;
@@ -8,13 +17,6 @@ use Symfony\Bridge\Propel1\Tests\Fixtures\TranslatableItemI18n;
 use Symfony\Bridge\Propel1\Tests\Fixtures\TranslatableItem;
 use Symfony\Component\Form\Tests\Extension\Core\Type\TypeTestCase;
 
-/**
- * Created by JetBrains PhpStorm.
- * User: patrickkaufmann
- * Date: 7/27/12
- * Time: 11:02 AM
- * To change this template use File | Settings | File Templates.
- */
 class TranslationCollectionTypeTest extends TypeTestCase
 {
     const TRANSLATION_CLASS = 'Symfony\Bridge\Propel1\Tests\Fixtures\TranslatableItem';

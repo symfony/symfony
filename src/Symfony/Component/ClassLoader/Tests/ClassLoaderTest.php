@@ -15,6 +15,28 @@ use Symfony\Component\ClassLoader\ClassLoader;
 
 class ClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetPrefixes()
+    {
+        $loader = new ClassLoader();
+        $loader->addPrefix('Foo', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->addPrefix('Bar', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->addPrefix('Bas', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $prefixes = $loader->getPrefixes();
+        $this->assertArrayHasKey('Foo', $prefixes);
+        $this->assertArrayNotHasKey('Foo1', $prefixes);
+        $this->assertArrayHasKey('Bar', $prefixes);
+        $this->assertArrayHasKey('Bas', $prefixes);
+    }
+
+    public function testGetFallbackDirs()
+    {
+        $loader = new ClassLoader();
+        $loader->addPrefix(null, __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->addPrefix(null, __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $fallback_dirs = $loader->getFallbackDirs();
+        $this->assertCount(2, $fallback_dirs);
+    }
+
     /**
      * @dataProvider getLoadClassTests
      */
@@ -35,6 +57,35 @@ class ClassLoaderTest extends \PHPUnit_Framework_TestCase
             array('\\Namespaced2\\Bar', '\\Namespaced2\\Bar', '->loadClass() loads Namespaced2\Bar class with a leading slash'),
             array('\\Pearlike2_Bar',    '\\Pearlike2_Bar',    '->loadClass() loads Pearlike2_Bar class with a leading slash'),
         );
+    }
+
+    /**
+     * @dataProvider getLoadNonexistentClassTests
+     */
+    public function testLoadNonexistentClass($className, $testClassName, $message)
+    {
+        $loader = new ClassLoader();
+        $loader->addPrefix('Namespaced2\\', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->addPrefix('Pearlike2_', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->loadClass($testClassName);
+        $this->assertFalse(class_exists($className), $message);
+    }
+
+    public function getLoadNonexistentClassTests()
+    {
+        return array(
+            array('\\Pearlike3_Bar', '\\Pearlike3_Bar', '->loadClass() loads non exising Pearlike3_Bar class with a leading slash'),
+        );
+    }
+
+    public function testAddPrefix()
+    {
+        $loader = new ClassLoader();
+        $loader->addPrefix('Foo', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $loader->addPrefix('Foo', __DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $prefixes = $loader->getPrefixes();
+        $this->assertArrayHasKey('Foo', $prefixes);
+        $this->assertCount(2, $prefixes['Foo']);
     }
 
     public function testUseIncludePath()

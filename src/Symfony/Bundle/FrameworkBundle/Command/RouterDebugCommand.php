@@ -77,10 +77,7 @@ EOF
     protected function outputRoutes(OutputInterface $output, $routes = null)
     {
         if (null === $routes) {
-            $routes = array();
-            foreach ($this->getContainer()->get('router')->getRouteCollection()->all() as $name => $route) {
-                $routes[$name] = $route->compile();
-            }
+            $routes = $this->getContainer()->get('router')->getRouteCollection()->all();
         }
 
         $output->writeln($this->getHelper('formatter')->formatSection('router', 'Current routes'));

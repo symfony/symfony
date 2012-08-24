@@ -420,7 +420,6 @@ class Form implements \IteratorAggregate, FormInterface
         $this->modelData = $modelData;
         $this->normData = $normData;
         $this->viewData = $viewData;
-        $this->synchronized = true;
         $this->initialized = true;
         $this->lockSetData = false;
 
@@ -546,10 +545,6 @@ class Form implements \IteratorAggregate, FormInterface
         // errors added during listeners
         $this->errors = array();
 
-        $modelData = null;
-        $normData = null;
-        $extraData = array();
-        $synchronized = false;
         $dispatcher = $this->config->getEventDispatcher();
 
         // Hook to change content of the data bound by the browser
@@ -560,9 +555,6 @@ class Form implements \IteratorAggregate, FormInterface
             $dispatcher->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
             $submittedData = $event->getData();
         }
-
-        // By default, the submitted data is also the data in view format
-        $viewData = $submittedData;
 
         // Check whether the form is compound.
         // This check is preferrable over checking the number of children,
@@ -587,14 +579,17 @@ class Form implements \IteratorAggregate, FormInterface
                 if ($this->has($name)) {
                     $this->children[$name]->bind($value);
                 } else {
-                    $extraData[$name] = $value;
+                    $this->extraData[$name] = $value;
                 }
             }
 
             // If the form is compound, the default data in view format
             // is reused. The data of the children is merged into this
             // default data using the data mapper.
-            $viewData = $this->getViewData();
+            $viewData = $this->viewData;
+        } else {
+            // If the form is not compound, the submitted data is also the data in view format.
+            $viewData = $submittedData;
         }
 
         if (FormUtil::isEmpty($viewData)) {
@@ -615,6 +610,9 @@ class Form implements \IteratorAggregate, FormInterface
             $this->config->getDataMapper()->mapFormsToData($this->children, $viewData);
         }
 
+        $modelData = null;
+        $normData = null;
+
         try {
             // Normalize data to unified representation
             $normData = $this->viewToNorm($viewData);
@@ -632,17 +630,14 @@ class Form implements \IteratorAggregate, FormInterface
             // Synchronize representations - must not change the content!
             $modelData = $this->normToModel($normData);
             $viewData = $this->normToView($normData);
-
-            $synchronized = true;
         } catch (TransformationFailedException $e) {
+            $this->synchronized = false;
         }
 
         $this->bound = true;
         $this->modelData = $modelData;
         $this->normData = $normData;
         $this->viewData = $viewData;
-        $this->extraData = $extraData;
-        $this->synchronized = $synchronized;
 
         if ($dispatcher->hasListeners(FormEvents::POST_BIND)) {
             $event = new FormEvent($this, $viewData);

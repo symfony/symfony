@@ -90,8 +90,8 @@ EOF;
 
             $properties = array();
             $properties[] = $compiledRoute->getVariables();
-            $properties[] = $compiledRoute->getDefaults();
-            $properties[] = $compiledRoute->getRequirements();
+            $properties[] = $route->getDefaults();
+            $properties[] = $route->getRequirements();
             $properties[] = $compiledRoute->getTokens();
 
             $routes .= sprintf("        '%s' => %s,\n", $name, str_replace("\n", '', var_export($properties, true)));

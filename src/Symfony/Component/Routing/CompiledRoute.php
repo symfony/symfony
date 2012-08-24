@@ -18,7 +18,6 @@ namespace Symfony\Component\Routing;
  */
 class CompiledRoute
 {
-    private $route;
     private $variables;
     private $tokens;
     private $staticPrefix;
@@ -27,29 +26,17 @@ class CompiledRoute
     /**
      * Constructor.
      *
-     * @param Route  $route        A original Route instance
      * @param string $staticPrefix The static prefix of the compiled route
      * @param string $regex        The regular expression to use to match this route
      * @param array  $tokens       An array of tokens to use to generate URL for this route
      * @param array  $variables    An array of variables
      */
-    public function __construct(Route $route, $staticPrefix, $regex, array $tokens, array $variables)
+    public function __construct($staticPrefix, $regex, array $tokens, array $variables)
     {
-        $this->route = $route;
         $this->staticPrefix = $staticPrefix;
         $this->regex = $regex;
         $this->tokens = $tokens;
         $this->variables = $variables;
-    }
-
-    /**
-     * Returns the Route instance.
-     *
-     * @return Route A Route instance
-     */
-    public function getRoute()
-    {
-        return $this->route;
     }
 
     /**
@@ -90,45 +77,5 @@ class CompiledRoute
     public function getVariables()
     {
         return $this->variables;
-    }
-
-    /**
-     * Returns the pattern.
-     *
-     * @return string The pattern
-     */
-    public function getPattern()
-    {
-        return $this->route->getPattern();
-    }
-
-    /**
-     * Returns the options.
-     *
-     * @return array The options
-     */
-    public function getOptions()
-    {
-        return $this->route->getOptions();
-    }
-
-    /**
-     * Returns the defaults.
-     *
-     * @return array The defaults
-     */
-    public function getDefaults()
-    {
-        return $this->route->getDefaults();
-    }
-
-    /**
-     * Returns the requirements.
-     *
-     * @return array The requirements
-     */
-    public function getRequirements()
-    {
-        return $this->route->getRequirements();
     }
 }

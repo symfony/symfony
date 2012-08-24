@@ -128,7 +128,6 @@ EOF
 
         $output->writeln($this->getHelper('formatter')->formatSection('router', sprintf('Route "%s"', $name)));
 
-        $route = $route->compile();
         $output->writeln(sprintf('<comment>Name</comment>         %s', $name));
         $output->writeln(sprintf('<comment>Pattern</comment>      %s', $route->getPattern()));
         $output->writeln(sprintf('<comment>Class</comment>        %s', get_class($route)));
@@ -157,7 +156,7 @@ EOF
         }
         $output->writeln(sprintf('<comment>Options</comment>      %s', $options));
         $output->write('<comment>Regex</comment>        ');
-        $output->writeln(preg_replace('/^             /', '', preg_replace('/^/m', '             ', $route->getRegex())), OutputInterface::OUTPUT_RAW);
+        $output->writeln(preg_replace('/^             /', '', preg_replace('/^/m', '             ', $route->compile()->getRegex())), OutputInterface::OUTPUT_RAW);
     }
 
     protected function formatValue($value)

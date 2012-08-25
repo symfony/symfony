@@ -23,6 +23,7 @@
         "psr-0": { "Symfony\\Bundle\\WebProfilerBundle": "" }
     },
     "target-dir": "Symfony/Bundle/WebProfilerBundle",
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "2.1-dev"

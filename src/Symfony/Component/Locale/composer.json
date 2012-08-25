@@ -25,6 +25,7 @@
         "psr-0": { "Symfony\\Component\\Locale": "" }
     },
     "target-dir": "Symfony/Component/Locale",
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "2.1-dev"

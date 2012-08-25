@@ -30,6 +30,7 @@
         "psr-0": { "Symfony\\Component\\Translation": "" }
     },
     "target-dir": "Symfony/Component/Translation",
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "2.1-dev"

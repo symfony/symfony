@@ -284,7 +284,7 @@ EOF;
     {
         $kernel = new KernelForTest('test', true);
 
-        $this->assertEquals(__DIR__, $kernel->getRootDir());
+        $this->assertEquals(__DIR__, realpath($kernel->getRootDir()));
     }
 
     public function testGetName()

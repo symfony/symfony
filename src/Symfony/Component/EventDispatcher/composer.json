@@ -29,6 +29,7 @@
         "psr-0": { "Symfony\\Component\\EventDispatcher": "" }
     },
     "target-dir": "Symfony/Component/EventDispatcher",
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "2.1-dev"

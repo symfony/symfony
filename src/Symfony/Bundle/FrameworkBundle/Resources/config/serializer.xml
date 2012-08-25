@@ -13,7 +13,9 @@
 
     <services>
         <service id="serializer" class="%serializer.class%" >
-            <argument type="collection" />
+            <argument type="collection" >
+               <argument type="service" id="serializer.normalizer.get_set_method" />
+            </argument> 
             <argument type="collection" />
         </service>
         <!-- Encoders -->
@@ -22,9 +24,9 @@
         </service>
         <service id="serializer.encoder.json" class="%serializer.encoder.json.class%" public="false" >
             <tag name="serializer.encoder" priority="2000" />
-        </serivce>
+        </service>
         <!-- Normalizers -->
-        <service id="serializer.normalizer.get_set_method" class="%serializer.normalizer.get_set_method.class%" public="false" 
+        <service id="serializer.normalizer.get_set_method" class="%serializer.normalizer.get_set_method.class%" public="false" >
             <tag name="serializer.normalizer" priority="1000" />
         </service>
     </services>

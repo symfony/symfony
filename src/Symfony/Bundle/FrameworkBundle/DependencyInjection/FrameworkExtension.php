@@ -103,7 +103,7 @@ class FrameworkExtension extends Extension
         }
 
         if (isset($config['serializer'])) {
-            $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
+            $this->registerSerializerConfiguration($config['serializer'], $loader);
         }
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);

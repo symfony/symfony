@@ -13,9 +13,7 @@
 
     <services>
         <service id="serializer" class="%serializer.class%" >
-            <argument type="collection" >
-               <argument type="service" id="serializer.normalizer.get_set_method" />
-            </argument> 
+            <argument type="collection" />
             <argument type="collection" />
         </service>
         <!-- Encoders -->

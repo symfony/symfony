@@ -43,6 +43,7 @@ class SerializerPass implements CompilerPassInterface
             $normalizers[$priority] = new Reference($serviceId);
         }
 
+        krsort($normalizers);
         $container->getDefinition('serializer')->replaceArgument(0, $normalizers);
 
         // Looks for all the services tagged "serializer.encoders" and adds them to the Serializer service
@@ -61,6 +62,7 @@ class SerializerPass implements CompilerPassInterface
             $encoders[$priority] = new Reference($serviceId);
         }
 
+        krsort($encoders);
         $container->getDefinition('serializer')->replaceArgument(1, $encoders);
     }
 }

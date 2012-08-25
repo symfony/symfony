@@ -570,18 +570,11 @@ class Form implements \IteratorAggregate, FormInterface
             }
 
             foreach ($this->children as $name => $child) {
-                if (!isset($submittedData[$name])) {
-                    $submittedData[$name] = null;
-                }
+                $child->bind(isset($submittedData[$name]) ? $submittedData[$name] : null);
+                unset($submittedData[$name]);
             }
 
-            foreach ($submittedData as $name => $value) {
-                if ($this->has($name)) {
-                    $this->children[$name]->bind($value);
-                } else {
-                    $this->extraData[$name] = $value;
-                }
-            }
+            $this->extraData = $submittedData;
 
             // If the form is compound, the default data in view format
             // is reused. The data of the children is merged into this

@@ -155,7 +155,7 @@ class ResizeFormListener implements EventSubscriberInterface
         if ($this->allowDelete) {
             foreach ($data as $name => $child) {
                 if (!$form->has($name)) {
-                    if (null != $this->deletionHandler) {
+                    if (null !== $this->deletionHandler) {
                         $deletionHandler = $this->deletionHandler;
                         $deletionHandler ($data[$name]);
                     }

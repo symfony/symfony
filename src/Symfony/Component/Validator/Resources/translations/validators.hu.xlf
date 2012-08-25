@@ -202,6 +202,18 @@
                 <source>A PHP extension caused the upload to fail.</source>
                 <target>Egy PHP bővítmény miatt a feltöltés nem sikerült.</target>
             </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} elements or more.</source>
+                <target>Ez a gyűjtemény {{ limit }} elemet vagy többet tartalmazzon.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} elements or less.</source>
+                <target>Ez a gyűjtemény {{ limit }} elemet vagy kevesebbet tartalmazzon.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} elements.</source>
+                <target>Ez a gyűjetemény pontosan {{ limit }} elemet tartalmazzon.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

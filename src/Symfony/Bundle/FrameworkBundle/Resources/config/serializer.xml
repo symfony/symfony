@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="serializer.class">Symfony\Component\Serializer\Serializer</parameter>
+        <parameter key="serializer.encoder.xml.class">Symfony\Component\Serializer\Encoder\XmlEncoder</parameter>
+        <parameter key="serializer.encoder.json.class">Symfony\Component\Serializer\Encoder\JsonEncoder</parameter>
+        <parameter key="serializer.normalizer.get_set_method.class">Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer</parameter>
+    </parameters>
+
+    <services>
+        <service id="serializer" class="%serializer.class%" >
+            <argument type="collection" />
+            <argument type="collection" />
+        </service>
+        <!-- Encoders -->
+        <service id="serializer.encoder.xml" class="%serializer.encoder.xml.class%" public="false" >
+            <tag name="serializer.encoder" priority="1000" />
+        </service>
+        <service id="serializer.encoder.json" class="%serializer.encoder.json.class%" public="false" >
+            <tag name="serializer.encoder" priority="2000" />
+        </serivce>
+        <!-- Normalizers -->
+        <service id="serializer.normalizer.get_set_method" class="%serializer.normalizer.get_set_method.class%" public="false" 
+            <tag name="serializer.normalizer" priority="1000" />
+        </service>
+    </services>
+</container>

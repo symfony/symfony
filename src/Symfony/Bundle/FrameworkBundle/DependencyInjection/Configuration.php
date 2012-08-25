@@ -78,6 +78,7 @@ class Configuration implements ConfigurationInterface
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
         $this->addAnnotationsSection($rootNode);
+        $this->addSerializerSection($rootNode);
 
         return $treeBuilder;
     }
@@ -409,4 +410,22 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
     }
+
+    private function addSerializerSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('serializer')
+                    ->info('serializer configuration')
+                    ->canBeUnset()
+                    ->treatNullLike(array('enabled' => true))
+                    ->treatTrueLike(array('enabled' => true))
+                    ->children()
+                        ->booleanNode('enabled')->defaultTrue()->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
 }

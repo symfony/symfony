@@ -211,14 +211,18 @@ class XmlFileLoader extends FileLoader
      */
     private function parseFile($file)
     {
+        $internalErrors = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+
         $dom = new \DOMDocument();
-        libxml_use_internal_errors(true);
-        if (!$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
-            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
-        }
         $dom->validateOnParse = true;
+        if (!$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
+            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($internalErrors)));
+        }
         $dom->normalizeDocument();
-        libxml_use_internal_errors(false);
+
+        libxml_use_internal_errors($internalErrors);
+
         $this->validate($dom, $file);
 
         return simplexml_import_dom($dom, 'Symfony\\Component\\DependencyInjection\\SimpleXMLElement');
@@ -360,12 +364,14 @@ EOF
         ;
 
         $current = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+
         $valid = $dom->schemaValidateSource($source);
         foreach ($tmpfiles as $tmpfile) {
             @unlink($tmpfile);
         }
         if (!$valid) {
-            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
+            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($current)));
         }
         libxml_use_internal_errors($current);
     }
@@ -406,7 +412,7 @@ EOF
      *
      * @return array
      */
-    private function getXmlErrors()
+    private function getXmlErrors($internalErrors)
     {
         $errors = array();
         foreach (libxml_get_errors() as $error) {
@@ -421,6 +427,7 @@ EOF
         }
 
         libxml_clear_errors();
+        libxml_use_internal_errors($internalErrors);
 
         return $errors;
     }

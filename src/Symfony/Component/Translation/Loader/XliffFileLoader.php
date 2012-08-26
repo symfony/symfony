@@ -55,10 +55,13 @@ class XliffFileLoader implements LoaderInterface
      */
     private function parseFile($file)
     {
+        $internalErrors = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+
         $dom = new \DOMDocument();
-        $current = libxml_use_internal_errors(true);
+        $dom->validateOnParse = true;
         if (!@$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
-            throw new \RuntimeException(implode("\n", $this->getXmlErrors()));
+            throw new \RuntimeException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
 
         $location = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
@@ -77,11 +80,11 @@ class XliffFileLoader implements LoaderInterface
         $source = str_replace('http://www.w3.org/2001/xml.xsd', $location, $source);
 
         if (!@$dom->schemaValidateSource($source)) {
-            throw new \RuntimeException(implode("\n", $this->getXmlErrors()));
+            throw new \RuntimeException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
-        $dom->validateOnParse = true;
         $dom->normalizeDocument();
-        libxml_use_internal_errors($current);
+
+        libxml_use_internal_errors($internalErrors);
 
         return simplexml_import_dom($dom);
     }
@@ -91,7 +94,7 @@ class XliffFileLoader implements LoaderInterface
      *
      * @return array  An array of errors
      */
-    private function getXmlErrors()
+    private function getXmlErrors($internalErrors)
     {
         $errors = array();
         foreach (libxml_get_errors() as $error) {
@@ -106,7 +109,7 @@ class XliffFileLoader implements LoaderInterface
         }
 
         libxml_clear_errors();
-        libxml_use_internal_errors(false);
+        libxml_use_internal_errors($internalErrors);
 
         return $errors;
     }

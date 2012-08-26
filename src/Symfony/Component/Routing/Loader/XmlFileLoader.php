@@ -150,14 +150,18 @@ class XmlFileLoader extends FileLoader
      */
     protected function loadFile($file)
     {
+        $internalErrors = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+
         $dom = new \DOMDocument();
-        libxml_use_internal_errors(true);
-        if (!$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
-            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
-        }
         $dom->validateOnParse = true;
+        if (!$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
+            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($internalErrors)));
+        }
         $dom->normalizeDocument();
-        libxml_use_internal_errors(false);
+
+        libxml_use_internal_errors($internalErrors);
+
         $this->validate($dom);
 
         return $dom;
@@ -175,8 +179,10 @@ class XmlFileLoader extends FileLoader
         $location = __DIR__.'/schema/routing/routing-1.0.xsd';
 
         $current = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+
         if (!$dom->schemaValidate($location)) {
-            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors()));
+            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($current)));
         }
         libxml_use_internal_errors($current);
     }
@@ -186,7 +192,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return array An array of libxml error strings
      */
-    private function getXmlErrors()
+    private function getXmlErrors($internalErrors)
     {
         $errors = array();
         foreach (libxml_get_errors() as $error) {
@@ -201,6 +207,7 @@ class XmlFileLoader extends FileLoader
         }
 
         libxml_clear_errors();
+        libxml_use_internal_errors($internalErrors);
 
         return $errors;
     }

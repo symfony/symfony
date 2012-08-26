@@ -164,9 +164,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the configuration of the form.
-     *
-     * @return FormConfigInterface The form's configuration.
+     * {@inheritdoc}
      */
     public function getConfig()
     {
@@ -174,9 +172,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the name by which the form is identified in forms.
-     *
-     * @return string The name of the form.
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -247,11 +243,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Sets the parent form.
-     *
-     * @param FormInterface $parent The parent form
-     *
-     * @return Form The current form
+     * {@inheritdoc}
      */
     public function setParent(FormInterface $parent = null)
     {
@@ -269,9 +261,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the parent form.
-     *
-     * @return FormInterface The parent form
+     * {@inheritdoc}
      */
     public function getParent()
     {
@@ -279,9 +269,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether the form has a parent.
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function hasParent()
     {
@@ -289,9 +277,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the root of the form tree.
-     *
-     * @return FormInterface The root of the tree
+     * {@inheritdoc}
      */
     public function getRoot()
     {
@@ -299,9 +285,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether the form is the root of the form tree.
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function isRoot()
     {
@@ -339,11 +323,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Updates the form with default data.
-     *
-     * @param mixed $modelData The data formatted as expected for the underlying object
-     *
-     * @return Form The current form
+     * {@inheritdoc}
      */
     public function setData($modelData)
     {
@@ -440,9 +420,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the data in the format needed for the underlying object.
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getData()
     {
@@ -454,11 +432,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the normalized data of the form.
-     *
-     * @return mixed When the form is not bound, the default data is returned.
-     *                When the form is bound, the normalized bound data is
-     *                returned if the form is valid, null otherwise.
+     * {@inheritdoc}
      */
     public function getNormData()
     {
@@ -470,9 +444,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the data transformed by the value transformer.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getViewData()
     {
@@ -497,9 +469,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the extra data.
-     *
-     * @return array The bound data which do not belong to a child
+     * {@inheritdoc}
      */
     public function getExtraData()
     {
@@ -507,13 +477,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Binds data to the form, transforms and validates it.
-     *
-     * @param string|array $submittedData The data
-     *
-     * @return Form The current form
-     *
-     * @throws UnexpectedTypeException
+     * {@inheritdoc}
      */
     public function bind($submittedData)
     {
@@ -677,11 +641,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Adds an error to this form.
-     *
-     * @param FormError $error
-     *
-     * @return Form The current form
+     * {@inheritdoc}
      */
     public function addError(FormError $error)
     {
@@ -708,9 +668,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether the form is bound.
-     *
-     * @return Boolean true if the form is bound to input values, false otherwise
+     * {@inheritdoc}
      */
     public function isBound()
     {
@@ -718,9 +676,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether the data in the different formats is synchronized.
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function isSynchronized()
     {
@@ -728,9 +684,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether the form is empty.
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function isEmpty()
     {
@@ -744,9 +698,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether the form is valid.
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
     public function isValid()
     {
@@ -783,9 +735,7 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns all errors.
-     *
-     * @return array An array of FormError instances that occurred during binding
+     * {@inheritdoc}
      */
     public function getErrors()
     {
@@ -962,11 +912,11 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns true if the child exists (implements the \ArrayAccess interface).
+     * Returns whether a child with the given name exists (implements the \ArrayAccess interface).
      *
      * @param string $name The name of the child
      *
-     * @return Boolean true if the widget exists, false otherwise
+     * @return Boolean
      */
     public function offsetExists($name)
     {
@@ -974,11 +924,13 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the form child associated with the name (implements the \ArrayAccess interface).
+     * Returns the child with the given name (implements the \ArrayAccess interface).
      *
-     * @param string $name The offset of the value to get
+     * @param string $name The name of the child
      *
-     * @return FormInterface A form instance
+     * @return FormInterface The child form
+     *
+     * @throws \InvalidArgumentException If the named child does not exist.
      */
     public function offsetGet($name)
     {
@@ -989,7 +941,12 @@ class Form implements \IteratorAggregate, FormInterface
      * Adds a child to the form (implements the \ArrayAccess interface).
      *
      * @param string        $name  Ignored. The name of the child is used.
-     * @param FormInterface $child The child to be added
+     * @param FormInterface $child The child to be added.
+     *
+     * @throws AlreadyBoundException If the form has already been bound.
+     * @throws FormException         When trying to add a child to a non-compound form.
+     *
+     * @see self::add()
      */
     public function offsetSet($name, $child)
     {
@@ -999,7 +956,9 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Removes the child with the given name from the form (implements the \ArrayAccess interface).
      *
-     * @param string $name The name of the child to be removed
+     * @param string $name The name of the child to remove
+     *
+     * @throws AlreadyBoundException If the form has already been bound.
      */
     public function offsetUnset($name)
     {
@@ -1043,7 +1002,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param mixed $value The value to transform
      *
-     * @return string
+     * @return mixed
      */
     private function modelToNorm($value)
     {
@@ -1077,7 +1036,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param mixed $value The value to transform
      *
-     * @return string
+     * @return mixed
      */
     private function normToView($value)
     {

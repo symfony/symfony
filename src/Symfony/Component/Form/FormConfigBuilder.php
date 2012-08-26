@@ -143,7 +143,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @param EventDispatcherInterface $dispatcher The event dispatcher
      * @param array                    $options    The form options
      *
-     * @throws UnexpectedTypeException   If the name is not a string.
      * @throws \InvalidArgumentException If the data class is not a valid class or if
      *                                   the name contains invalid characters.
      */

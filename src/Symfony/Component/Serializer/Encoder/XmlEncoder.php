@@ -54,14 +54,23 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      */
     public function decode($data, $format)
     {
-        $this->assertNoCustomDocType($data);
         $internalErrors = libxml_use_internal_errors(true);
         $disableEntities = libxml_disable_entity_loader(true);
         libxml_clear_errors();
 
-        $xml = simplexml_load_string($data);
+        $dom = new \DOMDocument();
+        $dom->loadXML($data);
+
         libxml_use_internal_errors($internalErrors);
         libxml_disable_entity_loader($disableEntities);
+
+        foreach ($dom->childNodes as $child) {
+            if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
+                throw new UnexpectedValueException('Document types are not allowed.');
+            }
+        }
+
+        $xml = simplexml_import_dom($dom);
 
         if ($error = libxml_get_last_error()) {
             throw new UnexpectedValueException($error->message);
@@ -289,17 +298,6 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             return $this->appendNode($parentNode, $data, 'data');
         }
         throw new UnexpectedValueException('An unexpected value could not be serialized: '.var_export($data, true));
-    }
-
-    private function assertNoCustomDocType($data)
-    {
-        $dom = new \DOMDocument;
-        $dom->loadXML($data);
-        foreach ($dom->childNodes as $child) {
-            if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
-                throw new \InvalidArgumentException('Document types are not allowed.');
-            }
-        }
     }
 
     /**

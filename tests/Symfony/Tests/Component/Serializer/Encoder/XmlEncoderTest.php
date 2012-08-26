@@ -54,7 +54,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException        UnexpectedValueException
      * @expectedExceptionMessage Document types are not allowed.
      */
     public function testDocTypeIsNotAllowed()
@@ -255,8 +255,8 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             chdir($oldCwd);
 
-            if (!$e instanceof \InvalidArgumentException) {
-                $this->fail('Expected InvalidArgumentException');
+            if (!$e instanceof UnexpectedValueException) {
+                $this->fail('Expected UnexpectedValueException');
             }
         }
     }

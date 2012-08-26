@@ -84,27 +84,36 @@ class UrlMatcher implements UrlMatcherInterface
     /**
      * Tries to match a URL with a set of routes.
      *
-     * @param string          $pathinfo The path info to be parsed
-     * @param RouteCollection $routes   The set of routes
+     * @param string          $pathinfo    The path info to be parsed
+     * @param RouteCollection $routes      The set of routes
+     * @param boolean         $returnFirst Return the first match or all matches
      *
-     * @return array An array of parameters
+     * @return array|RouteCollection if returnFirst is true, array of parameters for the first match,
+     *      otherwise a route collection of all matching routes
      *
      * @throws ResourceNotFoundException If the resource could not be found
      * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
      */
-    protected function matchCollection($pathinfo, RouteCollection $routes)
+    protected function matchCollection($pathinfo, RouteCollection $routes, $returnFirst = true)
     {
+        if (! $returnFirst) {
+            $collection = new RouteCollection();
+        }
         foreach ($routes as $name => $route) {
             if ($route instanceof RouteCollection) {
                 if (false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
                     continue;
                 }
 
-                if (!$ret = $this->matchCollection($pathinfo, $route)) {
+                if (!$ret = $this->matchCollection($pathinfo, $route, $returnFirst)) {
                     continue;
                 }
 
-                return $ret;
+                if ($returnFirst) {
+                    return $ret;
+                }
+                $collection->addCollection($ret);
+                continue;
             }
 
             $compiledRoute = $route->compile();
@@ -135,15 +144,26 @@ class UrlMatcher implements UrlMatcherInterface
             $status = $this->handleRouteRequirements($pathinfo, $name, $route);
 
             if (self::ROUTE_MATCH === $status[0]) {
-                return $status[1];
+                if ($returnFirst) {
+                    return $status[1];
+                }
+                $collection->addCollection($route);
+                continue;
             }
 
             if (self::REQUIREMENT_MISMATCH === $status[0]) {
                 continue;
             }
 
-            return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));
+            if ($returnFirst) {
+                return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));
+            }
+            $collection->add($name, $route);
         }
+        if ($returnFirst || 0 == count($collection)) {
+            return false;
+        }
+        return $collection;
     }
 
     /**

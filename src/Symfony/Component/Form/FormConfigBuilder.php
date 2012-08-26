@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\Form\Util\PropertyPathInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
@@ -41,7 +42,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $name;
 
     /**
-     * @var PropertyPath
+     * @var PropertyPathInterface
      */
     private $propertyPath;
 
@@ -709,7 +710,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new FormException('The config builder cannot be modified anymore.');
         }
 
-        if (null !== $propertyPath && !$propertyPath instanceof PropertyPath) {
+        if (null !== $propertyPath && !$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
         }
 

@@ -259,7 +259,7 @@ class Form implements \IteratorAggregate, FormInterface
             throw new AlreadyBoundException('You cannot set the parent of a bound form');
         }
 
-        if ('' === $this->config->getName()) {
+        if (null !== $parent && '' === $this->config->getName()) {
             throw new FormException('A form with an empty name cannot have a parent form.');
         }
 

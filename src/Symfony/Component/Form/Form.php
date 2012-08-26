@@ -910,7 +910,7 @@ class Form implements \IteratorAggregate, FormInterface
             return $this->children[$name];
         }
 
-        throw new \InvalidArgumentException(sprintf('Child "%s" does not exist.', $name));
+        throw new \OutOfBoundsException(sprintf('Child "%s" does not exist.', $name));
     }
 
     /**
@@ -932,7 +932,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return FormInterface The child form
      *
-     * @throws \InvalidArgumentException If the named child does not exist.
+     * @throws \OutOfBoundsException If the named child does not exist.
      */
     public function offsetGet($name)
     {

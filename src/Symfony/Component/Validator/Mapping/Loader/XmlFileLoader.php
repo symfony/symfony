@@ -181,16 +181,23 @@ class XmlFileLoader extends FileLoader
     protected function parseFile($file)
     {
         $internalErrors = libxml_use_internal_errors(true);
+        $disableEntities = libxml_disable_entity_loader(true);
         libxml_clear_errors();
 
         $dom = new \DOMDocument();
         $dom->validateOnParse = true;
-        if (!$dom->load($file, LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
+        if (!$dom->loadXML(file_get_contents($file), LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
+            libxml_disable_entity_loader($disableEntities);
+
             throw new MappingException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
+
+        libxml_disable_entity_loader($disableEntities);
+
         if (!$dom->schemaValidate(__DIR__.'/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd')) {
             throw new MappingException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
+
         $dom->normalizeDocument();
 
         libxml_use_internal_errors($internalErrors);

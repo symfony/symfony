@@ -59,7 +59,8 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
      *
      * @return array
      *
-     * @throws UnexpectedTypeException if the given value is not an array
+     * @throws UnexpectedTypeException       if the given value is not an array
+     * @throws TransformationFailedException if could not find all matching choices for the given values
      */
     public function reverseTransform($array)
     {

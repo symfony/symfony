@@ -143,6 +143,8 @@ class Form implements \IteratorAggregate, FormInterface
      * Creates a new form based on the given configuration.
      *
      * @param FormConfigInterface $config The form configuration.
+     *
+     * @throws FormException if data mapper is not provided for a compound form
      */
     public function __construct(FormConfigInterface $config)
     {
@@ -252,6 +254,8 @@ class Form implements \IteratorAggregate, FormInterface
      * @param FormInterface $parent The parent form
      *
      * @return Form The current form
+     *
+     * @throws FormException if form has an empty name
      */
     public function setParent(FormInterface $parent = null)
     {
@@ -344,6 +348,8 @@ class Form implements \IteratorAggregate, FormInterface
      * @param mixed $modelData The data formatted as expected for the underlying object
      *
      * @return Form The current form
+     *
+     * @throws AlreadyBoundException if the form is already bound or initialized
      */
     public function setData($modelData)
     {
@@ -514,6 +520,7 @@ class Form implements \IteratorAggregate, FormInterface
      * @return Form The current form
      *
      * @throws UnexpectedTypeException
+     * @throws AlreadyBoundException if the form is already bound
      */
     public function bind($submittedData)
     {
@@ -747,6 +754,8 @@ class Form implements \IteratorAggregate, FormInterface
      * Returns whether the form is valid.
      *
      * @return Boolean
+     *
+     * @throws LogicException if the form has not been bounded
      */
     public function isValid()
     {

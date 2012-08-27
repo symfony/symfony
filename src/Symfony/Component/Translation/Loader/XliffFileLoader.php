@@ -60,7 +60,7 @@ class XliffFileLoader implements LoaderInterface
 
         $dom = new \DOMDocument();
         $dom->validateOnParse = true;
-        if (!@$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
+        if (!@$dom->load($file, LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
             throw new \RuntimeException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
 

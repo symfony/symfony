@@ -97,12 +97,12 @@ abstract class Guess
      *
      * @param integer $confidence The confidence
      *
-     * @throws \UnexpectedValueException if the given value of confidence is unknown
+     * @throws \InvalidArgumentException if the given value of confidence is unknown
      */
     public function __construct($confidence)
     {
         if (!in_array($confidence, self::$confidences)) {
-            throw new \UnexpectedValueException(sprintf('The confidence should be one of "%s"', implode('", "', self::$confidences)));
+            throw new \InvalidArgumentException(sprintf('The confidence should be one of "%s"', implode('", "', self::$confidences)));
         }
 
         $this->confidence = $confidence;

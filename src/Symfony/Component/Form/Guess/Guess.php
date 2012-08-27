@@ -47,17 +47,6 @@ abstract class Guess
     const LOW_CONFIDENCE = 0;
 
     /**
-     * The list of allowed confidence values
-     * @var array
-     */
-    private static $confidences = array(
-        self::VERY_HIGH_CONFIDENCE,
-        self::HIGH_CONFIDENCE,
-        self::MEDIUM_CONFIDENCE,
-        self::LOW_CONFIDENCE,
-    );
-
-    /**
      * The confidence about the correctness of the value
      *
      * One of VERY_HIGH_CONFIDENCE, HIGH_CONFIDENCE, MEDIUM_CONFIDENCE
@@ -101,8 +90,9 @@ abstract class Guess
      */
     public function __construct($confidence)
     {
-        if (!in_array($confidence, self::$confidences)) {
-            throw new \InvalidArgumentException(sprintf('The confidence should be one of "%s"', implode('", "', self::$confidences)));
+        if (self::VERY_HIGH_CONFIDENCE !== $confidence && self::HIGH_CONFIDENCE !== $confidence && 
+            self::MEDIUM_CONFIDENCE !== $confidence && self::LOW_CONFIDENCE !== $confidence) {
+            throw new \InvalidArgumentException('The confidence should be one of the constants defined in Guess.');
         }
 
         $this->confidence = $confidence;

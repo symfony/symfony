@@ -89,6 +89,8 @@ class PropertyPathBuilder
      *
      * @param integer $offset The offset at which to remove.
      * @param integer $length The length of the removed piece.
+     *
+     * @throws \OutOfBoundsException if offset is invalid
      */
     public function remove($offset, $length = 1)
     {

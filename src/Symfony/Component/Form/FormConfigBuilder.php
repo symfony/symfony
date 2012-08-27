@@ -244,6 +244,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @return FormConfigBuilder The configuration object.
      *
+     * @throws FormException if the form configuration is locked
+     *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link addViewTransformer()} instead.
      */
@@ -263,6 +265,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @return FormConfigBuilder The configuration object.
      *
+     * @throws FormException if the form configuration is locked
+     *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function prependClientTransformer(DataTransformerInterface $viewTransformer)
@@ -278,6 +282,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * Alias of {@link resetViewTransformers()}.
      *
      * @return FormConfigBuilder The configuration object.
+     *
+     * @throws FormException if the form configuration is locked
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link resetViewTransformers()} instead.
@@ -330,6 +336,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @return FormConfigBuilder The configuration object.
      *
+     * @throws FormException if the form configuration is locked
+     *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function appendNormTransformer(DataTransformerInterface $modelTransformer)
@@ -348,6 +356,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @return FormConfigBuilder The configuration object.
      *
+     * @throws FormException if the form configuration is locked
+     *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link addModelTransformer()} instead.
      */
@@ -364,6 +374,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * Alias of {@link resetModelTransformers()}.
      *
      * @return FormConfigBuilder The configuration object.
+     *
+     * @throws FormException if the form configuration is locked
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link resetModelTransformers()} instead.

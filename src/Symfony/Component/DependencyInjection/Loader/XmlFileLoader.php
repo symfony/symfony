@@ -216,7 +216,7 @@ class XmlFileLoader extends FileLoader
 
         $dom = new \DOMDocument();
         $dom->validateOnParse = true;
-        if (!$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
+        if (!$dom->load($file, LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
             throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
         $dom->normalizeDocument();

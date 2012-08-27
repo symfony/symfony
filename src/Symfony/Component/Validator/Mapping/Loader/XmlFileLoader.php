@@ -185,7 +185,7 @@ class XmlFileLoader extends FileLoader
 
         $dom = new \DOMDocument();
         $dom->validateOnParse = true;
-        if (!$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
+        if (!$dom->load($file, LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
             throw new MappingException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
         if (!$dom->schemaValidate(__DIR__.'/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd')) {

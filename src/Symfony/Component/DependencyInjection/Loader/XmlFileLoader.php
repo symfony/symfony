@@ -212,16 +212,20 @@ class XmlFileLoader extends FileLoader
     private function parseFile($file)
     {
         $internalErrors = libxml_use_internal_errors(true);
+        $disableEntities = libxml_disable_entity_loader(true);
         libxml_clear_errors();
 
         $dom = new \DOMDocument();
         $dom->validateOnParse = true;
-        if (!$dom->load($file, LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
+        if (!$dom->loadXML(file_get_contents($file), LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
+            libxml_disable_entity_loader($disableEntities);
+
             throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
         $dom->normalizeDocument();
 
         libxml_use_internal_errors($internalErrors);
+        libxml_disable_entity_loader($disableEntities);
 
         foreach ($dom->childNodes as $child) {
             if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {

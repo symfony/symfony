@@ -119,10 +119,15 @@ class Crawler extends \SplObjectStorage
      */
     public function addHtmlContent($content, $charset = 'UTF-8')
     {
+        $disableEntities = libxml_disable_entity_loader(true);
+
         $dom = new \DOMDocument('1.0', $charset);
         $dom->validateOnParse = true;
 
         @$dom->loadHTML($content);
+
+        libxml_disable_entity_loader($disableEntities);
+
         $this->addDocument($dom);
 
         $base = $this->filter('base')->extract(array('href'));
@@ -142,11 +147,16 @@ class Crawler extends \SplObjectStorage
      */
     public function addXmlContent($content, $charset = 'UTF-8')
     {
+        $disableEntities = libxml_disable_entity_loader(true);
+
         $dom = new \DOMDocument('1.0', $charset);
         $dom->validateOnParse = true;
 
         // remove the default namespace to make XPath expressions simpler
-        @$dom->loadXML(str_replace('xmlns', 'ns', $content));
+        @$dom->loadXML(str_replace('xmlns', 'ns', $content), LIBXML_NONET);
+
+        libxml_disable_entity_loader($disableEntities);
+
         $this->addDocument($dom);
     }
 

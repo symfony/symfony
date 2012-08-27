@@ -223,6 +223,12 @@ class XmlFileLoader extends FileLoader
 
         libxml_use_internal_errors($internalErrors);
 
+        foreach ($dom->childNodes as $child) {
+            if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
+                throw new \InvalidArgumentException('Document types are not allowed.');
+            }
+        }
+
         $this->validate($dom, $file);
 
         return simplexml_import_dom($dom, 'Symfony\\Component\\DependencyInjection\\SimpleXMLElement');

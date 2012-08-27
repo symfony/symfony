@@ -64,6 +64,14 @@ class XliffFileLoader implements LoaderInterface
             throw new \RuntimeException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
 
+        foreach ($dom->childNodes as $child) {
+            if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
+                libxml_use_internal_errors($internalErrors);
+
+                throw new \RuntimeException('Document types are not allowed.');
+            }
+        }
+
         $location = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
         $parts = explode('/', $location);
         if (0 === stripos($location, 'phar://')) {

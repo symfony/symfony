@@ -175,7 +175,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateForRouteWithInvalidOptionalParameterNonStrictWithLogger()
     {
-        if (!class_exists('Symfony\Component\HttpKernel\Log\LoggerInterface')) {
+        if (!interface_exists('Symfony\Component\HttpKernel\Log\LoggerInterface')) {
             $this->markTestSkipped('The "HttpKernel" component is not available');
         }
 

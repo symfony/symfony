@@ -69,4 +69,14 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $resource = 'http://example.com/resources.xlf';
         $loader->load($resource, 'en', 'domain1');
     }
+
+    /**
+     * @expectedException        \RuntimeException
+     * @expectedExceptionMessage Document types are not allowed.
+     */
+    public function testDocTypeIsNotAllowed()
+    {
+        $loader = new XliffFileLoader();
+        $loader->load(__DIR__.'/../fixtures/withdoctype.xlf', 'en', 'domain1');
+    }
 }

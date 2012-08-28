@@ -529,11 +529,83 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
             'setSharedMaxAge' => 1,
             'setTtl' => 1,
             'setClientTtl' => 1,
+            'allowPartial' => true
         );
 
         foreach ($setters as $setter => $arg) {
             $this->assertEquals($response, $response->{$setter}($arg));
         }
+    }
+
+    /**
+     * @dataProvider partialRequestProvider
+     */
+    public function testPartialRequest($requestRange, $expectedResponseRange, $expectedResponseContent)
+    {
+        $request = new Request();
+        $request->headers->set('Range', 'bytes='.$requestRange);
+
+        $response = new Response();
+        $response->setContent('abcdefghijklm');
+        $response->allowPartial(true);
+        $response->prepare($request);
+
+        $this->assertEquals(206, $response->getStatusCode());
+        $this->assertEquals($expectedResponseContent, $response->getContent());
+        $this->assertEquals(strlen($expectedResponseContent), $response->headers->get('content-length'));
+        $this->assertEquals('bytes '.$expectedResponseRange, $response->headers->get('content-range'));
+    }
+
+    public function partialRequestProvider()
+    {
+        return array(
+            array('0-9', '0-9/13', 'abcdefghij'),
+            array('-5', '8-12/13', 'ijklm'),
+            array('6-', '6-12/13', 'ghijklm'),
+            array('0-12', '0-12/13', 'abcdefghijklm')
+        );
+    }
+
+    /**
+     * @dataProvider invalidPartialRequestProvider
+     */
+    public function testPartialRequestNotSatisfiable($requestRange)
+    {
+        $request = new Request();
+        $request->headers->set('Range', 'bytes='.$requestRange);
+
+        $response = new Response();
+        $response->setContent('abcdefghijklm');
+        $response->allowPartial(true);
+        $response->prepare($request);
+
+        $this->assertEquals(416, $response->getStatusCode());
+        $this->assertEquals(null, $response->getContent());
+        $this->assertEquals(0, $response->headers->get('content-length', 0));
+    }
+
+    public function invalidPartialRequestProvider()
+    {
+        return array(
+            array('5-3'),
+            array('18-'),
+            array('0-13')
+        );
+    }
+
+    public function testManualPartialResponseIsNotDoubleParsed()
+    {
+        $request = new Request();
+        $request->headers->set('Range', 'bytes=3-7');
+
+        $response = new Response();
+        $response->setContent('defgh');
+        $response->headers->set('Accept-Ranges', 'bytes');
+        $response->headers->set('Content-Range', 'bytes 3-7/13');
+        $response->prepare($request);
+
+        $this->assertEquals('defgh', $response->getContent());
+        $this->assertEquals('bytes 3-7/13', $response->headers->get('Content-Range'));
     }
 
     public function validContentProvider()

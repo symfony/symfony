@@ -231,6 +231,17 @@ class Response
             $headers->remove('Content-Length');
         }
 
+        if ($this->isOk() && $headers->has('Accept-Ranges') && !$headers->has('Content-Range')) {
+            if (preg_match('/bytes=(\d*)-(\d*)/i', $request->headers->get('Range'), $matches)) {
+                try {
+                    $this->parseRange($matches[1] === '' ? null : $matches[1], $matches[2] === '' ? null : $matches[2]);
+                } catch (\InvalidArgumentException $e) {
+                    $this->setStatusCode(416, $e->getMessage());
+                    $this->setContent(null);
+                }
+            }
+        }
+
         if ('HEAD' === $request->getMethod()) {
             // cf. RFC2616 14.13
             $length = $headers->get('Content-Length');
@@ -241,6 +252,34 @@ class Response
         }
 
         return $this;
+    }
+
+    protected function parseRange($start, $end)
+    {
+        if ($start === null && $end !== null) {
+            $start = strlen($this->content) - $end;
+            $end = null;
+        }
+
+        if (null === $end) {
+            $end = strlen($this->content) - 1;
+        }
+
+        if ($start === null || $end === null) {
+            throw new \InvalidArgumentException("Couldn't build range from request range $start-$end");
+        }
+        if ($start > $end) {
+            throw new \InvalidArgumentException('The range is invalid');
+        }
+        if (strlen($this->content) < $start + 1 || strlen($this->content) < $end + 1) {
+            throw new \InvalidArgumentException('The range is outside the content bounds');
+        }
+
+        $this->headers->set('Content-Range', sprintf('bytes %d-%d/%d', $start, $end, strlen($this->content)));
+        $this->content = substr($this->content, $start, $end - $start + 1);
+        $this->headers->set('Content-Length', strlen($this->content));
+
+        $this->setStatusCode(206);
     }
 
     /**
@@ -1144,5 +1183,22 @@ class Response
     public function isEmpty()
     {
         return in_array($this->statusCode, array(201, 204, 304));
+    }
+
+    /**
+     * Is the response allowed to be partial?
+     *
+     * @param Boolean
+     *
+     * @return Response
+     */
+    public function allowPartial($allow)
+    {
+        if ($allow) {
+            $this->headers->set('Accept-Ranges', 'bytes');
+        } else {
+            $this->headers->remove('Accept-Ranges');
+        }
+        return $this;
     }
 }

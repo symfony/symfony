@@ -96,6 +96,8 @@ abstract class Guess
      * Constructor
      *
      * @param integer $confidence The confidence
+     *
+     * @throws \UnexpectedValueException if the given value of confidence is unknown
      */
     public function __construct($confidence)
     {

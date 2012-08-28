@@ -21,7 +21,7 @@ class PropertyPathIterator extends \ArrayIterator implements PropertyPathIterato
 {
     /**
      * The traversed property path
-     * @var PropertyPath
+     * @var PropertyPathInterface
      */
     protected $path;
 

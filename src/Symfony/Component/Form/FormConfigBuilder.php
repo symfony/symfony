@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\Form\Util\PropertyPathInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
@@ -41,7 +42,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $name;
 
     /**
-     * @var PropertyPath
+     * @var PropertyPathInterface
      */
     private $propertyPath;
 
@@ -143,7 +144,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @param EventDispatcherInterface $dispatcher The event dispatcher
      * @param array                    $options    The form options
      *
-     * @throws UnexpectedTypeException   If the name is not a string.
      * @throws \InvalidArgumentException If the data class is not a valid class or if
      *                                   the name contains invalid characters.
      */
@@ -244,6 +244,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @return FormConfigBuilder The configuration object.
      *
+     * @throws FormException if the form configuration is locked
+     *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link addViewTransformer()} instead.
      */
@@ -263,6 +265,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @return FormConfigBuilder The configuration object.
      *
+     * @throws FormException if the form configuration is locked
+     *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function prependClientTransformer(DataTransformerInterface $viewTransformer)
@@ -278,6 +282,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * Alias of {@link resetViewTransformers()}.
      *
      * @return FormConfigBuilder The configuration object.
+     *
+     * @throws FormException if the form configuration is locked
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link resetViewTransformers()} instead.
@@ -330,6 +336,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @return FormConfigBuilder The configuration object.
      *
+     * @throws FormException if the form configuration is locked
+     *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function appendNormTransformer(DataTransformerInterface $modelTransformer)
@@ -348,6 +356,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @return FormConfigBuilder The configuration object.
      *
+     * @throws FormException if the form configuration is locked
+     *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link addModelTransformer()} instead.
      */
@@ -364,6 +374,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * Alias of {@link resetModelTransformers()}.
      *
      * @return FormConfigBuilder The configuration object.
+     *
+     * @throws FormException if the form configuration is locked
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link resetModelTransformers()} instead.
@@ -710,7 +722,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new FormException('The config builder cannot be modified anymore.');
         }
 
-        if (null !== $propertyPath && !$propertyPath instanceof PropertyPath) {
+        if (null !== $propertyPath && !$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
         }
 

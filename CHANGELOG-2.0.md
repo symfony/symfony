@@ -7,6 +7,34 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.17 (2012-08-28)
+
+ * 5bf4f92: fixed XML decoding attack vector through external entities
+ * 4e0c992: prevents injection of malicious doc types
+ * 47fe725: disabled network access when loading XML documents
+ * c896d71: refined previous commit
+ * a2a6cdc: prevents injection of malicious doc types
+ * 865461d: standardized the way we handle XML errors
+ * 352e8f5: Redirects are now absolute
+ * 9a355e9: [HttpKernel] excluded a test on PHP 5.3.16, which is buggy (PHP, not Symfony ;))
+ * f694615: [Process] fix ProcessTest::testProcessPipes hangs on Windows on branch 2.0
+ * 9beffff: [HttpKernel] KernelTest::testGetRootDir fails on Windows for branch 2.0
+ * e49afde: Update monolog compatibility
+ * 832f8dd: Add support for Monolog 1.2.0
+ * c51fc10: avoid fatal error on invalid session
+ * 1a4a4ee: [DependencyInjection] Fixed a frozen constructor of a container with no parameters
+ * b3cf36a: [Config] Missing type argument passed to loader.
+ * 55a0b34: Fixes incorrect class used in src/Symfony/Bundle/FrameworkBundle/Console/Application.php
+ * a0709fc: [DoctrineBridge] Fix log of non utf8 data
+ * 0b78fdf: Only call registerCommand on bundles that is an instance of Bundle
+ * 9e28593: fixed error on oracle db related to clob data.
+ * 9f4178b: [Validator] Fixed: StaticMethodLoader does not try to invoke methods of interfaces anymore
+ * 2a3235a: [Validator] Fixed group sequence support in the XML and YAML drivers
+ * 4f93d1a: [Console] Use proc_open instead of exec to suppress errors when run on windows and stty is not present
+ * 16a980b: [Validator] Fix bug order for constraint, property, getter and group-sequence-provider in validation.xml
+ * ed8823c: [HttpFoundation] Allow setting an unknown status code without specifying a text
+ * e9d799c: [Routing] fixed ApacheUrlMatcher and ApachMatcherDumper classes that did not take care of default parameters in urls.
+
 * 2.0.16 (2012-07-11)
 
  * 854daa8: [Form] Fixed errors not to be added onto non-synchronized forms

@@ -39,9 +39,25 @@ class RequestDataCollector extends DataCollector
             $responseHeaders['Set-Cookie'] = $cookies;
         }
 
+        $attributeStringifier = function (&$attributes, $key, $value) use (&$attributeStringifier) {
+            if (is_object($value)) {
+                $attributes[$key] = sprintf('Object(%s)', get_class($value));
+                if (is_callable(array($value, '__toString'))) {
+                    $attributes[$key] .= sprintf(' = %s', (string) $value);
+                }
+            } else if (is_array($value) || $value instanceof \Traversable) {
+                $attributes[$key] = array();
+                foreach ($value as $k => $v) {
+                    $attributeStringifier($attributes[$key], $k, $v);
+                }
+            } else {
+                $attributes[$key] = $value;
+            }
+        };
+
         $attributes = array();
         foreach ($request->attributes->all() as $key => $value) {
-            $attributes[$key] = is_object($value) ? sprintf('Object(%s)', get_class($value)) : $value;
+            $attributeStringifier($attributes, $key, $value);
         }
 
         $content = null;

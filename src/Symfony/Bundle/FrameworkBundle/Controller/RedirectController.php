@@ -38,7 +38,7 @@ class RedirectController extends ContainerAware
      */
     public function redirectAction($route, $permanent = false)
     {
-        if (!$route) {
+        if ('' == $route) {
             return new Response(null, $permanent ? 410 : 404);
         }
 
@@ -67,7 +67,7 @@ class RedirectController extends ContainerAware
      */
     public function urlRedirectAction($path, $permanent = false, $scheme = null, $httpPort = 80, $httpsPort = 443)
     {
-        if (!$path) {
+        if ('' == $path) {
             return new Response(null, $permanent ? 410 : 404);
         }
 

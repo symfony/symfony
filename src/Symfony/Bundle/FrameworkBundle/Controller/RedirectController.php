@@ -39,7 +39,7 @@ class RedirectController extends ContainerAware
     public function redirectAction($route, $permanent = false)
     {
         if (!$route) {
-            return new Response(null, 410);
+            return new Response(null, $permanent ? 410 : 404);
         }
 
         $attributes = $this->container->get('request')->attributes->get('_route_params');
@@ -67,7 +67,7 @@ class RedirectController extends ContainerAware
     public function urlRedirectAction($path, $permanent = false, $scheme = null, $httpPort = 80, $httpsPort = 443)
     {
         if (!$path) {
-            return new Response(null, 410);
+            return new Response(null, $permanent ? 410 : 404);
         }
 
         $statusCode = $permanent ? 301 : 302;

@@ -39,6 +39,7 @@ class Process
     private $timeout;
     private $options;
     private $exitcode;
+    private $fallbackExitcode;
     private $processInformation;
     private $stdout;
     private $stderr;
@@ -211,7 +212,13 @@ class Process
             );
             $descriptors = array(array('pipe', 'r'), $this->fileHandles[self::STDOUT], array('pipe', 'w'));
         } else {
-            $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w'));
+            $descriptors = array(
+                array('pipe', 'r'), // stdin
+                array('pipe', 'w'), // stdout
+                array('pipe', 'w'), // stderr
+                array('pipe', 'w')  // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
+            );
+            $this->commandline = '('.$this->commandline.') 3>/dev/null; echo $? >&3';
         }
 
         $commandline = $this->commandline;
@@ -336,8 +343,14 @@ class Process
                 foreach ($r as $pipe) {
                     $type = array_search($pipe, $this->pipes);
                     $data = fread($pipe, 8192);
+
                     if (strlen($data) > 0) {
-                        call_user_func($callback, $type == 1 ? self::OUT : self::ERR, $data);
+                        // last exit code is output and caught to work around --enable-sigchild
+                        if (3 == $type) {
+                            $this->fallbackExitcode = (int) $data;
+                        } else {
+                            call_user_func($callback, $type == 1 ? self::OUT : self::ERR, $data);
+                        }
                     }
                     if (false === $data || feof($pipe)) {
                         fclose($pipe);
@@ -363,7 +376,13 @@ class Process
             throw new \RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->processInformation['stopsig']));
         }
 
-        return $this->exitcode = $this->processInformation['running'] ? $exitcode : $this->processInformation['exitcode'];
+        $this->exitcode = $this->processInformation['running'] ? $exitcode : $this->processInformation['exitcode'];
+
+        if (-1 == $this->exitcode && null !== $this->fallbackExitcode) {
+            $this->exitcode = $this->fallbackExitcode;
+        }
+
+        return $this->exitcode;
     }
 
     /**

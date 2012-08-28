@@ -23,16 +23,16 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class RedirectController extends ContainerAware
 {
     /**
-     * Redirects to another route.
+     * Redirects to another route with the given name.
      *
-     * It expects a route path parameter.
-     * By default, the response status code is 301.
+     * The response status code is 301 if the permanent parameter is false (default),
+     * and 302 if the redirection is permanent.
      *
-     * If the route is empty, the status code will be 410.
-     * If the permanent path parameter is set, the status code will be 302.
+     * In case the route name is empty, the status code will be 404 when permanent is false
+     * and 410 otherwise.
      *
-     * @param string  $route     The route pattern to redirect to
-     * @param Boolean $permanent Whether the redirect is permanent or not
+     * @param string  $route     The route name to redirect to
+     * @param Boolean $permanent Whether the redirection is permanent
      *
      * @return Response A Response instance
      */
@@ -51,13 +51,14 @@ class RedirectController extends ContainerAware
     /**
      * Redirects to a URL.
      *
-     * By default, the response status code is 301.
+     * The response status code is 301 if the permanent parameter is false (default),
+     * and 302 if the redirection is permanent.
      *
-     * If the path is empty, the status code will be 410.
-     * If the permanent flag is set, the status code will be 302.
+     * In case the path is empty, the status code will be 404 when permanent is false
+     * and 410 otherwise.
      *
-     * @param string  $path      The path to redirect to
-     * @param Boolean $permanent Whether the redirect is permanent or not
+     * @param string  $path      The absolute path or URL to redirect to
+     * @param Boolean $permanent Whether the redirection is permanent
      * @param Boolean $scheme    The URL scheme (null to keep the current one)
      * @param integer $httpPort  The HTTP port
      * @param integer $httpsPort The HTTPS port

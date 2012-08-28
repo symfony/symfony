@@ -80,4 +80,16 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $metadata);
     }
+
+    /**
+     * @expectedException        Symfony\Component\Validator\Exception\MappingException
+     * @expectedExceptionMessage Document types are not allowed.
+     */
+    public function testDocTypeIsNotAllowed()
+    {
+        $loader = new XmlFileLoader(__DIR__.'/withdoctype.xml');
+        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+
+        $loader->loadClassMetadata($metadata);
+    }
 }

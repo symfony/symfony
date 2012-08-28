@@ -11,8 +11,8 @@
                 <target>L'arxiu pujat és massa gran. Per favor, pugi un arxiu més petit.</target>
             </trans-unit>
             <trans-unit id="30">
-                <source>The CSRF token is invalid.</source>
-                <target>El token CSRF no és vàlid.</target>
+                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
+                <target>El token CSRF no és vàlid. Per favor, provi d'enviar novament el formulari</target>
             </trans-unit>
         </body>
     </file>

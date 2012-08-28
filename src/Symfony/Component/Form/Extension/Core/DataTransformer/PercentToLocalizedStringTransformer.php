@@ -42,6 +42,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @param integer $precision The precision
      * @param string  $type      One of the supported types
+     *
+     * @throws UnexpectedTypeException if the given value of type is unknown
      */
     public function __construct($precision = null, $type = null)
     {

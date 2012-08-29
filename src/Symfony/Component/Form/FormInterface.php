@@ -57,7 +57,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormInterface The child form
      *
-     * @throws \InvalidArgumentException If the named child does not exist.
+     * @throws \OutOfBoundsException If the named child does not exist.
      */
     public function get($name);
 

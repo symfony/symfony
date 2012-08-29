@@ -13,7 +13,6 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\PropertyPath;
@@ -533,10 +532,6 @@ class Form implements \IteratorAggregate, FormInterface
         // (think of empty collection forms)
         if ($this->config->getCompound()) {
             if (!is_array($submittedData)) {
-                if (!FormUtil::isEmpty($submittedData)) {
-                    throw new UnexpectedTypeException($submittedData, 'array');
-                }
-
                 $submittedData = array();
             }
 

@@ -779,6 +779,25 @@ class SimpleFormTest extends AbstractFormTest
         $form->setData('foo');
     }
 
+    public function testBindingWrongDataIsIgnored()
+    {
+        $test = $this;
+
+        $child = $this->getBuilder('child', $this->dispatcher);
+        $child->addEventListener(FormEvents::PRE_BIND, function (FormEvent $event) use ($test) {
+            // child form doesn't receive the wrong data that is bound on parent
+            $test->assertNull($event->getData());
+        });
+
+        $parent = $this->getBuilder('parent', new EventDispatcher())
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->add($child)
+            ->getForm();
+
+        $parent->bind('not-an-array');
+    }
+
     protected function createForm()
     {
         return $this->getBuilder()->getForm();

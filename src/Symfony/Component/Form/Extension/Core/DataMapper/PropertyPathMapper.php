@@ -71,9 +71,7 @@ class PropertyPathMapper implements DataMapperInterface
             if (null !== $propertyPath && $config->getMapped() && $form->isSynchronized() && !$form->isDisabled()) {
                 // If the data is identical to the value in $data, we are
                 // dealing with a reference
-                $isReference = $form->getData() === $propertyPath->getValue($data);
-
-                if (!is_object($data) || !$isReference || !$config->getByReference()) {
+                if (!is_object($data) || !$config->getByReference() || $form->getData() !== $propertyPath->getValue($data)) {
                     $propertyPath->setValue($data, $form->getData());
                 }
             }

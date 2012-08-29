@@ -665,6 +665,14 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertEquals('', $form->getName());
     }
 
+    public function testSetNullParentWorksWithEmptyName()
+    {
+        $form = $this->getBuilder('')->getForm();
+        $form->setParent(null);
+
+        $this->assertNull($form->getParent());
+    }
+
     /**
      * @expectedException Symfony\Component\Form\Exception\FormException
      * @expectedExceptionMessage A form with an empty name cannot have a parent form.

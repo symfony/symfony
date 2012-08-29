@@ -86,10 +86,18 @@ class Store implements StoreInterface
      * Releases the lock for the given Request.
      *
      * @param Request $request A Request instance
+     *
+     * @return Boolean False if the lock file does not exist or cannot be unlocked, true otherwise
      */
     public function unlock(Request $request)
     {
-        return @unlink($this->getPath($this->getCacheKey($request).'.lck'));
+        $file = $this->getPath($this->getCacheKey($request).'.lck');
+
+        if (!is_file($file)) {
+            return false;            
+        }
+
+        return @unlink($file);
     }
 
     /**

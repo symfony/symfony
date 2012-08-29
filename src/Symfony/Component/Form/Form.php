@@ -708,7 +708,7 @@ class Form implements \IteratorAggregate, FormInterface
             throw new \LogicException('You cannot call isValid() on a form that is not bound.');
         }
 
-        if ($this->hasErrors()) {
+        if (count($this->errors) > 0) {
             return false;
         }
 
@@ -724,15 +724,15 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns whether or not there are errors.
+     * Returns whether there are errors associated with this form.
      *
-     * @return Boolean true if form is bound and not valid
+     * @return Boolean
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Count
+     *             {@link getErrors()} instead.
      */
     public function hasErrors()
     {
-        // Don't call isValid() here, as its semantics are slightly different
-        // Forms are not valid if their children are invalid, but
-        // hasErrors() returns only true if a form itself has errors
         return count($this->errors) > 0;
     }
 

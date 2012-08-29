@@ -39,13 +39,6 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function getParent();
 
     /**
-     * Returns whether the form has a parent.
-     *
-     * @return Boolean
-     */
-    public function hasParent();
-
-    /**
      * Adds a child to the form.
      *
      * @param  FormInterface $child The FormInterface to add as a child

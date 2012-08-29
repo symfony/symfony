@@ -21,7 +21,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Sets the parent form.
      *
-     * @param  FormInterface $parent The parent form
+     * @param  FormInterface|null $parent The parent form or null if it's the root.
      *
      * @return FormInterface The form instance
      *
@@ -34,7 +34,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the parent form.
      *
-     * @return FormInterface The parent form
+     * @return FormInterface|null The parent form or null if there is none.
      */
     public function getParent();
 

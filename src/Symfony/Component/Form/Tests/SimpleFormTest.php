@@ -231,12 +231,12 @@ class SimpleFormTest extends AbstractFormTest
     {
         $this->form->addError(new FormError('Error!'));
 
-        $this->assertTrue($this->form->hasErrors());
+        $this->assertCount(1, $this->form->getErrors());
     }
 
     public function testHasNoErrors()
     {
-        $this->assertFalse($this->form->hasErrors());
+        $this->assertCount(0, $this->form->getErrors());
     }
 
     /**

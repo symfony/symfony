@@ -194,7 +194,7 @@ class Form implements \IteratorAggregate, FormInterface
             return null;
         }
 
-        if ($this->hasParent() && null === $this->getParent()->getConfig()->getDataClass()) {
+        if ($this->parent && null === $this->parent->getConfig()->getDataClass()) {
             return new PropertyPath('[' . $this->getName() . ']');
         }
 
@@ -271,7 +271,12 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns whether the form has a parent.
+     *
+     * @return Boolean
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link getParent()} or inverse {@link isRoot()} instead.
      */
     public function hasParent()
     {
@@ -291,7 +296,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isRoot()
     {
-        return !$this->hasParent();
+        return null === $this->parent;
     }
 
     /**

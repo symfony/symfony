@@ -76,7 +76,7 @@ interface StoreInterface
      *
      * @return Boolean true if lock exists, false otherwise
      */
-    public function lockExists(Request $request);
+    public function isLocked(Request $request);
 
     /**
      * Purges data for the given URL.

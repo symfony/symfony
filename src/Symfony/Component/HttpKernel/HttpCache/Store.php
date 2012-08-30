@@ -97,9 +97,9 @@ class Store implements StoreInterface
         return @unlink($this->getPath($this->getCacheKey($request).'.lck'));
     }
 
-    public function lockExists(Request $request)
+    public function isLocked(Request $request)
     {
-      return is_file($this->getPath($this->getCacheKey($request).'.lck'));
+        return is_file($this->getPath($this->getCacheKey($request).'.lck'));
     }
 
     /**

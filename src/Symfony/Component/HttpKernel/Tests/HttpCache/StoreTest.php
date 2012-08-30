@@ -200,10 +200,10 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->store->lock($req));
 
         $path = $this->store->lock($req);
-        $this->assertTrue($this->store->lockExists($req));
+        $this->assertTrue($this->store->isLocked($req));
 
         $this->store->unlock($req);
-        $this->assertFalse($this->store->lockExists($req));
+        $this->assertFalse($this->store->isLocked($req));
     }
 
     protected function storeSimpleEntry($path = null, $headers = array())

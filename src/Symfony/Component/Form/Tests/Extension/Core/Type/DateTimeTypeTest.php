@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\FormError;
+
 class DateTimeTypeTest extends LocalizedTestCase
 {
     public function testSubmit_dateTime()
@@ -386,4 +388,53 @@ class DateTimeTypeTest extends LocalizedTestCase
         $view = $form->createView();
         $this->assertFalse(isset($view->vars['type']));
     }
+
+    public function testDateTypeChoiceErrorsBubbleUp()
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('datetime', null);
+
+        $form['date']->addError($error);
+
+        $this->assertSame(array(), $form['date']->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
+    public function testDateTypeSingleTextErrorsBubbleUp()
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('datetime', null, array(
+            'date_widget' => 'single_text'
+        ));
+
+        $form['date']->addError($error);
+
+        $this->assertSame(array(), $form['date']->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
+    public function testTimeTypeChoiceErrorsBubbleUp()
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('datetime', null);
+
+        $form['time']->addError($error);
+
+        $this->assertSame(array(), $form['time']->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
+    public function testTimeTypeSingleTextErrorsBubbleUp()
+    {
+        $error = new FormError('Invalid!');
+        $form = $this->factory->create('datetime', null, array(
+            'time_widget' => 'single_text'
+        ));
+
+        $form['time']->addError($error);
+
+        $this->assertSame(array(), $form['time']->getErrors());
+        $this->assertSame(array($error), $form->getErrors());
+    }
+
 }

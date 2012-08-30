@@ -218,7 +218,7 @@ class Process
                 array('pipe', 'w'), // stderr
                 array('pipe', 'w')  // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
             );
-            $this->commandline = '('.$this->commandline.') 3>/dev/null; echo $? >&3';
+            $this->commandline = '('.$this->commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
         }
 
         $commandline = $this->commandline;

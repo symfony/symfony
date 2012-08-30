@@ -23,10 +23,10 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  */
 class TemplateFinder implements TemplateFinderInterface
 {
-    private $kernel;
-    private $parser;
-    private $rootDir;
-    private $templates;
+    protected $kernel;
+    protected $parser;
+    protected $rootDir;
+    protected $templates;
 
     /**
      * Constructor.
@@ -71,7 +71,7 @@ class TemplateFinder implements TemplateFinderInterface
      *
      * @return array An array of templates of type TemplateReferenceInterface
      */
-    private function findTemplatesInFolder($dir)
+    protected function findTemplatesInFolder($dir)
     {
         $templates = array();
 
@@ -95,7 +95,7 @@ class TemplateFinder implements TemplateFinderInterface
      *
      * @return array An array of templates of type TemplateReferenceInterface
      */
-    private function findTemplatesInBundle(BundleInterface $bundle)
+    protected function findTemplatesInBundle(BundleInterface $bundle)
     {
         $templates = $this->findTemplatesInFolder($bundle->getPath().'/Resources/views');
         $name = $bundle->getName();

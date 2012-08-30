@@ -9,11 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\SecurityBundle\EventListener;
+namespace Symfony\Component\Security\Http\RememberMe;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
  * Adds remember-me cookies to the Response.

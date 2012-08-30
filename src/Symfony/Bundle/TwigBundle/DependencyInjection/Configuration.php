@@ -115,7 +115,7 @@ class Configuration implements ConfigurationInterface
     {
         $rootNode
             ->children()
-                ->scalarNode('autoescape')->end()
+                ->variableNode('autoescape')->end()
                 ->scalarNode('base_template_class')->end()
                 ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()

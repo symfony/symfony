@@ -162,6 +162,13 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
             'pattern' => '/[a-z]+/',
         ));
         $this->assertEquals('.*[a-z]+.*', $constraint->getHtmlPattern());
+        
+        // Dropped because of match=false
+        $constraint = new Regex(array(
+            'pattern' => '/[a-z]+/',
+            'match' => false
+        ));
+        $this->assertNull($constraint->getHtmlPattern());
     }
 
 }

@@ -89,6 +89,19 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($called, 'The callback should be executed with the output');
     }
 
+    public function testExitCodeCommandFailed()
+    {
+        if (strpos(PHP_OS, "WIN") === 0) {
+            $this->markTestSkipped('Windows does not support POSIX exit code');
+        }
+
+        // such command run in bash return an exitcode 127
+        $process = new Process('nonexistingcommandIhopeneversomeonewouldnameacommandlikethis');
+        $process->run();
+
+        $this->assertGreaterThan(0, $process->getExitCode());
+    }
+
     public function testExitCodeText()
     {
         $process = new Process('');

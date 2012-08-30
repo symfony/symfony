@@ -22,6 +22,8 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     private $mongo;
+    private $options;
+    private $storage;
 
     /**
      * @var array

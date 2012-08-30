@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Component\Process\Exception\RuntimeException;
+
 /**
  * Process is a thin wrapper around proc_* functions to ease
  * start independent PHP processes.
@@ -111,14 +114,14 @@ class Process
      * @param integer $timeout     The timeout in seconds
      * @param array   $options     An array of options for proc_open
      *
-     * @throws \RuntimeException When proc_open is not installed
+     * @throws RuntimeException When proc_open is not installed
      *
      * @api
      */
     public function __construct($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
     {
         if (!function_exists('proc_open')) {
-            throw new \RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
+            throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
         }
 
         $this->commandline = $commandline;
@@ -158,7 +161,7 @@ class Process
      *
      * @return integer The exit status code
      *
-     * @throws \RuntimeException When process can't be launch or is stopped
+     * @throws RuntimeException When process can't be launch or is stopped
      *
      * @api
      */
@@ -187,13 +190,13 @@ class Process
      * @param Closure|string|array $callback A PHP callback to run whenever there is some
      *                                       output available on STDOUT or STDERR
      *
-     * @throws \RuntimeException When process can't be launch or is stopped
-     * @throws \RuntimeException When process is already running
+     * @throws RuntimeException When process can't be launch or is stopped
+     * @throws RuntimeException When process is already running
      */
     public function start($callback = null)
     {
         if ($this->isRunning()) {
-            throw new \RuntimeException('Process is already running');
+            throw new RuntimeException('Process is already running');
         }
 
         $this->stdout = '';
@@ -233,7 +236,7 @@ class Process
         $this->process = proc_open($commandline, $descriptors, $this->pipes, $this->cwd, $this->env, $this->options);
 
         if (!is_resource($this->process)) {
-            throw new \RuntimeException('Unable to launch a new process.');
+            throw new RuntimeException('Unable to launch a new process.');
         }
         $this->status = self::STATUS_STARTED;
 
@@ -270,7 +273,7 @@ class Process
             if ($n === 0) {
                 proc_terminate($this->process);
 
-                throw new \RuntimeException('The process timed out.');
+                throw new RuntimeException('The process timed out.');
             }
 
             if ($w) {
@@ -311,7 +314,7 @@ class Process
      *
      * @return int The exitcode of the process
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function wait($callback = null)
     {
@@ -337,7 +340,7 @@ class Process
                 if (0 === $n) {
                     proc_terminate($this->process);
 
-                    throw new \RuntimeException('The process timed out.');
+                    throw new RuntimeException('The process timed out.');
                 }
 
                 foreach ($r as $pipe) {
@@ -361,7 +364,7 @@ class Process
         }
         $this->updateStatus();
         if ($this->processInformation['signaled']) {
-            throw new \RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->processInformation['stopsig']));
+            throw new RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->processInformation['stopsig']));
         }
 
         $time = 0;
@@ -373,7 +376,7 @@ class Process
         $exitcode = proc_close($this->process);
 
         if ($this->processInformation['signaled']) {
-            throw new \RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->processInformation['stopsig']));
+            throw new RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->processInformation['stopsig']));
         }
 
         $this->exitcode = $this->processInformation['running'] ? $exitcode : $this->processInformation['exitcode'];
@@ -546,7 +549,7 @@ class Process
      *
      * @return integer The exitcode of the process
      *
-     * @throws \RuntimeException if the process got signaled
+     * @throws RuntimeException if the process got signaled
      */
     public function stop($timeout=10)
     {
@@ -622,7 +625,7 @@ class Process
         $timeout = (integer) $timeout;
 
         if ($timeout < 0) {
-            throw new \InvalidArgumentException('The timeout value must be a valid positive integer.');
+            throw new InvalidArgumentException('The timeout value must be a valid positive integer.');
         }
 
         $this->timeout = $timeout;

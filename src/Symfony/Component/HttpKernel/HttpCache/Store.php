@@ -73,11 +73,11 @@ class Store implements StoreInterface
     {
         $path = $this->getPath($this->getCacheKey($request).'.lck');
         if (!is_dir(dirname($path)) && false === @mkdir(dirname($path), 0777, true)) {
-          return false;
+            return false;
         }
 
         $lock = @fopen($path, 'x');
-        if ($lock !== false) {
+        if (false !== $lock) {
             fclose($lock);
 
             $this->locks[] = $path;

@@ -141,6 +141,16 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($process->isRunning());
     }
 
+    public function testGetPid()
+    {
+        $process = new Process('php -r "sleep(1);"');
+        $this->assertNull($process->getPid());
+        $process->start();
+        $this->assertGreaterThan(0, $process->getPid());
+        $process->wait();
+        $this->assertNull($process->getPid());
+    }
+
     public function testStop()
     {
         $process = new Process('php -r "while (true) {}"');

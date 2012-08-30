@@ -540,6 +540,18 @@ class Process
     }
 
     /**
+     * Return the Pid (process id), if applicable
+     *
+     * @return integer|null The process id if running, null otherwise
+     */
+    public function getPid()
+    {
+        $this->updateStatus();
+
+        return $this->isRunning() ? $this->processInformation['pid'] : null;
+    }
+
+    /**
      * Stops the process.
      *
      * @param float $timeout The timeout in seconds

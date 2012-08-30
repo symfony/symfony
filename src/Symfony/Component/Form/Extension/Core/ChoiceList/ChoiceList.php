@@ -261,7 +261,7 @@ class ChoiceList implements ChoiceListInterface
     {
         // Add choices to the nested buckets
         foreach ($choices as $group => $choice) {
-            if (!isset($labels[$group])) {
+            if (!isset($labels[$group]) && (null !== $labels[$groups])) {
                 throw new \InvalidArgumentException('The structures of the choices and labels array do not match.');
             }
 

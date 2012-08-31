@@ -23,7 +23,8 @@ class RouteCompiler implements RouteCompilerInterface
     /**
      * {@inheritDoc}
      *
-     * @throws \LogicException If a variable is referenced more than once
+     * @throws \LogicException If a variable is referenced more than once or if a required variable
+     *                         has a default value that doesn't meet its own requirement.
      */
     public function compile(Route $route)
     {
@@ -67,14 +68,23 @@ class RouteCompiler implements RouteCompilerInterface
             $tokens[] = array('text', substr($pattern, $pos));
         }
 
-        // find the first optional token
+        // find the first optional token and validate the default values for non-optional variables
+        $optional = true;
         $firstOptional = INF;
         for ($i = count($tokens) - 1; $i >= 0; $i--) {
             $token = $tokens[$i];
             if ('variable' === $token[0] && $route->hasDefault($token[3])) {
-                $firstOptional = $i;
+                if ($optional) {
+                    $firstOptional = $i;
+                } elseif (!preg_match('#^'.$token[2].'$#', $route->getDefault($token[3]))) {
+                    throw new \LogicException(sprintf('The default value "%s" of the required variable "%s" in pattern "%s" does not match the requirement "%s". ' .
+                        'This route definition makes no sense because this default can neither be used as default for generating URLs nor can it ever be returned by the matching process. ' .
+                        'You should change the default to something that meets the requirement or remove it.',
+                        $route->getDefault($token[3]), $token[3], $route->getPattern(), $token[2]
+                    ));
+                }
             } else {
-                break;
+                $optional = false;
             }
         }
 

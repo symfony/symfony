@@ -106,7 +106,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Returns the parent node.
      *
-     * @return NodeParentInterface The builder of the parent node
+     * @return NodeParentInterface|NodeDefinition|NodeBuilder The builder of the parent node
      */
     public function end()
     {

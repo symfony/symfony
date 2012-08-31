@@ -31,4 +31,21 @@ class MoneyTypeTest extends LocalizedTestCase
         $view = $form->createView();
         $this->assertTrue((Boolean) strstr($view->vars['money_pattern'], '¥'));
     }
+
+    /**
+     * Because of the bug, the money type will cache the first result of the
+	 * first request and return it on the second request with another currency.
+	 */
+    public function testMoneyPatternCacheBug()
+    {
+        \Locale::setDefault('lv_LV');
+
+        $form = $this->factory->create('money', null, array('currency' => 'JPY'));
+        $view = $form->createView();
+        $this->assertTrue((Boolean) strstr($view->vars['money_pattern'], '¥'));
+
+        $form = $this->factory->create('money', null, array('currency' => 'EUR'));
+        $view = $form->createView();
+		$this->assertSame('{{ widget }} €', $view->vars['money_pattern']);
+    }
 }

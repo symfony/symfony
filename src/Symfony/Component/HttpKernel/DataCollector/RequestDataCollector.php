@@ -39,25 +39,9 @@ class RequestDataCollector extends DataCollector
             $responseHeaders['Set-Cookie'] = $cookies;
         }
 
-        $attributeStringifier = function (&$attributes, $key, $value) use (&$attributeStringifier) {
-            if (is_object($value)) {
-                $attributes[$key] = sprintf('Object(%s)', get_class($value));
-                if (is_callable(array($value, '__toString'))) {
-                    $attributes[$key] .= sprintf(' = %s', (string) $value);
-                }
-            } else if (is_array($value) || $value instanceof \Traversable) {
-                $attributes[$key] = array();
-                foreach ($value as $k => $v) {
-                    $attributeStringifier($attributes[$key], $k, $v);
-                }
-            } else {
-                $attributes[$key] = $value;
-            }
-        };
-
         $attributes = array();
         foreach ($request->attributes->all() as $key => $value) {
-            $attributeStringifier($attributes, $key, $value);
+            $attributes[$key] = $this->attributeStringifier($value);
         }
 
         $content = null;
@@ -186,5 +170,31 @@ class RequestDataCollector extends DataCollector
         }
 
         return $cookie;
+    }
+
+
+    /**
+     * Performs a deep conversion of the $value to a string representation.
+     *
+     * @param  mixed $value
+     * @return string|array
+     */
+    private function attributeStringifier($value)
+    {
+        if (is_object($value)) {
+            $result = sprintf('Object(%s)', get_class($value));
+            if (is_callable(array($value, '__toString'))) {
+                $result .= sprintf(' = %s', (string) $value);
+            }
+        } else if (is_array($value) || $value instanceof \Traversable) {
+            $result = array();
+            foreach ($value as $k => $v) {
+                $result[$k] = $this->attributeStringifier($v);
+            }
+        } else {
+            $result = $value;
+        }
+
+        return $result;
     }
 }

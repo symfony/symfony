@@ -181,15 +181,15 @@ class RequestDataCollector extends DataCollector
      */
     private function attributeStringifier($value)
     {
-        if (is_object($value)) {
-            $result = sprintf('Object(%s)', get_class($value));
-            if (is_callable(array($value, '__toString'))) {
-                $result .= sprintf(' = %s', (string) $value);
-            }
-        } else if (is_array($value) || $value instanceof \Traversable) {
+        if (is_array($value) || $value instanceof \Traversable) {
             $result = array();
             foreach ($value as $k => $v) {
                 $result[$k] = $this->attributeStringifier($v);
+            }
+        } else if (is_object($value)) {
+            $result = sprintf('Object(%s)', get_class($value));
+            if (is_callable(array($value, '__toString'))) {
+                $result .= sprintf(' = %s', (string) $value);
             }
         } else {
             $result = $value;

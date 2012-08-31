@@ -186,7 +186,7 @@ class RequestDataCollector extends DataCollector
             foreach ($value as $k => $v) {
                 $result[$k] = $this->attributeStringifier($v);
             }
-        } else if (is_object($value)) {
+        } elseif (is_object($value)) {
             $result = sprintf('Object(%s)', get_class($value));
             if (is_callable(array($value, '__toString'))) {
                 $result .= sprintf(' = %s', (string) $value);

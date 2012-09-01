@@ -173,4 +173,10 @@ EOF;
     {
         ClassCollectionLoader::load(array('SomeNotExistingClass'), '', 'foo', false);
     }
+
+    public function testLoadTwiceClass()
+    {
+        ClassCollectionLoader::load(array('Foo'), '', 'foo', false);
+        ClassCollectionLoader::load(array('Foo'), '', 'foo', false);
+    }
 }

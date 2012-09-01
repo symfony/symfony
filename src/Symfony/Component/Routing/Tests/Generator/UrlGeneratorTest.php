@@ -277,6 +277,17 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/app.php/foo', $this->getGenerator($routes)->generate('test', array('default' => 'foo')));
     }
 
+    public function testUrlWithDefaultIncluded()
+    {
+        $routes = $this->getRoutes('test', new Route('/index.{_format}', array('_format' => 'html'), array('_format' => '.*')));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/index.html', $generator->generate('test', array('_format' => 'html')), 'parameter that equals default is included when explicitly given');
+        $this->assertSame('/app.php/index', $generator->generate('test'), 'the default is not included when param not given');
+        $this->assertSame('/app.php/index', $generator->generate('test', array('_format' => null)), 'null for an optional variable is ignored');
+        $this->assertSame('/app.php/index.', $generator->generate('test', array('_format' => '')), 'empty string is treated as-is (the requirement allows it)');
+    }
+
     public function testQueryParamSameAsDefault()
     {
         $routes = $this->getRoutes('test', new Route('/test', array('default' => 'value')));

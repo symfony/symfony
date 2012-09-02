@@ -18,6 +18,28 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class DialogHelperTest extends \PHPUnit_Framework_TestCase
 {
+    public function testSelect()
+    {
+        $dialog = new DialogHelper();
+
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $dialog->setHelperSet($helperSet);
+
+        $heroes = array('Superman', 'Batman', 'Putin');
+
+        $dialog->setInputStream($this->getInputStream("\n1\n"));
+        $this->assertEquals('2', $dialog->select($this->getOutputStream(), 'What superhero rocks?', $heroes, '2'));
+        $this->assertEquals('1', $dialog->select($this->getOutputStream(), 'What superhero rocks?', $heroes));
+
+        $dialog->setInputStream($this->getInputStream("\n1\n"));
+        $this->assertEquals('Putin', $dialog->select($this->getOutputStream(), 'What superhero rocks?', $heroes, '2', array(
+            'return' => 'value'
+        )));
+        $this->assertEquals('Batman', $dialog->select($this->getOutputStream(), 'What superhero rocks?', $heroes, null, array(
+            'return' => 'value'
+        )));
+    }
+
     public function testAsk()
     {
         $dialog = new DialogHelper();

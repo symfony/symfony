@@ -23,6 +23,60 @@ class DialogHelper extends Helper
     private $inputStream;
 
     /**
+     * Asks to select array value to the user.
+     *
+     * @param OutputInterface $output   An Output instance
+     * @param string|array    $question The question to ask
+     * @param array           $choices  List of choices to pick from
+     * @param Boolean         $default  The default answer if the user enters nothing
+     * @param array           $options  Display options:
+     *                                      'attempts' - Max number of times to ask before giving up (false by default,
+     *                                                  which means infinite)
+     *                                      'error_template' - Message which will be shown if invalid value from choice
+     *                                                  list would be picked. Defaults to "Value '%s' is not in provided
+     *                                                  in choice list"
+     *                                      'return' - What should be returned from choice list - 'key' or 'value'
+     *
+     * @return mixed
+     */
+    public function select(OutputInterface $output, $question, $choices, $default = null, array $options = array())
+    {
+        $options = array_merge(array(
+            'attempts' => false,
+            'error_template' => "Value '%s' is not in provided in choice list",
+            'return' => 'key'
+        ), $options);
+
+        $width = 0;
+        foreach (array_keys($choices) as $key) {
+            $width = strlen($key) > $width ? strlen($key) : $width;
+        }
+        $width += 2;
+
+        $messages = array();
+        $messages[] = "<comment>$question</comment>";
+        foreach($choices as $key => $value) {
+            $messages[] = sprintf("  <info>%-${width}s</info> %s", $key, $value);
+        }
+
+        $messages = join(PHP_EOL, $messages);
+        $output->writeln($messages);
+
+        $result = $this->askAndValidate($output, '> ', function($picked) use($choices, $options)
+        {
+            if (empty($choices[$picked])) {
+                throw new \InvalidArgumentException(sprintf($options['error_template'], $picked));
+            }
+            return $picked;
+        }, $options['attempts'], $default);
+
+        switch($options['return']) {
+            case 'key': return $result;
+            case 'value': return $choices[$result];
+        }
+    }
+
+    /**
      * Asks a question to the user.
      *
      * @param OutputInterface $output   An Output instance

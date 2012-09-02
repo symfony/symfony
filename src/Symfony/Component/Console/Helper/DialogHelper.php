@@ -47,14 +47,10 @@ class DialogHelper extends Helper
             'return' => 'key'
         ), $options);
 
-        $width = 0;
-        foreach (array_keys($choices) as $key) {
-            $width = strlen($key) > $width ? strlen($key) : $width;
-        }
-        $width += 2;
+        $width = max(array_map('strlen', array_keys($heroes))) + 2;
 
         $messages = array();
-        $messages[] = "<comment>$question</comment>";
+        $messages[] = "<question>$question</question>";
         foreach($choices as $key => $value) {
             $messages[] = sprintf("  <info>%-${width}s</info> %s", $key, $value);
         }
@@ -67,6 +63,7 @@ class DialogHelper extends Helper
             if (empty($choices[$picked])) {
                 throw new \InvalidArgumentException(sprintf($options['error_template'], $picked));
             }
+            
             return $picked;
         }, $options['attempts'], $default);
 

@@ -47,7 +47,7 @@ class DialogHelper extends Helper
             'return' => 'key'
         ), $options);
 
-        $width = max(array_map('strlen', array_keys($heroes))) + 2;
+        $width = max(array_map('strlen', array_keys($choices))) + 2;
 
         $messages = array();
         $messages[] = "<question>$question</question>";

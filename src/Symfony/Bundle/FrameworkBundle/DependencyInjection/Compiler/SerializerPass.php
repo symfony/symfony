@@ -38,13 +38,15 @@ class SerializerPass implements CompilerPassInterface
         $container->getDefinition('serializer')->replaceArgument(1, $encoders);
     }
 
-    private function findAndSortTaggedServices($tag, $container)
+    private function findAndSortTaggedServices($tag_name, $container)
     {
         // Find tagged services
         $servs = array();
-        foreach ($container->findTaggedServiceIds($tag) as $serviceId => $value) {
-            $priority = isset($value[0]['priority']) ? $value[0]['priority'] : 0;
-            $servs[$priority][] = new Reference($serviceId);
+        foreach ($container->findTaggedServiceIds($tag_name) as $serviceId => $tags) {
+            foreach($tags as $tag) {
+                $priority = isset($tag['priority']) ? $tag['priority'] : 0;
+                $servs[$priority][] = new Reference($serviceId);
+            }
         }
 
         // Sort them
@@ -53,7 +55,7 @@ class SerializerPass implements CompilerPassInterface
         // Flatten the array
         $services = array();
         array_walk_recursive($servs, function($a) use (&$services) { $services[] = $a; });
-        
+
         return $services;
     }
 }

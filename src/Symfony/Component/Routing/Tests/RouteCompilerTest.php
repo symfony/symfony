@@ -123,10 +123,10 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with nested placeholders',
                 array('/{static{var}static}'),
-                '/{stati', '#^/\{static(?<var>[^cs]+)static\}$#s', array('var'), array(
+                '/{static', '#^/\{static(?<var>[^/]+)static\}$#s', array('var'), array(
                 array('text', 'static}'),
-                array('variable', 'c', '[^cs]+', 'var'),
-                array('text', '/{stati'),
+                array('variable', '', '[^/]+', 'var'),
+                array('text', '/{static'),
             )),
 
             array(

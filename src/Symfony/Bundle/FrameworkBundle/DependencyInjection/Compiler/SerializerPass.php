@@ -30,21 +30,30 @@ class SerializerPass implements CompilerPassInterface
         }
 
         // Looks for all the services tagged "serializer.normalizer" and adds them to the Serializer service
-        $normalizers = array();
-        
-        foreach ($container->findTaggedServiceIds('serializer.normalizer') as $serviceId => $tag) {
-            $normalizers[] = new Reference($serviceId);
-        }
-
+        $normalizers = $this->findAndSortTaggedServices('serializer.normalizer', $container);
         $container->getDefinition('serializer')->replaceArgument(0, $normalizers);
 
         // Looks for all the services tagged "serializer.encoders" and adds them to the Serializer service
-        $encoders = array();
+        $encoders = $this->findAndSortTaggedServices('serializer.encoder', $container);
+        $container->getDefinition('serializer')->replaceArgument(1, $encoders);
+    }
 
-        foreach ($container->findTaggedServiceIds('serializer.encoder') as $serviceId => $tag) {
-            $encoders[] = new Reference($serviceId);
+    private function findAndSortTaggedServices($tag, $container)
+    {
+        // Find tagged services
+        $servs = array();
+        foreach ($container->findTaggedServiceIds($tag) as $serviceId => $value) {
+            $priority = isset($value[0]['priority']) ? $value[0]['priority'] : 0;
+            $servs[$priority][] = new Reference($serviceId);
         }
 
-        $container->getDefinition('serializer')->replaceArgument(1, $encoders);
+        // Sort them
+        krsort($servs);
+
+        // Flatten the array
+        $services = array();
+        array_walk_recursive($servs, function($a) use (&$services) { $services[] = $a; });
+        
+        return $services;
     }
 }

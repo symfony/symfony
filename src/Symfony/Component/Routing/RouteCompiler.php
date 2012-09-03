@@ -22,6 +22,13 @@ class RouteCompiler implements RouteCompilerInterface
     const REGEX_DELIMITER = '#';
 
     /**
+     * This string defines the characters that are automatically considered separators in front of
+     * optional placeholders (with default and no static text following). Such a single separator
+     * can be left out together with the optional placeholder from matching and generating URLs.
+     */
+    const SEPARATORS = '/,;.:-_~+*=@|';
+
+    /**
      * {@inheritDoc}
      *
      * @throws \LogicException If a variable is referenced more than once
@@ -34,7 +41,7 @@ class RouteCompiler implements RouteCompilerInterface
         $variables = array();
         $matches = array();
         $pos = 0;
-        $lastSeparator = '';
+        $lastSeparator = '/';
 
         // match all variables enclosed in "{}" and iterate over them
         // but we only want to match the innermost variable in case of nested "{}", e.g. {foo{bar}}
@@ -45,13 +52,17 @@ class RouteCompiler implements RouteCompilerInterface
             $precedingText = substr($pattern, $pos, $match[0][1] - $pos);
             $pos = $match[0][1] + strlen($match[0][0]);
             $precedingChar = strlen($precedingText) > 0 ? substr($precedingText, -1) : ''; // substr could otherwise return false
+            $isSeparator = '' !== $precedingChar && false !== strpos(static::SEPARATORS, $precedingChar);
 
-            if (strlen($precedingText) > 1) {
+            if ($isSeparator && strlen($precedingText) > 1) {
                 $this->addTextToken($tokens, substr($precedingText, 0, -1));
+            } elseif (!$isSeparator && strlen($precedingText) > 0) {
+                $this->addTextToken($tokens, $precedingText);
             }
+
             // use the character preceding the variable as a separator
             // save it for later use as default separator for variables that follow directly without having a preceding char e.g. "/{x}{y}"
-            if ('' !== $precedingChar) {
+            if ($isSeparator) {
                 $lastSeparator = $precedingChar;
             }
 
@@ -68,7 +79,7 @@ class RouteCompiler implements RouteCompilerInterface
                 $regexp = sprintf('[^%s]+', preg_quote($lastSeparator !== $nextSeparator ? $lastSeparator.$nextSeparator : $lastSeparator, self::REGEX_DELIMITER));
             }
 
-            $tokens[] = array('variable', $precedingChar, $regexp, $varName);
+            $tokens[] = array('variable', $isSeparator ? $precedingChar : '', $regexp, $varName);
             $variables[] = $varName;
         }
 
@@ -122,7 +133,7 @@ class RouteCompiler implements RouteCompilerInterface
      *
      * @param string $pattern The route pattern
      *
-     * @return string The next static character (or empty string when none available)
+     * @return string The next static character that functions as separator (or empty string when none available)
      */
     private function findNextSeparator($pattern)
     {
@@ -133,7 +144,7 @@ class RouteCompiler implements RouteCompilerInterface
         // first remove all placeholders from the pattern so we can find the next real static character
         $pattern = preg_replace('#\{\w+\}#', '', $pattern);
 
-        return isset($pattern[0]) ? $pattern[0] : '';
+        return isset($pattern[0]) && false !== strpos(static::SEPARATORS, $pattern[0]) ? $pattern[0] : '';
     }
 
     /**

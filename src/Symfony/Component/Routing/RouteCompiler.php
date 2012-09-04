@@ -29,6 +29,12 @@ class RouteCompiler implements RouteCompilerInterface
     const SEPARATORS = '/,;.:-_~+*=@|';
 
     /**
+     * The default requirement as regular expression for each variable in the pattern when no custom
+     * requirement is specified.
+     */
+    const DEFAULT_REQUIREMENT = '[^/]+';
+
+    /**
      * {@inheritDoc}
      *
      * @throws \LogicException If a variable is referenced more than once
@@ -36,23 +42,26 @@ class RouteCompiler implements RouteCompilerInterface
     public function compile(Route $route)
     {
         $pattern = $route->getPattern();
-        $len = strlen($pattern);
         $tokens = array();
         $variables = array();
         $matches = array();
         $pos = 0;
-        $lastSeparator = '/';
 
         // match all variables enclosed in "{}" and iterate over them
         // but we only want to match the innermost variable in case of nested "{}", e.g. {foo{bar}}
         // this in ensured because \w does not match "{" or "}" itself
         preg_match_all('#\{\w+\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
         foreach ($matches as $match) {
+            $varName = substr($match[0][0], 1, -1);
             // get all static text preceding the current variable
             $precedingText = substr($pattern, $pos, $match[0][1] - $pos);
             $pos = $match[0][1] + strlen($match[0][0]);
             $precedingChar = strlen($precedingText) > 0 ? substr($precedingText, -1) : ''; // substr could otherwise return false
             $isSeparator = '' !== $precedingChar && false !== strpos(static::SEPARATORS, $precedingChar);
+
+            if (in_array($varName, $variables)) {
+                throw new \LogicException(sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $pattern, $varName));
+            }
 
             if ($isSeparator && strlen($precedingText) > 1) {
                 $this->addTextToken($tokens, substr($precedingText, 0, -1));
@@ -60,30 +69,16 @@ class RouteCompiler implements RouteCompilerInterface
                 $this->addTextToken($tokens, $precedingText);
             }
 
-            // use the character preceding the variable as a separator
-            // save it for later use as default separator for variables that follow directly without having a preceding char e.g. "/{x}{y}"
-            if ($isSeparator) {
-                $lastSeparator = $precedingChar;
-            }
-
-            $varName = substr($match[0][0], 1, -1);
-
-            if (in_array($varName, $variables)) {
-                throw new \LogicException(sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $pattern, $varName));
-            }
-
             $regexp = $route->getRequirement($varName);
             if ('' == $regexp) {
-                // use the character following the variable (ignoring other placeholders) as a separator when it's not the same as the preceding separator
-                $nextSeparator = $this->findNextSeparator(substr($pattern, $pos));
-                $regexp = sprintf('[^%s]+', preg_quote($lastSeparator !== $nextSeparator ? $lastSeparator.$nextSeparator : $lastSeparator, self::REGEX_DELIMITER));
+                $regexp = static::DEFAULT_REQUIREMENT;
             }
 
             $tokens[] = array('variable', $isSeparator ? $precedingChar : '', $regexp, $varName);
             $variables[] = $varName;
         }
 
-        if ($pos < $len) {
+        if ($pos < strlen($pattern)) {
             $this->addTextToken($tokens, substr($pattern, $pos));
         }
 
@@ -126,25 +121,6 @@ class RouteCompiler implements RouteCompilerInterface
         } else {
             $tokens[] = array('text', $text);
         }
-    }
-
-    /**
-     * Returns the next static character in the Route pattern that will serve as a separator.
-     *
-     * @param string $pattern The route pattern
-     *
-     * @return string The next static character that functions as separator (or empty string when none available)
-     */
-    private function findNextSeparator($pattern)
-    {
-        if ('' == $pattern) {
-            // return empty string if pattern is empty (or false which can be returned by substr)
-            return '';
-        }
-        // first remove all placeholders from the pattern so we can find the next real static character
-        $pattern = preg_replace('#\{\w+\}#', '', $pattern);
-
-        return isset($pattern[0]) && false !== strpos(static::SEPARATORS, $pattern[0]) ? $pattern[0] : '';
     }
 
     /**

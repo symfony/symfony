@@ -108,8 +108,8 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with a variable in last position',
                 array('/foo-{bar}'),
-                '/foo', '#^/foo\-(?<bar>[^\-]+)$#s', array('bar'), array(
-                array('variable', '-', '[^\-]+', 'bar'),
+                '/foo', '#^/foo\-(?<bar>[^/]+)$#s', array('bar'), array(
+                array('variable', '-', '[^/]+', 'bar'),
                 array('text', '/foo'),
             )),
 
@@ -125,20 +125,20 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route without separator between variables',
                 array('/{w}{x}{y}{z}.', array('z' => 'z'), array('y' => '(y|Y)')),
-                '', '#^/(?<w>[^/\.]+)(?<x>[^/\.]+)(?<y>(y|Y))(?<z>[^/\.]+)\.$#s', array('w', 'x', 'y', 'z'), array(
+                '', '#^/(?<w>[^/]+)(?<x>[^/]+)(?<y>(y|Y))(?<z>[^/]+)\.$#s', array('w', 'x', 'y', 'z'), array(
                 array('text', '.'),
-                array('variable', '', '[^/\.]+', 'z'),
+                array('variable', '', '[^/]+', 'z'),
                 array('variable', '', '(y|Y)', 'y'),
-                array('variable', '', '[^/\.]+', 'x'),
-                array('variable', '/', '[^/\.]+', 'w'),
+                array('variable', '', '[^/]+', 'x'),
+                array('variable', '/', '[^/]+', 'w'),
             )),
 
             array(
                 'Route with a format',
                 array('/foo/{bar}.{_format}'),
-                '/foo', '#^/foo/(?<bar>[^/\.]+)\.(?<_format>[^\.]+)$#s', array('bar', '_format'), array(
-                array('variable', '.', '[^\.]+', '_format'),
-                array('variable', '/', '[^/\.]+', 'bar'),
+                '/foo', '#^/foo/(?<bar>[^/]+)\.(?<_format>[^/]+)$#s', array('bar', '_format'), array(
+                array('variable', '.', '[^/]+', '_format'),
+                array('variable', '/', '[^/]+', 'bar'),
                 array('text', '/foo'),
             )),
         );

@@ -144,4 +144,23 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
         // irrelevant for both matching and generating URLs.
         $route->compile();
     }
+
+    /**
+     * @dataProvider getNumericVariableNames
+     * @expectedException \DomainException
+     */
+    public function testRouteWithNumericVariableName($name)
+    {
+        $route = new Route('/{'. $name . '}');
+        $route->compile();
+    }
+
+    public function getNumericVariableNames()
+    {
+        return array(
+           array('09'),
+           array('123'),
+           array('1e2')
+        );
+    }
 }

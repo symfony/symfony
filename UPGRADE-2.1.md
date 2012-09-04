@@ -161,7 +161,7 @@
 
   * The custom factories for the firewall configuration are now
     registered during the build method of bundles instead of being registered
-    by the end-user. This means that you will you need to remove the 'factories'
+    by the end-user. This means that you will need to remove the 'factories'
     keys in your security configuration.
 
     Before:

@@ -25,6 +25,22 @@ class RedirectResponseTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRedirectResponseConstructorNullUrl()
+    {
+        $response = new RedirectResponse(null);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRedirectResponseConstructorWrongStatusCode()
+    {
+        $response = new RedirectResponse('foo.bar', 404);
+    }
+
     public function testGenerateLocationHeader()
     {
         $response = new RedirectResponse('foo.bar');
@@ -46,6 +62,15 @@ class RedirectResponseTest extends \PHPUnit_Framework_TestCase
         $response->setTargetUrl('baz.beep');
 
         $this->assertEquals('baz.beep', $response->getTargetUrl());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetTargetUrlNull()
+    {
+        $response = new RedirectResponse('foo.bar');
+        $response->setTargetUrl(null);
     }
 
     public function testCreate()

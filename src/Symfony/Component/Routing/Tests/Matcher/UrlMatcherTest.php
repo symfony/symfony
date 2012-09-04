@@ -223,6 +223,16 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'text1-text2-text3', 'bar' => 'text4', '_route' => 'test'), $matcher->match('/text1-text2-text3-text4-'));
     }
 
+    public function testOptionalVariableWithNoRealSeparator()
+    {
+        $coll = new RouteCollection();
+        $coll->add('test', new Route('/get{what}', array('what' => 'All')));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+
+        $this->assertEquals(array('what' => 'All', '_route' => 'test'), $matcher->match('/get'));
+        $this->assertEquals(array('what' => 'Sites', '_route' => 'test'), $matcher->match('/getSites'));
+    }
+
     /**
      * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
      */

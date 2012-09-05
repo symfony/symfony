@@ -214,6 +214,15 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testDefaultRequirementForOptionalVariables()
+    {
+        $coll = new RouteCollection();
+        $coll->add('test', new Route('/{page}.{_format}', array('page' => 'index', '_format' => 'html')));
+
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $this->assertEquals(array('page' => 'my-page', '_format' => 'xml', '_route' => 'test'), $matcher->match('/my-page.xml'));
+    }
+
     public function testMatchingIsEager()
     {
         $coll = new RouteCollection();

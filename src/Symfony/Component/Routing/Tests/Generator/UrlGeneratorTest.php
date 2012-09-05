@@ -207,14 +207,6 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($generator->generate('test', array('foo' => 'bar'), true));
     }
 
-    public function testGenerateForRouteWithInvalidParameterButDisabledRequirementsCheck()
-    {
-        $routes = $this->getRoutes('test', new Route('/testing/{foo}', array('foo' => '1'), array('foo' => 'd+')));
-        $generator = $this->getGenerator($routes);
-        $generator->setStrictRequirements(null);
-        $this->assertSame('/app.php/testing/bar', $generator->generate('test', array('foo' => 'bar')));
-    }
-
     /**
      * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
      */

@@ -131,17 +131,6 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
     {
         $route = new Route('/{name}/{name}');
 
-        $route->compile();
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testRouteWithRequiredVariableAndBadDefault()
-    {
-        $route = new Route('/{foo}/', array('foo' => null));
-        // It should raise an exception when compiling this route because the given default value is absolutely
-        // irrelevant for both matching and generating URLs.
-        $route->compile();
+        $compiled = $route->compile();
     }
 }

@@ -75,13 +75,13 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \LogicException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
      */
     public function testRelativeUrlWithNullParameterButNotOptional()
     {
         $routes = $this->getRoutes('test', new Route('/testing/{foo}/bar', array('foo' => null)));
-        // It should raise an exception when compiling this route because the given default value is absolutely
-        // irrelevant for both matching and generating URLs.
+        // This must raise an exception because the default requirement for "foo" is "[^/]+" which is not met with these params.
+        // Generating path "/testing//bar" would be wrong as matching this route would fail.
         $this->getGenerator($routes)->generate('test', array(), false);
     }
 

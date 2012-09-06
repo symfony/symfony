@@ -17,6 +17,7 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
  * Translator.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Stefano Rodriguez <stefano.rodriguez@fubles.com>
  *
  * @api
  */

@@ -15,6 +15,7 @@ namespace Symfony\Component\Translation;
  * MessageSelector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Stefano Rodriguez <stefano.rodriguez@fubles.com>
  *
  * @api
  */

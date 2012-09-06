@@ -19,9 +19,9 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/http-foundation": "2.1.*",
-        "symfony/locale": "2.1.*",
-        "symfony/yaml": "2.1.*"
+        "symfony/http-foundation": "2.2.*",
+        "symfony/locale": "2.2.*",
+        "symfony/yaml": "2.2.*"
     },
     "suggest": {
         "doctrine/common": ">=2.1,<2.4-dev",
@@ -35,7 +35,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.2-dev"
         }
     }
 }

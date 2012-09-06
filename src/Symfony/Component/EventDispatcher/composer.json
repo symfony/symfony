@@ -19,7 +19,7 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/dependency-injection": "2.1.*"
+        "symfony/dependency-injection": "2.2.*"
     },
     "suggest": {
         "symfony/dependency-injection": "self.version",
@@ -32,7 +32,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.2-dev"
         }
     }
 }

@@ -17,13 +17,13 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/event-dispatcher": "2.1.*",
-        "symfony/locale": "2.1.*",
-        "symfony/options-resolver": "2.1.*"
+        "symfony/event-dispatcher": "2.2.*",
+        "symfony/locale": "2.2.*",
+        "symfony/options-resolver": "2.2.*"
     },
     "require-dev": {
-        "symfony/validator": "2.1.*",
-        "symfony/http-foundation": "2.1.*"
+        "symfony/validator": "2.2.*",
+        "symfony/http-foundation": "2.2.*"
     },
     "suggest": {
         "symfony/validator": "self.version",
@@ -36,7 +36,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.2-dev"
         }
     }
 }

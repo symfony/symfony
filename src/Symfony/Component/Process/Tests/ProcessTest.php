@@ -155,6 +155,15 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testRestart()
+    {
+      $process1 = new Process('php -r "echo getmypid();"');
+      $process1->run();
+      $process2 = $process1->restart();
+      usleep(300000); // wait for output
+      $this->assertNotEquals($process1->getOutput(), $process2->getOutput());
+    }
+
     public function testPhpDeadlock()
     {
         $this->markTestSkipped('Can course php to hang');

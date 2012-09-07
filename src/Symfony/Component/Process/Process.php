@@ -579,6 +579,18 @@ class Process
         return $this->exitcode;
     }
 
+    /**
+     * Send signal to the process.
+     *
+     * @param int $signal Signal to send to process.
+     *
+     * @return Boolean The terminations status of the process.
+     */
+    public function signal($signal)
+    {
+      return proc_terminate($this->process, $signal);
+    }
+
     public function addOutput($line)
     {
         $this->stdout .= $line;

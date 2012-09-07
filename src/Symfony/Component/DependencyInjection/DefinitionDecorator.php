@@ -26,7 +26,7 @@ class DefinitionDecorator extends Definition
     /**
      * Constructor.
      *
-     * @param Definition $parent The Definition instance to decorate.
+     * @param string $parent The id of Definition instance to decorate.
      *
      * @api
      */
@@ -41,7 +41,7 @@ class DefinitionDecorator extends Definition
     /**
      * Returns the Definition being decorated.
      *
-     * @return Definition
+     * @return string
      *
      * @api
      */
@@ -155,6 +155,8 @@ class DefinitionDecorator extends Definition
      * @param integer $index
      *
      * @return mixed The argument value
+     *
+     * @throws \OutOfBoundsException When the argument does not exist
      *
      * @api
      */

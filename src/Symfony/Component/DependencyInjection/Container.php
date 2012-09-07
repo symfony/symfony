@@ -135,7 +135,7 @@ class Container implements ContainerInterface
      *
      * @return mixed  The parameter value
      *
-     * @throws  \InvalidArgumentException if the parameter is not defined
+     * @throws \InvalidArgumentException if the parameter is not defined
      *
      * @api
      */
@@ -177,6 +177,9 @@ class Container implements ContainerInterface
      * @param string $id      The service identifier
      * @param object $service The service instance
      * @param string $scope   The scope of the service
+     *
+     * @throws \RuntimeException When trying to set a service in an inactive scope
+     * @throws \InvalidArgumentException When trying to set a service in the prototype scope
      *
      * @api
      */
@@ -226,7 +229,8 @@ class Container implements ContainerInterface
      *
      * @return object The associated service
      *
-     * @throws \InvalidArgumentException if the service is not defined
+     * @throws ServiceCircularReferenceException When a circular reference is detected
+     * @throws ServiceNotFoundException When the service is not defined
      *
      * @see Reference
      *
@@ -287,7 +291,8 @@ class Container implements ContainerInterface
      *
      * @param string $name
      *
-     * @return void
+     * @throws \RuntimeException When the parent scope is inactive
+     * @throws \InvalidArgumentException When the scope does not exist
      *
      * @api
      */
@@ -333,8 +338,6 @@ class Container implements ContainerInterface
      *
      * @param string $name The name of the scope to leave
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException if the scope is not active
      *
      * @api
@@ -374,7 +377,7 @@ class Container implements ContainerInterface
      *
      * @param ScopeInterface $scope
      *
-     * @return void
+     * @throws \InvalidArgumentException When the scope is invalid
      *
      * @api
      */

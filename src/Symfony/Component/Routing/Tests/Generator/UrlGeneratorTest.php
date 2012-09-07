@@ -148,6 +148,18 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/app.php/testing/bar', $url);
     }
 
+    public function testGlobalParameterHasHigherPriorityThanDefault()
+    {
+        $routes = $this->getRoutes('test', new Route('/{_locale}', array('_locale' => 'en')));
+        $generator = $this->getGenerator($routes);
+        $context = new RequestContext('/app.php');
+        $context->setParameter('_locale', 'de');
+        $generator->setContext($context);
+        $url = $generator->generate('test', array());
+
+        $this->assertSame('/app.php/de', $url);
+    }
+
     /**
      * @expectedException Symfony\Component\Routing\Exception\RouteNotFoundException
      */

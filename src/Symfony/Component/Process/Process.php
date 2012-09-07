@@ -680,6 +680,8 @@ class Process
 
     public function getStatus()
     {
+        $this->updateStatus();
+
         return $this->status;
     }
 
@@ -695,6 +697,8 @@ class Process
 
     public function isTerminated()
     {
+        $this->updateStatus();
+
         return $this->status == self::STATUS_TERMINATED;
     }
 

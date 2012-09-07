@@ -318,8 +318,8 @@ class Process
     /**
      * Restarts the process by cloning and invoking start().
      *
-     * @param Closure|string|array $callback A PHP callback to run whenever there is some
-     *                                       output available on STDOUT or STDERR
+     * @param callable $callback A PHP callback to run whenever there is some
+     *                           output available on STDOUT or STDERR
      *
      * @return Process The new process.
      *

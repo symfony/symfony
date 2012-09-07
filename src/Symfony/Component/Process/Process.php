@@ -557,25 +557,21 @@ class Process
     /**
      * Send a posix signal to the process
      *
-     * @param  integer $sig A valid posix signal (see http://www.php.net/manual/en/pcntl.constants.php)
+     * @param  integer $signal A valid posix signal (see http://www.php.net/manual/en/pcntl.constants.php)
      * @return Process
      *
      * @throws LogicException   In case the process is not running
      * @throws RuntimeException In case the environment does not support posix signals
      * @throws RuntimeException In case of failure
      */
-    public function sendSignal($sig)
+    public function signal($signal)
     {
         if (!$this->isRunning()) {
             throw new LogicException('Can not send signal on a non running process');
         }
 
-        if (!extension_loaded('posix')) {
-            throw new RuntimeException('Posix extension is required to send signals');
-        }
-
-        if (true !== posix_kill($this->getPid(), $sig)) {
-            throw new RuntimeException(sprintf('Error while sending signal : %s', posix_strerror(posix_get_last_error())));
+        if (true !== proc_terminate($this->process, $signal)) {
+            throw new RuntimeException('Error while sending signal');
         }
 
         return $this;

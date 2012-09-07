@@ -335,6 +335,7 @@ class Process
 
         $process = clone $this;
         $process->start($callback);
+
         return $process;
     }
 

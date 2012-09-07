@@ -12,6 +12,7 @@
 namespace Symfony\Component\Process\Tests;
 
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
@@ -139,6 +140,53 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($process->isRunning());
         $process->wait();
         $this->assertFalse($process->isRunning());
+    }
+
+    public function testGetPid()
+    {
+        $process = new Process('php -r "sleep(1);"');
+        $this->assertNull($process->getPid());
+        $process->start();
+        $this->assertGreaterThan(0, $process->getPid());
+        $process->wait();
+        $this->assertNull($process->getPid());
+    }
+
+    public function testSendSignal()
+    {
+        $process = new Process('php -r "sleep(1);');
+        $process->start();
+        $process->sendSignal(SIGCONT);
+        $process->stop();
+    }
+
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function testSendKillSignal()
+    {
+        $process = new Process('php -r "sleep(1);');
+        $process->start();
+        $process->sendSignal(SIGKILL);
+        $process->wait();
+    }
+
+    public function testSendKillSignalAndCatch()
+    {
+        $process = new Process('php -r "sleep(1);');
+        $process->start();
+        $process->sendSignal(SIGKILL);
+
+        try {
+            $process->wait();
+            $this->fail('Should throw an exception as the signal stops the process');
+        } catch (RuntimeException $e) {
+
+        }
+
+        $this->assertFalse($process->isRunning());
+        $this->assertTrue($process->hasBeenSignaled());
+        $this->assertEquals(SIGKILL, $process->getTermSignal());
     }
 
     public function testStop()

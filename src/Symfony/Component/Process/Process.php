@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\Exception\RuntimeException;
+
 /**
  * Process is a thin wrapper around proc_* functions to ease
  * start independent PHP processes.
@@ -361,7 +364,7 @@ class Process
         }
         $this->updateStatus();
         if ($this->processInformation['signaled']) {
-            throw new \RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->processInformation['stopsig']));
+            throw new RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->processInformation['stopsig']));
         }
 
         $time = 0;
@@ -537,6 +540,41 @@ class Process
         $this->updateStatus();
 
         return $this->processInformation['running'];
+    }
+
+    /**
+     * Return the Pid (process id), if applicable
+     *
+     * @return integer|null The process id if running, null otherwise
+     */
+    public function getPid()
+    {
+        $this->updateStatus();
+
+        return $this->isRunning() ? $this->processInformation['pid'] : null;
+    }
+
+    /**
+     * Send a posix signal to the process
+     *
+     * @param  integer $signal A valid posix signal (see http://www.php.net/manual/en/pcntl.constants.php)
+     * @return Process
+     *
+     * @throws LogicException   In case the process is not running
+     * @throws RuntimeException In case the environment does not support posix signals
+     * @throws RuntimeException In case of failure
+     */
+    public function signal($signal)
+    {
+        if (!$this->isRunning()) {
+            throw new LogicException('Can not send signal on a non running process');
+        }
+
+        if (true !== proc_terminate($this->process, $signal)) {
+            throw new RuntimeException('Error while sending signal');
+        }
+
+        return $this;
     }
 
     /**

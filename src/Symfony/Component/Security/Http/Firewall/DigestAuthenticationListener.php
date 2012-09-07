@@ -141,11 +141,12 @@ class DigestData
     public function __construct($header)
     {
         $this->header = $header;
-        $parts = preg_split('/, /', $header);
+        preg_match_all('/(\w+)=("([^"]+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);
         $this->elements = array();
-        foreach ($parts as $part) {
-            list($key, $value) = explode('=', $part);
-            $this->elements[$key] = '"' === $value[0] ? substr($value, 1, -1) : $value;
+        foreach ($matches as $matche) {
+            if (isset($matche[1]) && isset($matche[3])) {
+                $this->elements[$matche[1]] = isset($matche[4]) ? $matche[4] : $matche[3];
+            }
         }
     }
 
@@ -188,7 +189,7 @@ class DigestData
         $this->nonceExpiryTime = $nonceTokens[0];
 
         if (md5($this->nonceExpiryTime.':'.$entryPointKey) !== $nonceTokens[1]) {
-            new BadCredentialsException(sprintf('Nonce token compromised "%s".', $nonceAsPlainText));
+            throw new BadCredentialsException(sprintf('Nonce token compromised "%s".', $nonceAsPlainText));
         }
     }
 

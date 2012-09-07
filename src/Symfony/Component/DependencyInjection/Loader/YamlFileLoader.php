@@ -83,8 +83,6 @@ class YamlFileLoader extends FileLoader
      *
      * @param array  $content
      * @param string $file
-     *
-     * @return void
      */
     private function parseImports($content, $file)
     {
@@ -103,8 +101,6 @@ class YamlFileLoader extends FileLoader
      *
      * @param array  $content
      * @param string $file
-     *
-     * @return void
      */
     private function parseDefinitions($content, $file)
     {
@@ -124,7 +120,7 @@ class YamlFileLoader extends FileLoader
      * @param array  $service
      * @param string $file
      *
-     * @return void
+     * @throws InvalidArgumentException When tags are invalid
      */
     private function parseDefinition($id, $service, $file)
     {
@@ -319,8 +315,6 @@ class YamlFileLoader extends FileLoader
      * Loads from Extensions
      *
      * @param array $content
-     *
-     * @return void
      */
     private function loadFromExtensions($content)
     {

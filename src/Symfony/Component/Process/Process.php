@@ -678,6 +678,26 @@ class Process
         $this->enhanceWindowsCompatibility = (Boolean) $enhance;
     }
 
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * Checks if the process has been started with no regard to current state.
+     *
+     * @return Boolean true if status is started or terminated, false otherwise
+     */
+    public function isStarted()
+    {
+        return $this->status != self::STATUS_READY;
+    }
+
+    public function isTerminated()
+    {
+        return $this->status == self::STATUS_TERMINATED;
+    }
+
     /**
      * Builds up the callback used by wait().
      *

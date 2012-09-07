@@ -145,17 +145,16 @@ class Process
 
     public function __clone()
     {
-        unset($this->exitcode);
-        unset($this->fallbackExitcode);
-        unset($this->processInformation);
-        unset($this->stdout);
-        unset($this->stderr);
-        unset($this->pipes);
-        unset($this->process);
-        unset($this->fileHandles);
-        unset($this->readBytes);
-
+        $this->exitcode = null;
+        $this->fallbackExitcode = null;
+        $this->processInformation = null;
+        $this->stdout = null;
+        $this->stderr = null;
+        $this->pipes = null;
+        $this->process = null;
         $this->status = self::STATUS_READY;
+        $this->fileHandles = null;
+        $this->readBytes = null;
     }
 
     /**

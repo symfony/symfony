@@ -108,16 +108,36 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with a variable in last position',
                 array('/foo-{bar}'),
-                '/foo', '#^/foo\-(?<bar>[^\-]+)$#s', array('bar'), array(
-                array('variable', '-', '[^\-]+', 'bar'),
+                '/foo', '#^/foo\-(?<bar>[^/]+)$#s', array('bar'), array(
+                array('variable', '-', '[^/]+', 'bar'),
                 array('text', '/foo'),
+            )),
+
+            array(
+                'Route with nested placeholders',
+                array('/{static{var}static}'),
+                '/{static', '#^/\{static(?<var>[^/]+)static\}$#s', array('var'), array(
+                array('text', 'static}'),
+                array('variable', '', '[^/]+', 'var'),
+                array('text', '/{static'),
+            )),
+
+            array(
+                'Route without separator between variables',
+                array('/{w}{x}{y}{z}.{_format}', array('z' => 'default-z', '_format' => 'html'), array('y' => '(y|Y)')),
+                '', '#^/(?<w>[^/\.]+)(?<x>[^/\.]+)(?<y>(y|Y))(?:(?<z>[^/\.]+)(?:\.(?<_format>[^/]+))?)?$#s', array('w', 'x', 'y', 'z', '_format'), array(
+                array('variable', '.', '[^/]+', '_format'),
+                array('variable', '', '[^/\.]+', 'z'),
+                array('variable', '', '(y|Y)', 'y'),
+                array('variable', '', '[^/\.]+', 'x'),
+                array('variable', '/', '[^/\.]+', 'w'),
             )),
 
             array(
                 'Route with a format',
                 array('/foo/{bar}.{_format}'),
-                '/foo', '#^/foo/(?<bar>[^/\.]+)\.(?<_format>[^\.]+)$#s', array('bar', '_format'), array(
-                array('variable', '.', '[^\.]+', '_format'),
+                '/foo', '#^/foo/(?<bar>[^/\.]+)\.(?<_format>[^/]+)$#s', array('bar', '_format'), array(
+                array('variable', '.', '[^/]+', '_format'),
                 array('variable', '/', '[^/\.]+', 'bar'),
                 array('text', '/foo'),
             )),

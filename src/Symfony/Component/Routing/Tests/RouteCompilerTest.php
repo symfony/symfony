@@ -115,8 +115,8 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with a variable in last position',
                 array('/foo-{bar}'),
-                '/foo', '#^/foo\-(?<bar>[^\-]+)$#s', array('bar'), array(
-                array('variable', '-', '[^\-]+', 'bar'),
+                '/foo', '#^/foo\-(?<bar>[^/]+)$#s', array('bar'), array(
+                array('variable', '-', '[^/]+', 'bar'),
                 array('text', '/foo'),
             )),
 
@@ -132,8 +132,8 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route without separator between variables',
                 array('/{w}{x}{y}{z}.{_format}', array('z' => 'default-z', '_format' => 'html'), array('y' => '(y|Y)')),
-                '', '#^/(?<w>[^/\.]+)(?<x>[^/\.]+)(?<y>(y|Y))(?:(?<z>[^/\.]+)(?:\.(?<_format>[^\.]+))?)?$#s', array('w', 'x', 'y', 'z', '_format'), array(
-                array('variable', '.', '[^\.]+', '_format'),
+                '', '#^/(?<w>[^/\.]+)(?<x>[^/\.]+)(?<y>(y|Y))(?:(?<z>[^/\.]+)(?:\.(?<_format>[^/]+))?)?$#s', array('w', 'x', 'y', 'z', '_format'), array(
+                array('variable', '.', '[^/]+', '_format'),
                 array('variable', '', '[^/\.]+', 'z'),
                 array('variable', '', '(y|Y)', 'y'),
                 array('variable', '', '[^/\.]+', 'x'),
@@ -143,8 +143,8 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with a format',
                 array('/foo/{bar}.{_format}'),
-                '/foo', '#^/foo/(?<bar>[^/\.]+)\.(?<_format>[^\.]+)$#s', array('bar', '_format'), array(
-                array('variable', '.', '[^\.]+', '_format'),
+                '/foo', '#^/foo/(?<bar>[^/\.]+)\.(?<_format>[^/]+)$#s', array('bar', '_format'), array(
+                array('variable', '.', '[^/]+', '_format'),
                 array('variable', '/', '[^/\.]+', 'bar'),
                 array('text', '/foo'),
             )),

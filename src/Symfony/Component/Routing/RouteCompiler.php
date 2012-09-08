@@ -42,7 +42,6 @@ class RouteCompiler implements RouteCompilerInterface
         $variables = array();
         $matches = array();
         $pos = 0;
-        $lastSeparator = '/';
 
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
@@ -68,17 +67,18 @@ class RouteCompiler implements RouteCompilerInterface
                 $tokens[] = array('text', $precedingText);
             }
 
-            // use the character preceding the variable as a separator
-            // save it for later use as default separator for variables that follow directly without having a preceding char e.g. "/{x}{y}"
-            if ($isSeparator) {
-                $lastSeparator = $precedingChar;
-            }
-
             $regexp = $route->getRequirement($varName);
             if (null === $regexp) {
-                // use the character following the variable (ignoring other placeholders) as a separator when it's not the same as the preceding separator
-                $nextSeparator = $this->findNextSeparator(substr($pattern, $pos));
-                $regexp = sprintf('[^%s]+', preg_quote($lastSeparator !== $nextSeparator ? $lastSeparator.$nextSeparator : $lastSeparator, self::REGEX_DELIMITER));
+                $followingPattern = (string) substr($pattern, $pos);
+                // Find the next static character after the variable that functions as a separator. By default, this separator and '/'
+                // are disallowed for the variable. This default requirement makes sure that optional variables can be matched at all
+                // and that the generating-matching-combination of URLs unambiguous, i.e. the params used for generating the URL are
+                // the same that will be matched. Example: new Route('/{page}.{_format}', array('_format' => 'html'))
+                // If {page} would also match the separating dot, {_format} would never match as {page} will eagerly consume everything.
+                // Also even if {_format} was not optional the requirement prevents that {page} matches something that was originally
+                // part of {_format} when generating the URL, e.g. _format = 'mobile.html'.
+                $nextSeparator = $this->findNextSeparator($followingPattern);
+                $regexp = sprintf('[^/%s]+', '/' !== $nextSeparator && '' !== $nextSeparator ? preg_quote($nextSeparator, self::REGEX_DELIMITER) : '');
             }
 
             $tokens[] = array('variable', $isSeparator ? $precedingChar : '', $regexp, $varName);

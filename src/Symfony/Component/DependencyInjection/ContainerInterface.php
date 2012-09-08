@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+
 /**
  * ContainerInterface is the interface implemented by service container classes.
  *
@@ -46,7 +49,8 @@ interface ContainerInterface
      *
      * @return object The associated service
      *
-     * @throws \InvalidArgumentException if the service is not defined
+     * @throws ServiceCircularReferenceException When a circular reference is detected
+     * @throws ServiceNotFoundException When the service is not defined
      *
      * @see Reference
      *
@@ -72,7 +76,7 @@ interface ContainerInterface
      *
      * @return mixed  The parameter value
      *
-     * @throws  \InvalidArgumentException if the parameter is not defined
+     * @throws \InvalidArgumentException if the parameter is not defined
      *
      * @api
      */
@@ -104,8 +108,6 @@ interface ContainerInterface
      *
      * @param string $name
      *
-     * @return void
-     *
      * @api
      */
     public function enterScope($name);
@@ -115,8 +117,6 @@ interface ContainerInterface
      *
      * @param string $name
      *
-     * @return void
-     *
      * @api
      */
     public function leaveScope($name);
@@ -125,8 +125,6 @@ interface ContainerInterface
      * Adds a scope to the container
      *
      * @param ScopeInterface $scope
-     *
-     * @return void
      *
      * @api
      */

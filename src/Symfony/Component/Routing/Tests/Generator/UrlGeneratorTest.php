@@ -285,6 +285,33 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('/app.php/getSitesSuffix', $generator->generate('test', array('what' => 'Sites')));
     }
 
+    public function testDefaultRequirementOfVariable()
+    {
+        $routes = $this->getRoutes('test', new Route('/{page}.{_format}'));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/index.mobile.html', $generator->generate('test', array('page' => 'index', '_format' => 'mobile.html')));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
+     */
+    public function testDefaultRequirementOfVariableDisallowsSlash()
+    {
+        $routes = $this->getRoutes('test', new Route('/{page}.{_format}'));
+        $this->getGenerator($routes)->generate('test', array('page' => 'index', '_format' => 'sl/ash'));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
+     */
+    public function testDefaultRequirementOfVariableDisallowsNextSeparator()
+    {
+
+        $routes = $this->getRoutes('test', new Route('/{page}.{_format}'));
+        $this->getGenerator($routes)->generate('test', array('page' => 'do.t', '_format' => 'html'));
+    }
+
     protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)
     {
         $context = new RequestContext('/app.php');

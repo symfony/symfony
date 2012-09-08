@@ -276,6 +276,39 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('what' => 'Sites', '_route' => 'test'), $matcher->match('/getSitesSuffix'));
     }
 
+    public function testDefaultRequirementOfVariable()
+    {
+        $coll = new RouteCollection();
+        $coll->add('test', new Route('/{page}.{_format}'));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+
+        $this->assertEquals(array('page' => 'index', '_format' => 'mobile.html', '_route' => 'test'), $matcher->match('/index.mobile.html'));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testDefaultRequirementOfVariableDisallowsSlash()
+    {
+        $coll = new RouteCollection();
+        $coll->add('test', new Route('/{page}.{_format}'));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+
+        $matcher->match('/index.sl/ash');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testDefaultRequirementOfVariableDisallowsNextSeparator()
+    {
+        $coll = new RouteCollection();
+        $coll->add('test', new Route('/{page}.{_format}', array(), array('_format' => 'html|xml')));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+
+        $matcher->match('/do.t.html');
+    }
+
     /**
      * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
      */

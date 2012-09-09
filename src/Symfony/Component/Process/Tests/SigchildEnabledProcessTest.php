@@ -78,6 +78,22 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function testSignal()
+    {
+        parent::testSignal();
+    }
+    
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function testProcessWithoutTermSignalIsNotSignaled()
+    {
+        parent::testProcessWithoutTermSignalIsNotSignaled();
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())

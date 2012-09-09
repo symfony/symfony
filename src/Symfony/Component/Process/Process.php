@@ -12,6 +12,7 @@
 namespace Symfony\Component\Process;
 
 use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -477,15 +478,39 @@ class Process
     public function getPid()
     {
         if ($this->isSigchildEnabled()) {
-            throw new RuntimeException(
-                'This PHP has been compiled with --enable-sigchild.'
-                . ' The process identifier can not be retrieved.'
-            );
+            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. The process identifier can not be retrieved.');
         }
 
         $this->updateStatus();
 
         return $this->isRunning() ? $this->processInformation['pid'] : null;
+    }
+
+    /**
+     * Sends a posix signal to the process.
+     *
+     * @param  integer $signal A valid posix signal (see http://www.php.net/manual/en/pcntl.constants.php)
+     * @return Process
+     *
+     * @throws LogicException   In case the process is not running
+     * @throws RuntimeException In case --enable-sigchild is activated
+     * @throws RuntimeException In case of failure
+     */
+    public function signal($signal)
+    {
+        if (!$this->isRunning()) {
+            throw new LogicException('Can not send signal on a non running process.');
+        }
+
+        if ($this->isSigchildEnabled()) {
+            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. The process can not be signaled.');
+        }
+
+        if (true !== @proc_terminate($this->process, $signal)) {
+            throw new RuntimeException(sprintf('Error while sending signal `%d`.', $signal));
+        }
+
+        return $this;
     }
 
     /**
@@ -735,12 +760,13 @@ class Process
      * Stops the process.
      *
      * @param integer|float $timeout The timeout in seconds
+     * @param integer       $signal  A posix signal to send in case the process has not stop at timeout, default is SIGKILL
      *
      * @return integer The exit-code of the process
      *
      * @throws RuntimeException if the process got signaled
      */
-    public function stop($timeout = 10)
+    public function stop($timeout = 10, $signal = null)
     {
         $timeoutMicro = (int) $timeout*1E6;
         if ($this->isRunning()) {
@@ -751,8 +777,10 @@ class Process
                 usleep(1000);
             }
 
-            if (!defined('PHP_WINDOWS_VERSION_BUILD') && $this->isRunning()) {
-                proc_terminate($this->process, SIGKILL);
+            if ($this->isRunning() && !$this->isSigchildEnabled()) {
+                if (null !== $signal || defined('SIGKILL')) {
+                    $this->signal($signal ?: SIGKILL);
+                }
             }
 
             foreach ($this->pipes as $pipe) {

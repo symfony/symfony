@@ -45,12 +45,52 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
         parent::testProcessWithoutTermSignal();
     }
 
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function testGetPid()
+    {
+        parent::testGetPid();
+    }
+
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function testGetPidIsNullBeforeStart()
+    {
+        parent::testGetPidIsNullBeforeStart();
+    }
+
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function testGetPidIsNullAfterRun()
+    {
+        parent::testGetPidIsNullAfterRun();
+    }
+
     public function testExitCodeText()
     {
         $process = $this->getProcess('qdfsmfkqsdfmqmsd');
         $process->run();
 
         $this->assertInternalType('string', $process->getExitCodeText());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function testSignal()
+    {
+        parent::testSignal();
+    }
+    
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function testProcessWithoutTermSignalIsNotSignaled()
+    {
+        parent::testProcessWithoutTermSignalIsNotSignaled();
     }
 
     /**

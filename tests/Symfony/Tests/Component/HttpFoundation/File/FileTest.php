@@ -91,6 +91,41 @@ class FileTest extends \PHPUnit_Framework_TestCase
         @unlink($targetPath);
     }
 
+    public function getFilenameFixtures()
+    {
+        return array(
+            array('original.gif', 'original.gif'),
+            array('..\\..\\original.gif', 'original.gif'),
+            array('../../original.gif', 'original.gif'),
+            array('файлfile.gif', 'файлfile.gif'),
+            array('..\\..\\файлfile.gif', 'файлfile.gif'),
+            array('../../файлfile.gif', 'файлfile.gif'),
+        );
+    }
+
+    /**
+     * @dataProvider getFilenameFixtures
+     */
+    public function testMoveWithNonLatinName($filename, $sanitizedFilename)
+    {
+        $path = __DIR__.'/Fixtures/'.$sanitizedFilename;
+        $targetDir = __DIR__.'/Fixtures/directory/';
+        $targetPath = $targetDir.$sanitizedFilename;
+        @unlink($path);
+        @unlink($targetPath);
+        copy(__DIR__.'/Fixtures/test.gif', $path);
+
+        $file = new File($path);
+        $movedFile = $file->move($targetDir,$filename);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);
+
+        $this->assertTrue(file_exists($targetPath));
+        $this->assertFalse(file_exists($path));
+        $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
+
+        @unlink($targetPath);
+    }
+
     public function testMoveToAnUnexistentDirectory()
     {
         $sourcePath = __DIR__.'/Fixtures/test.copy.gif';

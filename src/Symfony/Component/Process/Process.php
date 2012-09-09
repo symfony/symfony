@@ -468,6 +468,27 @@ class Process
     }
 
     /**
+     * Returns the Pid (process identifier), if applicable.
+     *
+     * @return integer|null The process id if running, null otherwise
+     *
+     * @throws RuntimeException In case --enable-sigchild is activated
+     */
+    public function getPid()
+    {
+        if ($this->isSigchildEnabled()) {
+            throw new RuntimeException(
+                'This PHP has been compiled with --enable-sigchild.'
+                . ' The process identifier can not be retrieved.'
+            );
+        }
+
+        $this->updateStatus();
+
+        return $this->isRunning() ? $this->processInformation['pid'] : null;
+    }
+
+    /**
      * Returns the current output of the process (STDOUT).
      *
      * @return string The process output

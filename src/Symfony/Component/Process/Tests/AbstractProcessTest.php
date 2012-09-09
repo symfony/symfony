@@ -387,6 +387,27 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertLessThan($timeout + $precision, $duration);
     }
 
+    public function testGetPid()
+    {
+        $process = $this->getProcess('php -r "sleep(1);"');
+        $process->start();
+        $this->assertGreaterThan(0, $process->getPid());
+        $process->stop();
+    }
+
+    public function testGetPidIsNullBeforeStart()
+    {
+        $process = $this->getProcess('php -r "sleep(1);"');
+        $this->assertNull($process->getPid());
+    }
+
+    public function testGetPidIsNullAfterRun()
+    {
+        $process = $this->getProcess('php -m');
+        $process->run();
+        $this->assertNull($process->getPid());
+    }
+
     public function responsesCodeProvider()
     {
         return array(

@@ -64,6 +64,30 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
+    public function testGetPid()
+    {
+        parent::testGetPid();
+    }
+
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function testGetPidIsNullBeforeStart()
+    {
+        parent::testGetPidIsNullBeforeStart();
+    }
+
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function testGetPidIsNullAfterRun()
+    {
+        parent::testGetPidIsNullAfterRun();
+    }
+
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     */
     public function testExitCodeText()
     {
         $process = $this->getProcess('qdfsmfkqsdfmqmsd');

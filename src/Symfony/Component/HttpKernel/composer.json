@@ -31,12 +31,12 @@
         "symfony/routing": "2.1.*"
     },
     "suggest": {
-        "symfony/browser-kit": "self.version",
-        "symfony/class-loader": "self.version",
-        "symfony/config": "self.version",
-        "symfony/console": "self.version",
-        "symfony/dependency-injection": "self.version",
-        "symfony/finder": "self.version"
+        "symfony/browser-kit": "2.1.*",
+        "symfony/class-loader": "2.1.*",
+        "symfony/config": "2.1.*",
+        "symfony/console": "2.1.*",
+        "symfony/dependency-injection": "2.1.*",
+        "symfony/finder": "2.1.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\HttpKernel": "" }

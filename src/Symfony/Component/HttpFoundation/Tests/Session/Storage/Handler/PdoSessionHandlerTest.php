@@ -60,4 +60,19 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $storage->gc(-1);
         $this->assertEquals(0, count($this->pdo->query('SELECT * FROM sessions')->fetchAll()));
     }
+
+    public function testEncoding()
+    {
+        $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'sessions'), array());
+
+        $storage->write('foo', 'bar');    
+        $result = $this->pdo->query('SELECT * FROM sessions')->fetchAll();
+        $this->assertEquals(base64_encode('bar'), $result[0]['sess_data']);
+
+        $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'sessions', 'base64_encode' => false), array());
+
+        $storage->write('foo', 'bar');    
+        $result = $this->pdo->query('SELECT * FROM sessions')->fetchAll();
+        $this->assertEquals('bar', $result[0]['sess_data']);
+    }
 }

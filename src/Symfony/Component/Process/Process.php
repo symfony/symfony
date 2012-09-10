@@ -153,8 +153,8 @@ class Process
      * The STDOUT and STDERR are also available after the process is finished
      * via the getOutput() and getErrorOutput() methods.
      *
-     * @param Closure|string|array $callback A PHP callback to run whenever there is some
-     *                                       output available on STDOUT or STDERR
+     * @param callable $callback A PHP callback to run whenever there is some
+     *                           output available on STDOUT or STDERR
      *
      * @return integer The exit status code
      *
@@ -184,8 +184,8 @@ class Process
      * with true as a second parameter then the callback will get all data occurred
      * in (and since) the start call.
      *
-     * @param Closure|string|array $callback A PHP callback to run whenever there is some
-     *                                       output available on STDOUT or STDERR
+     * @param callable $callback A PHP callback to run whenever there is some
+     *                           output available on STDOUT or STDERR
      *
      * @throws \RuntimeException When process can't be launch or is stopped
      * @throws \RuntimeException When process is already running
@@ -307,7 +307,7 @@ class Process
      * from the output in real-time while writing the standard input to the process.
      * It allows to have feedback from the independent process during execution.
      *
-     * @param mixed $callback A valid PHP callback
+     * @param callable $callback A valid PHP callback
      *
      * @return int The exitcode of the process
      *
@@ -684,7 +684,7 @@ class Process
      * The callbacks adds all occurred output to the specific buffer and calls
      * the user callback (if present) with the received output.
      *
-     * @param mixed $callback The user defined PHP callback
+     * @param callable $callback The user defined PHP callback
      *
      * @return mixed A PHP callable
      */
@@ -746,7 +746,7 @@ class Process
     /**
      * Handles the windows file handles fallbacks
      *
-     * @param mixed $callback A valid PHP callback
+     * @param callable $callback A valid PHP callback
      * @param Boolean $closeEmptyHandles if true, handles that are empty will be assumed closed
      */
     private function processFileHandles($callback, $closeEmptyHandles = false)

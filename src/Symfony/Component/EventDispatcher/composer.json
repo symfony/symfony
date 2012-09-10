@@ -22,8 +22,8 @@
         "symfony/dependency-injection": "2.2.*"
     },
     "suggest": {
-        "symfony/dependency-injection": "self.version",
-        "symfony/http-kernel": "self.version"
+        "symfony/dependency-injection": "2.1.*",
+        "symfony/http-kernel": "2.1.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\EventDispatcher": "" }

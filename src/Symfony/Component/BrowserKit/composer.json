@@ -24,7 +24,7 @@
         "symfony/css-selector": "2.2.*"
     },
     "suggest": {
-        "symfony/process": "self.version"
+        "symfony/process": "2.1.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\BrowserKit": "" }

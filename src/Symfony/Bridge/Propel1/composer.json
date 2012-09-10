@@ -17,9 +17,9 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/http-foundation": "self.version",
-        "symfony/http-kernel": "self.version",
-        "symfony/form": "self.version",
+        "symfony/http-foundation": "2.1.*",
+        "symfony/http-kernel": "2.1.*",
+        "symfony/form": "2.1.*",
         "propel/propel1": "1.6.*"
     },
     "autoload": {

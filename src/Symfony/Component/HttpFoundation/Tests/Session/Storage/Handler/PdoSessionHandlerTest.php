@@ -61,6 +61,9 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, count($this->pdo->query('SELECT * FROM sessions')->fetchAll()));
     }
 
+    /**
+     * This tests disabling the base64_encoding option.
+     */
     public function testEncoding()
     {
         $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'sessions'), array());

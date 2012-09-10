@@ -144,9 +144,9 @@ class PdoSessionHandler implements \SessionHandlerInterface
             if (count($sessionRows) == 1) {
                 if ($this->dbOptions['base64_encode']) {
                     return base64_decode($sessionRows[0][0]);
-                } else {
-                    return $sessionRows[0][0];
-                }  
+                } 
+                
+                return $sessionRows[0][0]; 
             }
 
             // session does not exist, create it

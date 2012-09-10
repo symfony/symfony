@@ -135,7 +135,7 @@ class ParameterBag implements ParameterBagInterface
      */
     public function remove($key)
     {
-        unset($this->parameters[$key]);
+        unset($this->parameters[strtolower($key)]);
     }
 
     /**

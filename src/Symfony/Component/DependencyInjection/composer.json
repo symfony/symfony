@@ -23,8 +23,8 @@
         "symfony/config": "2.2.*"
     },
     "suggest": {
-        "symfony/yaml": "2.1.*",
-        "symfony/config": "2.1.*"
+        "symfony/yaml": "2.2.*",
+        "symfony/config": "2.2.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\DependencyInjection": "" }

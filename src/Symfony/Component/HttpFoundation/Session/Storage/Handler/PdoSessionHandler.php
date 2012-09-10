@@ -51,9 +51,10 @@ class PdoSessionHandler implements \SessionHandlerInterface
 
         $this->pdo = $pdo;
         $this->dbOptions = array_merge(array(
-            'db_id_col'   => 'sess_id',
-            'db_data_col' => 'sess_data',
-            'db_time_col' => 'sess_time',
+            'db_id_col'     => 'sess_id',
+            'db_data_col'   => 'sess_data',
+            'db_time_col'   => 'sess_time',
+            'base64_encode' => true,
         ), $dbOptions);
     }
 
@@ -141,7 +142,11 @@ class PdoSessionHandler implements \SessionHandlerInterface
             $sessionRows = $stmt->fetchAll(\PDO::FETCH_NUM);
 
             if (count($sessionRows) == 1) {
-                return base64_decode($sessionRows[0][0]);
+                if ($this->dbOptions['base64_encode']) {
+                    return base64_decode($sessionRows[0][0]);
+                } 
+                
+                return $sessionRows[0][0]; 
             }
 
             // session does not exist, create it
@@ -164,8 +169,12 @@ class PdoSessionHandler implements \SessionHandlerInterface
         $dbIdCol   = $this->dbOptions['db_id_col'];
         $dbTimeCol = $this->dbOptions['db_time_col'];
 
-        //session data can contain non binary safe characters so we need to encode it
-        $encoded = base64_encode($data);
+        if ($this->dbOptions['base64_encode']) {
+            //session data can contain non binary safe characters so we need to encode it
+            $encoded = base64_encode($data);
+        } else {
+            $encoded = $data;
+        }
 
         try {
             if ('mysql' === $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
@@ -218,8 +227,13 @@ class PdoSessionHandler implements \SessionHandlerInterface
 
         $sql = "INSERT INTO $dbTable ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, :time)";
 
-        //session data can contain non binary safe characters so we need to encode it
-        $encoded = base64_encode($data);
+        if ($this->dbOptions['base64_encode']) {
+            //session data can contain non binary safe characters so we need to encode it
+            $encoded = base64_encode($data);
+        } else {
+            $encoded = $data;
+        }
+        
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
         $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);

@@ -91,6 +91,13 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 )),
 
             array(
+                'Route with a requirement of 0',
+                array('/{bar}', array('bar' => null), array('bar' => '0')),
+                '', '#^/(?<bar>0)?$#s', array('bar'), array(
+                    array('variable', '/', '0', 'bar'),
+                )),
+
+            array(
                 'Route with an optional variable as the first segment with requirements',
                 array('/{bar}', array('bar' => 'bar'), array('bar' => '(foo|bar)')),
                 '', '#^/(?<bar>(foo|bar))?$#s', array('bar'), array(

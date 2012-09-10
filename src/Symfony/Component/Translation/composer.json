@@ -23,8 +23,8 @@
         "symfony/yaml": "2.1.*"
     },
     "suggest": {
-        "symfony/config": "self.version",
-        "symfony/yaml": "self.version"
+        "symfony/config": "2.1.*",
+        "symfony/yaml": "2.1.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Translation": "" }

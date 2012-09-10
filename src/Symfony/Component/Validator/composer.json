@@ -25,8 +25,8 @@
     },
     "suggest": {
         "doctrine/common": ">=2.1,<2.4-dev",
-        "symfony/http-foundation": "self.version",
-        "symfony/yaml": "self.version"
+        "symfony/http-foundation": "2.1.*",
+        "symfony/yaml": "2.1.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Validator": "" }

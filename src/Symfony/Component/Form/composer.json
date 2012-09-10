@@ -26,8 +26,8 @@
         "symfony/http-foundation": "2.2.*"
     },
     "suggest": {
-        "symfony/validator": "2.1.*",
-        "symfony/http-foundation": "2.1.*"
+        "symfony/validator": "2.2.*",
+        "symfony/http-foundation": "2.2.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Form": "" }

@@ -17,24 +17,24 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/dependency-injection" : "2.1.*",
-        "symfony/config" : "2.1.*",
-        "symfony/event-dispatcher": "2.1.*",
-        "symfony/http-kernel": "2.1.*",
-        "symfony/filesystem": "2.1.*",
-        "symfony/routing": "2.1.*",
-        "symfony/templating": "2.1.*",
-        "symfony/translation": "2.1.*",
+        "symfony/dependency-injection" : "2.2.*",
+        "symfony/config" : "2.2.*",
+        "symfony/event-dispatcher": "2.2.*",
+        "symfony/http-kernel": "2.2.*",
+        "symfony/filesystem": "2.2.*",
+        "symfony/routing": "2.2.*",
+        "symfony/templating": "2.2.*",
+        "symfony/translation": "2.2.*",
         "doctrine/common": ">=2.2,<2.4-dev"
     },
     "require-dev": {
-        "symfony/finder": "2.1.*"
+        "symfony/finder": "2.2.*"
     },
     "suggest": {
-        "symfony/console": "2.1.*",
-        "symfony/finder": "2.1.*",
-        "symfony/form": "2.1.*",
-        "symfony/validator": "2.1.*"
+        "symfony/console": "2.2.*",
+        "symfony/finder": "2.2.*",
+        "symfony/form": "2.2.*",
+        "symfony/validator": "2.2.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\FrameworkBundle": "" }

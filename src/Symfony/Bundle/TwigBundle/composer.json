@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/twig-bridge": "2.1.*"
+        "symfony/twig-bridge": "2.2.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\TwigBundle": "" }

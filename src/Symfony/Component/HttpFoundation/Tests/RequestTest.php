@@ -45,6 +45,46 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $request->headers->get('FOO'), '->initialize() takes an array of HTTP headers as its fourth argument');
     }
 
+    public function testClone()
+    {
+        $request = new Request();
+        $requestClone = clone $request;
+        $this->assertEquals($request, $requestClone);
+    }
+
+    public function testGetLocale()
+    {
+        $request = new Request();
+        $request->setLocale('pl');
+        $locale = $request->getLocale();
+        $this->assertEquals('pl', $locale);
+    }
+
+    public function testIsNoCache()
+    {
+        $request = new Request();
+        $isNoCache = $request->isNoCache();
+
+        $this->assertFalse($isNoCache);
+    }
+
+    public function testGetContentType()
+    {
+        $request = new Request();
+        $contentType = $request->getContentType();
+
+        $this->assertNull($contentType);
+    }
+
+    public function testSetDefaultLocale()
+    {
+        $request = new Request();
+        $request->setDefaultLocale('pl');
+        $locale = $request->getLocale();
+
+        $this->assertEquals('pl', $locale);
+    }
+
     /**
      * @covers Symfony\Component\HttpFoundation\Request::create
      */
@@ -975,6 +1015,19 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($request->hasSession());
         $request->setSession(new Session(new MockArraySessionStorage()));
         $this->assertTrue($request->hasSession());
+    }
+
+    public function testGetSession()
+    {
+        $request = new Request();
+
+        $request->setSession(new Session(new MockArraySessionStorage()));
+        $this->assertTrue($request->hasSession());
+
+        $session = $request->getSession();
+        $this->assertObjectHasAttribute('storage', $session);
+        $this->assertObjectHasAttribute('flashName', $session);
+        $this->assertObjectHasAttribute('attributeName', $session);
     }
 
     public function testHasPreviousSession()

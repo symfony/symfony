@@ -640,6 +640,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string     $id         The service identifier
      * @param Definition $definition A Definition instance
      *
+     * @return Definition A Definition instance
+     *
      * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
      * @api

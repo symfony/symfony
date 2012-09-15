@@ -43,6 +43,14 @@
                                     </li>
                                 {% endif %}
                             {% endfor %}
+                            <li class="minimize">
+                                <a href="javascript:void(0);" title="Minimize toolbar" onclick="return minimizeLeftPanels();">
+                                    <span class="label">
+                                        <span class="icon"><img id="minimizePanelIcon" src="{{ asset('bundles/webprofiler/images/profiler/left-arrow.png') }}" alt="" /></span>
+                                        <strong>Minimize</strong>
+                                    </span>
+                                </a>
+                            </li>
                         </ul>
                     {% endif %}
                     {% render 'WebProfilerBundle:Profiler:searchBar' %}
@@ -51,4 +59,71 @@
             </div>
         </div>
     </div>
+
+    <script type="text/javascript">//<![CDATA[
+
+        function minimizeLeftPanels() {
+            var leftIconPath = "{{ asset('bundles/webprofiler/images/profiler/left-arrow.png') }}",
+                rightIconPath = "{{ asset('bundles/webprofiler/images/profiler/right-arrow.png') }}",
+                menuItems = document.getElementById('menu_profiler').getElementsByTagName('LI'),
+                displayState = 'none', elem, cookie = Sfjs.getPreference('menu/displayState');
+
+            if (document.getElementById('minimizePanelIcon').src.indexOf(leftIconPath) == -1) {
+                document.getElementById('navigation').style.width = '250px';
+                document.getElementById('resume').style.marginLeft = '250px';
+                document.getElementById('collector_content').style.marginLeft = '250px';
+                document.getElementById('minimizePanelIcon').src = leftIconPath;
+                displayState = 'block';
+            } else {
+                document.getElementById('navigation').style.width = '60px';
+                document.getElementById('resume').style.marginLeft = '60px';
+                document.getElementById('collector_content').style.marginLeft = '60px';
+                document.getElementById('minimizePanelIcon').src = rightIconPath;
+                displayState = 'none';
+            }
+
+            document.getElementById('searchBar').style.display = displayState;
+            document.getElementById('adminBar').style.display = displayState;
+
+            for (elem in menuItems) {
+                if (typeof(menuItems[elem].getElementsByClassName) !='undefined' &&
+                    menuItems[elem].getElementsByClassName('count').length > 0) {
+                    menuItems[elem].getElementsByClassName('count')[0].style.display = displayState;
+                }
+            }
+
+            Sfjs.setPreference('menu/displayState', displayState);
+
+            try {
+                canvasAutoUpdateOnThresholdChange(null);
+            } catch (err) {
+
+            }
+
+            return false;
+        }
+
+        window.setTimeout(function() {
+            var menuItems = document.getElementById('menu_profiler').getElementsByTagName('LI'),
+                elem, value, child, displayState = Sfjs.getPreference('menu/displayState');
+
+            if (displayState == 'none') {
+                minimizeLeftPanels();
+            }
+
+            for (elem in menuItems) {
+                if (typeof(menuItems[elem].children) != 'undefined' &&
+                    menuItems[elem].children.length > 0) {
+                    child = menuItems[elem].children[0]
+
+                    if (child.getAttribute('title') == '' ||
+                        child.getAttribute('title') == null) {
+                        value = child.text.replace(/^\s+/g, '').split('\n')[0].replace(/\s+$/g, '');
+                        child.setAttribute('title', value);
+                    }
+                }
+            }
+        }, 25);
+
+    //]]></script>
 {% endblock %}

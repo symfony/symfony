@@ -36,6 +36,13 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($route, $route->setPattern(''), '->setPattern() implements a fluent interface');
     }
 
+    public function testAddSingleOption()
+    {
+        $route = new Route('/{foo}');
+        $route->setOption('foo', 'bar');
+        $this->assertSame('bar', $route->getOption('foo'));
+    }
+
     public function testOptions()
     {
         $route = new Route('/{foo}');
@@ -87,6 +94,15 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $route = new Route('/{foo}');
         $route->setRequirement('foo', '^\d+$');
         $this->assertEquals('\d+', $route->getRequirement('foo'), '->setRequirement() removes ^ and $ from the pattern');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testArrayRequirement()
+    {
+        $route = new Route('/{foo}');
+        $route->setRequirement('foo', array('^\d+$'));
     }
 
     public function testCompile()

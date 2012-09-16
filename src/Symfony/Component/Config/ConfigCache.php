@@ -99,7 +99,7 @@ class ConfigCache
             throw new \RuntimeException(sprintf('Unable to write in the %s directory', $dir));
         }
 
-        $tmpFile = tempnam(dirname($this->file), basename($this->file));
+        $tmpFile = tempnam($dir, basename($this->file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $this->file)) {
             @chmod($this->file, 0666 & ~umask());
         } else {
@@ -108,7 +108,7 @@ class ConfigCache
 
         if (null !== $metadata && true === $this->debug) {
             $file = $this->file.'.meta';
-            $tmpFile = tempnam(dirname($file), basename($file));
+            $tmpFile = tempnam($dir, basename($file));
             if (false !== @file_put_contents($tmpFile, serialize($metadata)) && @rename($tmpFile, $file)) {
                 @chmod($file, 0666 & ~umask());
             }

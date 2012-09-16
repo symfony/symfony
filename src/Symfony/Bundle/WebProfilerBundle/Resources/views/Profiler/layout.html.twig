@@ -44,7 +44,7 @@
                                 {% endif %}
                             {% endfor %}
                             <li class="minimize">
-                                <a href="javascript:void(0);" title="Minimize toolbar" onclick="return minimizeLeftPanels();">
+                                <a href="javascript:void(0);" title="Minimize toolbar" onclick="return toggleMenuPanels();">
                                     <span class="label">
                                         <span class="icon"><img id="minimizePanelIcon" src="{{ asset('bundles/webprofiler/images/profiler/left-arrow.png') }}" alt="" /></span>
                                         <strong>Minimize</strong>
@@ -62,37 +62,40 @@
 
     <script type="text/javascript">//<![CDATA[
 
-        function minimizeLeftPanels() {
-            var leftIconPath = "{{ asset('bundles/webprofiler/images/profiler/left-arrow.png') }}",
-                rightIconPath = "{{ asset('bundles/webprofiler/images/profiler/right-arrow.png') }}",
-                menuItems = document.getElementById('menu_profiler').getElementsByTagName('LI'),
-                displayState = 'none', elem, cookie = Sfjs.getPreference('menu/displayState');
+        function toggleMenuPanels(state, doSave) {
+            var leftIconPath = "{{ asset('bundles/webprofiler/images/profiler/left-arrow.png')|e('js') }}",
+                rightIconPath = "{{ asset('bundles/webprofiler/images/profiler/right-arrow.png')|e('js') }}",
+                menu = document.getElementById('navigation'), savedState = Sfjs.getPreference('menu/displayState'),
+                displayState, elem, className;
 
-            if (document.getElementById('minimizePanelIcon').src.indexOf(leftIconPath) == -1) {
-                document.getElementById('navigation').style.width = '250px';
-                document.getElementById('resume').style.marginLeft = '250px';
-                document.getElementById('collector_content').style.marginLeft = '250px';
-                document.getElementById('minimizePanelIcon').src = leftIconPath;
-                displayState = 'block';
-            } else {
-                document.getElementById('navigation').style.width = '60px';
-                document.getElementById('resume').style.marginLeft = '60px';
-                document.getElementById('collector_content').style.marginLeft = '60px';
-                document.getElementById('minimizePanelIcon').src = rightIconPath;
-                displayState = 'none';
+            if (savedState == null) {
+                savedState = 'block';
+            }
+
+            displayState = state || (savedState == 'block' ? 'none' : 'block');
+
+            if (typeof doSave === 'undefined') {
+                doSave = true;
             }
 
             document.getElementById('searchBar').style.display = displayState;
             document.getElementById('adminBar').style.display = displayState;
 
-            for (elem in menuItems) {
-                if (typeof(menuItems[elem].getElementsByClassName) !='undefined' &&
-                    menuItems[elem].getElementsByClassName('count').length > 0) {
-                    menuItems[elem].getElementsByClassName('count')[0].style.display = displayState;
-                }
+            if (displayState == 'block') {
+                Sfjs.removeClass(menu, 'collapsed-menu');
+                Sfjs.removeClass(menu.parentNode.parentNode, 'collapsed-menu-parents');
+
+                document.getElementById('minimizePanelIcon').src = leftIconPath;
+            } else {
+                Sfjs.addClass(menu, 'collapsed-menu');
+                Sfjs.addClass(menu.parentNode.parentNode, 'collapsed-menu-parents');
+
+                document.getElementById('minimizePanelIcon').src = rightIconPath;
             }
 
-            Sfjs.setPreference('menu/displayState', displayState);
+            if (doSave) {
+                Sfjs.setPreference('menu/displayState', displayState);
+            }
 
             try {
                 canvasAutoUpdateOnThresholdChange(null);
@@ -108,7 +111,7 @@
                 elem, value, child, displayState = Sfjs.getPreference('menu/displayState');
 
             if (displayState == 'none') {
-                minimizeLeftPanels();
+                toggleMenuPanels('none', false);
             }
 
             for (elem in menuItems) {

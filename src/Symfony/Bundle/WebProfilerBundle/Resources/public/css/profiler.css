@@ -493,3 +493,20 @@ td.main, td.menu {
     border: 1px solid #999;
     border-width: 1px 0;
 }
+
+.collapsed-menu-parents #resume,
+.collapsed-menu-parents #collector_content {
+    margin-left: 60px !important;
+}
+
+.collapsed-menu {
+    width: 60px !important;
+}
+
+.collapsed-menu span :not(.icon) {
+    display: none !important;
+}
+
+.collapsed-menu span.icon img {
+    display: inline !important;
+}

@@ -34,10 +34,18 @@
             },
 
             getPreference = function(name) {
+                if (!window.localStorage) {
+                    return null;
+                }
+
                 return localStorage.getItem(profilerStorageKey + name);
             },
 
             setPreference = function(name, value) {
+                if (!window.localStorage) {
+                    return null;
+                }
+
                 localStorage.setItem(profilerStorageKey + name, value);
             };
 
@@ -73,6 +81,7 @@
 
                 return this;
             },
+
             toggle: function(selector, elOn, elOff) {
                 var i,
                     style,
@@ -88,7 +97,6 @@
 
                 return this;
             }
-
         }
     })();
 /*]]>*/</script>

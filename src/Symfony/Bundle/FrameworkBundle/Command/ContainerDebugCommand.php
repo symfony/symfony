@@ -44,6 +44,8 @@ class ContainerDebugCommand extends ContainerAwareCommand
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Use to show public *and* private services'),
+                new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Show all services with a specific tag'),
+                new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application')
             ))
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<EOF
@@ -59,6 +61,14 @@ By default, private services are hidden. You can display all services by
 using the --show-private flag:
 
   <info>php %command.full_name% --show-private</info>
+
+Use the --tags option to display tagged <comment>public</comment> services grouped by tag:
+
+  <info>php %command.full_name% --tags</info>
+
+Find all services with a specific tag by specifying the tag name with the --tag option:
+
+  <info>php %command.full_name% --tag=form.type</info>
 EOF
             )
         ;
@@ -72,7 +82,18 @@ EOF
         $name = $input->getArgument('name');
 
         $this->containerBuilder = $this->getContainerBuilder();
-        $serviceIds = $this->containerBuilder->getServiceIds();
+
+        if ($input->getOption('tags')) {
+            $this->outputTags($output, $input->getOption('show-private'));
+            return;
+        }
+        
+        $tag = $input->getOption('tag');
+        if (null !== $tag) {
+            $serviceIds = array_keys($this->containerBuilder->findTaggedServiceIds($tag));
+        } else {
+            $serviceIds = $this->containerBuilder->getServiceIds();
+        }
 
         // sort so that it reads like an index of services
         asort($serviceIds);
@@ -80,17 +101,20 @@ EOF
         if ($name) {
             $this->outputService($output, $name);
         } else {
-            $this->outputServices($output, $serviceIds, $input->getOption('show-private'));
+            $this->outputServices($output, $serviceIds, $input->getOption('show-private'), $tag);
         }
     }
 
-    protected function outputServices(OutputInterface $output, $serviceIds, $showPrivate = false)
+    protected function outputServices(OutputInterface $output, $serviceIds, $showPrivate = false, $showTagAttributes = null)
     {
         // set the label to specify public or public+private
         if ($showPrivate) {
             $label = '<comment>Public</comment> and <comment>private</comment> services';
         } else {
             $label = '<comment>Public</comment> services';
+        }
+        if ($showTagAttributes) {
+            $label .= ' with tag <info>'.$showTagAttributes.'</info>';
         }
 
         $output->writeln($this->getHelper('formatter')->formatSection('container', $label));
@@ -135,6 +159,23 @@ EOF
                 // we have no information (happens with "service_container")
                 $service = $definition;
                 $output->writeln(sprintf($format, $serviceId, '', get_class($service)));
+            }
+            
+            if (null !== $showTagAttributes) {
+                $tags = $definition->getTag($showTagAttributes);
+                foreach($tags as $tag) {
+                    $output->write('  <comment>'.$showTagAttributes.' tag attributes</comment>: ');
+                    if (count($tag)) {
+                        $arguments = array();
+                        foreach($tag as $key => $value) {
+                            $arguments[] = $key;
+                            $arguments[] = $value;
+                        }
+                        $output->writeln(vsprintf(implode(", ", array_fill(0, count($tag), '<info>%s</info>: %s')), $arguments));
+                    } else {
+                        $output->writeln('none');
+                    }
+                }
             }
         }
     }
@@ -222,5 +263,46 @@ EOF
 
         // the service has been injected in some special way, just return the service
         return $this->containerBuilder->get($serviceId);
+    }
+
+    /**
+     * Renders list of tagged services grouped by tag
+     *
+     * @param OutputInterface $output
+     * @param bool            $showPrivate
+     */
+    protected function outputTags(OutputInterface $output, $showPrivate = false)
+    {
+        $tags = $this->containerBuilder->findTags();
+        asort($tags);
+
+        $label = 'Tagged services';
+        $output->writeln($this->getHelper('formatter')->formatSection('container', $label));
+
+        foreach ($tags as $tag) {
+            $serviceIds = $this->containerBuilder->findTaggedServiceIds($tag);
+
+            foreach ($serviceIds as $serviceId => $attributes) {
+                $definition = $this->resolveServiceDefinition($serviceId);
+                if ($definition instanceof Definition) {
+                    if (!$showPrivate && !$definition->isPublic()) {
+                        unset($serviceIds[$serviceId]);
+                        continue;
+                    }
+                }
+            }
+
+            if (count($serviceIds) === 0) {
+                continue;
+            }
+
+            $output->writeln($this->getHelper('formatter')->formatSection('tag', $tag));
+
+            foreach ($serviceIds as $serviceId => $attributes) {
+                $output->writeln($serviceId);
+            }
+
+            $output->writeln('');
+        }
     }
 }

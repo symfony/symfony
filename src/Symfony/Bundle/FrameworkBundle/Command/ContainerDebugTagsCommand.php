@@ -33,16 +33,16 @@ class ContainerDebugTagsCommand extends ContainerDebugCommand
         $this
             ->setName('container:debug:tags')
             ->setDefinition(
-            array(
-                new InputArgument('name', InputArgument::OPTIONAL, 'A tag name (form.type)'),
-                new InputOption(
-                    'show-private',
-                    null,
-                    InputOption::VALUE_NONE,
-                    'Use to show public *and* private services'
-                ),
+                array(
+                    new InputArgument('name', InputArgument::OPTIONAL, 'A tag name (form.type)'),
+                    new InputOption(
+                        'show-private',
+                        null,
+                        InputOption::VALUE_NONE,
+                        'Use to show public *and* private services'
+                    ),
+                )
             )
-        )
             ->setDescription('Displays tagged services for an application')
             ->setHelp(
             <<<EOF
@@ -67,17 +67,13 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $name = $input->getArgument('name');
-
         $this->containerBuilder = $this->getContainerBuilder();
-        $tags = $this->containerBuilder->findTags();
-
-        asort($tags);
+        $name = $input->getArgument('name');
 
         if ($name) {
             $this->outputTag($output, $name);
         } else {
-            $this->outputTags($output, $tags, $input->getOption('show-private'));
+            $this->outputTags($output, $input->getOption('show-private'));
         }
     }
 
@@ -85,11 +81,13 @@ EOF
      * Renders list of tagged services grouped by tag
      *
      * @param OutputInterface $output
-     * @param array           $tags
      * @param bool            $showPrivate
      */
-    protected function outputTags(OutputInterface $output, $tags, $showPrivate = false)
+    protected function outputTags(OutputInterface $output, $showPrivate = false)
     {
+        $tags = $this->containerBuilder->findTags();
+        asort($tags);
+
         $label = 'Tagged services';
         $output->writeln($this->getHelper('formatter')->formatSection('container', $label));
 
@@ -106,7 +104,7 @@ EOF
                 }
             }
 
-            if (count($serviceIds) == 0) {
+            if (count($serviceIds) === 0) {
                 continue;
             }
 
@@ -134,7 +132,7 @@ EOF
 
         $serviceIds = $this->containerBuilder->findTaggedServiceIds($name);
 
-        if (count($serviceIds) == 0) {
+        if (count($serviceIds) === 0) {
             $output->writeln('There are no services tagged with ' . $name);
 
             return;

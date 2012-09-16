@@ -614,11 +614,15 @@ class Process
     public function addOutput($line)
     {
         $this->stdout .= $line;
+
+        return $this;
     }
 
     public function addErrorOutput($line)
     {
         $this->stderr .= $line;
+
+        return $this;
     }
 
     public function getCommandLine()
@@ -629,6 +633,8 @@ class Process
     public function setCommandLine($commandline)
     {
         $this->commandline = $commandline;
+
+        return $this;
     }
 
     public function getTimeout()
@@ -648,7 +654,7 @@ class Process
         if (null === $timeout) {
             $this->timeout = null;
 
-            return;
+            return $this;
         }
 
         $timeout = (integer) $timeout;
@@ -658,6 +664,8 @@ class Process
         }
 
         $this->timeout = $timeout;
+
+        return $this;
     }
 
     public function getWorkingDirectory()
@@ -668,6 +676,8 @@ class Process
     public function setWorkingDirectory($cwd)
     {
         $this->cwd = $cwd;
+
+        return $this;
     }
 
     public function getEnv()
@@ -678,6 +688,8 @@ class Process
     public function setEnv(array $env)
     {
         $this->env = $env;
+
+        return $this;
     }
 
     public function getStdin()
@@ -688,6 +700,8 @@ class Process
     public function setStdin($stdin)
     {
         $this->stdin = $stdin;
+
+        return $this;
     }
 
     public function getOptions()
@@ -698,6 +712,8 @@ class Process
     public function setOptions(array $options)
     {
         $this->options = $options;
+
+        return $this;
     }
 
     public function getEnhanceWindowsCompatibility()
@@ -708,6 +724,8 @@ class Process
     public function setEnhanceWindowsCompatibility($enhance)
     {
         $this->enhanceWindowsCompatibility = (Boolean) $enhance;
+
+        return $this;'
     }
 
     /**

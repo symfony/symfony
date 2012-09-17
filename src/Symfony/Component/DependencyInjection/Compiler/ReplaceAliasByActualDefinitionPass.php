@@ -97,6 +97,8 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
      * @param array  $arguments An array of Arguments
      * @param string $currentId The alias identifier
      * @param string $newId     The identifier the alias points to
+     *
+     * @return array
      */
     private function updateArgumentReferences(array $arguments, $currentId, $newId)
     {

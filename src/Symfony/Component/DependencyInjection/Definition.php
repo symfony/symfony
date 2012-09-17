@@ -241,6 +241,8 @@ class Definition
      *
      * @return Definition The current instance
      *
+     * @throws \OutOfBoundsException When the replaced argument does not exist
+     *
      * @api
      */
     public function replaceArgument($index, $argument)
@@ -272,6 +274,8 @@ class Definition
      * @param integer $index
      *
      * @return mixed The argument value
+     *
+     * @throws \OutOfBoundsException When the argument does not exist
      *
      * @api
      */
@@ -628,7 +632,7 @@ class Definition
     /**
      * Sets a configurator to call after the service is fully initialized.
      *
-     * @param mixed $callable A PHP callable
+     * @param callable $callable A PHP callable
      *
      * @return Definition The current instance
      *
@@ -644,7 +648,7 @@ class Definition
     /**
      * Gets the configurator to call after the service is fully initialized.
      *
-     * @return mixed The PHP callable to call
+     * @return callable The PHP callable to call
      *
      * @api
      */

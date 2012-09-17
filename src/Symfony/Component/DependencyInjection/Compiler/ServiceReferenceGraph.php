@@ -37,6 +37,8 @@ class ServiceReferenceGraph
      * Checks if the graph has a specific node.
      *
      * @param string $id Id to check
+     *
+     * @return Boolean
      */
     public function hasNode($id)
     {

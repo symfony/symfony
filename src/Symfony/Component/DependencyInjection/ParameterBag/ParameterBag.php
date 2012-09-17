@@ -84,7 +84,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @return mixed  The parameter value
      *
-     * @throws  ParameterNotFoundException if the parameter is not defined
+     * @throws ParameterNotFoundException if the parameter is not defined
      *
      * @api
      */

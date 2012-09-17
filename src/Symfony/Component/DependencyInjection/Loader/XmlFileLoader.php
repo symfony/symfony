@@ -200,7 +200,9 @@ class XmlFileLoader extends FileLoader
      *
      * @param string $file Path to a file
      *
-     * @throws InvalidArgumentException When loading of XML file returns error
+     * @return SimpleXMLElement
+     *
+     * @throws \InvalidArgumentException When loading of XML file returns error
      */
     private function parseFile($file)
     {
@@ -286,8 +288,8 @@ class XmlFileLoader extends FileLoader
     /**
      * Validates an XML document.
      *
-     * @param DOMDocument $dom
-     * @param string      $file
+     * @param \DOMDocument $dom
+     * @param string       $file
      */
     private function validate(\DOMDocument $dom, $file)
     {
@@ -302,7 +304,7 @@ class XmlFileLoader extends FileLoader
      * @param string       $file
      *
      * @throws RuntimeException         When extension references a non-existent XSD file
-     * @throws InvalidArgumentException When XML doesn't validate its XSD schema
+     * @throws InvalidArgumentException When xml doesn't validate its xsd schema
      */
     private function validateSchema(\DOMDocument $dom, $file)
     {
@@ -403,6 +405,8 @@ EOF
 
     /**
      * Returns an array of XML errors.
+     *
+     * @param Boolean $internalErrors
      *
      * @return array
      */

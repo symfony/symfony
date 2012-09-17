@@ -165,7 +165,7 @@ class Profiler
         $profile = new Profile(uniqid());
         $profile->setTime(time());
         $profile->setUrl($request->getUri());
-        $profile->setIp($request->server->get('REMOTE_ADDR'));
+        $profile->setIp($request->getClientIp());
 
         $response->headers->set('X-Debug-Token', $profile->getToken());
 

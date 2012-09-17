@@ -141,7 +141,7 @@ class DigestData
     public function __construct($header)
     {
         $this->header = $header;
-        preg_match_all('/(\w+)=("([^"]+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);
+        preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);
         $this->elements = array();
         foreach ($matches as $match) {
             if (isset($match[1]) && isset($match[3])) {

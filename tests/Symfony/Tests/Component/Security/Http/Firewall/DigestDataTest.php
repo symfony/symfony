@@ -44,6 +44,18 @@ class DigestDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('user', $digestAuth->getUsername());
     }
 
+    public function testGetUsernameWithQuote()
+    {
+        $digestAuth = new DigestData(
+            'username="\"user\"", realm="Welcome, robot!", ' .
+            'nonce="MTM0NzMyMTgyMy42NzkzOmRlZjM4NmIzOGNjMjE0OWJiNDU0MDAxNzJmYmM1MmZl", ' .
+            'uri="/path/info?p1=5&p2=5", cnonce="MDIwODkz", nc=00000001, qop="auth", ' .
+            'response="b52938fc9e6d7c01be7702ece9031b42"'
+        );
+
+        $this->assertEquals('\"user\"', $digestAuth->getUsername());
+    }
+
     public function testValidateAndDecode()
     {
         $time = microtime(true);
@@ -65,24 +77,24 @@ class DigestDataTest extends \PHPUnit_Framework_TestCase
 
     public function testCalculateServerDigest()
     {
-        $username = 'user';
-        $realm = 'Welcome, robot!';
-        $password = 'pass,word=password';
+        $this->calculateServerDigest('user', 'Welcome, robot!', 'pass,word=password', 'ThisIsAKey', '00000001', 'MDIwODkz', 'auth', 'GET', '/path/info?p1=5&p2=5');
+    }
+
+    public function testCalculateServerDigestWithQuote()
+    {
+        $this->calculateServerDigest('\"user\"', 'Welcome, \"robot\"!', 'pass,word=password', 'ThisIsAKey', '00000001', 'MDIwODkz', 'auth', 'GET', '/path/info?p1=5&p2=5');
+    }
+
+    private function calculateServerDigest($username, $realm, $password, $key, $nc, $cnonce, $qop, $method, $uri)
+    {
         $time = microtime(true);
-        $key = 'ThisIsAKey';
         $nonce = base64_encode($time . ':' . md5($time . ':' . $key));
-        $nc = '00000001';
-        $cnonce = 'MDIwODkz';
-        $qop = 'auth';
-        $method = 'GET';
-        $uri = '/path/info?p1=5&p2=5';
 
         $response = md5(
-            md5($username . ':' . $realm . ':' . $password) .
-            ':' . $nonce . ':' . $nc . ':' . $cnonce . ':' . $qop . ':' . md5($method . ':' . $uri)
+            md5($username . ':' . $realm . ':' . $password) . ':' . $nonce . ':' . $nc . ':' . $cnonce . ':' . $qop . ':' . md5($method . ':' . $uri)
         );
 
-        $digest = sprintf('username="%s", realm="%s", nonce="%s", uri="%s", cnonce="%s", nc="%s", qop="%s", response="%s"',
+        $digest = sprintf('username="%s", realm="%s", nonce="%s", uri="%s", cnonce="%s", nc=%s, qop="%s", response="%s"',
             $username, $realm, $nonce, $uri, $cnonce, $nc, $qop, $response
         );
 

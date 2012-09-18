@@ -858,6 +858,21 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Returns all tags the defined services use.
+     *
+     * @return array An array of tags
+     */
+    public function findTags()
+    {
+        $tags = array();
+        foreach ($this->getDefinitions() as $id => $definition) {
+            $tags = array_merge(array_keys($definition->getTags()), $tags);
+        }
+
+        return array_unique($tags);
+    }
+
+    /**
      * Returns the Service Conditionals.
      *
      * @param mixed $value An array of conditionals to return.

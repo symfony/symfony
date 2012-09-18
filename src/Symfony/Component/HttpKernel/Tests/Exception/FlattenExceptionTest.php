@@ -101,7 +101,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
                     'args'        => array()
                 )),
             )
-        ),$flattened->toArray());
+        ), $flattened->toArray());
     }
 
     public function flattenDataProvider()
@@ -164,6 +164,6 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
             )
-        ),$flattened->toArray());
+        ), $flattened->toArray());
     }
 }

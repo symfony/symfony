@@ -42,17 +42,18 @@ class ConfigDataCollector extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data = array(
-            'token'           => $response->headers->get('X-Debug-Token'),
-            'symfony_version' => Kernel::VERSION,
-            'name'            => isset($this->kernel) ? $this->kernel->getName() : 'n/a',
-            'env'             => isset($this->kernel) ? $this->kernel->getEnvironment() : 'n/a',
-            'debug'           => isset($this->kernel) ? $this->kernel->isDebug() : 'n/a',
-            'php_version'     => PHP_VERSION,
-            'xdebug_enabled'  => extension_loaded('xdebug'),
-            'eaccel_enabled'  => extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'),
-            'apc_enabled'     => extension_loaded('apc') && ini_get('apc.enabled'),
-            'xcache_enabled'  => extension_loaded('xcache') && ini_get('xcache.cacher'),
-            'bundles'         => array(),
+            'token'            => $response->headers->get('X-Debug-Token'),
+            'symfony_version'  => Kernel::VERSION,
+            'name'             => isset($this->kernel) ? $this->kernel->getName() : 'n/a',
+            'env'              => isset($this->kernel) ? $this->kernel->getEnvironment() : 'n/a',
+            'debug'            => isset($this->kernel) ? $this->kernel->isDebug() : 'n/a',
+            'php_version'      => PHP_VERSION,
+            'xdebug_enabled'   => extension_loaded('xdebug'),
+            'eaccel_enabled'   => extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'),
+            'apc_enabled'      => extension_loaded('apc') && ini_get('apc.enabled'),
+            'xcache_enabled'   => extension_loaded('xcache') && ini_get('xcache.cacher'),
+            'wincache_enabled' => extension_loaded('wincache') && ini_get('wincache.ocenabled'),
+            'bundles'          => array(),
         );
 
         if (isset($this->kernel)) {
@@ -163,13 +164,23 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
+     * Returns true if WinCache is enabled.
+     *
+     * @return Boolean true if WinCache is enabled, false otherwise
+     */
+    public function hasWinCache()
+    {
+        return $this->data['wincache_enabled'];
+    }
+
+    /**
      * Returns true if any accelerator is enabled.
      *
      * @return Boolean true if any accelerator is enabled, false otherwise
      */
     public function hasAccelerator()
     {
-        return $this->hasApc() || $this->hasEAccelerator() || $this->hasXCache();
+        return $this->hasApc() || $this->hasEAccelerator() || $this->hasXCache() || $this->hasWinCache();
     }
 
     public function getBundles()

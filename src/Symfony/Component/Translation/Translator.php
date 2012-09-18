@@ -146,7 +146,7 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($locale);
         }
 
-        $catalogue = $this->findCatalogueForId($this->catalogues[$locale], $id, $domain);
+        $catalogue = $this->filterCatalogueForId($this->catalogues[$locale], $id, $domain);
 
         return strtr($catalogue->get((string) $id, $domain), $parameters);
     }
@@ -168,7 +168,7 @@ class Translator implements TranslatorInterface
 
         $id = (string) $id;
 
-        $catalogue = $this->findCatalogueForId($this->catalogues[$locale], $id, $domain);
+        $catalogue = $this->filterCatalogueForId($this->catalogues[$locale], $id, $domain);
         while (!$catalogue->defines($id, $domain)) {
             if ($cat = $catalogue->getFallbackCatalogue()) {
                 $catalogue = $cat;
@@ -189,7 +189,7 @@ class Translator implements TranslatorInterface
      * @param string $domain
      * @return MessageCatalogueInterface
      */
-    protected function findCatalogueForId(MessageCatalogueInterface $catalogue, $id, $domain)
+    protected function filterCatalogueForId(MessageCatalogueInterface $catalogue, $id, $domain)
     {
         // by default, do nothing
         return $catalogue;

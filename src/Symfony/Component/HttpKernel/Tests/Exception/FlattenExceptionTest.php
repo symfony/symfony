@@ -125,4 +125,13 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     {
         return new \Exception();
     }
+
+    public function testSetTraceIncompleteClass()
+    {
+        $exception = $this->createException(unserialize('O:14:"BogusTestClass":0:{}'));
+        $flattened = FlattenException::create($exception);
+
+        $flattened->toArray();
+        $this->assertTrue(true, 'The above line should not throw');
+    }
 }

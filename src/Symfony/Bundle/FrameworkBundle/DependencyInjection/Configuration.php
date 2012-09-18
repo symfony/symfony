@@ -367,6 +367,7 @@ class Configuration implements ConfigurationInterface
                     ->treatTrueLike(array('enabled' => true))
                     ->children()
                         ->booleanNode('enabled')->defaultTrue()->end()
+                        ->booleanNode('logging')->defaultFalse()->end()
                         ->scalarNode('fallback')->defaultValue('en')->end()
                     ->end()
                 ->end()

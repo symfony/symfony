@@ -125,7 +125,9 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($locale);
         }
 
-        return strtr($this->catalogues[$locale]->get((string) $id, $domain), $parameters);
+        $catalogue = $this->validateCatalogueForId($this->catalogues[$locale], $id, $domain);
+
+        return strtr($catalogue->get((string) $id, $domain), $parameters);
     }
 
     /**
@@ -145,7 +147,7 @@ class Translator implements TranslatorInterface
 
         $id = (string) $id;
 
-        $catalogue = $this->catalogues[$locale];
+        $catalogue = $this->validateCatalogueForId($this->catalogues[$locale], $id, $domain);
         while (!$catalogue->defines($id, $domain)) {
             if ($cat = $catalogue->getFallbackCatalogue()) {
                 $catalogue = $cat;
@@ -156,6 +158,20 @@ class Translator implements TranslatorInterface
         }
 
         return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
+    }
+
+    /**
+     * Extension point for handling catalogue misses or fallbacks.
+     *
+     * @param MessageCatalogueInterface $catalogue
+     * @param string $id
+     * @param string $domain
+     * @return MessageCatalogueInterface
+     */
+    protected function validateCatalogueForId(MessageCatalogueInterface $catalogue, $id, $domain)
+    {
+        // by default, do nothing
+        return $catalogue;
     }
 
     protected function loadCatalogue($locale)

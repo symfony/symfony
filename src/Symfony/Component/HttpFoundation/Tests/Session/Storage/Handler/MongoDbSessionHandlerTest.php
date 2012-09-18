@@ -23,7 +23,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
      */
     private $mongo;
     private $storage;
-    private $options;
+    public $options;
 
     protected function setUp()
     {

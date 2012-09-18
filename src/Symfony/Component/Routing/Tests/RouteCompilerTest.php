@@ -132,7 +132,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \LogicException
+     * @expectedException Symfony\Component\Routing\Exception\LogicException
      */
     public function testRouteWithSameVariableTwice()
     {
@@ -143,7 +143,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getNumericVariableNames
-     * @expectedException \DomainException
+     * @expectedException Symfony\Component\Routing\Exception\DomainException
      */
     public function testRouteWithNumericVariableName($name)
     {

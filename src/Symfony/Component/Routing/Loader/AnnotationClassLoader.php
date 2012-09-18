@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 
@@ -88,12 +89,12 @@ abstract class AnnotationClassLoader implements LoaderInterface
      *
      * @return RouteCollection A RouteCollection instance
      *
-     * @throws \InvalidArgumentException When route can't be parsed
+     * @throws InvalidArgumentException When route can't be parsed
      */
     public function load($class, $type = null)
     {
         if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
+            throw new InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
         }
 
         $globals = array(
@@ -105,7 +106,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
         $class = new \ReflectionClass($class);
         if ($class->isAbstract()) {
-            throw new \InvalidArgumentException(sprintf('Annotations from class "%s" cannot be read as it is abstract.', $class));
+            throw new InvalidArgumentException(sprintf('Annotations from class "%s" cannot be read as it is abstract.', $class));
         }
 
         if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {

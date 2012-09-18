@@ -12,13 +12,10 @@
 namespace Symfony\Component\Routing\Exception;
 
 /**
- * Exception thrown when a route cannot be generated because of missing
- * mandatory parameters.
+ * BadMethodCallException for the Routing Component.
  *
- * @author Alexandre Salomé <alexandre.salome@gmail.com>
- *
- * @api
+ * @author Romain Neutron <imprec@gmail.com>
  */
-class MissingMandatoryParametersException extends InvalidArgumentException
+class BadMethodCallException extends \BadMethodCallException implements ExceptionInterface
 {
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Resource\DirectoryResource;
 
 /**
@@ -30,7 +31,7 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
      *
      * @return RouteCollection A RouteCollection instance
      *
-     * @throws \InvalidArgumentException When the directory does not exist or its routes cannot be parsed
+     * @throws InvalidArgumentException When the directory does not exist or its routes cannot be parsed
      */
     public function load($path, $type = null)
     {

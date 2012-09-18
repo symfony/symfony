@@ -20,6 +20,6 @@ namespace Symfony\Component\Routing\Exception;
  *
  * @api
  */
-class ResourceNotFoundException extends \RuntimeException implements ExceptionInterface
+class ResourceNotFoundException extends RuntimeException
 {
 }

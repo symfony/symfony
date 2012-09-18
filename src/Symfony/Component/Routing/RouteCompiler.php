@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Routing;
 
+use Symfony\Component\Routing\Exception\DomainException;
+use Symfony\Component\Routing\Exception\LogicException;
+
 /**
  * RouteCompiler compiles Route instances to CompiledRoute instances.
  *
@@ -23,8 +26,8 @@ class RouteCompiler implements RouteCompilerInterface
     /**
      * {@inheritDoc}
      *
-     * @throws \LogicException  If a variable is referenced more than once
-     * @throws \DomainException If a variable name is numeric because PHP raises an error for such
+     * @throws LogicException  If a variable is referenced more than once
+     * @throws DomainException If a variable name is numeric because PHP raises an error for such
      *                          subpatterns in PCRE and thus would break matching, e.g. "(?<123>.+)".
      */
     public function compile(Route $route)
@@ -59,10 +62,10 @@ class RouteCompiler implements RouteCompilerInterface
             $tokens[] = array('variable', $match[0][0][0], $regexp, $var);
 
             if (is_numeric($var)) {
-                throw new \DomainException(sprintf('Variable name "%s" cannot be numeric in route pattern "%s". Please use a different name.', $var, $route->getPattern()));
+                throw new DomainException(sprintf('Variable name "%s" cannot be numeric in route pattern "%s". Please use a different name.', $var, $route->getPattern()));
             }
             if (in_array($var, $variables)) {
-                throw new \LogicException(sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $route->getPattern(), $var));
+                throw new LogicException(sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $route->getPattern(), $var));
             }
 
             $variables[] = $var;

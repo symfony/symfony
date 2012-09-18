@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RouteCollection;
 class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \LogicException
+     * @expectedException Symfony\Component\Routing\Exception\LogicException
      */
     public function testDumpWhenSchemeIsUsedWithoutAProperDumper()
     {

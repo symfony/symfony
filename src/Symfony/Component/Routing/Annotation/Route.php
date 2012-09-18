@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Annotation;
 
+use Symfony\Component\Routing\Exception\BadMethodCallException;
+
 /**
  * Annotation class for @Route().
  *
@@ -45,7 +47,7 @@ class Route
         foreach ($data as $key => $value) {
             $method = 'set'.$key;
             if (!method_exists($this, $method)) {
-                throw new \BadMethodCallException(sprintf("Unknown property '%s' on annotation '%s'.", $key, get_class($this)));
+                throw new BadMethodCallException(sprintf("Unknown property '%s' on annotation '%s'.", $key, get_class($this)));
             }
             $this->$method($value);
         }

@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class RouteTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \BadMethodCallException
+     * @expectedException Symfony\Component\Routing\Exception\BadMethodCallException
      */
     public function testInvalidRouteParameter()
     {

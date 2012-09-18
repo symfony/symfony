@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added Client::enableProfiler()
+
 2.1.0
 -----
 

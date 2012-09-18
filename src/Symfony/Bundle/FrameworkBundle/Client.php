@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
 class Client extends BaseClient
 {
     private $hasPerformedRequest = false;
+    private $profiler = false;
 
     /**
      * Returns the container.
@@ -62,6 +63,18 @@ class Client extends BaseClient
     }
 
     /**
+     * Enables the profiler for the very next request.
+     *
+     * If the profiler is not enabled, the call to this method does nothing.
+     */
+    public function enableProfiler()
+    {
+        if ($this->kernel->getContainer()->has('profiler')) {
+            $this->profiler = true;
+        }
+    }
+
+    /**
      * Makes a request.
      *
      * @param Request $request A Request instance
@@ -78,7 +91,26 @@ class Client extends BaseClient
             $this->hasPerformedRequest = true;
         }
 
+        if ($this->profiler) {
+            $this->profiler = false;
+
+            $this->kernel->boot();
+            $this->kernel->getContainer()->get('profiler')->enable();
+        }
+
         return $this->kernel->handle($request);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doRequestInProcess($request)
+    {
+        $response = parent::doRequestInProcess($request);
+
+        $this->profiler = false;
+
+        return $response;
     }
 
     /**
@@ -109,6 +141,11 @@ class Client extends BaseClient
 
         $path = str_replace("'", "\\'", $r->getFileName());
 
+        $profilerCode = '';
+        if ($this->profiler) {
+            $profilerCode = '$kernel->getContainer()->get(\'profiler\')->enable();';
+        }
+
         return <<<EOF
 <?php
 
@@ -119,6 +156,7 @@ require_once '$path';
 
 \$kernel = unserialize('$kernel');
 \$kernel->boot();
+$profilerCode
 echo serialize(\$kernel->handle(unserialize('$request')));
 EOF;
     }

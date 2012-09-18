@@ -234,12 +234,7 @@ class FlattenException
 
     private function getClassNameFromIncomplete(\__PHP_Incomplete_Class $value)
     {
-        $serial = serialize($value);
-        $parts  = explode(':', $serial, 4);
-
-        if ('O' === $parts[0] && strlen($parts[2]) -2 == $parts[1]) {
-            return substr($parts[2], 1, -1);
-        }
-        return '-- Error --';
+        $array  = new \ArrayObject($value);
+        return $array['__PHP_Incomplete_Class_Name'];
     }
 }

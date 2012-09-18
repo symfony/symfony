@@ -128,10 +128,42 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
     public function testSetTraceIncompleteClass()
     {
-        $exception = $this->createException(unserialize('O:14:"BogusTestClass":0:{}'));
-        $flattened = FlattenException::create($exception);
+        $flattened = FlattenException::create(new \Exception('test', 123));
+        $flattened->setTrace(
+            array(
+                array(
+                    'file' => __FILE__,
+                    'line' => 123,
+                    'function' => 'test',
+                    'args' => array(
+                        unserialize('O:14:"BogusTestClass":0:{}')
+                    ),
+                ),
+            ),
+            'foo.php', 123
+        );
 
-        $flattened->toArray();
-        $this->assertTrue(true, 'The above line should not throw');
+        $this->assertEquals(array(
+            array(
+                'message'=> 'test',
+                'class'=>'Exception',
+                'trace'=>array(
+                    array(
+                        'namespace'   => '', 'short_class' => '', 'class' => '','type' => '','function' => '',
+                        'file'        => 'foo.php', 'line' => 123,
+                        'args'        => array(),
+                    ),
+                    array(
+                        'namespace'   => '', 'short_class' => '', 'class' => '','type' => '','function' => 'test',
+                        'file'        => __FILE__, 'line' => 123,
+                        'args'        => array(
+                            array(
+                                'incomplete-object', 'BogusTestClass'
+                            ),
+                        ),
+                    )
+                ),
+            )
+        ),$flattened->toArray());
     }
 }

@@ -19,7 +19,7 @@ use Symfony\Component\Process\Process;
 class ProcessTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function testNegativeTimeoutFromConstructor()
     {
@@ -27,7 +27,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function testNegativeTimeoutFromSetter()
     {

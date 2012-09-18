@@ -84,7 +84,7 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
-    protected function validateCatalogueForId(MessageCatalogueInterface $catalogue, $id, $domain)
+    protected function findCatalogueForId(MessageCatalogueInterface $catalogue, $id, $domain)
     {
         if (null !== $this->logger && !$catalogue->defines($id, $domain)) {
             if ($catalogue->has($id, $domain)) {
@@ -94,7 +94,7 @@ class Translator extends BaseTranslator
             }
         }
 
-        return parent::validateCatalogueForId($catalogue, $id, $domain);
+        return parent::findCatalogueForId($catalogue, $id, $domain);
     }
 
     /**

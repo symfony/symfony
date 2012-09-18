@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.1.2
+-----
+
+ * added support for WinCache opcode cache in ConfigDataCollector
+
 2.1.0
 -----
 

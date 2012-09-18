@@ -65,15 +65,13 @@ class Client extends BaseClient
     /**
      * Enables the profiler for the very next request.
      *
-     * @throws \LogicException if the profiler is not configured in the service container
+     * If the profiler is not enabled, the call to this method does nothing.
      */
     public function enableProfiler()
     {
-        if (!$this->kernel->getContainer()->has('profiler')) {
-            throw new \LogicException('You cannot enable the profiler as it is not configured in the service container.');
+        if ($this->kernel->getContainer()->has('profiler')) {
+            $this->profiler = true;
         }
-
-        $this->profiler = true;
     }
 
     /**

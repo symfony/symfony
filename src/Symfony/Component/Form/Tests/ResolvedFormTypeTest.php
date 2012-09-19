@@ -104,13 +104,8 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
             ->method('setDefaultOptions')
             ->will($this->returnCallback($assertIndexAndAddOption(3, 'd', 'd_default')));
 
-        // Can only be uncommented when the following PHPUnit "bug" is fixed:
-        // https://github.com/sebastianbergmann/phpunit-mock-objects/issues/47
-        // $givenOptions = array('a' => 'a_custom', 'c' => 'c_custom');
-        // $resolvedOptions = array('a' => 'a_custom', 'b' => 'b_default', 'c' => 'c_custom', 'd' => 'd_default');
-
-        $givenOptions = array();
-        $resolvedOptions = array();
+        $givenOptions = array('a' => 'a_custom', 'c' => 'c_custom');
+        $resolvedOptions = array('a' => 'a_custom', 'b' => 'b_default', 'c' => 'c_custom', 'd' => 'd_default');
 
         // Then the form is built for the super type
         $parentType->expects($this->once())

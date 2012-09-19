@@ -88,6 +88,44 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($called, 'The callback should be executed with the output');
     }
 
+    public function testGetErrorOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('ini_set(\'display_errors\',\'on\');$n=0;while($n<3){echo $a;$n++;}')));
+
+        $p->run();
+        $this->assertEquals(3, preg_match_all('/PHP Notice/', $p->getErrorOutput(), $matches));
+    }
+
+    public function testGetIncrementalErrorOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('ini_set(\'display_errors\',\'on\');usleep(50000);$n=0;while($n<3){echo $a;$n++;}')));
+
+        $p->start();
+        while($p->isRunning()) {
+            $this->assertLessThanOrEqual(1, preg_match_all('/PHP Notice/', $p->getIncrementalOutput(), $matches));
+            usleep(20000);
+        }
+    }
+
+    public function testGetOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while($n<3){echo \' foo \';$n++;}')));
+
+        $p->run();
+        $this->assertEquals(3, preg_match_all('/foo/', $p->getOutput(), $matches));
+    }
+
+    public function testGetIncrementalOutput()
+    {
+        $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while($n<3){echo \' foo \';usleep(50000);$n++;}')));
+
+        $p->start();
+        while($p->isRunning()) {
+            $this->assertLessThanOrEqual(1, preg_match_all('/foo/', $p->getIncrementalOutput(), $matches));
+            usleep(20000);
+        }
+    }
+
     public function testExitCodeCommandFailed()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {

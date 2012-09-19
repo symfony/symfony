@@ -58,8 +58,9 @@ class MessageSelector
 
             if (preg_match('/^(?P<interval>'.Interval::getIntervalRegexp().')\s*(?P<message>.*?)$/x', $part, $matches)) {
                 $explicitRules[$matches['interval']] = $matches['message'];
-            } elseif (preg_match('/^\w+\:\s*(.*?)$/', $part, $matches)) {
-                $standardRules[] = $matches[1];
+            } elseif (preg_match('/^(?P<tag>\w+)\:\s*(?P<message>.*?)$/', $part, $matches)) {
+                $standardRules[] = $matches['message'];
+                $standardRules[$matches['tag']] = $matches['message'];
             } else {
                 $standardRules[] = $part;
             }
@@ -67,12 +68,18 @@ class MessageSelector
 
         // try to match an explicit rule, then fallback to the standard ones
         foreach ($explicitRules as $interval => $m) {
-            if (Interval::test($number, $interval)) {
+            if (Interval::test((int) $number, $interval)) {
                 return $m;
             }
         }
 
-        $position = PluralizationRules::get($number, $locale);
+        // try to match an explicit tag rule
+        if (!is_integer($number) && isset($standardRules[$number])) {
+            return $standardRules[$number];
+        }
+
+        $position = PluralizationRules::get((int) $number, $locale);
+
         if (!isset($standardRules[$position])) {
             throw new \InvalidArgumentException(sprintf('Unable to choose a translation for "%s" with locale "%s". Double check that this translation has the correct plural options (e.g. "There is one apple|There are %%count%% apples").', $message, $locale));
         }

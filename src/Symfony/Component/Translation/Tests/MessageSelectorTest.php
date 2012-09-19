@@ -56,6 +56,10 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
             array('There is one apple', 'one: There is one apple|more: There is %count% apples', 1),
             array('There is %count% apples', 'one: There is one apple|more: There is %count% apples', 10),
 
+            array('There is %count% apples', 'one: There is one apple|more: There is %count% apples', 'more'),
+            array('There is one apple', 'one: There is one apple|more: There is %count% apples', 'one'),
+            array('There are some apples', 'one: There is one apple|some: There are some apples|more: There is %count% apples', 'some'),
+
             array('There is no apples', '{0} There is no apples|one: There is one apple|more: There is %count% apples', 0),
             array('There is one apple', '{0} There is no apples|one: There is one apple|more: There is %count% apples', 1),
             array('There is %count% apples', '{0} There is no apples|one: There is one apple|more: There is %count% apples', 10),

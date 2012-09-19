@@ -51,6 +51,8 @@ class Process
     private $pipes;
     private $process;
     private $status = self::STATUS_READY;
+    private $incrementalOutputOffset;
+    private $incrementalErrorOutputOffset;
 
     private $fileHandles;
     private $readBytes;
@@ -205,6 +207,8 @@ class Process
 
         $this->stdout = '';
         $this->stderr = '';
+        $this->incrementalOutputOffset = 0;
+        $this->incrementalErrorOutputOffset = 0;
         $callback = $this->buildCallback($callback);
 
         //Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
@@ -414,6 +418,24 @@ class Process
     }
 
     /**
+     * Returns the output incrementally.
+     *
+     * In comparison with the getOutput method which always return the whole
+     * output, this one returns the new output since the last call.
+     *
+     * @return string The process output since the last call
+     */
+    public function getIncrementalOutput()
+    {
+        $data = $this->getOutput();
+
+        $latest = substr($data, $this->incrementalOutputOffset);
+        $this->incrementalOutputOffset = strlen($data);
+
+        return $latest;
+    }
+
+    /**
      * Returns the current error output of the process (STDERR).
      *
      * @return string The process error output
@@ -425,6 +447,25 @@ class Process
         $this->updateErrorOutput();
 
         return $this->stderr;
+    }
+
+    /**
+     * Returns the errorOutput incrementally.
+     *
+     * In comparison with the getErrorOutput method which always return the
+     * whole error output, this one returns the new error output since the last
+     * call.
+     *
+     * @return string The process error output since the last call
+     */
+    public function getIncrementalErrorOutput()
+    {
+        $data = $this->getErrorOutput();
+
+        $latest = substr($data, $this->incrementalErrorOutputOffset);
+        $this->incrementalErrorOutputOffset = strlen($data);
+
+        return $latest;
     }
 
     /**

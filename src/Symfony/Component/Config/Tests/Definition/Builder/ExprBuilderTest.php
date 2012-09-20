@@ -171,7 +171,7 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * Close the validation process and finalize with the given config
      * @param TreeBuilder $testBuilder The tree builder to finalize
-     * @param array $config The config you want to use for the finalization, if nothing provided
+     * @param array       $config      The config you want to use for the finalization, if nothing provided
      *                       a simple array('key'=>'value') will be used
      * @return array The finalized config values
      */
@@ -200,6 +200,7 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Assert that the given test builder, will return the given value
+     *
      * @param mixed       $value       The value to test
      * @param TreeBuilder $treeBuilder The tree builder to finalize
      * @param mixed       $config      The config values that new to be finalized

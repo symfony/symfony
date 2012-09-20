@@ -468,8 +468,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the configuration array for the given extension.
      *
-     * @param string $name The name of the extension
-     * @param array $configs The configs to set
+     * @param string $name    The name of the extension
+     * @param array  $configs The configs to set
      *
      * @api
      */

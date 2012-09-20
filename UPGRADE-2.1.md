@@ -1332,8 +1332,7 @@
 
 ### Session
 
-  * Flash messages now return an array based on their type. The old method is
-    still available but is now deprecated.
+  * Using `get` to retrieve flash messages now returns an array.
 
     ##### Retrieving the flash messages from a Twig template
 

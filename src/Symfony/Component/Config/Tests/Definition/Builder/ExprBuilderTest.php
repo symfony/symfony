@@ -175,7 +175,7 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
      *                       a simple array('key'=>'value') will be used
      * @return array The finalized config values
      */
-    protected function finalizeTestBuilder($testBuilder, $config=null)
+    protected function finalizeTestBuilder($testBuilder, $config = null)
     {
         return $testBuilder
             ->end()
@@ -205,7 +205,7 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
      * @param TreeBuilder $treeBuilder The tree builder to finalize
      * @param mixed       $config      The config values that new to be finalized
      */
-    protected function assertFinalizedValueIs($value, $treeBuilder, $config=null)
+    protected function assertFinalizedValueIs($value, $treeBuilder, $config = null)
     {
         $this->assertEquals(array('key'=>$value), $this->finalizeTestBuilder($treeBuilder, $config));
     }

@@ -21,7 +21,7 @@ use Symfony\Component\Config\Definition\FloatNode;
 class FloatNodeDefinition extends NumericNodeDefinition
 {
     /**
-     * Instantiate a Node
+     * Instantiates a Node.
      *
      * @return FloatNode The node
      */

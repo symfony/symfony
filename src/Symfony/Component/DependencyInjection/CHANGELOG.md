@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added PrependExtensionInterface (to be able to allow extensions to prepend
+   application configuration settings for any Bundle)
+
 2.1.0
 -----
 

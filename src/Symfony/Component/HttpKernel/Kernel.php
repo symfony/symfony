@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\DependencyInjection\PreProcessExtensionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -28,6 +27,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
+use Symfony\Component\HttpKernel\DependencyInjection\PreProcessExtensionInterface;
 use Symfony\Component\HttpKernel\Debug\ErrorHandler;
 use Symfony\Component\HttpKernel\Debug\ExceptionHandler;
 use Symfony\Component\Config\Loader\LoaderResolver;
@@ -665,10 +665,14 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         return $container;
     }
 
+    /**
+     * Allow extensions to pre-process the extension configurations
+     *
+     * @param ContainerBuilder $container
+     */
     protected function preProcessExtensionConfigs(ContainerBuilder $container)
     {
-        $preProcessExtensions = $this->getPreProcessExtensions();
-        foreach ($preProcessExtensions as $name) {
+        foreach ($this->getPreProcessExtensions() as $name) {
             $extension = $container->getExtension($name);
             if ($extension instanceof PreProcessExtensionInterface) {
                 $extension->preProcess($container);
@@ -676,6 +680,11 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         }
     }
 
+    /**
+     * Returns the ordered list of extensions that may pre-process extension configurations
+     *
+     * @return array
+     */
     protected function getPreProcessExtensions()
     {
         return array();

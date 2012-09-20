@@ -13,6 +13,9 @@ namespace Symfony\Component\DomCrawler;
 
 use Symfony\Component\DomCrawler\Field\FormField;
 
+/**
+ * This is an internal class that must not be used directly.
+ */
 class FormFieldRegistry
 {
     private $fields = array();

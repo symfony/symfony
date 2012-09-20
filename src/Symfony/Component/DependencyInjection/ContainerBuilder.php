@@ -466,6 +466,19 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Sets the configuration array for the given extension.
+     *
+     * @param string $name The name of the extension
+     * @param array $configs The configs to set
+     *
+     * @api
+     */
+    public function setExtensionConfig($name, $configs)
+    {
+        $this->extensionConfigs[$name] = $configs;
+    }
+
+    /**
      * Compiles the container.
      *
      * This method passes the container to compiler

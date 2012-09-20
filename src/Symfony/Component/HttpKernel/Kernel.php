@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\DependencyInjection\PreProcessExtensionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -649,6 +650,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         $container->addObjectResource($this);
 
+        $this->preProcessExtensionConfigs($container);
+
         // ensure these extensions are implicitly loaded
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
 
@@ -660,6 +663,22 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $container->compile();
 
         return $container;
+    }
+
+    protected function preProcessExtensionConfigs(ContainerBuilder $container)
+    {
+        $preProcessExtensions = $this->getPreProcessExtensions();
+        foreach ($preProcessExtensions as $name) {
+            $extension = $container->getExtension($name);
+            if ($extension instanceof PreProcessExtensionInterface) {
+                $extension->preProcess($container);
+            }
+        }
+    }
+
+    protected function getPreProcessExtensions()
+    {
+        return array();
     }
 
     /**

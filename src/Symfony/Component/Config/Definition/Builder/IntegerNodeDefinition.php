@@ -21,7 +21,7 @@ use Symfony\Component\Config\Definition\IntegerNode;
 class IntegerNodeDefinition extends NumericNodeDefinition
 {
     /**
-     * Instantiate a Node
+     * Instantiates a Node.
      *
      * @return IntegerNode The node
      */

@@ -52,5 +52,4 @@ class NumericNode extends ScalarNode
 
         return $value;
     }
-
 }

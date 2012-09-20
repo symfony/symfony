@@ -18,16 +18,17 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 abstract class NumericNodeDefinition extends ScalarNodeDefinition
 {
-
     protected $min;
     protected $max;
 
     /**
-     * Ensure the value is smaller than the given reference
+     * Ensures that the value is smaller than the given reference.
      *
      * @param mixed $max
      *
      * @return NumericNodeDefinition
+     *
+     * @throws \InvalidArgumentException when the constraint is inconsistent
      */
     public function max($max)
     {
@@ -40,11 +41,13 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
     }
 
     /**
-     * Ensure the value is bigger than the given reference
+     * Ensures that the value is bigger than the given reference.
      *
      * @param mixed $min
      *
      * @return NumericNodeDefinition
+     *
+     * @throws \InvalidArgumentException when the constraint is inconsistent
      */
     public function min($min)
     {

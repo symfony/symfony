@@ -666,7 +666,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * Allow extensions to pre-process the extension configurations
+     * Allow extensions to pre-process the extension configurations.
      *
      * @param ContainerBuilder $container
      */
@@ -681,7 +681,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * Returns the ordered list of extensions that may pre-process extension configurations
+     * Returns the ordered list of extensions that may pre-process extension configurations.
      *
      * @return array
      */

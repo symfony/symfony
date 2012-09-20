@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 interface PreProcessExtensionInterface
 {
     /**
-     * Allow an extension to pre-process the extension configurations
+     * Allow an extension to pre-process the extension configurations.
      *
      * @param ContainerBuilder $container
      */

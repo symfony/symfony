@@ -41,7 +41,7 @@ class RequestDataCollector extends DataCollector
 
         $attributes = array();
         foreach ($request->attributes->all() as $key => $value) {
-            $attributes[$key] = is_object($value) ? sprintf('Object(%s)', get_class($value)) : $value;
+            $attributes[$key] = $this->varToString($value);
         }
 
         $content = null;

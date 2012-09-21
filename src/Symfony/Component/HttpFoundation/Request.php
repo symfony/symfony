@@ -795,11 +795,14 @@ class Request
     /**
      * Gets the scheme and HTTP host.
      *
+     * If the URL was called with basic authentication, the user
+     * and the password are not added to the generated string.
+     *
      * @return string The scheme and HTTP host
      */
     public function getSchemeAndHttpHost()
     {
-        return $this->getScheme().'://'.(('' != $auth = $this->getUserInfo()) ? $auth.'@' : '').$this->getHttpHost();
+        return $this->getScheme().'://'.$this->getHttpHost();
     }
 
     /**

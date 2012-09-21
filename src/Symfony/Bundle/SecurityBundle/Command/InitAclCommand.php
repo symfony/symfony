@@ -62,7 +62,7 @@ EOF
         } catch (SchemaException $e) {
             $output->writeln("Aborting: " . $e->getMessage());
 
-            return;
+            return 1;
         }
 
         foreach ($schema->toSql($connection->getDatabasePlatform()) as $sql) {

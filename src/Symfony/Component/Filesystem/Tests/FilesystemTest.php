@@ -863,6 +863,17 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         if (!function_exists('symlink')) {
             $this->markTestSkipped('symlink is not supported');
         }
+
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $originDir = tempnam(sys_get_temp_dir(), 'sl');
+            $targetDir = tempnam(sys_get_temp_dir(), 'sl');
+            if (true !== @symlink($originDir, $targetDir)) {
+                $report = error_get_last();
+                if (is_array($report) && false !== strpos($report['message'], 'error code(1314)')) {
+                    $this->markTestSkipped('symlink requires administrator rights on windows');
+                }
+            }
+        }
     }
 
     private function markAsSkippedIfChmodIsMissing()

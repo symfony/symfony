@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/twig-bundle": "self.version"
+        "symfony/twig-bundle": "2.2.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\WebProfilerBundle": "" }
@@ -26,7 +26,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.2-dev"
         }
     }
 }

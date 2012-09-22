@@ -19,12 +19,12 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/yaml": "2.1.*",
-        "symfony/config": "2.1.*"
+        "symfony/yaml": "2.2.*",
+        "symfony/config": "2.2.*"
     },
     "suggest": {
-        "symfony/yaml": "self.version",
-        "symfony/config": "self.version"
+        "symfony/yaml": "2.2.*",
+        "symfony/config": "2.2.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\DependencyInjection": "" }
@@ -33,7 +33,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.2-dev"
         }
     }
 }

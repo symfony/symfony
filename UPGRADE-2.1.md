@@ -14,7 +14,7 @@
     for multiple environments.
 
   * The priorities for the built-in listeners have changed.
- 
+
     ```
                                             2.0         2.1
         security.firewall   kernel.request  64          8
@@ -161,7 +161,7 @@
 
   * The custom factories for the firewall configuration are now
     registered during the build method of bundles instead of being registered
-    by the end-user. This means that you will you need to remove the 'factories'
+    by the end-user. This means that you will need to remove the 'factories'
     keys in your security configuration.
 
     Before:
@@ -204,7 +204,9 @@
 
   * The Firewall listener is now registered after the Router listener. This
     means that specific Firewall URLs (like /login_check and /logout) must now
-    have proper routes defined in your routing configuration.
+    have proper routes defined in your routing configuration. Also, if you have
+    a custom 404 error page, make sure that you do not use any security related
+    features such as `is_granted` on it.
 
   * The user provider configuration has been refactored. The configuration
     for the chain provider and the memory provider has been changed:
@@ -248,9 +250,9 @@
      use Symfony\Bundle\SecurityBundle\Validator\Constraint\UserPassword;
      use Symfony\Bundle\SecurityBundle\Validator\Constraint as SecurityAssert;
      ```
-     
+
      After:
-     
+
      ```
      use Symfony\Component\Security\Core\Validator\Constraint\UserPassword;
      use Symfony\Component\Security\Core\Validator\Constraint as SecurityAssert;
@@ -1330,8 +1332,7 @@
 
 ### Session
 
-  * Flash messages now return an array based on their type. The old method is
-    still available but is now deprecated.
+  * Using `get` to retrieve flash messages now returns an array.
 
     ##### Retrieving the flash messages from a Twig template
 

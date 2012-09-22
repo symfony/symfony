@@ -17,26 +17,26 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/event-dispatcher": "2.1.*",
-        "symfony/http-foundation": "2.1.*"
+        "symfony/event-dispatcher": "2.2.*",
+        "symfony/http-foundation": "2.2.*"
     },
     "require-dev": {
-        "symfony/browser-kit": "2.1.*",
-        "symfony/class-loader": "2.1.*",
-        "symfony/config": "2.1.*",
-        "symfony/console": "2.1.*",
-        "symfony/dependency-injection": "2.1.*",
-        "symfony/finder": "2.1.*",
-        "symfony/process": "2.1.*",
-        "symfony/routing": "2.1.*"
+        "symfony/browser-kit": "2.2.*",
+        "symfony/class-loader": "2.2.*",
+        "symfony/config": "2.2.*",
+        "symfony/console": "2.2.*",
+        "symfony/dependency-injection": "2.2.*",
+        "symfony/finder": "2.2.*",
+        "symfony/process": "2.2.*",
+        "symfony/routing": "2.2.*"
     },
     "suggest": {
-        "symfony/browser-kit": "self.version",
-        "symfony/class-loader": "self.version",
-        "symfony/config": "self.version",
-        "symfony/console": "self.version",
-        "symfony/dependency-injection": "self.version",
-        "symfony/finder": "self.version"
+        "symfony/browser-kit": "2.2.*",
+        "symfony/class-loader": "2.2.*",
+        "symfony/config": "2.2.*",
+        "symfony/console": "2.2.*",
+        "symfony/dependency-injection": "2.2.*",
+        "symfony/finder": "2.2.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\HttpKernel": "" }
@@ -45,7 +45,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.2-dev"
         }
     }
 }

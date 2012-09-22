@@ -11,33 +11,33 @@
 
 namespace Symfony\Component\Process\Tests;
 
-use Symfony\Component\Process\Process;
-
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
  */
-class ProcessTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 {
+    protected abstract function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array());
+
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function testNegativeTimeoutFromConstructor()
     {
-        new Process('', null, null, null, -1);
+        $this->getProcess('', null, null, null, -1);
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function testNegativeTimeoutFromSetter()
     {
-        $p = new Process('');
+        $p = $this->getProcess('');
         $p->setTimeout(-1);
     }
 
     public function testNullTimeout()
     {
-        $p = new Process('');
+        $p = $this->getProcess('');
         $p->setTimeout(10);
         $p->setTimeout(null);
 
@@ -51,7 +51,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessResponses($expected, $getter, $code)
     {
-        $p = new Process(sprintf('php -r %s', escapeshellarg($code)));
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg($code)));
         $p->run();
 
         $this->assertSame($expected, $p->$getter());
@@ -64,22 +64,21 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessPipes($expected, $code)
     {
-        if (strpos(PHP_OS, "WIN") === 0) {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $this->markTestSkipped('Test hangs on Windows & PHP due to https://bugs.php.net/bug.php?id=60120 and https://bugs.php.net/bug.php?id=51800');
         }
 
-        $p = new Process(sprintf('php -r %s', escapeshellarg($code)));
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg($code)));
         $p->setStdin($expected);
         $p->run();
 
         $this->assertSame($expected, $p->getOutput());
         $this->assertSame($expected, $p->getErrorOutput());
-        $this->assertSame(0, $p->getExitCode());
     }
 
     public function testCallbackIsExecutedForOutput()
     {
-        $p = new Process(sprintf('php -r %s', escapeshellarg('echo \'foo\';')));
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('echo \'foo\';')));
 
         $called = false;
         $p->run(function ($type, $buffer) use (&$called) {
@@ -89,9 +88,22 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($called, 'The callback should be executed with the output');
     }
 
+    public function testExitCodeCommandFailed()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('Windows does not support POSIX exit code');
+        }
+
+        // such command run in bash return an exitcode 127
+        $process = $this->getProcess('nonexistingcommandIhopeneversomeonewouldnameacommandlikethis');
+        $process->run();
+
+        $this->assertGreaterThan(0, $process->getExitCode());
+    }
+
     public function testExitCodeText()
     {
-        $process = new Process('');
+        $process = $this->getProcess('');
         $r = new \ReflectionObject($process);
         $p = $r->getProperty('exitcode');
         $p->setAccessible(true);
@@ -102,7 +114,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStartIsNonBlocking()
     {
-        $process = new Process('php -r "sleep(4);"');
+        $process = $this->getProcess('php -r "sleep(4);"');
         $start = microtime(true);
         $process->start();
         $end = microtime(true);
@@ -111,16 +123,21 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateStatus()
     {
-        $process = new Process('php -h');
-        $process->start();
-        usleep(300000); // wait for output
-        $this->assertEquals(0, $process->getExitCode());
+        $process = $this->getProcess('php -h');
+        $process->run();
         $this->assertTrue(strlen($process->getOutput()) > 0);
+    }
+
+    public function testGetExitCode()
+    {
+        $process = $this->getProcess('php -m');
+        $process->run();
+        $this->assertEquals(0, $process->getExitCode());
     }
 
     public function testIsRunning()
     {
-        $process = new Process('php -r "sleep(1);"');
+        $process = $this->getProcess('php -r "sleep(1);"');
         $this->assertFalse($process->isRunning());
         $process->start();
         $this->assertTrue($process->isRunning());
@@ -130,16 +147,74 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStop()
     {
-        $process = new Process('php -r "while (true) {}"');
+        $process = $this->getProcess('php -r "while (true) {}"');
         $process->start();
         $this->assertTrue($process->isRunning());
         $process->stop();
         $this->assertFalse($process->isRunning());
+    }
 
-        // skip this check on windows since it does not support signals
-        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
-            $this->assertTrue($process->hasBeenSignaled());
+    public function testIsSuccessful()
+    {
+        $process = $this->getProcess('php -m');
+        $process->run();
+        $this->assertTrue($process->isSuccessful());
+    }
+
+    public function testIsNotSuccessful()
+    {
+        $process = $this->getProcess('php -r "while (true) {}"');
+        $process->start();
+        $this->assertTrue($process->isRunning());
+        $process->stop();
+        $this->assertFalse($process->isSuccessful());
+    }
+
+    public function testProcessIsNotSignaled()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('Windows does not support POSIX signals');
         }
+
+        $process = $this->getProcess('php -m');
+        $process->run();
+        $this->assertFalse($process->hasBeenSignaled());
+    }
+
+    public function testProcessWithoutTermSignal()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('Windows does not support POSIX signals');
+        }
+
+        $process = $this->getProcess('php -m');
+        $process->run();
+        $this->assertEquals(0, $process->getTermSignal());
+    }
+
+    public function testProcessIsSignaledIfStopped()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('Windows does not support POSIX signals');
+        }
+
+        $process = $this->getProcess('php -r "while (true) {}"');
+        $process->start();
+        $process->stop();
+        $this->assertTrue($process->hasBeenSignaled());
+    }
+
+    public function testProcessWithTermSignal()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('Windows does not support POSIX signals');
+        }
+
+
+        $process = $this->getProcess('php -r "while (true) {}"');
+        $process->start();
+        $process->stop();
+        $this->assertEquals(SIGTERM, $process->getTermSignal());
     }
 
     public function testPhpDeadlock()
@@ -148,7 +223,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
         // Sleep doesn't work as it will allow the process to handle signals and close
         // file handles from the other end.
-        $process = new Process('php -r "while (true) {}"');
+        $process = $this->getProcess('php -r "while (true) {}"');
         $process->start();
 
         // PHP will deadlock when it tries to cleanup $process

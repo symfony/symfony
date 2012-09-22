@@ -162,9 +162,9 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets the property path that the form should be mapped to.
      *
-     * @param  string|PropertyPath $propertyPath The property path or null if the path
-     *                                           should be set automatically based on
-     *                                           the form's name.
+     * @param  null|string|PropertyPathInterface $propertyPath The property path or null if the path
+     *                                                         should be set automatically based on
+     *                                                         the form's name.
      *
      * @return self The configuration object.
      */
@@ -184,7 +184,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * Sets whether the form's data should be modified by reference.
      *
      * @param  Boolean $byReference Whether the data should be
-     * modified by reference.
+     *                              modified by reference.
      *
      * @return self The configuration object.
      */

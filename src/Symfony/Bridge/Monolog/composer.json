@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/http-kernel": "self.version",
+        "symfony/http-kernel": "2.2.*",
         "monolog/monolog": "1.*"
     },
     "autoload": {
@@ -27,7 +27,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.2-dev"
         }
     }
 }

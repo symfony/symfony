@@ -25,6 +25,99 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $response->headers->get('foo'));
     }
 
+    public function testToString()
+    {
+        $response = new Response();
+        $response = explode("\r\n", $response);
+        $this->assertEquals("HTTP/1.0 200 OK", $response[0]);
+        $this->assertEquals("Cache-Control: no-cache", $response[1]);
+    }
+
+    public function testClone()
+    {
+        $response = new Response();
+        $responseClone = clone $response;
+        $this->assertEquals($response, $responseClone);
+    }
+
+    public function testSendHeaders()
+    {
+        $response = new Response();
+        $headers = $response->sendHeaders();
+        $this->assertObjectHasAttribute('headers', $headers);
+        $this->assertObjectHasAttribute('content', $headers);
+        $this->assertObjectHasAttribute('version', $headers);
+        $this->assertObjectHasAttribute('statusCode', $headers);
+        $this->assertObjectHasAttribute('statusText', $headers);
+        $this->assertObjectHasAttribute('charset', $headers);
+    }
+
+    public function testSend()
+    {
+        $response = new Response();
+        $responseSend = $response->send();
+        $this->assertObjectHasAttribute('headers', $responseSend);
+        $this->assertObjectHasAttribute('content', $responseSend);
+        $this->assertObjectHasAttribute('version', $responseSend);
+        $this->assertObjectHasAttribute('statusCode', $responseSend);
+        $this->assertObjectHasAttribute('statusText', $responseSend);
+        $this->assertObjectHasAttribute('charset', $responseSend);
+    }
+
+    public function testGetCharset()
+    {
+        $response = new Response();
+        $charsetOrigin = 'UTF-8';
+        $response->setCharset($charsetOrigin);
+        $charset = $response->getCharset();
+        $this->assertEquals($charsetOrigin, $charset);
+    }
+
+    public function testIsCacheable()
+    {
+        $response = new Response();
+        $this->assertFalse($response->isCacheable());
+    }
+
+    public function testIsCacheableWithSetTtl()
+    {
+        $response = new Response();
+        $response->setTtl(10);
+        $this->assertTrue($response->isCacheable());
+    }
+
+    public function testMustRevalidate()
+    {
+        $response = new Response();
+        $this->assertFalse($response->mustRevalidate());
+    }
+
+    public function testSetNotModified()
+    {
+        $response = new Response();
+        $modified = $response->setNotModified();
+        $this->assertObjectHasAttribute('headers', $modified);
+        $this->assertObjectHasAttribute('content', $modified);
+        $this->assertObjectHasAttribute('version', $modified);
+        $this->assertObjectHasAttribute('statusCode', $modified);
+        $this->assertObjectHasAttribute('statusText', $modified);
+        $this->assertObjectHasAttribute('charset', $modified);
+        $this->assertEquals(304, $modified->getStatusCode());
+    }
+
+    public function testIsSuccessful()
+    {
+        $response = new Response();
+        $this->assertTrue($response->isSuccessful());
+    }
+
+    public function testIsNotModified()
+    {
+        $response = new Response();
+        $modified = $response->isNotModified(new Request());
+        $this->assertFalse($modified);
+    }
+
     public function testIsValidateable()
     {
         $response = new Response('', 200, array('Last-Modified' => $this->createDateTimeOneHourAgo()->format(DATE_RFC2822)));

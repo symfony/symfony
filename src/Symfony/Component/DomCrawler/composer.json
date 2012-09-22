@@ -19,10 +19,10 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/css-selector": "2.1.*"
+        "symfony/css-selector": "2.2.*"
     },
     "suggest": {
-        "symfony/css-selector": "self.version"
+        "symfony/css-selector": "2.2.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\DomCrawler": "" }
@@ -31,7 +31,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.2-dev"
         }
     }
 }

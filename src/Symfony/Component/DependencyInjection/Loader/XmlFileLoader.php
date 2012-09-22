@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\SimpleXMLElement;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
@@ -200,18 +200,34 @@ class XmlFileLoader extends FileLoader
      *
      * @param string $file Path to a file
      *
-     * @throws InvalidArgumentException When loading of XML file returns error
+     * @return SimpleXMLElement
+     *
+     * @throws \InvalidArgumentException When loading of XML file returns error
      */
     private function parseFile($file)
     {
+        $internalErrors = libxml_use_internal_errors(true);
+        $disableEntities = libxml_disable_entity_loader(true);
+        libxml_clear_errors();
+
         $dom = new \DOMDocument();
-        libxml_use_internal_errors(true);
-        if (!$dom->load($file, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
-            throw new InvalidArgumentException(implode("\n", $this->getXmlErrors()));
-        }
         $dom->validateOnParse = true;
+        if (!$dom->loadXML(file_get_contents($file), LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
+            libxml_disable_entity_loader($disableEntities);
+
+            throw new InvalidArgumentException(implode("\n", $this->getXmlErrors($internalErrors)));
+        }
         $dom->normalizeDocument();
-        libxml_use_internal_errors(false);
+
+        libxml_use_internal_errors($internalErrors);
+        libxml_disable_entity_loader($disableEntities);
+
+        foreach ($dom->childNodes as $child) {
+            if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
+                throw new InvalidArgumentException('Document types are not allowed.');
+            }
+        }
+
         $this->validate($dom, $file);
 
         return simplexml_import_dom($dom, 'Symfony\\Component\\DependencyInjection\\SimpleXMLElement');
@@ -272,8 +288,8 @@ class XmlFileLoader extends FileLoader
     /**
      * Validates an XML document.
      *
-     * @param DOMDocument $dom
-     * @param string      $file
+     * @param \DOMDocument $dom
+     * @param string       $file
      */
     private function validate(\DOMDocument $dom, $file)
     {
@@ -288,7 +304,7 @@ class XmlFileLoader extends FileLoader
      * @param string       $file
      *
      * @throws RuntimeException         When extension references a non-existent XSD file
-     * @throws InvalidArgumentException When XML doesn't validate its XSD schema
+     * @throws InvalidArgumentException When xml doesn't validate its xsd schema
      */
     private function validateSchema(\DOMDocument $dom, $file)
     {
@@ -345,12 +361,15 @@ EOF
         ;
 
         $current = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+
         $valid = @$dom->schemaValidateSource($source);
+
         foreach ($tmpfiles as $tmpfile) {
             @unlink($tmpfile);
         }
         if (!$valid) {
-            throw new InvalidArgumentException(implode("\n", $this->getXmlErrors()));
+            throw new InvalidArgumentException(implode("\n", $this->getXmlErrors($current)));
         }
         libxml_use_internal_errors($current);
     }
@@ -387,9 +406,11 @@ EOF
     /**
      * Returns an array of XML errors.
      *
+     * @param Boolean $internalErrors
+     *
      * @return array
      */
-    private function getXmlErrors()
+    private function getXmlErrors($internalErrors)
     {
         $errors = array();
         foreach (libxml_get_errors() as $error) {
@@ -404,6 +425,7 @@ EOF
         }
 
         libxml_clear_errors();
+        libxml_use_internal_errors($internalErrors);
 
         return $errors;
     }

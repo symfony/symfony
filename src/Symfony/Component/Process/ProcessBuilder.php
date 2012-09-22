@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Component\Process\Exception\LogicException;
+
 /**
  * Process builder.
  *
@@ -99,7 +102,7 @@ class ProcessBuilder
         $timeout = (integer) $timeout;
 
         if ($timeout < 0) {
-            throw new \InvalidArgumentException('The timeout value must be a valid positive integer.');
+            throw new InvalidArgumentException('The timeout value must be a valid positive integer.');
         }
 
         $this->timeout = $timeout;
@@ -117,7 +120,7 @@ class ProcessBuilder
     public function getProcess()
     {
         if (!count($this->arguments)) {
-            throw new \LogicException('You must add() command arguments before calling getProcess().');
+            throw new LogicException('You must add() command arguments before calling getProcess().');
         }
 
         $options = $this->options;

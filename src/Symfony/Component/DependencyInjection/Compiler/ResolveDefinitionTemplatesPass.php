@@ -58,6 +58,8 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
      * @param DefinitionDecorator $definition
      *
      * @return Definition
+     *
+     * @throws \RuntimeException When the definition is invalid
      */
     private function resolveDefinition($id, DefinitionDecorator $definition)
     {

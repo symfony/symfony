@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added numerical type handling for config definitions
+
 2.1.0
 -----
 

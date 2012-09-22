@@ -27,7 +27,7 @@ class GuessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \UnexpectedValueException
+     * @expectedException \InvalidArgumentException
      */
     public function testGuessExpectsValidConfidence()
     {

@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ConfigDataCollector extends DataCollector
 {
+    /** @var KernelInterface */
     private $kernel;
 
     /**
@@ -58,6 +59,7 @@ class ConfigDataCollector extends DataCollector
 
         if (isset($this->kernel)) {
             foreach ($this->kernel->getBundles() as $name => $bundle) {
+                /** @var $bundle \Symfony\Component\HttpKernel\Bundle\BundleInterface */
                 $this->data['bundles'][$name] = $bundle->getPath();
             }
         }

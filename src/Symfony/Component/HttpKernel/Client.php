@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\BrowserKit\Client as BaseClient;
 use Symfony\Component\BrowserKit\Request as DomRequest;
 use Symfony\Component\BrowserKit\Response as DomResponse;
@@ -30,6 +31,7 @@ use Symfony\Component\HttpKernel\TerminableInterface;
  */
 class Client extends BaseClient
 {
+    /** @var TerminableInterface */
     protected $kernel;
 
     /**
@@ -71,6 +73,8 @@ class Client extends BaseClient
      * Returns the script to execute when the request must be insulated.
      *
      * @param Request $request A Request instance
+     *
+     * @return string
      */
     protected function getScript($request)
     {
@@ -174,6 +178,7 @@ EOF;
         if ($response->headers->getCookies()) {
             $cookies = array();
             foreach ($response->headers->getCookies() as $cookie) {
+                /** @var $cookie \Symfony\Component\HttpFoundation\Cookie */
                 $cookies[] = new DomCookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
             }
             $headers['Set-Cookie'] = $cookies;

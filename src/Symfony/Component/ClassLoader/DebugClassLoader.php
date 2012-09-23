@@ -74,6 +74,8 @@ class DebugClassLoader
      *
      * @param string $class The name of the class
      *
+     * @throws \RuntimeException
+     *
      * @return Boolean|null True, if loaded
      */
     public function loadClass($class)

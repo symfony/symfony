@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\File\MimeType;
 
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 
@@ -95,11 +94,15 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      * returns a value that is not NULL, this method terminates and returns the
      * value.
      *
-     * @param string $path The path to the file
      *
-     * @return string         The mime type or NULL, if none could be guessed
+     * @throws \LogicException
+     * @throws \Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException
+     * @throws \Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException
      *
-     * @throws FileException  If the file does not exist
+     * @param string $path    The path to the file
+     *
+     * @return string|void    The mime type or NULL, if none could be guessed
+     *
      */
     public function guess($path)
     {
@@ -116,6 +119,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
         }
 
         foreach ($this->guessers as $guesser) {
+            /** @var $guesser MimeTypeGuesserInterface */
             if (null !== $mimeType = $guesser->guess($path)) {
                 return $mimeType;
             }

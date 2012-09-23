@@ -62,6 +62,8 @@ class StreamedResponse extends Response
      * Sets the PHP callback associated with this Response.
      *
      * @param mixed $callback A valid PHP callback
+     *
+     * @throws \LogicException
      */
     public function setCallback($callback)
     {
@@ -120,7 +122,7 @@ class StreamedResponse extends Response
     /**
      * {@inheritdoc}
      *
-     * @return false
+     * @return Boolean
      */
     public function getContent()
     {

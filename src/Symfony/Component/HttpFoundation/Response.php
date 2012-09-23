@@ -267,6 +267,7 @@ class Response
 
         // cookies
         foreach ($this->headers->getCookies() as $cookie) {
+            /** @var $cookie Cookie */
             setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
         }
 
@@ -322,6 +323,8 @@ class Response
      * Valid types are strings, numbers, and objects that implement a __toString() method.
      *
      * @param mixed $content
+     *
+     * @throws \UnexpectedValueException
      *
      * @return Response
      *

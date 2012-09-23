@@ -93,6 +93,8 @@ class ControllerResolver implements ControllerResolverInterface
      *
      * @throws \RuntimeException When value for argument given is not provided
      *
+     * @return array
+     *
      * @api
      */
     public function getArguments(Request $request, $controller)

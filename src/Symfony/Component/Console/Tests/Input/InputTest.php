@@ -107,7 +107,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testSetFetInteractive()
+    public function testSetGetInteractive()
     {
         $input = new ArrayInput(array());
         $this->assertTrue($input->isInteractive(), '->isInteractive() returns whether the input should be interactive or not');

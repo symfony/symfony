@@ -231,7 +231,7 @@ class Response
             $headers->remove('Content-Length');
         }
 
-        if ('HEAD' === $request->getMethod()) {
+        if ($request->isMethod('HEAD')) {
             // cf. RFC2616 14.13
             $length = $headers->get('Content-Length');
             $this->setContent(null);

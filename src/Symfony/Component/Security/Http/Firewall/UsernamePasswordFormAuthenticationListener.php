@@ -67,7 +67,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
      */
     protected function attemptAuthentication(Request $request)
     {
-        if ($this->options['post_only'] && 'post' !== strtolower($request->getMethod())) {
+        if ($this->options['post_only'] && !$request->isMethod('post')) {
             if (null !== $this->logger) {
                 $this->logger->debug(sprintf('Authentication method not supported: %s.', $request->getMethod()));
             }

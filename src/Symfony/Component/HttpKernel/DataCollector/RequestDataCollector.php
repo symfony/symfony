@@ -43,6 +43,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         $responseHeaders = $response->headers->all();
         $cookies = array();
         foreach ($response->headers->getCookies() as $cookie) {
+            /** @var $cookie Cookie */
             $cookies[] = $this->getCookieHeader($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
         }
         if (count($cookies) > 0) {

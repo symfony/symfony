@@ -135,7 +135,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Gets the Request instance associated with the master request.
      *
-     * @return Symfony\Component\HttpFoundation\Request A Request instance
+     * @return \Symfony\Component\HttpFoundation\Request A Request instance
      */
     public function getRequest()
     {
@@ -145,7 +145,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Gets the Kernel instance
      *
-     * @return Symfony\Component\HttpKernel\HttpKernelInterface An HttpKernelInterface instance
+     * @return \Symfony\Component\HttpKernel\HttpKernelInterface An HttpKernelInterface instance
      */
     public function getKernel()
     {
@@ -156,7 +156,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Gets the Esi instance
      *
-     * @return Symfony\Component\HttpKernel\HttpCache\Esi An Esi instance
+     * @return \Symfony\Component\HttpKernel\HttpCache\Esi An Esi instance
      */
     public function getEsi()
     {
@@ -249,6 +249,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Request $request A Request instance
      * @param Boolean $catch   Whether to process exceptions
      *
+     * @throws \Exception
+     *
      * @return Response A Response instance
      *
      * @see RFC2616 13.10
@@ -286,6 +288,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param Request $request A Request instance
      * @param Boolean $catch   whether to process exceptions
+     *
+     * @throws \Exception
      *
      * @return Response A Response instance
      */
@@ -549,6 +553,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
+     *
+     * @throws \Exception
      */
     protected function store(Request $request, Response $response)
     {

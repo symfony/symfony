@@ -194,6 +194,8 @@ class RequestMatcher implements RequestMatcherInterface
      * @param string $requestIp
      * @param string $ip
      *
+     * @throws \RuntimeException
+     *
      * @return boolean True valid, false if not.
      */
     protected function checkIp6($requestIp, $ip)

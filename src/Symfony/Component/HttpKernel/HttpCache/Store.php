@@ -86,6 +86,8 @@ class Store implements StoreInterface
      * Releases the lock for the given Request.
      *
      * @param Request $request A Request instance
+     *
+     * @return bool
      */
     public function unlock(Request $request)
     {
@@ -141,6 +143,8 @@ class Store implements StoreInterface
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
      *
+     * @throws \RuntimeException
+     *
      * @return string The key under which the response is stored
      */
     public function write(Request $request, Response $response)
@@ -192,6 +196,8 @@ class Store implements StoreInterface
      * Invalidates all cache entries that match the request.
      *
      * @param Request $request A Request instance
+     *
+     * @throws \RuntimeException
      */
     public function invalidate(Request $request)
     {
@@ -309,6 +315,8 @@ class Store implements StoreInterface
      *
      * @param string $key  The store key
      * @param string $data The data to store
+     *
+     * @return bool
      */
     private function save($key, $data)
     {

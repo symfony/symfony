@@ -200,6 +200,8 @@ class Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
+     * @throws \Exception
+     *
      * @return integer The command exit code
      *
      * @see setCode()

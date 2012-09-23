@@ -41,6 +41,8 @@ class RouterListener implements EventSubscriberInterface
      * @param UrlMatcherInterface|RequestMatcherInterface $matcher The Url or Request matcher
      * @param RequestContext|null                         $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
      * @param LoggerInterface|null                        $logger  The logger
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null)
     {

@@ -62,7 +62,9 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     /**
      * Returns the bundle's container extension.
      *
-     * @return ExtensionInterface|null The container extension
+     * @throws \LogicException
+     *
+     * @return \Symfony\Component\DependencyInjection\Extension\ExtensionInterface|null The container extension
      *
      * @api
      */
@@ -73,6 +75,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
 
             $class = $this->getNamespace().'\\DependencyInjection\\'.$basename.'Extension';
             if (class_exists($class)) {
+                /** @var $extension \Symfony\Component\DependencyInjection\Extension\ExtensionInterface */
                 $extension = new $class();
 
                 // check naming convention

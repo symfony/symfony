@@ -83,6 +83,8 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      *
      * This can be overridden in a sub-class to specify the alias manually.
      *
+     * @throws \BadMethodCallException
+     *
      * @return string The alias
      */
     public function getAlias()

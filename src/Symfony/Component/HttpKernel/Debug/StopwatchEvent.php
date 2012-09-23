@@ -74,6 +74,8 @@ class StopwatchEvent
     /**
      * Stops the last started event period.
      *
+     * @throws \LogicException
+     *
      * @return StopwatchEvent The event
      */
     public function stop()

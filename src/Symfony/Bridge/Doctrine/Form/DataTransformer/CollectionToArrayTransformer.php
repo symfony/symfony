@@ -26,6 +26,8 @@ class CollectionToArrayTransformer implements DataTransformerInterface
      *
      * @param Collection $collection A collection of entities
      *
+     * @throws \Symfony\Component\Form\Exception\UnexpectedTypeException
+     *
      * @return mixed An array of entities
      */
     public function transform($collection)

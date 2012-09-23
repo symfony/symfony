@@ -67,6 +67,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $compound = false;
 
     /**
+     * @var Boolean
+     */
+    private $partial = false;
+
+    /**
      * @var ResolvedFormTypeInterface
      */
     private $type;
@@ -448,6 +453,14 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function getPartial()
+    {
+        return $this->partial;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getType()
     {
         return $this->type;
@@ -783,6 +796,20 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         }
 
         $this->compound = $compound;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPartial($partial)
+    {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
+        $this->partial = $partial;
 
         return $this;
     }

@@ -211,6 +211,17 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setCompound($compound);
 
     /**
+     * Sets whether the form should support partial binding.
+     *
+     * @param  Boolean $partial Whether the form should support partial binding.
+     *
+     * @return self The configuration object.
+     *
+     * @see FormConfigInterface::getPartial()
+     */
+    public function setPartial($partial);
+
+    /**
      * Set the types.
      *
      * @param ResolvedFormTypeInterface $type The type of the form.

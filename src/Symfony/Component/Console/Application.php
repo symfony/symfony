@@ -56,7 +56,7 @@ class Application
     private $autoExit;
     private $definition;
     private $helperSet;
-
+    private $defaultCommandName = null;
     /**
      * Constructor.
      *
@@ -81,6 +81,30 @@ class Application
     }
 
     /**
+     * Sets the name of the default command, this command will be executed if
+     * no command is provided in the CLI arguments
+     * @param String $command
+     */
+    public function setDefaultCommandName($command)
+    {
+        if (!is_string($command)) {
+            throw new \UnexpectedValueException('Default Command Name must be a String');
+        }
+        $this->defaultCommandName = $command;
+    }
+
+    /**
+     * gets the name of the default command, this command will be executed if
+     * no command is provided in the CLI arguments
+
+     * @return String
+     */
+    public function getDefaultCommandName()
+    {
+        return $this->defaultCommandName ;
+    }
+
+    /**
      * Runs the current application.
      *
      * @param InputInterface  $input  An Input instance
@@ -96,6 +120,15 @@ class Application
     {
         if (null === $input) {
             $input = new ArgvInput();
+            // if we have a default command and we can not decide which command
+            // to execute we execute the default one
+            if (! is_null($this->getDefaultcommandName())) {
+                if (! $this->has($this->getCommandName($input))) {
+                    $argv = $_SERVER['argv'];
+                    array_splice($argv, 1, 0, $this->getDefaultcommandName());
+                    $input = new ArgvInput($argv);
+                }
+            }
         }
 
         if (null === $output) {

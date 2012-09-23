@@ -391,16 +391,6 @@ class Form implements \IteratorAggregate, FormInterface
                     'that transforms ' . $actualType . ' to ' . $expectedType . '.'
                 );
             }
-
-            if (null !== $dataClass && !$viewData instanceof $dataClass) {
-                throw new FormException(
-                    'The form\'s view data is expected to be an instance of class ' .
-                    $dataClass . ', but is '. $actualType . '. You can avoid this error ' .
-                    'by setting the "data_class" option to null or by adding a view ' .
-                    'transformer that transforms ' . $actualType . ' to an instance of ' .
-                    $dataClass . '.'
-                );
-            }
         }
 
         $this->modelData = $modelData;

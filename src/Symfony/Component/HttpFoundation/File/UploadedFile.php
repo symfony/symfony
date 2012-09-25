@@ -124,15 +124,11 @@ class UploadedFile extends File
      * It is extracted from the original file name that was uploaded.
      * Then is should not be considered as a safe value.
      *
-     * \SplFileInfo::getExtension() is not available before PHP 5.3.6
-     *
      * @return string The extension
-     *
-     * @api
      */
     public function getClientOriginalExtension()
     {
-        return pathinfo($this->originalName,PATHINFO_EXTENSION);
+        return pathinfo($this->originalName, PATHINFO_EXTENSION);
     }
 
     /**

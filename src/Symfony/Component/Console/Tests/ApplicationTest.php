@@ -400,13 +400,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(32));
         $tester = new ApplicationTester($application);
 
-        $application = $this->getMock('Symfony\Component\Console\Application', array('getTerminalWidth'));
-        $application->setAutoExit(false);
-        $application->expects($this->any())
-            ->method('getTerminalWidth')
-            ->will($this->returnValue(32));
-        $tester = new ApplicationTester($application);
-
         $tester->run(array('command' => 'foo'), array('decorated' => false));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception4.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->renderException() wraps messages when they are bigger than the terminal');
     }

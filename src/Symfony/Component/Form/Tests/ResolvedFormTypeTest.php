@@ -55,6 +55,10 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateBuilder()
     {
+        if (version_compare(\PHPUnit_Runner_Version::id(), '3.7', '<')) {
+            $this->markTestSkipped('This test requires PHPUnit 3.7.');
+        }
+
         $parentType = $this->getMockFormType();
         $type = $this->getMockFormType();
         $extension1 = $this->getMockFormTypeExtension();

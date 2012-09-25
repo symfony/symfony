@@ -35,12 +35,9 @@ class TreeBuilder implements NodeParentInterface
      */
     public function root($name, $type = 'array', NodeBuilder $builder = null)
     {
-        $builder = null === $builder ? new NodeBuilder() : $builder;
+        $builder = $builder ?: new NodeBuilder();
 
-        $this->root = $builder->node($name, $type);
-        $this->root->setParent($this);
-
-        return $this->root;
+        return $this->root = $builder->node($name, $type)->setParent($this);
     }
 
     /**

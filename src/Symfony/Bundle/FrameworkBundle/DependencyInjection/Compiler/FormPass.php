@@ -1,7 +1,5 @@
 <?php
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -11,6 +9,8 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
  * file that was distributed with this source code.
  */
 
+namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  * Adds all services with the tags "form.type" and "form.type_guesser" as
  * arguments of the "form.extension" service
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormPass implements CompilerPassInterface
 {

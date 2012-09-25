@@ -18,7 +18,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * Transforms between an integer and a localized number with grouping
  * (each thousand) and comma separators.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {
@@ -33,6 +33,10 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
 
         if ('' === $value) {
             return null;
+        }
+
+        if ('NaN' === $value) {
+            throw new TransformationFailedException('"NaN" is not a valid integer');
         }
 
         $formatter = $this->getNumberFormatter();

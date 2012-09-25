@@ -16,7 +16,7 @@ namespace Symfony\Bridge\Twig\Node;
  */
 class TransNode extends \Twig_Node
 {
-    public function __construct(\Twig_NodeInterface $body, \Twig_NodeInterface $domain, \Twig_Node_Expression $count = null, \Twig_Node_Expression $vars = null, \Twig_Node_Expression $locale = null, $lineno = 0, $tag = null)
+    public function __construct(\Twig_NodeInterface $body, \Twig_NodeInterface $domain = null, \Twig_Node_Expression $count = null, \Twig_Node_Expression $vars = null, \Twig_Node_Expression $locale = null, $lineno = 0, $tag = null)
     {
         parent::__construct(array('count' => $count, 'body' => $body, 'domain' => $domain, 'vars' => $vars, 'locale' => $locale), array(), $lineno, $tag);
     }
@@ -66,10 +66,14 @@ class TransNode extends \Twig_Node
             $compiler->subcompile($defaults);
         }
 
-        $compiler
-            ->raw(', ')
-            ->subcompile($this->getNode('domain'))
-        ;
+        $compiler->raw(', ');
+
+        if (null === $this->getNode('domain')) {
+            $compiler->repr('messages');
+        } else {
+            $compiler->subcompile($this->getNode('domain'));
+        }
+
         if (null !== $this->getNode('locale')) {
             $compiler
                 ->raw(', ')

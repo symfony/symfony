@@ -84,19 +84,4 @@ interface UserInterface
      * @return void
      */
     public function eraseCredentials();
-
-    /**
-     * Returns whether or not the given user is equivalent to *this* user.
-     *
-     * The equality comparison should neither be done by referential equality
-     * nor by comparing identities (i.e. getId() === getId()).
-     *
-     * However, you do not need to compare every attribute, but only those that
-     * are relevant for assessing whether re-authentication is required.
-     *
-     * @param UserInterface $user
-     *
-     * @return Boolean
-     */
-    public function equals(UserInterface $user);
 }

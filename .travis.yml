@@ -5,4 +5,7 @@ php:
   - 5.3
   - 5.4
 
-before_script: php vendors.php
+before_script:
+    - COMPOSER_ROOT_VERSION=dev-master composer --dev install
+    - php src/Symfony/Component/Locale/Resources/data/build-data.php
+    - export USE_INTL_ICU_DATA_VERSION=1

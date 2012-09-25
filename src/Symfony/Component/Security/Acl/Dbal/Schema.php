@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Acl\Dbal;
 
 use Doctrine\DBAL\Schema\Schema as BaseSchema;
+use Doctrine\DBAL\Connection;
 
 /**
  * The schema used for the ACL system.
@@ -25,12 +26,14 @@ final class Schema extends BaseSchema
     /**
      * Constructor
      *
-     * @param array $options the names for tables
-     * @return void
+     * @param array      $options    the names for tables
+     * @param Connection $connection
      */
-    public function __construct(array $options)
+    public function __construct(array $options, Connection $connection = null)
     {
-        parent::__construct();
+        $schemaConfig = null === $connection ? null : $connection->getSchemaManager()->createSchemaConfig();
+
+        parent::__construct(array(), array(), $schemaConfig);
 
         $this->options = $options;
 
@@ -42,9 +45,23 @@ final class Schema extends BaseSchema
     }
 
     /**
-     * Adds the class table to the schema
+     * Merges ACL schema with the given schema.
      *
-     * @return void
+     * @param BaseSchema $schema
+     */
+    public function addToSchema(BaseSchema $schema)
+    {
+        foreach ($this->getTables() as $table) {
+            $schema->_addTable($table);
+        }
+
+        foreach ($this->getSequences() as $sequence) {
+            $schema->_addSequence($sequence);
+        }
+    }
+
+    /**
+     * Adds the class table to the schema
      */
     protected function addClassTable()
     {
@@ -57,8 +74,6 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the entry table to the schema
-     *
-     * @return void
      */
     protected function addEntryTable()
     {
@@ -87,8 +102,6 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the object identity table to the schema
-     *
-     * @return void
      */
     protected function addObjectIdentitiesTable()
     {
@@ -104,13 +117,11 @@ final class Schema extends BaseSchema
         $table->addUniqueIndex(array('object_identifier', 'class_id'));
         $table->addIndex(array('parent_object_identity_id'));
 
-        $table->addForeignKeyConstraint($table, array('parent_object_identity_id'), array('id'), array('onDelete' => 'RESTRICT', 'onUpdate' => 'RESTRICT'));
+        $table->addForeignKeyConstraint($table, array('parent_object_identity_id'), array('id'));
     }
 
     /**
      * Adds the object identity relation table to the schema
-     *
-     * @return void
      */
     protected function addObjectIdentityAncestorsTable()
     {
@@ -128,8 +139,6 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the security identity table to the schema
-     *
-     * @return void
      */
     protected function addSecurityIdentitiesTable()
     {

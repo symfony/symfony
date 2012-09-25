@@ -16,12 +16,18 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2",
-        "symfony/http-kernel": "self.version",
+        "php": ">=5.3.3",
+        "symfony/http-kernel": "2.2.*",
         "monolog/monolog": "1.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Monolog": "" }
     },
-    "target-dir": "Symfony/Bridge/Monolog"
+    "target-dir": "Symfony/Bridge/Monolog",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.2-dev"
+        }
+    }
 }

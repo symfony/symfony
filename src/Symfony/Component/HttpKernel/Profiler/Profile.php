@@ -18,16 +18,22 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Profile implements \Serializable
+class Profile
 {
     private $token;
     private $collectors;
     private $ip;
+    private $method;
     private $url;
     private $time;
     private $parent;
     private $children;
 
+    /**
+     * Constructor.
+     *
+     * @param string $token The token
+     */
     public function __construct($token)
     {
         $this->token = $token;
@@ -66,13 +72,23 @@ class Profile implements \Serializable
     }
 
     /**
-     * Returns the parent token.
+     * Returns the parent profile.
      *
      * @return Profile The parent profile
      */
     public function getParent()
     {
         return $this->parent;
+    }
+
+    /**
+     * Returns the parent token.
+     *
+     * @return null|string The parent token
+     */
+    public function getParentToken()
+    {
+        return $this->parent ? $this->parent->getToken() : null;
     }
 
     /**
@@ -88,6 +104,21 @@ class Profile implements \Serializable
     public function setIp($ip)
     {
         $this->ip = $ip;
+    }
+
+    /**
+     * Returns the request method.
+     *
+     * @return string The request method
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    public function setMethod($method)
+    {
+        $this->method = $method;
     }
 
     /**
@@ -138,9 +169,15 @@ class Profile implements \Serializable
         }
     }
 
+    /**
+     * Adds the child token
+     *
+     * @param Profile $child The child Profile
+     */
     public function addChild(Profile $child)
     {
         $this->children[] = $child;
+        $child->setParent($this);
     }
 
     public function getCollector($name)
@@ -175,13 +212,8 @@ class Profile implements \Serializable
         return isset($this->collectors[$name]);
     }
 
-    public function serialize()
+    public function __sleep()
     {
-        return serialize(array($this->token, $this->parent, $this->children, $this->collectors, $this->ip, $this->url, $this->time));
-    }
-
-    public function unserialize($data)
-    {
-        list($this->token, $this->parent, $this->children, $this->collectors, $this->ip, $this->url, $this->time) = unserialize($data);
+        return array('token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time');
     }
 }

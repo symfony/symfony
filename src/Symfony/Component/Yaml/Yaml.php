@@ -22,6 +22,13 @@ use Symfony\Component\Yaml\Exception\ParseException;
  */
 class Yaml
 {
+    public static $enablePhpParsing = false;
+
+    public static function enablePhpParsing()
+    {
+        self::$enablePhpParsing = true;
+    }
+
     /**
      * Parses YAML into a PHP array.
      *
@@ -38,33 +45,35 @@ class Yaml
      *
      * @return array The YAML converted to a PHP array
      *
-     * @throws \InvalidArgumentException If the YAML is not valid
+     * @throws ParseException If the YAML is not valid
      *
      * @api
      */
     public static function parse($input)
     {
-        $file = '';
-
         // if input is a file, process it
+        $file = '';
         if (strpos($input, "\n") === false && is_file($input)) {
             if (false === is_readable($input)) {
                 throw new ParseException(sprintf('Unable to parse "%s" as the file is not readable.', $input));
             }
 
             $file = $input;
+            if (self::$enablePhpParsing) {
+                ob_start();
+                $retval = include($file);
+                $content = ob_get_clean();
 
-            ob_start();
-            $retval = include($input);
-            $content = ob_get_clean();
+                // if an array is returned by the config file assume it's in plain php form else in YAML
+                $input = is_array($retval) ? $retval : $content;
 
-            // if an array is returned by the config file assume it's in plain php form else in YAML
-            $input = is_array($retval) ? $retval : $content;
-        }
-
-        // if an array is returned by the config file assume it's in plain php form else in YAML
-        if (is_array($input)) {
-            return $input;
+                // if an array is returned by the config file assume it's in plain php form else in YAML
+                if (is_array($input)) {
+                    return $input;
+                }
+            } else {
+                $input = file_get_contents($file);
+            }
         }
 
         $yaml = new Parser();
@@ -88,14 +97,16 @@ class Yaml
      *
      * @param array   $array  PHP array
      * @param integer $inline The level where you switch to inline YAML
+     * @param integer $indent The amount of spaces to use for indentation of nested nodes.
      *
      * @return string A YAML string representing the original PHP array
      *
      * @api
      */
-    public static function dump($array, $inline = 2)
+    public static function dump($array, $inline = 2, $indent = 4)
     {
         $yaml = new Dumper();
+        $yaml->setIndentation($indent);
 
         return $yaml->dump($array, $inline);
     }

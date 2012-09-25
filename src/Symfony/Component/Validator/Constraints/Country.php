@@ -20,5 +20,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class Country extends Constraint
 {
-    public $message = 'This value is not a valid country';
+    public $message = 'This value is not a valid country.';
 }

@@ -36,8 +36,15 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->booleanNode('verbose')->defaultTrue()->end()
+                ->booleanNode('verbose')->defaultTrue()->info('DEPRECATED, it is not useful anymore and can be removed safely from your configuration')->end()
                 ->booleanNode('toolbar')->defaultFalse()->end()
+                ->scalarNode('position')
+                    ->defaultValue('bottom')
+                    ->validate()
+                        ->ifNotInArray(array('bottom', 'top'))
+                        ->thenInvalid('The CSS position %s is not supported')
+                    ->end()
+                ->end()
                 ->booleanNode('intercept_redirects')->defaultFalse()->end()
             ->end()
         ;

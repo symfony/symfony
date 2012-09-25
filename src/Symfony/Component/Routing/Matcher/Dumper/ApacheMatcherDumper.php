@@ -55,10 +55,19 @@ class ApacheMatcherDumper extends MatcherDumper
             if (strlen($regex) < 2 || 0 === $regexPatternEnd) {
                 throw new \LogicException('The "%s" route regex "%s" is invalid', $name, $regex);
             }
-            $regex = preg_replace('/\?P<.+?>/', '', substr($regex, 1, $regexPatternEnd - 1));
+            $regex = preg_replace('/\?<.+?>/', '', substr($regex, 1, $regexPatternEnd - 1));
             $regex = '^'.self::escape(preg_quote($options['base_uri']).substr($regex, 1), ' ', '\\');
 
-            $hasTrailingSlash = '/$' == substr($regex, -2) && '^/$' != $regex;
+            $methods = array();
+            if ($req = $route->getRequirement('_method')) {
+                $methods = explode('|', strtoupper($req));
+                // GET and HEAD are equivalent
+                if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
+                    $methods[] = 'HEAD';
+                }
+            }
+
+            $hasTrailingSlash = (!$methods || in_array('HEAD', $methods)) && '/$' === substr($regex, -2) && '^/$' !== $regex;
 
             $variables = array('E=_ROUTING__route:'.$name);
             foreach ($compiledRoute->getVariables() as $i => $variable) {

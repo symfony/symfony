@@ -16,6 +16,7 @@
 namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,7 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @api
  */
-class HttpCache implements HttpKernelInterface
+class HttpCache implements HttpKernelInterface, TerminableInterface
 {
     private $kernel;
     private $store;
@@ -210,9 +211,21 @@ class HttpCache implements HttpKernelInterface
             }
         }
 
-        $response->prepare();
+        $response->prepare($request);
 
         return $response;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function terminate(Request $request, Response $response)
+    {
+        if ($this->getKernel() instanceof TerminableInterface) {
+            $this->getKernel()->terminate($request, $response);
+        }
     }
 
     /**
@@ -502,7 +515,7 @@ class HttpCache implements HttpKernelInterface
 
             // wait for the lock to be released
             $wait = 0;
-            while (file_exists($lock) && $wait < 5000000) {
+            while (is_file($lock) && $wait < 5000000) {
                 usleep(50000);
                 $wait += 50000;
             }
@@ -567,8 +580,8 @@ class HttpCache implements HttpKernelInterface
      */
     private function restoreResponseBody(Request $request, Response $response)
     {
-        if ('HEAD' === $request->getMethod() || 304 === $response->getStatusCode()) {
-            $response->setContent('');
+        if ($request->isMethod('HEAD') || 304 === $response->getStatusCode()) {
+            $response->setContent(null);
             $response->headers->remove('X-Body-Eval');
             $response->headers->remove('X-Body-File');
 

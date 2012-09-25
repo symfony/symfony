@@ -17,11 +17,13 @@ use Symfony\Component\Validator\Constraint;
  * @Annotation
  *
  * @api
+ *
+ * @deprecated Deprecated since version 2.1, to be removed in 2.3.
  */
 class Max extends Constraint
 {
-    public $message = 'This value should be {{ limit }} or less';
-    public $invalidMessage = 'This value should be a valid number';
+    public $message = 'This value should be {{ limit }} or less.';
+    public $invalidMessage = 'This value should be a valid number.';
     public $limit;
 
     /**

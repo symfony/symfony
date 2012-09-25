@@ -18,9 +18,59 @@ Here is a simple example that shows how to register services and parameters:
 
     $sc->get('foo');
 
+Method Calls (Setter Injection):
+
+    $sc = new ContainerBuilder();
+
+    $sc
+        ->register('bar', '%bar.class%')
+        ->addMethodCall('setFoo', array(new Reference('foo')))
+    ;
+    $sc->setParameter('bar.class', 'Bar');
+
+    $sc->get('bar');
+
+Factory Class:
+
+If your service is retrieved by calling a static method:
+
+    $sc = new ContainerBuilder();
+
+    $sc
+        ->register('bar', '%bar.class%')
+        ->setFactoryClass('%bar.class%')
+        ->setFactoryMethod('getInstance')
+        ->addArgument('Aarrg!!!')
+    ;
+    $sc->setParameter('bar.class', 'Bar');
+
+    $sc->get('bar');
+
+File Include:
+
+For some services, especially those that are difficult or impossible to
+autoload, you may need the container to include a file before
+instantiating your class.
+
+    $sc = new ContainerBuilder();
+
+    $sc
+        ->register('bar', '%bar.class%')
+        ->setFile('/path/to/file')
+        ->addArgument('Aarrg!!!')
+    ;
+    $sc->setParameter('bar.class', 'Bar');
+
+    $sc->get('bar');
+
 Resources
 ---------
 
-Unit tests:
+You can run the unit tests with the following command:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/DependencyInjection
+    phpunit
+
+If you also want to run the unit tests that depend on other Symfony
+Components, install dev dependencies before running PHPUnit:
+
+    php composer.phar install --dev

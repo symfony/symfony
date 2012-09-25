@@ -1,0 +1,15 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/routing.png') }}" alt="Routing" /></span>
+    <strong>Routing</strong>
+</span>
+{% endblock %}
+
+{% block panel %}
+    {% render "WebProfilerBundle:Router:panel" with {'token': token} %}
+{% endblock %}

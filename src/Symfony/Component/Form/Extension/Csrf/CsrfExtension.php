@@ -16,7 +16,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\AbstractExtension;
 
 /**
- * This extension protects forms by using a CSRF token
+ * This extension protects forms by using a CSRF token.
  */
 class CsrfExtension extends AbstractExtension
 {
@@ -35,24 +35,10 @@ class CsrfExtension extends AbstractExtension
     /**
      * {@inheritDoc}
      */
-    protected function loadTypes()
-    {
-        return array(
-            new Type\CsrfType($this->csrfProvider),
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     protected function loadTypeExtensions()
     {
         return array(
-            new Type\ChoiceTypeCsrfExtension(),
-            new Type\DateTypeCsrfExtension(),
-            new Type\FormTypeCsrfExtension(),
-            new Type\RepeatedTypeCsrfExtension(),
-            new Type\TimeTypeCsrfExtension(),
+            new Type\FormTypeCsrfExtension($this->csrfProvider),
         );
     }
 }

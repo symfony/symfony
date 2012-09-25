@@ -19,8 +19,11 @@ form_login_default_target_path:
     defaults: { _controller: FormLoginBundle:Login:afterLogin }
 
 form_login_redirect_to_protected_resource_after_login:
-    pattern: /protected-resource
+    pattern: /protected_resource
     defaults: { _controller: FormLoginBundle:Login:afterLogin }
+
+highly_protected_resource:
+    pattern: /highly_protected_resource
 
 form_logout:
     pattern: /logout_path

@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * Controllers should be callables.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */

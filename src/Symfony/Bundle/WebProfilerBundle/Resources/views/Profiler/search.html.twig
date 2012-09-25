@@ -7,6 +7,13 @@
         <label for="ip">IP</label>
         <input type="text" name="ip" id="ip" value="{{ ip }}" />
         <div class="clear_fix"></div>
+        <label for="method">Method</label>
+        <select name="method" id="method">
+            {% for m in ['', 'DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'] %}
+                <option{{ m == method ? ' selected="selected"' : '' }}>{{ m }}</option>
+            {% endfor %}
+        </select>
+        <div class="clear_fix"></div>
         <label for="url">URL</label>
         <input type="text" name="url" id="url" value="{{ url }}" />
         <div class="clear_fix"></div>

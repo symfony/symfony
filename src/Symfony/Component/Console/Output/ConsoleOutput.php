@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Console\Output;
 
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 /**
  * ConsoleOutput is the default class for all CLI output. It uses STDOUT.
@@ -28,8 +30,10 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  *
  * @api
  */
-class ConsoleOutput extends StreamOutput
+class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 {
+    private $stderr;
+
     /**
      * Constructor.
      *
@@ -48,6 +52,39 @@ class ConsoleOutput extends StreamOutput
         }
 
         parent::__construct(fopen($outputStream, 'w'), $verbosity, $decorated, $formatter);
+
+        $this->stderr = new StreamOutput(fopen('php://stderr', 'w'), $verbosity, $decorated, $formatter);
+    }
+
+    public function setDecorated($decorated)
+    {
+        parent::setDecorated($decorated);
+        $this->stderr->setDecorated($decorated);
+    }
+
+    public function setFormatter(OutputFormatterInterface $formatter)
+    {
+        parent::setFormatter($formatter);
+        $this->stderr->setFormatter($formatter);
+    }
+
+    public function setVerbosity($level)
+    {
+        parent::setVerbosity($level);
+        $this->stderr->setVerbosity($level);
+    }
+
+    /**
+     * @return OutputInterface
+     */
+    public function getErrorOutput()
+    {
+        return $this->stderr;
+    }
+
+    public function setErrorOutput(OutputInterface $error)
+    {
+        $this->stderr = $error;
     }
 
     /**

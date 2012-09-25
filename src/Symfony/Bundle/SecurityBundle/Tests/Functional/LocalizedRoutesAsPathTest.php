@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 class LocalizedRoutesAsPathTest extends WebTestCase
@@ -29,6 +38,23 @@ class LocalizedRoutesAsPathTest extends WebTestCase
     /**
      * @dataProvider getLocales
      */
+    public function testLoginFailureWithLocalizedFailurePath($locale)
+    {
+        $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => 'localized_form_failure_handler.yml'));
+        $client->insulate();
+
+        $crawler = $client->request('GET', '/'.$locale.'/login');
+        $form = $crawler->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'foobar';
+        $client->submit($form);
+
+        $this->assertRedirect($client->getResponse(), '/'.$locale.'/login');
+    }
+
+    /**
+     * @dataProvider getLocales
+     */
     public function testAccessRestrictedResource($locale)
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes.yml'));
@@ -47,7 +73,7 @@ class LocalizedRoutesAsPathTest extends WebTestCase
         $client->insulate();
 
         $crawler = $client->request('GET', '/'.$locale.'/secure/');
-        $this->assertEquals(1, count($crawler->selectButton('login')), (string) $client->getResponse());
+        $this->assertCount(1, $crawler->selectButton('login'), (string) $client->getResponse());
     }
 
     public function getLocales()

@@ -50,6 +50,10 @@ class InputOption
             $name = substr($name, 2);
         }
 
+        if (empty($name)) {
+            throw new \InvalidArgumentException('An option name cannot be empty.');
+        }
+
         if (empty($shortcut)) {
             $shortcut = null;
         }
@@ -58,11 +62,15 @@ class InputOption
             if ('-' === $shortcut[0]) {
                 $shortcut = substr($shortcut, 1);
             }
+
+            if (empty($shortcut)) {
+                throw new \InvalidArgumentException('An option shortcut cannot be empty.');
+            }
         }
 
         if (null === $mode) {
             $mode = self::VALUE_NONE;
-        } elseif (!is_int($mode) || $mode > 15) {
+        } elseif (!is_int($mode) || $mode > 15 || $mode < 1) {
             throw new \InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 
@@ -180,5 +188,22 @@ class InputOption
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * Checks whether the given option equals this one
+     *
+     * @param InputOption $option option to compare
+     * @return Boolean
+     */
+    public function equals(InputOption $option)
+    {
+        return $option->getName() === $this->getName()
+            && $option->getShortcut() === $this->getShortcut()
+            && $option->getDefault() === $this->getDefault()
+            && $option->isArray() === $this->isArray()
+            && $option->isValueRequired() === $this->isValueRequired()
+            && $option->isValueOptional() === $this->isValueOptional()
+        ;
     }
 }

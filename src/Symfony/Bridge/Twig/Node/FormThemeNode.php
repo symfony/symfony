@@ -30,18 +30,11 @@ class FormThemeNode extends \Twig_Node
     {
         $compiler
             ->addDebugInfo($this)
-            ->write('echo $this->env->getExtension(\'form\')->setTheme(')
+            ->write('$this->env->getExtension(\'form\')->renderer->setTheme(')
             ->subcompile($this->getNode('form'))
-            ->raw(', array(')
+            ->raw(', ')
+            ->subcompile($this->getNode('resources'))
+            ->raw(");\n");
         ;
-
-        foreach ($this->getNode('resources') as $resource) {
-            $compiler
-                ->subcompile($resource)
-                ->raw(', ')
-            ;
-        }
-
-        $compiler->raw("));\n");
     }
 }

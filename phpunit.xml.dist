@@ -9,11 +9,16 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="tests/bootstrap.php"
+         bootstrap="autoload.php.dist"
 >
+    <php>
+        <ini name="intl.default_locale" value="en"/>
+    </php>
+
     <testsuites>
         <testsuite name="Symfony Test Suite">
-            <directory>./tests/Symfony/</directory>
+            <directory>./src/Symfony/Bridge/*/Tests/</directory>
+            <directory>./src/Symfony/Component/*/Tests/</directory>
             <directory>./src/Symfony/Bundle/*/Tests/</directory>
         </testsuite>
     </testsuites>
@@ -28,8 +33,10 @@
         <whitelist>
             <directory>./src/Symfony/</directory>
             <exclude>
-                <directory>./src/Symfony/Bundle/*/Resources</directory>
+                <directory>./src/Symfony/Bridge/*/Tests</directory>
+                <directory>./src/Symfony/Component/*/Tests</directory>
                 <directory>./src/Symfony/Bundle/*/Tests</directory>
+                <directory>./src/Symfony/Bundle/*/Resources</directory>
                 <directory>./src/Symfony/Component/*/Resources</directory>
                 <directory>./src/Symfony/Component/*/*/Resources</directory>
             </exclude>

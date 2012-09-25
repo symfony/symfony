@@ -14,7 +14,7 @@ namespace Symfony\Component\Locale\Stub;
 /**
  * Provides fake static versions of the global functions in the intl extension
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class StubIntl
 {
@@ -103,6 +103,8 @@ abstract class StubIntl
 
     /**
      * Returns the symbolic name for a given error code
+     *
+     * @param integer $code The error code returned by StubIntl::getErrorCode()
      *
      * @return string
      */

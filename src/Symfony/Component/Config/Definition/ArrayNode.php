@@ -50,6 +50,16 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
+     * Retrieves the children of this node.
+     *
+     * @return array The children
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
      * Sets the xml remappings that should be performed.
      *
      * @param array $remappings an array of the form array(array(string, string))

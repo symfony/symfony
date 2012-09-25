@@ -32,23 +32,28 @@ class ListCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition($this->createDefinition())
             ->setName('list')
+            ->setDefinition($this->createDefinition())
             ->setDescription('Lists commands')
             ->setHelp(<<<EOF
-The <info>list</info> command lists all commands:
+The <info>%command.name%</info> command lists all commands:
 
-  <info>php app/console list</info>
+  <info>php %command.full_name%</info>
 
 You can also display the commands for a specific namespace:
 
-  <info>php app/console list test</info>
+  <info>php %command.full_name% test</info>
 
 You can also output the information as XML by using the <comment>--xml</comment> option:
 
-  <info>php app/console list --xml</info>
+  <info>php %command.full_name% --xml</info>
+
+It's also possible to get raw list of commands (useful for embedding command runner):
+
+  <info>php %command.full_name% --raw</info>
 EOF
-            );
+            )
+        ;
     }
 
     /**
@@ -67,7 +72,7 @@ EOF
         if ($input->getOption('xml')) {
             $output->writeln($this->getApplication()->asXml($input->getArgument('namespace')), OutputInterface::OUTPUT_RAW);
         } else {
-            $output->writeln($this->getApplication()->asText($input->getArgument('namespace')));
+            $output->writeln($this->getApplication()->asText($input->getArgument('namespace'), $input->getOption('raw')));
         }
     }
 
@@ -76,6 +81,7 @@ EOF
         return new InputDefinition(array(
             new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
             new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
+            new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
         ));
     }
 }

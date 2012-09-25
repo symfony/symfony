@@ -11,8 +11,18 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 /**
  * Request represents an HTTP request.
+ *
+ * The methods dealing with URL accept / return a raw path (% encoded):
+ *   * getBasePath
+ *   * getBaseUrl
+ *   * getPathInfo
+ *   * getRequestUri
+ *   * getUri
+ *   * getUriForPath
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
@@ -71,18 +81,74 @@ class Request
      */
     public $headers;
 
+    /**
+     * @var string
+     */
     protected $content;
+
+    /**
+     * @var array
+     */
     protected $languages;
+
+    /**
+     * @var array
+     */
     protected $charsets;
+
+    /**
+     * @var array
+     */
     protected $acceptableContentTypes;
+
+    /**
+     * @var string
+     */
     protected $pathInfo;
+
+    /**
+     * @var string
+     */
     protected $requestUri;
+
+    /**
+     * @var string
+     */
     protected $baseUrl;
+
+    /**
+     * @var string
+     */
     protected $basePath;
+
+    /**
+     * @var string
+     */
     protected $method;
+
+    /**
+     * @var string
+     */
     protected $format;
+
+    /**
+     * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
+     */
     protected $session;
 
+    /**
+     * @var string
+     */
+    protected $locale;
+
+    /**
+     * @var string
+     */
+    protected $defaultLocale = 'en';
+
+    /**
+     * @var array
+     */
     protected static $formats;
 
     /**
@@ -152,7 +218,7 @@ class Request
         $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
 
         if (0 === strpos($request->server->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
-            && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE'))
+            && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE', 'PATCH'))
         ) {
             parse_str($request->getContent(), $data);
             $request->request = new ParameterBag($data);
@@ -166,7 +232,7 @@ class Request
      *
      * @param string $uri        The URI
      * @param string $method     The HTTP method
-     * @param array  $parameters The request (GET) or query (POST) parameters
+     * @param array  $parameters The query (GET) or request (POST) parameters
      * @param array  $cookies    The request cookies ($_COOKIE)
      * @param array  $files      The request files ($_FILES)
      * @param array  $server     The server parameters ($_SERVER)
@@ -211,38 +277,46 @@ class Request
             $defaults['HTTP_HOST'] = $defaults['HTTP_HOST'].':'.$components['port'];
         }
 
+        if (isset($components['user'])) {
+            $defaults['PHP_AUTH_USER'] = $components['user'];
+        }
+
+        if (isset($components['pass'])) {
+            $defaults['PHP_AUTH_PW'] = $components['pass'];
+        }
+
         if (!isset($components['path'])) {
             $components['path'] = '';
         }
 
-        if (in_array(strtoupper($method), array('POST', 'PUT', 'DELETE'))) {
-            $request = $parameters;
-            $query = array();
-            $defaults['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
-        } else {
-            $request = array();
-            $query = $parameters;
-            if (false !== $pos = strpos($uri, '?')) {
-                $qs = substr($uri, $pos + 1);
-                parse_str($qs, $params);
-
-                $query = array_merge($params, $query);
-            }
+        switch (strtoupper($method)) {
+            case 'POST':
+            case 'PUT':
+            case 'DELETE':
+                $defaults['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
+            case 'PATCH':
+                $request = $parameters;
+                $query = array();
+                break;
+            default:
+                $request = array();
+                $query = $parameters;
+                break;
         }
 
-        $queryString = isset($components['query']) ? html_entity_decode($components['query']) : '';
-        parse_str($queryString, $qs);
-        if (is_array($qs)) {
+        if (isset($components['query'])) {
+            parse_str(html_entity_decode($components['query']), $qs);
             $query = array_replace($qs, $query);
         }
+        $queryString = http_build_query($query, '', '&');
 
-        $uri = $components['path'].($queryString ? '?'.$queryString : '');
+        $uri = $components['path'].('' !== $queryString ? '?'.$queryString : '');
 
         $server = array_replace($defaults, $server, array(
-            'REQUEST_METHOD'       => strtoupper($method),
-            'PATH_INFO'            => '',
-            'REQUEST_URI'          => $uri,
-            'QUERY_STRING'         => $queryString,
+            'REQUEST_METHOD' => strtoupper($method),
+            'PATH_INFO'      => '',
+            'REQUEST_URI'    => $uri,
+            'QUERY_STRING'   => $queryString,
         ));
 
         return new static($query, $request, array(), $cookies, $files, $server, $content);
@@ -257,6 +331,8 @@ class Request
      * @param array $cookies    The COOKIE parameters
      * @param array $files      The FILES parameters
      * @param array $server     The SERVER parameters
+     *
+     * @return Request The duplicated request
      *
      * @api
      */
@@ -328,7 +404,8 @@ class Request
     /**
      * Overrides the PHP global variables according to this request instance.
      *
-     * It overrides $_GET, $_POST, $_REQUEST, $_SERVER, $_COOKIE, and $_FILES.
+     * It overrides $_GET, $_POST, $_REQUEST, $_SERVER, $_COOKIE.
+     * $_FILES is never override, see rfc1867
      *
      * @api
      */
@@ -338,7 +415,6 @@ class Request
         $_POST = $this->request->all();
         $_SERVER = $this->server->all();
         $_COOKIE = $this->cookies->all();
-        // FIXME: populate $_FILES
 
         foreach ($this->headers->all() as $key => $value) {
             $key = strtoupper(str_replace('-', '_', $key));
@@ -349,9 +425,15 @@ class Request
             }
         }
 
-        // FIXME: should read variables_order and request_order
-        // to know which globals to merge and in which order
-        $_REQUEST = array_merge($_GET, $_POST);
+        $request = array('g' => $_GET, 'p' => $_POST, 'c' => $_COOKIE);
+
+        $requestOrder = ini_get('request_order') ?: ini_get('variable_order');
+        $requestOrder = preg_replace('#[^cgp]#', '', strtolower($requestOrder)) ?: 'gp';
+
+        $_REQUEST = array();
+        foreach (str_split($requestOrder) as $order) {
+            $_REQUEST = array_merge($_REQUEST, $request[$order]);
+        }
     }
 
     /**
@@ -368,18 +450,77 @@ class Request
     }
 
     /**
+     * Returns true if $_SERVER entries coming from proxies are trusted,
+     * false otherwise.
+     *
+     * @return boolean
+     */
+    public static function isProxyTrusted()
+    {
+        return self::$trustProxy;
+    }
+
+    /**
+     * Normalizes a query string.
+     *
+     * It builds a normalized query string, where keys/value pairs are alphabetized,
+     * have consistent escaping and unneeded delimiters are removed.
+     *
+     * @param string $qs Query string
+     *
+     * @return string A normalized query string for the Request
+     */
+    public static function normalizeQueryString($qs)
+    {
+        if ('' == $qs) {
+            return '';
+        }
+
+        $parts = array();
+        $order = array();
+
+        foreach (explode('&', $qs) as $param) {
+            if ('' === $param || '=' === $param[0]) {
+                // Ignore useless delimiters, e.g. "x=y&".
+                // Also ignore pairs with empty key, even if there was a value, e.g. "=value", as such nameless values cannot be retrieved anyway.
+                // PHP also does not include them when building _GET.
+                continue;
+            }
+
+            $keyValuePair = explode('=', $param, 2);
+
+            // GET parameters, that are submitted from a HTML form, encode spaces as "+" by default (as defined in enctype application/x-www-form-urlencoded).
+            // PHP also converts "+" to spaces when filling the global _GET or when using the function parse_str. This is why we use urldecode and then normalize to
+            // RFC 3986 with rawurlencode.
+            $parts[] = isset($keyValuePair[1]) ?
+                rawurlencode(urldecode($keyValuePair[0])).'='.rawurlencode(urldecode($keyValuePair[1])) :
+                rawurlencode(urldecode($keyValuePair[0]));
+            $order[] = urldecode($keyValuePair[0]);
+        }
+
+        array_multisort($order, SORT_ASC, $parts);
+
+        return implode('&', $parts);
+    }
+
+    /**
      * Gets a "parameter" value.
      *
      * This method is mainly useful for libraries that want to provide some flexibility.
      *
      * Order of precedence: GET, PATH, POST, COOKIE
+     *
      * Avoid using this method in controllers:
+     *
      *  * slow
      *  * prefer to get from a "named" source
      *
-     * @param string $key     the key
-     * @param mixed  $default the default value
-     * @param type   $deep    is parameter deep in multidimensional array
+     * It is better to explicitly get request parameters from the appropriate
+     * public property instead (query, request, attributes, ...).
+     *
+     * @param string  $key     the key
+     * @param mixed   $default the default value
+     * @param Boolean $deep    is parameter deep in multidimensional array
      *
      * @return mixed
      */
@@ -391,7 +532,7 @@ class Request
     /**
      * Gets the Session.
      *
-     * @return Session|null The session
+     * @return SessionInterface|null The session
      *
      * @api
      */
@@ -411,7 +552,7 @@ class Request
     public function hasPreviousSession()
     {
         // the check for $this->session avoids malicious users trying to fake a session cookie with proper name
-        return $this->cookies->has(session_name()) && null !== $this->session;
+        return $this->hasSession() && $this->cookies->has($this->session->getName());
     }
 
     /**
@@ -429,11 +570,11 @@ class Request
     /**
      * Sets the Session.
      *
-     * @param Session $session The Session
+     * @param SessionInterface $session The Session
      *
      * @api
      */
-    public function setSession(Session $session)
+    public function setSession(SessionInterface $session)
     {
         $this->session = $session;
     }
@@ -441,21 +582,27 @@ class Request
     /**
      * Returns the client IP address.
      *
-     * @param Boolean $proxy Whether the current request has been made behind a proxy or not
-     *
      * @return string The client IP address
      *
      * @api
      */
-    public function getClientIp($proxy = false)
+    public function getClientIp()
     {
-        if ($proxy) {
+        if (self::$trustProxy) {
             if ($this->server->has('HTTP_CLIENT_IP')) {
                 return $this->server->get('HTTP_CLIENT_IP');
-            } elseif (self::$trustProxy && $this->server->has('HTTP_X_FORWARDED_FOR')) {
-                $clientIp = explode(',', $this->server->get('HTTP_X_FORWARDED_FOR'), 2);
+            } elseif ($this->server->has('HTTP_X_FORWARDED_FOR')) {
+                $clientIp = explode(',', $this->server->get('HTTP_X_FORWARDED_FOR'));
 
-                return isset($clientIp[0]) ? trim($clientIp[0]) : '';
+                foreach ($clientIp as $ipAddress) {
+                    $cleanIpAddress = trim($ipAddress);
+
+                    if (false !== filter_var($cleanIpAddress, FILTER_VALIDATE_IP)) {
+                        return $cleanIpAddress;
+                    }
+                }
+
+                return '';
             }
         }
 
@@ -483,9 +630,10 @@ class Request
      *
      *  * http://localhost/mysite              returns an empty string
      *  * http://localhost/mysite/about        returns '/about'
+     *  * htpp://localhost/mysite/enco%20ded   returns '/enco%20ded'
      *  * http://localhost/mysite/about?var=1  returns '/about'
      *
-     * @return string
+     * @return string The raw path (i.e. not urldecoded)
      *
      * @api
      */
@@ -503,11 +651,12 @@ class Request
      *
      * Suppose that an index.php file instantiates this request object:
      *
-     *  * http://localhost/index.php        returns an empty string
-     *  * http://localhost/index.php/page   returns an empty string
-     *  * http://localhost/web/index.php    return '/web'
+     *  * http://localhost/index.php         returns an empty string
+     *  * http://localhost/index.php/page    returns an empty string
+     *  * http://localhost/web/index.php     returns '/web'
+     *  * http://localhost/we%20b/index.php  returns '/we%20b'
      *
-     * @return string
+     * @return string The raw path (i.e. not urldecoded)
      *
      * @api
      */
@@ -528,7 +677,7 @@ class Request
      * This is similar to getBasePath(), except that it also includes the
      * script filename (e.g. index.php) if one exists.
      *
-     * @return string
+     * @return string The raw url (i.e. not urldecoded)
      *
      * @api
      */
@@ -570,6 +719,43 @@ class Request
     }
 
     /**
+     * Returns the user.
+     *
+     * @return string|null
+     */
+    public function getUser()
+    {
+        return $this->server->get('PHP_AUTH_USER');
+    }
+
+    /**
+     * Returns the password.
+     *
+     * @return string|null
+     */
+    public function getPassword()
+    {
+        return $this->server->get('PHP_AUTH_PW');
+    }
+
+    /**
+     * Gets the user info.
+     *
+     * @return string A user name and, optionally, scheme-specific information about how to gain authorization to access the server
+     */
+    public function getUserInfo()
+    {
+        $userinfo = $this->getUser();
+
+        $pass = $this->getPassword();
+        if ('' != $pass) {
+           $userinfo .= ":$pass";
+        }
+
+        return $userinfo;
+    }
+
+    /**
      * Returns the HTTP host being requested.
      *
      * The port name will be appended to the host if it's non-standard.
@@ -593,7 +779,7 @@ class Request
     /**
      * Returns the requested URI.
      *
-     * @return string
+     * @return string The raw URI (i.e. not urldecoded)
      *
      * @api
      */
@@ -604,6 +790,19 @@ class Request
         }
 
         return $this->requestUri;
+    }
+
+    /**
+     * Gets the scheme and HTTP host.
+     *
+     * If the URL was called with basic authentication, the user
+     * and the password are not added to the generated string.
+     *
+     * @return string The scheme and HTTP host
+     */
+    public function getSchemeAndHttpHost()
+    {
+        return $this->getScheme().'://'.$this->getHttpHost();
     }
 
     /**
@@ -622,7 +821,7 @@ class Request
             $qs = '?'.$qs;
         }
 
-        return $this->getScheme().'://'.$this->getHttpHost().$this->getBaseUrl().$this->getPathInfo().$qs;
+        return $this->getSchemeAndHttpHost().$this->getBaseUrl().$this->getPathInfo().$qs;
     }
 
     /**
@@ -636,7 +835,7 @@ class Request
      */
     public function getUriForPath($path)
     {
-        return $this->getScheme().'://'.$this->getHttpHost().$this->getBaseUrl().$path;
+        return $this->getSchemeAndHttpHost().$this->getBaseUrl().$path;
     }
 
     /**
@@ -651,26 +850,9 @@ class Request
      */
     public function getQueryString()
     {
-        if (!$qs = $this->server->get('QUERY_STRING')) {
-            return null;
-        }
+        $qs = static::normalizeQueryString($this->server->get('QUERY_STRING'));
 
-        $parts = array();
-        $order = array();
-
-        foreach (explode('&', $qs) as $segment) {
-            if (false === strpos($segment, '=')) {
-                $parts[] = $segment;
-                $order[] = $segment;
-            } else {
-                $tmp = explode('=', rawurldecode($segment), 2);
-                $parts[] = rawurlencode($tmp[0]).'='.rawurlencode($tmp[1]);
-                $order[] = $tmp[0];
-            }
-        }
-        array_multisort($order, SORT_ASC, $parts);
-
-        return implode('&', $parts);
+        return '' === $qs ? null : $qs;
     }
 
     /**
@@ -715,7 +897,8 @@ class Request
         // Remove port number from host
         $host = preg_replace('/:\d+$/', '', $host);
 
-        return trim($host);
+        // host is lowercase as per RFC 952/2181
+        return trim(strtolower($host));
     }
 
     /**
@@ -745,7 +928,7 @@ class Request
         if (null === $this->method) {
             $this->method = strtoupper($this->server->get('REQUEST_METHOD', 'GET'));
             if ('POST' === $this->method) {
-                $this->method = strtoupper($this->headers->get('X-HTTP-METHOD-OVERRIDE', $this->request->get('_method', 'POST')));
+                $this->method = strtoupper($this->headers->get('X-HTTP-METHOD-OVERRIDE', $this->request->get('_method', $this->query->get('_method', 'POST'))));
             }
         }
 
@@ -775,7 +958,7 @@ class Request
      *
      * @param string $mimeType The associated mime type
      *
-     * @return string The format (null if not found)
+     * @return string|null The format (null if not found)
      *
      * @api
      */
@@ -851,22 +1034,62 @@ class Request
         $this->format = $format;
     }
 
-    public function setLocale($locale)
+    /**
+     * Gets the format associated with the request.
+     *
+     * @return string|null The format (null if no content type is present)
+     *
+     * @api
+     */
+    public function getContentType()
     {
-        if (!$this->hasSession()) {
-            throw new \LogicException('Forward compatibility for Request::setLocale() requires the session to be set.');
-        }
-
-        $this->session->setLocale($locale);
+        return $this->getFormat($this->server->get('CONTENT_TYPE'));
     }
 
+    /**
+     * Sets the default locale.
+     *
+     * @param string $locale
+     *
+     * @api
+     */
+    public function setDefaultLocale($locale)
+    {
+        $this->setPhpDefaultLocale($this->defaultLocale = $locale);
+    }
+
+    /**
+     * Sets the locale.
+     *
+     * @param string $locale
+     *
+     * @api
+     */
+    public function setLocale($locale)
+    {
+        $this->setPhpDefaultLocale($this->locale = $locale);
+    }
+
+    /**
+     * Get the locale.
+     *
+     * @return string
+     */
     public function getLocale()
     {
-        if (!$this->hasSession()) {
-            throw new \LogicException('Forward compatibility for Request::getLocale() requires the session to be set.');
-        }
+        return null === $this->locale ? $this->defaultLocale : $this->locale;
+    }
 
-        return $this->session->getLocale();
+    /**
+     * Checks if the request method is of specified type.
+     *
+     * @param string $method Uppercase request method (GET, POST etc).
+     *
+     * @return Boolean
+     */
+    public function isMethod($method)
+    {
+        return $this->getMethod() === strtoupper($method);
     }
 
     /**
@@ -917,6 +1140,9 @@ class Request
         return preg_split('/\s*,\s*/', $this->headers->get('if_none_match'), null, PREG_SPLIT_NO_EMPTY);
     }
 
+    /**
+     * @return Boolean
+     */
     public function isNoCache()
     {
         return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' == $this->headers->get('Pragma');
@@ -1092,14 +1318,14 @@ class Request
         } elseif ($this->server->has('REQUEST_URI')) {
             $requestUri = $this->server->get('REQUEST_URI');
             // HTTP proxy reqs setup request uri with scheme and host [and port] + the url path, only use url path
-            $schemeAndHttpHost = $this->getScheme().'://'.$this->getHttpHost();
+            $schemeAndHttpHost = $this->getSchemeAndHttpHost();
             if (strpos($requestUri, $schemeAndHttpHost) === 0) {
                 $requestUri = substr($requestUri, strlen($schemeAndHttpHost));
             }
         } elseif ($this->server->has('ORIG_PATH_INFO')) {
             // IIS 5.0, PHP as CGI
             $requestUri = $this->server->get('ORIG_PATH_INFO');
-            if ($this->server->get('QUERY_STRING')) {
+            if ('' != $this->server->get('QUERY_STRING')) {
                 $requestUri .= '?'.$this->server->get('QUERY_STRING');
             }
         }
@@ -1107,6 +1333,11 @@ class Request
         return $requestUri;
     }
 
+    /**
+     * Prepares the base URL.
+     *
+     * @return string
+     */
     protected function prepareBaseUrl()
     {
         $filename = basename($this->server->get('SCRIPT_FILENAME'));
@@ -1137,14 +1368,14 @@ class Request
         // Does the baseUrl have anything in common with the request_uri?
         $requestUri = $this->getRequestUri();
 
-        if ($baseUrl && 0 === strpos($requestUri, $baseUrl)) {
+        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) {
             // full $baseUrl matches
-            return $baseUrl;
+            return $prefix;
         }
 
-        if ($baseUrl && 0 === strpos($requestUri, dirname($baseUrl))) {
+        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, dirname($baseUrl))) {
             // directory portion of $baseUrl matches
-            return rtrim(dirname($baseUrl), '/');
+            return rtrim($prefix, '/');
         }
 
         $truncatedRequestUri = $requestUri;
@@ -1153,7 +1384,7 @@ class Request
         }
 
         $basename = basename($baseUrl);
-        if (empty($basename) || !strpos($truncatedRequestUri, $basename)) {
+        if (empty($basename) || !strpos(rawurldecode($truncatedRequestUri), $basename)) {
             // no match whatsoever; set it blank
             return '';
         }
@@ -1169,7 +1400,7 @@ class Request
     }
 
     /**
-     * Prepares base path.
+     * Prepares the base path.
      *
      * @return string base path
      */
@@ -1195,7 +1426,7 @@ class Request
     }
 
     /**
-     * Prepares path info.
+     * Prepares the path info.
      *
      * @return string path info
      */
@@ -1214,7 +1445,7 @@ class Request
             $requestUri = substr($requestUri, 0, $pos);
         }
 
-        if ((null !== $baseUrl) && (false === ($pathInfo = substr(urldecode($requestUri), strlen(urldecode($baseUrl)))))) {
+        if ((null !== $baseUrl) && (false === ($pathInfo = substr($requestUri, strlen($baseUrl))))) {
             // If substr() returns false then PATH_INFO is set to an empty string
             return '/';
         } elseif (null === $baseUrl) {
@@ -1238,6 +1469,49 @@ class Request
             'xml'  => array('text/xml', 'application/xml', 'application/x-xml'),
             'rdf'  => array('application/rdf+xml'),
             'atom' => array('application/atom+xml'),
+            'rss'  => array('application/rss+xml'),
         );
+    }
+
+    /**
+     * Sets the default PHP locale.
+     *
+     * @param string $locale
+     */
+    private function setPhpDefaultLocale($locale)
+    {
+        // if either the class Locale doesn't exist, or an exception is thrown when
+        // setting the default locale, the intl module is not installed, and
+        // the call can be ignored:
+        try {
+            if (class_exists('Locale', false)) {
+                \Locale::setDefault($locale);
+            }
+        } catch (\Exception $e) {
+        }
+    }
+
+    /*
+     * Returns the prefix as encoded in the string when the string starts with
+     * the given prefix, false otherwise.
+     *
+     * @param string $string The urlencoded string
+     * @param string $prefix The prefix not encoded
+     *
+     * @return string|false The prefix as it is encoded in $string, or false
+     */
+    private function getUrlencodedPrefix($string, $prefix)
+    {
+        if (0 !== strpos(rawurldecode($string), $prefix)) {
+            return false;
+        }
+
+        $len = strlen($prefix);
+
+        if (preg_match("#^(%[[:xdigit:]]{2}|.){{$len}}#", $string, $match)) {
+            return $match[0];
+        }
+
+        return false;
     }
 }

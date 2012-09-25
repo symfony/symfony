@@ -1,10 +1,10 @@
 {% use "form_div_layout.html.twig" %}
 
-{% block field_row %}
+{% block form_row %}
 {% spaceless %}
     <tr>
         <td>
-            {{ form_label(form, label|default(null)) }}
+            {{ form_label(form) }}
         </td>
         <td>
             {{ form_errors(form) }}
@@ -12,19 +12,7 @@
         </td>
     </tr>
 {% endspaceless %}
-{% endblock field_row %}
-
-{% block form_errors %}
-{% spaceless %}
-    {% if errors|length > 0 %}
-    <tr>
-        <td colspan="2">
-            {{ block('field_errors') }}
-        </td>
-    </tr>
-    {% endif %}
-{% endspaceless %}
-{% endblock form_errors %}
+{% endblock form_row %}
 
 {% block hidden_row %}
 {% spaceless %}
@@ -36,11 +24,18 @@
 {% endspaceless %}
 {% endblock hidden_row %}
 
-{% block form_widget %}
+{% block form_widget_compound %}
 {% spaceless %}
     <table {{ block('widget_container_attributes') }}>
-        {{ block('field_rows') }}
+        {% if form.parent is empty and errors|length > 0 %}
+        <tr>
+            <td colspan="2">
+                {{ form_errors(form) }}
+            </td>
+        </tr>
+        {% endif %}
+        {{ block('form_rows') }}
         {{ form_rest(form) }}
     </table>
 {% endspaceless %}
-{% endblock form_widget %}
+{% endblock form_widget_compound %}

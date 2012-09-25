@@ -32,7 +32,7 @@ class XmlFileLoader extends FileLoader
             $xml = $this->parseFile($this->file);
 
             foreach ($xml->namespace as $namespace) {
-                $this->namespaces[(string) $namespace['prefix']] = trim((string) $namespace);
+                $this->addNamespaceAlias((string) $namespace['prefix'], trim((string) $namespace));
             }
 
             foreach ($xml->class as $class) {
@@ -42,6 +42,10 @@ class XmlFileLoader extends FileLoader
 
         if (isset($this->classes[$metadata->getClassName()])) {
             $xml = $this->classes[$metadata->getClassName()];
+
+            foreach ($xml->{'group-sequence-provider'} as $provider) {
+                $metadata->setGroupSequenceProvider(true);
+            }
 
             foreach ($xml->{'group-sequence'} as $groupSequence) {
                 if (count($groupSequence->value) > 0) {

@@ -11,16 +11,31 @@
 
 namespace Symfony\Component\Form;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
-    private $vars = array(
+    /**
+     * The variables assigned to this view.
+     * @var array
+     */
+    public $vars = array(
         'value' => null,
         'attr'  => array(),
     );
 
-    private $parent;
+    /**
+     * The parent view.
+     * @var FormView
+     */
+    public $parent;
 
-    private $children = array();
+    /**
+     * The child views.
+     * @var array
+     */
+    public $children = array();
 
     /**
      * Is the form attached to this renderer rendered?
@@ -33,11 +48,33 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     private $rendered = false;
 
+    public function __construct(FormView $parent = null)
+    {
+        $this->parent = $parent;
+    }
+
+    /**
+     * Returns the name of the form.
+     *
+     * @return string The form name.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead which contains an
+     *             entry named "name".
+     */
+    public function getName()
+    {
+        return $this->vars['name'];
+    }
+
     /**
      * @param string $name
      * @param mixed  $value
      *
      * @return FormView The current view
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
      */
     public function set($name, $value)
     {
@@ -50,6 +87,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param $name
      *
      * @return Boolean
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
      */
     public function has($name)
     {
@@ -61,6 +101,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param $default
      *
      * @return mixed
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
      */
     public function get($name, $default = null)
     {
@@ -73,6 +116,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * @return array
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
      */
     public function all()
     {
@@ -80,13 +126,16 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * Alias of all so it is possible to do `form.vars.foo`
+     * Returns the values of all view variables.
      *
-     * @return array
+     * @return array The values of all variables.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
      */
     public function getVars()
     {
-        return $this->all();
+        return $this->vars;
     }
 
     /**
@@ -96,6 +145,10 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param string $value The value
      *
      * @return FormView The current view
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead which contains an
+     *             entry named "attr".
      */
     public function setAttribute($name, $value)
     {
@@ -105,9 +158,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * Returns whether the attached form is rendered.
+     * Returns whether the view was already rendered.
      *
-     * @return Boolean Whether the form is rendered
+     * @return Boolean Whether this view's widget is rendered.
      */
     public function isRendered()
     {
@@ -131,9 +184,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * Marks the attached form as rendered
+     * Marks the view as rendered.
      *
-     * @return FormView The current view
+     * @return FormView The view object.
      */
     public function setRendered()
     {
@@ -145,9 +198,12 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Sets the parent view.
      *
-     * @param FormView $parent The parent view
+     * @param FormView $parent The parent view.
      *
-     * @return FormView The current view
+     * @return FormView The view object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link parent} instead.
      */
     public function setParent(FormView $parent = null)
     {
@@ -159,7 +215,10 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns the parent view.
      *
-     * @return FormView The parent view
+     * @return FormView The parent view.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link parent} instead.
      */
     public function getParent()
     {
@@ -170,6 +229,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Returns whether this view has a parent.
      *
      * @return Boolean Whether this view has a parent
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link parent} instead.
      */
     public function hasParent()
     {
@@ -182,6 +244,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param array $children The children as instances of FormView
      *
      * @return FormView The current view
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link children} instead.
      */
     public function setChildren(array $children)
     {
@@ -194,6 +259,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * Returns the children.
      *
      * @return array The children as instances of FormView
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link children} instead.
      */
     public function getChildren()
     {
@@ -206,6 +274,9 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param string $name The name of the child
      *
      * @return FormView The child view
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link children} instead.
      */
     public function getChild($name)
     {
@@ -213,9 +284,12 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * Returns whether this view has children.
+     * Returns whether this view has any children.
      *
-     * @return Boolean Whether this view has children
+     * @return Boolean Whether the view has children.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link count()} instead.
      */
     public function hasChildren()
     {
@@ -231,7 +305,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function offsetGet($name)
     {
-        return $this->getChild($name);
+        return $this->children[$name];
     }
 
     /**

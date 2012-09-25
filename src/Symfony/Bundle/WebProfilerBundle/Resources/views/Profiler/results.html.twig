@@ -9,6 +9,7 @@
                 <tr>
                     <th scope="col">Token</th>
                     <th scope="col">IP</th>
+                    <th scope="col">Method</th>
                     <th scope="col">URL</th>
                     <th scope="col">Time</th>
                 </tr>
@@ -18,6 +19,7 @@
                     <tr>
                         <td><a href="{{ path('_profiler', { 'token': elements.token }) }}">{{ elements.token }}</a></td>
                         <td>{{ elements.ip }}</td>
+                        <td>{{ elements.method }}</td>
                         <td>{{ elements.url }}</td>
                         <td>{{ elements.time|date('r') }}</td>
                     </tr>

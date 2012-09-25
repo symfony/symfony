@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Authentication;
 
+use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
+use Symfony\Component\Security\Core\Event\AuthenticationEvent;
+use Symfony\Component\Security\Core\AuthenticationEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
@@ -22,11 +26,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * instances to authenticate a Token.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class AuthenticationProviderManager implements AuthenticationManagerInterface
 {
     private $providers;
     private $eraseCredentials;
+    private $eventDispatcher;
 
     /**
      * Constructor.
@@ -42,6 +48,11 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
 
         $this->providers = $providers;
         $this->eraseCredentials = (Boolean) $eraseCredentials;
+    }
+
+    public function setEventDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->eventDispatcher = $dispatcher;
     }
 
     /**
@@ -77,11 +88,19 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
                 $result->eraseCredentials();
             }
 
+            if (null !== $this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(AuthenticationEvents::AUTHENTICATION_SUCCESS, new AuthenticationEvent($result));
+            }
+
             return $result;
         }
 
         if (null === $lastException) {
             $lastException = new ProviderNotFoundException(sprintf('No Authentication Provider found for token of class "%s".', get_class($token)));
+        }
+
+        if (null !== $this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(AuthenticationEvents::AUTHENTICATION_FAILURE, new AuthenticationFailureEvent($token, $lastException));
         }
 
         $lastException->setExtraInformation($token);

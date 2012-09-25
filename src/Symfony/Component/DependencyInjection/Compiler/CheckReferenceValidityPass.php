@@ -1,22 +1,23 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Exception\ScopeWideningInjectionException;
-use Symfony\Component\DependencyInjection\Exception\ScopeCrossingInjectionException;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Exception\ScopeCrossingInjectionException;
+use Symfony\Component\DependencyInjection\Exception\ScopeWideningInjectionException;
 
 /**
  * Checks the validity of references
@@ -86,7 +87,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
      *
      * @param array $arguments An array of Reference objects
      *
-     * @throws \RuntimeException when there is a reference to an abstract definition.
+     * @throws RuntimeException when there is a reference to an abstract definition.
      */
     private function validateReferences(array $arguments)
     {
@@ -97,7 +98,7 @@ class CheckReferenceValidityPass implements CompilerPassInterface
                 $targetDefinition = $this->getDefinition((string) $argument);
 
                 if (null !== $targetDefinition && $targetDefinition->isAbstract()) {
-                    throw new \RuntimeException(sprintf(
+                    throw new RuntimeException(sprintf(
                         'The definition "%s" has a reference to an abstract definition "%s". '
                        .'Abstract definitions cannot be the target of references.',
                        $this->currentId,
@@ -116,7 +117,8 @@ class CheckReferenceValidityPass implements CompilerPassInterface
      * @param Reference  $reference
      * @param Definition $definition
      *
-     * @throws ScopeWideningInjectionException|ScopeCrossingInjectionException when there is an issue with the Reference scope
+     * @throws ScopeWideningInjectionException when the definition references a service of a narrower scope
+     * @throws ScopeCrossingInjectionException when the definition references a service of another scope hierarchy
      */
     private function validateScope(Reference $reference, Definition $definition = null)
     {

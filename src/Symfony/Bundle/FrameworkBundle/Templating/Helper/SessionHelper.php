@@ -46,29 +46,19 @@ class SessionHelper extends Helper
         return $this->session->get($name, $default);
     }
 
-    /**
-     * Returns the locale
-     *
-     * @return string
-     */
-    public function getLocale()
+    public function getFlash($name, array $default = array())
     {
-        return $this->session->getLocale();
-    }
-
-    public function getFlash($name, $default = null)
-    {
-        return $this->session->getFlash($name, $default);
+        return $this->session->getFlashBag()->get($name, $default);
     }
 
     public function getFlashes()
     {
-        return $this->session->getFlashes();
+        return $this->session->getFlashBag()->all();
     }
 
     public function hasFlash($name)
     {
-        return $this->session->hasFlash($name);
+        return $this->session->getFlashBag()->has($name);
     }
 
     /**

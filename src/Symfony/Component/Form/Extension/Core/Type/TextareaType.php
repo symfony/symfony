@@ -20,15 +20,15 @@ class TextareaType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->set('pattern', null);
+        $view->vars['pattern'] = null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getParent(array $options)
+    public function getParent()
     {
         return 'text';
     }

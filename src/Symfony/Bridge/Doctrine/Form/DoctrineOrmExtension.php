@@ -11,14 +11,14 @@
 
 namespace Symfony\Bridge\Doctrine\Form;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Form\AbstractExtension;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class DoctrineOrmExtension extends AbstractExtension
 {
     protected $registry;
 
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }

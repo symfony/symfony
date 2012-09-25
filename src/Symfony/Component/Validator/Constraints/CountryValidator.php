@@ -18,26 +18,19 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 /**
  * Validates whether a value is a valid country code
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */
 class CountryValidator extends ConstraintValidator
 {
     /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @return Boolean Whether or not the value is valid
-     *
-     * @api
+     * {@inheritDoc}
      */
-    public function isValid($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
-            return true;
+            return;
         }
 
         if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
@@ -47,11 +40,7 @@ class CountryValidator extends ConstraintValidator
         $value = (string) $value;
 
         if (!in_array($value, \Symfony\Component\Locale\Locale::getCountries())) {
-            $this->setMessage($constraint->message, array('{{ value }}' => $value));
-
-            return false;
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
         }
-
-        return true;
     }
 }

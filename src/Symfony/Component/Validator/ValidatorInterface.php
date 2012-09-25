@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraint;
 /**
  * Validates a given value.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */

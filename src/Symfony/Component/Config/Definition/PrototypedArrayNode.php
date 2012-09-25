@@ -14,6 +14,7 @@ namespace Symfony\Component\Config\Definition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\DuplicateKeyException;
 use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * Represents a prototyped Array node in the config tree.
@@ -27,6 +28,7 @@ class PrototypedArrayNode extends ArrayNode
     protected $removeKeyAttribute;
     protected $minNumberOfElements;
     protected $defaultValue;
+    protected $defaultChildren;
 
     /**
      * Constructor.
@@ -39,6 +41,7 @@ class PrototypedArrayNode extends ArrayNode
         parent::__construct($name, $parent);
 
         $this->minNumberOfElements = 0;
+        $this->defaultValue = array();
     }
 
     /**
@@ -53,21 +56,25 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * The name of the attribute which value should be used as key.
+     * Sets the attribute which value is to be used as key.
      *
-     * This is only relevant for XML configurations, and only in combination
-     * with a prototype based node.
+     * This is useful when you have an indexed array that should be an
+     * associative array. You can select an item from within the array
+     * to be the key of the particular item. For example, if "id" is the
+     * "key", then:
      *
-     * For example, if "id" is the keyAttribute, then:
+     *     array(
+     *         array('id' => 'my_name', 'foo' => 'bar'),
+     *     );
      *
-     *     array('id' => 'my_name', 'foo' => 'bar')
+     *  becomes
      *
-     * becomes
+     *      array(
+     *          'my_name' => array('foo' => 'bar'),
+     *      );
      *
-     *     'my_name' => array('foo' => 'bar')
-     *
-     * If $remove is false, the resulting array will still have the
-     * "'id' => 'my_name'" item in it.
+     * If you'd like "'id' => 'my_name'" to still be present in the resulting
+     * array, then you can set the second argument of this method to false.
      *
      * @param string  $attribute The name of the attribute which value is to be used as a key
      * @param Boolean $remove    Whether or not to remove the key
@@ -76,6 +83,16 @@ class PrototypedArrayNode extends ArrayNode
     {
         $this->keyAttribute = $attribute;
         $this->removeKeyAttribute = $remove;
+    }
+
+    /**
+     * Retrieves the name of the attribute which value should be used as key.
+     *
+     * @return string The name of the attribute
+     */
+    public function getKeyAttribute()
+    {
+        return $this->keyAttribute;
     }
 
     /**
@@ -105,13 +122,40 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
+     * Adds default children when none are set.
+     *
+     * @param integer|string|array|null $children The number of children|The child name|The children names to be added
+     */
+    public function setAddChildrenIfNoneSet($children = array('defaults'))
+    {
+        if (null === $children) {
+            $this->defaultChildren = array('defaults');
+        } else {
+            $this->defaultChildren = is_integer($children) && $children > 0 ? range(1, $children) : (array) $children;
+        }
+    }
+
+    /**
      * Retrieves the default value.
+     *
+     * The default value could be either explicited or derived from the prototype
+     * default value.
      *
      * @return array The default value
      */
     public function getDefaultValue()
     {
-        return $this->defaultValue ?: array();
+        if (null !== $this->defaultChildren) {
+            $default = $this->prototype->hasDefaultValue() ? $this->prototype->getDefaultValue() : array();
+            $defaults = array();
+            foreach (array_values($this->defaultChildren) as $i => $name) {
+                $defaults[null === $this->keyAttribute ? $i : $name] = $default;
+            }
+
+            return $defaults;
+        }
+
+        return $this->defaultValue;
     }
 
     /**
@@ -125,6 +169,16 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
+     * Retrieves the prototype
+     *
+     * @return PrototypeNodeInterface The prototype
+     */
+    public function getPrototype()
+    {
+        return $this->prototype;
+    }
+
+    /**
      * Disable adding concrete children for prototyped nodes.
      *
      * @param NodeInterface $node The child node to add
@@ -133,7 +187,7 @@ class PrototypedArrayNode extends ArrayNode
      */
     public function addChild(NodeInterface $node)
     {
-        throw new \RuntimeException('A prototyped array node can not have concrete children.');
+        throw new Exception('A prototyped array node can not have concrete children.');
     }
 
     /**
@@ -141,7 +195,7 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @param mixed $value
      *
-     * @return mixed The finalised value
+     * @return mixed The finalized value
      *
      * @throws UnsetKeyException
      * @throws InvalidConfigurationException if the node doesn't have enough children
@@ -188,10 +242,11 @@ class PrototypedArrayNode extends ArrayNode
 
         $value = $this->remapXml($value);
 
+        $isAssoc = array_keys($value) === range(0, count($value) -1);
         $normalized = array();
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && is_array($v)) {
-                if (!isset($v[$this->keyAttribute]) && is_int($k)) {
+                if (!isset($v[$this->keyAttribute]) && is_int($k) && $isAssoc) {
                     $msg = sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath());
                     $ex = new InvalidConfigurationException($msg);
                     $ex->setPath($this->getPath());

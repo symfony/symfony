@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class AccessMap
+class AccessMap implements AccessMapInterface
 {
     private $map = array();
 

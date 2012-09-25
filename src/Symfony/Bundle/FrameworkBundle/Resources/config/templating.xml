@@ -7,6 +7,7 @@
     <parameters>
         <parameter key="templating.engine.delegating.class">Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine</parameter>
         <parameter key="templating.name_parser.class">Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser</parameter>
+        <parameter key="templating.filename_parser.class">Symfony\Bundle\FrameworkBundle\Templating\TemplateFilenameParser</parameter>
         <parameter key="templating.cache_warmer.template_paths.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplatePathsCacheWarmer</parameter>
         <parameter key="templating.locator.class">Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator</parameter>
         <parameter key="templating.loader.filesystem.class">Symfony\Bundle\FrameworkBundle\Templating\Loader\FilesystemLoader</parameter>
@@ -25,6 +26,8 @@
             <argument type="service" id="kernel" />
         </service>
 
+        <service id="templating.filename_parser" class="%templating.filename_parser.class%" />
+
         <service id="templating.locator" class="%templating.locator.class%" public="false">
             <argument type="service" id="file_locator" />
             <argument>%kernel.cache_dir%</argument>
@@ -32,7 +35,7 @@
 
         <service id="templating.finder" class="%templating.finder.class%" public="false">
             <argument type="service" id="kernel" />
-            <argument type="service" id="templating.name_parser" />
+            <argument type="service" id="templating.filename_parser" />
             <argument>%kernel.root_dir%/Resources</argument>
         </service>
 

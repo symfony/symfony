@@ -65,19 +65,6 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
 
         try {
             $user = $this->retrieveUser($username, $token);
-
-            if (!$user instanceof UserInterface) {
-                throw new AuthenticationServiceException('retrieveUser() must return a UserInterface.');
-            }
-
-            $this->userChecker->checkPreAuth($user);
-            $this->checkAuthentication($user, $token);
-            $this->userChecker->checkPostAuth($user);
-
-            $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
-            $authenticatedToken->setAttributes($token->getAttributes());
-
-            return $authenticatedToken;
         } catch (UsernameNotFoundException $notFound) {
             if ($this->hideUserNotFoundExceptions) {
                 throw new BadCredentialsException('Bad credentials', 0, $notFound);
@@ -85,6 +72,27 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
 
             throw $notFound;
         }
+
+        if (!$user instanceof UserInterface) {
+            throw new AuthenticationServiceException('retrieveUser() must return a UserInterface.');
+        }
+
+        try {
+            $this->userChecker->checkPreAuth($user);
+            $this->checkAuthentication($user, $token);
+            $this->userChecker->checkPostAuth($user);
+        } catch (BadCredentialsException $e) {
+            if ($this->hideUserNotFoundExceptions) {
+                throw new BadCredentialsException('Bad credentials', 0, $e);
+            }
+
+            throw $e;
+        }
+
+        $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $user->getRoles());
+        $authenticatedToken->setAttributes($token->getAttributes());
+
+        return $authenticatedToken;
     }
 
     /**

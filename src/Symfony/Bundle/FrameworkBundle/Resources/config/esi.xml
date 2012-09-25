@@ -13,7 +13,7 @@
         <service id="esi" class="%esi.class%" />
 
         <service id="esi_listener" class="%esi_listener.class%">
-          <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
+          <tag name="kernel.event_subscriber" />
           <argument type="service" id="esi" on-invalid="ignore" />
         </service>
     </services>

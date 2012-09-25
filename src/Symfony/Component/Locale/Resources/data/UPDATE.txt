@@ -1,13 +1,26 @@
 How to update the ICU data
 ==========================
 
-1. Checkout the current version of the ICU data files
+The build script is a handy tool to generate or update the ICU data that ships
+with Symfony2. You can pass the desired ICU version to build and the path to
+the ICU binaries. Both arguments are optional, if not provided, the script will
+try to build the latest available ICU data using the binaries available in the
+environment path:
 
-   $ svn co http://source.icu-project.org/repos/icu/icu/trunk/source/data icu-data
+   $ php build-data.php 49
+   $ php build-data.php 49 /path/to/icu/bin
 
-2. Execute the build script
+It is recommended to use the ICU binaries in the same version of the desired
+version to build the data files.
 
-   $ php update-data.php /path/to/icu-data
+You can use one of the versions available in the `icu.ini` file. To update to
+a newer version, just update the SVN URL for the desired release URL. For each
+major ICU release, try to use the latest release tag available.
+
+The script requires `svn` (used to download the ICU data) and the `genrb` and
+`icu-config` ICU binaries. The PHP needs the extensions iconv and intl enabled.
+It is recommended to use a PHP with the same intl/ICU version as the target
+ICU version to build the data.
 
 .dat-package
 ------------

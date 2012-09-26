@@ -229,6 +229,10 @@ class FrameworkExtension extends Extension
                 }
             }
         }
+
+        if (!$config['enabled']) {
+            $container->getDefinition('profiler')->addMethodCall('disable', array());
+        }
     }
 
     /**

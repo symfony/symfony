@@ -23,7 +23,9 @@ class RouteCompiler implements RouteCompilerInterface
     /**
      * {@inheritDoc}
      *
-     * @throws \LogicException If a variable is referenced more than once
+     * @throws \LogicException  If a variable is referenced more than once
+     * @throws \DomainException If a variable name is numeric because PHP raises an error for such
+     *                          subpatterns in PCRE and thus would break matching, e.g. "(?<123>.+)".
      */
     public function compile(Route $route)
     {
@@ -41,7 +43,7 @@ class RouteCompiler implements RouteCompilerInterface
             $pos = $match[0][1] + strlen($match[0][0]);
             $var = $match[1][0];
 
-            if ($req = $route->getRequirement($var)) {
+            if (null !== $req = $route->getRequirement($var)) {
                 $regexp = $req;
             } else {
                 // Use the character preceding the variable as a separator
@@ -56,6 +58,9 @@ class RouteCompiler implements RouteCompilerInterface
 
             $tokens[] = array('variable', $match[0][0][0], $regexp, $var);
 
+            if (is_numeric($var)) {
+                throw new \DomainException(sprintf('Variable name "%s" cannot be numeric in route pattern "%s". Please use a different name.', $var, $route->getPattern()));
+            }
             if (in_array($var, $variables)) {
                 throw new \LogicException(sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $route->getPattern(), $var));
             }

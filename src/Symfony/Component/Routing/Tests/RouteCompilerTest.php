@@ -91,6 +91,13 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 )),
 
             array(
+                'Route with a requirement of 0',
+                array('/{bar}', array('bar' => null), array('bar' => '0')),
+                '', '#^/(?<bar>0)?$#s', array('bar'), array(
+                    array('variable', '/', '0', 'bar'),
+                )),
+
+            array(
                 'Route with an optional variable as the first segment with requirements',
                 array('/{bar}', array('bar' => 'bar'), array('bar' => '(foo|bar)')),
                 '', '#^/(?<bar>(foo|bar))?$#s', array('bar'), array(
@@ -132,5 +139,24 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
         $route = new Route('/{name}/{name}');
 
         $compiled = $route->compile();
+    }
+
+    /**
+     * @dataProvider getNumericVariableNames
+     * @expectedException \DomainException
+     */
+    public function testRouteWithNumericVariableName($name)
+    {
+        $route = new Route('/{'. $name . '}');
+        $route->compile();
+    }
+
+    public function getNumericVariableNames()
+    {
+        return array(
+           array('09'),
+           array('123'),
+           array('1e2')
+        );
     }
 }

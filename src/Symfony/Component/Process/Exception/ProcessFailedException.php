@@ -25,7 +25,7 @@ class ProcessFailedException extends RuntimeException
     public function __construct(Process $process)
     {
         if ($process->isSuccessful()) {
-            throw new \InvalidArgumentException('Expected a failed process, but the given process was successful.');
+            throw new InvalidArgumentException('Expected a failed process, but the given process was successful.');
         }
 
         parent::__construct(

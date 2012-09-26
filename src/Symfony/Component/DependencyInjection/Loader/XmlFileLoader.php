@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\SimpleXMLElement;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
@@ -215,7 +215,7 @@ class XmlFileLoader extends FileLoader
         if (!$dom->loadXML(file_get_contents($file), LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
             libxml_disable_entity_loader($disableEntities);
 
-            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($internalErrors)));
+            throw new InvalidArgumentException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
         $dom->normalizeDocument();
 
@@ -224,7 +224,7 @@ class XmlFileLoader extends FileLoader
 
         foreach ($dom->childNodes as $child) {
             if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
-                throw new \InvalidArgumentException('Document types are not allowed.');
+                throw new InvalidArgumentException('Document types are not allowed.');
             }
         }
 

@@ -19,7 +19,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     protected abstract function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array());
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function testNegativeTimeoutFromConstructor()
     {
@@ -27,7 +27,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function testNegativeTimeoutFromSetter()
     {

@@ -89,6 +89,30 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertTrue($form->isBound());
     }
 
+    public function testPartialBindUsesViewDataIfNull()
+    {
+        $form = $this->getBuilder('name', new EventDispatcher())
+            ->setPartial(true)
+            ->addViewTransformer(new FixedDataTransformer(array(
+                ''      => '',
+                'norm'  => 'client',
+            )))
+            ->addModelTransformer(new FixedDataTransformer(array(
+                ''      => '',
+                'app'   => 'norm',
+            )))
+            ->getForm()
+        ;
+
+        $form->setData('app');
+
+        $form->bind(null);
+
+        $this->assertEquals('app',      $form->getData());
+        $this->assertEquals('norm',     $form->getNormData());
+        $this->assertEquals('client',   $form->getClientData());
+    }
+
     public function testNeverRequiredIfParentNotRequired()
     {
         $parent = $this->getBuilder()->setRequired(false)->getForm();

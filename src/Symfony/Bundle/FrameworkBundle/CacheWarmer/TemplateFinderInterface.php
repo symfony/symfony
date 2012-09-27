@@ -21,7 +21,7 @@ interface TemplateFinderInterface
     /**
      * Find all the templates.
      *
-     * @return array An array of templates of type TemplateReferenceInterface
+     * @return \Symfony\Component\Templating\TemplateReferenceInterface[] An array of templates of type TemplateReferenceInterface
      */
     public function findAllTemplates();
 }

@@ -25,6 +25,8 @@ class TransChoiceTokenParser extends TransTokenParser
      *
      * @param \Twig_Token $token A Twig_Token instance
      *
+     * @throws \Twig_Error_Syntax
+     *
      * @return \Twig_NodeInterface A Twig_NodeInterface instance
      */
     public function parse(\Twig_Token $token)
@@ -70,6 +72,10 @@ class TransChoiceTokenParser extends TransTokenParser
         return new TransNode($body, $domain, $count, $vars, $locale, $lineno, $this->getTag());
     }
 
+    /**
+     * @param \Twig_Token $token
+     * @return boolean
+     */
     public function decideTransChoiceFork($token)
     {
         return $token->test(array('endtranschoice'));

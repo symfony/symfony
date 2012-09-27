@@ -48,12 +48,9 @@ EOT
     {
         $entityManagerName = $input->getOption('em') ? $input->getOption('em') : $this->getContainer()->get('doctrine')->getDefaultEntityManagerName();
 
-        /* @var $entityManager Doctrine\ORM\EntityManager */
         $entityManager = $this->getEntityManager($input->getOption('em'));
 
-        $entityClassNames = $entityManager->getConfiguration()
-                                          ->getMetadataDriverImpl()
-                                          ->getAllClassNames();
+        $entityClassNames = $entityManager->getConfiguration()->getMetadataDriverImpl()->getAllClassNames();
 
         if (!$entityClassNames) {
             throw new \LogicException(

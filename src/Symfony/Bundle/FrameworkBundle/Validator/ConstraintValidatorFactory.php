@@ -57,7 +57,7 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
      *
      * @param Constraint $constraint A constraint
      *
-     * @return Symfony\Component\Validator\ConstraintValidator A validator for the supplied constraint
+     * @return \Symfony\Component\Validator\ConstraintValidator A validator for the supplied constraint
      */
     public function getInstance(Constraint $constraint)
     {

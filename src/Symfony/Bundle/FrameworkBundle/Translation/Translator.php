@@ -42,6 +42,8 @@ class Translator extends BaseTranslator
      * @param array              $loaderIds An array of loader Ids
      * @param array              $options   An array of options
      * @param Session            $session   A Session instance
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array(), Session $session = null)
     {

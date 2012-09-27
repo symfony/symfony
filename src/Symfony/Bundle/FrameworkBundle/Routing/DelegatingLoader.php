@@ -50,7 +50,7 @@ class DelegatingLoader extends BaseDelegatingLoader
      * @param mixed  $resource A resource
      * @param string $type     The resource type
      *
-     * @return RouteCollection A RouteCollection instance
+     * @return \Symfony\Component\Routing\RouteCollection A RouteCollection instance
      */
     public function load($resource, $type = null)
     {

@@ -31,6 +31,7 @@ class InternalController extends ContainerAware
      */
     public function indexAction($path, $controller)
     {
+        /** @var $request \Symfony\Component\HttpFoundation\Request */
         $request = $this->container->get('request');
         $attributes = $request->attributes;
 

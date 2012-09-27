@@ -50,7 +50,7 @@ interface BundleInterface
     /**
      * Returns the container extension that should be implicitly loaded.
      *
-     * @return ExtensionInterface|null The default extension or null if there is none
+     * @return \Symfony\Component\DependencyInjection\Extension\ExtensionInterface|null The default extension or null if there is none
      *
      * @api
      */

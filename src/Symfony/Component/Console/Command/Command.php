@@ -187,6 +187,8 @@ class Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
+     * @throws \Exception
+     *
      * @return integer The command exit code
      *
      * @see setCode()
@@ -561,7 +563,7 @@ class Command
      *
      * @param Boolean $asDom Whether to return a DOM or an XML string
      *
-     * @return string|DOMDocument An XML string representing the command
+     * @return string|\DOMDocument An XML string representing the command
      */
     public function asXml($asDom = false)
     {

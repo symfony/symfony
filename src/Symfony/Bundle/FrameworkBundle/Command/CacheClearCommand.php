@@ -131,6 +131,14 @@ EOF
         return $this->name;
     }
 
+    /**
+     * @param KernelInterface $parent
+     * @param string          $namespace
+     * @param string          $class
+     * @param string          $warmupDir
+     *
+     * @return KernelInterface
+     */
     protected function getTempKernel(KernelInterface $parent, $namespace, $class, $warmupDir)
     {
         $suffix = $this->getTempKernelSuffix();

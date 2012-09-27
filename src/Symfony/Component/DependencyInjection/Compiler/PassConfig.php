@@ -74,7 +74,7 @@ class PassConfig
     /**
      * Returns all passes in order to be processed.
      *
-     * @return array An array of all passes to process
+     * @return CompilerPassInterface[] An array of all passes to process
      *
      * @api
      */

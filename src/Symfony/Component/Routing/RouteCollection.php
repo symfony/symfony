@@ -113,7 +113,7 @@ class RouteCollection implements \IteratorAggregate
     /**
      * Returns the array of routes.
      *
-     * @return array An array of routes
+     * @return Route[] An array of routes
      */
     public function all()
     {

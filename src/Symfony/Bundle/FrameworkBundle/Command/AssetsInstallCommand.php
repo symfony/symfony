@@ -77,6 +77,7 @@ EOT
         $filesystem->mkdir($targetArg.'/bundles/', 0777);
 
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
+            /** @var $bundle \Symfony\Component\HttpKernel\Bundle\BundleInterface */
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
                 $targetDir = $targetArg.'/bundles/'.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
 

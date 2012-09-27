@@ -105,8 +105,8 @@ class Controller extends ContainerAware
      *
      *     throw $this->createNotFoundException('Page not found!');
      *
-     * @param string    $message  A message
-     * @param Exception $previous The previous exception
+     * @param string     $message  A message
+     * @param \Exception $previous The previous exception
      *
      * @return NotFoundHttpException
      */

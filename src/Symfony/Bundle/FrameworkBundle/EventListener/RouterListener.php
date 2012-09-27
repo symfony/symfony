@@ -27,6 +27,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class RouterListener
 {
+    /** @var $router \Symfony\Component\Routing\Router */
     private $router;
     private $logger;
     private $httpPort;

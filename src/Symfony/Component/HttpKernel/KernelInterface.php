@@ -30,7 +30,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     /**
      * Returns an array of bundles to registers.
      *
-     * @return array An array of bundle instances.
+     * @return BundleInterface[] An array of bundle instances.
      *
      * @api
      */
@@ -87,7 +87,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @param string  $name  Bundle name
      * @param Boolean $first Whether to return the first bundle only or together with its descendants
      *
-     * @return BundleInterface|Array A BundleInterface instance or an array of BundleInterface instances if $first is false
+     * @return BundleInterface[] A BundleInterface instance or an array of BundleInterface instances if $first is false
      *
      * @throws \InvalidArgumentException when the bundle is not enabled
      *

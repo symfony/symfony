@@ -62,7 +62,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Returns a builder to add children nodes
      *
-     * @return NodeBuilder
+     * @return NodeBuilder|ArrayNodeBuilder
      */
     public function children()
     {
@@ -74,7 +74,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * @param string $type the type of node
      *
-     * @return NodeDefinition
+     * @return ArrayNodeDefinition
      */
     public function prototype($type)
     {

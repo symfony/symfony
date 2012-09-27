@@ -47,7 +47,7 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
      * is the symfony one (i.e. the name can be parsed).
      * Otherwise the template is located using the locator from the twig library.
      *
-     * @param string|TemplateReferenceInterface $template The template
+     * @param string|\Symfony\Component\Templating\TemplateReferenceInterface $template The template
      *
      * @return string The path to the template file
      *

@@ -47,6 +47,9 @@ class ControllerResolver extends BaseControllerResolver
      *
      * @param string $controller A Controller string
      *
+     * @throws \LogicException
+     * @throws \InvalidArgumentException
+     *
      * @return mixed A PHP callable
      */
     protected function createController($controller)

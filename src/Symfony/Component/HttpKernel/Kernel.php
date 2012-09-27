@@ -188,7 +188,7 @@ abstract class Kernel implements KernelInterface
     /**
      * Gets the registered bundle instances.
      *
-     * @return array An array of registered bundle instances
+     * @return BundleInterface[] An array of registered bundle instances
      *
      * @api
      */
@@ -223,7 +223,7 @@ abstract class Kernel implements KernelInterface
      * @param string  $name  Bundle name
      * @param Boolean $first Whether to return the first bundle only or together with its descendants
      *
-     * @return BundleInterface|Array A BundleInterface instance or an array of BundleInterface instances if $first is false
+     * @return BundleInterface[] A BundleInterface instance or an array of BundleInterface instances if $first is false
      *
      * @throws \InvalidArgumentException when the bundle is not enabled
      *
@@ -611,6 +611,8 @@ abstract class Kernel implements KernelInterface
 
     /**
      * Builds the service container.
+     *
+     * @throws \RuntimeException
      *
      * @return ContainerBuilder The compiled service container
      */

@@ -85,6 +85,7 @@ class YamlDriver extends BaseYamlDriver
                     \RecursiveIteratorIterator::LEAVES_ONLY
                 );
 
+                /** @var $iterator \SplFileInfo[] */
                 foreach ($iterator as $file) {
                     $fileName = $file->getBasename($this->_fileExtension);
 

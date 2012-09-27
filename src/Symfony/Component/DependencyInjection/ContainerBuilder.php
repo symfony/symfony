@@ -717,11 +717,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param Definition $definition A service definition instance
      * @param string     $id         The service identifier
      *
-     * @return object The service described by the service definition
-     *
      * @throws \RuntimeException When the scope is inactive
      * @throws \RuntimeException When the factory definition is incomplete
      * @throws \InvalidArgumentException When configure callable is not callable
+     *
+     * @return object The service described by the service definition
      */
     private function createService(Definition $definition, $id)
     {

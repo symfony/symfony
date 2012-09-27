@@ -91,6 +91,9 @@ class HttpKernel extends BaseHttpKernel
      * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
      * @param array  $options    An array of options
      *
+     * @throws \RuntimeException
+     * @throws \Exception
+     *
      * @return string The Response content
      */
     public function render($controller, array $options = array())

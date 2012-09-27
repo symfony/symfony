@@ -40,6 +40,8 @@ class ActionsHelper extends Helper
      * @param array  $attributes An array of request attributes
      * @param array  $options    An array of options
      *
+     * @return string
+     *
      * @see Symfony\Bundle\FrameworkBundle\HttpKernel::render()
      */
     public function render($controller, array $attributes = array(), array $options = array())

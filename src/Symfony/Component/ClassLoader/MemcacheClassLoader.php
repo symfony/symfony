@@ -58,10 +58,6 @@ class MemcacheClassLoader
      */
     public function __construct($prefix, $classFinder, \Memcache $memcache)
     {
-        if (!extension_loaded('Memcache')) {
-            throw new \RuntimeException('Unable to use MemcacheClassLoader as Memcache is not enabled.');
-        }
-
         if (!method_exists($classFinder, 'findFile')) {
             throw new \InvalidArgumentException('The class finder must implement a "findFile" method.');
         }

@@ -136,7 +136,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($request->isSecure());
 
         $request = Request::create('http://test:test@test.com');
-        $this->assertEquals('http://test:test@test.com/', $request->getUri());
+        $this->assertEquals('http://test.com/', $request->getUri());
         $this->assertEquals('/', $request->getPathInfo());
         $this->assertEquals('', $request->getQueryString());
         $this->assertEquals(80, $request->getPort());
@@ -146,7 +146,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($request->isSecure());
 
         $request = Request::create('http://testnopass@test.com');
-        $this->assertEquals('http://testnopass@test.com/', $request->getUri());
+        $this->assertEquals('http://test.com/', $request->getUri());
         $this->assertEquals('/', $request->getPathInfo());
         $this->assertEquals('', $request->getQueryString());
         $this->assertEquals(80, $request->getPort());
@@ -340,11 +340,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $server['PHP_AUTH_USER'] = 'fabien';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://fabien@hostname:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
+        $this->assertEquals('http://hostname:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
 
         $server['PHP_AUTH_PW'] = 'symfony';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://fabien:symfony@hostname:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
+        $this->assertEquals('http://hostname:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
     }
 
     /**
@@ -450,11 +450,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $server['PHP_AUTH_USER'] = 'fabien';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://fabien@servername/some/path', $request->getUriForPath('/some/path'));
+        $this->assertEquals('http://servername/some/path', $request->getUriForPath('/some/path'));
 
         $server['PHP_AUTH_PW'] = 'symfony';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://fabien:symfony@servername/some/path', $request->getUriForPath('/some/path'));
+        $this->assertEquals('http://servername/some/path', $request->getUriForPath('/some/path'));
     }
 
     /**
@@ -491,15 +491,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $server['PHP_AUTH_USER'] = 'fabien';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://fabien@servername:90', $request->getSchemeAndHttpHost());
+        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
 
         $server['PHP_AUTH_USER'] = '0';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://0@servername:90', $request->getSchemeAndHttpHost());
+        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
 
         $server['PHP_AUTH_PW'] = '0';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://0:0@servername:90', $request->getSchemeAndHttpHost());
+        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
     }
 
     /**

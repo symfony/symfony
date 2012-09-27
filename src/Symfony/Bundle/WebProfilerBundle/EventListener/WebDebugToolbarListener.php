@@ -113,8 +113,8 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                 'WebProfilerBundle:Profiler:toolbar_js.html.twig',
                 array(
                     'position' => $this->position,
-                    'token' => $response->headers->get('X-Debug-Token')
-                ))
+                    'token' => $response->headers->get('X-Debug-Token'),
+                )
             ))."\n";
             $content = $substrFunction($content, 0, $pos).$toolbar.$substrFunction($content, $pos);
             $response->setContent($content);

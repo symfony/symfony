@@ -3,3 +3,4 @@ composer.lock
 composer.phar
 autoload.php
 /vendor/
+src/Symfony/Component/Locale/Resources/data/4.8/

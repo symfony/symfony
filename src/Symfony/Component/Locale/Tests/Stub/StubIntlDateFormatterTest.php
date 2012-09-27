@@ -472,7 +472,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->skipIfIntlExtensionIsNotLoaded();
         $this->skipIfICUVersionIsTooOld();
 
-        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC');
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
         $this->assertEquals(

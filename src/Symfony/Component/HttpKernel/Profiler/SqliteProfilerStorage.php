@@ -28,7 +28,7 @@ class SqliteProfilerStorage extends PdoProfilerStorage
                 throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Sqlite with an invalid dsn "%s". The expected format is "sqlite:/path/to/the/db/file".', $this->dsn));
             }
             if (class_exists('SQLite3')) {
-                $db = new \SQLite3(substr($this->dsn, 7, strlen($this->dsn)), \SQLITE3_OPEN_READWRITE | \SQLITE3_OPEN_CREATE);
+                $db = new \SQLite3($this->dsn);
                 if (method_exists($db, 'busyTimeout')) {
                     // busyTimeout only exists for PHP >= 5.3.3
                     $db->busyTimeout(1000);

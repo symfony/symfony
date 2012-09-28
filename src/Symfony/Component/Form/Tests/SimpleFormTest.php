@@ -89,10 +89,10 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertTrue($form->isBound());
     }
 
-    public function testPartialBindUsesViewDataIfNull()
+    public function testBindUsesViewDataIfNullAndIgnoreMissing()
     {
         $form = $this->getBuilder('name', new EventDispatcher())
-            ->setPartial(true)
+            ->setIgnoreMissing(true)
             ->addViewTransformer(new FixedDataTransformer(array(
                 ''      => '',
                 'norm'  => 'client',

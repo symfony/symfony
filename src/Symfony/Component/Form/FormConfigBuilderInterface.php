@@ -213,13 +213,13 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     /**
      * Sets whether the form should support partial binding.
      *
-     * @param  Boolean $partial Whether the form should support partial binding.
+     * @param  Boolean $ignoreMissing Whether the form should support partial binding.
      *
      * @return self The configuration object.
      *
      * @see FormConfigInterface::getPartial()
      */
-    public function setPartial($partial);
+    public function setIgnoreMissing($ignoreMissing);
 
     /**
      * Set the types.

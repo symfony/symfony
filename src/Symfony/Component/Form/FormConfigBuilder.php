@@ -69,7 +69,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @var Boolean
      */
-    private $partial = false;
+    private $ignoreMissing = false;
 
     /**
      * @var ResolvedFormTypeInterface
@@ -453,9 +453,9 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getPartial()
+    public function getIgnoreMissing()
     {
-        return $this->partial;
+        return $this->ignoreMissing;
     }
 
     /**
@@ -803,13 +803,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setPartial($partial)
+    public function setIgnoreMissing($ignoreMissing)
     {
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
 
-        $this->partial = $partial;
+        $this->ignoreMissing = (Boolean) $ignoreMissing;
 
         return $this;
     }

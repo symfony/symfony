@@ -41,7 +41,7 @@ class FormType extends AbstractType
             ->setByReference($options['by_reference'])
             ->setVirtual($options['virtual'])
             ->setCompound($options['compound'])
-            ->setPartial($options['partial'])
+            ->setIgnoreMissing($options['ignore_missing'])
             ->setData(isset($options['data']) ? $options['data'] : null)
             ->setDataLocked(isset($options['data']))
             ->setDataMapper($options['compound'] ? new PropertyPathMapper() : null)
@@ -126,7 +126,7 @@ class FormType extends AbstractType
             'attr'                => $options['attr'],
             'label_attr'          => $options['label_attr'],
             'compound'            => $form->getConfig()->getCompound(),
-            'partial'             => $form->getConfig()->getPartial(),
+            'ignore_missing'      => $form->getConfig()->getIgnoreMissing(),
             'block_prefixes'      => $blockPrefixes,
             'unique_block_prefix' => $uniqueBlockPrefix,
             'translation_domain'  => $translationDomain,
@@ -218,7 +218,7 @@ class FormType extends AbstractType
             'label_attr'         => array(),
             'virtual'            => false,
             'compound'           => true,
-            'partial'            => false,
+            'ignore_missing'     => null,
             'translation_domain' => null,
         ));
 

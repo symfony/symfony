@@ -95,7 +95,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
         $record = array(
             '_id' => $profile->getToken(),
             'parent' => $profile->getParentToken(),
-            'data' => serialize($profile->getCollectors()),
+            'data' => base64_encode(serialize($profile->getCollectors())),
             'ip' => $profile->getIp(),
             'method' => $profile->getMethod(),
             'url' => $profile->getUrl(),
@@ -220,7 +220,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
         $profile->setMethod($data['method']);
         $profile->setUrl($data['url']);
         $profile->setTime($data['time']);
-        $profile->setCollectors(unserialize($data['data']));
+        $profile->setCollectors(unserialize(base64_decode($data['data'])));
 
         return $profile;
     }

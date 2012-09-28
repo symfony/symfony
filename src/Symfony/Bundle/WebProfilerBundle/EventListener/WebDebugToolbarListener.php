@@ -99,28 +99,22 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     {
         if (function_exists('mb_stripos')) {
             $posrFunction   = 'mb_strripos';
-            $posFunction    = 'mb_stripos';
             $substrFunction = 'mb_substr';
         } else {
             $posrFunction   = 'strripos';
-            $posFunction    = 'stripos';
             $substrFunction = 'substr';
         }
 
         $content = $response->getContent();
+        $pos = $posrFunction($content, '</body>');
 
-        if ($this->position === 'bottom') {
-            $pos = $posrFunction($content, '</body>');
-        } else {
-            $pos = $posFunction($content, '<body');
-            if (false !== $pos) {
-                $pos = $posFunction($content, '>', $pos) + 1;
-            }
-        }
         if (false !== $pos) {
             $toolbar = "\n".str_replace("\n", '', $this->templating->render(
                 'WebProfilerBundle:Profiler:toolbar_js.html.twig',
-                array('token' => $response->headers->get('X-Debug-Token'))
+                array(
+                    'position' => $this->position,
+                    'token' => $response->headers->get('X-Debug-Token'),
+                )
             ))."\n";
             $content = $substrFunction($content, 0, $pos).$toolbar.$substrFunction($content, $pos);
             $response->setContent($content);

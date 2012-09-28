@@ -27,7 +27,7 @@
         "symfony/config": "2.2.*"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\DependencyInjection": "" }
+        "psr-0": { "Symfony\\Component\\DependencyInjection\\": "" }
     },
     "target-dir": "Symfony/Component/DependencyInjection",
     "minimum-stability": "dev",

@@ -134,7 +134,7 @@
             "use strict";
 
             var _drawingColors  = {{ colors|json_encode|raw }},
-                _storagePrefix  = 'sf2/profiler/timeline',
+                _storagePrefix  = 'timeline/',
                 _threshold      = 1,
                 _requests       = requests,
                 _maxRequestTime = maxRequestTime;
@@ -353,7 +353,7 @@
             };
 
             this.getThreshold = function() {
-                var threshold = localStorage.getItem(_storagePrefix + '/threshold');
+                var threshold = Sfjs.getPreference(_storagePrefix + 'threshold');
 
                 if (threshold === null) {
                     return _threshold;
@@ -368,7 +368,7 @@
             {
                 _threshold = threshold;
 
-                localStorage.setItem(_storagePrefix + '/threshold', threshold);
+                Sfjs.setPreference(_storagePrefix + 'threshold', threshold);
 
                 return this;
             };
@@ -423,6 +423,11 @@
         elementThresholdControl.onclick  = canvasAutoUpdateOnThresholdChange;
         elementThresholdControl.onchange = canvasAutoUpdateOnThresholdChange;
         elementThresholdControl.onkeyup  = canvasAutoUpdateOnThresholdChange;
+
+        window.setTimeout(function() {
+            canvasAutoUpdateOnThresholdChange(null);
+        }, 50);
+
     //]]></script>
 {% endblock %}
 

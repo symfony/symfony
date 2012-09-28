@@ -104,13 +104,14 @@ abbr {
 
 #content {
     padding: 0 50px;
-    margin: 0 auto;
+    margin: 0 auto 20px;
     font-family: Arial, Helvetica, sans-serif;
     min-width: 970px;
+
 }
 
 #header {
-    padding: 30px 30px 20px;
+    padding: 20px 30px 20px;
 }
 
 #header h1 {
@@ -131,6 +132,7 @@ abbr {
     padding-bottom: 0;
     display: block;
     background-color: #f6f6f6;
+    z-index: 10000;
 }
 
 #menu_profiler li a {
@@ -144,9 +146,9 @@ abbr {
 
 #menu_profiler li a span.label {
     display: block;
-    padding: 20px 20px 16px 65px;
-    min-height: 24px;
-    _height: 24px;
+    padding: 20px 0px 16px 65px;
+    min-height: 16px;
+    overflow: hidden;
 }
 
 #menu_profiler li a span.icon {
@@ -186,7 +188,7 @@ abbr {
 
 #collector_content {
     margin-left: 250px;
-    padding: 40px 50px;
+    padding: 30px 40px 40px;
 }
 
 #navigation {
@@ -235,8 +237,9 @@ li {
 #resume {
     background-color: #f6f6f6;
     border-bottom: 1px solid #dfdfdf;
-    padding: 10px 50px;
-    margin-left: 210px;
+    padding: 18px 10px 0px;
+    margin-left: 250px;
+    height: 34px;
     color: #313131;
     font-size: 12px;
     -moz-border-radius-topright: 16px;
@@ -284,7 +287,9 @@ table th.value {
 }
 
 .sf-exceptionreset .block_exception_detected .text_exception {
-    width: 520px;
+    left: 10px;
+    right: 10px;
+    width: 95%;
 }
 
 .sf-exceptionreset .block_exception_detected .illustration_exception {
@@ -487,4 +492,21 @@ td.main, td.menu {
 .sf-profiler-timeline canvas {
     border: 1px solid #999;
     border-width: 1px 0;
+}
+
+.collapsed-menu-parents #resume,
+.collapsed-menu-parents #collector_content {
+    margin-left: 60px !important;
+}
+
+.collapsed-menu {
+    width: 60px !important;
+}
+
+.collapsed-menu span :not(.icon) {
+    display: none !important;
+}
+
+.collapsed-menu span.icon img {
+    display: inline !important;
 }

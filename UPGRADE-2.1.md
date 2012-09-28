@@ -1461,6 +1461,14 @@ To use mock session storage use the following.  `handler_id` is irrelevant in th
              storage_id: session.storage.mock_file
   ```
 
+The config option `strict_parameters` was renamed to `strict_requirements`.
+
+  ```
+     framework:
+         router:
+             strict_requirements: %kernel.debug%
+  ```
+
 ### WebProfilerBundle
 
   * You must clear old profiles after upgrading to 2.1. If you are using a

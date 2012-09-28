@@ -22,6 +22,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
             $tmpDir.'/.git/',
             $tmpDir.'/.foo/',
             $tmpDir.'/.foo/.bar',
+            $tmpDir.'/.foo/bar',
             $tmpDir.'/.bar',
             $tmpDir.'/test.py',
             $tmpDir.'/foo/',

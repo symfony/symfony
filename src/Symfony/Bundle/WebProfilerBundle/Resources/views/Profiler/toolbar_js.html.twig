@@ -15,6 +15,20 @@
             '{{ path("_wdt", { "token": token }) }}',
             function(xhr, el) {
                 el.style.display = -1 !== xhr.responseText.indexOf('sf-toolbarreset') ? 'block' : 'none';
+
+                if (el.style.display == 'none') {
+                    return;
+                }
+
+                if (Sfjs.getPreference('toolbar/displayState') == 'none') {
+                    document.getElementById('sfToolbarMainContent_{{ token }}').style.display = 'none';
+                    document.getElementById('sfToolbarClearer_{{ token }}').style.display = 'none';
+                    document.getElementById('sfMiniToolbar_{{ token }}').style.display = 'block';
+                } else {
+                    document.getElementById('sfToolbarMainContent_{{ token }}').style.display = 'block';
+                    document.getElementById('sfToolbarClearer_{{ token }}').style.display = 'block';
+                    document.getElementById('sfMiniToolbar_{{ token }}').style.display = 'none';
+                }
             },
             function(xhr) {
                 if (xhr.status !== 0) {

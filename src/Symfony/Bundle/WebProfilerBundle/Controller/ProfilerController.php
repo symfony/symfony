@@ -186,6 +186,7 @@ class ProfilerController extends ContainerAware
             'profile'      => $profile,
             'templates'    => $this->getTemplateManager()->getTemplates($profile),
             'profiler_url' => $url,
+            'token'        => $token,
         ));
     }
 

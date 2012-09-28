@@ -229,8 +229,6 @@ class Process
                 $descriptors = array_merge($descriptors, array(array('pipe', 'w')));
 
                 $this->commandline = '('.$this->commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
-            } else {
-                $this->commandline = 'exec ' . $this->commandline;
             }
         }
 

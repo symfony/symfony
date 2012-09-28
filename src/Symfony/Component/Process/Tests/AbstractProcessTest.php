@@ -76,6 +76,29 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $p->getErrorOutput());
     }
 
+    public function chainedCommandsOutputProvider()
+    {
+        return array(
+            array('11', ';', '1'),
+            array('22', '&&', '2'),
+        );
+    }
+
+    /**
+     *
+     * @dataProvider chainedCommandsOutputProvider
+     */
+    public function testChainedCommandsOutput($expected, $operator, $input)
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('Does it work on windows ?');
+        }
+
+        $process = $this->getProcess(sprintf('echo -n %s %s echo -n %s', $input, $operator, $input));
+        $process->run();
+        $this->assertEquals($expected, $process->getOutput());
+    }
+
     public function testCallbackIsExecutedForOutput()
     {
         $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('echo \'foo\';')));

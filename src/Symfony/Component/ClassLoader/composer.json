@@ -23,7 +23,7 @@
         "symfony/finder": "2.2.*"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\ClassLoader": "" }
+        "psr-0": { "Symfony\\Component\\ClassLoader\\": "" }
     },
     "target-dir": "Symfony/Component/ClassLoader",
     "minimum-stability": "dev",

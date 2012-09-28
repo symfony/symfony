@@ -21,7 +21,7 @@
         "monolog/monolog": "1.*"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Monolog": "" }
+        "psr-0": { "Symfony\\Bridge\\Monolog\\": "" }
     },
     "target-dir": "Symfony/Bridge/Monolog",
     "minimum-stability": "dev",

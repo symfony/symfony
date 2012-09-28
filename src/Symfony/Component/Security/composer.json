@@ -37,7 +37,7 @@
         "doctrine/dbal": "to use the built-in ACL implementation"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Security": "" }
+        "psr-0": { "Symfony\\Component\\Security\\": "" }
     },
     "target-dir": "Symfony/Component/Security",
     "minimum-stability": "dev",

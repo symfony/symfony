@@ -27,7 +27,7 @@
         "doctrine/orm": ">=2.2.3,<2.4-dev"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Doctrine": "" }
+        "psr-0": { "Symfony\\Bridge\\Doctrine\\": "" }
     },
     "target-dir": "Symfony/Bridge/Doctrine",
     "minimum-stability": "dev",

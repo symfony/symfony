@@ -26,7 +26,7 @@
         "symfony/http-kernel": "2.2.*"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\EventDispatcher": "" }
+        "psr-0": { "Symfony\\Component\\EventDispatcher\\": "" }
     },
     "target-dir": "Symfony/Component/EventDispatcher",
     "minimum-stability": "dev",

@@ -20,7 +20,7 @@
         "symfony/twig-bundle": "2.2.*"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bundle\\WebProfilerBundle": "" }
+        "psr-0": { "Symfony\\Bundle\\WebProfilerBundle\\": "" }
     },
     "target-dir": "Symfony/Bundle/WebProfilerBundle",
     "minimum-stability": "dev",

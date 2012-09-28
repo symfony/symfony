@@ -20,7 +20,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Symfony\\Component\\HttpFoundation": "",
+            "Symfony\\Component\\HttpFoundation\\": "",
             "SessionHandlerInterface": "Symfony/Component/HttpFoundation/Resources/stubs"
         }
     },

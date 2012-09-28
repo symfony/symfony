@@ -30,7 +30,7 @@
         "symfony/http-foundation": "2.2.*"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Form": "" }
+        "psr-0": { "Symfony\\Component\\Form\\": "" }
     },
     "target-dir": "Symfony/Component/Form",
     "minimum-stability": "dev",

@@ -29,7 +29,7 @@
         "symfony/yaml": "2.2.*"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Validator": "" }
+        "psr-0": { "Symfony\\Component\\Validator\\": "" }
     },
     "target-dir": "Symfony/Component/Validator",
     "minimum-stability": "dev",

@@ -36,7 +36,7 @@
         "symfony/security": "2.2.*"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Twig": "" }
+        "psr-0": { "Symfony\\Bridge\\Twig\\": "" }
     },
     "target-dir": "Symfony/Bridge/Twig",
     "minimum-stability": "dev",

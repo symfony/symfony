@@ -23,7 +23,7 @@
         "symfony/http-kernel": "2.2.*"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Swiftmailer": "" }
+        "psr-0": { "Symfony\\Bridge\\Swiftmailer\\": "" }
     },
     "target-dir": "Symfony/Bridge/Swiftmailer",
     "minimum-stability": "dev",

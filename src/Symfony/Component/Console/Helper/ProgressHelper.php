@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * The Progress class providers helpers to display progress output.
  *
  * @author Chris Jones <leeked@gmail.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class ProgressHelper extends Helper
 {
@@ -27,29 +28,15 @@ class ProgressHelper extends Helper
     const FORMAT_NORMAL_NOMAX  = ' %current% [%bar%]';
     const FORMAT_VERBOSE_NOMAX = ' %current% [%bar%] Elapsed: %elapsed%';
 
-    /**
-     * @var array
-     */
-    protected $options = array(
-        'barWidth'     => null,
-        'barChar'      => null,
-        'emptyBarChar' => null,
-        'progressChar' => null,
-        'format'       => null,
-        'redrawFreq'   => null,
-    );
+    // options
+    private $barWidth     = 28;
+    private $barChar      = '=';
+    private $emptyBarChar = '-';
+    private $progressChar = '>';
+    private $format       = self::FORMAT_NORMAL_NOMAX;
+    private $redrawFreq   = 1;
 
-    /**
-     * @var array
-     */
-    private $defaultOptions = array(
-        'barWidth'     => 28,
-        'barChar'      => '=',
-        'emptyBarChar' => '-',
-        'progressChar' => '>',
-        'format'       => self::FORMAT_NORMAL_NOMAX,
-        'redrawFreq'   => 1,
-    );
+    private $barCharOriginal;
 
     /**
      * @var OutputInterface
@@ -127,13 +114,72 @@ class ProgressHelper extends Helper
     );
 
     /**
+     * Sets the progress bar width.
+     *
+     * @param int $size The progress bar size
+     */
+    public function setBarWidth($size)
+    {
+        $this->barWidth = (int) $size;
+    }
+
+    /**
+     * Sets the bar character.
+     *
+     * @param string $char A character
+     */
+    public function setBarCharacter($char)
+    {
+        $this->barChar = $char;
+    }
+
+    /**
+     * Sets the empty bar character.
+     *
+     * @param string $char A character
+     */
+    public function setEmptyBarCharacter($char)
+    {
+        $this->emptyBarChar = $char;
+    }
+
+    /**
+     * Sets the progress bar character.
+     *
+     * @param string $char A character
+     */
+    public function setProgressChar($char)
+    {
+        $this->progressChar = $char;
+    }
+
+    /**
+     * Sets the progress bar format.
+     *
+     * @param string $format The format
+     */
+    public function setFormat($format)
+    {
+        $this->format = $format;
+    }
+
+    /**
+     * Sets the redraw frequency.
+     *
+     * @param int $freq The frequency in seconds
+     */
+    public function setRedrawFrequency($freq)
+    {
+        $this->redrawFreq = (int) $freq;
+    }
+
+    /**
      * Starts the progress output.
      *
      * @param OutputInterface $output  An Output instance
      * @param integer         $max     Maximum steps
-     * @param array           $options Options for progress helper
      */
-    public function start(OutputInterface $output, $max = null, array $options = array())
+    public function start(OutputInterface $output, $max = null)
     {
         $this->startTime = time();
         $this->current   = 0;
@@ -142,25 +188,24 @@ class ProgressHelper extends Helper
 
         switch ($output->getVerbosity()) {
             case OutputInterface::VERBOSITY_QUIET:
-                $this->options['format'] = self::FORMAT_QUIET_NOMAX;
+                $this->format = self::FORMAT_QUIET_NOMAX;
                 if ($this->max > 0) {
-                    $this->options['format'] = self::FORMAT_QUIET;
+                    $this->format = self::FORMAT_QUIET;
                 }
                 break;
             case OutputInterface::VERBOSITY_VERBOSE:
-                $this->options['format'] = self::FORMAT_VERBOSE_NOMAX;
+                $this->format = self::FORMAT_VERBOSE_NOMAX;
                 if ($this->max > 0) {
-                    $this->options['format'] = self::FORMAT_VERBOSE;
+                    $this->format = self::FORMAT_VERBOSE;
                 }
                 break;
             default:
                 if ($this->max > 0) {
-                    $this->options['format'] = self::FORMAT_NORMAL;
+                    $this->format = self::FORMAT_NORMAL;
                 }
                 break;
         }
 
-        $this->options = array_merge($this->defaultOptions, $options);
         $this->inititalize();
     }
 
@@ -172,11 +217,15 @@ class ProgressHelper extends Helper
      */
     public function advance($step = 1, $redraw = false)
     {
+        if (null === $this->startTime) {
+            throw new \LogicException('You must start the progress bar before calling advance().');
+        }
+
         if ($this->current === 0) {
             $redraw = true;
         }
         $this->current += $step;
-        if ($redraw || $this->current % $this->options['redrawFreq'] === 0) {
+        if ($redraw || $this->current % $this->redrawFreq === 0) {
             $this->display();
         }
     }
@@ -188,7 +237,11 @@ class ProgressHelper extends Helper
      */
     public function display($finish = false)
     {
-        $message = $this->options['format'];
+        if (null === $this->startTime) {
+            throw new \LogicException('You must start the progress bar before calling display().');
+        }
+
+        $message = $this->format;
         foreach ($this->generate($finish) as $name => $value) {
             $message = str_replace("%{$name}%", $value, $message);
         }
@@ -196,13 +249,17 @@ class ProgressHelper extends Helper
     }
 
     /**
-     * Finish the progress output
+     * Finishes the progress output.
      */
     public function finish()
     {
+        if (null === $this->startTime) {
+            throw new \LogicException('You must start the progress bar before calling finish().');
+        }
+
         if ($this->startTime !== null) {
             if (!$this->max) {
-                $this->options['barChar'] = $this->options['barCharOriginal'];
+                $this->barChar = $this->barCharOriginal;
                 $this->display(true);
             }
             $this->startTime = null;
@@ -212,13 +269,13 @@ class ProgressHelper extends Helper
     }
 
     /**
-     * Initialize the progress helper.
+     * Initializes the progress helper.
      */
-    protected function inititalize()
+    private function inititalize()
     {
         $this->formatVars = array();
         foreach ($this->defaultFormatVars as $var) {
-            if (strpos($this->options['format'], "%{$var}%") !== false) {
+            if (strpos($this->format, "%{$var}%") !== false) {
                 $this->formatVars[$var] = true;
             }
         }
@@ -227,8 +284,8 @@ class ProgressHelper extends Helper
             $this->widths['max']     = strlen($this->max);
             $this->widths['current'] = $this->widths['max'];
         } else {
-            $this->options['barCharOriginal'] = $this->options['barChar'];
-            $this->options['barChar']         = $this->options['emptyBarChar'];
+            $this->barCharOriginal = $this->barChar;
+            $this->barChar         = $this->emptyBarChar;
         }
     }
 
@@ -238,7 +295,7 @@ class ProgressHelper extends Helper
      * @param Boolean $finish Forces the end result
      * @return array Array of format vars and values
      */
-    protected function generate($finish = false)
+    private function generate($finish = false)
     {
         $vars    = array();
         $percent = 0;
@@ -250,20 +307,20 @@ class ProgressHelper extends Helper
             $completeBars = 0;
             $emptyBars    = 0;
             if ($this->max > 0) {
-                $completeBars = floor($percent * $this->options['barWidth']);
+                $completeBars = floor($percent * $this->barWidth);
             } else {
                 if (!$finish) {
-                    $completeBars = floor($this->current % $this->options['barWidth']);
+                    $completeBars = floor($this->current % $this->barWidth);
                 } else {
-                    $completeBars = $this->options['barWidth'];
+                    $completeBars = $this->barWidth;
                 }
             }
 
-            $emptyBars = $this->options['barWidth'] - $completeBars - strlen($this->options['progressChar']);
-            $bar = str_repeat($this->options['barChar'], $completeBars);
-            if ($completeBars < $this->options['barWidth']) {
-                $bar .= $this->options['progressChar'];
-                $bar .= str_repeat($this->options['emptyBarChar'], $emptyBars);
+            $emptyBars = $this->barWidth - $completeBars - strlen($this->progressChar);
+            $bar = str_repeat($this->barChar, $completeBars);
+            if ($completeBars < $this->barWidth) {
+                $bar .= $this->progressChar;
+                $bar .= str_repeat($this->emptyBarChar, $emptyBars);
             }
 
             $vars['bar'] = $bar;

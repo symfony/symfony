@@ -59,7 +59,9 @@ class FrameworkExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('kernel.secret', $config['secret']);
+        if (isset($config['secret'])) {
+            $container->setParameter('kernel.secret', $config['secret']);
+        }
 
         $container->setParameter('kernel.trust_proxy_headers', $config['trust_proxy_headers']);
 
@@ -155,6 +157,9 @@ class FrameworkExtension extends Extension
         if (isset($config['csrf_protection'])) {
             if (!isset($config['session'])) {
                 throw new \LogicException('CSRF protection needs that sessions are enabled.');
+            }
+            if (!isset($config['secret'])) {
+                throw new \LogicException('CSRF protection needs a secret to be set.');
             }
             $loader->load('form_csrf.xml');
 

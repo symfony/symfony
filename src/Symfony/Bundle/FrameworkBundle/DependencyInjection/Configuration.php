@@ -62,7 +62,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('trust_proxy_headers')->defaultFalse()->end()
-                ->scalarNode('secret')->isRequired()->end()
+                ->scalarNode('secret')->end()
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()

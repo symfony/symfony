@@ -33,7 +33,7 @@ class ProgressHelper extends Helper
     private $barChar      = '=';
     private $emptyBarChar = '-';
     private $progressChar = '>';
-    private $format       = self::FORMAT_NORMAL_NOMAX;
+    private $format       = null;
     private $redrawFreq   = 1;
 
     private $barCharOriginal;
@@ -148,7 +148,7 @@ class ProgressHelper extends Helper
      *
      * @param string $char A character
      */
-    public function setProgressChar($char)
+    public function setProgressCharacter($char)
     {
         $this->progressChar = $char;
     }
@@ -186,27 +186,29 @@ class ProgressHelper extends Helper
         $this->max       = (int) $max;
         $this->output    = $output;
 
-        switch ($output->getVerbosity()) {
-            case OutputInterface::VERBOSITY_QUIET:
-                $this->format = self::FORMAT_QUIET_NOMAX;
-                if ($this->max > 0) {
-                    $this->format = self::FORMAT_QUIET;
-                }
-                break;
-            case OutputInterface::VERBOSITY_VERBOSE:
-                $this->format = self::FORMAT_VERBOSE_NOMAX;
-                if ($this->max > 0) {
-                    $this->format = self::FORMAT_VERBOSE;
-                }
-                break;
-            default:
-                if ($this->max > 0) {
-                    $this->format = self::FORMAT_NORMAL;
-                }
-                break;
+        if (null === $this->format) {
+            switch ($output->getVerbosity()) {
+                case OutputInterface::VERBOSITY_QUIET:
+                    $this->format = self::FORMAT_QUIET_NOMAX;
+                    if ($this->max > 0) {
+                        $this->format = self::FORMAT_QUIET;
+                    }
+                    break;
+                case OutputInterface::VERBOSITY_VERBOSE:
+                    $this->format = self::FORMAT_VERBOSE_NOMAX;
+                    if ($this->max > 0) {
+                        $this->format = self::FORMAT_VERBOSE;
+                    }
+                    break;
+                default:
+                    if ($this->max > 0) {
+                        $this->format = self::FORMAT_NORMAL;
+                    }
+                    break;
+            }
         }
 
-        $this->inititalize();
+        $this->initialize();
     }
 
     /**
@@ -271,7 +273,7 @@ class ProgressHelper extends Helper
     /**
      * Initializes the progress helper.
      */
-    private function inititalize()
+    private function initialize()
     {
         $this->formatVars = array();
         foreach ($this->defaultFormatVars as $var) {

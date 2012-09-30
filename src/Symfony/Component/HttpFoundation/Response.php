@@ -430,7 +430,7 @@ class Response
      */
     public function getDate()
     {
-        return $this->headers->getDate('Date');
+        return $this->headers->getDate('Date', new \DateTime());
     }
 
     /**

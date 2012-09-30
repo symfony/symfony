@@ -20,7 +20,7 @@
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\HttpFoundation\\": "" },
-        "classmap": [ "Resources/stubs" ]
+        "classmap": [ "Symfony/Component/HttpFoundation/Resources/stubs" ]
     },
     "target-dir": "Symfony/Component/HttpFoundation",
     "minimum-stability": "dev",

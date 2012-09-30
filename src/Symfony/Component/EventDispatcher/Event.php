@@ -74,11 +74,11 @@ class Event
     /**
      * Stores the EventDispatcher that dispatches this Event
      *
-     * @param EventDispatcherInterface $dispatcher
+     * @param EventDispatcher $dispatcher
      *
      * @api
      */
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcher $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
@@ -86,7 +86,7 @@ class Event
     /**
      * Returns the EventDispatcher that dispatches this Event
      *
-     * @return EventDispatcherInterface
+     * @return EventDispatcher
      *
      * @api
      */

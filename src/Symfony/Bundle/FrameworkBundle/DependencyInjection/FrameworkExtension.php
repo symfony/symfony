@@ -49,6 +49,7 @@ class FrameworkExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
+            $container->setDefinition('event_dispatcher.original', $container->findDefinition('event_dispatcher'));
             $container->setDefinition('event_dispatcher', $container->findDefinition('debug.event_dispatcher'));
             $container->setAlias('debug.event_dispatcher', 'event_dispatcher');
 

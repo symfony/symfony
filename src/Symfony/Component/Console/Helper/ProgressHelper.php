@@ -201,6 +201,7 @@ class ProgressHelper extends Helper
                     }
                     break;
                 default:
+                    $this->format = self::FORMAT_NORMAL_NOMAX;
                     if ($this->max > 0) {
                         $this->format = self::FORMAT_NORMAL;
                     }

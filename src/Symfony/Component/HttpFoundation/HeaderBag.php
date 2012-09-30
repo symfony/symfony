@@ -226,7 +226,9 @@ class HeaderBag
      * @param string    $key     The parameter key
      * @param \DateTime $default The default value
      *
-     * @return \DateTime The filtered value
+     * @return null|\DateTime The filtered value
+     *
+     * @throws \RuntimeException When the HTTP header is not parseable
      *
      * @api
      */

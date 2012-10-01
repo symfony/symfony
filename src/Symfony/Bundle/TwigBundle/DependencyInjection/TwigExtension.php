@@ -60,10 +60,31 @@ class TwigExtension extends Extension
         $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
         $container->getDefinition('twig.loader')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
 
-        if (!empty($config['paths'])) {
-            foreach ($config['paths'] as $path) {
-                $container->getDefinition('twig.loader')->addMethodCall('addPath', array($path));
+        $twigLoaderDefinition = $container->getDefinition('twig.loader');
+
+        // register user-configured paths
+        foreach ($config['paths'] as $path => $namespace) {
+            if (!$namespace) {
+                $twigLoaderDefinition->addMethodCall('addPath', array($path));
+            } else {
+                $twigLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
             }
+        }
+
+        // register bundles as Twig namespaces
+        foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
+            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
+                $this->addTwigPath($twigLoaderDefinition, $dir, $bundle);
+            }
+
+            $reflection = new \ReflectionClass($class);
+            if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
+                $this->addTwigPath($twigLoaderDefinition, $dir, $bundle);
+            }
+        }
+
+        if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
+            $twigLoaderDefinition->addMethodCall('addPath', array($dir));
         }
 
         if (!empty($config['globals'])) {
@@ -106,6 +127,15 @@ class TwigExtension extends Extension
             'Twig_Markup',
             'Twig_Template',
         ));
+    }
+
+    private function addTwigPath($twigLoaderDefinition, $dir, $bundle)
+    {
+        $name = $bundle;
+        if ('Bundle' === substr($name, -6)) {
+            $name = substr($name, 0, -6);
+        }
+        $twigLoaderDefinition->addMethodCall('addPath', array($dir, $name));
     }
 
     /**

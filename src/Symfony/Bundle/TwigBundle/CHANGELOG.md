@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added automatic registration of namespaced paths for registered bundles
+ * added support for namespaced paths
+
 2.1.0
 -----
 

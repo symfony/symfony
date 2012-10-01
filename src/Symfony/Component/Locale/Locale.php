@@ -285,12 +285,8 @@ class Locale extends \Locale
      */
     protected static function getFallbackLocale($locale)
     {
-        if ($locale === self::getDefault()) {
-            return null;
-        }
-
         if (false === $pos = strrpos($locale, '_')) {
-            return self::getDefault();
+            return null;
         }
 
         return substr($locale, 0, $pos);

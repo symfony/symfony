@@ -222,6 +222,18 @@ class Application
     }
 
     /**
+     * Set an input definition set to be used with this application
+     *
+     * @param InputDefinition $definition The input definition
+     *
+     * @api
+     */
+    public function setDefinition(InputDefinition $definition)
+    {
+        $this->definition = $definition;
+    }
+
+    /**
      * Gets the InputDefinition related to this Application.
      *
      * @return InputDefinition The InputDefinition instance

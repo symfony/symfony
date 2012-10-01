@@ -110,6 +110,14 @@ class EntityTypeTest extends TypeTestCase
         // be managed!
     }
 
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     */
+    public function testClassOptionIsRequired()
+    {
+        $this->factory->createNamed('name', 'entity');
+    }
+
     public function testSetDataToUninitializedEntityWithNonRequired()
     {
         $entity1 = new SingleIdentEntity(1, 'Foo');

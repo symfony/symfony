@@ -108,6 +108,37 @@ class TwigExtensionTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider getFormats
+     */
+    public function testTwigLoaderPaths($format)
+    {
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $this->loadFromFile($container, 'full', $format);
+        $this->compileContainer($container);
+
+        $def = $container->getDefinition('twig.loader');
+        $paths = array();
+        foreach ($def->getMethodCalls() as $call) {
+            if ('addPath' === $call[0]) {
+                if (false === strpos($call[1][0], 'Form')) {
+                    $paths[] = $call[1];
+                }
+            }
+        }
+
+        $this->assertEquals(array(
+            array('path1'),
+            array('path2'),
+            array('namespaced_path1', 'namespace'),
+            array('namespaced_path2', 'namespace'),
+            array(__DIR__.'/Fixtures/Resources/TwigBundle/views', 'Twig'),
+            array(realpath(__DIR__.'/../../Resources/views'), 'Twig'),
+            array(__DIR__.'/Fixtures/Resources/views'),
+        ), $paths);
+    }
+
     public function getFormats()
     {
         return array(
@@ -121,8 +152,10 @@ class TwigExtensionTest extends TestCase
     {
         $container = new ContainerBuilder(new ParameterBag(array(
             'kernel.cache_dir' => __DIR__,
+            'kernel.root_dir'  => __DIR__.'/Fixtures',
             'kernel.charset'   => 'UTF-8',
             'kernel.debug'     => false,
+            'kernel.bundles'   => array('TwigBundle' => 'Symfony\\Bundle\\TwigBundle\\TwigBundle'),
         )));
 
         return $container;

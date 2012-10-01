@@ -38,8 +38,6 @@ namespace Symfony\Component\ClassLoader;
  * @author Kris Wallsmith <kris@symfony.com>
  * @author Kim Hemsø Rasmussen <kimhemsoe@gmail.com>
  * @author Sander Marechal <s.marechal@jejik.com>
- *
- * @api
  */
 class MemcacheClassLoader
 {

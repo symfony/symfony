@@ -12,8 +12,11 @@
 namespace Symfony\Component\Console\Tests;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
@@ -505,5 +508,78 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             array(new InputOption('quiet', '', InputOption::VALUE_NONE)),
             array(new InputOption('query', 'q', InputOption::VALUE_NONE)),
         );
+    }
+    
+    public function testGetDefaultHelperSetReturnsDefaultValues()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        
+        $helperSet = $application->getHelperSet();
+        
+        $this->assertTrue($helperSet->has('formatter'));
+        $this->assertTrue($helperSet->has('dialog'));
+        $this->assertTrue($helperSet->has('progress'));
+    }
+    
+    public function testAddingSingleHelperSetOverwritesDefaultValues()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        
+        $application->setHelperSet(new HelperSet(array(new FormatterHelper())));
+        
+        $helperSet = $application->getHelperSet();
+        
+        $this->assertTrue($helperSet->has('formatter'));
+        
+        // no other default helper set should be returned
+        $this->assertFalse($helperSet->has('dialog'));
+        $this->assertFalse($helperSet->has('progress'));
+    }
+    
+    public function testGetDefaultInputDefinitionReturnsDefaultValues()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        
+        $inputDefinition = $application->getDefinition();
+
+        $this->assertTrue($inputDefinition->hasArgument('command'));
+        
+        $this->assertTrue($inputDefinition->hasOption('help'));
+        $this->assertTrue($inputDefinition->hasOption('quiet'));
+        $this->assertTrue($inputDefinition->hasOption('verbose'));
+        $this->assertTrue($inputDefinition->hasOption('version'));
+        $this->assertTrue($inputDefinition->hasOption('ansi'));
+        $this->assertTrue($inputDefinition->hasOption('no-ansi'));
+        $this->assertTrue($inputDefinition->hasOption('no-interaction'));
+    }
+    
+    public function testSettingCustomInputDefinitionOverwritesDefaultValues()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        
+        $application->setDefinition(new InputDefinition(array(new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.'))));
+        
+        $inputDefinition = $application->getDefinition();
+
+        // check wether the default arguments and options are not returned any more
+        $this->assertFalse($inputDefinition->hasArgument('command'));
+        
+        $this->assertFalse($inputDefinition->hasOption('help'));
+        $this->assertFalse($inputDefinition->hasOption('quiet'));
+        $this->assertFalse($inputDefinition->hasOption('verbose'));
+        $this->assertFalse($inputDefinition->hasOption('version'));
+        $this->assertFalse($inputDefinition->hasOption('ansi'));
+        $this->assertFalse($inputDefinition->hasOption('no-ansi'));
+        $this->assertFalse($inputDefinition->hasOption('no-interaction'));
+        
+        $this->assertTrue($inputDefinition->hasOption('custom'));
     }
 }

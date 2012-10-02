@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing\Tests\Matcher;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\Matcher\UrlMatcherEvent;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
@@ -250,5 +251,110 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $matcher = new UrlMatcher($coll, new RequestContext());
         $this->assertEquals(array('foo' => 'bar%23', '_route' => 'foo'), $matcher->match('/foo/bar%2523'));
+    }
+
+    public function testEventDispatcherIsRun()
+    {
+        $route =  new Route('/foo');
+        $event = new UrlMatcherEvent($route);
+
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher->expects($this->once())
+                    ->method('dispatch')
+                    ->with(UrlMatcher::EVENT_HANDLE_REQUIREMENTS, $event);
+        $coll = new RouteCollection();
+        $coll->add('foo', $route);
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->setEventDispatcher($dispatcher);
+        $matcher->match('/foo');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testEventDispatcherCanMismatch()
+    {
+        $route =  new Route('/foo');
+
+        $callback = function($name, $event) {
+            $event->setStatus(1);
+            $event->stopPropagation();
+        };
+
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->will($this->returnCallback($callback));
+        $coll = new RouteCollection();
+        $coll->add('foo', $route);
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->setEventDispatcher($dispatcher);
+        $matcher->match('/foo');
+    }
+
+    public function testEventDispatcherCanMatch()
+    {
+        $route1 =  new Route('/foo');
+        $route1->setRequirement('_bar', 'hello');
+
+        $route2 =  new Route('/foo');
+        $route2->setRequirement('_bar', 'hiya');
+
+        $callback = function($name, $event) {
+            if ($event->getRoute()->getRequirement('_bar') == 'hello') {
+                $event->setStatus(1);
+                $event->stopPropagation();
+            }
+            if ($event->getRoute()->getRequirement('_bar') == 'hiya') {
+                $event->setStatus(0);
+            }
+        };
+
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher->expects($this->any())
+            ->method('dispatch')
+            ->will($this->returnCallback($callback));
+
+        $coll = new RouteCollection();
+        $coll->add('foo1', $route1);
+        $coll->add('foo2', $route2);
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->setEventDispatcher($dispatcher);
+        $result = $matcher->match('/foo');
+
+        $this->assertEquals('foo2', $result['_route']);
+    }
+
+    public function testEventDispatcherCanMatchInOppositeOrder()
+    {
+        $route1 =  new Route('/foo');
+        $route1->setRequirement('_bar', 'hello');
+
+        $route2 =  new Route('/foo');
+        $route2->setRequirement('_bar', 'hiya');
+
+        $callback = function($name, $event) {
+            if ($event->getRoute()->getRequirement('_bar') == 'hiya') {
+                $event->setStatus(1);
+                $event->stopPropagation();
+            }
+            if ($event->getRoute()->getRequirement('_bar') == 'hello') {
+                $event->setStatus(0);
+            }
+        };
+
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher->expects($this->any())
+            ->method('dispatch')
+            ->will($this->returnCallback($callback));
+
+        $coll = new RouteCollection();
+        $coll->add('foo1', $route1);
+        $coll->add('foo2', $route2);
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->setEventDispatcher($dispatcher);
+        $result = $matcher->match('/foo');
+
+        $this->assertEquals('foo1', $result['_route']);
     }
 }

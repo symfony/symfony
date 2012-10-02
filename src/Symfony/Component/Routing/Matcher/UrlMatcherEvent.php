@@ -22,7 +22,7 @@ class UrlMatcherEvent extends Event
     /**
      * Returns the route being matched
      *
-     * @return \Symfony\Component\Routing\Route
+     * @return Route
      */
     public function getRoute()
     {

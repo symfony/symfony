@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -72,9 +72,9 @@ class UrlMatcher implements UrlMatcherInterface
     }
 
     /**
-     * @param \Symfony\Component\EventDispatcher\EventDispatcher $event_dispatcher
+     * @param EventDispatcherInterface $event_dispatcher
      */
-    public function setEventDispatcher(EventDispatcher $event_dispatcher)
+    public function setEventDispatcher(EventDispatcherInterface $event_dispatcher)
     {
         $this->dispatcher = $event_dispatcher;
     }

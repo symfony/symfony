@@ -11,8 +11,8 @@ class UrlMatcherEvent extends Event
 
     private $status;
 
-    const REQUIREMENT_MISMATCH = 2;
-    const REQUIREMENT_MATCH = 1;
+    const REQUIREMENT_MISMATCH = 1;
+    const REQUIREMENT_MATCH = 0;
 
     public function __construct(Route $route)
     {
@@ -32,13 +32,13 @@ class UrlMatcherEvent extends Event
     /**
      * Set the result of the requirement match
      *
-     * 0 - Mismatch
-     * 1 - Match
+     * 0 - Match
+     * 1 - Mismatch
      * null - No vote
      *
      * First listener to set to Mismatch wins
      *
-     * @param $status boolean|null
+     * @param $status integer|null
      */
     public function setStatus($status)
     {
@@ -52,7 +52,7 @@ class UrlMatcherEvent extends Event
     /**
      * Returns the set status
      *
-     * @return boolean|null
+     * @return integer|null
      */
     public function getStatus()
     {

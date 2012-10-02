@@ -174,7 +174,7 @@ class UrlMatcher implements UrlMatcherInterface
         $scheme = $route->getRequirement('_scheme');
         $status = $scheme && $scheme !== $this->context->getScheme() ? self::REQUIREMENT_MISMATCH : self::REQUIREMENT_MATCH;
 
-        if (0 === $status) {
+        if (self::REQUIREMENT_MISMATCH === $status) {
             return array($status, null);
         }
 

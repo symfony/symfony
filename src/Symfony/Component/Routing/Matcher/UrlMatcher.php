@@ -32,13 +32,12 @@ class UrlMatcher implements UrlMatcherInterface
     const REQUIREMENT_MISMATCH  = 1;
     const ROUTE_MATCH           = 2;
 
-    const EVENT_HANDLE_REQUIREMENTS = 'match.requirements';
+    const EVENT_HANDLE_REQUIREMENTS = 'routing.match.requirements';
 
     protected $context;
     protected $allow;
 
-    /** @var \Symfony\Component\EventDispatcher\EventDispatcher */
-    protected $event_dispatcher;
+    protected $dispatcher;
 
     private $routes;
 
@@ -77,7 +76,7 @@ class UrlMatcher implements UrlMatcherInterface
      */
     public function setEventDispatcher(EventDispatcher $event_dispatcher)
     {
-        $this->event_dispatcher = $event_dispatcher;
+        $this->dispatcher = $event_dispatcher;
     }
 
     /**
@@ -180,9 +179,9 @@ class UrlMatcher implements UrlMatcherInterface
             return array($status, null);
         }
 
-        if ($this->event_dispatcher) {
+        if ($this->dispatcher) {
             $event = new UrlMatcherEvent($route);
-            $this->event_dispatcher->dispatch(self::EVENT_HANDLE_REQUIREMENTS, $event);
+            $this->dispatcher->dispatch(self::EVENT_HANDLE_REQUIREMENTS, $event);
             $status = $event->getStatus();
         }
 

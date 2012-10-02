@@ -7,10 +7,8 @@ use Symfony\Component\Routing\Route;
 
 class UrlMatcherEvent extends Event
 {
-    /** @var \Symfony\Component\Routing\Route */
     private $route;
 
-    /** @var boolean */
     private $status;
 
     const REQUIREMENT_MISMATCH = 2;
@@ -40,17 +38,22 @@ class UrlMatcherEvent extends Event
      *
      * First listener to set to Mismatch wins
      *
-     * @param $result boolean
+     * @param $status boolean|null
      */
-    public function setStatus($result)
+    public function setStatus($status)
     {
-        $this->status = $result;
+        $this->status = $status;
 
         if ($this->status == self::REQUIREMENT_MISMATCH) {
             $this->stopPropagation();
         }
     }
 
+    /**
+     * Returns the set status
+     *
+     * @return boolean|null
+     */
     public function getStatus()
     {
         return $this->status;

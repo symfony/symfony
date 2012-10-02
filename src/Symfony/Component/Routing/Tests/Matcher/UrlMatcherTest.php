@@ -278,7 +278,6 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $callback = function($name, $event) {
             $event->setStatus(1);
-            $event->stopPropagation();
         };
 
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
@@ -303,7 +302,6 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $callback = function($name, $event) {
             if ($event->getRoute()->getRequirement('_bar') == 'hello') {
                 $event->setStatus(1);
-                $event->stopPropagation();
             }
             if ($event->getRoute()->getRequirement('_bar') == 'hiya') {
                 $event->setStatus(0);
@@ -336,7 +334,6 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $callback = function($name, $event) {
             if ($event->getRoute()->getRequirement('_bar') == 'hiya') {
                 $event->setStatus(1);
-                $event->stopPropagation();
             }
             if ($event->getRoute()->getRequirement('_bar') == 'hello') {
                 $event->setStatus(0);

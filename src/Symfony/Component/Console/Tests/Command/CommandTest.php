@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -31,6 +32,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     {
         self::$fixturesPath = __DIR__.'/../Fixtures/';
         require_once self::$fixturesPath.'/TestCommand.php';
+        require_once self::$fixturesPath.'/FooCommand.php';
     }
 
     public function testConstructor()
@@ -256,5 +258,21 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $tester = new CommandTester($command);
         $tester->execute(array('command' => $command->getName()));
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/command_asxml.txt', $command->asXml(), '->asXml() returns an XML representation of the command');
+    }
+
+    public function testRunAutoCommandNameOnInput()
+    {
+        $command = new \TestCommand();
+        $otherCommand = new \FooCommand();
+        $application = new Application();
+        $application->add($command);
+        $application->add($otherCommand);
+
+        $args = array($command->getName(), new ArrayInput(array()), new NullOutput());
+        $method = new \ReflectionMethod($otherCommand, 'runCommand');
+        $method->setAccessible(true);
+        $result = $method->invokeArgs($otherCommand, $args);
+
+        $this->assertSame(0, $result);
     }
 }

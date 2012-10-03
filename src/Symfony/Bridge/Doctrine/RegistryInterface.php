@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManager;
 
 /**
  * References Doctrine connections and entity managers.
@@ -70,7 +71,7 @@ interface RegistryInterface
     /**
      * Gets an array of all registered entity managers
      *
-     * @return array An array of EntityManager instances
+     * @return EntityManager[] An array of EntityManager instances
      */
     public function getEntityManagers();
 
@@ -119,7 +120,7 @@ interface RegistryInterface
      * @param string $entityName        The name of the entity.
      * @param string $entityManagerName The entity manager name (null for the default one)
      *
-     * @return Doctrine\ORM\EntityRepository
+     * @return \Doctrine\ORM\EntityRepository
      */
     public function getRepository($entityName, $entityManagerName = null);
 

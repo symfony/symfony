@@ -48,6 +48,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /** @var $router \Symfony\Component\Routing\Router */
         $router = $this->getContainer()->get('router');
 
         $routes = array();
@@ -62,6 +63,10 @@ EOF
         }
     }
 
+    /**
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfony\Component\Routing\Route[]                $routes
+     */
     protected function outputRoutes(OutputInterface $output, $routes)
     {
         $output->writeln($this->getHelper('formatter')->formatSection('router', 'Current routes'));
@@ -93,6 +98,10 @@ EOF
     }
 
     /**
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfony\Component\Routing\Route[] $routes
+     * @param string $name
+     *
      * @throws \InvalidArgumentException When route does not exist
      */
     protected function outputRoute(OutputInterface $output, $routes, $name)

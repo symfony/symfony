@@ -188,7 +188,7 @@ class Router implements RouterInterface
      *
      * @param string $url URL to be parsed
      *
-     * @return array|false An array of parameters or false if no route matches
+     * @return array|boolean An array of parameters or false if no route matches
      */
     public function match($url)
     {
@@ -198,7 +198,7 @@ class Router implements RouterInterface
     /**
      * Gets the UrlMatcher instance associated with this Router.
      *
-     * @return UrlMatcherInterface A UrlMatcherInterface instance
+     * @return \Symfony\Component\Routing\Matcher\UrlMatcherInterface A UrlMatcherInterface instance
      */
     public function getMatcher()
     {
@@ -231,7 +231,7 @@ class Router implements RouterInterface
     /**
      * Gets the UrlGenerator instance associated with this Router.
      *
-     * @return UrlGeneratorInterface A UrlGeneratorInterface instance
+     * @return \Symfony\Component\Routing\Generator\UrlGeneratorInterface A UrlGeneratorInterface instance
      */
     public function getGenerator()
     {

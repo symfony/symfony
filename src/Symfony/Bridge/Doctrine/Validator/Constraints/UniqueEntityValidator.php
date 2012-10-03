@@ -41,6 +41,9 @@ class UniqueEntityValidator extends ConstraintValidator
      * @param object     $entity
      * @param Constraint $constraint
      *
+     * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @throws \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     *
      * @return bool
      */
     public function isValid($entity, Constraint $constraint)

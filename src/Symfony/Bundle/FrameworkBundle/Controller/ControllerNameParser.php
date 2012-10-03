@@ -38,6 +38,10 @@ class ControllerNameParser
      * Converts a short notation a:b:c to a class::method.
      *
      * @param string $controller A short notation controller (a:b:c)
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public function parse($controller)
     {

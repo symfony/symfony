@@ -169,6 +169,8 @@ class ExprBuilder
      *
      * @param string $message
      *
+     * @throws \InvalidArgumentException
+     *
      * @return ExprBuilder
      */
     public function thenInvalid($message)
@@ -181,6 +183,8 @@ class ExprBuilder
     /**
      * Sets a closure unsetting this key of the array at validation time.
      *
+     * @throws \Symfony\Component\Config\Definition\Exception\UnsetKeyException
+     *
      * @return ExprBuilder
      */
     public function thenUnset()
@@ -192,6 +196,8 @@ class ExprBuilder
 
     /**
      * Returns the related node
+     *
+     * @throws \RuntimeException
      *
      * @return NodeDefinition
      */

@@ -40,8 +40,9 @@ class ConnectionFactory
      * @param array         $params
      * @param Configuration $config
      * @param EventManager  $eventManager
+     * @param array         $mappingTypes
      *
-     * @return Doctrine\DBAL\Connection
+     * @return \Doctrine\DBAL\Connection
      */
     public function createConnection(array $params, Configuration $config = null, EventManager $eventManager = null, array $mappingTypes = array())
     {
@@ -50,6 +51,7 @@ class ConnectionFactory
             $this->initialized = true;
         }
 
+        /** @var \Doctrine\DBAL\Connection $connection  */
         $connection = DriverManager::getConnection($params, $config, $eventManager);
 
         if (!empty($mappingTypes)) {

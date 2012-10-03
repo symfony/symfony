@@ -44,7 +44,7 @@ class DataEvent extends Event
     /**
      * Returns the data associated with this event.
      *
-     * @return type
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getData()
     {

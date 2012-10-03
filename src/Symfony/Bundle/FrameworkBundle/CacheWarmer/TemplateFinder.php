@@ -69,7 +69,7 @@ class TemplateFinder implements TemplateFinderInterface
      *
      * @param string $dir The folder where to look for templates
      *
-     * @return array An array of templates of type TemplateReferenceInterface
+     * @return \Symfony\Component\Templating\TemplateReferenceInterface[] An array of templates of type TemplateReferenceInterface
      */
     private function findTemplatesInFolder($dir)
     {
@@ -78,6 +78,7 @@ class TemplateFinder implements TemplateFinderInterface
         if (is_dir($dir)) {
             $finder = new Finder();
             foreach ($finder->files()->followLinks()->in($dir) as $file) {
+                /** @var $file \Symfony\Component\Finder\SplFileInfo  */
                 $template = $this->parser->parseFromFilename($file->getRelativePathname());
                 if (false !== $template) {
                     $templates[] = $template;

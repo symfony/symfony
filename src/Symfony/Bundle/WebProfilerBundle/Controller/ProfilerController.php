@@ -28,10 +28,13 @@ class ProfilerController extends ContainerAware
      *
      * @param string $token The profiler token
      *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
      * @return Response A Response instance
      */
     public function panelAction($token)
     {
+        /** @var $profiler \Symfony\Component\HttpKernel\Profiler\Profiler */
         $profiler = $this->container->get('profiler');
         $profiler->disable();
 
@@ -58,6 +61,8 @@ class ProfilerController extends ContainerAware
      * Exports data for a given token.
      *
      * @param string $token The profiler token
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      *
      * @return Response A Response instance
      */
@@ -92,6 +97,8 @@ class ProfilerController extends ContainerAware
 
     /**
      * Imports token data.
+     *
+     * @throws \RuntimeException
      *
      * @return Response A Response instance
      */

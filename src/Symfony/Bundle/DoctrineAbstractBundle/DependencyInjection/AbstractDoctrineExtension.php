@@ -117,7 +117,8 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array  $mappingConfig
      * @param string $mappingName
-     * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     protected function setMappingDriverConfig(array $mappingConfig, $mappingName)
     {
@@ -137,7 +138,7 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param \ReflectionClass $bundle
      * @param ContainerBuilder $container    A ContainerBuilder instance
      *
-     * @return array|false
+     * @return array|boolean
      */
     protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container)
     {
@@ -227,6 +228,8 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array  $mappingConfig
      * @param string $objectManagerName
+     *
+     * @throws \InvalidArgumentException
      */
     protected function assertValidMappingConfiguration(array $mappingConfig, $objectManagerName)
     {

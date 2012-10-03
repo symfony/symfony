@@ -26,13 +26,13 @@ class KernelEvent extends Event
 {
     /**
      * The kernel in which this event was thrown
-     * @var Symfony\Component\HttpKernel\HttpKernelInterface
+     * @var \Symfony\Component\HttpKernel\HttpKernelInterface
      */
     private $kernel;
 
     /**
      * The request the kernel is currently processing
-     * @var Symfony\Component\HttpFoundation\Request
+     * @var \Symfony\Component\HttpFoundation\Request
      */
     private $request;
 
@@ -53,7 +53,7 @@ class KernelEvent extends Event
     /**
      * Returns the kernel in which this event was thrown
      *
-     * @return Symfony\Component\HttpKernel\HttpKernelInterface
+     * @return \Symfony\Component\HttpKernel\HttpKernelInterface
      *
      * @api
      */
@@ -65,7 +65,7 @@ class KernelEvent extends Event
     /**
      * Returns the request the kernel is currently processing
      *
-     * @return Symfony\Component\HttpFoundation\Request
+     * @return \Symfony\Component\HttpFoundation\Request
      *
      * @api
      */

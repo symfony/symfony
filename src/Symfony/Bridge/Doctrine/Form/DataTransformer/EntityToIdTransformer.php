@@ -31,6 +31,9 @@ class EntityToIdTransformer implements DataTransformerInterface
      *
      * @param Collection|object $entity A collection of entities, a single entity or NULL
      *
+     * @throws \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @throws \InvalidArgumentException
+     *
      * @return mixed An array of choice keys, a single key or NULL
      */
     public function transform($entity)
@@ -62,7 +65,10 @@ class EntityToIdTransformer implements DataTransformerInterface
      *
      * @param mixed $key An array of keys, a single key or NULL
      *
-     * @return Collection|object  A collection of entities, a single entity or NULL
+     * @throws \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @throws \Symfony\Component\Form\Exception\TransformationFailedException
+     *
+     * @return Collection[]|Collection|null  A collection of entities, a single entity or NULL
      */
     public function reverseTransform($key)
     {

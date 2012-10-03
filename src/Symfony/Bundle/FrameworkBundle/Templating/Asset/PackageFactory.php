@@ -35,7 +35,7 @@ class PackageFactory
      * @param string  $httpId  The id for the package to use when the current request is HTTP
      * @param string  $sslId   The id for the package to use when the current request is SSL
      *
-     * @return PackageInterface The package
+     * @return \Symfony\Component\Templating\Asset\PackageInterface The package
      */
     public function getPackage(Request $request, $httpId, $sslId)
     {

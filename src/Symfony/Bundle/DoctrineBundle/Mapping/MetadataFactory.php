@@ -40,6 +40,8 @@ class MetadataFactory
      *
      * @param BundleInterface $bundle A BundleInterface instance
      *
+     * @throws \RuntimeException
+     *
      * @return ClassMetadataCollection A ClassMetadataCollection instance
      */
     public function getBundleMetadata(BundleInterface $bundle)
@@ -63,6 +65,9 @@ class MetadataFactory
      *
      * @param string $class A class name
      * @param string $path  The path where the class is stored (if known)
+     *
+     * @throws \RuntimeException
+     * @throws \Doctrine\ORM\Mapping\MappingException
      *
      * @return ClassMetadataCollection A ClassMetadataCollection instance
      */
@@ -92,6 +97,8 @@ class MetadataFactory
      *
      * @param string $namespace A namespace name
      * @param string $path      The path where the class is stored (if known)
+     *
+     * @throws \RuntimeException
      *
      * @return ClassMetadataCollection A ClassMetadataCollection instance
      */
@@ -157,6 +164,7 @@ class MetadataFactory
         $metadata = array();
         foreach ($this->registry->getEntityManagers() as $em) {
             $class = $this->getClassMetadataFactoryClass();
+            /** @var $cmf \Doctrine\ORM\Mapping\ClassMetadataFactory */
             $cmf = new $class();
             $cmf->setEntityManager($em);
             foreach ($cmf->getAllMetadata() as $m) {

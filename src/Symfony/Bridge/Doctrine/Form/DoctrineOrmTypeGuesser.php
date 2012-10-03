@@ -39,6 +39,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
             return new TypeGuess('text', array(), Guess::LOW_CONFIDENCE);
         }
 
+        /** @var $metadata \Doctrine\ORM\Mapping\ClassMetadata */
         list($metadata, $name) = $ret;
 
         if ($metadata->hasAssociation($property)) {
@@ -82,6 +83,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessRequired($class, $property)
     {
+        /** @var $ret \Doctrine\ORM\Mapping\ClassMetadata[] */
         $ret = $this->getMetadata($class);
         if ($ret && $ret[0]->hasField($property)) {
             if (!$ret[0]->isNullable($property)) {
@@ -97,6 +99,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessMaxLength($class, $property)
     {
+        /** @var $ret \Doctrine\ORM\Mapping\ClassMetadata[] */
         $ret = $this->getMetadata($class);
         if ($ret && $ret[0]->hasField($property) && !$ret[0]->hasAssociation($property)) {
             $mapping = $ret[0]->getFieldMapping($property);
@@ -114,6 +117,11 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     {
     }
 
+    /**
+     * @param string $class
+     *
+     * @return array
+     */
     protected function getMetadata($class)
     {
         if (array_key_exists($class, $this->cache)) {

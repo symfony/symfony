@@ -80,6 +80,7 @@ class XmlDriver extends BaseXmlDriver
                     throw MappingException::fileMappingDriversRequireConfiguredDirectoryPath($path);
                 }
 
+                /** @var $iterator \SplFileInfo[] */
                 $iterator = new \RecursiveIteratorIterator(
                     new \RecursiveDirectoryIterator($path),
                     \RecursiveIteratorIterator::LEAVES_ONLY

@@ -56,6 +56,8 @@ class Registry implements RegistryInterface
      *
      * @param string $name The connection name (null for the default one)
      *
+     * @throws \InvalidArgumentException
+     *
      * @return Connection
      */
     public function getConnection($name = null)
@@ -111,6 +113,8 @@ class Registry implements RegistryInterface
      *
      * @param string $name The entity manager name (null for the default one)
      *
+     * @throws \InvalidArgumentException
+     *
      * @return EntityManager
      */
     public function getEntityManager($name = null)
@@ -156,6 +160,8 @@ class Registry implements RegistryInterface
      *
      * @param string $name The entity manager name (null for the default one)
      *
+     * @throws \InvalidArgumentException
+     *
      * @return EntityManager
      */
     public function resetEntityManager($name = null)
@@ -179,6 +185,8 @@ class Registry implements RegistryInterface
      * This method looks for the alias in all registered entity managers.
      *
      * @param string $alias The alias
+     *
+     * @throws \Doctrine\ORM\ORMException
      *
      * @return string The full namespace
      *
@@ -234,6 +242,7 @@ class Registry implements RegistryInterface
         }
 
         foreach ($this->entityManagers as $id) {
+            /** @var $em \Doctrine\ORM\EntityManager */
             $em = $this->container->get($id);
 
             if (!$em->getConfiguration()->getMetadataDriverImpl()->isTransient($class)) {

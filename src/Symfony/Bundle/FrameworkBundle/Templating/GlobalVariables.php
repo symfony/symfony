@@ -30,7 +30,7 @@ class GlobalVariables
     /**
      * Returns the security context service.
      *
-     * @return Symfony\Component\Security\Core\SecurityContext|void The security context
+     * @return \Symfony\Component\Security\Core\SecurityContext|void The security context
      */
     public function getSecurity()
     {
@@ -67,7 +67,7 @@ class GlobalVariables
     /**
      * Returns the current request.
      *
-     * @return Symfony\Component\HttpFoundation\Request|void The http request object
+     * @return \Symfony\Component\HttpFoundation\Request|void The http request object
      */
     public function getRequest()
     {
@@ -79,7 +79,7 @@ class GlobalVariables
     /**
      * Returns the current session.
      *
-     * @return Symfony\Component\HttpFoundation\Session|void The session
+     * @return \Symfony\Component\HttpFoundation\Session|void The session
      */
     public function getSession()
     {

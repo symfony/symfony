@@ -29,6 +29,10 @@ use Symfony\Component\Config\FileLocator;
  */
 class DoctrineExtension extends AbstractDoctrineExtension
 {
+    protected $entityManagers;
+    protected $defaultConnection;
+
+
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration($container->getParameter('kernel.debug'));
@@ -199,6 +203,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
      *
      * @param array            $entityManager A configured ORM entity manager.
      * @param ContainerBuilder $container     A ContainerBuilder instance
+     *
+     * @throws \LogicException
      */
     protected function loadOrmEntityManager(array $entityManager, ContainerBuilder $container)
     {
@@ -359,6 +365,9 @@ class DoctrineExtension extends AbstractDoctrineExtension
      * @param array            $entityManager The array configuring an entity manager.
      * @param array            $cacheDriver   The cache driver configuration.
      * @param ContainerBuilder $container
+     *
+     * @throws \InvalidArgumentException
+     *
      * @return Definition $cacheDef
      */
     protected function getEntityManagerCacheDefinition(array $entityManager, $cacheDriver, ContainerBuilder $container)

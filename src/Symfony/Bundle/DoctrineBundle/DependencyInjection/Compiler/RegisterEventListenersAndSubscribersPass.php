@@ -17,8 +17,10 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 {
+    /** @var ContainerBuilder */
     private $container;
     private $connections;
+    /** @var \Doctrine\Common\EventManager */
     private $eventManagers;
 
     public function process(ContainerBuilder $container)
@@ -86,6 +88,12 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
         }
     }
 
+    /**
+     * @param string       $name
+     * @param null|integer $listenerId
+     *
+     * @throws \InvalidArgumentException
+     */
     private function getEventManager($name, $listenerId = null)
     {
         if (null === $this->eventManagers) {

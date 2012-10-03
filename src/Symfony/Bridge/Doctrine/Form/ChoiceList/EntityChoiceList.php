@@ -22,12 +22,12 @@ use Doctrine\ORM\NoResultException;
 class EntityChoiceList extends ArrayChoiceList
 {
     /**
-     * @var Doctrine\ORM\EntityManager
+     * @var \Doctrine\ORM\EntityManager
      */
     private $em;
 
     /**
-     * @var Doctrine\ORM\Mapping\ClassMetadata
+     * @var \Doctrine\ORM\Mapping\ClassMetadata
      */
     private $class;
 
@@ -40,7 +40,7 @@ class EntityChoiceList extends ArrayChoiceList
      * This property is initialized by initializeChoices(). It should only
      * be accessed through getEntity() and getEntities().
      *
-     * @var Collection
+     * @var \Doctrine\Common\Collections\Collection
      */
     private $entities = array();
 
@@ -50,7 +50,7 @@ class EntityChoiceList extends ArrayChoiceList
      *
      * This property should only be accessed through queryBuilder.
      *
-     * @var Doctrine\ORM\QueryBuilder
+     * @var \Doctrine\ORM\QueryBuilder
      */
     private $queryBuilder;
 
@@ -68,14 +68,14 @@ class EntityChoiceList extends ArrayChoiceList
      *
      * This property should only be accessed through getReflProperty().
      *
-     * @var array
+     * @var \ReflectionProperty[]
      */
     private $reflProperties = array();
 
     /**
      * A cache for the UnitOfWork instance of Doctrine
      *
-     * @var Doctrine\ORM\UnitOfWork
+     * @var \Doctrine\ORM\UnitOfWork
      */
     private $unitOfWork;
 
@@ -89,6 +89,8 @@ class EntityChoiceList extends ArrayChoiceList
      * @param string                $property     The property name
      * @param QueryBuilder|\Closure $queryBuilder An optional query builder
      * @param array|\Closure        $choices      An array of choices or a function returning an array
+     *
+     * @throws \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = null)
     {
@@ -169,6 +171,8 @@ class EntityChoiceList extends ArrayChoiceList
      *
      * @param array  $entities An array of entities
      * @param string $group    A group name
+     *
+     * @throws \Symfony\Component\Form\Exception\FormException
      */
     private function loadEntities($entities, $group = null)
     {

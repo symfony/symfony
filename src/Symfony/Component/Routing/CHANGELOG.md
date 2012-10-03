@@ -15,6 +15,10 @@ CHANGELOG
  * The default requirement now uses possesive quantifiers when possible which
    improves matching performance by up to 20% because it prevents backtracking
    when it's not needed.
+ * The ConfigurableRequirementsInterface can now also be used to disable the requirements
+   check on URL generation completely by calling `setStrictRequirements(null)`. It
+   improves performance in production environment as you should know that params always
+   pass the requirements (otherwise it would break your link anyway).
 
 2.1.0
 -----
@@ -37,5 +41,6 @@ CHANGELOG
    been used anyway without creating inconsistencies
  * [BC BREAK] RouteCollection::remove also removes a route from parent
    collections (not only from its children)
- * added strict_requirements option to disable exceptions (and generate empty
-   URLs instead) when generating a route with an invalid parameter value
+ * added ConfigurableRequirementsInterface that allows to disable exceptions 
+   (and generate empty URLs instead) when generating a route with an invalid
+   parameter value

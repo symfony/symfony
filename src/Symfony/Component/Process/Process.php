@@ -614,15 +614,11 @@ class Process
     public function addOutput($line)
     {
         $this->stdout .= $line;
-
-        return $this;
     }
 
     public function addErrorOutput($line)
     {
         $this->stderr .= $line;
-
-        return $this;
     }
 
     public function getCommandLine()
@@ -630,6 +626,9 @@ class Process
         return $this->commandline;
     }
 
+    /**
+     * @return self The current Process instance
+     */
     public function setCommandLine($commandline)
     {
         $this->commandline = $commandline;
@@ -648,6 +647,8 @@ class Process
      * To disable the timeout, set this value to null.
      *
      * @param integer|null
+     *
+     * @return self The current Process instance
      */
     public function setTimeout($timeout)
     {
@@ -673,6 +674,9 @@ class Process
         return $this->cwd;
     }
 
+    /**
+     * @return self The current Process instance
+     */
     public function setWorkingDirectory($cwd)
     {
         $this->cwd = $cwd;
@@ -685,6 +689,9 @@ class Process
         return $this->env;
     }
 
+    /**
+     * @return self The current Process instance
+     */
     public function setEnv(array $env)
     {
         $this->env = $env;
@@ -697,6 +704,9 @@ class Process
         return $this->stdin;
     }
 
+    /**
+     * @return self The current Process instance
+     */
     public function setStdin($stdin)
     {
         $this->stdin = $stdin;
@@ -709,6 +719,9 @@ class Process
         return $this->options;
     }
 
+    /**
+     * @return self The current Process instance
+     */
     public function setOptions(array $options)
     {
         $this->options = $options;
@@ -721,11 +734,14 @@ class Process
         return $this->enhanceWindowsCompatibility;
     }
 
+    /**
+     * @return self The current Process instance
+     */
     public function setEnhanceWindowsCompatibility($enhance)
     {
         $this->enhanceWindowsCompatibility = (Boolean) $enhance;
 
-        return $this;'
+        return $this;
     }
 
     /**
@@ -746,10 +762,14 @@ class Process
      * the --enable-sigchild option
      *
      * @param Boolean $enhance
+     *
+     * @return self The current Process instance
      */
     public function setEnhanceSigchildCompatibility($enhance)
     {
         $this->enhanceSigchildCompatibility = (Boolean) $enhance;
+
+        return $this;
     }
 
     /**

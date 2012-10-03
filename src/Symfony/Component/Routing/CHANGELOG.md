@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * Adjacent placeholders without separator work now, e.g. `/{x}{y}{z}.{_format}`.
+ * Characters that function as separator between placeholders are now whitelisted
+   to fix routes with normal text around a variable, e.g. `/prefix{var}suffix`.
+ * [BC BREAK] The default requirement of a variable has been changed slightly.
+   Previously it disallowed the previous and the next char around a variable. Now
+   it disallows the slash (`/`) and the next char. Using the previous char added
+   no value and was problematic because the route `/index.{_format}` would be
+   matched by `/index.ht/ml`.
+ * The default requirement now uses possesive quantifiers when possible which
+   improves matching performance by up to 20% because it prevents backtracking
+   when it's not needed.
+
 2.1.0
 -----
 

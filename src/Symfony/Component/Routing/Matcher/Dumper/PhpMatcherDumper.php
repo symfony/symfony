@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
 
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Exception\LogicException;
 
 /**
  * PhpMatcherDumper creates a PHP class able to match URLs for a given set of routes.
@@ -171,6 +172,8 @@ EOF;
      * @param string|null $parentPrefix         The prefix of the parent collection used to optimize the code
      *
      * @return string PHP code
+     *
+     * @throws LogicException  If a _scheme is provided for URL matchers that does not implement RedirectableUrlMatcherInterface
      */
     private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)
     {
@@ -258,7 +261,7 @@ EOF;
 
         if ($scheme = $route->getRequirement('_scheme')) {
             if (!$supportsRedirections) {
-                throw new \LogicException('The "_scheme" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
+                throw new LogicException('The "_scheme" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
             }
 
             $code .= <<<EOF

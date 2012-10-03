@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing;
 
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
+
 /**
  * A Route describes a route and its parameters.
  *
@@ -373,7 +375,7 @@ class Route implements \Serializable
     private function sanitizeRequirement($key, $regex)
     {
         if (!is_string($regex)) {
-            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string.', $key));
+            throw new InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string.', $key));
         }
 
         if ('' !== $regex && '^' === $regex[0]) {
@@ -385,7 +387,7 @@ class Route implements \Serializable
         }
 
         if ('' === $regex) {
-            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty.', $key));
+            throw new InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty.', $key));
         }
 
         return $regex;

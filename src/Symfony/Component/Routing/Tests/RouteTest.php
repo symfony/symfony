@@ -100,7 +100,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getInvalidRequirements
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidArgumentException
      */
     public function testSetInvalidRequirement($req)
     {

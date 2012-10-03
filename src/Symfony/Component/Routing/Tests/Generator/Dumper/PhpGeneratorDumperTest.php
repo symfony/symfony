@@ -76,7 +76,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\RouteNotFoundException
      */
     public function testDumpWithoutRoutes()
     {

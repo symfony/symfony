@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
-
 class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 {
     protected $loader;
@@ -25,7 +23,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidArgumentException
      */
     public function testLoadMissingClass()
     {
@@ -33,7 +31,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidArgumentException
      */
     public function testLoadAbstractClass()
     {

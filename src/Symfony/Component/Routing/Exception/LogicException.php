@@ -12,13 +12,11 @@
 namespace Symfony\Component\Routing\Exception;
 
 /**
- * Exception thrown when a route cannot be generated because of missing
- * mandatory parameters.
+ * Exception that represents error in the program logic inside the Routing
+ * Component
  *
- * @author Alexandre Salomé <alexandre.salome@gmail.com>
- *
- * @api
+ * @author Romain Neutron <imprec@gmail.com>
  */
-class MissingMandatoryParametersException extends InvalidArgumentException
+class LogicException extends \LogicException implements ExceptionInterface
 {
 }

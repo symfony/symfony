@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
 
 /**
  * A RouteCollection represents a set of Route instances as a tree structure.
@@ -109,14 +110,14 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param string $name  The route name
      * @param Route  $route A Route instance
      *
-     * @throws \InvalidArgumentException When route name contains non valid characters
+     * @throws InvalidArgumentException When route name contains non valid characters
      *
      * @api
      */
     public function add($name, Route $route)
     {
         if (!preg_match('/^[a-z0-9A-Z_.]+$/', $name)) {
-            throw new \InvalidArgumentException(sprintf('The provided route name "%s" contains non valid characters. A route name must only contain digits (0-9), letters (a-z and A-Z), underscores (_) and dots (.).', $name));
+            throw new InvalidArgumentException(sprintf('The provided route name "%s" contains non valid characters. A route name must only contain digits (0-9), letters (a-z and A-Z), underscores (_) and dots (.).', $name));
         }
 
         $this->remove($name);
@@ -189,7 +190,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param array           $requirements An array of requirements
      * @param array           $options      An array of options
      *
-     * @throws \InvalidArgumentException When the RouteCollection already exists in the tree
+     * @throws InvalidArgumentException When the RouteCollection already exists in the tree
      *
      * @api
      */
@@ -198,7 +199,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
         // prevent infinite loops by recursive referencing
         $root = $this->getRoot();
         if ($root === $collection || $root->hasCollection($collection)) {
-            throw new \InvalidArgumentException('The RouteCollection already exists in the tree.');
+            throw new InvalidArgumentException('The RouteCollection already exists in the tree.');
         }
 
         // remove all routes with the same names in all existing collections

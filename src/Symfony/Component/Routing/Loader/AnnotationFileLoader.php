@@ -12,6 +12,8 @@
 namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
+use Symfony\Component\Routing\Exception\RuntimeException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\Config\FileLocator;
@@ -36,7 +38,7 @@ class AnnotationFileLoader extends FileLoader
     public function __construct(FileLocator $locator, AnnotationClassLoader $loader, $paths = array())
     {
         if (!function_exists('token_get_all')) {
-            throw new \RuntimeException('The Tokenizer extension is required for the routing annotation loaders.');
+            throw new RuntimeException('The Tokenizer extension is required for the routing annotation loaders.');
         }
 
         parent::__construct($locator, $paths);
@@ -52,7 +54,7 @@ class AnnotationFileLoader extends FileLoader
      *
      * @return RouteCollection A RouteCollection instance
      *
-     * @throws \InvalidArgumentException When the file does not exist or its routes cannot be parsed
+     * @throws InvalidArgumentException When the file does not exist or its routes cannot be parsed
      */
     public function load($file, $type = null)
     {

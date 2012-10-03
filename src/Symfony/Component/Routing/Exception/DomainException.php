@@ -12,13 +12,11 @@
 namespace Symfony\Component\Routing\Exception;
 
 /**
- * Exception thrown when a route cannot be generated because of missing
- * mandatory parameters.
+ * Exception thrown if a value does not adhere to a defined valid data domain
+ * inside the Routing Component
  *
- * @author Alexandre Salomé <alexandre.salome@gmail.com>
- *
- * @api
+ * @author Romain Neutron <imprec@gmail.com>
  */
-class MissingMandatoryParametersException extends InvalidArgumentException
+class DomainException extends \DomainException implements ExceptionInterface
 {
 }

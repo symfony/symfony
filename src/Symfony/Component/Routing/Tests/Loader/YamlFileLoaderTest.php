@@ -13,7 +13,6 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Config\Resource\FileResource;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
@@ -53,7 +52,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidArgumentException
      */
     public function testLoadThrowsExceptionIfNotAnArray()
     {
@@ -62,7 +61,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidArgumentException
      */
     public function testLoadThrowsExceptionIfArrayHasUnsupportedKeys()
     {
@@ -71,7 +70,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidArgumentException
      */
     public function testLoadThrowsExceptionWhenIncomplete()
     {
@@ -105,7 +104,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidArgumentException
      */
     public function testParseRouteThrowsExceptionWithMissingPattern()
     {

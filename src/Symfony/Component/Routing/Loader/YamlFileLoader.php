@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Loader\FileLoader;
@@ -38,7 +39,7 @@ class YamlFileLoader extends FileLoader
      *
      * @return RouteCollection A RouteCollection instance
      *
-     * @throws \InvalidArgumentException When route can't be parsed
+     * @throws InvalidArgumentException When route can't be parsed
      *
      * @api
      */
@@ -58,7 +59,7 @@ class YamlFileLoader extends FileLoader
 
         // not an array
         if (!is_array($config)) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $file));
+            throw new InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $file));
         }
 
         foreach ($config as $name => $config) {
@@ -99,7 +100,7 @@ class YamlFileLoader extends FileLoader
      * @param array           $config     Route definition
      * @param string          $file       A Yaml file path
      *
-     * @throws \InvalidArgumentException When config pattern is not defined for the given route
+     * @throws InvalidArgumentException When config pattern is not defined for the given route
      */
     protected function parseRoute(RouteCollection $collection, $name, $config, $file)
     {
@@ -108,7 +109,7 @@ class YamlFileLoader extends FileLoader
         $options = isset($config['options']) ? $config['options'] : array();
 
         if (!isset($config['pattern'])) {
-            throw new \InvalidArgumentException(sprintf('You must define a "pattern" for the "%s" route.', $name));
+            throw new InvalidArgumentException(sprintf('You must define a "pattern" for the "%s" route.', $name));
         }
 
         $route = new Route($config['pattern'], $defaults, $requirements, $options);
@@ -129,7 +130,7 @@ class YamlFileLoader extends FileLoader
     {
         foreach ($config as $key => $value) {
             if (!in_array($key, self::$availableKeys)) {
-                throw new \InvalidArgumentException(sprintf(
+                throw new InvalidArgumentException(sprintf(
                     'Yaml routing loader does not support given key: "%s". Expected one of the (%s).',
                     $key, implode(', ', self::$availableKeys)
                 ));

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Matcher\Dumper;
 
+use Symfony\Component\Routing\Exception\LogicException;
+
 /**
  * Dumps a set of Apache mod_rewrite rules.
  *
@@ -31,7 +33,7 @@ class ApacheMatcherDumper extends MatcherDumper
      *
      * @return string A string to be used as Apache rewrite rules
      *
-     * @throws \LogicException When the route regex is invalid
+     * @throws LogicException When the route regex is invalid
      */
     public function dump(array $options = array())
     {
@@ -53,7 +55,7 @@ class ApacheMatcherDumper extends MatcherDumper
             $delimiter = $regex[0];
             $regexPatternEnd = strrpos($regex, $delimiter);
             if (strlen($regex) < 2 || 0 === $regexPatternEnd) {
-                throw new \LogicException('The "%s" route regex "%s" is invalid', $name, $regex);
+                throw new LogicException('The "%s" route regex "%s" is invalid', $name, $regex);
             }
             $regex = preg_replace('/\?<.+?>/', '', substr($regex, 1, $regexPatternEnd - 1));
             $regex = '^'.self::escape(preg_quote($options['base_uri']).substr($regex, 1), ' ', '\\');

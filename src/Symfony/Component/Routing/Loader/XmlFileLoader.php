@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Loader\FileLoader;
 
@@ -33,7 +34,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return RouteCollection A RouteCollection instance
      *
-     * @throws \InvalidArgumentException When a tag can't be parsed
+     * @throws InvalidArgumentException When a tag can't be parsed
      *
      * @api
      */
@@ -97,7 +98,7 @@ class XmlFileLoader extends FileLoader
                             $options[(string) $n->getAttribute('key')] = trim((string) $n->nodeValue);
                             break;
                         default:
-                            throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $n->tagName));
+                            throw new InvalidArgumentException(sprintf('Unable to parse tag "%s"', $n->tagName));
                     }
                 }
 
@@ -105,7 +106,7 @@ class XmlFileLoader extends FileLoader
                 $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix, $defaults, $requirements, $options);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
+                throw new InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
         }
     }
 
@@ -126,7 +127,7 @@ class XmlFileLoader extends FileLoader
      * @param \DOMElement     $definition Route definition
      * @param string          $file       An XML file path
      *
-     * @throws \InvalidArgumentException When the definition cannot be parsed
+     * @throws InvalidArgumentException When the definition cannot be parsed
      */
     protected function parseRoute(RouteCollection $collection, \DOMElement $definition, $file)
     {
@@ -150,7 +151,7 @@ class XmlFileLoader extends FileLoader
                     $requirements[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
                     break;
                 default:
-                    throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
+                    throw new InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
             }
         }
 
@@ -166,7 +167,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return \DOMDocument
      *
-     * @throws \InvalidArgumentException When loading of XML file returns error
+     * @throws InvalidArgumentException When loading of XML file returns error
      */
     protected function loadFile($file)
     {
@@ -179,7 +180,7 @@ class XmlFileLoader extends FileLoader
         if (!$dom->loadXML(file_get_contents($file), LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
             libxml_disable_entity_loader($disableEntities);
 
-            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($internalErrors)));
+            throw new InvalidArgumentException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
         $dom->normalizeDocument();
 
@@ -188,7 +189,7 @@ class XmlFileLoader extends FileLoader
 
         foreach ($dom->childNodes as $child) {
             if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
-                throw new \InvalidArgumentException('Document types are not allowed.');
+                throw new InvalidArgumentException('Document types are not allowed.');
             }
         }
 
@@ -202,7 +203,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param \DOMDocument $dom A loaded XML file
      *
-     * @throws \InvalidArgumentException When XML doesn't validate its XSD schema
+     * @throws InvalidArgumentException When XML doesn't validate its XSD schema
      */
     protected function validate(\DOMDocument $dom)
     {
@@ -212,7 +213,7 @@ class XmlFileLoader extends FileLoader
         libxml_clear_errors();
 
         if (!$dom->schemaValidate($location)) {
-            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($current)));
+            throw new InvalidArgumentException(implode("\n", $this->getXmlErrors($current)));
         }
         libxml_use_internal_errors($current);
     }

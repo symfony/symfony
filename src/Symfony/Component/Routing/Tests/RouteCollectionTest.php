@@ -28,7 +28,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidArgumentException
      */
     public function testAddInvalidRoute()
     {
@@ -233,7 +233,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidArgumentException
      */
     public function testCannotSelfJoinCollection()
     {
@@ -243,7 +243,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidArgumentException
      */
     public function testCannotAddExistingCollectionToTree()
     {

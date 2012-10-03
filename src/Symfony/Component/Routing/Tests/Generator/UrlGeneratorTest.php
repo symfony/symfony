@@ -312,6 +312,14 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->getGenerator($routes)->generate('test', array('page' => 'do.t', '_format' => 'html'));
     }
 
+    public function testEscapedVariable()
+    {
+        $routes = $this->getRoutes('test', new Route('/{foo}\{static}{bar}'));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/foo%7Bstatic%7Dbar', $generator->generate('test', array('foo' => 'foo', 'bar' => 'bar')));
+    }
+
     protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)
     {
         $context = new RequestContext('/app.php');

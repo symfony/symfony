@@ -121,6 +121,26 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             )),
 
             array(
+                'Route with nested placeholders',
+                array('/{static{var}static}'),
+                '/{stati', '#^/\{static(?<var>[^cs]+)static\}$#s', array('var'), array(
+                array('text', 'static}'),
+                array('variable', 'c', '[^cs]+', 'var'),
+                array('text', '/{stati'),
+            )),
+
+            array(
+                'Route without separator between variables',
+                array('/{w}{x}{y}{z}.{_format}', array('z' => 'default-z', '_format' => 'html'), array('y' => '(y|Y)')),
+                '', '#^/(?<w>[^/\.]+)(?<x>[^/\.]+)(?<y>(y|Y))(?:(?<z>[^/\.]+)(?:\.(?<_format>[^\.]+))?)?$#s', array('w', 'x', 'y', 'z', '_format'), array(
+                array('variable', '.', '[^\.]+', '_format'),
+                array('variable', '', '[^/\.]+', 'z'),
+                array('variable', '', '(y|Y)', 'y'),
+                array('variable', '', '[^/\.]+', 'x'),
+                array('variable', '/', '[^/\.]+', 'w'),
+            )),
+
+            array(
                 'Route with a format',
                 array('/foo/{bar}.{_format}'),
                 '/foo', '#^/foo/(?<bar>[^/\.]+)\.(?<_format>[^\.]+)$#s', array('bar', '_format'), array(

@@ -255,6 +255,19 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('/app.php/a./.a/a../..a/...', $this->getGenerator($routes)->generate('test'));
     }
 
+    public function testAdjacentVariables()
+    {
+        $routes = $this->getRoutes('test', new Route('/{x}{y}{z}.{_format}', array('z' => 'default-z', '_format' => 'html'), array('y' => '\d+')));
+        $generator = $this->getGenerator($routes);
+        $this->assertSame('/app.php/foo123', $generator->generate('test', array('x' => 'foo', 'y' => '123')));
+        $this->assertSame('/app.php/foo123bar.xml', $generator->generate('test', array('x' => 'foo', 'y' => '123', 'z' => 'bar', '_format' => 'xml')));
+
+        // The default requirement for 'x' should not allow the separator '.' in this case because it would otherwise match everything
+        // and following optional variables like _format could never match.
+        $this->setExpectedException('Symfony\Component\Routing\Exception\InvalidParameterException');
+        $generator->generate('test', array('x' => 'do.t', 'y' => '123', 'z' => 'bar', '_format' => 'xml'));
+    }
+
     protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)
     {
         $context = new RequestContext('/app.php');

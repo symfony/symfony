@@ -231,7 +231,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = new Finder();
         $iterator = $finder->files()->name('*.php')->depth('< 1')->in(array(self::$tmpDir, __DIR__))->getIterator();
 
-        $this->assertIterator(array(self::$tmpDir.DIRECTORY_SEPARATOR.'test.php', __DIR__.DIRECTORY_SEPARATOR.'FinderTest.php', __DIR__.DIRECTORY_SEPARATOR.'bootstrap.php', __DIR__.DIRECTORY_SEPARATOR.'GlobTest.php'), $iterator);
+        $this->assertIterator(array(self::$tmpDir.DIRECTORY_SEPARATOR.'test.php', __DIR__.DIRECTORY_SEPARATOR.'FinderFactoryTest.php', __DIR__.DIRECTORY_SEPARATOR.'FinderTest.php', __DIR__.DIRECTORY_SEPARATOR.'bootstrap.php', __DIR__.DIRECTORY_SEPARATOR.'GlobTest.php'), $iterator);
     }
 
     public function testGetIterator()

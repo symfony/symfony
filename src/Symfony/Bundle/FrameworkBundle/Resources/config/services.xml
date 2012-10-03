@@ -11,6 +11,7 @@
         <parameter key="cache_warmer.class">Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate</parameter>
         <parameter key="cache_clearer.class">Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer</parameter>
         <parameter key="file_locator.class">Symfony\Component\HttpKernel\Config\FileLocator</parameter>
+        <parameter key="finder_factory.class">Symfony\Component\Finder\FinderFactory</parameter>
     </parameters>
 
     <services>
@@ -51,5 +52,7 @@
             <argument type="service" id="kernel" />
             <argument>%kernel.root_dir%/Resources</argument>
         </service>
+
+        <service id="finder_factory" class="%finder_factory.class%" />
     </services>
 </container>

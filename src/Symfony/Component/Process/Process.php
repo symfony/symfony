@@ -327,15 +327,18 @@ class Process
     }
 
     /**
-     * Restarts the process by cloning and invoking start().
+     * Restarts the process.
+     *
+     * Be warned that the process is cloned before being started.
      *
      * @param callable $callback A PHP callback to run whenever there is some
      *                           output available on STDOUT or STDERR
      *
-     * @return Process The new process.
+     * @return Process The new process
      *
      * @throws \RuntimeException When process can't be launch or is stopped
      * @throws \RuntimeException When process is already running
+     *
      * @see start()
      */
     public function restart($callback = null)

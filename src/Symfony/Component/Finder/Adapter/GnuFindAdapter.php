@@ -124,8 +124,7 @@ class GnuFindAdapter extends AbstractAdapter
      */
     public function isSupported()
     {
-        return $this->shell->getType() !== Shell::TYPE_WINDOWS
-            && $this->shell->testCommand('find');
+        return $this->shell->getType() === Shell::TYPE_UNIX && $this->shell->testCommand('find');
     }
 
     /**

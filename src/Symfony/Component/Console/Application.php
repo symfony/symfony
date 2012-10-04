@@ -220,7 +220,7 @@ class Application
     {
         return $this->helperSet;
     }
-    
+
     /**
      * Set an input definition set to be used with this application
      *

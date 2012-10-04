@@ -89,10 +89,6 @@ class ExceptionHandler
      */
     public function getContent(FlattenException $exception)
     {
-        if (!$this->debug) {
-            return '';
-        }
-
         $title = '';
         switch ($exception->getStatusCode()) {
             case 404:
@@ -102,49 +98,52 @@ class ExceptionHandler
                 $title = 'Whoops, looks like something went wrong.';
         }
 
-        try {
-            $message = nl2br($exception->getMessage());
-            $class = $this->abbrClass($exception->getClass());
-            $count = count($exception->getAllPrevious());
-            $content = '';
-            foreach ($exception->toArray() as $position => $e) {
-                $ind = $count - $position + 1;
-                $total = $count + 1;
-                $class = $this->abbrClass($e['class']);
-                $message = nl2br($e['message']);
-                $content .= sprintf(<<<EOF
-                    <div class="block_exception clear_fix">
-                        <h2><span>%d/%d</span> %s: %s</h2>
-                    </div>
-                    <div class="block">
-                        <ol class="traces list_exception">
+        $content = '';
+        if ($this->debug) {
+            try {
+                $message = nl2br($exception->getMessage());
+                $class = $this->abbrClass($exception->getClass());
+                $count = count($exception->getAllPrevious());
+                $content = '';
+                foreach ($exception->toArray() as $position => $e) {
+                    $ind = $count - $position + 1;
+                    $total = $count + 1;
+                    $class = $this->abbrClass($e['class']);
+                    $message = nl2br($e['message']);
+                    $content .= sprintf(<<<EOF
+                        <div class="block_exception clear_fix">
+                            <h2><span>%d/%d</span> %s: %s</h2>
+                        </div>
+                        <div class="block">
+                            <ol class="traces list_exception">
 
 EOF
-                    , $ind, $total, $class, $message);
-                foreach ($e['trace'] as $i => $trace) {
-                    $content .= '       <li>';
-                    if ($trace['function']) {
-                        $content .= sprintf('at %s%s%s(%s)', $this->abbrClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
-                    }
-                    if (isset($trace['file']) && isset($trace['line'])) {
-                        if ($linkFormat = ini_get('xdebug.file_link_format')) {
-                            $link = str_replace(array('%f', '%l'), array($trace['file'], $trace['line']), $linkFormat);
-                            $content .= sprintf(' in <a href="%s" title="Go to source">%s line %s</a>', $link, $trace['file'], $trace['line']);
-                        } else {
-                            $content .= sprintf(' in %s line %s', $trace['file'], $trace['line']);
+                        , $ind, $total, $class, $message);
+                    foreach ($e['trace'] as $i => $trace) {
+                        $content .= '       <li>';
+                        if ($trace['function']) {
+                            $content .= sprintf('at %s%s%s(%s)', $this->abbrClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
                         }
+                        if (isset($trace['file']) && isset($trace['line'])) {
+                            if ($linkFormat = ini_get('xdebug.file_link_format')) {
+                                $link = str_replace(array('%f', '%l'), array($trace['file'], $trace['line']), $linkFormat);
+                                $content .= sprintf(' in <a href="%s" title="Go to source">%s line %s</a>', $link, $trace['file'], $trace['line']);
+                            } else {
+                                $content .= sprintf(' in %s line %s', $trace['file'], $trace['line']);
+                            }
+                        }
+                        $content .= "</li>\n";
                     }
-                    $content .= "</li>\n";
-                }
 
-                $content .= "    </ol>\n</div>\n";
-            }
-        } catch (\Exception $e) {
-            // something nasty happened and we cannot throw an exception anymore
-            if ($this->debug) {
-                $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($exception), $exception->getMessage());
-            } else {
-                $title = 'Whoops, looks like something went wrong.';
+                    $content .= "    </ol>\n</div>\n";
+                }
+            } catch (\Exception $e) {
+                // something nasty happened and we cannot throw an exception anymore
+                if ($this->debug) {
+                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($exception), $exception->getMessage());
+                } else {
+                    $title = 'Whoops, looks like something went wrong.';
+                }
             }
         }
 

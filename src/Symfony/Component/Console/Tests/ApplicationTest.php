@@ -540,6 +540,23 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($helperSet->has('progress'));
     }
     
+    public function testOverwritingDefaultHelperSetOverwritesDefaultValues()
+    {
+        $application = new CustomApplication();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        
+        $application->setHelperSet(new HelperSet(array(new FormatterHelper())));
+        
+        $helperSet = $application->getHelperSet();
+        
+        $this->assertTrue($helperSet->has('formatter'));
+        
+        // no other default helper set should be returned
+        $this->assertFalse($helperSet->has('dialog'));
+        $this->assertFalse($helperSet->has('progress'));
+    }
+    
     public function testGetDefaultInputDefinitionReturnsDefaultValues()
     {
         $application = new Application();
@@ -559,13 +576,11 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($inputDefinition->hasOption('no-interaction'));
     }
     
-    public function testSettingCustomInputDefinitionOverwritesDefaultValues()
+    public function testOverwritingDefaultInputDefinitionOverwritesDefaultValues()
     {
-        $application = new Application();
+        $application = new CustomApplication();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
-        
-        $application->setDefinition(new InputDefinition(array(new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.'))));
         
         $inputDefinition = $application->getDefinition();
 
@@ -581,5 +596,28 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($inputDefinition->hasOption('no-interaction'));
         
         $this->assertTrue($inputDefinition->hasOption('custom'));
+    }
+}
+
+class CustomApplication extends Application
+{
+    /**
+     * Overwrites the default input definition.
+     *
+     * @return InputDefinition An InputDefinition instance
+     */
+    protected function getDefaultInputDefinition()
+    {
+        return new InputDefinition(array(new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.')));
+    }
+    
+    /**
+     * Gets the default helper set with the helpers that should always be available.
+     *
+     * @return HelperSet A HelperSet instance
+     */
+    protected function getDefaultHelperSet()
+    {
+        return new HelperSet(array(new FormatterHelper()));
     }
 }

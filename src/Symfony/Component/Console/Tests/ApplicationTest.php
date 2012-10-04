@@ -509,64 +509,64 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             array(new InputOption('query', 'q', InputOption::VALUE_NONE)),
         );
     }
-    
+
     public function testGetDefaultHelperSetReturnsDefaultValues()
     {
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
-        
+
         $helperSet = $application->getHelperSet();
-        
+
         $this->assertTrue($helperSet->has('formatter'));
         $this->assertTrue($helperSet->has('dialog'));
         $this->assertTrue($helperSet->has('progress'));
     }
-    
+
     public function testAddingSingleHelperSetOverwritesDefaultValues()
     {
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
-        
+
         $application->setHelperSet(new HelperSet(array(new FormatterHelper())));
-        
+
         $helperSet = $application->getHelperSet();
-        
+
         $this->assertTrue($helperSet->has('formatter'));
-        
+
         // no other default helper set should be returned
         $this->assertFalse($helperSet->has('dialog'));
         $this->assertFalse($helperSet->has('progress'));
     }
-    
+
     public function testOverwritingDefaultHelperSetOverwritesDefaultValues()
     {
         $application = new CustomApplication();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
-        
+
         $application->setHelperSet(new HelperSet(array(new FormatterHelper())));
-        
+
         $helperSet = $application->getHelperSet();
-        
+
         $this->assertTrue($helperSet->has('formatter'));
-        
+
         // no other default helper set should be returned
         $this->assertFalse($helperSet->has('dialog'));
         $this->assertFalse($helperSet->has('progress'));
     }
-    
+
     public function testGetDefaultInputDefinitionReturnsDefaultValues()
     {
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
-        
+
         $inputDefinition = $application->getDefinition();
 
         $this->assertTrue($inputDefinition->hasArgument('command'));
-        
+
         $this->assertTrue($inputDefinition->hasOption('help'));
         $this->assertTrue($inputDefinition->hasOption('quiet'));
         $this->assertTrue($inputDefinition->hasOption('verbose'));
@@ -575,18 +575,18 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($inputDefinition->hasOption('no-ansi'));
         $this->assertTrue($inputDefinition->hasOption('no-interaction'));
     }
-    
+
     public function testOverwritingDefaultInputDefinitionOverwritesDefaultValues()
     {
         $application = new CustomApplication();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
-        
+
         $inputDefinition = $application->getDefinition();
 
         // check wether the default arguments and options are not returned any more
         $this->assertFalse($inputDefinition->hasArgument('command'));
-        
+
         $this->assertFalse($inputDefinition->hasOption('help'));
         $this->assertFalse($inputDefinition->hasOption('quiet'));
         $this->assertFalse($inputDefinition->hasOption('verbose'));
@@ -594,7 +594,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($inputDefinition->hasOption('ansi'));
         $this->assertFalse($inputDefinition->hasOption('no-ansi'));
         $this->assertFalse($inputDefinition->hasOption('no-interaction'));
-        
+
         $this->assertTrue($inputDefinition->hasOption('custom'));
     }
 }
@@ -610,7 +610,7 @@ class CustomApplication extends Application
     {
         return new InputDefinition(array(new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.')));
     }
-    
+
     /**
      * Gets the default helper set with the helpers that should always be available.
      *

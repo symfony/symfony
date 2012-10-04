@@ -178,6 +178,33 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\HttpFoundation\Request::get
+     */
+    public function testGet()
+    {
+        $query = array(
+            'query_key' => 'query_value'
+        );
+        $attributes = array(
+            'query_key' => 'attr_value',
+            'attr_key' => 'attr_value'
+        );
+        $post = array(
+            'query_key' => 'post_value',
+            'attr_key' => 'post_value',
+            'post_key' => 'post_value'
+        );
+
+        $request = new Request($query, $post, $attributes);
+
+        $this->assertEquals('query_value', $request->get('query_key', 'default_value'));
+        $this->assertEquals('attr_value', $request->get('attr_key', 'default_value'));
+        $this->assertEquals('post_value', $request->get('post_key', 'default_value'));
+        $this->assertEquals('default_value', $request->get('unknown_key', 'default_value'));
+        $this->assertNull($request->get('unknown_key'));
+    }
+
+    /**
      * @covers Symfony\Component\HttpFoundation\Request::getFormat
      * @covers Symfony\Component\HttpFoundation\Request::setFormat
      * @dataProvider getFormatToMimeTypeMapProvider

@@ -526,7 +526,7 @@ class Request
      */
     public function get($key, $default = null, $deep = false)
     {
-        return $this->query->get($key, $this->attributes->get($key, $this->request->get($key, $default, $deep), $deep), $deep);
+        return $this->query->get($key, null, $deep) ?: $this->attributes->get($key, null, $deep) ?: $this->request->get($key, null, $deep) ?: $default;
     }
 
     /**

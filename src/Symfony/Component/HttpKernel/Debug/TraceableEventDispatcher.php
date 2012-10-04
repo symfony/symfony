@@ -37,6 +37,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
     private $dispatcher;
     private $wrappedListeners;
     private $firstCalledEvent;
+    private $id;
 
     /**
      * Constructor.
@@ -118,6 +119,12 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      */
     public function dispatch($eventName, Event $event = null)
     {
+        if (null === $event) {
+            $event = new Event();
+        }
+
+        $this->id = spl_object_hash($event);
+
         $this->preDispatch($eventName, $event);
 
         $e = $this->stopwatch->start($eventName, 'section');
@@ -125,6 +132,9 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         $this->firstCalledEvent[$eventName] = $this->stopwatch->start($eventName.'.loading', 'event_listener_loading');
 
         $this->dispatcher->dispatch($eventName, $event);
+
+        // reset the id as another event might have been dispatched during the dispatching of this event
+        $this->id = spl_object_hash($event);
 
         unset($this->firstCalledEvent[$eventName]);
 
@@ -342,17 +352,17 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         return '[?] '.var_export($listener, true);
     }
 
-    private function preDispatch($eventName, Event $event = null)
+    private function preDispatch($eventName, Event $event)
     {
         // wrap all listeners before they are called
-        $this->wrappedListeners[$eventName] = new \SplObjectStorage();
+        $this->wrappedListeners[$this->id] = new \SplObjectStorage();
 
         $listeners = $this->dispatcher->getListeners($eventName);
 
         foreach ($listeners as $listener) {
             $this->dispatcher->removeListener($eventName, $listener);
             $wrapped = $this->wrapListener($eventName, $listener);
-            $this->wrappedListeners[$eventName][$wrapped] = $listener;
+            $this->wrappedListeners[$this->id][$wrapped] = $listener;
             $this->dispatcher->addListener($eventName, $wrapped);
         }
 
@@ -375,7 +385,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         }
     }
 
-    private function postDispatch($eventName, Event $event = null)
+    private function postDispatch($eventName, Event $event)
     {
         switch ($eventName) {
             case 'kernel.controller':
@@ -400,12 +410,12 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
                 break;
         }
 
-        foreach ($this->wrappedListeners[$eventName] as $wrapped) {
+        foreach ($this->wrappedListeners[$this->id] as $wrapped) {
             $this->dispatcher->removeListener($eventName, $wrapped);
-            $this->dispatcher->addListener($eventName, $this->wrappedListeners[$eventName][$wrapped]);
+            $this->dispatcher->addListener($eventName, $this->wrappedListeners[$this->id][$wrapped]);
         }
 
-        unset($this->wrappedListeners[$eventName]);
+        unset($this->wrappedListeners[$this->id]);
     }
 
     private function wrapListener($eventName, $listener)
@@ -428,8 +438,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
     private function unwrapListener($listener, $eventName)
     {
         // get the original listener
-        if (is_object($listener) && isset($this->wrappedListeners[$eventName][$listener])) {
-            return $this->wrappedListeners[$eventName][$listener];
+        if (is_object($listener) && isset($this->wrappedListeners[$this->id][$listener])) {
+            return $this->wrappedListeners[$this->id][$listener];
         }
 
         return $listener;

@@ -62,8 +62,8 @@ class Finder implements \IteratorAggregate, \Countable
     {
         $this->ignore = static::IGNORE_VCS_FILES | static::IGNORE_DOT_FILES;
 
-        $this->register(new GnuFindAdapter());
-        $this->register(new PhpAdapter(), -50);
+        $this->addAdapter(new GnuFindAdapter());
+        $this->addAdapter(new PhpAdapter(), -50);
     }
 
     /**
@@ -86,7 +86,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      */
-    public function register(Adapter\AdapterInterface $adapter, $priority = 0)
+    public function addAdapter(Adapter\AdapterInterface $adapter, $priority = 0)
     {
         $this->adapters[$adapter->getName()] = array(
             'adapter'  => $adapter,

@@ -20,6 +20,7 @@ class Shell
     const TYPE_DARWIN  = 2;
     const TYPE_CYGWIN  = 3;
     const TYPE_WINDOWS = 4;
+    const TYPE_BSD     = 5;
 
     /**
      * @var string|null
@@ -75,6 +76,10 @@ class Shell
 
         if (false !== strpos($os, 'darwin')) {
             return self::TYPE_DARWIN;
+        }
+
+        if (false !== strpos($os, 'bsd')) {
+            return self::TYPE_BSD;
         }
 
         if (0 === strpos($os, 'win')) {

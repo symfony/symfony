@@ -552,11 +552,11 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = Finder::create()
             ->removeAdapters()
-            ->register(new FakeAdapter\NamedAdapter('a'), 0)
-            ->register(new FakeAdapter\NamedAdapter('b'), -50)
-            ->register(new FakeAdapter\NamedAdapter('c'), 50)
-            ->register(new FakeAdapter\NamedAdapter('d'), -25)
-            ->register(new FakeAdapter\NamedAdapter('e'), 25);
+            ->addAdapter(new FakeAdapter\NamedAdapter('a'), 0)
+            ->addAdapter(new FakeAdapter\NamedAdapter('b'), -50)
+            ->addAdapter(new FakeAdapter\NamedAdapter('c'), 50)
+            ->addAdapter(new FakeAdapter\NamedAdapter('d'), -25)
+            ->addAdapter(new FakeAdapter\NamedAdapter('e'), 25);
 
         $this->assertEquals(
             array('c', 'e', 'a', 'd', 'b'),
@@ -576,9 +576,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $finder = Finder::create()
             ->removeAdapters()
-            ->register(new FakeAdapter\UnsupportedAdapter(), 3)
-            ->register(new FakeAdapter\FailingAdapter(), 2)
-            ->register(new FakeAdapter\DummyAdapter($iterator), 1);
+            ->addAdapter(new FakeAdapter\UnsupportedAdapter(), 3)
+            ->addAdapter(new FakeAdapter\FailingAdapter(), 2)
+            ->addAdapter(new FakeAdapter\DummyAdapter($iterator), 1);
 
         $this->assertIterator($filenames, $finder->in(sys_get_temp_dir())->getIterator());
     }
@@ -624,7 +624,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         return Finder::create()
             ->removeAdapters()
-            ->register($adapter);
+            ->addAdapter($adapter);
     }
 
     private function getValidAdapters()

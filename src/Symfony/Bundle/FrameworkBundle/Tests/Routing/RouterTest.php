@@ -27,6 +27,8 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
                 'foo'    => 'before_%parameter.foo%',
                 'bar'    => '%parameter.bar%_after',
                 'baz'    => '%%unescaped%%',
+                'boo'    => array('%parameter%', '%%escaped_parameter%%', array('%bee_parameter%', 'bee')),
+                'bee'    => array('bee', 'bee'),
             ),
             array(
             )
@@ -39,6 +41,12 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
         $sc->expects($this->at(3))->method('hasParameter')->will($this->returnValue(true));
         $sc->expects($this->at(4))->method('getParameter')->will($this->returnValue('bar'));
 
+        $sc->expects($this->at(5))->method('hasParameter')->will($this->returnValue(true));
+        $sc->expects($this->at(6))->method('getParameter')->will($this->returnValue('boo'));
+
+        $sc->expects($this->at(7))->method('hasParameter')->will($this->returnValue(true));
+        $sc->expects($this->at(8))->method('getParameter')->will($this->returnValue('foo_bee'));
+
         $router = new Router($sc, 'foo');
         $route = $router->getRouteCollection()->get('foo');
 
@@ -47,6 +55,8 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
                 'foo' => 'before_foo',
                 'bar' => 'bar_after',
                 'baz' => '%unescaped%',
+                'boo' => array('boo', '%escaped_parameter%', array('foo_bee', 'bee')),
+                'bee' => array('bee', 'bee'),
             ),
             $route->getDefaults()
         );

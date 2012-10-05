@@ -28,6 +28,7 @@ class LdapUserProvider implements LdapUserProviderInterface
 
     /**
      * @param LdapInterface $ldap
+     * @param array         $defaultRoles
      */
     public function __construct(LdapInterface $ldap, array $defaultRoles = array())
     {

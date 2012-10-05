@@ -32,7 +32,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap
             ->expects($this->once())
-            ->method('getConnection')
+            ->method('bind')
         ;
 
         $provider = new LdapUserProvider($ldap);
@@ -59,7 +59,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap
             ->expects($this->once())
-            ->method('getConnection')
+            ->method('bind')
             ->will($this->throwException(new ConnectionException('baz')))
         ;
 

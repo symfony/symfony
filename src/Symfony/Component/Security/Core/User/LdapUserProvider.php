@@ -24,13 +24,15 @@ use Symfony\Component\Security\Ldap\LdapInterface;
 class LdapUserProvider implements LdapUserProviderInterface
 {
     private $ldap;
+    private $defaultRoles;
 
     /**
      * @param LdapInterface $ldap
      */
-    public function __construct(LdapInterface $ldap)
+    public function __construct(LdapInterface $ldap, array $defaultRoles = array())
     {
         $this->ldap = $ldap;
+        $this->defaultRoles = $defaultRoles;
     }
 
     /**
@@ -66,7 +68,7 @@ class LdapUserProvider implements LdapUserProviderInterface
      */
     public function loadRoles()
     {
-        return array('ROLE_USER');
+        return $this->defaultRoles;
     }
 
     /**

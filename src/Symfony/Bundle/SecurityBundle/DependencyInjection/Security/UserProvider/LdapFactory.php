@@ -44,7 +44,8 @@ class LdapFactory implements UserProviderFactoryInterface
 
         $container
             ->setDefinition($id, new DefinitionDecorator('security.user.provider.ldap'))
-            ->replaceArgument(0, new Reference('security.ldap.ldap.'.$id));
+            ->replaceArgument(0, new Reference('security.ldap.ldap.'.$id))
+            ->replaceArgument(1, $config['default_roles'])
         ;
     }
 
@@ -65,6 +66,10 @@ class LdapFactory implements UserProviderFactoryInterface
                 ->scalarNode('use_ssl')->defaultFalse()->end()
                 ->scalarNode('use_start_tls')->defaultFalse()->end()
                 ->scalarNode('opt_referrals')->defaultFalse()->end()
+                ->arrayNode('default_roles')
+                    ->beforeNormalization()->ifString()->then(function($v) { return preg_split('/\s*,\s*/', $v); })->end()
+                    ->prototype('scalar')->end()
+                ->end()
             ->end()
         ;
     }

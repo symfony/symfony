@@ -129,6 +129,7 @@
 
         <service id="security.user.provider.ldap" class="%security.user.provider.ldap.class%" abstract="true" public="false">
             <argument /> <!-- security.ldap.ldap -->
+            <argument /> <!-- default_roles -->
         </service>
 
         <service id="security.user.provider.chain" class="%security.user.provider.chain.class%" abstract="true" public="false" />

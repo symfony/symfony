@@ -64,16 +64,19 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
         $file = null;
         $previous = null;
         try {
-            $template = $this->parser->parse($template);
+            $file = parent::findTemplate($template);
+        } catch (\Twig_Error_Loader $e) {
+            $previous = $e;
+
+            // for BC
             try {
-                $file = $this->locator->locate($template);
-            } catch (\InvalidArgumentException $e) {
-                $previous = $e;
-            }
-        } catch (\Exception $e) {
-            try {
-                $file = parent::findTemplate($template);
-            } catch (\Twig_Error_Loader $e) {
+                $template = $this->parser->parse($template);
+                try {
+                    $file = $this->locator->locate($template);
+                } catch (\InvalidArgumentException $e) {
+                    $previous = $e;
+                }
+            } catch (\Exception $e) {
                 $previous = $e;
             }
         }

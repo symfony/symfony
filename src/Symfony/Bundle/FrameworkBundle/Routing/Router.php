@@ -114,6 +114,14 @@ class Router extends BaseRouter implements WarmableInterface
     {
         $container = $this->container;
 
+        if (is_array($value)) {
+            foreach ($value as $key => $val) {
+                $value[$key] = $this->resolveString($val);
+            }
+
+            return $value;
+        }
+
         if (null === $value || false === $value || true === $value || is_object($value)) {
             return $value;
         }

@@ -34,6 +34,8 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $route->setPattern('bar');
         $this->assertEquals('/bar', $route->getPattern(), '->setPattern() adds a / at the beginning of the pattern if needed');
         $this->assertEquals($route, $route->setPattern(''), '->setPattern() implements a fluent interface');
+        $route->setPattern('//path');
+        $this->assertEquals('/path', $route->getPattern(), '->setPattern() does not allow two slahes "//" at the beginning of the pattern as it would be confused with a network path when generating the path from the route');
     }
 
     public function testOptions()

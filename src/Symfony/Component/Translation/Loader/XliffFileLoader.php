@@ -51,7 +51,7 @@ class XliffFileLoader implements LoaderInterface
      *
      * @param string $file
      *
-     * @return SimpleXMLElement
+     * @return \SimpleXMLElement
      */
     private function parseFile($file)
     {
@@ -106,7 +106,7 @@ class XliffFileLoader implements LoaderInterface
     /**
      * Returns the XML errors of the internal XML parser
      *
-     * @return array  An array of errors
+     * @return array An array of errors
      */
     private function getXmlErrors($internalErrors)
     {

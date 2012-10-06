@@ -1277,22 +1277,30 @@ class Request
         }
 
         $values = array();
+        $groups = array();
         foreach (array_filter(explode(',', $header)) as $value) {
             // Cut off any q-value that might come after a semi-colon
             if (preg_match('/;\s*(q=.*$)/', $value, $match)) {
-                $q     = (float) substr(trim($match[1]), 2);
+                $q     = substr(trim($match[1]), 2);
                 $value = trim(substr($value, 0, -strlen($match[0])));
             } else {
                 $q = 1;
             }
 
-            if (0 < $q) {
-                $values[trim($value)] = $q;
-            }
+            $groups[$q][] = $value;
         }
 
-        arsort($values);
-        reset($values);
+        krsort($groups);
+
+        foreach ($groups as $q => $items) {
+            $q = (float) $q;
+
+            if (0 < $q) {
+                foreach ($items as $value) {
+                    $values[trim($value)] = $q;
+                }
+            }
+        }
 
         return $values;
     }

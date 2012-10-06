@@ -211,6 +211,19 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
 
+    // https://github.com/symfony/symfony/issues/5605
+    public function testReplaceWithLongerPath()
+    {
+        // error occurs when path contains at least two more elements
+        // than the builder
+        $path = new PropertyPath('new1.new2.new3');
+
+        $builder = new PropertyPathBuilder(new PropertyPath('old1'));
+        $builder->replace(0, 1, $path);
+
+        $this->assertEquals($path, $builder->getPropertyPath());
+    }
+
     public function testRemove()
     {
         $this->builder->remove(3);

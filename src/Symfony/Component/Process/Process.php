@@ -279,7 +279,7 @@ class Process
     }
 
     /**
-     * Returns the number of the signal that caused the child process to stop its execution
+     * Returns the number of the signal that caused the child process to stop its execution.
      *
      * It is only meaningful if hasBeenStopped() returns true.
      *
@@ -293,7 +293,7 @@ class Process
     }
 
     /**
-     * Adds a line to the STDOUT stream
+     * Adds a line to the STDOUT stream.
      *
      * @param string $line The line to append
      */
@@ -303,7 +303,7 @@ class Process
     }
 
     /**
-     * Adds a line to the STDERR stream
+     * Adds a line to the STDERR stream.
      *
      * @param string $line The line to append
      */
@@ -313,7 +313,7 @@ class Process
     }
 
     /**
-     * Gets the command line to be executed
+     * Gets the command line to be executed.
      *
      * @return string The command to execute
      */
@@ -323,7 +323,7 @@ class Process
     }
 
     /**
-     * Sets the command line to be executed
+     * Sets the command line to be executed.
      *
      * @param string $commandline The command to execute
      */
@@ -333,7 +333,7 @@ class Process
     }
 
     /**
-     * Gets the process timeout
+     * Gets the process timeout.
      *
      * @return integer The timeout in seconds
      */
@@ -343,7 +343,7 @@ class Process
     }
 
     /**
-     * Sets the process timeout
+     * Sets the process timeout.
      *
      * @param integer|null $timeout The timeout in seconds
      */
@@ -353,7 +353,7 @@ class Process
     }
 
     /**
-     * Gets the working directory
+     * Gets the working directory.
      *
      * @return string The current working directory
      */
@@ -363,7 +363,7 @@ class Process
     }
 
     /**
-     * Sets the current working directory
+     * Sets the current working directory.
      *
      * @param string $cwd The new working directory
      */
@@ -373,7 +373,7 @@ class Process
     }
 
     /**
-     * Gets the environment variables
+     * Gets the environment variables.
      *
      * @return array The current environment variables
      */
@@ -383,7 +383,7 @@ class Process
     }
 
     /**
-     * Sets the environment variables
+     * Sets the environment variables.
      *
      * @param array $env The new environment variables
      */
@@ -393,7 +393,7 @@ class Process
     }
 
     /**
-     * Gets the contents of STDIN
+     * Gets the contents of STDIN.
      *
      * @return string The current contents
      */
@@ -403,7 +403,7 @@ class Process
     }
 
     /**
-     * Sets the contents of STDIN
+     * Sets the contents of STDIN.
      *
      * @param string $stdin The new contents
      */
@@ -413,7 +413,7 @@ class Process
     }
 
     /**
-     * Gets the options for proc_open
+     * Gets the options for proc_open.
      *
      * @return array The current options
      */
@@ -423,7 +423,7 @@ class Process
     }
 
     /**
-     * Sets the options for proc_open
+     * Sets the options for proc_open.
      *
      * @param array $options The new options
      */

@@ -209,6 +209,34 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         return $this;
     }
 
+    public function canBeEnabled()
+    {
+        $this
+            ->treatFalseLike(array('enabled' => false))
+            ->treatTrueLike(array('enabled' => true))
+            ->treatNullLike(array('enabled' => true))
+            ->children()
+                ->booleanNode('enabled')
+                    ->defaultFalse()
+        ;
+
+        return $this;
+    }
+
+    public function canBeDisabled()
+    {
+        $this
+            ->treatFalseLike(array('enabled' => false))
+            ->treatTrueLike(array('enabled' => true))
+            ->treatNullLike(array('enabled' => true))
+            ->children()
+                ->booleanNode('enabled')
+                    ->defaultTrue()
+        ;
+
+        return $this;
+    }
+
     /**
      * Disables the deep merging of the node.
      *

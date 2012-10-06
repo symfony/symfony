@@ -610,26 +610,51 @@ class Process
         return $this->exitcode;
     }
 
+    /**
+     * Adds a line to the STDOUT stream
+     *
+     * @param string $line The line to append
+     */
     public function addOutput($line)
     {
         $this->stdout .= $line;
     }
 
+    /**
+     * Adds a line to the STDERR stream
+     *
+     * @param string $line The line to append
+     */
     public function addErrorOutput($line)
     {
         $this->stderr .= $line;
     }
 
+    /**
+     * Gets the command line to be executed
+     *
+     * @return string The command to execute
+     */
     public function getCommandLine()
     {
         return $this->commandline;
     }
 
+    /**
+     * Sets the command line to be executed
+     *
+     * @param string $commandline The command to execute
+     */
     public function setCommandLine($commandline)
     {
         $this->commandline = $commandline;
     }
 
+    /**
+     * Gets the process timeout
+     *
+     * @return integer|null The timeout in seconds or null if it's disabled
+     */
     public function getTimeout()
     {
         return $this->timeout;
@@ -640,7 +665,9 @@ class Process
      *
      * To disable the timeout, set this value to null.
      *
-     * @param integer|null
+     * @param integer|null $timeout The timeout in seconds
+     *
+     * @throws \InvalidArgumentException if the timeout is negative
      */
     public function setTimeout($timeout)
     {
@@ -659,51 +686,103 @@ class Process
         $this->timeout = $timeout;
     }
 
+    /**
+     * Gets the working directory
+     *
+     * @return string The current working directory
+     */
     public function getWorkingDirectory()
     {
         return $this->cwd;
     }
 
+    /**
+     * Sets the current working directory
+     *
+     * @param string $cwd The new working directory
+     */
     public function setWorkingDirectory($cwd)
     {
         $this->cwd = $cwd;
     }
 
+    /**
+     * Gets the environment variables
+     *
+     * @return array The current environment variables
+     */
     public function getEnv()
     {
         return $this->env;
     }
 
+    /**
+     * Sets the environment variables
+     *
+     * @param array $env The new environment variables
+     */
     public function setEnv(array $env)
     {
         $this->env = $env;
     }
 
+    /**
+     * Gets the contents of STDIN
+     *
+     * @return string The current contents
+     */
     public function getStdin()
     {
         return $this->stdin;
     }
 
+    /**
+     * Sets the contents of STDIN
+     *
+     * @param string $stdin The new contents
+     */
     public function setStdin($stdin)
     {
         $this->stdin = $stdin;
     }
 
+    /**
+     * Gets the options for proc_open
+     *
+     * @return array The current options
+     */
     public function getOptions()
     {
         return $this->options;
     }
 
+    /**
+     * Sets the options for proc_open
+     *
+     * @param array $options The new options
+     */
     public function setOptions(array $options)
     {
         $this->options = $options;
     }
 
+    /**
+     * Gets whether or not Windows compatibility is enabled
+     *
+     * This is true by default.
+     *
+     * @return Boolean
+     */
     public function getEnhanceWindowsCompatibility()
     {
         return $this->enhanceWindowsCompatibility;
     }
 
+    /**
+     * Sets whether or not Windows compatibility is enabled
+     *
+     * @param Boolean $enhance
+     */
     public function setEnhanceWindowsCompatibility($enhance)
     {
         $this->enhanceWindowsCompatibility = (Boolean) $enhance;

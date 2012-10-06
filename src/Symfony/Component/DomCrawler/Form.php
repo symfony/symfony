@@ -584,4 +584,3 @@ class FormFieldRegistry
         throw new \InvalidArgumentException(sprintf('Malformed field path "%s"', $name));
     }
 }
->>>>>>> 2.1

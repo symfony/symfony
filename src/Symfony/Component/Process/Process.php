@@ -653,7 +653,7 @@ class Process
     /**
      * Gets the process timeout.
      *
-     * @return integer The timeout in seconds
+     * @return integer|null The timeout in seconds or null if it's disabled
      */
     public function getTimeout()
     {
@@ -666,6 +666,8 @@ class Process
      * To disable the timeout, set this value to null.
      *
      * @param integer|null $timeout The timeout in seconds
+     *
+     * @throws \InvalidArgumentException if the timeout is negative
      */
     public function setTimeout($timeout)
     {
@@ -764,11 +766,23 @@ class Process
         $this->options = $options;
     }
 
+    /**
+     * Gets whether or not Windows compatibility is enabled
+     *
+     * This is true by default.
+     *
+     * @return Boolean
+     */
     public function getEnhanceWindowsCompatibility()
     {
         return $this->enhanceWindowsCompatibility;
     }
 
+    /**
+     * Sets whether or not Windows compatibility is enabled
+     *
+     * @param Boolean $enhance
+     */
     public function setEnhanceWindowsCompatibility($enhance)
     {
         $this->enhanceWindowsCompatibility = (Boolean) $enhance;

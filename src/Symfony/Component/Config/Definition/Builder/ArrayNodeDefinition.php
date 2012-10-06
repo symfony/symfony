@@ -209,6 +209,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         return $this;
     }
 
+    /**
+     * Adds an "enabled" boolean to enable the current section.
+     *
+     * By default, the section is disabled.
+     *
+     * @return ArrayNodeDefinition
+     */
     public function canBeEnabled()
     {
         $this
@@ -223,6 +230,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         return $this;
     }
 
+    /**
+     * Adds an "enabled" boolean to enable the current section.
+     *
+     * By default, the section is enabled.
+     *
+     * @return ArrayNodeDefinition
+     */
     public function canBeDisabled()
     {
         $this

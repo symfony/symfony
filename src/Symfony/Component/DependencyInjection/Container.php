@@ -258,6 +258,11 @@ class Container implements IntrospectableContainerInterface
                 $service = $this->$method();
             } catch (\Exception $e) {
                 unset($this->loading[$id]);
+
+                if (isset($this->services[$id])) {
+                    unset($this->services[$id]);
+                }
+
                 throw $e;
             }
 

@@ -209,6 +209,9 @@ EOF
                 border-radius: 10px;
                 border: 1px solid #ccc;
             }
+            .xdebug-error {
+                display: none;
+            }
         </style>
     </head>
     <body>

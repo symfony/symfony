@@ -28,6 +28,7 @@
                     {% endif %}
 
                     <div id="collector_content">
+                        <div id="panel_items_navigation"></div>
                         {% include 'WebProfilerBundle:Profiler:base_js.html.twig' %}
                         {% block panel '' %}
                     </div>
@@ -126,7 +127,48 @@
                     }
                 }
             }
+
+
+            // Add navigation items
+            var container = document.getElementById('panel_items_navigation'),
+                wrapper, myDiv, newElement, contents;
+
+            var elements = document.getElementById('collector_content').getElementsByTagName('H2');
+            if (elements.length < 2) {
+                return;
+            }
+
+            contents = '<span style="display: none;"><a href="#">Top</a></span> ';
+
+            for (elem = 0; elem < elements.length; elem++) {
+                // Prepare the value for the paragraph that will wrap the H2 items
+                value = elements[elem].innerHTML.toLowerCase().replace(/\s/g, '-');
+                elements[elem].id = value;
+                contents += '<span><a href="#'+ value +'">' + elements[elem].innerHTML + '</a></span> ';
+            }
+
+            container.innerHTML = contents;
+
+            newElement = document.createElement('BR');
+            container.parentNode.insertBefore(newElement, container.nextSibling);
+
+            // Add the scroll event listener
+            if (window.addEventListener){
+                window.addEventListener('scroll', handleScroll, false);
+            }else{
+                window.attachEvent('onscroll', handleScroll);
+            }
+
+            handleScroll();
+
         }, 25);
+
+        function handleScroll() {
+            var offset = window.pageYOffset ? window.pageYOffset : document.documentElement.scrollTop;
+
+            document.getElementById('panel_items_navigation').className = (offset > 240 ? 'fixed' : '');
+            document.getElementById('panel_items_navigation').firstChild.style.display = (offset > 240 ? 'inline' : 'none');
+        }
 
     //]]></script>
 {% endblock %}

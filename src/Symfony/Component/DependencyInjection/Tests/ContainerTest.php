@@ -98,7 +98,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('service_container', 'foo', 'bar'), $sc->getServiceIds(), '->getServiceIds() returns all defined service ids');
 
         $sc = new ProjectServiceContainer();
-        $this->assertEquals(array('scoped', 'scoped_foo', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'service_container'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods');
+        $this->assertEquals(array('scoped', 'scoped_foo', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods');
     }
 
     /**
@@ -367,6 +367,25 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testGetThrowsExceptionOnServiceConfiguration()
+    {
+        $c = new ProjectServiceContainer();
+
+        try {
+            $c->get('throws_exception_on_service_configuration');
+            $this->fail('The container can not contain invalid service!');
+        } catch (\Exception $e) {
+            $this->assertEquals('Something was terribly wrong while trying to configure the service!', $e->getMessage());
+        }
+
+        try {
+            $c->get('throws_exception_on_service_configuration');
+            $this->fail('The container can not contain invalid service!');
+        } catch (\Exception $e) {
+            $this->assertEquals('Something was terribly wrong while trying to configure the service!', $e->getMessage());
+        }
+    }
+
     public function getInvalidParentScopes()
     {
         return array(
@@ -446,5 +465,14 @@ class ProjectServiceContainer extends Container
     protected function getThrowExceptionService()
     {
         throw new \Exception('Something went terribly wrong!');
+    }
+
+    protected function getThrowsExceptionOnServiceConfigurationService()
+    {
+        $this->services['throws_exception_on_service_configuration'] = $instance = new \stdClass();
+
+        throw new \Exception('Something was terribly wrong while trying to configure the service!');
+
+        return $instance;
     }
 }

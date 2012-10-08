@@ -61,7 +61,7 @@ class Validator implements ValidatorInterface
         $metadata = $this->metadataFactory->getClassMetadata(get_class($object));
 
         $walk = function(GraphWalker $walker, $group) use ($metadata, $object) {
-            return $walker->walkObject($metadata, $object, $group, '');
+            $walker->walkObject($metadata, $object, $group, '');
         };
 
         return $this->validateGraph($object, $walk, $groups);
@@ -77,7 +77,7 @@ class Validator implements ValidatorInterface
         $metadata = $this->metadataFactory->getClassMetadata(get_class($object));
 
         $walk = function(GraphWalker $walker, $group) use ($metadata, $property, $object) {
-            return $walker->walkProperty($metadata, $property, $object, $group, '');
+            $walker->walkProperty($metadata, $property, $object, $group, '');
         };
 
         return $this->validateGraph($object, $walk, $groups);
@@ -93,7 +93,7 @@ class Validator implements ValidatorInterface
         $metadata = $this->metadataFactory->getClassMetadata($class);
 
         $walk = function(GraphWalker $walker, $group) use ($metadata, $property, $value) {
-            return $walker->walkPropertyValue($metadata, $property, $value, $group, '');
+            $walker->walkPropertyValue($metadata, $property, $value, $group, '');
         };
 
         return $this->validateGraph($class, $walk, $groups);
@@ -123,7 +123,7 @@ class Validator implements ValidatorInterface
         }
 
         $walk = function(GraphWalker $walker, $group) use ($constraint, $value) {
-            return $walker->walkConstraint($constraint, $value, $group, '');
+            $walker->walkConstraint($constraint, $value, $group, '');
         };
 
         return $this->validateGraph('', $walk, $groups);

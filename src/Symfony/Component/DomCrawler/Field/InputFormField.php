@@ -30,8 +30,8 @@ class InputFormField extends FormField
      */
     protected function initialize()
     {
-        if ('input' != $this->node->nodeName) {
-            throw new \LogicException(sprintf('An InputFormField can only be created from an input tag (%s given).', $this->node->nodeName));
+        if ('input' != $this->node->nodeName && 'button' != $this->node->nodeName) {
+            throw new \LogicException(sprintf('An InputFormField can only be created from an input or button tag (%s given).', $this->node->nodeName));
         }
 
         if ('checkbox' == $this->node->getAttribute('type')) {

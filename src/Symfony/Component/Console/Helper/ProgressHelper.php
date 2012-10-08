@@ -296,6 +296,7 @@ class ProgressHelper extends Helper
      * Generates the array map of format variables to values.
      *
      * @param Boolean $finish Forces the end result
+     *
      * @return array Array of format vars and values
      */
     private function generate($finish = false)
@@ -353,6 +354,7 @@ class ProgressHelper extends Helper
      * Converts seconds into human-readable format.
      *
      * @param integer $secs Number of seconds
+     *
      * @return string Time in readable format
      */
     private function humaneTime($secs)
@@ -369,6 +371,7 @@ class ProgressHelper extends Helper
                 }
             }
         }
+
         return $text;
     }
 
@@ -380,32 +383,22 @@ class ProgressHelper extends Helper
      * @param Boolean         $newline  Whether to add a newline or not
      * @param integer         $size     The size of line
      */
-    private function overwrite(OutputInterface $output, $messages, $newline = true, $size = 80)
+    private function overwrite(OutputInterface $output, $messages, $newline = false, $size = 80)
     {
-        for ($place = $size; $place > 0; $place--) {
-            $output->write("\x08", false);
-        }
-
-        $output->write($messages, false);
-
-        for ($place = ($size - strlen($messages)); $place > 0; $place--) {
-            $output->write(' ', false);
-        }
+        $output->write(str_repeat("\x08", $size));
+        $output->write($messages);
+        $output->write(str_repeat(' ', $size - strlen($messages)));
 
         // clean up the end line
-        for ($place = ($size - strlen($messages)); $place > 0; $place--) {
-            $output->write("\x08", false);
-        }
+        $output->write(str_repeat("\x08", $size - strlen($messages)));
 
         if ($newline) {
-            $output->write('');
+            $output->writeln('');
         }
     }
 
     /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
+     * {@inheritDoc}
      */
     public function getName()
     {

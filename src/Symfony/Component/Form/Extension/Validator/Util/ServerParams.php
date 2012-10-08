@@ -31,12 +31,12 @@ class ServerParams
 
         $max = (int) $iniMax;
 
-        switch (substr($iniMax, -1)) {
+        switch (strtoupper(substr($iniMax), -1)) {
             case 'G':
-                $max *= 1024;
+                $max *= 1024 * 1024 * 1024;
                 break;
             case 'M':
-                $max *= 1024;
+                $max *= 1024 * 1024;
                 break;
             case 'K':
                 $max *= 1024;

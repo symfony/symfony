@@ -15,6 +15,13 @@ $container->loadFromExtension('security', array(
         'JMS\FooBundle\Entity\User4' => array(
             'id' => 'security.encoder.foo',
         ),
+        'JMS\FooBundle\Entity\User5' => array(
+            'algorithm' => 'pbkdf2',
+            'hash_algorithm' => 'sha1',
+            'encode_as_base64' => false,
+            'iterations' => 5,
+            'key_length' => 30,
+        ),
     ),
     'providers' => array(
         'default' => array(

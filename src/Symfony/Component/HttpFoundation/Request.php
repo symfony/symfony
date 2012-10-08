@@ -294,6 +294,9 @@ class Request
             case 'PUT':
             case 'DELETE':
                 $defaults['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
+                $request = $parameters;
+                $query = array();
+                break;
             case 'PATCH':
                 $request = $parameters;
                 $query = array();

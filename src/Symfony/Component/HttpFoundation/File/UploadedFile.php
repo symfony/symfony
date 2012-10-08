@@ -211,11 +211,14 @@ class UploadedFile extends File
 
         switch (strtolower(substr($max, -1))) {
             case 'g':
-                $max *= 1024;
+                $max *= 1024 * 1024 * 1024;
+                break;
             case 'm':
-                $max *= 1024;
+                $max *= 1024 * 1024;
+                break;
             case 'k':
                 $max *= 1024;
+                break;
         }
 
         return (integer) $max;

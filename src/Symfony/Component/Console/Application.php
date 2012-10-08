@@ -671,7 +671,7 @@ class Application
 
         if ($raw) {
             $messages = array();
-            foreach ($this->sortCommands($commands) as $space => $commands) {
+            foreach ($this->sortCommands($commands) as $commands) {
                 foreach ($commands as $name => $command) {
                     $messages[] = sprintf("%-${width}s %s", $name, $command->getDescription());
                 }
@@ -780,8 +780,8 @@ class Application
             $len = $strlen($title);
             $width = $this->getTerminalWidth() ? $this->getTerminalWidth() - 1 : PHP_INT_MAX;
             $lines = array();
-            foreach (preg_split("{\r?\n}", $e->getMessage()) as $line) {
-                foreach (str_split($line, $width - 4) as $line) {
+            foreach (preg_split("{\r?\n}", $e->getMessage()) as $ln) {
+                foreach (str_split($ln, $width - 4) as $line) {
                     $lines[] = sprintf('  %s  ', $line);
                     $len = max($strlen($line) + 4, $len);
                 }

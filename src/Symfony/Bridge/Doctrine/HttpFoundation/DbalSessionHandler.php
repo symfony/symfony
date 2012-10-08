@@ -47,7 +47,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function open($path = null, $name = null)
+    public function open($path = null, $sessionName = null)
     {
         return true;
     }
@@ -157,6 +157,8 @@ class DbalSessionHandler implements \SessionHandlerInterface
     *
     * @param string $id
     * @param string $data
+    *
+    * @return bool
     */
     private function createNewSession($id, $data = '')
     {

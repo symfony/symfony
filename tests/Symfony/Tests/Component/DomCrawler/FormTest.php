@@ -84,6 +84,11 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 array('bar' => array('Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'bar')),
             ),
             array(
+                'appends the submitted button value for Button element',
+                '<button type="submit" name="bar" value="bar">Bar</button>',
+                array('bar' => array('Symfony\\Component\\DomCrawler\\Field\\InputFormField', 'bar')),
+            ),
+            array(
                 'appends the submitted button value but not other submit buttons',
                 '<input type="submit" name="bar" value="bar" />
                  <input type="submit" name="foobar" value="foobar" />',
@@ -404,7 +409,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $dom = new \DOMDocument();
         $dom->loadHTML('<html>'.$form.'</html>');
 
-        $nodes = $dom->getElementsByTagName('input');
+        $xPath = new \DOMXPath($dom);
+        $nodes = $xPath->query('//input | //button');
 
         if (null === $currentUri) {
             $currentUri = 'http://example.com/';

@@ -61,20 +61,20 @@ class YamlFileLoader extends FileLoader
             throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $file));
         }
 
-        foreach ($config as $name => $config) {
-            $config = $this->normalizeRouteConfig($config);
+        foreach ($config as $name => $cfg) {
+            $cfg = $this->normalizeRouteConfig($cfg);
 
-            if (isset($config['resource'])) {
-                $type = isset($config['type']) ? $config['type'] : null;
-                $prefix = isset($config['prefix']) ? $config['prefix'] : null;
-                $defaults = isset($config['defaults']) ? $config['defaults'] : array();
-                $requirements = isset($config['requirements']) ? $config['requirements'] : array();
-                $options = isset($config['options']) ? $config['options'] : array();
+            if (isset($cfg['resource'])) {
+                $type = isset($cfg['type']) ? $cfg['type'] : null;
+                $prefix = isset($cfg['prefix']) ? $cfg['prefix'] : null;
+                $defaults = isset($cfg['defaults']) ? $cfg['defaults'] : array();
+                $requirements = isset($cfg['requirements']) ? $cfg['requirements'] : array();
+                $options = isset($cfg['options']) ? $cfg['options'] : array();
 
                 $this->setCurrentDir(dirname($path));
-                $collection->addCollection($this->import($config['resource'], $type, false, $file), $prefix, $defaults, $requirements, $options);
+                $collection->addCollection($this->import($cfg['resource'], $type, false, $file), $prefix, $defaults, $requirements, $options);
             } else {
-                $this->parseRoute($collection, $name, $config, $path);
+                $this->parseRoute($collection, $name, $cfg, $path);
             }
         }
 

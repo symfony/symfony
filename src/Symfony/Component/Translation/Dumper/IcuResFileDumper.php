@@ -64,7 +64,7 @@ class IcuResFileDumper implements DumperInterface
 
         $keyTop = $this->getPosition($data);
 
-        foreach ($messages->all($domain) as $source => $target) {
+        foreach ($messages->all($domain) as $target) {
             $resources .= pack('V', $this->getPosition($data));
 
             $data .= pack('V', strlen($target))

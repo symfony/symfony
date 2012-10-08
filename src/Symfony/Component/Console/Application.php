@@ -671,7 +671,7 @@ class Application
 
         if ($raw) {
             $messages = array();
-            foreach ($this->sortCommands($commands) as $space => $commands) {
+            foreach ($this->sortCommands($commands) as $commands) {
                 foreach ($commands as $name => $command) {
                     $messages[] = sprintf("%-${width}s %s", $name, $command->getDescription());
                 }

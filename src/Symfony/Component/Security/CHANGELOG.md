@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+* Added PBKDF2 Password encoder
+
 2.1.0
 -----
 

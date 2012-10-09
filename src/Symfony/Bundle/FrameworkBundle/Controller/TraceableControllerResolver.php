@@ -42,7 +42,7 @@ class TraceableControllerResolver extends ControllerResolver
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      */
     public function getController(Request $request)
     {
@@ -56,7 +56,7 @@ class TraceableControllerResolver extends ControllerResolver
     }
 
     /**
-     * @{inheritdoc}
+     * {@inheritdoc}
      */
     public function getArguments(Request $request, $controller)
     {

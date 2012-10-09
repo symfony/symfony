@@ -545,7 +545,10 @@ class Application
         // name
         $commands = array();
         foreach ($this->commands as $command) {
-            if ($this->extractNamespace($command->getName()) == $namespace) {
+            $extractedNamespace = $this->extractNamespace($command->getName());
+            if ($extractedNamespace === $namespace
+               || !empty($namespace) && 0 === strpos($extractedNamespace, $namespace)
+            ) {
                 $commands[] = $command->getName();
             }
         }
@@ -565,7 +568,10 @@ class Application
         $aliases = array();
         foreach ($this->commands as $command) {
             foreach ($command->getAliases() as $alias) {
-                if ($this->extractNamespace($alias) == $namespace) {
+                $extractedNamespace = $this->extractNamespace($alias);
+                if ($extractedNamespace === $namespace
+                   || !empty($namespace) && 0 === strpos($extractedNamespace, $namespace)
+                ) {
                     $aliases[] = $alias;
                 }
             }

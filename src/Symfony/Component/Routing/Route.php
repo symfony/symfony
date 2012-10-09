@@ -95,13 +95,9 @@ class Route implements \Serializable
      */
     public function setPattern($pattern)
     {
-        $this->pattern = trim($pattern);
-
-        // a route must start with a slash
-        if ('' === $this->pattern || '/' !== $this->pattern[0]) {
-            $this->pattern = '/'.$this->pattern;
-        }
-
+        // A pattern must start with a slash and must not have multiple slashes at the beginning because the
+        // generated path for this route would be confused with a network path, e.g. '//domain.com/path'.
+        $this->pattern = '/' . ltrim(trim($pattern), '/');
         $this->compiled = null;
 
         return $this;

@@ -214,6 +214,14 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $routes = $this->getRoutes('test', new Route('/', array(), array('_scheme' => 'http')));
         $this->assertEquals('http://localhost/app.php/', $this->getGenerator($routes, array('scheme' => 'https'))->generate('test'));
     }
+    
+    public function testPathWithTwoStartingSlashes()
+    {
+        $routes = $this->getRoutes('test', new Route('//path-and-not-domain'));
+
+        // this must not generate '//path-and-not-domain' because that would be a network path
+        $this->assertSame('/path-and-not-domain', $this->getGenerator($routes, array('BaseUrl' => ''))->generate('test'));
+    }
 
     public function testNoTrailingSlashForMultipleOptionalParameters()
     {

@@ -102,6 +102,16 @@ class Request
     protected $acceptableContentTypes;
 
     /**
+     * @var array
+     */
+    protected $encodings;
+
+    /**
+     * @var array
+     */
+    protected $featurePredicates;
+
+    /**
      * @var string
      */
     protected $pathInfo;
@@ -198,6 +208,8 @@ class Request
         $this->languages = null;
         $this->charsets = null;
         $this->acceptableContentTypes = null;
+        $this->encodings = null;
+        $this->featurePredicates = null;
         $this->pathInfo = null;
         $this->requestUri = null;
         $this->baseUrl = null;
@@ -1246,6 +1258,34 @@ class Request
         }
 
         return $this->acceptableContentTypes = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept')));
+    }
+
+    /**
+     * Gets a list of encodings acceptable by the client browser.
+     *
+     * @return array List of encodings
+     */
+    public function getEncodings()
+    {
+        if (null !== $this->encodings) {
+            return $this->encodings;
+        }
+
+        return $this->encodings = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Encoding')));
+    }
+
+    /**
+     * Gets a list of feature predicates sent by the client browser.
+     *
+     * @return array List of feature predicates
+     */
+    public function getFeaturePredicates()
+    {
+        if (null !== $this->featurePredicates) {
+            return $this->featurePredicates;
+        }
+
+        return $this->featurePredicates = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Features')));
     }
 
     /**

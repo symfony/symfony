@@ -510,3 +510,20 @@ td.main, td.menu {
 .collapsed-menu span.icon img {
     display: inline !important;
 }
+
+#panel_items_navigation.fixed {
+    position: fixed;
+    top: 0;
+    padding: 10px;
+    margin-right: 51px;
+    margin-left: -40px;
+
+    -moz-border-radius: 0 0 16px 16px;
+    -webkit-border-radius: 0 0 16px 16px;
+    border-radius: 0 0 16px 16px;
+
+    background-image: -moz-linear-gradient(top, #e4e4e4, #ffffff);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e4e4e4), to(#ffffff));
+    background-image: -o-linear-gradient(top, #e4e4e4, #ffffff);
+    background: linear-gradient(top, #e4e4e4, #ffffff);
+}

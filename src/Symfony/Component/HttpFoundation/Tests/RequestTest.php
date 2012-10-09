@@ -928,6 +928,30 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('application/vnd.wap.wmlscriptc', 'text/vnd.wap.wml', 'application/vnd.wap.xhtml+xml', 'application/xhtml+xml', 'text/html', 'multipart/mixed', '*/*'), $request->getAcceptableContentTypes());
     }
 
+    public function testGetEncodings()
+    {
+        $request = new Request();
+        $this->assertEquals(array(), $request->getEncodings());
+        $request->headers->set('Accept-Encoding', 'gzip,deflate,sdch');
+        $this->assertEquals(array(), $request->getEncodings()); // testing caching
+
+        $request = new Request();
+        $request->headers->set('Accept-Encoding', 'gzip,deflate,sdch');
+        $this->assertEquals(array('gzip', 'deflate', 'sdch'), $request->getEncodings());
+    }
+
+    public function testGetFeaturePredicates()
+    {
+        $request = new Request();
+        $this->assertEquals(array(), $request->getFeaturePredicates());
+        $request->headers->set('Accept-Features', 'blex, !blebber, colordepth={5}, !screenwidth, paper = A4, paper!="A2", x-version=104, *');
+        $this->assertEquals(array(), $request->getFeaturePredicates()); // testing caching
+
+        $request = new Request();
+        $request->headers->set('Accept-Features', 'blex, !blebber, colordepth={5}, !screenwidth, paper = A4, paper!="A2", x-version=104, *');
+        $this->assertEquals(array('blex', '!blebber', 'colordepth={5}', '!screenwidth', 'paper = A4', 'paper!="A2"', 'x-version=104', '*'), $request->getFeaturePredicates());
+    }
+
     public function testGetLanguages()
     {
         $request = new Request();

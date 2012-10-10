@@ -29,6 +29,7 @@ class RequestContext
     private $httpPort;
     private $httpsPort;
     private $parameters;
+    private $acceptances;
 
     /**
      * Constructor.
@@ -51,6 +52,7 @@ class RequestContext
         $this->httpPort = $httpPort;
         $this->httpsPort = $httpsPort;
         $this->parameters = array();
+        $this->acceptances = array();
     }
 
     public function fromRequest(Request $request)
@@ -258,5 +260,25 @@ class RequestContext
     public function setParameter($name, $parameter)
     {
         $this->parameters[$name] = $parameter;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return RequestAcceptance|null
+     */
+    public function getAcceptance($name)
+    {
+        return isset($this->acceptances[$name]) ? $this->acceptances[$name] : null;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @param RequestAcceptance $acceptance
+     */
+    public function setAcceptance($name, RequestAcceptance $acceptance)
+    {
+        $this->acceptances[$name] = $acceptance;
     }
 }

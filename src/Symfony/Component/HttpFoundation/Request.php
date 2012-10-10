@@ -33,6 +33,11 @@ class Request
     protected static $trustProxy = false;
 
     /**
+     * @var AcceptHeaderParser
+     */
+    private $acceptHeaderParser;
+
+    /**
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
      * @api
@@ -176,6 +181,7 @@ class Request
      */
     public function __construct(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
+        $this->acceptHeaderParser = new AcceptHeaderParser();
         $this->initialize($query, $request, $attributes, $cookies, $files, $server, $content);
     }
 
@@ -1241,7 +1247,7 @@ class Request
             return $this->charsets;
         }
 
-        return $this->charsets = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Charset')));
+        return $this->charsets = array_keys($this->acceptHeaderParser->split($this->headers->get('Accept-Charset')));
     }
 
     /**
@@ -1257,7 +1263,7 @@ class Request
             return $this->acceptableContentTypes;
         }
 
-        return $this->acceptableContentTypes = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept')));
+        return $this->acceptableContentTypes = array_keys($this->acceptHeaderParser->split($this->headers->get('Accept')));
     }
 
     /**
@@ -1271,7 +1277,7 @@ class Request
             return $this->encodings;
         }
 
-        return $this->encodings = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Encoding')));
+        return $this->encodings = array_keys($this->acceptHeaderParser->split($this->headers->get('Accept-Encoding')));
     }
 
     /**
@@ -1285,7 +1291,7 @@ class Request
             return $this->featurePredicates;
         }
 
-        return $this->featurePredicates = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Features')));
+        return $this->featurePredicates = array_keys($this->acceptHeaderParser->split($this->headers->get('Accept-Features')));
     }
 
     /**
@@ -1301,48 +1307,6 @@ class Request
     public function isXmlHttpRequest()
     {
         return 'XMLHttpRequest' == $this->headers->get('X-Requested-With');
-    }
-
-    /**
-     * Splits an Accept-* HTTP header.
-     *
-     * @param string $header Header to split
-     *
-     * @return array Array indexed by the values of the Accept-* header in preferred order
-     */
-    public function splitHttpAcceptHeader($header)
-    {
-        if (!$header) {
-            return array();
-        }
-
-        $values = array();
-        $groups = array();
-        foreach (array_filter(explode(',', $header)) as $value) {
-            // Cut off any q-value that might come after a semi-colon
-            if (preg_match('/;\s*(q=.*$)/', $value, $match)) {
-                $q     = substr(trim($match[1]), 2);
-                $value = trim(substr($value, 0, -strlen($match[0])));
-            } else {
-                $q = 1;
-            }
-
-            $groups[$q][] = $value;
-        }
-
-        krsort($groups);
-
-        foreach ($groups as $q => $items) {
-            $q = (float) $q;
-
-            if (0 < $q) {
-                foreach ($items as $value) {
-                    $values[trim($value)] = $q;
-                }
-            }
-        }
-
-        return $values;
     }
 
     /*

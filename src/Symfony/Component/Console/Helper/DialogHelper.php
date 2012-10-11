@@ -87,7 +87,7 @@ class DialogHelper extends Helper
     public function askHiddenResponse(OutputInterface $output, $question, $fallback = true)
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $exe = __DIR__ . '\\hiddeninput.exe';
+            $exe = __DIR__ . '/hiddeninput.exe';
 
             // handle code running from a phar
             if ('phar:' === substr(__FILE__, 0, 5)) {
@@ -105,7 +105,9 @@ class DialogHelper extends Helper
             }
 
             return $value;
-        } elseif ($this->hasSttyAvailable()) {
+        }
+
+        if ($this->hasSttyAvailable()) {
 
             $output->write($question);
 
@@ -113,7 +115,7 @@ class DialogHelper extends Helper
 
             shell_exec('/usr/bin/env stty -echo');
             $value = fgets($this->inputStream ?: STDIN, 4096);
-            shell_exec(sprintf('/usr/bin/env stty %s', escapeshellarg($sttyMode)));
+            shell_exec(sprintf('/usr/bin/env stty %s', $sttyMode));
 
             if (false === $value) {
                 throw new \RuntimeException('Aborted');
@@ -123,7 +125,9 @@ class DialogHelper extends Helper
             $output->writeln('');
 
             return $value;
-        } elseif (false !== $shell = $this->getShell()) {
+        }
+
+        if (false !== $shell = $this->getShell()) {
 
             $output->write($question);
             $readCmd = $shell === 'csh' ? 'set mypassword = $<' : 'read mypassword';
@@ -132,7 +136,9 @@ class DialogHelper extends Helper
             $output->writeln('');
 
             return $value;
-        } elseif ($fallback) {
+        }
+
+        if ($fallback) {
             return $this->ask($output, $question);
         }
 
@@ -158,8 +164,10 @@ class DialogHelper extends Helper
      */
     public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null)
     {
-        $interviewer = function() use ($output, $question, $default) {
-            return $this->ask($output, $question, $default);
+        $that = $this;
+
+        $interviewer = function() use ($output, $question, $default, $that) {
+            return $that->ask($output, $question, $default);
         };
 
         return $this->validateAttempts($interviewer, $output, $validator, $attempts);
@@ -186,8 +194,10 @@ class DialogHelper extends Helper
      */
     public function askHiddenResponseAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $fallback = true)
     {
-        $interviewer = function() use ($output, $question, $fallback) {
-            return $this->askHiddenResponse($output, $question, $fallback);
+        $that = $this;
+
+        $interviewer = function() use ($output, $question, $fallback, $that) {
+            return $that->askHiddenResponse($output, $question, $fallback);
         };
 
         return $this->validateAttempts($interviewer, $output, $validator, $attempts);

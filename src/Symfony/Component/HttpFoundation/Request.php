@@ -286,7 +286,7 @@ class Request
         }
 
         if (!isset($components['path'])) {
-            $components['path'] = '';
+            $components['path'] = '/';
         }
 
         switch (strtoupper($method)) {

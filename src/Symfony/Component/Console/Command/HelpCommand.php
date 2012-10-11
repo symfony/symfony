@@ -49,6 +49,8 @@ The <info>%command.name%</info> command displays help for a given command:
 You can also output the help as XML by using the <comment>--xml</comment> option:
 
   <info>php %command.full_name% --xml list</info>
+
+To display the list of available commands, please use the <info>list</info> command.
 EOF
             )
         ;

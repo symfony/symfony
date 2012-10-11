@@ -377,6 +377,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->assertEquals('Something was terribly wrong while trying to configure the service!', $e->getMessage());
         }
+        $this->assertFalse($c->initialized('throws_exception_on_service_configuration'));
 
         try {
             $c->get('throws_exception_on_service_configuration');
@@ -384,6 +385,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->assertEquals('Something was terribly wrong while trying to configure the service!', $e->getMessage());
         }
+        $this->assertFalse($c->initialized('throws_exception_on_service_configuration'));
     }
 
     public function getInvalidParentScopes()

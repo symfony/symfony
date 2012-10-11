@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
 /**
  * Holds information about the current request.
@@ -63,6 +64,32 @@ class RequestContext
         $this->setScheme($request->getScheme());
         $this->setHttpPort($request->isSecure() ? $this->httpPort : $request->getPort());
         $this->setHttpsPort($request->isSecure() ? $request->getPort() : $this->httpsPort);
+
+        if ($request->headers->has('Accept')) {
+            $types = $request->headers->get('Accept');
+            $typeToFormat = function($type) { return ExtensionGuesser::getInstance()->guess($type); };
+            $this->acceptances['_format'] = new RequestAcceptance(array_combine(array_map($typeToFormat, array_keys($types)), array_values($types)));
+        } else {
+            unset($this->acceptances['_format']);
+        }
+
+        if ($request->headers->has('Accept-Language')) {
+            $this->acceptances['_locale'] = new RequestAcceptance($request->headers->get('Accept-Language'));
+        } else {
+            unset($this->acceptances['_locale']);
+        }
+
+        if ($request->headers->has('Accept-Charset')) {
+            $this->acceptances['_charset'] = new RequestAcceptance($request->headers->get('Accept-Charset'));
+        } else {
+            unset($this->acceptances['_charset']);
+        }
+
+        if ($request->headers->has('Accept-Encoding')) {
+            $this->acceptances['_encoding'] = new RequestAcceptance($request->headers->get('Accept-Encoding'));
+        } else {
+            unset($this->acceptances['_encoding']);
+        }
     }
 
     /**

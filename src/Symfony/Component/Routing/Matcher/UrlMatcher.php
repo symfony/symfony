@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\NotAcceptableException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
@@ -32,6 +33,7 @@ class UrlMatcher implements UrlMatcherInterface
 
     protected $context;
     protected $allow;
+    protected $negotiatedVariables;
 
     private $routes;
 
@@ -47,6 +49,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $this->routes = $routes;
         $this->context = $context;
+        $this->negotiatedVariables = array('_locale', '_format', '_charset', '_encoding');
     }
 
     /**
@@ -94,6 +97,7 @@ class UrlMatcher implements UrlMatcherInterface
      */
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
+        /** @var Route $route */
         foreach ($routes as $name => $route) {
             if ($route instanceof RouteCollection) {
                 if (false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
@@ -129,6 +133,21 @@ class UrlMatcher implements UrlMatcherInterface
                     $this->allow = array_merge($this->allow, $req);
 
                     continue;
+                }
+            }
+
+            if ($route->getOption('negotiate')) {
+                foreach ($this->negotiatedVariables as $variable) {
+                    if (in_array($variable, $compiledRoute->getVariables()) && null !== $acceptance = $this->context->getAcceptance($variable)) {
+                        if (null !== $requirement = $route->getRequirement($variable)) {
+                            $acceptance = $acceptance->filter($requirement);
+                        }
+                        if (null !== $default = $acceptance->getBestValue()) {
+                            $route->setDefault($variable, $default);
+                        } else {
+                            throw new NotAcceptableException($this->context->getAcceptance($variable), $requirement);
+                        }
+                    }
                 }
             }
 

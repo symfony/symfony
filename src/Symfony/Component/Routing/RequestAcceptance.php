@@ -18,10 +18,31 @@ class RequestAcceptance
 
     /**
      * Constructor.
+     *
+     * @param array $qualities
      */
-    public function __construct()
+    public function __construct(array $qualities = array())
     {
-        $this->qualities = array();
+        $this->qualities = $qualities;
+    }
+
+    /**
+     * Filters value with given regex.
+     *
+     * @param string $regex
+     *
+     * @return RequestAcceptance
+     */
+    public function filter($regex)
+    {
+        $qualities = array();
+        foreach ($this->qualities as $value => $quality) {
+            if (preg_match(sprintf('~%s~i', $regex), $value)) {
+                $qualities[$value] = $quality;
+            }
+        }
+
+        return new self($qualities);
     }
 
     /**
@@ -65,5 +86,15 @@ class RequestAcceptance
     public function getQuality($value)
     {
         return isset($this->qualities[$value]) ? $this->qualities[$value] : 0;
+    }
+
+    /**
+     * Returns the values.
+     *
+     * @return array
+     */
+    public function getValues()
+    {
+        return array_keys($this->qualities);
     }
 }

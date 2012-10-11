@@ -900,6 +900,27 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($request->isXmlHttpRequest());
     }
 
+    public function testIntlLocale()
+    {
+        if (!extension_loaded('intl')) {
+            $this->markTestSkipped('The intl extension is needed to run this test.');
+        }
+
+        $request = new Request();
+
+        $request->setDefaultLocale('fr');
+        $this->assertEquals('fr', $request->getLocale());
+        $this->assertEquals('fr', \Locale::getDefault());
+
+        $request->setLocale('en');
+        $this->assertEquals('en', $request->getLocale());
+        $this->assertEquals('en', \Locale::getDefault());
+
+        $request->setDefaultLocale('de');
+        $this->assertEquals('en', $request->getLocale());
+        $this->assertEquals('en', \Locale::getDefault());
+    }
+
     public function testGetCharsets()
     {
         $request = new Request();

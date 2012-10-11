@@ -1055,7 +1055,11 @@ class Request
      */
     public function setDefaultLocale($locale)
     {
-        $this->setPhpDefaultLocale($this->defaultLocale = $locale);
+        $this->defaultLocale = $locale;
+
+        if (null === $this->locale) {
+            $this->setPhpDefaultLocale($locale);
+        }
     }
 
     /**

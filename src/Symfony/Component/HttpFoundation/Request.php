@@ -1205,7 +1205,7 @@ class Request
             return $this->languages;
         }
 
-        $languages = $this->splitHttpAcceptHeader($this->headers->get('Accept-Language'));
+        $languages = $this->acceptHeaderParser->split($this->headers->get('Accept-Language'));
         $this->languages = array();
         foreach ($languages as $lang => $q) {
             if (strstr($lang, '-')) {

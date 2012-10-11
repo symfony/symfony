@@ -474,7 +474,5 @@ class ProjectServiceContainer extends Container
         $this->services['throws_exception_on_service_configuration'] = $instance = new \stdClass();
 
         throw new \Exception('Something was terribly wrong while trying to configure the service!');
-
-        return $instance;
     }
 }

@@ -16,7 +16,7 @@ use Symfony\Component\Routing\RequestAcceptance;
 /**
  * The resource was found but the Accept-* header does not match requirement.
  *
- * This exception should trigger an HTTP 405 response in your application code.
+ * This exception should trigger an HTTP 406 response in your application code.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */

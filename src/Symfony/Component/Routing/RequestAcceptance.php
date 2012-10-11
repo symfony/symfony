@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\Routing;
 
+use Symfony\Component\HttpFoundation\AcceptHeaderParser;
+
 /**
  * Holds information about an Accept-* header of hte current request.
  *
@@ -19,11 +21,12 @@ class RequestAcceptance
     /**
      * Constructor.
      *
-     * @param array $qualities
+     * @param string $header
      */
-    public function __construct(array $qualities = array())
+    public function __construct($header = '')
     {
-        $this->qualities = $qualities;
+        $parser = new AcceptHeaderParser();
+        $this->qualities = $parser->split($header);
     }
 
     /**
@@ -35,14 +38,14 @@ class RequestAcceptance
      */
     public function filter($regex)
     {
-        $qualities = array();
+        $acceptance = new self();
         foreach ($this->qualities as $value => $quality) {
             if (preg_match(sprintf('~%s~i', $regex), $value)) {
-                $qualities[$value] = $quality;
+                $acceptance->add($value, $quality);
             }
         }
 
-        return new self($qualities);
+        return $acceptance;
     }
 
     /**
@@ -96,5 +99,17 @@ class RequestAcceptance
     public function getValues()
     {
         return array_keys($this->qualities);
+    }
+
+    /**
+     * Applies a closure on values.
+     *
+     * @param \Closure $closure
+     *
+     * @return array
+     */
+    public function mapValues(\Closure $closure)
+    {
+        $this->qualities = array_combine(array_map($closure, array_keys($this->qualities)), array_values($this->qualities));
     }
 }

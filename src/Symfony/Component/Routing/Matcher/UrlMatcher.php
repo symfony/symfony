@@ -49,7 +49,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $this->routes = $routes;
         $this->context = $context;
-        $this->negotiatedVariables = array('_locale', '_format', '_charset', '_encoding');
+        $this->negotiatedVariables = array('_locale', '_format', '_charset');
     }
 
     /**
@@ -109,6 +109,12 @@ class UrlMatcher implements UrlMatcherInterface
                 }
 
                 return $ret;
+            }
+
+            if ($route->getOption('negotiate')) {
+                foreach ($this->negotiatedVariables as $variable) {
+                    $route->setDefault($variable, null);
+                }
             }
 
             $compiledRoute = $route->compile();

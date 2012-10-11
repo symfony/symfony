@@ -66,9 +66,8 @@ class RequestContext
         $this->setHttpsPort($request->isSecure() ? $request->getPort() : $this->httpsPort);
 
         if ($request->headers->has('Accept')) {
-            $types = $request->headers->get('Accept');
-            $typeToFormat = function($type) { return ExtensionGuesser::getInstance()->guess($type); };
-            $this->acceptances['_format'] = new RequestAcceptance(array_combine(array_map($typeToFormat, array_keys($types)), array_values($types)));
+            $this->acceptances['_format'] = new RequestAcceptance($request->headers->get('Accept'));
+            $this->acceptances['_format']->mapValues(function($type) { return ExtensionGuesser::getInstance()->guess($type); });
         } else {
             unset($this->acceptances['_format']);
         }
@@ -83,12 +82,6 @@ class RequestContext
             $this->acceptances['_charset'] = new RequestAcceptance($request->headers->get('Accept-Charset'));
         } else {
             unset($this->acceptances['_charset']);
-        }
-
-        if ($request->headers->has('Accept-Encoding')) {
-            $this->acceptances['_encoding'] = new RequestAcceptance($request->headers->get('Accept-Encoding'));
-        } else {
-            unset($this->acceptances['_encoding']);
         }
     }
 

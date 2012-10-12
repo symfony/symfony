@@ -41,11 +41,17 @@ output abstractions (so that you can easily unit-test your commands),
 validation, automatic help messages, ...
 
 Tests
----------
+-----
 
 You can run the unit tests with the following command:
 
     phpunit
+
+Third Party
+-----------
+
+`hiddeninput.exe` third party binary is provided within this component. Find
+sources and license at https://github.com/Seldaek/hidden-input.
 
 Resources
 ---------

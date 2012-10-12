@@ -97,9 +97,9 @@ class RouterListener implements EventSubscriberInterface
 
             throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
         } catch (NotAcceptableException $e) {
-            $message = sprintf('No acceptable representation found.');
+            $message = 'No acceptable representation found.';
 
-            throw new NotAcceptableHttpException($message, $e);
+            throw new NotAcceptableHttpException($message, $e, array('Vary' => implode(', ', $e->getVariables())));
         }
     }
 

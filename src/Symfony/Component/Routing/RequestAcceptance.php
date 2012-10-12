@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Routing;
 
-use Symfony\Component\HttpFoundation\AcceptHeaderParser;
+use Symfony\Component\HttpFoundation\AcceptHeader;
 
 /**
  * Holds information about an Accept-* header of hte current request.
@@ -34,8 +34,7 @@ class RequestAcceptance
      */
     public function __construct($header = '')
     {
-        $parser = new AcceptHeaderParser();
-        $this->qualities = $parser->split($header);
+        $this->qualities = AcceptHeader::split($header);
     }
 
     /**
@@ -86,18 +85,6 @@ class RequestAcceptance
         arsort($this->qualities, SORT_NUMERIC);
 
         return key($this->qualities);
-    }
-
-    /**
-     * Returns quality associated to given value.
-     *
-     * @param string $value
-     *
-     * @return float
-     */
-    public function getQuality($value)
-    {
-        return isset($this->qualities[$value]) ? $this->qualities[$value] : 0;
     }
 
     /**

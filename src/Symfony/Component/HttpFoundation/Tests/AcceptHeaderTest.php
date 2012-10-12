@@ -11,17 +11,16 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
-use Symfony\Component\HttpFoundation\AcceptHeaderParser;
+use Symfony\Component\HttpFoundation\AcceptHeader;
 
-class AcceptHeaderParserTest extends \PHPUnit_Framework_TestCase
+class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider splitData
      */
     public function testSplitHttp($acceptHeader, $expected)
     {
-        $parser = new AcceptHeaderParser();
-        $this->assertEquals($expected, $parser->split($acceptHeader));
+        $this->assertEquals($expected, AcceptHeader::split($acceptHeader));
     }
 
     public function splitData()

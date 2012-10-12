@@ -12,11 +12,11 @@
 namespace Symfony\Component\HttpFoundation;
 
 /**
- * Parses Accept-* HTTP headers.
+ * Accept-* HTTP headers utils.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
-class AcceptHeaderParser
+class AcceptHeader
 {
     /**
      * Splits an Accept-* HTTP header.
@@ -25,7 +25,7 @@ class AcceptHeaderParser
      *
      * @return array Array indexed by the values of the Accept-* header in preferred order
      */
-    public function split($header)
+    static public function split($header)
     {
         if (!$header) {
             return array();

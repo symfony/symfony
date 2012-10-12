@@ -25,55 +25,25 @@ class NotAcceptableException extends \RuntimeException implements ExceptionInter
     /**
      * @var array
      */
-    protected $negotiationVariants;
+    protected $variables;
 
     /**
-     * @var RequestAcceptance
+     * @param array           $variables
+     * @param string          $message
+     * @param int             $code
+     * @param \Exception|null $previous
      */
-    protected $acceptance;
-
-    /**
-     * @var string
-     */
-    protected $requirement;
-
-    /**
-     * @param array             $negotiationVariants
-     * @param RequestAcceptance $acceptance
-     * @param string            $requirement
-     * @param int               $code
-     * @param \Exception|null   $previous
-     */
-    public function __construct(array $negotiationVariants, RequestAcceptance $acceptance, $requirement, $code = 0, \Exception $previous = null)
+    public function __construct(array $variables, $message, $code = 0, \Exception $previous = null)
     {
-        $this->negotiationVariants = $negotiationVariants;
-        $this->acceptance = $acceptance;
-        $this->requirement = $requirement;
-        $message = sprintf('None of the accepted values "%s" match route requirement "%s".', implode(', ', $acceptance->getValues()), $requirement);
+        $this->variables = $variables;
         parent::__construct($message, $code, $previous);
     }
 
     /**
      * @return array
      */
-    public function getNegotiationVariants()
+    public function getVariables()
     {
-        return $this->negotiationVariants;
-    }
-
-    /**
-     * @return RequestAcceptance
-     */
-    public function getAcceptance()
-    {
-        return $this->acceptance;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRequirement()
-    {
-        return $this->requirement;
+        return $this->variables;
     }
 }

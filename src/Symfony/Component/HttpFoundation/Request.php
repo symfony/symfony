@@ -33,11 +33,6 @@ class Request
     protected static $trustProxy = false;
 
     /**
-     * @var AcceptHeaderParser
-     */
-    private $acceptHeaderParser;
-
-    /**
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
      * @api
@@ -181,7 +176,6 @@ class Request
      */
     public function __construct(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
-        $this->acceptHeaderParser = new AcceptHeaderParser();
         $this->initialize($query, $request, $attributes, $cookies, $files, $server, $content);
     }
 
@@ -1193,7 +1187,7 @@ class Request
     }
 
     /**
-     * Gets a list of languages acceptable by the client browser.
+     * Gets a list of languages acceptable by the user agent.
      *
      * @return array Languages ordered in the user browser preferences
      *
@@ -1205,7 +1199,7 @@ class Request
             return $this->languages;
         }
 
-        $languages = $this->acceptHeaderParser->split($this->headers->get('Accept-Language'));
+        $languages = AcceptHeader::split($this->headers->get('Accept-Language'));
         $this->languages = array();
         foreach ($languages as $lang => $q) {
             if (strstr($lang, '-')) {
@@ -1235,7 +1229,7 @@ class Request
     }
 
     /**
-     * Gets a list of charsets acceptable by the client browser.
+     * Gets a list of charsets acceptable by the user agent.
      *
      * @return array List of charsets in preferable order
      *
@@ -1247,11 +1241,11 @@ class Request
             return $this->charsets;
         }
 
-        return $this->charsets = array_keys($this->acceptHeaderParser->split($this->headers->get('Accept-Charset')));
+        return $this->charsets = array_keys(AcceptHeader::split($this->headers->get('Accept-Charset')));
     }
 
     /**
-     * Gets a list of content types acceptable by the client browser
+     * Gets a list of content types acceptable by the user agent.
      *
      * @return array List of content types in preferable order
      *
@@ -1263,7 +1257,7 @@ class Request
             return $this->acceptableContentTypes;
         }
 
-        return $this->acceptableContentTypes = array_keys($this->acceptHeaderParser->split($this->headers->get('Accept')));
+        return $this->acceptableContentTypes = array_keys(AcceptHeader::split($this->headers->get('Accept')));
     }
 
     /**
@@ -1277,11 +1271,11 @@ class Request
             return $this->encodings;
         }
 
-        return $this->encodings = array_keys($this->acceptHeaderParser->split($this->headers->get('Accept-Encoding')));
+        return $this->encodings = array_keys(AcceptHeader::split($this->headers->get('Accept-Encoding')));
     }
 
     /**
-     * Gets a list of feature predicates sent by the client browser.
+     * Gets a list of feature predicates sent by the user agent.
      *
      * @return array List of feature predicates
      */
@@ -1291,7 +1285,7 @@ class Request
             return $this->featurePredicates;
         }
 
-        return $this->featurePredicates = array_keys($this->acceptHeaderParser->split($this->headers->get('Accept-Features')));
+        return $this->featurePredicates = array_keys(AcceptHeader::split($this->headers->get('Accept-Features')));
     }
 
     /**

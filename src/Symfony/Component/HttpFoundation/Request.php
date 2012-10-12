@@ -1267,7 +1267,7 @@ class Request
     }
 
     /**
-     * Gets a list of encodings acceptable by the client browser.
+     * Gets a list of encodings acceptable by the user agent.
      *
      * @return array List of encodings
      */

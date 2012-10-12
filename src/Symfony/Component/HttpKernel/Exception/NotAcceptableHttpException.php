@@ -21,9 +21,9 @@ class NotAcceptableHttpException extends HttpException
     /**
      * Constructor.
      *
-     * @param array      $headers  An array of headers
      * @param string     $message  The internal exception message
      * @param \Exception $previous The previous exception
+     * @param array      $headers  An array of headers
      * @param integer    $code     The internal exception code
      */
     public function __construct($message = null, \Exception $previous = null, array $headers = array(), $code = 0)

@@ -111,9 +111,15 @@ class UrlMatcher implements UrlMatcherInterface
                 return $ret;
             }
 
+            // check negotiate route option
+            $negotiationVariants = array();
             if ($route->getOption('negotiate')) {
                 foreach ($this->negotiatedVariables as $variable) {
-                    $route->setDefault($variable, null);
+                    if (null !== $requirement = $route->getRequirement($variable)) {
+                        // requirement must be set with the form "xx|yy|zz"
+                        $negotiationVariants[$variable] = explode('|', strtoupper($requirement));
+                        $route->setDefault($variable, null);
+                    }
                 }
             }
 
@@ -151,7 +157,7 @@ class UrlMatcher implements UrlMatcherInterface
                         if (null !== $default = $acceptance->getBestValue()) {
                             $route->setDefault($variable, $default);
                         } else {
-                            throw new NotAcceptableException($this->context->getAcceptance($variable), $requirement);
+                            throw new NotAcceptableException($negotiationVariants, $this->context->getAcceptance($variable), $requirement);
                         }
                     }
                 }
@@ -167,7 +173,12 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
-            return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));
+            $parameters = array('_route' => $name);
+            if ($route->getOption('negotiate')) {
+                $parameters['_negotiation'] = $negotiationVariants;
+            }
+
+            return array_merge($this->mergeDefaults($matches, $route->getDefaults()), $parameters);
         }
     }
 

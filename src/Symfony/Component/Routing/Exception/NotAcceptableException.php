@@ -22,19 +22,58 @@ use Symfony\Component\Routing\RequestAcceptance;
  */
 class NotAcceptableException extends \RuntimeException implements ExceptionInterface
 {
+    /**
+     * @var array
+     */
+    protected $negotiationVariants;
+
+    /**
+     * @var RequestAcceptance
+     */
     protected $acceptance;
+
+    /**
+     * @var string
+     */
     protected $requirement;
 
-    public function __construct(RequestAcceptance $acceptance, $requirement, $message = null, $code = 0, \Exception $previous = null)
+    /**
+     * @param array             $negotiationVariants
+     * @param RequestAcceptance $acceptance
+     * @param string            $requirement
+     * @param int               $code
+     * @param \Exception|null   $previous
+     */
+    public function __construct(array $negotiationVariants, RequestAcceptance $acceptance, $requirement, $code = 0, \Exception $previous = null)
     {
+        $this->negotiationVariants = $negotiationVariants;
         $this->acceptance = $acceptance;
         $this->requirement = $requirement;
         $message = sprintf('None of the accepted values "%s" match route requirement "%s".', implode(', ', $acceptance->getValues()), $requirement);
         parent::__construct($message, $code, $previous);
     }
 
-    public function getVariants()
+    /**
+     * @return array
+     */
+    public function getNegotiationVariants()
     {
-        
+        return $this->negotiationVariants;
+    }
+
+    /**
+     * @return RequestAcceptance
+     */
+    public function getAcceptance()
+    {
+        return $this->acceptance;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRequirement()
+    {
+        return $this->requirement;
     }
 }

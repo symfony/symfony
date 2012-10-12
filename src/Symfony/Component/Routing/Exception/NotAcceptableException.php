@@ -32,4 +32,9 @@ class NotAcceptableException extends \RuntimeException implements ExceptionInter
         $message = sprintf('None of the accepted values "%s" match route requirement "%s".', implode(', ', $acceptance->getValues()), $requirement);
         parent::__construct($message, $code, $previous);
     }
+
+    public function getVariants()
+    {
+        
+    }
 }

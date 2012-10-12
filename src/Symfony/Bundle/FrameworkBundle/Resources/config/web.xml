@@ -10,6 +10,7 @@
         <parameter key="response_listener.class">Symfony\Component\HttpKernel\EventListener\ResponseListener</parameter>
         <parameter key="streamed_response_listener.class">Symfony\Component\HttpKernel\EventListener\StreamedResponseListener</parameter>
         <parameter key="locale_listener.class">Symfony\Component\HttpKernel\EventListener\LocaleListener</parameter>
+        <parameter key="content_negotiation_listener.class">Symfony\Component\HttpKernel\EventListener\ContentNegotiationListener</parameter>
     </parameters>
 
     <services>
@@ -38,6 +39,10 @@
             <tag name="kernel.event_subscriber" />
             <argument>%kernel.default_locale%</argument>
             <argument type="service" id="router" on-invalid="ignore" />
+        </service>
+
+        <service id="content_negotiation_listener" class="%content_negotiation_listener.class%">
+            <tag name="kernel.event_subscriber" />
         </service>
     </services>
 </container>

@@ -13,9 +13,10 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormViewInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CollectionType extends AbstractType
@@ -46,25 +47,25 @@ class CollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->addVars(array(
+        $view->vars = array_replace($view->vars, array(
             'allow_add'    => $options['allow_add'],
             'allow_delete' => $options['allow_delete'],
         ));
 
         if ($form->getConfig()->hasAttribute('prototype')) {
-            $view->setVar('prototype', $form->getConfig()->getAttribute('prototype')->createView($view));
+            $view->vars['prototype'] = $form->getConfig()->getAttribute('prototype')->createView($view);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        if ($form->getConfig()->hasAttribute('prototype') && $view->getVar('prototype')->getVar('multipart')) {
-            $view->setVar('multipart', true);
+        if ($form->getConfig()->hasAttribute('prototype') && $view->vars['prototype']->vars['multipart']) {
+            $view->vars['multipart'] = true;
         }
     }
 
@@ -73,6 +74,12 @@ class CollectionType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $optionsNormalizer = function (Options $options, $value) {
+            $value['block_name'] = 'entry';
+
+            return $value;
+        };
+
         $resolver->setDefaults(array(
             'allow_add'      => false,
             'allow_delete'   => false,
@@ -80,6 +87,10 @@ class CollectionType extends AbstractType
             'prototype_name' => '__name__',
             'type'           => 'text',
             'options'        => array(),
+        ));
+
+        $resolver->setNormalizers(array(
+            'options' => $optionsNormalizer,
         ));
     }
 

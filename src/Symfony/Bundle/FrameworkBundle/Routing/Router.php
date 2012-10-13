@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
- * This Router only creates the Loader only when the cache is empty.
+ * This Router creates the Loader only when the cache is empty.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -113,6 +113,14 @@ class Router extends BaseRouter implements WarmableInterface
     private function resolveString($value)
     {
         $container = $this->container;
+
+        if (is_array($value)) {
+            foreach ($value as $key => $val) {
+                $value[$key] = $this->resolveString($val);
+            }
+
+            return $value;
+        }
 
         if (null === $value || false === $value || true === $value || is_object($value)) {
             return $value;

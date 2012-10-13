@@ -73,6 +73,9 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
  * ValidatorFactory instances should be cached and reused in your application.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+ *             {@link Validation::createValidatorBuilder()} instead.
  */
 class ValidatorFactory implements ValidatorContextInterface
 {
@@ -94,9 +97,15 @@ class ValidatorFactory implements ValidatorContextInterface
      *                                      use, if static method loading should
      *                                      be enabled
      *
+     * @return ValidatorFactory             The validator factory.
+     *
      * @throws MappingException             If any of the files in $mappingFiles
      *                                      has neither the extension ".xml" nor
      *                                      ".yml" nor ".yaml"
+     * @throws \RuntimeException            If annotations are not supported.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link Validation::createValidatorBuilder()} instead.
      */
     public static function buildDefault(array $mappingFiles = array(), $annotations = false, $staticMethod = null)
     {
@@ -155,6 +164,9 @@ class ValidatorFactory implements ValidatorContextInterface
      * Sets the given context as default context
      *
      * @param ValidatorContextInterface $defaultContext A preconfigured context
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link Validation::createValidatorBuilder()} instead.
      */
     public function __construct(ValidatorContextInterface $defaultContext = null)
     {
@@ -168,6 +180,9 @@ class ValidatorFactory implements ValidatorContextInterface
      * @param ClassMetadataFactoryInterface $metadataFactory The new factory instance
      *
      * @return ValidatorContextInterface                       The preconfigured form context
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link Validation::createValidatorBuilder()} instead.
      */
     public function setClassMetadataFactory(ClassMetadataFactoryInterface $metadataFactory)
     {
@@ -183,6 +198,9 @@ class ValidatorFactory implements ValidatorContextInterface
      * @param ClassMetadataFactoryInterface $validatorFactory The new factory instance
      *
      * @return ValidatorContextInterface                        The preconfigured form context
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link Validation::createValidatorBuilder()} instead.
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
     {
@@ -195,6 +213,9 @@ class ValidatorFactory implements ValidatorContextInterface
      * Creates a new validator with the settings stored in the default context
      *
      * @return ValidatorInterface  The new validator
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link Validation::createValidator()} instead.
      */
     public function getValidator()
     {

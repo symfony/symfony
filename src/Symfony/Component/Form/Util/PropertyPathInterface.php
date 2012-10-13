@@ -24,15 +24,7 @@ interface PropertyPathInterface extends \Traversable
     public function __toString();
 
     /**
-     * Returns the positions at which the elements of the path
-     * start in the string.
-     *
-     * @return array The string offsets of the elements.
-     */
-    public function getPositions();
-
-    /**
-     * Returns the length of the property path.
+     * Returns the length of the property path, i.e. the number of elements.
      *
      * @return integer The path length.
      */

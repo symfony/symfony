@@ -12,14 +12,20 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\FormExtension;
+use Symfony\Bridge\Twig\Form\TwigRenderer;
+use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 {
+    /**
+     * @var FormExtension
+     */
     protected $extension;
 
     protected function setUp()
@@ -42,20 +48,23 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
         parent::setUp();
 
-        $loader = new StubFilesystemLoader(array(
-            __DIR__.'/../../../../../../src/Symfony/Bridge/Twig/Resources/views/Form',
-            __DIR__,
-        ));
-
-        $this->extension = new FormExtension($this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'), array(
+        $rendererEngine = new TwigRendererEngine(array(
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
         ));
+        $renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'));
+
+        $this->extension = new FormExtension($renderer);
+
+        $loader = new StubFilesystemLoader(array(
+            __DIR__.'/../../Resources/views/Form',
+            __DIR__,
+        ));
 
         $environment = new \Twig_Environment($loader, array('strict_variables' => true));
-        $environment->addExtension($this->extension);
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addGlobal('global', '');
+        $environment->addExtension($this->extension);
 
         $this->extension->initRuntime($environment);
     }
@@ -97,39 +106,76 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         );
     }
 
+    public function isSelectedChoiceProvider()
+    {
+        // The commented cases should not be necessary anymore, because the
+        // choice lists should assure that both values passed here are always
+        // strings
+        return array(
+//             array(true, 0, 0),
+            array(true, '0', '0'),
+            array(true, '1', '1'),
+//             array(true, false, 0),
+//             array(true, true, 1),
+            array(true, '', ''),
+//             array(true, null, ''),
+            array(true, '1.23', '1.23'),
+            array(true, 'foo', 'foo'),
+            array(true, 'foo10', 'foo10'),
+            array(true, 'foo', array(1, 'foo', 'foo10')),
+
+            array(false, 10, array(1, 'foo', 'foo10')),
+            array(false, 0, array(1, 'foo', 'foo10')),
+        );
+    }
+
+    /**
+     * @dataProvider isSelectedChoiceProvider
+     */
+    public function testIsChoiceSelected($expected, $choice, $value)
+    {
+        $choice = new ChoiceView($choice, $choice, $choice . ' label');
+
+        $this->assertSame($expected, $this->extension->isSelectedChoice($choice, $value));
+    }
+
     protected function renderEnctype(FormView $view)
     {
-        return (string) $this->extension->renderEnctype($view);
+        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'enctype');
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        return (string) $this->extension->renderLabel($view, $label, $vars);
+        if ($label !== null) {
+            $vars += array('label' => $label);
+        }
+
+        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'label', $vars);
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string) $this->extension->renderErrors($view);
+        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'errors');
     }
 
     protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderWidget($view, $vars);
+        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'widget', $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderRow($view, $vars);
+        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'row', $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderRest($view, $vars);
+        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'rest', $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)
     {
-        $this->extension->setTheme($view, $themes);
+        $this->extension->renderer->setTheme($view, $themes);
     }
 
     public static function themeBlockInheritanceProvider()

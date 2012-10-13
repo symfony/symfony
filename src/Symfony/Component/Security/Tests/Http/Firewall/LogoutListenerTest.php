@@ -103,7 +103,9 @@ class LogoutListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleMatchedPathWithoutSuccessHandlerAndCsrfValidation()
     {
-        list($listener, $context, $httpUtils, $options) = $this->getListener();
+        $successHandler = $this->getSuccessHandler();
+
+        list($listener, $context, $httpUtils, $options) = $this->getListener($successHandler);
 
         list($event, $request) = $this->getGetResponseEvent();
 
@@ -112,9 +114,9 @@ class LogoutListenerTest extends \PHPUnit_Framework_TestCase
             ->with($request, $options['logout_path'])
             ->will($this->returnValue(true));
 
-        $httpUtils->expects($this->once())
-            ->method('createRedirectResponse')
-            ->with($request, $options['target_url'])
+        $successHandler->expects($this->once())
+            ->method('onLogoutSuccess')
+            ->with($request)
             ->will($this->returnValue($response = new Response()));
 
         $context->expects($this->once())
@@ -231,13 +233,13 @@ class LogoutListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new LogoutListener(
             $context = $this->getContext(),
             $httpUtils = $this->getHttpUtils(),
+            $successHandler ?: $this->getSuccessHandler(),
             $options = array(
                 'csrf_parameter' => '_csrf_token',
                 'intention'      => 'logout',
                 'logout_path'    => '/logout',
                 'target_url'     => '/',
             ),
-            $successHandler,
             $csrfProvider
         );
 

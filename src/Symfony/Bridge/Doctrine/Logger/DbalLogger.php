@@ -47,7 +47,7 @@ class DbalLogger implements SQLLogger
         }
 
         if (null !== $this->logger) {
-            $this->log($sql.' ('.json_encode($params).')');
+            $this->log($sql, null === $params ? array() : $params);
         }
     }
 
@@ -65,9 +65,10 @@ class DbalLogger implements SQLLogger
      * Logs a message.
      *
      * @param string $message A message to log
+     * @param array  $params  The context
      */
-    public function log($message)
+    protected function log($message, array $params)
     {
-        $this->logger->debug($message);
+        $this->logger->debug($message, $params);
     }
 }

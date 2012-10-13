@@ -62,15 +62,9 @@ class ExceptionListener implements EventSubscriberInterface
 
         $logger = $this->logger instanceof DebugLoggerInterface ? $this->logger : null;
 
-        $flattenException = FlattenException::create($exception);
-        if ($exception instanceof HttpExceptionInterface) {
-            $flattenException->setStatusCode($exception->getStatusCode());
-            $flattenException->setHeaders($exception->getHeaders());
-        }
-
         $attributes = array(
             '_controller' => $this->controller,
-            'exception'   => $flattenException,
+            'exception'   => FlattenException::create($exception),
             'logger'      => $logger,
             'format'      => $request->getRequestFormat(),
         );
@@ -96,7 +90,7 @@ class ExceptionListener implements EventSubscriberInterface
             $handling = false;
 
             // re-throw the exception as this is a catch-all
-            throw $exception;
+            return;
         }
 
         $event->setResponse($response);

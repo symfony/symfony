@@ -104,7 +104,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     {
         $data = array(
             $this->options['id_field']   => $sessionId,
-            $this->options['data_field'] => new \MongoBinData($data),
+            $this->options['data_field'] => new \MongoBinData($data, \MongoBinData::BYTE_ARRAY),
             $this->options['time_field'] => new \MongoTimestamp()
         );
 

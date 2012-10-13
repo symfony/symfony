@@ -22,25 +22,16 @@ use Symfony\Component\Validator\ConstraintValidator;
 class TrueValidator extends ConstraintValidator
 {
     /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @api
+     * {@inheritDoc}
      */
     public function validate($value, Constraint $constraint)
     {
         if (null === $value) {
-            return true;
+            return;
         }
 
-        if (true === $value || 1 === $value || '1' === $value) {
-            return true;
+        if (true !== $value && 1 !== $value && '1' !== $value) {
+            $this->context->addViolation($constraint->message);
         }
-
-        $this->context->addViolation($constraint->message);
-
-        return false;
     }
 }

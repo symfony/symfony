@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Exception\StringCastException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\InvalidPropertyException;
 
 /**
@@ -57,11 +56,12 @@ class ObjectChoiceList extends ChoiceList
     /**
      * Creates a new object choice list.
      *
-     * @param array $choices The array of choices. Choices may also be given
-     *                       as hierarchy of unlimited depth. Hierarchies are
-     *                       created by creating nested arrays. The title of
-     *                       the sub-hierarchy can be stored in the array
-     *                       key pointing to the nested array.
+     * @param array|\Traversable $choices The array of choices. Choices may also be given
+     *                                    as hierarchy of unlimited depth by creating nested
+     *                                    arrays. The title of the sub-hierarchy can be
+     *                                    stored in the array key pointing to the nested
+     *                                    array. The topmost level of the hierarchy may also
+     *                                    be a \Traversable.
      * @param string $labelPath A property path pointing to the property used
      *                          for the choice labels. The value is obtained
      *                          by calling the getter on the object. If the
@@ -78,9 +78,9 @@ class ObjectChoiceList extends ChoiceList
      */
     public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null)
     {
-        $this->labelPath = $labelPath ? new PropertyPath($labelPath) : null;
-        $this->groupPath = $groupPath ? new PropertyPath($groupPath) : null;
-        $this->valuePath = $valuePath ? new PropertyPath($valuePath) : null;
+        $this->labelPath = null !== $labelPath ? new PropertyPath($labelPath) : null;
+        $this->groupPath = null !== $groupPath ? new PropertyPath($groupPath) : null;
+        $this->valuePath = null !== $valuePath ? new PropertyPath($valuePath) : null;
 
         parent::__construct($choices, array(), $preferredChoices);
     }
@@ -93,19 +93,18 @@ class ObjectChoiceList extends ChoiceList
      * @param array|\Traversable $choices          The choices to write into the list.
      * @param array              $labels           Ignored.
      * @param array              $preferredChoices The choices to display with priority.
+     *
+     * @throws \InvalidArgumentException When passing a hierarchy of choices and using
+     *                                   the "groupPath" option at the same time.
      */
     protected function initialize($choices, array $labels, array $preferredChoices)
     {
-        if (!is_array($choices) && !$choices instanceof \Traversable) {
-            throw new UnexpectedTypeException($choices, 'array or \Traversable');
-        }
-
         if (null !== $this->groupPath) {
             $groupedChoices = array();
 
             foreach ($choices as $i => $choice) {
                 if (is_array($choice)) {
-                    throw new \InvalidArgumentException('You should pass a plain object array (without groups, $code, $previous) when using the "groupPath" option');
+                    throw new \InvalidArgumentException('You should pass a plain object array (without groups) when using the "groupPath" option.');
                 }
 
                 try {
@@ -142,10 +141,10 @@ class ObjectChoiceList extends ChoiceList
      *
      * If a property path for the value was given at object creation,
      * the getter behind that path is now called to obtain a new value.
-     *
      * Otherwise a new integer is generated.
      *
      * @param mixed $choice The choice to create a value for
+     *
      * @return integer|string A unique value without character limitations.
      */
     protected function createValue($choice)
@@ -160,7 +159,7 @@ class ObjectChoiceList extends ChoiceList
     private function extractLabels($choices, array &$labels)
     {
         foreach ($choices as $i => $choice) {
-            if (is_array($choice) || $choice instanceof \Traversable) {
+            if (is_array($choice)) {
                 $labels[$i] = array();
                 $this->extractLabels($choice, $labels[$i]);
             } elseif ($this->labelPath) {

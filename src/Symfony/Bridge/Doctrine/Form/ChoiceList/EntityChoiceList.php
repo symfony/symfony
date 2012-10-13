@@ -77,24 +77,33 @@ class EntityChoiceList extends ObjectChoiceList
     private $loaded = false;
 
     /**
+     * The preferred entities.
+     *
+     * @var array
+     */
+    private $preferredEntities = array();
+
+    /**
      * Creates a new entity choice list.
      *
-     * @param ObjectManager         $manager      An EntityManager instance
-     * @param string                $class        The class name
-     * @param string                $labelPath    The property path used for the label
-     * @param EntityLoaderInterface $entityLoader An optional query builder
-     * @param array                 $entities     An array of choices
-     * @param string                $groupPath    A property path pointing to the property used
-     *                                            to group the choices. Only allowed if
-     *                                            the choices are given as flat array.
+     * @param ObjectManager         $manager           An EntityManager instance
+     * @param string                $class             The class name
+     * @param string                $labelPath         The property path used for the label
+     * @param EntityLoaderInterface $entityLoader      An optional query builder
+     * @param array                 $entities          An array of choices
+     * @param array                 $preferredEntities An array of preferred choices
+     * @param string                $groupPath         A property path pointing to the property used
+     *                                                 to group the choices. Only allowed if
+     *                                                 the choices are given as flat array.
      */
-    public function __construct(ObjectManager $manager, $class, $labelPath = null, EntityLoaderInterface $entityLoader = null, $entities = null, $groupPath = null)
+    public function __construct(ObjectManager $manager, $class, $labelPath = null, EntityLoaderInterface $entityLoader = null, $entities = null,  array $preferredEntities = array(), $groupPath = null)
     {
         $this->em = $manager;
         $this->entityLoader = $entityLoader;
         $this->classMetadata = $manager->getClassMetadata($class);
         $this->class = $this->classMetadata->getName();
         $this->loaded = is_array($entities) || $entities instanceof \Traversable;
+        $this->preferredEntities = $preferredEntities;
 
         $identifier = $this->classMetadata->getIdentifierFieldNames();
 
@@ -113,7 +122,7 @@ class EntityChoiceList extends ObjectChoiceList
             $entities = array();
         }
 
-        parent::__construct($entities, $labelPath, array(), $groupPath);
+        parent::__construct($entities, $labelPath, $preferredEntities, $groupPath);
     }
 
     /**
@@ -312,7 +321,7 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * Otherwise a new integer is generated.
      *
-     * @param mixed $choice The choice to create an index for
+     * @param mixed $entity The choice to create an index for
      *
      * @return integer|string A unique index containing only ASCII letters,
      *                        digits and underscores.
@@ -333,7 +342,7 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * Otherwise a new integer is generated.
      *
-     * @param mixed $choice The choice to create a value for
+     * @param mixed $entity The choice to create a value for
      *
      * @return integer|string A unique value without character limitations.
      */
@@ -359,8 +368,7 @@ class EntityChoiceList extends ObjectChoiceList
 
         try {
             // The second parameter $labels is ignored by ObjectChoiceList
-            // The third parameter $preferredChoices is currently not supported
-            parent::initialize($entities, array(), array());
+            parent::initialize($entities, array(), $this->preferredEntities);
         } catch (StringCastException $e) {
             throw new StringCastException(str_replace('argument $labelPath', 'option "property"', $e->getMessage()), null, $e);
         }

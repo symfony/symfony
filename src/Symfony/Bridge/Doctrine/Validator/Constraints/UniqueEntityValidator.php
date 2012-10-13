@@ -47,6 +47,10 @@ class UniqueEntityValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint->fields, 'array');
         }
 
+        if (null !== $constraint->errorPath && !is_string($constraint->errorPath)) {
+            throw new UnexpectedTypeException($constraint->errorPath, 'string or null');
+        }
+
         $fields = (array) $constraint->fields;
 
         if (0 === count($fields)) {
@@ -71,7 +75,7 @@ class UniqueEntityValidator extends ConstraintValidator
 
             $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
 
-            if (null === $criteria[$fieldName]) {
+            if ($constraint->ignoreNull && null === $criteria[$fieldName]) {
                 return;
             }
 
@@ -96,7 +100,7 @@ class UniqueEntityValidator extends ConstraintValidator
         }
 
         $repository = $em->getRepository($className);
-        $result = $repository->findBy($criteria);
+        $result = $repository->{$constraint->repositoryMethod}($criteria);
 
         /* If the result is a MongoCursor, it must be advanced to the first
          * element. Rewinding should have no ill effect if $result is another
@@ -114,6 +118,8 @@ class UniqueEntityValidator extends ConstraintValidator
             return;
         }
 
-        $this->context->addViolationAtSubPath($fields[0], $constraint->message, array(), $criteria[$fields[0]]);
+        $errorPath = null !== $constraint->errorPath ? $constraint->errorPath : $fields[0];
+
+        $this->context->addViolationAtSubPath($errorPath, $constraint->message, array(), $criteria[$fields[0]]);
     }
 }

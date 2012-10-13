@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
 
 /**
  * The Router class is an example of the integration of all pieces of the
@@ -77,22 +78,20 @@ class Router implements RouterInterface
             'matcher_dumper_class'   => 'Symfony\\Component\\Routing\\Matcher\\Dumper\\PhpMatcherDumper',
             'matcher_cache_class'    => 'ProjectUrlMatcher',
             'resource_type'          => null,
-            'strict_parameters'      => true,
+            'strict_requirements'    => true,
         );
 
         // check option names and live merge, if errors are encountered Exception will be thrown
         $invalid = array();
-        $isInvalid = false;
         foreach ($options as $key => $value) {
             if (array_key_exists($key, $this->options)) {
                 $this->options[$key] = $value;
             } else {
-                $isInvalid = true;
                 $invalid[] = $key;
             }
         }
 
-        if ($isInvalid) {
+        if ($invalid) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the following options: "%s".', implode('\', \'', $invalid)));
         }
     }
@@ -244,8 +243,8 @@ class Router implements RouterInterface
             $this->generator = new $class($this->context, $this->logger);
         }
 
-        if (false === $this->options['strict_parameters']) {
-            $this->generator->setStrictParameters(false);
+        if ($this->generator instanceof ConfigurableRequirementsInterface) {
+            $this->generator->setStrictRequirements($this->options['strict_requirements']);
         }
 
         return $this->generator;

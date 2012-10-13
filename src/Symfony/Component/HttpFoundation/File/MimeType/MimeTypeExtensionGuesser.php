@@ -542,6 +542,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'application/x-pkcs7-certificates' => 'p7b',
         'application/x-pkcs7-certreqresp' => 'p7r',
         'application/x-rar-compressed' => 'rar',
+        'application/x-rar' => 'rar',
         'application/x-sh' => 'sh',
         'application/x-shar' => 'shar',
         'application/x-shockwave-flash' => 'swf',

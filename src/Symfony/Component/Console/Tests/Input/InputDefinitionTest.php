@@ -81,9 +81,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         // arguments must have different names
         try {
             $definition->addArgument($this->foo1);
-            $this->fail('->addArgument() throws a Exception if another argument is already registered with the same name');
+            $this->fail('->addArgument() throws a \LogicException if another argument is already registered with the same name');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->addArgument() throws a Exception if another argument is already registered with the same name');
+            $this->assertInstanceOf('\LogicException', $e, '->addArgument() throws a \LogicException if another argument is already registered with the same name');
             $this->assertEquals('An argument with name "foo" already exists.', $e->getMessage());
         }
 
@@ -91,9 +91,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $definition->addArgument(new InputArgument('fooarray', InputArgument::IS_ARRAY));
         try {
             $definition->addArgument(new InputArgument('anotherbar'));
-            $this->fail('->addArgument() throws a Exception if there is an array parameter already registered');
+            $this->fail('->addArgument() throws a \LogicException if there is an array parameter already registered');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->addArgument() throws a Exception if there is an array parameter already registered');
+            $this->assertInstanceOf('\LogicException', $e, '->addArgument() throws a \LogicException if there is an array parameter already registered');
             $this->assertEquals('Cannot add an argument after an array argument.', $e->getMessage());
         }
 
@@ -102,9 +102,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $definition->addArgument($this->foo);
         try {
             $definition->addArgument($this->foo2);
-            $this->fail('->addArgument() throws an exception if you try to add a required argument after an optional one');
+            $this->fail('->addArgument() throws a \LogicException if you try to add a required argument after an optional one');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->addArgument() throws an exception if you try to add a required argument after an optional one');
+            $this->assertInstanceOf('\LogicException', $e, '->addArgument() throws a \LogicException if you try to add a required argument after an optional one');
             $this->assertEquals('Cannot add a required argument after an optional one.', $e->getMessage());
         }
     }
@@ -118,9 +118,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->foo, $definition->getArgument('foo'), '->getArgument() returns a InputArgument by its name');
         try {
             $definition->getArgument('bar');
-            $this->fail('->getArgument() throws an exception if the InputArgument name does not exist');
+            $this->fail('->getArgument() throws an \InvalidArgumentException if the InputArgument name does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->getArgument() throws an exception if the InputArgument name does not exist');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getArgument() throws an \InvalidArgumentException if the InputArgument name does not exist');
             $this->assertEquals('The "bar" argument does not exist.', $e->getMessage());
         }
     }
@@ -185,7 +185,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
             $definition->getOptionForShortcut('f');
             $this->fail('->setOptions() clears all InputOption objects');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->setOptions() clears all InputOption objects');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOptions() clears all InputOption objects');
             $this->assertEquals('The "-f" option does not exist.', $e->getMessage());
         }
     }
@@ -211,16 +211,16 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => $this->foo, 'bar' => $this->bar), $definition->getOptions(), '->addOption() adds a InputOption object');
         try {
             $definition->addOption($this->foo2);
-            $this->fail('->addOption() throws a Exception if the another option is already registered with the same name');
+            $this->fail('->addOption() throws a \LogicException if the another option is already registered with the same name');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->addOption() throws a Exception if the another option is already registered with the same name');
+            $this->assertInstanceOf('\LogicException', $e, '->addOption() throws a \LogicException if the another option is already registered with the same name');
             $this->assertEquals('An option named "foo" already exists.', $e->getMessage());
         }
         try {
             $definition->addOption($this->foo1);
-            $this->fail('->addOption() throws a Exception if the another option is already registered with the same shortcut');
+            $this->fail('->addOption() throws a \LogicException if the another option is already registered with the same shortcut');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->addOption() throws a Exception if the another option is already registered with the same shortcut');
+            $this->assertInstanceOf('\LogicException', $e, '->addOption() throws a \LogicException if the another option is already registered with the same shortcut');
             $this->assertEquals('An option with shortcut "f" already exists.', $e->getMessage());
         }
     }
@@ -233,9 +233,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->foo, $definition->getOption('foo'), '->getOption() returns a InputOption by its name');
         try {
             $definition->getOption('bar');
-            $this->fail('->getOption() throws an exception if the option name does not exist');
+            $this->fail('->getOption() throws an \InvalidArgumentException if the option name does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->getOption() throws an exception if the option name does not exist');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getOption() throws an \InvalidArgumentException if the option name does not exist');
             $this->assertEquals('The "--bar" option does not exist.', $e->getMessage());
         }
     }
@@ -266,9 +266,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->foo, $definition->getOptionForShortcut('f'), '->getOptionForShortcut() returns a InputOption by its shortcut');
         try {
             $definition->getOptionForShortcut('l');
-            $this->fail('->getOption() throws an exception if the shortcut does not exist');
+            $this->fail('->getOption() throws an \InvalidArgumentException if the shortcut does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->getOption() throws an exception if the shortcut does not exist');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->getOption() throws an \InvalidArgumentException if the shortcut does not exist');
             $this->assertEquals('The "-l" option does not exist.', $e->getMessage());
         }
     }
@@ -322,11 +322,11 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $definition = new InputDefinition(array(
             new InputArgument('foo', InputArgument::OPTIONAL, 'The foo argument'),
             new InputArgument('baz', InputArgument::OPTIONAL, 'The baz argument', true),
-            new InputArgument('bar', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'The bar argument', array('bar')),
+            new InputArgument('bar', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'The bar argument', array('http://foo.com/')),
             new InputOption('foo', 'f', InputOption::VALUE_REQUIRED, 'The foo option'),
             new InputOption('baz', null, InputOption::VALUE_OPTIONAL, 'The baz option', false),
             new InputOption('bar', 'b', InputOption::VALUE_OPTIONAL, 'The bar option', 'bar'),
-            new InputOption('qux', '', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The qux option', array('foo', 'bar')),
+            new InputOption('qux', '', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The qux option', array('http://foo.com/', 'bar')),
             new InputOption('qux2', '', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The qux2 option', array('foo' => 'bar')),
         ));
         $this->assertStringEqualsFile(self::$fixtures.'/definition_astext.txt', $definition->asText(), '->asText() returns a textual representation of the InputDefinition');

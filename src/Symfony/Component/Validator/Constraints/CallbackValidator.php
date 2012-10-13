@@ -26,12 +26,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 class CallbackValidator extends ConstraintValidator
 {
     /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $object     The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @api
+     * {@inheritDoc}
      */
     public function validate($object, Constraint $constraint)
     {

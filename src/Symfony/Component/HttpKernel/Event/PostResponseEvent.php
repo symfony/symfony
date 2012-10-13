@@ -61,7 +61,7 @@ class PostResponseEvent extends Event
     }
 
     /**
-     * Returns the reponse for which this event was thrown.
+     * Returns the response for which this event was thrown.
      *
      * @return Response
      */

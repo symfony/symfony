@@ -27,6 +27,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
  * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+ *             {@link Validation::createValidatorBuilder()} instead.
  */
 interface ValidatorContextInterface
 {
@@ -34,6 +37,9 @@ interface ValidatorContextInterface
      * Sets the class metadata factory used in the new validator
      *
      * @param ClassMetadataFactoryInterface $classMetadataFactory The factory instance
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link Validation::createValidatorBuilder()} instead.
      */
     public function setClassMetadataFactory(ClassMetadataFactoryInterface $classMetadataFactory);
 
@@ -41,6 +47,9 @@ interface ValidatorContextInterface
      * Sets the constraint validator factory used in the new validator
      *
      * @param ConstraintValidatorFactoryInterface $constraintValidatorFactory The factory instance
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link Validation::createValidatorBuilder()} instead.
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $constraintValidatorFactory);
 
@@ -48,6 +57,9 @@ interface ValidatorContextInterface
      * Creates a new validator with the settings stored in this context
      *
      * @return ValidatorInterface   The new validator
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link Validation::createValidator()} instead.
      */
     public function getValidator();
 }

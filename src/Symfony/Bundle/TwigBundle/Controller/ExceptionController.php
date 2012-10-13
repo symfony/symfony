@@ -45,7 +45,7 @@ class ExceptionController extends ContainerAware
         $templating = $this->container->get('templating');
         $code = $exception->getStatusCode();
 
-        $response = $templating->renderResponse(
+        return $templating->renderResponse(
             $this->findTemplate($templating, $format, $code, $this->container->get('kernel')->isDebug()),
             array(
                 'status_code'    => $code,
@@ -55,11 +55,6 @@ class ExceptionController extends ContainerAware
                 'currentContent' => $currentContent,
             )
         );
-
-        $response->setStatusCode($code);
-        $response->headers->replace($exception->getHeaders());
-
-        return $response;
     }
 
     /**

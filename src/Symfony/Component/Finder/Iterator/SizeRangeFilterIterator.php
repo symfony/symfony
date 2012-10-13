@@ -16,7 +16,7 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SizeRangeFilterIterator extends \FilterIterator
+class SizeRangeFilterIterator extends FilterIterator
 {
     private $comparators = array();
 

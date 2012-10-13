@@ -40,7 +40,7 @@ class ChoicesToBooleanArrayTransformer implements DataTransformerInterface
      *
      * @return mixed An array
      *
-     * @throws UnexpectedTypeException if the given value is not an array
+     * @throws UnexpectedTypeException       if the given value is not an array
      * @throws TransformationFailedException if the choices can not be retrieved
      */
     public function transform($array)
@@ -79,7 +79,9 @@ class ChoicesToBooleanArrayTransformer implements DataTransformerInterface
      *
      * @return mixed An array
      *
-     * @throws UnexpectedTypeException if the given value is not an array
+     * @throws UnexpectedTypeException       if the given value is not an array
+     * @throws TransformationFailedException if the recuperation of the choices fails or
+     *                                       if some choice can't be found
      */
     public function reverseTransform($values)
     {

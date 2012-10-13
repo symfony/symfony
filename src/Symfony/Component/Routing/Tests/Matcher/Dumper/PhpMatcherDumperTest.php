@@ -50,7 +50,7 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 
         $collection = new RouteCollection();
 
-        $collection->add('overriden', new Route('/overriden'));
+        $collection->add('overridden', new Route('/overridden'));
 
         // defaults and requirements
         $collection->add('foo', new Route(
@@ -116,25 +116,25 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 
         // prefixes
         $collection1 = new RouteCollection();
-        $collection1->add('overriden', new Route('/overriden1'));
+        $collection1->add('overridden', new Route('/overridden1'));
         $collection1->add('foo1', new Route('/{foo}'));
         $collection1->add('bar1', new Route('/{bar}'));
         $collection2 = new RouteCollection();
         $collection2->addCollection($collection1, '/b\'b');
-        $collection2->add('overriden', new Route('/{var}', array(), array('var' => '.*')));
+        $collection2->add('overridden', new Route('/{var}', array(), array('var' => '.*')));
         $collection1 = new RouteCollection();
         $collection1->add('foo2', new Route('/{foo1}'));
         $collection1->add('bar2', new Route('/{bar1}'));
         $collection2->addCollection($collection1, '/b\'b');
         $collection->addCollection($collection2, '/a');
 
-        // overriden through addCollection() and multiple sub-collections with no own prefix
+        // overridden through addCollection() and multiple sub-collections with no own prefix
         $collection1 = new RouteCollection();
-        $collection1->add('overriden2', new Route('/old'));
+        $collection1->add('overridden2', new Route('/old'));
         $collection1->add('helloWorld', new Route('/hello/{who}', array('who' => 'World!')));
         $collection2 = new RouteCollection();
         $collection3 = new RouteCollection();
-        $collection3->add('overriden2', new Route('/new'));
+        $collection3->add('overridden2', new Route('/new'));
         $collection3->add('hey', new Route('/hey/'));
         $collection1->addCollection($collection2);
         $collection2->addCollection($collection3);

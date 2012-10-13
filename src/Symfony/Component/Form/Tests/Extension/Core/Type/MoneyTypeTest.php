@@ -20,7 +20,7 @@ class MoneyTypeTest extends LocalizedTestCase
         $form = $this->factory->create('money');
         $view = $form->createView();
 
-        $this->assertSame('{{ widget }} €', $view->getVar('money_pattern'));
+        $this->assertSame('{{ widget }} €', $view->vars['money_pattern']);
     }
 
     public function testMoneyPatternWorksForYen()
@@ -29,6 +29,6 @@ class MoneyTypeTest extends LocalizedTestCase
 
         $form = $this->factory->create('money', null, array('currency' => 'JPY'));
         $view = $form->createView();
-        $this->assertTrue((Boolean) strstr($view->getVar('money_pattern'), '¥'));
+        $this->assertTrue((Boolean) strstr($view->vars['money_pattern'], '¥'));
     }
 }

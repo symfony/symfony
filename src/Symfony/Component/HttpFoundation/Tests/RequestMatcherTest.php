@@ -62,6 +62,9 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
         return array(
             array(true, '2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'),
             array(false, '2a00:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'),
+            array(false, '2a01:198:603:0:396e:4789:8e99:890f', '::1'),
+            array(true, '0:0:0:0:0:0:0:1', '::1'),
+            array(false, '0:0:603:0:396e:4789:8e99:0001', '::1'),
         );
     }
 

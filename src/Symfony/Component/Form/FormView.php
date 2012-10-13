@@ -14,18 +14,28 @@ namespace Symfony\Component\Form;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormView implements \IteratorAggregate, FormViewInterface
+class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
-    private $name;
-
-    private $vars = array(
+    /**
+     * The variables assigned to this view.
+     * @var array
+     */
+    public $vars = array(
         'value' => null,
         'attr'  => array(),
     );
 
-    private $parent;
+    /**
+     * The parent view.
+     * @var FormView
+     */
+    public $parent;
 
-    private $children = array();
+    /**
+     * The child views.
+     * @var array
+     */
+    public $children = array();
 
     /**
      * Is the form attached to this renderer rendered?
@@ -38,23 +48,35 @@ class FormView implements \IteratorAggregate, FormViewInterface
      */
     private $rendered = false;
 
-    public function __construct($name)
+    public function __construct(FormView $parent = null)
     {
-        $this->name = $name;
+        $this->parent = $parent;
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the name of the form.
+     *
+     * @return string The form name.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead which contains an
+     *             entry named "name".
      */
     public function getName()
     {
-        return $this->name;
+        return $this->vars['name'];
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return FormView The current view
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
      */
-    public function setVar($name, $value)
+    public function set($name, $value)
     {
         $this->vars[$name] = $value;
 
@@ -62,19 +84,30 @@ class FormView implements \IteratorAggregate, FormViewInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param $name
+     *
+     * @return Boolean
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
      */
-    public function hasVar($name)
+    public function has($name)
     {
         return array_key_exists($name, $this->vars);
     }
 
     /**
-     * {@inheritdoc}
+     * @param $name
+     * @param $default
+     *
+     * @return mixed
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
      */
-    public function getVar($name, $default = null)
+    public function get($name, $default = null)
     {
-        if (false === $this->hasVar($name)) {
+        if (false === $this->has($name)) {
             return $default;
         }
 
@@ -82,17 +115,23 @@ class FormView implements \IteratorAggregate, FormViewInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
      */
-    public function addVars(array $vars)
+    public function all()
     {
-        $this->vars = array_replace($this->vars, $vars);
-
-        return $this;
+        return $this->vars;
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the values of all view variables.
+     *
+     * @return array The values of all variables.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead.
      */
     public function getVars()
     {
@@ -106,6 +145,10 @@ class FormView implements \IteratorAggregate, FormViewInterface
      * @param string $value The value
      *
      * @return FormView The current view
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link vars} instead which contains an
+     *             entry named "attr".
      */
     public function setAttribute($name, $value)
     {
@@ -115,7 +158,9 @@ class FormView implements \IteratorAggregate, FormViewInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns whether the view was already rendered.
+     *
+     * @return Boolean Whether this view's widget is rendered.
      */
     public function isRendered()
     {
@@ -139,7 +184,9 @@ class FormView implements \IteratorAggregate, FormViewInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Marks the view as rendered.
+     *
+     * @return FormView The view object.
      */
     public function setRendered()
     {
@@ -149,9 +196,16 @@ class FormView implements \IteratorAggregate, FormViewInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the parent view.
+     *
+     * @param FormView $parent The parent view.
+     *
+     * @return FormView The view object.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link parent} instead.
      */
-    public function setParent(FormViewInterface $parent = null)
+    public function setParent(FormView $parent = null)
     {
         $this->parent = $parent;
 
@@ -159,7 +213,12 @@ class FormView implements \IteratorAggregate, FormViewInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the parent view.
+     *
+     * @return FormView The parent view.
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link parent} instead.
      */
     public function getParent()
     {
@@ -167,7 +226,12 @@ class FormView implements \IteratorAggregate, FormViewInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns whether this view has a parent.
+     *
+     * @return Boolean Whether this view has a parent
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link parent} instead.
      */
     public function hasParent()
     {
@@ -175,42 +239,47 @@ class FormView implements \IteratorAggregate, FormViewInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the children view.
+     *
+     * @param array $children The children as instances of FormView
+     *
+     * @return FormView The current view
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link children} instead.
      */
-    public function add(FormViewInterface $child)
+    public function setChildren(array $children)
     {
-        $this->children[$child->getName()] = $child;
+        $this->children = $children;
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the children.
+     *
+     * @return array The children as instances of FormView
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link children} instead.
      */
-    public function remove($name)
-    {
-        unset($this->children[$name]);
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function all()
+    public function getChildren()
     {
         return $this->children;
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a given child.
+     *
+     * @param string $name The name of the child
+     *
+     * @return FormView The child view
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Access
+     *             the public property {@link children} instead.
      */
-    public function get($name)
+    public function getChild($name)
     {
-        if (!isset($this->children[$name])) {
-            throw new \InvalidArgumentException(sprintf('Child "%s" does not exist.', $name));
-        }
-
         return $this->children[$name];
     }
 
@@ -228,14 +297,6 @@ class FormView implements \IteratorAggregate, FormViewInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function has($name)
-    {
-        return isset($this->children[$name]);
-    }
-
-    /**
      * Returns a child by name (implements \ArrayAccess).
      *
      * @param string $name The child name
@@ -244,7 +305,7 @@ class FormView implements \IteratorAggregate, FormViewInterface
      */
     public function offsetGet($name)
     {
-        return $this->get($name);
+        return $this->children[$name];
     }
 
     /**

@@ -65,6 +65,6 @@ class ModelType extends AbstractType
 
     public function getName()
     {
-        return 'propel_model';
+        return 'model';
     }
 }

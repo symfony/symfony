@@ -72,7 +72,7 @@ abstract class FileLoader extends Loader
             }
             self::$loading[$resource] = true;
 
-            $ret = $loader->load($resource);
+            $ret = $loader->load($resource, $type);
 
             unset(self::$loading[$resource]);
 

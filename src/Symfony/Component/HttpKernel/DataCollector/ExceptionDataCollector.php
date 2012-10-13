@@ -29,13 +29,8 @@ class ExceptionDataCollector extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         if (null !== $exception) {
-            $flattenException = FlattenException::create($exception);
-            if ($exception instanceof HttpExceptionInterface) {
-                $flattenException->setStatusCode($exception->getStatusCode());
-            }
-
             $this->data = array(
-                'exception' => $flattenException,
+                'exception' => FlattenException::create($exception),
             );
         }
     }

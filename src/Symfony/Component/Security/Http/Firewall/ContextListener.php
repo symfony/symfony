@@ -75,19 +75,26 @@ class ContextListener implements ListenerInterface
 
         if (null === $session || null === $token = $session->get('_security_'.$this->contextKey)) {
             $this->context->setToken(null);
-        } else {
-            if (null !== $this->logger) {
-                $this->logger->debug('Read SecurityContext from the session');
-            }
-
-            $token = unserialize($token);
-
-            if (null !== $token) {
-                $token = $this->refreshUser($token);
-            }
-
-            $this->context->setToken($token);
+            return;
         }
+
+        $token = unserialize($token);
+
+        if (null !== $this->logger) {
+            $this->logger->debug('Read SecurityContext from the session');
+        }
+
+        if ($token instanceof TokenInterface) {
+            $token = $this->refreshUser($token);
+        } elseif (null !== $token) {
+            if (null !== $this->logger) {
+                $this->logger->warn(sprintf('Session includes a "%s" where a security token is expected', is_object($token) ? get_class($token) : gettype($token)));
+            }
+
+            $token = null;
+        }
+
+        $this->context->setToken($token);
     }
 
     /**

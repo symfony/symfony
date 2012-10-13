@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderInterface
+class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormBuilderInterface
 {
     /**
      * The form factory.
@@ -44,7 +44,8 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
     private $unresolvedChildren = array();
 
     /**
-     * The parent of this builder
+     * The parent of this builder.
+     *
      * @var FormBuilder
      */
     private $parent;
@@ -56,6 +57,7 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
      * @param string                   $dataClass
      * @param EventDispatcherInterface $dispatcher
      * @param FormFactoryInterface     $factory
+     * @param array                    $options
      */
     public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory, array $options = array())
     {
@@ -77,6 +79,10 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
      */
     public function add($child, $type = null, array $options = array())
     {
+        if ($this->locked) {
+            throw new FormException('The form builder cannot be modified anymore.');
+        }
+
         if ($child instanceof self) {
             $child->setParent($this);
             $this->children[$child->getName()] = $child;
@@ -110,15 +116,19 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
      */
     public function create($name, $type = null, array $options = array())
     {
+        if ($this->locked) {
+            throw new FormException('The form builder cannot be modified anymore.');
+        }
+
         if (null === $type && null === $this->getDataClass()) {
             $type = 'text';
         }
 
         if (null !== $type) {
-            return $this->getFormFactory()->createNamedBuilder($name, $type, null, $options, $this);
+            return $this->factory->createNamedBuilder($name, $type, null, $options, $this);
         }
 
-        return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, null, $options, $this);
+        return $this->factory->createBuilderForProperty($this->getDataClass(), $name, null, $options, $this);
     }
 
     /**
@@ -142,6 +152,10 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
      */
     public function remove($name)
     {
+        if ($this->locked) {
+            throw new FormException('The form builder cannot be modified anymore.');
+        }
+
         unset($this->unresolvedChildren[$name]);
 
         if (array_key_exists($name, $this->children)) {
@@ -195,7 +209,7 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
     {
         $this->resolveChildren();
 
-        $form = new Form($this);
+        $form = new Form($this->getFormConfig());
 
         foreach ($this->children as $child) {
             $form->add($child->getForm());
@@ -217,6 +231,10 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
      */
     public function setParent(FormBuilderInterface $parent = null)
     {
+        if ($this->locked) {
+            throw new FormException('The form builder cannot be modified anymore.');
+        }
+
         $this->parent = $parent;
 
         return $this;
@@ -265,5 +283,24 @@ class FormBuilder extends FormConfig implements \IteratorAggregate, FormBuilderI
     public function getIterator()
     {
         return new \ArrayIterator($this->children);
+    }
+
+    /**
+     * Returns the types used by this builder.
+     *
+     * @return array An array of FormTypeInterface
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link FormConfigInterface::getType()} instead.
+     */
+    public function getTypes()
+    {
+        $types = array();
+
+        for ($type = $this->getType(); null !== $type; $type = $type->getParent()) {
+            array_unshift($types, $type->getInnerType());
+        }
+
+        return $types;
     }
 }

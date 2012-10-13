@@ -160,8 +160,9 @@ class StubNumberFormatterTest extends LocaleTestCase
      */
     public function testFormatCurrencyWithCurrencyStyleCostaRicanColonsRoundingStub($value, $currency, $symbol, $expected)
     {
+        $this->skipIfICUDataVersionNotDefined();
         $formatter = $this->getStubFormatterWithCurrencyStyle();
-        $this->assertEquals(sprintf($expected, '₡'), $formatter->formatCurrency($value, $currency));
+        $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
 
     /**
@@ -177,7 +178,7 @@ class StubNumberFormatterTest extends LocaleTestCase
 
     public function formatCurrencyWithCurrencyStyleCostaRicanColonsRoundingProvider()
     {
-        $crc = $this->isIntlExtensionLoaded() && $this->isSameAsIcuVersion('4.8') ? 'CRC' : '₡';
+        $crc = $this->isIntlExtensionLoaded() && $this->isGreaterOrEqualThanIcuVersion('4.8') ? 'CRC' : '₡';
 
         return array(
             array(100, 'CRC', $crc, '%s100'),
@@ -191,8 +192,9 @@ class StubNumberFormatterTest extends LocaleTestCase
      */
     public function testFormatCurrencyWithCurrencyStyleBrazilianRealRoundingStub($value, $currency, $symbol, $expected)
     {
+        $this->skipIfICUDataVersionNotDefined();
         $formatter = $this->getStubFormatterWithCurrencyStyle();
-        $this->assertEquals(sprintf($expected, 'R'), $formatter->formatCurrency($value, $currency));
+        $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
 
     /**
@@ -231,8 +233,9 @@ class StubNumberFormatterTest extends LocaleTestCase
      */
     public function testFormatCurrencyWithCurrencyStyleSwissRoundingStub($value, $currency, $symbol, $expected)
     {
+        $this->skipIfICUDataVersionNotDefined();
         $formatter = $this->getStubFormatterWithCurrencyStyle();
-        $this->assertEquals(sprintf($expected, 'CHF'), $formatter->formatCurrency($value, $currency));
+        $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
 
     /**
@@ -1191,5 +1194,12 @@ class StubNumberFormatterTest extends LocaleTestCase
         $formatter->setSymbol(\NumberFormatter::CURRENCY_SYMBOL, 'SFD');
 
         return $formatter;
+    }
+
+    protected function skipIfICUDataVersionNotDefined()
+    {
+        if (!getenv('USE_INTL_ICU_DATA_VERSION')) {
+            $this->markTestSkipped('Please set environment variable USE_INTL_ICU_DATA_VERSION.');
+        }
     }
 }

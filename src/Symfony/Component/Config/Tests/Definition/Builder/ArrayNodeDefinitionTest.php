@@ -69,7 +69,7 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
      */
-    public function testPrototypeNodesCantHaveADefaultValueWhenUsingDefaulChildren()
+    public function testPrototypeNodesCantHaveADefaultValueWhenUsingDefaultChildren()
     {
         $node = new ArrayNodeDefinition('root');
         $node

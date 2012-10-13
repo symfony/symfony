@@ -7,6 +7,63 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.17 (2012-08-28)
+
+ * 5bf4f92: fixed XML decoding attack vector through external entities
+ * 4e0c992: prevents injection of malicious doc types
+ * 47fe725: disabled network access when loading XML documents
+ * c896d71: refined previous commit
+ * a2a6cdc: prevents injection of malicious doc types
+ * 865461d: standardized the way we handle XML errors
+ * 352e8f5: Redirects are now absolute
+ * 9a355e9: [HttpKernel] excluded a test on PHP 5.3.16, which is buggy (PHP, not Symfony ;))
+ * f694615: [Process] fix ProcessTest::testProcessPipes hangs on Windows on branch 2.0
+ * 9beffff: [HttpKernel] KernelTest::testGetRootDir fails on Windows for branch 2.0
+ * e49afde: Update monolog compatibility
+ * 832f8dd: Add support for Monolog 1.2.0
+ * c51fc10: avoid fatal error on invalid session
+ * 1a4a4ee: [DependencyInjection] Fixed a frozen constructor of a container with no parameters
+ * b3cf36a: [Config] Missing type argument passed to loader.
+ * 55a0b34: Fixes incorrect class used in src/Symfony/Bundle/FrameworkBundle/Console/Application.php
+ * a0709fc: [DoctrineBridge] Fix log of non utf8 data
+ * 0b78fdf: Only call registerCommand on bundles that is an instance of Bundle
+ * 9e28593: fixed error on oracle db related to clob data.
+ * 9f4178b: [Validator] Fixed: StaticMethodLoader does not try to invoke methods of interfaces anymore
+ * 2a3235a: [Validator] Fixed group sequence support in the XML and YAML drivers
+ * 4f93d1a: [Console] Use proc_open instead of exec to suppress errors when run on windows and stty is not present
+ * 16a980b: [Validator] Fix bug order for constraint, property, getter and group-sequence-provider in validation.xml
+ * ed8823c: [HttpFoundation] Allow setting an unknown status code without specifying a text
+ * e9d799c: [Routing] fixed ApacheUrlMatcher and ApachMatcherDumper classes that did not take care of default parameters in urls.
+
+* 2.0.16 (2012-07-11)
+
+ * 854daa8: [Form] Fixed errors not to be added onto non-synchronized forms
+ * facbcdc: [Validator] fixed error message for dates like 2012-02-31 (closes #4223)
+ * 28f002d: [Locale] fixed bug on the parsing of TYPE_INT64 integers in 32 bit and 64 bit environments, caused by PHP bug fix :) (closes #4718)
+ * c1fea1d: fixed incorrect reference to set*Service() method
+ * b89b00f: bumped minimal version of Swiftmailer to 4.2.0
+ * 997bcfc: [SwiftmailerBridge] allowed versions 4.2.*
+ * 680b83c: [Security] Allow "0" as a password
+ * a609d55: [Locale] fixed StubIntlDateFormatter to behave like the ext/intl implementation
+ * 3ce8227: [Security] Only redirect to urls called with http method GET
+ * ba16a51: changed getName() to name on all Reflection* object calls (fixes #4555, refs https://bugs.php.net/bug.php?id=61384)
+ * 5d88255: Authorization header should only be rebuild when Basic Auth scheme is used
+ * 789fc14: Accept calling setLenient(false)
+ * b631073: [Yaml] Fixed double quotes escaping in Dumper.
+
+* 2.0.15 (2012-05-30)
+
+ * 20b556d: [Form] fixed a bug that caused input date validation not to be strict when using the single_text widget with a datetime field
+ * 7e3213c: [Form] fixed a bug that caused input date validation not to be strict when using the single_text widget with a date field
+ * 35b458f: fix kernel root, linux dir separator on windows, to fix cache:clear issue
+ * 8da880c: Fixed notice in AddCacheWarmerPass if there is no cache warmer defined.
+ * 7a85b43: [TwigBundle] Fixed the path to templates when using composer
+ * 8223632: [HttpFoundation] Fix the UploadedFilename name sanitization (fix #2577)
+ * f883953: TypeGuess fixed for Date/Time constraints
+ * 41bed29: [Form] fixed invalid 'type' option in ValidatorTypeGuesser for Date/TimeFields
+ * fff7221: Fixed the proxy autoloading for Doctrine 2.2
+ * a450d00: [HttpFoundation] HTTP Basic authentication is broken with PHP as cgi/fastCGI under Apache
+
 * 2.0.14 (2012-05-17)
 
  * d1c831d: Change must-proxy-revalidate by proxy-revalidate
@@ -204,7 +261,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * 89cd64a: Set error code when number cannot be parsed. Fixes #2389
  * c9d05d7: Let NumberFormatter handle integer type casting
 
-
 * 2.0.5 (2011-11-02)
 
  * c5e2def: Fix ternary operator usage in RequestMatcher::checkIpv6()
@@ -305,37 +361,37 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 * 2.0.1 (2011-08-26)
 
-   * 1c7694f: [HttpFoundation] added a missing exception
-   * 84c1719: [FrameworkBundle] Avoid listener key conflicts in ContainerAwareEventDispatcher
-   * 536538f: [DoctrineBundle] removed an unused and confusing parameter (the connection class can be changed via the wrapper_class setting of a connection)
-   * d7f0789: [FrameworkBundle] fixed duplicated RequestContext instances
-   * 89f477e: [WebProfilerBundle] Throw exception if a collector template isn't found
-   * 6ca72cf: [WebProfilerBundle] Allow .html.twig in collector template names
-   * 39fabab: [EventDispatcher] Fix removeSubscriber() to work with priority syntax
-   * 3380f2a: [DomCrawler] fixed disabled fields in forms (they are available in the DOM, but their values are not submitted -- whereas before, they were simply removed from the DOM)
-   * 2b1bb2c: [Form] added missing DelegatingValidator registration in the Form Extension class (used when using the Form component outside a Symfony2 project where the validation.xml is used instead)
-   * fdd2e7a: [Form] Fixing a bug where setting empty_value to false caused a variable to not be found
-   * bc7edfe: [FrameworkBundle] changed resource filename of Japanese validator translation
-   * c29fa9d: [Form] Fix for treatment zero as empty data. Closes #1986
-   * 6e7c375: [FrameworkBundle] Cleanup schema file
-   * b6ee1a6: fixes a bug when overriding method via the X-HTTP-METHOD-OVERRIDE header
-   * 80d1718: [Fix] Email() constraints now guess as 'email' field type
-   * 3a64b08: Search in others user providers when a user is not found in the first user provider and throws the right exception.
-   * 805a267: Remove Content-Length header adding for now. Fixes #1846.
-   * ae55a98: Added $format in serialize() method, to keep consistence and give a hint to the normalizer.
-   * 7ec533e: got an if-condition out of unnecessary loops in Symfony\Component\ClassLoader\UniversalClassLoader
-   * 34a1b53: [HttpFoundation] Do not save session in Session::__destroy() when saved already
-   * 81fb8e1: [DomCrawler] fix finding charset in addContent
-   * 4f9d229: The trace argument value could be string ("*DEEP NESTED ARRAY*")
-   * be031f5: [HttpKernel] fixed ControllerResolver when the controller is a class name with an __invoke() method
-   * 275da0d: [Validator] changed 'self' to 'static' for child class to override pattern constant
-   * e78bc32: Fixed: Notice: Undefined index: enable_annotations in ...
-   * 86f888f: fix https default port check
-   * 8a980bd: $node->hasAttribute('disabled') sf2 should not create disagreement between implementation and practice for a crawler. If sahi real browser can find an element that is disabled, then sf2 should too. https://github.com/Behat/Mink/pull/58#issuecomment-1712459
-   * 1087792: -- fix use of STDIN
-   * ee5b9ce: [SwiftmailerBundle] Allow non-file spools
-   * d880db2: [Form] Test covered fix for invalid date (13 month/31.02.2011 etc.) send to transformer. Closes #1755
-   * df74f49: Patched src/Symfony/Component/Form/Extension/Core/DataTransformer/DateTimeToArrayTransformer.php to throw an exception when an invalid date is passed for transformation (e.g. 31st February)
-   * 8519967: Calling supportsClass from vote to find out if we can vote
+ * 1c7694f: [HttpFoundation] added a missing exception
+ * 84c1719: [FrameworkBundle] Avoid listener key conflicts in ContainerAwareEventDispatcher
+ * 536538f: [DoctrineBundle] removed an unused and confusing parameter (the connection class can be changed via the wrapper_class setting of a connection)
+ * d7f0789: [FrameworkBundle] fixed duplicated RequestContext instances
+ * 89f477e: [WebProfilerBundle] Throw exception if a collector template isn't found
+ * 6ca72cf: [WebProfilerBundle] Allow .html.twig in collector template names
+ * 39fabab: [EventDispatcher] Fix removeSubscriber() to work with priority syntax
+ * 3380f2a: [DomCrawler] fixed disabled fields in forms (they are available in the DOM, but their values are not submitted -- whereas before, they were simply removed from the DOM)
+ * 2b1bb2c: [Form] added missing DelegatingValidator registration in the Form Extension class (used when using the Form component outside a Symfony2 project where the validation.xml is used instead)
+ * fdd2e7a: [Form] Fixing a bug where setting empty_value to false caused a variable to not be found
+ * bc7edfe: [FrameworkBundle] changed resource filename of Japanese validator translation
+ * c29fa9d: [Form] Fix for treatment zero as empty data. Closes #1986
+ * 6e7c375: [FrameworkBundle] Cleanup schema file
+ * b6ee1a6: fixes a bug when overriding method via the X-HTTP-METHOD-OVERRIDE header
+ * 80d1718: [Fix] Email() constraints now guess as 'email' field type
+ * 3a64b08: Search in others user providers when a user is not found in the first user provider and throws the right exception.
+ * 805a267: Remove Content-Length header adding for now. Fixes #1846.
+ * ae55a98: Added $format in serialize() method, to keep consistence and give a hint to the normalizer.
+ * 7ec533e: got an if-condition out of unnecessary loops in Symfony\Component\ClassLoader\UniversalClassLoader
+ * 34a1b53: [HttpFoundation] Do not save session in Session::__destroy() when saved already
+ * 81fb8e1: [DomCrawler] fix finding charset in addContent
+ * 4f9d229: The trace argument value could be string ("*DEEP NESTED ARRAY*")
+ * be031f5: [HttpKernel] fixed ControllerResolver when the controller is a class name with an __invoke() method
+ * 275da0d: [Validator] changed 'self' to 'static' for child class to override pattern constant
+ * e78bc32: Fixed: Notice: Undefined index: enable_annotations in ...
+ * 86f888f: fix https default port check
+ * 8a980bd: $node->hasAttribute('disabled') sf2 should not create disagreement between implementation and practice for a crawler. If sahi real browser can find an element that is disabled, then sf2 should too. https://github.com/Behat/Mink/pull/58#issuecomment-1712459
+ * 1087792: -- fix use of STDIN
+ * ee5b9ce: [SwiftmailerBundle] Allow non-file spools
+ * d880db2: [Form] Test covered fix for invalid date (13 month/31.02.2011 etc.) send to transformer. Closes #1755
+ * df74f49: Patched src/Symfony/Component/Form/Extension/Core/DataTransformer/DateTimeToArrayTransformer.php to throw an exception when an invalid date is passed for transformation (e.g. 31st February)
+ * 8519967: Calling supportsClass from vote to find out if we can vote
 
 * 2.0.0 (2011-07-28)

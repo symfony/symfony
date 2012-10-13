@@ -51,6 +51,27 @@ class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_Te
         $this->assertEquals(array('foo', 'bar'), $calls[1][1][0]);
     }
 
+    public function testProcessEventListenersWithMultipleConnections()
+    {
+        $container = $this->createBuilder(true);
+
+        $container
+            ->register('a', 'stdClass')
+            ->addTag('doctrine.event_listener', array(
+                'event' => 'onFlush',
+            ))
+        ;
+        $this->process($container);
+
+        $callsDefault = $container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls();
+
+        $this->assertEquals('addEventListener', $callsDefault[0][0]);
+        $this->assertEquals(array('onFlush'), $callsDefault[0][1][0]);
+
+        $callsSecond = $container->getDefinition('doctrine.dbal.second_connection.event_manager')->getMethodCalls();
+        $this->assertEquals($callsDefault, $callsSecond);
+    }
+
     public function testProcessEventSubscribersWithPriorities()
     {
         $container = $this->createBuilder();
@@ -114,12 +135,22 @@ class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_Te
         return $order;
     }
 
-    private function createBuilder()
+    private function createBuilder($multipleConnections = false)
     {
         $container = new ContainerBuilder();
+
+        $connections = array('default' => 'doctrine.dbal.default_connection');
+
         $container->register('doctrine.dbal.default_connection.event_manager', 'stdClass');
         $container->register('doctrine.dbal.default_connection', 'stdClass');
-        $container->setParameter('doctrine.connections', array('default' => 'doctrine.dbal.default_connection'));
+
+        if ($multipleConnections) {
+            $container->register('doctrine.dbal.second_connection.event_manager', 'stdClass');
+            $container->register('doctrine.dbal.second_connection', 'stdClass');
+            $connections['second'] = 'doctrine.dbal.second_connection';
+        }
+
+        $container->setParameter('doctrine.connections', $connections);
 
         return $container;
     }

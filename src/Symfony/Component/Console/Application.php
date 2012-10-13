@@ -27,6 +27,7 @@ use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Helper\ProgressHelper;
 
 /**
  * An Application is the container for a collection of commands.
@@ -496,7 +497,12 @@ class Application
                 }
 
                 if ($alternatives = $this->findAlternativeNamespace($part, $abbrevs)) {
-                    $message .= "\n\nDid you mean one of these?\n    ";
+                    if (1 == count($alternatives)) {
+                        $message .= "\n\nDid you mean this?\n    ";
+                    } else {
+                        $message .= "\n\nDid you mean one of these?\n    ";
+                    }
+
                     $message .= implode("\n    ", $alternatives);
                 }
 
@@ -571,7 +577,11 @@ class Application
             $message = sprintf('Command "%s" is not defined.', $name);
 
             if ($alternatives = $this->findAlternativeCommands($searchName, $abbrevs)) {
-                $message .= "\n\nDid you mean one of these?\n    ";
+                if (1 == count($alternatives)) {
+                    $message .= "\n\nDid you mean this?\n    ";
+                } else {
+                    $message .= "\n\nDid you mean one of these?\n    ";
+                }
                 $message .= implode("\n    ", $alternatives);
             }
 
@@ -925,6 +935,7 @@ class Application
         return new HelperSet(array(
             new FormatterHelper(),
             new DialogHelper(),
+            new ProgressHelper(),
         ));
     }
 
@@ -1041,7 +1052,7 @@ class Application
      * if nothing is found in $collection, try in $abbrevs
      *
      * @param string               $name       The string
-     * @param array|Traversable    $collection The collecion
+     * @param array|Traversable    $collection The collection
      * @param array                $abbrevs    The abbreviations
      * @param Closure|string|array $callback   The callable to transform collection item before comparison
      *

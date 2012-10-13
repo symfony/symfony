@@ -116,7 +116,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             ->getForm()
             ->createView();
 
-        // Render field2 row -> does not implicitely call renderWidget because
+        // Render field2 row -> does not implicitly call renderWidget because
         // it is a repeated field!
         $this->renderRow($view['field2']);
 
@@ -338,6 +338,27 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             ]
     ]
     [count(.//input)=3]
+'
+        );
+    }
+
+    /**
+     * The block "_name_child_label" should be overridden in the theme of the
+     * implemented driver.
+     */
+    public function testCollectionRowWithCustomBlock()
+    {
+        $collection = array('one', 'two', 'three');
+        $form = $this->factory->createNamedBuilder('name', 'collection', $collection)
+            ->getForm();
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/table
+    [
+        ./tr[./td/label[.="Custom label: [trans]0[/trans]"]]
+        /following-sibling::tr[./td/label[.="Custom label: [trans]1[/trans]"]]
+        /following-sibling::tr[./td/label[.="Custom label: [trans]2[/trans]"]]
+    ]
 '
         );
     }

@@ -157,7 +157,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
     {
         $key = strtr(strtolower($key), '_', '-');
 
-        $values = (array) $values;
+        $values = array_values((array) $values);
 
         if (true === $replace || !isset($this->headers[$key])) {
             $this->headers[$key] = $values;
@@ -223,7 +223,9 @@ class HeaderBag implements \IteratorAggregate, \Countable
      * @param string    $key     The parameter key
      * @param \DateTime $default The default value
      *
-     * @return \DateTime The filtered value
+     * @return null|\DateTime The filtered value
+     *
+     * @throws \RuntimeException When the HTTP header is not parseable
      *
      * @api
      */

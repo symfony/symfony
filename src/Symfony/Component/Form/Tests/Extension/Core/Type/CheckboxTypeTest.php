@@ -20,7 +20,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form = $this->factory->create('checkbox', null, array('value' => 'foobar'));
         $view = $form->createView();
 
-        $this->assertEquals('foobar', $view->getVar('value'));
+        $this->assertEquals('foobar', $view->vars['value']);
     }
 
     public function testCheckedIfDataTrue()
@@ -29,7 +29,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->setData(true);
         $view = $form->createView();
 
-        $this->assertTrue($view->getVar('checked'));
+        $this->assertTrue($view->vars['checked']);
     }
 
     public function testCheckedIfDataTrueWithEmptyValue()
@@ -38,7 +38,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->setData(true);
         $view = $form->createView();
 
-        $this->assertTrue($view->getVar('checked'));
+        $this->assertTrue($view->vars['checked']);
     }
 
     public function testNotCheckedIfDataFalse()
@@ -47,7 +47,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->setData(false);
         $view = $form->createView();
 
-        $this->assertFalse($view->getVar('checked'));
+        $this->assertFalse($view->vars['checked']);
     }
 
     public function testBindWithValueChecked()
@@ -127,7 +127,7 @@ class CheckboxTypeTest extends TypeTestCase
         $form->setData($data);
         $view = $form->createView();
 
-        $this->assertEquals($expected, $view->getVar('checked'));
+        $this->assertEquals($expected, $view->vars['checked']);
     }
 
     public function provideTransformedData()

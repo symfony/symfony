@@ -12,11 +12,12 @@
 namespace Symfony\Bridge\Doctrine\Form;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\MappingException;
+use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
-use Doctrine\ORM\Mapping\MappingException;
 
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
@@ -145,6 +146,8 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
                 return $this->cache[$class] = array($em->getClassMetadata($class), $name);
             } catch (MappingException $e) {
                 // not an entity or mapped super class
+            } catch (LegacyMappingException $e) {
+                // not an entity or mapped super class, using Doctrine ORM 2.2
             }
         }
     }

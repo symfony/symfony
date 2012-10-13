@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-use Symfony\Component\Form\FormConfig;
+use Symfony\Component\Form\FormConfigBuilder;
 
 class FormConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,7 +64,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         try {
-            new FormConfig($name, null, $dispatcher);
+            new FormConfigBuilder($name, null, $dispatcher);
             if (!$accepted) {
                 $this->fail(sprintf('The value "%s" should not be accepted', $name));
             }

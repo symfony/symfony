@@ -22,6 +22,7 @@ final class User implements AdvancedUserInterface
 {
     private $username;
     private $password;
+    private $enabled;
     private $accountNonExpired;
     private $credentialsNonExpired;
     private $accountNonLocked;

@@ -54,17 +54,19 @@ class OptionsResolver implements OptionsResolverInterface
     private $allowedTypes = array();
 
     /**
-     * A list of filters transforming each resolved options.
-     * @var array
-     */
-    private $filters = array();
-
-    /**
      * Creates a new instance.
      */
     public function __construct()
     {
         $this->defaultOptions = new Options();
+    }
+
+    /**
+     * Clones the resolver.
+     */
+    public function __clone()
+    {
+        $this->defaultOptions = clone $this->defaultOptions;
     }
 
     /**
@@ -182,11 +184,13 @@ class OptionsResolver implements OptionsResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function setFilters(array $filters)
+    public function setNormalizers(array $normalizers)
     {
-        $this->validateOptionsExistence($filters);
+        $this->validateOptionsExistence($normalizers);
 
-        $this->filters = array_replace($this->filters, $filters);
+        foreach ($normalizers as $option => $normalizer) {
+            $this->defaultOptions->setNormalizer($option, $normalizer);
+        }
 
         return $this;
     }
@@ -210,7 +214,7 @@ class OptionsResolver implements OptionsResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(array $options)
+    public function resolve(array $options = array())
     {
         $this->validateOptionsExistence($options);
         $this->validateOptionsCompleteness($options);
@@ -221,11 +225,6 @@ class OptionsResolver implements OptionsResolverInterface
         // Override options set by the user
         foreach ($options as $option => $value) {
             $combinedOptions->set($option, $value);
-        }
-
-        // Apply filters
-        foreach ($this->filters as $option => $filter) {
-            $combinedOptions->overload($option, $filter);
         }
 
         // Resolve options
@@ -295,7 +294,7 @@ class OptionsResolver implements OptionsResolverInterface
     private function validateOptionValues(array $options)
     {
         foreach ($this->allowedValues as $option => $allowedValues) {
-            if (!in_array($options[$option], $allowedValues, true)) {
+            if (isset($options[$option]) && !in_array($options[$option], $allowedValues, true)) {
                 throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $allowedValues)));
             }
         }
@@ -313,6 +312,10 @@ class OptionsResolver implements OptionsResolverInterface
     private function validateOptionTypes(array $options)
     {
         foreach ($this->allowedTypes as $option => $allowedTypes) {
+            if (!array_key_exists($option, $options)) {
+                continue;
+            }
+
             $value = $options[$option];
             $allowedTypes = (array) $allowedTypes;
 

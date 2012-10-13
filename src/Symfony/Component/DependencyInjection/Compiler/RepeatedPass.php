@@ -28,7 +28,8 @@ class RepeatedPass implements CompilerPassInterface
      * Constructor.
      *
      * @param array $passes An array of RepeatablePassInterface objects
-     * @throws InvalidArgumentException if a pass is not a RepeatablePassInterface instance
+     *
+     * @throws InvalidArgumentException when the passes don't implement RepeatablePassInterface
      */
     public function __construct(array $passes)
     {

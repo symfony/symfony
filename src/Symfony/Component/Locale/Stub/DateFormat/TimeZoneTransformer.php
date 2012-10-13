@@ -33,7 +33,10 @@ class TimeZoneTransformer extends Transformer
             throw new NotImplementedException('Time zone different than GMT or UTC is not supported as a formatting output.');
         }
 
-        return $dateTime->format('\G\M\TP');
+        // From ICU >= 4.8, the zero offset is not more used, example: GMT instead of GMT+00:00
+        $format = (0 !== (int) $dateTime->format('O')) ? '\G\M\TP' : '\G\M\T';
+
+        return $dateTime->format($format);
     }
 
     /**

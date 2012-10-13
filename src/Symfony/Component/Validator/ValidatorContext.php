@@ -17,6 +17,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
  * Default implementation of ValidatorContextInterface
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+ *             {@link Validation::createValidatorBuilder()} instead.
  */
 class ValidatorContext implements ValidatorContextInterface
 {
@@ -34,6 +37,9 @@ class ValidatorContext implements ValidatorContextInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link Validation::createValidatorBuilder()} instead.
      */
     public function setClassMetadataFactory(ClassMetadataFactoryInterface $classMetadataFactory)
     {
@@ -44,6 +50,9 @@ class ValidatorContext implements ValidatorContextInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link Validation::createValidatorBuilder()} instead.
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $constraintValidatorFactory)
     {
@@ -54,6 +63,9 @@ class ValidatorContext implements ValidatorContextInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link Validation::createValidator()} instead.
      */
     public function getValidator()
     {
@@ -67,6 +79,8 @@ class ValidatorContext implements ValidatorContextInterface
      * Returns the class metadata factory used in the new validator
      *
      * @return ClassMetadataFactoryInterface  The factory instance
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function getClassMetadataFactory()
     {
@@ -77,6 +91,8 @@ class ValidatorContext implements ValidatorContextInterface
      * Returns the constraint validator factory used in the new validator
      *
      * @return ConstraintValidatorFactoryInterface  The factory instance
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function getConstraintValidatorFactory()
     {

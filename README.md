@@ -18,6 +18,17 @@ Requirements
 
 Symfony2 is only supported on PHP 5.3.3 and up.
 
+Be warned that PHP versions before 5.3.8 are known to be buggy and might not
+work for you:
+
+ * before PHP 5.3.4, if you get "Notice: Trying to get property of
+   non-object", you've hit a known PHP bug (see
+   https://bugs.php.net/bug.php?id=52083 and
+   https://bugs.php.net/bug.php?id=50027);
+
+ * before PHP 5.3.8, if you get an error involving annotations, you've hit a
+   known PHP bug (see https://bugs.php.net/bug.php?id=55156).
+
 Installation
 ------------
 
@@ -39,8 +50,15 @@ Symfony2 is an open source, community-driven project. If you'd like to contribut
 please read the [Contributing Code][4] part of the documentation. If you're submitting
 a pull request, please follow the guidelines in the [Submitting a Patch][5] section.
 
+Running Symfony2 Tests
+----------------------
+
+Information on how to run the Symfony2 test suite can be found in the
+[Running Symfony2 Tests][6] section.
+
 [1]: http://symfony.com/download
 [2]: http://symfony.com/get_started
 [3]: http://symfony.com/doc/current/
 [4]: http://symfony.com/doc/current/contributing/code/index.html
 [5]: http://symfony.com/doc/current/contributing/code/patches.html#check-list
+[6]: http://symfony.com/doc/master/contributing/code/tests.html

@@ -210,6 +210,10 @@
                 <source>This collection should contain {{ limit }} elements or less.</source>
                 <target>Esta coleção deve conter {{ limit }} elemento ou menos.|Esta coleção deve conter {{ limit }} elementos ou menos.</target>
             </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} elements.</source>
+                <target>Esta coleção deve conter exatamente {{ limit }} elemento.|Esta coleção deve conter exatamente {{ limit }} elementos.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

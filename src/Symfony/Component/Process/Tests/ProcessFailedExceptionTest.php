@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Process\Tests;
 
-use Symfony\Component\Process\Process,
-    Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
  * @author Sebastian Marek <proofek@gmail.com>

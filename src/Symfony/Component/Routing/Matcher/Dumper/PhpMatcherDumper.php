@@ -165,7 +165,7 @@ EOF;
     /**
      * Compiles a single Route to PHP code used to match it against the path info.
      *
-     * @param Route       $routes               A Route instance
+     * @param Route       $route                A Route instance
      * @param string      $name                 The name of the Route
      * @param Boolean     $supportsRedirections Whether redirections are supported by the base class
      * @param string|null $parentPrefix         The prefix of the parent collection used to optimize the code
@@ -271,14 +271,14 @@ EOF;
         }
 
         // optimize parameters array
-        if (true === $matches && $compiledRoute->getDefaults()) {
+        if (true === $matches && $route->getDefaults()) {
             $code .= sprintf("            return array_merge(\$this->mergeDefaults(\$matches, %s), array('_route' => '%s'));\n"
-                , str_replace("\n", '', var_export($compiledRoute->getDefaults(), true)), $name);
+                , str_replace("\n", '', var_export($route->getDefaults(), true)), $name);
         } elseif (true === $matches) {
             $code .= sprintf("            \$matches['_route'] = '%s';\n\n", $name);
             $code .= "            return \$matches;\n";
-        } elseif ($compiledRoute->getDefaults()) {
-            $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_merge($compiledRoute->getDefaults(), array('_route' => $name)), true)));
+        } elseif ($route->getDefaults()) {
+            $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_merge($route->getDefaults(), array('_route' => $name)), true)));
         } else {
             $code .= sprintf("            return array('_route' => '%s');\n", $name);
         }

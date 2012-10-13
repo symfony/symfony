@@ -22,6 +22,8 @@
         <parameter key="router.options.matcher.cache_class">%kernel.name%%kernel.environment%UrlMatcher</parameter>
         <parameter key="router.options.generator.cache_class">%kernel.name%%kernel.environment%UrlGenerator</parameter>
         <parameter key="router_listener.class">Symfony\Component\HttpKernel\EventListener\RouterListener</parameter>
+        <parameter key="router.request_context.host">localhost</parameter>
+        <parameter key="router.request_context.scheme">http</parameter>
     </parameters>
 
     <services>
@@ -74,8 +76,8 @@
         <service id="router.request_context" class="%router.request_context.class%" public="false">
             <argument></argument>
             <argument>GET</argument>
-            <argument>localhost</argument>
-            <argument>http</argument>
+            <argument>%router.request_context.host%</argument>
+            <argument>%router.request_context.scheme%</argument>
             <argument>%request_listener.http_port%</argument>
             <argument>%request_listener.https_port%</argument>
         </service>

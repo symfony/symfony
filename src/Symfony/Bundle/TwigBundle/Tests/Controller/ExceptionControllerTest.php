@@ -35,10 +35,6 @@ class ExceptionControllerTest extends TestCase
             ->expects($this->once())
             ->method('getStatusCode')
             ->will($this->returnValue(404));
-        $this->flatten
-            ->expects($this->once())
-            ->method('getHeaders')
-            ->will($this->returnValue(array()));
         $this->controller = new ExceptionController();
         $this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
         $this->templating = $this->getMockBuilder('Symfony\\Bundle\\TwigBundle\\TwigEngine')

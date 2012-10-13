@@ -89,18 +89,22 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::LONG);
 
-        $this->assertEquals('03.02.2010 04:05:06 GMT+00:00', $transformer->transform($this->dateTime));
+        $expected = $this->isLowerThanIcuVersion('4.8') ? '03.02.2010 04:05:06 GMT+00:00' : '03.02.2010 04:05:06 GMT';
+
+        $this->assertEquals($expected, $transformer->transform($this->dateTime));
     }
 
     public function testTransformFullTime()
     {
-        if ($this->isLowerThanIcuVersion(3.8)) {
-            $this->markTestSkipped('Please upgrade ICU version to 3.8+');
+        if ($this->isLowerThanIcuVersion('4.0')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.0+');
         }
 
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::FULL);
 
-        $this->assertEquals('03.02.2010 04:05:06 GMT+00:00', $transformer->transform($this->dateTime));
+        $expected = $this->isLowerThanIcuVersion('4.8') ? '03.02.2010 04:05:06 GMT+00:00' : '03.02.2010 04:05:06 GMT';
+
+        $this->assertEquals($expected, $transformer->transform($this->dateTime));
     }
 
     public function testTransformToDifferentLocale()
@@ -209,8 +213,8 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
     public function testReverseTransformFullTime()
     {
-        if ($this->isLowerThanIcuVersion(3.8)) {
-            $this->markTestSkipped('Please upgrade ICU version to 3.8+');
+        if ($this->isLowerThanIcuVersion('4.0')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.0+');
         }
 
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::FULL);

@@ -23,41 +23,42 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class RedirectController extends ContainerAware
 {
     /**
-     * Redirects to another route.
+     * Redirects to another route with the given name.
      *
-     * It expects a route path parameter.
-     * By default, the response status code is 301.
+     * The response status code is 301 if the permanent parameter is false (default),
+     * and 302 if the redirection is permanent.
      *
-     * If the route empty, the status code will be 410.
-     * If the permanent path parameter is set, the status code will be 302.
+     * In case the route name is empty, the status code will be 404 when permanent is false
+     * and 410 otherwise.
      *
-     * @param string  $route     The route pattern to redirect to
-     * @param Boolean $permanent Whether the redirect is permanent or not
+     * @param string  $route     The route name to redirect to
+     * @param Boolean $permanent Whether the redirection is permanent
      *
      * @return Response A Response instance
      */
     public function redirectAction($route, $permanent = false)
     {
-        if (!$route) {
-            return new Response(null, 410);
+        if ('' == $route) {
+            return new Response(null, $permanent ? 410 : 404);
         }
 
         $attributes = $this->container->get('request')->attributes->get('_route_params');
         unset($attributes['route'], $attributes['permanent']);
 
-        return new RedirectResponse($this->container->get('router')->generate($route, $attributes), $permanent ? 301 : 302);
+        return new RedirectResponse($this->container->get('router')->generate($route, $attributes, true), $permanent ? 301 : 302);
     }
 
     /**
      * Redirects to a URL.
      *
-     * By default, the response status code is 301.
+     * The response status code is 301 if the permanent parameter is false (default),
+     * and 302 if the redirection is permanent.
      *
-     * If the path is empty, the status code will be 410.
-     * If the permanent flag is set, the status code will be 302.
+     * In case the path is empty, the status code will be 404 when permanent is false
+     * and 410 otherwise.
      *
-     * @param string  $path      The path to redirect to
-     * @param Boolean $permanent Whether the redirect is permanent or not
+     * @param string  $path      The absolute path or URL to redirect to
+     * @param Boolean $permanent Whether the redirection is permanent
      * @param Boolean $scheme    The URL scheme (null to keep the current one)
      * @param integer $httpPort  The HTTP port
      * @param integer $httpsPort The HTTPS port
@@ -66,8 +67,8 @@ class RedirectController extends ContainerAware
      */
     public function urlRedirectAction($path, $permanent = false, $scheme = null, $httpPort = 80, $httpsPort = 443)
     {
-        if (!$path) {
-            return new Response(null, 410);
+        if ('' == $path) {
+            return new Response(null, $permanent ? 410 : 404);
         }
 
         $statusCode = $permanent ? 301 : 302;

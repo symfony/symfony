@@ -17,6 +17,8 @@ use Symfony\Component\Validator\Constraint;
  * @Annotation
  *
  * @api
+ *
+ * @deprecated Deprecated since version 2.1, to be removed in 2.3.
  */
 class MaxLength extends Constraint
 {

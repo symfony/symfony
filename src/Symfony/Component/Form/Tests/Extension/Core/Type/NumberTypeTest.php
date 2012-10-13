@@ -26,7 +26,7 @@ class NumberTypeTest extends LocalizedTestCase
         $form->setData('12345.67890');
         $view = $form->createView();
 
-        $this->assertSame('12345,679', $view->getVar('value'));
+        $this->assertSame('12345,679', $view->vars['value']);
     }
 
     public function testDefaultFormattingWithGrouping()
@@ -35,7 +35,7 @@ class NumberTypeTest extends LocalizedTestCase
         $form->setData('12345.67890');
         $view = $form->createView();
 
-        $this->assertSame('12.345,679', $view->getVar('value'));
+        $this->assertSame('12.345,679', $view->vars['value']);
     }
 
     public function testDefaultFormattingWithPrecision()
@@ -44,7 +44,7 @@ class NumberTypeTest extends LocalizedTestCase
         $form->setData('12345.67890');
         $view = $form->createView();
 
-        $this->assertSame('12345,68', $view->getVar('value'));
+        $this->assertSame('12345,68', $view->vars['value']);
     }
 
     public function testDefaultFormattingWithRounding()
@@ -53,6 +53,6 @@ class NumberTypeTest extends LocalizedTestCase
         $form->setData('12345.54321');
         $view = $form->createView();
 
-        $this->assertSame('12346', $view->getVar('value'));
+        $this->assertSame('12346', $view->vars['value']);
     }
 }

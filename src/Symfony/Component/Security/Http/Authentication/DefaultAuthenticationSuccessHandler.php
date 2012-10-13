@@ -35,13 +35,11 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      * Constructor.
      *
      * @param HttpUtils $httpUtils
-     * @param string    $providerKey
      * @param array     $options   Options for processing a successful authentication attempt.
      */
-    public function __construct(HttpUtils $httpUtils, $providerKey, array $options)
+    public function __construct(HttpUtils $httpUtils, array $options)
     {
         $this->httpUtils   = $httpUtils;
-        $this->providerKey = $providerKey;
 
         $this->options = array_merge(array(
             'always_use_default_target_path' => false,
@@ -58,6 +56,27 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {
         return $this->httpUtils->createRedirectResponse($request, $this->determineTargetUrl($request));
+    }
+
+
+    /**
+     * Get the provider key.
+     *
+     * @return string
+     */
+    public function getProviderKey()
+    {
+        return $this->providerKey;
+    }
+
+    /**
+     * Set the provider key.
+     *
+     * @param string $providerKey
+     */
+    public function setProviderKey($providerKey)
+    {
+        $this->providerKey = $providerKey;
     }
 
     /**
@@ -77,14 +96,13 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
             return $targetUrl;
         }
 
-        $session = $request->getSession();
-        if ($targetUrl = $session->get('_security.'.$this->providerKey.'.target_path')) {
-            $session->remove('_security.'.$this->providerKey.'.target_path');
+        if (null !== $this->providerKey && $targetUrl = $request->getSession()->get('_security.'.$this->providerKey.'.target_path')) {
+            $request->getSession()->remove('_security.'.$this->providerKey.'.target_path');
 
             return $targetUrl;
         }
 
-        if ($this->options['use_referer'] && ($targetUrl = $request->headers->get('Referer')) && $targetUrl !== $request->getUriForPath($this->options['login_path'])) {
+        if ($this->options['use_referer'] && ($targetUrl = $request->headers->get('Referer')) && $targetUrl !== $this->httpUtils->generateUri($request, $this->options['login_path'])) {
             return $targetUrl;
         }
 

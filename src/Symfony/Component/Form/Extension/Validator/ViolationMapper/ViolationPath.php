@@ -27,11 +27,6 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * @var array
      */
-    private $positions = array();
-
-    /**
-     * @var array
-     */
     private $isIndex = array();
 
     /**
@@ -59,7 +54,6 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     {
         $path = new PropertyPath($violationPath);
         $elements = $path->getElements();
-        $positions = $path->getPositions();
         $data = false;
 
         for ($i = 0, $l = count($elements); $i < $l; ++$i) {
@@ -76,7 +70,6 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
                     }
 
                     $this->elements[] = $elements[$i];
-                    $this->positions[] = $positions[$i];
                     $this->isIndex[] = true;
                     $this->mapsForm[] = true;
                 } elseif ('data' === $elements[$i] && $path->isProperty($i)) {
@@ -89,7 +82,6 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
                     }
 
                     $this->elements[] = $elements[$i];
-                    $this->positions[] = $positions[$i];
                     $this->isIndex[] = $path->isIndex($i);
                     $this->mapsForm[] = false;
                     $data = true;
@@ -102,16 +94,14 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
                 // Already after the "data" element
                 // Pick everything as is
                 $this->elements[] = $elements[$i];
-                $this->positions[] = $positions[$i];
                 $this->isIndex[] = $path->isIndex($i);
                 $this->mapsForm[] = false;
             }
         }
 
         $this->length = count($this->elements);
-        $this->pathAsString = $violationPath;
 
-        $this->resizeString();
+        $this->buildString();
     }
 
     /**
@@ -120,14 +110,6 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function __toString()
     {
         return $this->pathAsString;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPositions()
-    {
-        return $this->positions;
     }
 
     /**
@@ -153,9 +135,8 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
         array_pop($parent->elements);
         array_pop($parent->isIndex);
         array_pop($parent->mapsForm);
-        array_pop($parent->positions);
 
-        $parent->resizeString();
+        $parent->buildString();
 
         return $parent;
     }
@@ -242,24 +223,27 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     }
 
     /**
-     * Resizes the string representation to match the number of elements.
+     * Builds the string representation from the elements.
      */
-    private function resizeString()
+    private function buildString()
     {
-        $lastIndex = $this->length - 1;
+        $this->pathAsString = '';
+        $data = false;
 
-        if ($lastIndex < 0) {
-            $this->pathAsString = '';
-        } else {
-            // +1 for the dot/opening bracket
-            $length = $this->positions[$lastIndex] + strlen($this->elements[$lastIndex]) + 1;
-
-            if ($this->isIndex[$lastIndex]) {
-                // +1 for the closing bracket
-                ++$length;
+        foreach ($this->elements as $index => $element) {
+            if ($this->mapsForm[$index]) {
+                $this->pathAsString .= ".children[$element]";
+            } elseif (!$data) {
+                $this->pathAsString .= '.data' . ($this->isIndex[$index] ? "[$element]" : ".$element");
+                $data = true;
+            } else {
+                $this->pathAsString .= $this->isIndex[$index] ? "[$element]" : ".$element";
             }
+        }
 
-            $this->pathAsString = substr($this->pathAsString, 0, $length);
+        if ('' !== $this->pathAsString) {
+            // remove leading dot
+            $this->pathAsString = substr($this->pathAsString, 1);
         }
     }
 }

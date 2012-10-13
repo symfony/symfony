@@ -8,6 +8,11 @@
 
   <class name="Symfony\Component\Validator\Tests\Fixtures\Entity">
 
+    <group-sequence>
+       <value>Foo</value>
+       <value>Entity</value>
+    </group-sequence>
+
     <!-- CLASS CONSTRAINTS -->
 
     <!-- Custom constraint -->

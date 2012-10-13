@@ -22,7 +22,8 @@ CHANGELOG
  * [BC BREAK] Moved all session related classes and interfaces into own namespace, as
    `Symfony\Component\HttpFoundation\Session` and renamed classes accordingly.
    Session handlers are located in the subnamespace `Symfony\Component\HttpFoundation\Session\Handler`.
- * SessionHandlers must implement `\SessionHandlerInterface`.
+ * SessionHandlers must implement `\SessionHandlerInterface` or extend from the
+   `Symfony\Component\HttpFoundation\Storage\Handler\NativeSessionHandler` base class.
  * Added internal storage driver proxy mechanism for forward compatibility with
    PHP 5.4 `\SessionHandler` class.
  * Added session handlers for custom Memcache, Memcached and Null session save handlers.
@@ -53,8 +54,8 @@ CHANGELOG
  * Added `FlashBag`. Flashes expire when retrieved by `get()` or `all()`. This
    implementation is ESI compatible.
  * Added `AutoExpireFlashBag` (default) to replicate Symfony 2.0.x auto expire
-   behaviour of messages auto expiring.
-   after one page page load.  Messages must be retrieved by `get()` or `all()`.
+   behaviour of messages auto expiring after one page page load.  Messages must
+   be retrieved by `get()` or `all()`.
  * Added `Symfony\Component\HttpFoundation\Attribute\AttributeBag` to replicate
    attributes storage behaviour from 2.0.x (default).
  * Added `Symfony\Component\HttpFoundation\Attribute\NamespacedAttributeBag` for

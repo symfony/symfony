@@ -1,0 +1,6 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    profiler:
+        enabled: false

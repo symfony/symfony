@@ -90,7 +90,7 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
         ->end();
     }
 
-    public function testDefinitionInfoGetsTransferedToNode()
+    public function testDefinitionInfoGetsTransferredToNode()
     {
         $builder = new TreeBuilder();
 
@@ -107,7 +107,7 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('child info', $children['child']->getInfo());
     }
 
-    public function testDefinitionExampleGetsTransferedToNode()
+    public function testDefinitionExampleGetsTransferredToNode()
     {
         $builder = new TreeBuilder();
 

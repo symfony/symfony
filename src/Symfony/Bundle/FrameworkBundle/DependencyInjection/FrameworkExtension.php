@@ -49,8 +49,12 @@ class FrameworkExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
-            $container->setDefinition('event_dispatcher', $container->findDefinition('debug.event_dispatcher'));
-            $container->setAlias('debug.event_dispatcher', 'event_dispatcher');
+
+            // only HttpKernel needs the debug event dispatcher
+            $definition = $container->findDefinition('http_kernel');
+            $arguments = $definition->getArguments();
+            $arguments[0] = new Reference('debug.event_dispatcher');
+            $definition->setArguments($arguments);
 
             $container->setDefinition('controller_resolver', $container->findDefinition('debug.controller_resolver'));
             $container->setAlias('debug.controller_resolver', 'controller_resolver');
@@ -59,7 +63,9 @@ class FrameworkExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('kernel.secret', $config['secret']);
+        if (isset($config['secret'])) {
+            $container->setParameter('kernel.secret', $config['secret']);
+        }
 
         $container->setParameter('kernel.trust_proxy_headers', $config['trust_proxy_headers']);
 
@@ -156,6 +162,9 @@ class FrameworkExtension extends Extension
             if (!isset($config['session'])) {
                 throw new \LogicException('CSRF protection needs that sessions are enabled.');
             }
+            if (!isset($config['secret'])) {
+                throw new \LogicException('CSRF protection needs a secret to be set.');
+            }
             $loader->load('form_csrf.xml');
 
             $container->setParameter('form.type_extension.csrf.enabled', $config['csrf_protection']['enabled']);
@@ -229,6 +238,10 @@ class FrameworkExtension extends Extension
                 }
             }
         }
+
+        if (!$config['enabled']) {
+            $container->getDefinition('profiler')->addMethodCall('disable', array());
+        }
     }
 
     /**
@@ -246,7 +259,7 @@ class FrameworkExtension extends Extension
         $router = $container->findDefinition('router.default');
 
         $argument = $router->getArgument(2);
-        $argument['strict_parameters'] = $config['strict_parameters'];
+        $argument['strict_requirements'] = $config['strict_requirements'];
         if (isset($config['type'])) {
             $argument['resource_type'] = $config['type'];
         }
@@ -256,7 +269,6 @@ class FrameworkExtension extends Extension
         $container->setParameter('request_listener.https_port', $config['https_port']);
 
         $this->addClassesToCompile(array(
-            'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
             'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
             'Symfony\\Component\\Routing\\RequestContext',
             'Symfony\\Component\\Routing\\Router',
@@ -295,14 +307,19 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.storage.options', $options);
 
         // session handler (the internal callback registered with PHP session management)
-        $container->setAlias('session.handler', $config['handler_id']);
+        if (null == $config['handler_id']) {
+            // Set the handler class to be null
+            $container->getDefinition('session.storage.native')->replaceArgument(1, null);
+        } else {
+            $container->setAlias('session.handler', $config['handler_id']);
+        }
 
         $container->setParameter('session.save_path', $config['save_path']);
 
         $this->addClassesToCompile(array(
             'Symfony\\Bundle\\FrameworkBundle\\EventListener\\SessionListener',
             'Symfony\\Component\\HttpFoundation\\Session\\Storage\\NativeSessionStorage',
-            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\\FileSessionHandler',
+            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\\NativeFileSessionHandler',
             'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\\AbstractProxy',
             'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\\SessionHandlerProxy',
             $container->getDefinition('session')->getClass(),

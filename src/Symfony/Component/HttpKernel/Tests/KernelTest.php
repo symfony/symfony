@@ -293,15 +293,7 @@ EOF;
     {
         $kernel = new KernelForTest('test', true);
 
-        $rootDir = __DIR__.DIRECTORY_SEPARATOR.'Fixtures';
-
-        // getRootDir() returns path with slashes
-        // without conversion test fails on Windows
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
-            $rootDir = strtr($rootDir, '\\', '/');
-        }
-
-        $this->assertEquals($rootDir, $kernel->getRootDir());
+        $this->assertEquals(__DIR__.DIRECTORY_SEPARATOR.'Fixtures', realpath($kernel->getRootDir()));
     }
 
     public function testGetName()

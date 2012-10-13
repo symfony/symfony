@@ -17,14 +17,24 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * RequestDataCollector.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RequestDataCollector extends DataCollector
+class RequestDataCollector extends DataCollector implements EventSubscriberInterface
 {
+    protected $controllers;
+
+    public function __construct()
+    {
+        $this->controllers = new \SplObjectStorage();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -41,14 +51,7 @@ class RequestDataCollector extends DataCollector
 
         $attributes = array();
         foreach ($request->attributes->all() as $key => $value) {
-            if (is_object($value)) {
-                $attributes[$key] = sprintf('Object(%s)', get_class($value));
-                if (is_callable(array($value, '__toString'))) {
-                    $attributes[$key] .= sprintf(' = %s', (string) $value);
-                }
-            } else {
-                $attributes[$key] = $value;
-            }
+            $attributes[$key] = $this->varToString($value);
         }
 
         $content = null;
@@ -60,11 +63,17 @@ class RequestDataCollector extends DataCollector
         }
 
         $sessionMetadata = array();
-
+        $sessionAttributes = array();
+        $flashes = array();
         if ($request->hasSession()) {
-            $sessionMetadata['Created'] = date(DATE_RFC822, $request->getSession()->getMetadataBag()->getCreated());
-            $sessionMetadata['Last used'] = date(DATE_RFC822, $request->getSession()->getMetadataBag()->getLastUsed());
-            $sessionMetadata['Lifetime'] = $request->getSession()->getMetadataBag()->getLifetime();
+            $session = $request->getSession();
+            if ($session->isStarted()) {
+                $sessionMetadata['Created'] = date(DATE_RFC822, $session->getMetadataBag()->getCreated());
+                $sessionMetadata['Last used'] = date(DATE_RFC822, $session->getMetadataBag()->getLastUsed());
+                $sessionMetadata['Lifetime'] = $session->getMetadataBag()->getLifetime();
+                $sessionAttributes = $session->all();
+                $flashes = $session->getFlashBag()->peekAll();
+            }
         }
 
         $this->data = array(
@@ -80,10 +89,29 @@ class RequestDataCollector extends DataCollector
             'request_attributes' => $attributes,
             'response_headers'   => $responseHeaders,
             'session_metadata'   => $sessionMetadata,
-            'session_attributes' => $request->hasSession() ? $request->getSession()->all() : array(),
-            'flashes'            => $request->hasSession() ? $request->getSession()->getFlashBag()->peekAll() : array(),
+            'session_attributes' => $sessionAttributes,
+            'flashes'            => $flashes,
             'path_info'          => $request->getPathInfo(),
+            'controller'         => 'n/a',
         );
+
+        if (isset($this->controllers[$request])) {
+            $controller = $this->controllers[$request];
+            if (is_array($controller)) {
+                $r = new \ReflectionMethod($controller[0], $controller[1]);
+                $this->data['controller'] = array(
+                    'class'  => get_class($controller[0]),
+                    'method' => $controller[1],
+                    'file'   => $r->getFilename(),
+                    'line'   => $r->getStartLine(),
+                );
+            } elseif ($controller instanceof \Closure) {
+                $this->data['controller'] = 'Closure';
+            } else {
+                $this->data['controller'] = (string) $controller ?: 'n/a';
+            }
+            unset($this->controllers[$request]);
+        }
     }
 
     public function getPathInfo()
@@ -159,6 +187,50 @@ class RequestDataCollector extends DataCollector
     public function getFormat()
     {
         return $this->data['format'];
+    }
+
+    /**
+     * Gets the route name.
+     *
+     * The _route request attributes is automatically set by the Router Matcher.
+     *
+     * @return string The route
+     */
+    public function getRoute()
+    {
+        return isset($this->data['request_attributes']['_route']) ? $this->data['request_attributes']['_route'] : '';
+    }
+
+    /**
+     * Gets the route parameters.
+     *
+     * The _route_params request attributes is automatically set by the RouterListener.
+     *
+     * @return array The parameters
+     */
+    public function getRouteParams()
+    {
+        return isset($this->data['request_attributes']['_route_params']) ? $this->data['request_attributes']['_route_params'] : array();
+    }
+
+    /**
+     * Gets the controller.
+     *
+     * @return string The controller as a string
+     */
+    public function getController()
+    {
+        return $this->data['controller'];
+    }
+
+    public function onKernelController(FilterControllerEvent $event)
+    {
+        $this->controllers[$event->getRequest()] = $event->getController();
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return array(KernelEvents::CONTROLLER => 'onKernelController');
     }
 
     /**

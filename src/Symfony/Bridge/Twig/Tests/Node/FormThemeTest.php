@@ -55,7 +55,7 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                'echo $this->env->getExtension(\'form\')->setTheme(%s, array(0 => "tpl1", 1 => "tpl2"));',
+                '$this->env->getExtension(\'form\')->renderer->setTheme(%s, array(0 => "tpl1", 1 => "tpl2"));',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())
@@ -67,7 +67,7 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                'echo $this->env->getExtension(\'form\')->setTheme(%s, "tpl1");',
+                '$this->env->getExtension(\'form\')->renderer->setTheme(%s, "tpl1");',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())

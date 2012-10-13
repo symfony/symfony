@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\Debug;
 
 use Symfony\Component\HttpKernel\Debug\ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class ExceptionHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -44,11 +45,20 @@ class ExceptionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $response = $handler->createResponse(new \RuntimeException('Foo'));
         $this->assertEquals('500', $response->getStatusCode());
-        $this->assertContains('<title>Whoops, looks like something went wrong.</title>', $response->getContent());
+        $this->assertContains('Whoops, looks like something went wrong.', $response->getContent());
 
         $response = $handler->createResponse(new NotFoundHttpException('Foo'));
         $this->assertEquals('404', $response->getStatusCode());
-        $this->assertContains('<title>Sorry, the page you are looking for could not be found.</title>', $response->getContent());
+        $this->assertContains('Sorry, the page you are looking for could not be found.', $response->getContent());
+    }
+
+    public function testHeaders()
+    {
+        $handler = new ExceptionHandler(false);
+
+        $response = $handler->createResponse(new MethodNotAllowedHttpException(array('POST')));
+        $this->assertEquals('405', $response->getStatusCode());
+        $this->assertEquals('POST', $response->headers->get('Allow'));
     }
 
     public function testNestedExceptions()

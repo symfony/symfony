@@ -12,10 +12,11 @@
 namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Bundle\TwigBundle\TwigEngine;
-use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
@@ -27,19 +28,19 @@ use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class WebDebugToolbarListener
+class WebDebugToolbarListener implements EventSubscriberInterface
 {
-    const DISABLED        = 1;
-    const ENABLED         = 2;
+    const DISABLED = 1;
+    const ENABLED  = 2;
 
-    protected $templating;
+    protected $twig;
     protected $interceptRedirects;
     protected $mode;
     protected $position;
 
-    public function __construct(TwigEngine $templating, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom')
+    public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom')
     {
-        $this->templating = $templating;
+        $this->twig = $twig;
         $this->interceptRedirects = (Boolean) $interceptRedirects;
         $this->mode = (integer) $mode;
         $this->position = $position;
@@ -71,7 +72,7 @@ class WebDebugToolbarListener
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
             }
 
-            $response->setContent($this->templating->render('WebProfilerBundle:Profiler:toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));
+            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));
             $response->setStatusCode(200);
             $response->headers->remove('Location');
         }
@@ -97,31 +98,32 @@ class WebDebugToolbarListener
     {
         if (function_exists('mb_stripos')) {
             $posrFunction   = 'mb_strripos';
-            $posFunction    = 'mb_stripos';
             $substrFunction = 'mb_substr';
         } else {
             $posrFunction   = 'strripos';
-            $posFunction    = 'stripos';
             $substrFunction = 'substr';
         }
 
         $content = $response->getContent();
+        $pos = $posrFunction($content, '</body>');
 
-        if ($this->position === 'bottom') {
-            $pos = $posrFunction($content, '</body>');
-        } else {
-            $pos = $posFunction($content, '<body');
-            if (false !== $pos) {
-                $pos = $posFunction($content, '>', $pos) + 1;
-            }
-        }
         if (false !== $pos) {
-            $toolbar = "\n".str_replace("\n", '', $this->templating->render(
-                'WebProfilerBundle:Profiler:toolbar_js.html.twig',
-                array('token' => $response->headers->get('X-Debug-Token'))
+            $toolbar = "\n".str_replace("\n", '', $this->twig->render(
+                '@WebProfiler/Profiler/toolbar_js.html.twig',
+                array(
+                    'position' => $this->position,
+                    'token' => $response->headers->get('X-Debug-Token'),
+                )
             ))."\n";
             $content = $substrFunction($content, 0, $pos).$toolbar.$substrFunction($content, $pos);
             $response->setContent($content);
         }
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::RESPONSE => array('onKernelResponse', -128),
+        );
     }
 }

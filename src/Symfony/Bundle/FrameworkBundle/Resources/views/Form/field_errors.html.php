@@ -1,1 +1,1 @@
-<?php echo $view['form']->renderBlock('form_errors') ?>
+<?php echo $view['form']->block($form, 'form_errors') ?>

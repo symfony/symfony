@@ -20,8 +20,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 abstract class AbstractType implements FormTypeInterface
 {
     /**
-     * The extensions for this type
-     * @var array An array of FormTypeExtensionInterface instances
+     * @var array
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     private $extensions = array();
 
@@ -35,23 +36,15 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormViewInterface $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function finishView(FormViewInterface $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createBuilder($name, FormFactoryInterface $factory, array $options)
-    {
-        return null;
     }
 
     /**
@@ -59,19 +52,21 @@ abstract class AbstractType implements FormTypeInterface
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults($this->getDefaultOptions());
-        $resolver->addAllowedValues($this->getAllowedOptionValues());
+        $resolver->setDefaults($this->getDefaultOptions(array()));
+        $resolver->addAllowedValues($this->getAllowedOptionValues(array()));
     }
 
     /**
      * Returns the default options for this type.
+     *
+     * @param array $options Unsupported as of Symfony 2.1.
      *
      * @return array The default options
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      *             Use {@link setDefaultOptions()} instead.
      */
-    public function getDefaultOptions()
+    public function getDefaultOptions(array $options)
     {
         return array();
     }
@@ -79,12 +74,14 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * Returns the allowed option values for each option (if any).
      *
+     * @param array $options Unsupported as of Symfony 2.1.
+     *
      * @return array The allowed option values
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      *             Use {@link setDefaultOptions()} instead.
      */
-    public function getAllowedOptionValues()
+    public function getAllowedOptionValues(array $options)
     {
         return array();
     }
@@ -98,21 +95,26 @@ abstract class AbstractType implements FormTypeInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the extensions for this type.
+     *
+     * @param array $extensions An array of FormTypeExtensionInterface
+     *
+     * @throws Exception\UnexpectedTypeException if any extension does not implement FormTypeExtensionInterface
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
     public function setExtensions(array $extensions)
     {
-        foreach ($extensions as $extension) {
-            if (!$extension instanceof FormTypeExtensionInterface) {
-                throw new UnexpectedTypeException($extension, 'Symfony\Component\Form\FormTypeExtensionInterface');
-            }
-        }
-
         $this->extensions = $extensions;
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the extensions associated with this type.
+     *
+     * @return array An array of FormTypeExtensionInterface
+     *
+     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+     *             {@link ResolvedFormTypeInterface::getTypeExtensions()} instead.
      */
     public function getExtensions()
     {

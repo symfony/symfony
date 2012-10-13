@@ -148,9 +148,9 @@ interface OptionsResolverInterface
     public function addAllowedTypes(array $allowedTypes);
 
     /**
-     * Sets filters that are applied on resolved options.
+     * Sets normalizers that are applied on resolved options.
      *
-     * The filters should be closures with the following signature:
+     * The normalizers should be closures with the following signature:
      *
      * <code>
      * function (Options $options, $value)
@@ -159,13 +159,13 @@ interface OptionsResolverInterface
      * The second parameter passed to the closure is the value of
      * the option.
      *
-     * The closure should return the filtered value.
+     * The closure should return the normalized value.
      *
-     * @param array $filters An array of filter closures.
+     * @param array $normalizers An array of closures.
      *
      * @return OptionsResolverInterface The resolver instance.
      */
-    public function setFilters(array $filters);
+    public function setNormalizers(array $normalizers);
 
     /**
      * Returns whether an option is known.
@@ -206,5 +206,5 @@ interface OptionsResolverInterface
      * @throws Exception\OptionDefinitionException If a cyclic dependency is detected
      *                                             between two lazy options.
      */
-    public function resolve(array $options);
+    public function resolve(array $options = array());
 }

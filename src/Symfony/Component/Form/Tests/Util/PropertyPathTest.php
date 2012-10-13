@@ -95,6 +95,8 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
 
     public function testGetValueIgnoresSingular()
     {
+        $this->markTestSkipped('This feature is temporarily disabled as of 2.1');
+
         $object = (object) array('children' => 'Many');
 
         $path = new PropertyPath('children|child');

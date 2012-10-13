@@ -79,6 +79,23 @@ class CookieTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3600, $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
     }
 
+    public function testConstructorWithDateTime()
+    {
+        $expire = new \DateTime();
+        $cookie = new Cookie('foo', 'bar', $expire);
+
+        $this->assertEquals($expire->format('U'), $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
+    }
+
+    public function testGetExpiresTimeWithStringValue()
+    {
+        $value = "+1 day";
+        $cookie = new Cookie('foo', 'bar', $value);
+        $expire = strtotime($value);
+
+        $this->assertEquals($expire, $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
+    }
+
     public function testGetDomain()
     {
         $cookie = new Cookie('foo', 'bar', 3600, '/', '.myfoodomain.com');

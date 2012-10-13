@@ -23,13 +23,14 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  * UrlGenerator generates a URL based on a set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Tobias Schultze <http://tobion.de>
  *
  * @api
  */
-class UrlGenerator implements UrlGeneratorInterface
+class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
 {
     protected $context;
-    protected $strictParameters = true;
+    protected $strictRequirements = true;
     protected $logger;
 
     /**
@@ -95,23 +96,19 @@ class UrlGenerator implements UrlGeneratorInterface
     }
 
     /**
-     * Enables or disables the exception on incorrect parameters.
-     *
-     * @param Boolean $enabled
+     * {@inheritdoc}
      */
-    public function setStrictParameters($enabled)
+    public function setStrictRequirements($enabled)
     {
-        $this->strictParameters = $enabled;
+        $this->strictRequirements = null === $enabled ? null : (Boolean) $enabled;
     }
 
     /**
-     * Gets the strict check of incorrect parameters.
-     *
-     * @return Boolean
+     * {@inheritdoc}
      */
-    public function getStrictParameters()
+    public function isStrictRequirements()
     {
-        return $this->strictParameters;
+        return $this->strictRequirements;
     }
 
     /**
@@ -136,13 +133,10 @@ class UrlGenerator implements UrlGeneratorInterface
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
     {
         $variables = array_flip($variables);
-
-        $originParameters = $parameters;
-        $parameters = array_replace($this->context->getParameters(), $parameters);
-        $tparams = array_replace($defaults, $parameters);
+        $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
 
         // all params must be given
-        if ($diff = array_diff_key($variables, $tparams)) {
+        if ($diff = array_diff_key($variables, $mergedParams)) {
             throw new MissingMandatoryParametersException(sprintf('The "%s" route has some missing mandatory parameters ("%s").', $name, implode('", "', array_keys($diff))));
         }
 
@@ -150,30 +144,26 @@ class UrlGenerator implements UrlGeneratorInterface
         $optional = true;
         foreach ($tokens as $token) {
             if ('variable' === $token[0]) {
-                if (false === $optional || !array_key_exists($token[3], $defaults) || (isset($parameters[$token[3]]) && (string) $parameters[$token[3]] != (string) $defaults[$token[3]])) {
-                    if (!$isEmpty = in_array($tparams[$token[3]], array(null, '', false), true)) {
-                        // check requirement
-                        if ($tparams[$token[3]] && !preg_match('#^'.$token[2].'$#', $tparams[$token[3]])) {
-                            $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $tparams[$token[3]]);
-                            if ($this->strictParameters) {
-                                throw new InvalidParameterException($message);
-                            }
-
-                            if ($this->logger) {
-                                $this->logger->err($message);
-                            }
-
-                            return null;
+                if (!$optional || !array_key_exists($token[3], $defaults) || (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]]) {
+                    // check requirement
+                    if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
+                        $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $mergedParams[$token[3]]);
+                        if ($this->strictRequirements) {
+                            throw new InvalidParameterException($message);
                         }
+
+                        if ($this->logger) {
+                            $this->logger->err($message);
+                        }
+
+                        return null;
                     }
 
-                    if (!$isEmpty || !$optional) {
-                        $url = $token[1].$tparams[$token[3]].$url;
-                    }
-
+                    $url = $token[1].$mergedParams[$token[3]].$url;
                     $optional = false;
                 }
-            } elseif ('text' === $token[0]) {
+            } else {
+                // static text
                 $url = $token[1].$url;
                 $optional = false;
             }
@@ -197,7 +187,7 @@ class UrlGenerator implements UrlGeneratorInterface
         }
 
         // add a query string if needed
-        $extra = array_diff_key($originParameters, $variables, $defaults);
+        $extra = array_diff_key($parameters, $variables);
         if ($extra && $query = http_build_query($extra, '', '&')) {
             $url .= '?'.$query;
         }

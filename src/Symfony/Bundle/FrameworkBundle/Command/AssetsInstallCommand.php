@@ -33,7 +33,7 @@ class AssetsInstallCommand extends ContainerAwareCommand
         $this
             ->setName('assets:install')
             ->setDefinition(array(
-                new InputArgument('target', InputArgument::REQUIRED, 'The target directory (usually "web")'),
+                new InputArgument('target', InputArgument::OPTIONAL, 'The target directory', 'web'),
             ))
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')

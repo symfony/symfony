@@ -433,7 +433,7 @@ class AclTest extends \PHPUnit_Framework_TestCase
      * @expectedException \InvalidArgumentException
      * @dataProvider getUpdateFieldAuditingTests
      */
-    public function testUpdateFieldAuditingthrowsExceptionOnInvalidField($type)
+    public function testUpdateFieldAuditingThrowsExceptionOnInvalidField($type)
     {
         $acl = $this->getAcl();
         $acl->{'update'.$type.'Auditing'}(0, 'foo', true, true);

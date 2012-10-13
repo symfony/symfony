@@ -83,6 +83,17 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
      */
+    public function testAddHtmlContentUnsupportedCharset()
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent(file_get_contents(__DIR__.'/Fixtures/windows-1250.html'), 'Windows-1250');
+
+        $this->assertEquals('Žťčýů', $crawler->filterXPath('//p')->text());
+    }
+
+    /**
+     * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
+     */
     public function testAddHtmlContentWithErrors()
     {
         libxml_use_internal_errors(true);

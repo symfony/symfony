@@ -5,41 +5,45 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="form.extension.class">Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
+        <parameter key="form.resolved_type_factory.class">Symfony\Component\Form\ResolvedFormTypeFactory</parameter>
+        <parameter key="form.registry.class">Symfony\Component\Form\FormRegistry</parameter>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
+        <parameter key="form.extension.class">Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
         <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
     </parameters>
 
     <services>
-        <!-- FormFactory -->
-        <service id="form.factory" class="%form.factory.class%">
+        <!-- ResolvedFormTypeFactory -->
+        <service id="form.resolved_type_factory" class="%form.resolved_type_factory.class%" />
+
+        <!-- FormRegistry -->
+        <service id="form.registry" class="%form.registry.class%">
             <argument type="collection">
                 <!--
                 We don't need to be able to add more extensions.
                  * more types can be registered with the form.type tag
+                 * more type extensions can be registered with the form.type_extension tag
                  * more type_guessers can be registered with the form.type.type_guesser tag
                 -->
                 <argument type="service" id="form.extension" />
             </argument>
+            <argument type="service" id="form.resolved_type_factory" />
+        </service>
+
+        <!-- FormFactory -->
+        <service id="form.factory" class="%form.factory.class%">
+            <argument type="service" id="form.registry" />
+            <argument type="service" id="form.resolved_type_factory" />
         </service>
 
         <!-- DependencyInjectionExtension -->
         <service id="form.extension" class="%form.extension.class%" public="false">
             <argument type="service" id="service_container" />
-            <!--
-            All services with tag "form.type" are inserted here by
-            InitFormsPass
-            -->
+            <!-- All services with tag "form.type" are inserted here by FormPass -->
             <argument type="collection" />
-            <!--
-            All services with tag "form.type_extension" are inserted here by
-            InitFormsPass
-            -->
+            <!-- All services with tag "form.type_extension" are inserted here by FormPass -->
             <argument type="collection" />
-            <!--
-            All services with tag "form.type_guesser" are inserted here by
-            InitFormsPass
-            -->
+            <!-- All services with tag "form.type_guesser" are inserted here by FormPass -->
             <argument type="collection" />
         </service>
 
@@ -130,6 +134,11 @@
         </service>
         <service id="form.type.url" class="Symfony\Component\Form\Extension\Core\Type\UrlType">
             <tag name="form.type" alias="url" />
+        </service>
+
+        <!-- FormTypeHttpFoundationExtension -->
+        <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension">
+            <tag name="form.type_extension" alias="form" />
         </service>
 
         <!-- FormTypeValidatorExtension -->

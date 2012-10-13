@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added a Luhn validator
+
 2.1.0
 -----
 
@@ -21,5 +26,10 @@ CHANGELOG
  * [BC BREAK] collections in fields annotated with `Valid` are not traversed
    recursively anymore by default. `Valid` contains a new property `deep`
    which enables the BC behavior.
- * added MinCount and MaxCount constraint
- * deprecated the Size constraint
+ * added Count constraint
+ * added Length constraint
+ * added Range constraint
+ * deprecated the Min and Max constraints
+ * deprecated the MinLength and MaxLength constraints
+ * added Validation and ValidatorBuilderInterface
+ * deprecated ValidatorContext, ValidatorContextInterface and ValidatorFactory

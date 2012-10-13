@@ -49,7 +49,7 @@ class RepeatedTypeTest extends TypeTestCase
     public function testSetOptionsPerChild()
     {
         $form = $this->factory->create('repeated', null, array(
-            // the global required value cannot be overriden
+            // the global required value cannot be overridden
             'type'           => 'text',
             'first_options'  => array('label' => 'Test', 'required' => false),
             'second_options' => array('label' => 'Test2')

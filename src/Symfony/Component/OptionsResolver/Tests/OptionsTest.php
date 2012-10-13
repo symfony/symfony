@@ -79,6 +79,16 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->options->remove('foo');
     }
 
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     */
+    public function testSetNormalizerNotSupportedAfterGet()
+    {
+        $this->options->set('foo', 'bar');
+        $this->options->get('foo');
+        $this->options->setNormalizer('foo', function () {});
+    }
+
     public function testSetLazyOption()
     {
         $test = $this;
@@ -146,6 +156,23 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('dynamic', $this->options->get('foo'));
     }
 
+    public function testPreviousValueIsNotEvaluatedIfNoSecondArgument()
+    {
+        $test = $this;
+
+        // defined by superclass
+        $this->options->set('foo', function (Options $options) use ($test) {
+            $test->fail('Should not be called');
+        });
+
+        // defined by subclass, no $previousValue argument defined!
+        $this->options->overload('foo', function (Options $options) use ($test) {
+            return 'dynamic';
+        });
+
+        $this->assertEquals('dynamic', $this->options->get('foo'));
+    }
+
     public function testLazyOptionCanAccessOtherOptions()
     {
         $test = $this;
@@ -182,6 +209,66 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('dynamic', $this->options->get('bam'));
     }
 
+    public function testNormalizer()
+    {
+        $this->options->set('foo', 'bar');
+
+        $this->options->setNormalizer('foo', function () {
+            return 'normalized';
+        });
+
+        $this->assertEquals('normalized', $this->options->get('foo'));
+    }
+
+    public function testNormalizerReceivesUnnormalizedValue()
+    {
+        $this->options->set('foo', 'bar');
+
+        $this->options->setNormalizer('foo', function (Options $options, $value) {
+            return 'normalized[' . $value . ']';
+        });
+
+        $this->assertEquals('normalized[bar]', $this->options->get('foo'));
+    }
+
+    public function testNormalizerCanAccessOtherOptions()
+    {
+        $test = $this;
+
+        $this->options->set('foo', 'bar');
+        $this->options->set('bam', 'baz');
+
+        $this->options->setNormalizer('bam', function (Options $options) use ($test) {
+            /* @var \PHPUnit_Framework_TestCase $test */
+            $test->assertEquals('bar', $options->get('foo'));
+
+            return 'normalized';
+        });
+
+        $this->assertEquals('bar', $this->options->get('foo'));
+        $this->assertEquals('normalized', $this->options->get('bam'));
+    }
+
+    public function testNormalizerCanAccessOtherLazyOptions()
+    {
+        $test = $this;
+
+        $this->options->set('foo', function (Options $options) {
+            return 'bar';
+        });
+        $this->options->set('bam', 'baz');
+
+        $this->options->setNormalizer('bam', function (Options $options) use ($test) {
+            /* @var \PHPUnit_Framework_TestCase $test */
+            $test->assertEquals('bar', $options->get('foo'));
+
+            return 'normalized';
+        });
+
+        $this->assertEquals('bar', $this->options->get('foo'));
+        $this->assertEquals('normalized', $this->options->get('bam'));
+    }
+
     /**
      * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
@@ -196,6 +283,85 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         });
 
         $this->options->get('foo');
+    }
+
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     */
+    public function testFailForCyclicDependenciesBetweenNormalizers()
+    {
+        $this->options->set('foo', 'bar');
+        $this->options->set('bam', 'baz');
+
+        $this->options->setNormalizer('foo', function (Options $options) {
+            $options->get('bam');
+        });
+
+        $this->options->setNormalizer('bam', function (Options $options) {
+            $options->get('foo');
+        });
+
+        $this->options->get('foo');
+    }
+
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     */
+    public function testFailForCyclicDependenciesBetweenNormalizerAndLazyOption()
+    {
+        $this->options->set('foo', function (Options $options) {
+            $options->get('bam');
+        });
+        $this->options->set('bam', 'baz');
+
+        $this->options->setNormalizer('bam', function (Options $options) {
+            $options->get('foo');
+        });
+
+        $this->options->get('foo');
+    }
+
+    public function testAllInvokesEachLazyOptionOnlyOnce()
+    {
+        $test = $this;
+        $i = 1;
+
+        $this->options->set('foo', function (Options $options) use ($test, &$i) {
+            $test->assertSame(1, $i);
+            ++$i;
+
+            // Implicitly invoke lazy option for "bam"
+            $options->get('bam');
+        });
+        $this->options->set('bam', function (Options $options) use ($test, &$i) {
+            $test->assertSame(2, $i);
+            ++$i;
+        });
+
+        $this->options->all();
+    }
+
+    public function testAllInvokesEachNormalizerOnlyOnce()
+    {
+        $test = $this;
+        $i = 1;
+
+        $this->options->set('foo', 'bar');
+        $this->options->set('bam', 'baz');
+
+        $this->options->setNormalizer('foo', function (Options $options) use ($test, &$i) {
+            $test->assertSame(1, $i);
+            ++$i;
+
+            // Implicitly invoke normalizer for "bam"
+            $options->get('bam');
+        });
+        $this->options->setNormalizer('bam', function (Options $options) use ($test, &$i) {
+            $test->assertSame(2, $i);
+            ++$i;
+        });
+
+        $this->options->all();
     }
 
     public function testReplaceClearsAndSets()
@@ -264,7 +430,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->options->clear();
     }
 
-    public function testOverloadCannotBeEvaluatedLazilyWithoutExpectedClousureParams()
+    public function testOverloadCannotBeEvaluatedLazilyWithoutExpectedClosureParams()
     {
         $this->options->set('foo', 'bar');
 
@@ -295,5 +461,12 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $expectedResult = array('foo' => 'bar', 'foo1' => 'bar1');
 
         $this->assertEquals($expectedResult, iterator_to_array($this->options, true));
+    }
+
+    public function testHasWithNullValue()
+    {
+        $this->options->set('foo', null);
+
+        $this->assertTrue($this->options->has('foo'));
     }
 }

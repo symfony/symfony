@@ -38,6 +38,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     protected $charset;
     protected $cache;
     protected $escapers;
+    protected static $escaperCache;
     protected $globals;
     protected $parser;
 
@@ -334,6 +335,20 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function escape($value, $context = 'html')
     {
+        if (is_numeric($value)) {
+            return $value;
+        }
+
+        // If we deal with a scalar value, we can cache the result to increase
+        // the performance when the same value is escaped multiple times (e.g. loops)
+        if (is_scalar($value)) {
+            if (!isset(self::$escaperCache[$context][$value])) {
+                self::$escaperCache[$context][$value] = call_user_func($this->getEscaper($context), $value);
+            }
+
+            return self::$escaperCache[$context][$value];
+        }
+
         return call_user_func($this->getEscaper($context), $value);
     }
 
@@ -372,6 +387,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     public function setEscaper($context, $escaper)
     {
         $this->escapers[$context] = $escaper;
+        self::$escaperCache[$context] = array();
     }
 
     /**
@@ -489,6 +505,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                     return $value;
                 },
         );
+
+        self::$escaperCache = array();
     }
 
     /**

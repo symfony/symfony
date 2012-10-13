@@ -22,12 +22,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 class BlankValidator extends ConstraintValidator
 {
     /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @api
+     * {@inheritDoc}
      */
     public function validate($value, Constraint $constraint)
     {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface FormBuilderInterface extends FormConfigEditorInterface, \Traversable, \Countable
+interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuilderInterface
 {
     /**
      * Adds a new field to this group. A field must have a unique name within

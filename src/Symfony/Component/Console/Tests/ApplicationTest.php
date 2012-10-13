@@ -12,8 +12,11 @@
 namespace Symfony\Component\Console\Tests;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
@@ -215,6 +218,52 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFindAlternativeExceptionMessage()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+
+        // Command + singular
+        try {
+            $application->find('foo:baR');
+            $this->fail('->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
+            $this->assertRegExp('/Did you mean this/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
+        }
+
+        // Namespace + singular
+        try {
+            $application->find('foO:bar');
+            $this->fail('->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
+            $this->assertRegExp('/Did you mean this/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
+        }
+
+
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+
+        // Command + plural
+        try {
+            $application->find('foo:baR');
+            $this->fail('->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+        }
+
+        // Namespace + plural
+        try {
+            $application->find('foo2:bar');
+            $this->fail('->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+            $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+        }
+    }
+
     public function testFindAlternativeCommands()
     {
         $application = new Application();
@@ -224,7 +273,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->add(new \Foo2Command());
 
         try {
-            $application->find($commandName = 'Unknow command');
+            $application->find($commandName = 'Unknown command');
             $this->fail('->find() throws an \InvalidArgumentException if command does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist');
@@ -264,11 +313,11 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->add(new \foo3Command());
 
         try {
-            $application->find('Unknow-namespace:Unknow-command');
+            $application->find('Unknown-namespace:Unknown-command');
             $this->fail('->find() throws an \InvalidArgumentException if namespace does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if namespace does not exist');
-            $this->assertEquals('There are no commands defined in the "Unknow-namespace" namespace.', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, without alternatives');
+            $this->assertEquals('There are no commands defined in the "Unknown-namespace" namespace.', $e->getMessage(), '->find() throws an \InvalidArgumentException if namespace does not exist, without alternatives');
         }
 
         try {
@@ -346,13 +395,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo3:bar'), array('decorated' => false));
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->renderException() renders a pretty exceptions with previous exceptions');
-
-        $application = $this->getMock('Symfony\Component\Console\Application', array('getTerminalWidth'));
-        $application->setAutoExit(false);
-        $application->expects($this->any())
-            ->method('getTerminalWidth')
-            ->will($this->returnValue(32));
-        $tester = new ApplicationTester($application);
 
         $application = $this->getMock('Symfony\Component\Console\Application', array('getTerminalWidth'));
         $application->setAutoExit(false);
@@ -466,5 +508,116 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             array(new InputOption('quiet', '', InputOption::VALUE_NONE)),
             array(new InputOption('query', 'q', InputOption::VALUE_NONE)),
         );
+    }
+
+    public function testGetDefaultHelperSetReturnsDefaultValues()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        $helperSet = $application->getHelperSet();
+
+        $this->assertTrue($helperSet->has('formatter'));
+        $this->assertTrue($helperSet->has('dialog'));
+        $this->assertTrue($helperSet->has('progress'));
+    }
+
+    public function testAddingSingleHelperSetOverwritesDefaultValues()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        $application->setHelperSet(new HelperSet(array(new FormatterHelper())));
+
+        $helperSet = $application->getHelperSet();
+
+        $this->assertTrue($helperSet->has('formatter'));
+
+        // no other default helper set should be returned
+        $this->assertFalse($helperSet->has('dialog'));
+        $this->assertFalse($helperSet->has('progress'));
+    }
+
+    public function testOverwritingDefaultHelperSetOverwritesDefaultValues()
+    {
+        $application = new CustomApplication();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        $application->setHelperSet(new HelperSet(array(new FormatterHelper())));
+
+        $helperSet = $application->getHelperSet();
+
+        $this->assertTrue($helperSet->has('formatter'));
+
+        // no other default helper set should be returned
+        $this->assertFalse($helperSet->has('dialog'));
+        $this->assertFalse($helperSet->has('progress'));
+    }
+
+    public function testGetDefaultInputDefinitionReturnsDefaultValues()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        $inputDefinition = $application->getDefinition();
+
+        $this->assertTrue($inputDefinition->hasArgument('command'));
+
+        $this->assertTrue($inputDefinition->hasOption('help'));
+        $this->assertTrue($inputDefinition->hasOption('quiet'));
+        $this->assertTrue($inputDefinition->hasOption('verbose'));
+        $this->assertTrue($inputDefinition->hasOption('version'));
+        $this->assertTrue($inputDefinition->hasOption('ansi'));
+        $this->assertTrue($inputDefinition->hasOption('no-ansi'));
+        $this->assertTrue($inputDefinition->hasOption('no-interaction'));
+    }
+
+    public function testOverwritingDefaultInputDefinitionOverwritesDefaultValues()
+    {
+        $application = new CustomApplication();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        $inputDefinition = $application->getDefinition();
+
+        // check wether the default arguments and options are not returned any more
+        $this->assertFalse($inputDefinition->hasArgument('command'));
+
+        $this->assertFalse($inputDefinition->hasOption('help'));
+        $this->assertFalse($inputDefinition->hasOption('quiet'));
+        $this->assertFalse($inputDefinition->hasOption('verbose'));
+        $this->assertFalse($inputDefinition->hasOption('version'));
+        $this->assertFalse($inputDefinition->hasOption('ansi'));
+        $this->assertFalse($inputDefinition->hasOption('no-ansi'));
+        $this->assertFalse($inputDefinition->hasOption('no-interaction'));
+
+        $this->assertTrue($inputDefinition->hasOption('custom'));
+    }
+}
+
+class CustomApplication extends Application
+{
+    /**
+     * Overwrites the default input definition.
+     *
+     * @return InputDefinition An InputDefinition instance
+     */
+    protected function getDefaultInputDefinition()
+    {
+        return new InputDefinition(array(new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.')));
+    }
+
+    /**
+     * Gets the default helper set with the helpers that should always be available.
+     *
+     * @return HelperSet A HelperSet instance
+     */
+    protected function getDefaultHelperSet()
+    {
+        return new HelperSet(array(new FormatterHelper()));
     }
 }

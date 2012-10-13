@@ -28,8 +28,9 @@ class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
 
     public function testCollect()
     {
-        $kernel = new KernelForTest('test',true);
-        $c = new ConfigDataCollector($kernel);
+        $kernel = new KernelForTest('test', true);
+        $c = new ConfigDataCollector();
+        $c->setKernel($kernel);
         $c->collect(new Request(), new Response());
 
         $this->assertSame('test',$c->getEnv());
@@ -52,7 +53,9 @@ class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
                 ||
                 (extension_loaded('apc') && ini_get('apc.enabled'))
                 ||
-                (extension_loaded('xcache') && ini_get('xcache.cacher')))) {
+                (extension_loaded('xcache') && ini_get('xcache.cacher'))
+                ||
+                (extension_loaded('wincache') && ini_get('wincache.ocenabled')))) {
             $this->assertTrue($c->hasAccelerator());
         } else {
             $this->assertFalse($c->hasAccelerator());

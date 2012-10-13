@@ -142,7 +142,7 @@ class DirectoryResource implements ResourceInterface
     /**
      * Checks that passed file exists in resource and matches resource filters.
      *
-     * @param  SplFileInfo|string   $file
+     * @param SplFileInfo|string $file
      *
      * @return Boolean
      */

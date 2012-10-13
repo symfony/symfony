@@ -39,14 +39,14 @@ interface ResourceInterface extends \Serializable
      *
      * @return integer
      */
-    function getModificationTime();
+    public function getModificationTime();
 
     /**
      * Returns true if the resource exists in the filesystem.
      *
      * @return Boolean
      */
-    function exists();
+    public function exists();
 
     /**
      * Returns the resource tied to this Resource.
@@ -60,5 +60,5 @@ interface ResourceInterface extends \Serializable
      *
      * @return string
      */
-    function getId();
+    public function getId();
 }

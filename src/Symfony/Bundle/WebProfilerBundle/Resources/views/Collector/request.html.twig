@@ -136,7 +136,7 @@
     <h2>Flashes</h2>
 
     {% if collector.flashes|length %}
-        {% include '@WebProfilerBundle/Profiler/table.html.twig' with { 'data': collector.flashes } only %}
+        {% include '@WebProfiler/Profiler/table.html.twig' with { 'data': collector.flashes } only %}
     {% else %}
         <p>
             <em>No flashes</em>

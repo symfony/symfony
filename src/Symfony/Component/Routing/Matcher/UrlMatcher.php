@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteHandlerInterface;
 
 /**
  * UrlMatcher matches URL based on a set of routes.
@@ -34,6 +35,7 @@ class UrlMatcher implements UrlMatcherInterface
     protected $context;
     protected $allow;
     protected $negotiatedVariables;
+    protected $routeHandlers;
 
     private $routes;
 
@@ -49,7 +51,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $this->routes = $routes;
         $this->context = $context;
-        $this->negotiatedVariables = array('_locale', '_format', '_charset');
+        $this->routeHandlers = array();
     }
 
     /**
@@ -66,6 +68,14 @@ class UrlMatcher implements UrlMatcherInterface
     public function getContext()
     {
         return $this->context;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addRouteHandler(RouteHandlerInterface $handler)
+    {
+        $this->routeHandlers[] = $handler;
     }
 
     /**
@@ -111,7 +121,7 @@ class UrlMatcher implements UrlMatcherInterface
                 return $ret;
             }
 
-            foreach ($this->context->getRouteHandlers() as $handler) {
+            foreach ($this->routeHandlers as $handler) {
                 $handler->updateBeforeCompilation($route);
             }
 
@@ -140,8 +150,8 @@ class UrlMatcher implements UrlMatcherInterface
                 }
             }
 
-            foreach ($this->context->getRouteHandlers() as $handler) {
-                $handler->checkMatcherExceptions($route);
+            foreach ($this->routeHandlers as $handler) {
+                $handler->checkMatcherExceptions($route, $compiledRoute);
             }
 
             $status = $this->handleRouteRequirements($pathinfo, $name, $route);
@@ -156,7 +166,7 @@ class UrlMatcher implements UrlMatcherInterface
 
             $parameters = array('_route' => $name);
 
-            foreach ($this->context->getRouteHandlers() as $handler) {
+            foreach ($this->routeHandlers as $handler) {
                 $parameters = $handler->updateMatchedParameters($route, $parameters);
             }
 

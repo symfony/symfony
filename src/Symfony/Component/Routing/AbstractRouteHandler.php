@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Route;
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-abstract class AbstractRouteHandler
+abstract class AbstractRouteHandler implements RouteHandlerInterface
 {
     /**
      * {@inheritdoc}
@@ -28,7 +28,7 @@ abstract class AbstractRouteHandler
     /**
      * {@inheritdoc}
      */
-    public function checkMatcherExceptions(Route $route)
+    public function checkMatcherExceptions(Route $route, CompiledRoute $compiledRoute)
     {
     }
 

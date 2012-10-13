@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Component\Routing\RouteHandlerAwareInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
@@ -22,7 +23,7 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
  *
  * @api
  */
-interface UrlMatcherInterface extends RequestContextAwareInterface
+interface UrlMatcherInterface extends RequestContextAwareInterface, RouteHandlerAwareInterface
 {
     /**
      * Tries to match a URL path with a set of routes.

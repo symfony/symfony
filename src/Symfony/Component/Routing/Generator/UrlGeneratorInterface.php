@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Generator;
 
 use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Component\Routing\RouteHandlerAwareInterface;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
@@ -21,7 +22,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
  *
  * @api
  */
-interface UrlGeneratorInterface extends RequestContextAwareInterface
+interface UrlGeneratorInterface extends RequestContextAwareInterface, RouteHandlerAwareInterface
 {
     /**
      * Generates a URL from the given parameters.

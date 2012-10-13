@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Routing;
 
-use Symfony\Component\Routing\Route;
-
 /**
+ * RouteHandlerInterface
+ *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
 interface RouteHandlerInterface
@@ -28,9 +28,12 @@ interface RouteHandlerInterface
     /**
      * Checks route for an exception during matching.
      *
+     * @TODO: change name of this method.
+     *
      * @param Route $route
+     * @param CompiledRoute $compiledRoute
      */
-    function checkMatcherExceptions(Route $route);
+    function checkMatcherExceptions(Route $route, CompiledRoute $compiledRoute);
 
     /**
      * Updates matched parameters.

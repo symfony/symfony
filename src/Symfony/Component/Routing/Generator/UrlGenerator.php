@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\Routing\RouteHandlerInterface;
 
 /**
  * UrlGenerator generates a URL based on a set of routes.
@@ -32,6 +33,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     protected $context;
     protected $strictRequirements = true;
     protected $logger;
+    protected $routeHandlers;
 
     /**
      * This array defines the characters (besides alphanumeric ones) that will not be percent-encoded in the path segment of the generated URL.
@@ -77,6 +79,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $this->routes = $routes;
         $this->context = $context;
         $this->logger = $logger;
+        $this->routeHandlers = array();
     }
 
     /**
@@ -93,6 +96,14 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     public function getContext()
     {
         return $this->context;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addRouteHandler(RouteHandlerInterface $handler)
+    {
+        $this->routeHandlers[] = $handler;
     }
 
     /**
@@ -120,7 +131,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', $name));
         }
 
-        foreach ($this->context->getOptionsHandlers(array_keys($route->getOptions())) as $handler) {
+        foreach ($this->routeHandlers as $handler) {
             $handler->updateBeforeCompilation($route);
         }
 

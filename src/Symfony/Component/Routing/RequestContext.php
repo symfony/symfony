@@ -30,7 +30,6 @@ class RequestContext
     private $httpPort;
     private $httpsPort;
     private $parameters;
-    private $routeHandlers;
 
     /**
      * Constructor.
@@ -64,14 +63,6 @@ class RequestContext
         $this->setScheme($request->getScheme());
         $this->setHttpPort($request->isSecure() ? $this->httpPort : $request->getPort());
         $this->setHttpsPort($request->isSecure() ? $request->getPort() : $this->httpsPort);
-    }
-
-    /**
-     * @param RouteHandlerInterface $handler
-     */
-    public function addOptionsHandler(RouteHandlerInterface $handler)
-    {
-        $this->routeHandlers[] = $handler;
     }
 
     /**
@@ -269,15 +260,5 @@ class RequestContext
     public function setParameter($name, $parameter)
     {
         $this->parameters[$name] = $parameter;
-    }
-
-    /**
-     * Returns route handlers.
-     *
-     * @return RouteHandlerInterface[]
-     */
-    public function getRouteHandlers()
-    {
-        $this->routeHandlers;
     }
 }

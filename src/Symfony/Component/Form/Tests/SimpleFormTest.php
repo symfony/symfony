@@ -113,6 +113,39 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertEquals('client',   $form->getClientData());
     }
 
+    public function testIgnoreMissingUsesParentSettingByDefault()
+    {
+        $parent = $this->getBuilder()->setIgnoreMissing(true)->getForm();
+        $child = $this->getBuilder()->getForm();
+
+        $child->setParent($parent);
+
+        $this->assertTrue($child->getIgnoreMissing());
+    }
+
+    public function testIgnoreMissingDefaultsToNull()
+    {
+        $form = $this->getBuilder()->getForm();
+        $this->assertNull($form->getIgnoreMissing());
+    }
+
+    public function testIgnoreMissingUsesSetValue()
+    {
+        $parent = $this->getBuilder()->setIgnoreMissing(false)->getForm();
+        $child  = $this->getBuilder()->setIgnoreMissing(true)->getForm();
+
+        $child->setParent($parent);
+
+        $this->assertTrue($child->getIgnoreMissing());
+
+        $parent = $this->getBuilder()->setIgnoreMissing(true)->getForm();
+        $child  = $this->getBuilder()->setIgnoreMissing(false)->getForm();
+
+        $child->setParent($parent);
+
+        $this->assertFalse($child->getIgnoreMissing());
+    }
+
     public function testNeverRequiredIfParentNotRequired()
     {
         $parent = $this->getBuilder()->setRequired(false)->getForm();

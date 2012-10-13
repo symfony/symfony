@@ -2,7 +2,7 @@
 
 {% block body %}
 
-    {% render 'WebProfilerBundle:Profiler:toolbar' with { 'token': token, 'position': 'normal' } %}
+    {% render 'web_profiler.controller.profiler:toolbarAction' with { 'token': token, 'position': 'normal' } %}
 
     <div id="content">
         {% include '@WebProfiler/Profiler/header.html.twig' only %}
@@ -53,7 +53,7 @@
                             </li>
                         </ul>
                     {% endif %}
-                    {% render 'WebProfilerBundle:Profiler:searchBar' %}
+                    {% render 'web_profiler.controller.profiler:searchBarAction' %}
                     {% include '@WebProfiler/Profiler/admin.html.twig' with { 'token': token } only %}
                 </div>
             </div>

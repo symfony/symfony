@@ -9,35 +9,30 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Controller;
+namespace Symfony\Component\HttpKernel\Controller;
 
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Debug\Stopwatch;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 
 /**
  * TraceableControllerResolver.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TraceableControllerResolver extends ControllerResolver
+class TraceableControllerResolver implements ControllerResolverInterface
 {
+    private $resolver;
     private $stopwatch;
 
     /**
      * Constructor.
      *
-     * @param ContainerInterface   $container A ContainerInterface instance
-     * @param ControllerNameParser $parser    A ControllerNameParser instance
-     * @param Stopwatch            $stopwatch A Stopwatch instance
-     * @param LoggerInterface      $logger    A LoggerInterface instance
+     * @param ControllerResolverInterface $resolver  A ControllerResolverInterface instance
+     * @param Stopwatch                   $stopwatch A Stopwatch instance
      */
-    public function __construct(ContainerInterface $container, ControllerNameParser $parser, Stopwatch $stopwatch, LoggerInterface $logger = null)
+    public function __construct(ControllerResolverInterface $resolver, Stopwatch $stopwatch)
     {
-        parent::__construct($container, $parser, $logger);
-
+        $this->resolver = $resolver;
         $this->stopwatch = $stopwatch;
     }
 
@@ -48,7 +43,7 @@ class TraceableControllerResolver extends ControllerResolver
     {
         $e = $this->stopwatch->start('controller.get_callable');
 
-        $ret = parent::getController($request);
+        $ret = $this->resolver->getController($request);
 
         $e->stop();
 
@@ -62,7 +57,7 @@ class TraceableControllerResolver extends ControllerResolver
     {
         $e = $this->stopwatch->start('controller.get_arguments');
 
-        $ret = parent::getArguments($request, $controller);
+        $ret = $this->resolver->getArguments($request, $controller);
 
         $e->stop();
 

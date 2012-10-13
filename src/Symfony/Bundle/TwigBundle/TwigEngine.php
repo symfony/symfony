@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\TwigBundle;
 
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -31,16 +30,11 @@ class TwigEngine implements EngineInterface
      *
      * @param \Twig_Environment           $environment A \Twig_Environment instance
      * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
-     * @param GlobalVariables|null        $globals     A GlobalVariables instance or null
      */
-    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser, GlobalVariables $globals = null)
+    public function __construct(\Twig_Environment $environment, TemplateNameParserInterface $parser)
     {
         $this->environment = $environment;
         $this->parser = $parser;
-
-        if (null !== $globals) {
-            $environment->addGlobal('app', $globals);
-        }
     }
 
     /**

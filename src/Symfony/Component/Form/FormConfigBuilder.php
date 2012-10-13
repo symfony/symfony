@@ -69,7 +69,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @var Boolean
      */
-    private $ignoreMissing = false;
+    private $ignoreMissing = null;
 
     /**
      * @var ResolvedFormTypeInterface
@@ -809,7 +809,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new FormException('The config builder cannot be modified anymore.');
         }
 
-        $this->ignoreMissing = (Boolean) $ignoreMissing;
+        $this->ignoreMissing = $ignoreMissing;
 
         return $this;
     }

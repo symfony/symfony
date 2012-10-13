@@ -75,8 +75,6 @@ class ProfilerController
             'request'   => $request,
             'templates' => $this->getTemplateManager()->getTemplates($profile),
             'is_ajax'   => $request->isXmlHttpRequest(),
-            // for BC compatibility
-            'app'       => array('request' => $request),
         )));
     }
 
@@ -126,7 +124,7 @@ class ProfilerController
         $file = $request->files->get('file');
 
         if (empty($file) || !$file->isValid()) {
-            return new RedirectResponse($router->generate('_profiler_info', array('about' => 'upload_error')));
+            return new RedirectResponse($this->generator->generate('_profiler_info', array('about' => 'upload_error')));
         }
 
         if (!$profile = $this->profiler->import(file_get_contents($file->getPathname()))) {

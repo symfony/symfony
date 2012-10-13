@@ -14,6 +14,8 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\NegotiatedRouteHandler;
+use Symfony\Component\Routing\Router;
 
 /**
  * Set response header for content negotiation.
@@ -22,20 +24,47 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ContentNegotiationListener implements EventSubscriberInterface
 {
+    /**
+     * @var Router
+     */
+    private $router;
+
+    /**
+     * @param Router $router
+     */
+    public function __construct(Router $router)
+    {
+        $this->router = $router;
+    }
+
+    /**
+     * @param GetResponseEvent $event
+     */
     public function onKernelRequest(GetResponseEvent $event)
+    {
+        $this->router->addRouteHandler(new NegotiatedRouteHandler($event->getRequest()->headers));
+    }
+
+    /**
+     * @param GetResponseEvent $event
+     */
+    public function onKernelResponse(GetResponseEvent $event)
     {
         $attributes = $event->getRequest()->attributes;
 
-        if ($attributes->has('_negotiation')) {
-            $vary    = implode(', ', $attributes->get('_negotiation'));
+        if ($attributes->has('_negotiated_headers')) {
+            $vary    = implode(', ', $attributes->get('_negotiated_headers'));
             $headers = $event->getResponse()->headers;
 
             $headers->set('Vary', $headers->has('Vary') ? $headers->get('Vary').', '.$vary : $vary);
         }
     }
 
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents()
     {
-        return array(KernelEvents::REQUEST => 'onKernelRequest');
+        return array(KernelEvents::RESPONSE => 'onKernelResponse');
     }
 }

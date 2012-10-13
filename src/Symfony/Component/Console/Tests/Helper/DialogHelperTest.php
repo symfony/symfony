@@ -33,6 +33,10 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testAskHiddenResponse()
     {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('This test is not supported on Windows');
+        }
+
         $dialog = new DialogHelper();
 
         $dialog->setInputStream($this->getInputStream("8AM\n"));

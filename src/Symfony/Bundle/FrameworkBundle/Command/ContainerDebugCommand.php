@@ -44,6 +44,7 @@ class ContainerDebugCommand extends ContainerAwareCommand
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Use to show public *and* private services'),
+                new InputOption('format', null, InputOption::VALUE_OPTIONAL, 'The output format (plain|json)', 'plain'),
             ))
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<EOF
@@ -78,13 +79,61 @@ EOF
         asort($serviceIds);
 
         if ($name) {
-            $this->outputService($output, $name);
+            $this->outputService($output, $name, $input->getOption('format'));
         } else {
-            $this->outputServices($output, $serviceIds, $input->getOption('show-private'));
+            $this->outputServices($output, $serviceIds, $input->getOption('show-private'), $input->getOption('format'));
         }
     }
 
-    protected function outputServices(OutputInterface $output, $serviceIds, $showPrivate = false)
+    protected function outputServices(OutputInterface $output, $serviceIds, $showPrivate = false, $format = 'plain')
+    {
+        switch ($format) {
+            case 'plain':
+                $this->outputServicesPlain($output, $serviceIds, $showPrivate);
+                break;
+            case 'json':
+                $this->outputServicesJson($output, $serviceIds, $showPrivate);
+                break;
+            default:
+                throw new \InvalidArgumentException("The format " . $format ." is not available.");
+        }
+    }
+
+    protected function outputServicesJson(OutputInterface $output, $serviceIds, $showPrivate = false)
+    {
+        $services = array();
+
+        // loop through to filter private services
+        foreach ($serviceIds as $key => $serviceId) {
+            $definition = $this->resolveServiceDefinition($serviceId);
+
+            if ($definition instanceof Definition) {
+                // filter out private services unless shown explicitly
+                if (!$showPrivate && !$definition->isPublic()) {
+                    unset($serviceIds[$key]);
+                    continue;
+                }
+            }
+        }
+
+        foreach ($serviceIds as $serviceId) {
+            $definition = $this->resolveServiceDefinition($serviceId);
+            if ($definition instanceof Definition) {
+                $services[] = array('id' => $serviceId, 'scope' => $definition->getScope(), 'class' => $definition->getClass());
+            } elseif ($definition instanceof Alias) {
+                $alias = $definition;
+                $services[] = array('id' => $serviceId, 'scope'=> 'n/a', 'aliasFor' => (string) $alias);
+            } else {
+                // we have no information (happens with "service_container")
+                $service = $definition;
+                $services[] = array('id' => $serviceId, 'scope' => '', 'class' => get_class($service));
+            }
+        }
+
+        $output->writeln(json_encode($services));
+    }
+
+    protected function outputServicesPlain(OutputInterface $output, $serviceIds, $showPrivate = false)
     {
         // set the label to specify public or public+private
         if ($showPrivate) {
@@ -142,7 +191,54 @@ EOF
     /**
      * Renders detailed service information about one service
      */
-    protected function outputService(OutputInterface $output, $serviceId)
+    protected function outputService(OutputInterface $output, $serviceId, $format = 'plain')
+    {
+        switch ($format) {
+            case 'plain':
+                $this->outputServicePlain($output, $serviceId);
+                break;
+            case 'json':
+                $this->outputServiceJson($output, $serviceId);
+                break;
+            default:
+                throw new \InvalidArgumentException("The format " . $format ." is not available.");
+        }
+    }
+
+    protected function outputServiceJson(OutputInterface $output, $serviceId)
+    {
+        $definition = $this->resolveServiceDefinition($serviceId);
+        $service = array();
+
+        if ($definition instanceof Definition) {
+
+            $public = $definition->isPublic() ? 'yes' : 'no';
+            $synthetic = $definition->isSynthetic() ? 'yes' : 'no';
+            $tags = $definition->getTags() ? array_keys($definition->getTags()) : array();
+            $file = $definition->getFile() ? $definition->getFile() : null;
+
+            $service['id'] = $serviceId;
+            $service['class'] = $definition->getClass();
+            $service['tags'] = $tags;
+            $service['scope'] = $definition->getScope();
+            $service['public'] = $public;
+            $service['synthetic'] = $synthetic;
+            $service['file'] = $file;
+
+        } elseif ($definition instanceof Alias) {
+            $alias = $definition;
+            $service['aliasFor'] = (string) $alias;
+        } else {
+            // edge case (but true for "service_container", all we have is the service itself
+            $s = $definition;
+            $service['id'] = $serviceId;
+            $service['class'] = get_class($s);
+        }
+
+        $output->writeln(json_encode($service));
+    }
+
+    protected function outputServicePlain(OutputInterface $output, $serviceId)
     {
         $definition = $this->resolveServiceDefinition($serviceId);
 

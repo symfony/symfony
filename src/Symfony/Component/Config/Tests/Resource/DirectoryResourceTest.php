@@ -38,13 +38,13 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     {
         $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory), \RecursiveIteratorIterator::CHILD_FIRST);
         foreach ($iterator as $path) {
-            if (preg_match('#[/\\\\]\.\.?$#', $path->__toString())) {
+            if (preg_match('#[/\\\\]\.\.?$#', (string) $path)) {
                 continue;
             }
             if ($path->isDir()) {
-               rmdir($path->__toString());
+               rmdir((string) $path);
             } else {
-               unlink($path->__toString());
+               unlink((string) $path);
             }
         }
         rmdir($directory);
@@ -213,14 +213,14 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(5, count($childs));
 
         $childs = array_map(function($item) {
-            return (string) $item;
+            return $item->getRealPath();
         }, $childs);
 
-        $this->assertContains($file1, $childs);
-        $this->assertContains($file2, $childs);
-        $this->assertContains($dir, $childs);
-        $this->assertContains($this->directory.'/tmp.xml', $childs);
-        $this->assertContains($file3, $childs);
+        $this->assertContains(realpath($file1), $childs);
+        $this->assertContains(realpath($file2), $childs);
+        $this->assertContains(realpath($dir), $childs);
+        $this->assertContains(realpath($this->directory.'/tmp.xml'), $childs);
+        $this->assertContains(realpath($file3), $childs);
     }
 
     /**

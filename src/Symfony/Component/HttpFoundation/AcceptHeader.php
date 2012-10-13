@@ -25,7 +25,7 @@ class AcceptHeader
      *
      * @return array Array indexed by the values of the Accept-* header in preferred order
      */
-    static public function split($header)
+    public static function split($header)
     {
         if (!$header) {
             return array();

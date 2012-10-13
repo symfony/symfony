@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\AcceptHeader;
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-abstract class AcceptTypeQualifier extends AcceptHeaderQualifier
+class AcceptTypeQualifier extends AcceptHeaderQualifier
 {
     /**
      * {@inheritdoc}

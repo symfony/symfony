@@ -91,11 +91,14 @@ class Negotiator implements NegotiatorInterface
     /**
      * {@inheritdoc}
      */
-    public function getContents()
+    public function getVaryingHeaders()
     {
-        $this->sort();
+        $headers = array();
+        foreach ($this->qualifiers as $qualifier) {
+            $headers = array_merge($headers, $qualifier->getVaryingHeaders());
+        }
 
-        return $this->contents;
+        return array_unique($headers);
     }
 
     /**

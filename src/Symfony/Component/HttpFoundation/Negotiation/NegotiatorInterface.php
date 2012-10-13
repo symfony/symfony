@@ -40,9 +40,9 @@ interface NegotiatorInterface
     function getBestContent();
 
     /**
-     * Returns all qualified documents.
+     * Returns varying headers.
      *
-     * @return ContentInterface[]
+     * @return array
      */
-    function getContents();
+    function getVaryingHeaders();
 }

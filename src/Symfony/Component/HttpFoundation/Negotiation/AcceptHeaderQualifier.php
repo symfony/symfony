@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Negotiation;
 
+use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\AcceptHeader;
 
 /**
@@ -26,12 +27,19 @@ abstract class AcceptHeaderQualifier implements QualifierInterface
     private $qualities;
 
     /**
-     * @param string $header
+     * @var string
      */
-    public function __construct($header)
+    private $headerName;
+
+    /**
+     * @param string $headerName
+     * @param string $headerValue
+     */
+    public function __construct($headerName, $headerValue)
     {
+        $this->headerName = $headerName;
         $this->qualities = array();
-        foreach (AcceptHeader::split($header) as $value => $quality) {
+        foreach (AcceptHeader::split($headerValue) as $value => $quality) {
             $this->add($value, $quality);
         }
     }
@@ -43,6 +51,14 @@ abstract class AcceptHeaderQualifier implements QualifierInterface
     public function add($value, $quality = 1)
     {
         $this->qualities[$value] = $quality;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVaryingHeaders()
+    {
+        return array($this->headerName);
     }
 
     /**

@@ -318,23 +318,25 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
             return;
         }
 
-        $this->saveStopwatchInfoInProfile($profile, $updateChildren);
+        $this->saveInfoInProfile($profile, $updateChildren);
     }
 
     /**
-     * Update the profiles with the timing info and saves them.
+     * Update the profiles with the timing and events information and saves them.
      *
      * @param Profile $profile        The root profile
      * @param Boolean $updateChildren Whether to update the children altogether
      */
-    private function saveStopwatchInfoInProfile(Profile $profile, $updateChildren)
+    private function saveInfoInProfile(Profile $profile, $updateChildren)
     {
         $profile->getCollector('time')->setEvents($this->stopwatch->getSectionEvents($profile->getToken()));
+        $profile->getCollector('events')->setCalledListeners($this->getCalledListeners());
+        $profile->getCollector('events')->setNotCalledListeners($this->getNotCalledListeners());
         $this->profiler->saveProfile($profile);
 
         if ($updateChildren) {
             foreach ($profile->getChildren() as $child) {
-                $this->saveStopwatchInfoInProfile($child, true);
+                $this->saveInfoInProfile($child, true);
             }
         }
     }

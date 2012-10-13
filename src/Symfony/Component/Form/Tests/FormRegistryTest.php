@@ -9,8 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form;
+namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\Tests\Fixtures\TestExtension;
 use Symfony\Component\Form\Tests\Fixtures\FooSubTypeWithParentInstance;
 use Symfony\Component\Form\Tests\Fixtures\FooSubType;

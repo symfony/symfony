@@ -180,6 +180,15 @@ class Form implements \IteratorAggregate, FormInterface
         return $this->config->getName();
     }
 
+    public function getIgnoreMissing()
+    {
+        if ($this->parent && null === $this->config->getIgnoreMissing()) {
+            return $this->parent->getIgnoreMissing();
+        }
+
+        return $this->config->getIgnoreMissing();
+    }
+
     /**
      * {@inheritdoc}
      */

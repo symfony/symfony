@@ -321,7 +321,6 @@ class ProfilerController extends ContainerAware
         if (null === $this->templateManager) {
             $this->templateManager = new TemplateManager(
                 $this->container->get('profiler'),
-                $this->container->get('templating'),
                 $this->container->get('twig'),
                 $this->container->getParameter('data_collector.templates')
             );

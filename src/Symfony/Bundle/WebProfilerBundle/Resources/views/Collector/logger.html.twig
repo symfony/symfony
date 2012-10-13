@@ -31,7 +31,7 @@
 {% block panel %}
     <h2>Logs</h2>
 
-    {% set priority = app.request.query.get('priority', 0) %}
+    {% set priority = request.query.get('priority', 0) %}
 
     <table>
         <tr>

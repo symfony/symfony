@@ -1,6 +1,6 @@
 <!-- START of Symfony2 Web Debug Toolbar -->
 {% if 'normal' != position %}
-    {% include 'WebProfilerBundle:Profiler:toolbar_style.html.twig' with { 'position': position, 'floatable': true } %}
+    {% include '@WebProfiler/Profiler/toolbar_style.html.twig' with { 'position': position, 'floatable': true } %}
     <div id="sfMiniToolbar_{{ token }}" class="sf-minitoolbar">
         <a href="javascript:void(0);" title="Show Symfony toolbar" onclick="
             var elem = this.parentNode;

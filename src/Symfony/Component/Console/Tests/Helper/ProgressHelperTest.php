@@ -63,6 +63,18 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->generateOutput('  1/10 [_/        ]  10%'), stream_get_contents($output->getStream()));
     }
 
+    public function testPercent()
+    {
+        $progress = new ProgressHelper();
+        $progress->start($output = $this->getOutputStream(), 50);
+        $progress->display();
+        $progress->advance();
+        $progress->advance();
+
+        rewind($output->getStream());
+        $this->assertEquals($this->generateOutput('  0/50 [>---------------------------]   0%').$this->generateOutput('  1/50 [>---------------------------]   2%').$this->generateOutput('  2/50 [=>--------------------------]   4%'), stream_get_contents($output->getStream()));
+    }
+
     protected function getOutputStream()
     {
         return new StreamOutput(fopen('php://memory', 'r+', false));

@@ -34,11 +34,11 @@ class DirectoryResource implements ResourceInterface
     }
 
     /**
-     * Returns the list of filtered file and directory childs of directory resource.
+     * Returns the list of filtered file and directory children of directory resource.
      *
      * @return array An array of files
      */
-    public function getFilteredChilds()
+    public function getFilteredChildren()
     {
         if (!$this->exists()) {
             return array();
@@ -49,7 +49,7 @@ class DirectoryResource implements ResourceInterface
             \RecursiveIteratorIterator::SELF_FIRST
         );
 
-        $childs = array();
+        $children = array();
         foreach ($iterator as $file) {
             // if regex filtering is enabled only return matching files
             if ($file->isFile() && !$this->hasFile($file)) {
@@ -62,10 +62,10 @@ class DirectoryResource implements ResourceInterface
                 continue;
             }
 
-            $childs[] = $file;
+            $children[] = $file;
         }
 
-        return $childs;
+        return $children;
     }
 
     /**
@@ -177,7 +177,7 @@ class DirectoryResource implements ResourceInterface
         clearstatcache(true, $this->resource);
         $newestMTime = filemtime($this->resource);
 
-        foreach ($this->getFilteredChilds() as $file) {
+        foreach ($this->getFilteredChildren() as $file) {
             clearstatcache(true, (string) $file);
             $newestMTime = max($file->getMTime(), $newestMTime);
         }

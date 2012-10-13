@@ -197,9 +197,9 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Symfony\Component\Config\Resource\DirectoryResource::getFilteredChilds
+     * @covers Symfony\Component\Config\Resource\DirectoryResource::getFilteredChildren
      */
-    public function testGetFilteredChilds()
+    public function testGetFilteredChildren()
     {
         $resource = new DirectoryResource($this->directory, '/\.(foo|xml)$/');
 
@@ -209,18 +209,18 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         mkdir($dir = $this->directory.'/sub');
         touch($file3 = $this->directory.'/sub/file.foo', time() + 20);
 
-        $childs = $resource->getFilteredChilds();
-        $this->assertSame(5, count($childs));
+        $children = $resource->getFilteredChildren();
+        $this->assertSame(5, count($children));
 
-        $childs = array_map(function($item) {
+        $children = array_map(function($item) {
             return $item->getRealPath();
-        }, $childs);
+        }, $children);
 
-        $this->assertContains(realpath($file1), $childs);
-        $this->assertContains(realpath($file2), $childs);
-        $this->assertContains(realpath($dir), $childs);
-        $this->assertContains(realpath($this->directory.'/tmp.xml'), $childs);
-        $this->assertContains(realpath($file3), $childs);
+        $this->assertContains(realpath($file1), $children);
+        $this->assertContains(realpath($file2), $children);
+        $this->assertContains(realpath($dir), $children);
+        $this->assertContains(realpath($this->directory.'/tmp.xml'), $children);
+        $this->assertContains(realpath($file3), $children);
     }
 
     /**
@@ -239,14 +239,14 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         $resources = $resource->getFilteredResources();
         $this->assertSame(4, count($resources));
 
-        $childs = array_map(function($item) {
+        $children = array_map(function($item) {
             return realpath($item->getResource());
         }, $resources);
 
-        $this->assertContains(realpath($file1), $childs);
-        $this->assertContains(realpath($file2), $childs);
-        $this->assertContains(realpath($dir), $childs);
-        $this->assertContains(realpath($this->directory.'/tmp.xml'), $childs);
+        $this->assertContains(realpath($file1), $children);
+        $this->assertContains(realpath($file2), $children);
+        $this->assertContains(realpath($dir), $children);
+        $this->assertContains(realpath($this->directory.'/tmp.xml'), $children);
     }
 
     /**

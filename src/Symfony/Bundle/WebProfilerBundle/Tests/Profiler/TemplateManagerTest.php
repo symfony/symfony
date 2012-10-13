@@ -22,11 +22,6 @@ use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 class TemplateManagerTest extends TestCase
 {
     /**
-     * @var \Symfony\Bundle\TwigBundle\TwigEngine
-     */
-    protected $twigEngine;
-
-    /**
      * @var \Twig_Environment
      */
     protected $twigEnvironment;
@@ -51,7 +46,6 @@ class TemplateManagerTest extends TestCase
         parent::setUp();
 
         $profiler = $this->mockProfiler();
-        $twigEngine = $this->mockTwigEngine();
         $twigEnvironment = $this->mockTwigEnvironment();
         $templates = array(
             'data_collector.foo'=>array('foo','FooBundle:Collector:foo'),
@@ -59,7 +53,7 @@ class TemplateManagerTest extends TestCase
             'data_collector.baz'=>array('baz','FooBundle:Collector:baz')
             );
 
-        $this->templateManager = new TemplateManager($profiler, $twigEngine, $twigEnvironment, $templates);
+        $this->templateManager = new TemplateManager($profiler, $twigEnvironment, $templates);
     }
 
     /**
@@ -152,19 +146,6 @@ class TemplateManagerTest extends TestCase
             ->will($this->returnValue('loadedTemplate'));
 
         return $this->twigEnvironment;
-    }
-
-    protected function mockTwigEngine()
-    {
-        $this->twigEngine = $this->getMockBuilder('Symfony\Bundle\TwigBundle\TwigEngine')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->twigEngine->expects($this->any())
-            ->method('exists')
-            ->will($this->returnValue(true));
-
-        return $this->twigEngine;
     }
 
     protected function mockProfiler()

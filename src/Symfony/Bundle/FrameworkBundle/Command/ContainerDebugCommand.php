@@ -85,7 +85,7 @@ EOF
         }
     }
 
-    protected function outputServices(OutputInterface $output, $serviceIds, $showPrivate, $format = 'plain')
+    protected function outputServices(OutputInterface $output, $serviceIds, $showPrivate = false, $format = 'plain')
     {
         switch ($format) {
             case 'plain':

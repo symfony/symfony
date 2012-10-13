@@ -54,10 +54,8 @@ class FrameworkExtension extends Extension
             $definition = $container->findDefinition('http_kernel');
             $arguments = $definition->getArguments();
             $arguments[0] = new Reference('debug.event_dispatcher');
+            $arguments[2] = new Reference('debug.controller_resolver');
             $definition->setArguments($arguments);
-
-            $container->setDefinition('controller_resolver', $container->findDefinition('debug.controller_resolver'));
-            $container->setAlias('debug.controller_resolver', 'controller_resolver');
         }
 
         $configuration = $this->getConfiguration($configs, $container);

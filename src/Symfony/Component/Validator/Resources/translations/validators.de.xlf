@@ -200,7 +200,7 @@
             </trans-unit>
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail.</source>
-                <target>Eine PHP Erweiterung verhinderte den Upload.</target>
+                <target>Eine PHP-Erweiterung verhinderte den Upload.</target>
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} elements or more.</source>
@@ -212,7 +212,7 @@
             </trans-unit>
             <trans-unit id="56">
                 <source>This collection should contain exactly {{ limit }} elements.</source>
-                <target>Diese Sammlung sollte genau {{ limit }} Element beinhalten.|Diese Sammlung sollte genau {{ limit }} Element beinhalten.</target>
+                <target>Diese Sammlung sollte genau {{ limit }} Element beinhalten.|Diese Sammlung sollte genau {{ limit }} Elemente beinhalten.</target>
             </trans-unit>
         </body>
     </file>

@@ -210,7 +210,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         touch($file3 = $this->directory.'/sub/file.foo', time() + 20);
 
         $children = $resource->getFilteredChildren();
-        $this->assertSame(5, count($children));
+        $this->assertCount(5, $children);
 
         $children = array_map(function($item) {
             return $item->getRealPath();
@@ -237,7 +237,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         touch($file3 = $this->directory.'/sub/file.foo', time() + 20);
 
         $resources = $resource->getFilteredResources();
-        $this->assertSame(4, count($resources));
+        $this->assertCount(4, $resources);
 
         $children = array_map(function($item) {
             return realpath($item->getResource());

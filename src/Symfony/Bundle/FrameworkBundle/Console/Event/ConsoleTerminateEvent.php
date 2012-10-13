@@ -11,6 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Event;
 
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
 /**
  * Allows to receive the exit code of a command after its execution.
  *
@@ -26,8 +29,9 @@ class ConsoleTerminateEvent extends ConsoleEvent
      */
     private $exitCode;
 
-    public function __construct($exitCode)
+    public function __construct(InputInterface $input, OutputInterface $output, $exitCode)
     {
+        parent::__construct($input, $output);
         $this->exitCode = $exitCode;
     }
 

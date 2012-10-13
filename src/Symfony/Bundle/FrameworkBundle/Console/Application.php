@@ -85,7 +85,7 @@ class Application extends BaseApplication
 
         $exitCode = parent::doRun($input, $output);
 
-        $terminateEvent = new ConsoleTerminateEvent($exitCode);
+        $terminateEvent = new ConsoleTerminateEvent($input, $output, $exitCode);
         $dispatcher->dispatch(ConsoleEvents::TERMINATE, $terminateEvent);
 
         return $exitCode;

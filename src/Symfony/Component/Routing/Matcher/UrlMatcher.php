@@ -111,15 +111,8 @@ class UrlMatcher implements UrlMatcherInterface
                 return $ret;
             }
 
-            // check negotiate route option
-            $negotiatedVariables = array();
-            if ($route->getOption('negotiate')) {
-                foreach ($this->negotiatedVariables as $variable) {
-                    if (null !== $requirement = $route->getRequirement($variable)) {
-                        $negotiatedVariables[] = $variable;
-                        $route->setDefault($variable, null);
-                    }
-                }
+            foreach ($this->context->getRouteHandlers() as $handler) {
+                $handler->updateBeforeCompilation($route);
             }
 
             $compiledRoute = $route->compile();
@@ -147,21 +140,8 @@ class UrlMatcher implements UrlMatcherInterface
                 }
             }
 
-            if ($route->getOption('negotiate')) {
-                foreach ($this->negotiatedVariables as $variable) {
-                    if (in_array($variable, $compiledRoute->getVariables()) && null !== $acceptance = $this->context->getAcceptance($variable)) {
-                        if (null !== $requirement = $route->getRequirement($variable)) {
-                            $acceptance = $acceptance->filter($requirement);
-                        }
-                        if (null !== $default = $acceptance->getBestValue()) {
-                            $route->setDefault($variable, $default);
-                        } else {
-                            $message = sprintf('None of the accepted values "%s" match route requirement "%s".', implode(', ', $acceptance->getValues()), $requirement);
-
-                            throw new NotAcceptableException($negotiatedVariables, $message);
-                        }
-                    }
-                }
+            foreach ($this->context->getRouteHandlers() as $handler) {
+                $handler->checkMatcherExceptions($route);
             }
 
             $status = $this->handleRouteRequirements($pathinfo, $name, $route);
@@ -175,8 +155,9 @@ class UrlMatcher implements UrlMatcherInterface
             }
 
             $parameters = array('_route' => $name);
-            if ($route->getOption('negotiate')) {
-                $parameters['_negotiation'] = $negotiatedVariables;
+
+            foreach ($this->context->getRouteHandlers() as $handler) {
+                $parameters = $handler->updateMatchedParameters($route, $parameters);
             }
 
             return array_merge($this->mergeDefaults($matches, $route->getDefaults()), $parameters);

@@ -30,7 +30,7 @@ class RequestContext
     private $httpPort;
     private $httpsPort;
     private $parameters;
-    private $acceptances;
+    private $routeHandlers;
 
     /**
      * Constructor.
@@ -53,7 +53,7 @@ class RequestContext
         $this->httpPort = $httpPort;
         $this->httpsPort = $httpsPort;
         $this->parameters = array();
-        $this->acceptances = array();
+        $this->routeHandlers = array();
     }
 
     public function fromRequest(Request $request)
@@ -64,25 +64,14 @@ class RequestContext
         $this->setScheme($request->getScheme());
         $this->setHttpPort($request->isSecure() ? $this->httpPort : $request->getPort());
         $this->setHttpsPort($request->isSecure() ? $request->getPort() : $this->httpsPort);
+    }
 
-        if ($request->headers->has('Accept')) {
-            $this->acceptances['_format'] = new RequestAcceptance($request->headers->get('Accept'));
-            $this->acceptances['_format']->mapValues(function($type) { return ExtensionGuesser::getInstance()->guess($type); });
-        } else {
-            unset($this->acceptances['_format']);
-        }
-
-        if ($request->headers->has('Accept-Language')) {
-            $this->acceptances['_locale'] = new RequestAcceptance($request->headers->get('Accept-Language'));
-        } else {
-            unset($this->acceptances['_locale']);
-        }
-
-        if ($request->headers->has('Accept-Charset')) {
-            $this->acceptances['_charset'] = new RequestAcceptance($request->headers->get('Accept-Charset'));
-        } else {
-            unset($this->acceptances['_charset']);
-        }
+    /**
+     * @param RouteHandlerInterface $handler
+     */
+    public function addOptionsHandler(RouteHandlerInterface $handler)
+    {
+        $this->routeHandlers[] = $handler;
     }
 
     /**
@@ -283,22 +272,12 @@ class RequestContext
     }
 
     /**
-     * @param string $name
+     * Returns route handlers.
      *
-     * @return RequestAcceptance|null
+     * @return RouteHandlerInterface[]
      */
-    public function getAcceptance($name)
+    public function getRouteHandlers()
     {
-        return isset($this->acceptances[$name]) ? $this->acceptances[$name] : null;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @param RequestAcceptance $acceptance
-     */
-    public function setAcceptance($name, RequestAcceptance $acceptance)
-    {
-        $this->acceptances[$name] = $acceptance;
+        $this->routeHandlers;
     }
 }

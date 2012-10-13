@@ -120,6 +120,10 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', $name));
         }
 
+        foreach ($this->context->getOptionsHandlers(array_keys($route->getOptions())) as $handler) {
+            $handler->updateBeforeCompilation($route);
+        }
+
         // the Route has a cache of its own and is not recompiled as long as it does not get modified
         $compiledRoute = $route->compile();
 

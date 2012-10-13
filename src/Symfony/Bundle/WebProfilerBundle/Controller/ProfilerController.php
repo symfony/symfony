@@ -58,6 +58,7 @@ class ProfilerController extends ContainerAware
             'collector' => $profile->getCollector($panel),
             'panel'     => $panel,
             'page'      => $page,
+            'request'   => $request,
             'templates' => $this->getTemplateManager()->getTemplates($profile),
             'is_ajax'   => $request->isXmlHttpRequest(),
         ));

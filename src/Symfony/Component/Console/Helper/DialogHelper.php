@@ -23,6 +23,59 @@ class DialogHelper extends Helper
     private $inputStream;
 
     /**
+     * Asks to select array value to the user.
+     *
+     * @param OutputInterface $output   An Output instance
+     * @param string|array    $question The question to ask
+     * @param array           $choices  List of choices to pick from
+     * @param Boolean         $default  The default answer if the user enters nothing
+     * @param array           $options  Display options:
+     *                                      'attempts' - Max number of times to ask before giving up (false by default,
+     *                                                  which means infinite)
+     *                                      'error_template' - Message which will be shown if invalid value from choice
+     *                                                  list would be picked. Defaults to "Value '%s' is not in provided
+     *                                                  in choice list"
+     *                                      'return' - What should be returned from choice list - 'key' or 'value'
+     *
+     * @return mixed
+     */
+    public function select(OutputInterface $output, $question, $choices, $default = null, array $options = array())
+    {
+        $options = array_merge(array(
+            'attempts' => false,
+            'error_template' => "Value '%s' is not in provided in choice list",
+            'return' => 'key'
+        ), $options);
+
+        $width = max(array_map('strlen', array_keys($choices))) + 2;
+
+        $messages = (array) $question;
+        foreach ($choices as $key => $value) {
+            $messages[] = sprintf("  <info>%-${width}s</info> %s", $key, $value);
+        }
+
+        $output->writeln($messages);
+
+        $result = $this->askAndValidate($output, '> ', function($picked) use ($choices, $options) {
+            if (empty($choices[$picked])) {
+                throw new \InvalidArgumentException(sprintf($options['error_template'], $picked));
+            }
+
+            return $picked;
+        }, $options['attempts'], $default);
+
+        switch($options['return']) {
+            case 'key':
+                return $result;
+            case 'value':
+                return $choices[$result];
+            default:
+                $tpl = 'Invalid return type specified: "%s". Should be either "key" or "value".';
+                throw new \InvalidArgumentException(sprintf($tpl . '', $options['return']));
+        }
+    }
+
+    /**
      * Asks a question to the user.
      *
      * @param OutputInterface $output   An Output instance
@@ -69,6 +122,49 @@ class DialogHelper extends Helper
         }
 
         return !$answer || 'y' == strtolower($answer[0]);
+    }
+
+    /**
+     * Asks for a list of values interactively
+     *
+     * Optionally filter callback can be provided to filter out values
+     * and/or throw exception, if they don't pass validation
+     *
+     * @param OutputInterface $output    An Output instance
+     * @param string|array    $question  The question to ask
+     * @param callback        $validator A PHP callback
+     *
+     * @return array
+     */
+    public function askForList(OutputInterface $output, $question, $filter = null)
+    {
+        if (!empty($filter)) {
+            if(!is_callable($filter)) {
+                throw new \InvalidArgumentException('Filter should be callable');
+            }
+
+            $formatter = $this->getHelperSet()->get('formatter');
+        }
+
+        $output->writeln($question);
+
+        $list = array();
+        while (true) {
+            $value = $this->ask($output, '> ');
+            if (empty($value)) {
+                break;
+            }
+
+            if(!empty($filter)) {
+                try {
+                    $list[] = call_user_func($filter, $value);
+                } catch (\Exception $error) {
+                    $output->writeln($formatter->formatBlock($error->getMessage(), 'error'));
+                }
+            }
+        }
+
+        return $list;
     }
 
     /**

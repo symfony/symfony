@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added support for colorization on Windows via ConEmu
+ * added support for interactive selections in console (DialogHelper::select())
 
 2.1.0
 -----

@@ -518,7 +518,7 @@ class Form implements \IteratorAggregate, FormInterface
         // and radio buttons with empty values.
         if (is_scalar($submittedData)) {
             $submittedData = (string) $submittedData;
-        } elseif ($this->config->getPartial() && is_null($submittedData)) {
+        } elseif ($this->getIgnoreMissing() && null === $submittedData) {
             $submittedData = $this->getViewData();
         }
 

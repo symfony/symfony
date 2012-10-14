@@ -103,13 +103,13 @@ class ClassCollectionLoader
 
             $c = preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($class->getFileName()));
 
-            // add namespace declaration for global code
+            // fakes namespace declaration for global code
             if (!$class->inNamespace()) {
-                $c = "\nnamespace\n{\n".self::stripComments($c)."\n}\n";
-            } else {
-                $c = self::fixNamespaceDeclarations('<?php '.$c);
-                $c = preg_replace('/^\s*<\?php/', '', $c);
+                $c = "\nnamespace ;".$c;
             }
+
+            $c = self::fixNamespaceDeclarations('<?php '.$c);
+            $c = preg_replace('/^\s*<\?php/', '', $c);
 
             $content .= $c;
         }
@@ -198,37 +198,6 @@ class ClassCollectionLoader
         }
 
         throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
-    }
-
-    /**
-     * Removes comments from a PHP source string.
-     *
-     * We don't use the PHP php_strip_whitespace() function
-     * as we want the content to be readable and well-formatted.
-     *
-     * @param string $source A PHP string
-     *
-     * @return string The PHP string with the comments removed
-     */
-    private static function stripComments($source)
-    {
-        if (!function_exists('token_get_all')) {
-            return $source;
-        }
-
-        $output = '';
-        foreach (token_get_all($source) as $token) {
-            if (is_string($token)) {
-                $output .= $token;
-            } elseif (!in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
-                $output .= $token[1];
-            }
-        }
-
-        // replace multiple new lines with a single newline
-        $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
-
-        return $output;
     }
 
     /**

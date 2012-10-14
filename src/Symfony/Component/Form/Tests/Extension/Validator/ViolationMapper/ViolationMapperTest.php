@@ -124,9 +124,9 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->mapper->mapViolation($violation, $parent);
 
-        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
         $this->assertEquals(array($this->getFormError()), $child->getErrors(), $child->getName() . ' should have an error, but has none');
-        $this->assertFalse($grandChild->hasErrors(), $grandChild->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName() . ' should not have an error, but has one');
     }
 
     public function testFollowDotRules()
@@ -149,9 +149,9 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->mapper->mapViolation($violation, $parent);
 
-        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
-        $this->assertFalse($child->hasErrors(), $child->getName() . ' should not have an error, but has one');
-        $this->assertFalse($grandChild->hasErrors(), $grandChild->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $child->getErrors(), $child->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName() . ' should not have an error, but has one');
         $this->assertEquals(array($this->getFormError()), $grandGrandChild->getErrors(), $grandGrandChild->getName() . ' should have an error, but has none');
     }
 
@@ -172,9 +172,9 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->mapper->mapViolation($violation, $parent);
 
-        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
-        $this->assertFalse($child->hasErrors(), $child->getName() . ' should not have an error, but has one');
-        $this->assertFalse($grandChild->hasErrors(), $grandChild->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $child->getErrors(), $child->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName() . ' should not have an error, but has one');
     }
 
     public function testAbortVirtualFormMappingIfNotSynchronized()
@@ -194,9 +194,9 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->mapper->mapViolation($violation, $parent);
 
-        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
-        $this->assertFalse($child->hasErrors(), $child->getName() . ' should not have an error, but has one');
-        $this->assertFalse($grandChild->hasErrors(), $grandChild->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $child->getErrors(), $child->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName() . ' should not have an error, but has one');
     }
 
     public function testAbortDotRuleMappingIfNotSynchronized()
@@ -218,9 +218,9 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->mapper->mapViolation($violation, $parent);
 
-        $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
-        $this->assertFalse($child->hasErrors(), $child->getName() . ' should not have an error, but has one');
-        $this->assertFalse($grandChild->hasErrors(), $grandChild->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $child->getErrors(), $child->getName() . ' should not have an error, but has one');
+        $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName() . ' should not have an error, but has one');
     }
 
     public function provideDefaultTests()
@@ -235,6 +235,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', 'address', 'street', 'street', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', 'address', 'street', 'street', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', 'address', 'street', 'street', 'children[address].data'),
             array(self::LEVEL_2, 'address', 'address', 'street', 'street', 'children[address].data.street'),
             array(self::LEVEL_2, 'address', 'address', 'street', 'street', 'children[address].data.street.prop'),
             array(self::LEVEL_1, 'address', 'address', 'street', 'street', 'children[address].data[street]'),
@@ -250,6 +251,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', 'address', 'street', '[street]', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', 'address', 'street', '[street]', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', 'address', 'street', '[street]', 'children[address].data'),
             array(self::LEVEL_1, 'address', 'address', 'street', '[street]', 'children[address].data.street'),
             array(self::LEVEL_1, 'address', 'address', 'street', '[street]', 'children[address].data.street.prop'),
             array(self::LEVEL_2, 'address', 'address', 'street', '[street]', 'children[address].data[street]'),
@@ -265,6 +267,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', '[address]', 'street', 'street', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', '[address]', 'street', 'street', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', '[address]', 'street', 'street', 'children[address].data'),
             array(self::LEVEL_2, 'address', '[address]', 'street', 'street', 'children[address].data.street'),
             array(self::LEVEL_2, 'address', '[address]', 'street', 'street', 'children[address].data.street.prop'),
             array(self::LEVEL_1, 'address', '[address]', 'street', 'street', 'children[address].data[street]'),
@@ -280,6 +283,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', '[address]', 'street', '[street]', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', '[address]', 'street', '[street]', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', '[address]', 'street', '[street]', 'children[address].data'),
             array(self::LEVEL_1, 'address', '[address]', 'street', '[street]', 'children[address].data.street'),
             array(self::LEVEL_1, 'address', '[address]', 'street', '[street]', 'children[address].data.street.prop'),
             array(self::LEVEL_2, 'address', '[address]', 'street', '[street]', 'children[address].data[street]'),
@@ -295,6 +299,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', 'person.address', 'street', 'street', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', 'person.address', 'street', 'street', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', 'person.address', 'street', 'street', 'children[address].data'),
             array(self::LEVEL_2, 'address', 'person.address', 'street', 'street', 'children[address].data.street'),
             array(self::LEVEL_2, 'address', 'person.address', 'street', 'street', 'children[address].data.street.prop'),
             array(self::LEVEL_1, 'address', 'person.address', 'street', 'street', 'children[address].data[street]'),
@@ -318,6 +323,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', 'person.address', 'street', '[street]', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', 'person.address', 'street', '[street]', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', 'person.address', 'street', '[street]', 'children[address].data'),
             array(self::LEVEL_1, 'address', 'person.address', 'street', '[street]', 'children[address].data.street'),
             array(self::LEVEL_1, 'address', 'person.address', 'street', '[street]', 'children[address].data.street.prop'),
             array(self::LEVEL_2, 'address', 'person.address', 'street', '[street]', 'children[address].data[street]'),
@@ -341,6 +347,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', 'person[address]', 'street', 'street', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', 'person[address]', 'street', 'street', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', 'person[address]', 'street', 'street', 'children[address].data'),
             array(self::LEVEL_2, 'address', 'person[address]', 'street', 'street', 'children[address].data.street'),
             array(self::LEVEL_2, 'address', 'person[address]', 'street', 'street', 'children[address].data.street.prop'),
             array(self::LEVEL_1, 'address', 'person[address]', 'street', 'street', 'children[address].data[street]'),
@@ -364,6 +371,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', 'person[address]', 'street', '[street]', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', 'person[address]', 'street', '[street]', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', 'person[address]', 'street', '[street]', 'children[address].data'),
             array(self::LEVEL_1, 'address', 'person[address]', 'street', '[street]', 'children[address].data.street'),
             array(self::LEVEL_1, 'address', 'person[address]', 'street', '[street]', 'children[address].data.street.prop'),
             array(self::LEVEL_2, 'address', 'person[address]', 'street', '[street]', 'children[address].data[street]'),
@@ -387,6 +395,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', '[person].address', 'street', 'street', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', '[person].address', 'street', 'street', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', '[person].address', 'street', 'street', 'children[address].data'),
             array(self::LEVEL_2, 'address', '[person].address', 'street', 'street', 'children[address].data.street'),
             array(self::LEVEL_2, 'address', '[person].address', 'street', 'street', 'children[address].data.street.prop'),
             array(self::LEVEL_1, 'address', '[person].address', 'street', 'street', 'children[address].data[street]'),
@@ -410,6 +419,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', '[person].address', 'street', '[street]', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', '[person].address', 'street', '[street]', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', '[person].address', 'street', '[street]', 'children[address].data'),
             array(self::LEVEL_1, 'address', '[person].address', 'street', '[street]', 'children[address].data.street'),
             array(self::LEVEL_1, 'address', '[person].address', 'street', '[street]', 'children[address].data.street.prop'),
             array(self::LEVEL_2, 'address', '[person].address', 'street', '[street]', 'children[address].data[street]'),
@@ -433,6 +443,8 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', '[person][address]', 'street', 'street', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', '[person][address]', 'street', 'street', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', '[person][address]', 'street', 'street', 'children[address]'),
+            array(self::LEVEL_1, 'address', '[person][address]', 'street', 'street', 'children[address].data'),
             array(self::LEVEL_2, 'address', '[person][address]', 'street', 'street', 'children[address].data.street'),
             array(self::LEVEL_2, 'address', '[person][address]', 'street', 'street', 'children[address].data.street.prop'),
             array(self::LEVEL_1, 'address', '[person][address]', 'street', 'street', 'children[address].data[street]'),
@@ -456,6 +468,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', '[person][address]', 'street', '[street]', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', '[person][address]', 'street', '[street]', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', '[person][address]', 'street', '[street]', 'children[address].data'),
             array(self::LEVEL_1, 'address', '[person][address]', 'street', '[street]', 'children[address].data.street'),
             array(self::LEVEL_1, 'address', '[person][address]', 'street', '[street]', 'children[address].data.street.prop'),
             array(self::LEVEL_2, 'address', '[person][address]', 'street', '[street]', 'children[address].data[street]'),
@@ -479,10 +492,13 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', 'address', 'street', 'office.street', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', 'address', 'street', 'office.street', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', 'address', 'street', 'office.street', 'children[address].data'),
+            array(self::LEVEL_1, 'address', 'address', 'street', 'office.street', 'children[address].data.office'),
             array(self::LEVEL_2, 'address', 'address', 'street', 'office.street', 'children[address].data.office.street'),
             array(self::LEVEL_2, 'address', 'address', 'street', 'office.street', 'children[address].data.office.street.prop'),
             array(self::LEVEL_1, 'address', 'address', 'street', 'office.street', 'children[address].data.office[street]'),
             array(self::LEVEL_1, 'address', 'address', 'street', 'office.street', 'children[address].data.office[street].prop'),
+            array(self::LEVEL_1, 'address', 'address', 'street', 'office.street', 'children[address].data[office]'),
             array(self::LEVEL_1, 'address', 'address', 'street', 'office.street', 'children[address].data[office].street'),
             array(self::LEVEL_1, 'address', 'address', 'street', 'office.street', 'children[address].data[office].street.prop'),
             array(self::LEVEL_1, 'address', 'address', 'street', 'office.street', 'children[address].data[office][street]'),
@@ -506,10 +522,13 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', '[address]', 'street', 'office.street', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', '[address]', 'street', 'office.street', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', '[address]', 'street', 'office.street', 'children[address].data'),
+            array(self::LEVEL_1, 'address', '[address]', 'street', 'office.street', 'children[address].data.office'),
             array(self::LEVEL_2, 'address', '[address]', 'street', 'office.street', 'children[address].data.office.street'),
             array(self::LEVEL_2, 'address', '[address]', 'street', 'office.street', 'children[address].data.office.street.prop'),
             array(self::LEVEL_1, 'address', '[address]', 'street', 'office.street', 'children[address].data.office[street]'),
             array(self::LEVEL_1, 'address', '[address]', 'street', 'office.street', 'children[address].data.office[street].prop'),
+            array(self::LEVEL_1, 'address', '[address]', 'street', 'office.street', 'children[address].data[office]'),
             array(self::LEVEL_1, 'address', '[address]', 'street', 'office.street', 'children[address].data[office].street'),
             array(self::LEVEL_1, 'address', '[address]', 'street', 'office.street', 'children[address].data[office].street.prop'),
             array(self::LEVEL_1, 'address', '[address]', 'street', 'office.street', 'children[address].data[office][street]'),
@@ -533,10 +552,13 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', 'address', 'street', 'office[street]', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', 'address', 'street', 'office[street]', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', 'address', 'street', 'office[street]', 'children[address].data'),
+            array(self::LEVEL_1, 'address', 'address', 'street', 'office[street]', 'children[address].data.office'),
             array(self::LEVEL_1, 'address', 'address', 'street', 'office[street]', 'children[address].data.office.street'),
             array(self::LEVEL_1, 'address', 'address', 'street', 'office[street]', 'children[address].data.office.street.prop'),
             array(self::LEVEL_2, 'address', 'address', 'street', 'office[street]', 'children[address].data.office[street]'),
             array(self::LEVEL_2, 'address', 'address', 'street', 'office[street]', 'children[address].data.office[street].prop'),
+            array(self::LEVEL_1, 'address', 'address', 'street', 'office[street]', 'children[address].data[office]'),
             array(self::LEVEL_1, 'address', 'address', 'street', 'office[street]', 'children[address].data[office].street'),
             array(self::LEVEL_1, 'address', 'address', 'street', 'office[street]', 'children[address].data[office].street.prop'),
             array(self::LEVEL_1, 'address', 'address', 'street', 'office[street]', 'children[address].data[office][street]'),
@@ -564,6 +586,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
             array(self::LEVEL_1, 'address', '[address]', 'street', 'office[street]', 'children[address].data.office.street.prop'),
             array(self::LEVEL_2, 'address', '[address]', 'street', 'office[street]', 'children[address].data.office[street]'),
             array(self::LEVEL_2, 'address', '[address]', 'street', 'office[street]', 'children[address].data.office[street].prop'),
+            array(self::LEVEL_1, 'address', '[address]', 'street', 'office[street]', 'children[address].data[office]'),
             array(self::LEVEL_1, 'address', '[address]', 'street', 'office[street]', 'children[address].data[office].street'),
             array(self::LEVEL_1, 'address', '[address]', 'street', 'office[street]', 'children[address].data[office].street.prop'),
             array(self::LEVEL_1, 'address', '[address]', 'street', 'office[street]', 'children[address].data[office][street]'),
@@ -587,10 +610,13 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', 'address', 'street', '[office].street', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', 'address', 'street', '[office].street', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', 'address', 'street', '[office].street', 'children[address].data'),
+            array(self::LEVEL_1, 'address', 'address', 'street', '[office].street', 'children[address].data.office'),
             array(self::LEVEL_1, 'address', 'address', 'street', '[office].street', 'children[address].data.office.street'),
             array(self::LEVEL_1, 'address', 'address', 'street', '[office].street', 'children[address].data.office.street.prop'),
             array(self::LEVEL_1, 'address', 'address', 'street', '[office].street', 'children[address].data.office[street]'),
             array(self::LEVEL_1, 'address', 'address', 'street', '[office].street', 'children[address].data.office[street].prop'),
+            array(self::LEVEL_1, 'address', 'address', 'street', '[office].street', 'children[address].data[office]'),
             array(self::LEVEL_2, 'address', 'address', 'street', '[office].street', 'children[address].data[office].street'),
             array(self::LEVEL_2, 'address', 'address', 'street', '[office].street', 'children[address].data[office].street.prop'),
             array(self::LEVEL_1, 'address', 'address', 'street', '[office].street', 'children[address].data[office][street]'),
@@ -614,10 +640,13 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', '[address]', 'street', '[office].street', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', '[address]', 'street', '[office].street', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', '[address]', 'street', '[office].street', 'children[address].data'),
+            array(self::LEVEL_1, 'address', '[address]', 'street', '[office].street', 'children[address].data.office'),
             array(self::LEVEL_1, 'address', '[address]', 'street', '[office].street', 'children[address].data.office.street'),
             array(self::LEVEL_1, 'address', '[address]', 'street', '[office].street', 'children[address].data.office.street.prop'),
             array(self::LEVEL_1, 'address', '[address]', 'street', '[office].street', 'children[address].data.office[street]'),
             array(self::LEVEL_1, 'address', '[address]', 'street', '[office].street', 'children[address].data.office[street].prop'),
+            array(self::LEVEL_1, 'address', '[address]', 'street', '[office].street', 'children[address].data[office]'),
             array(self::LEVEL_2, 'address', '[address]', 'street', '[office].street', 'children[address].data[office].street'),
             array(self::LEVEL_2, 'address', '[address]', 'street', '[office].street', 'children[address].data[office].street.prop'),
             array(self::LEVEL_1, 'address', '[address]', 'street', '[office].street', 'children[address].data[office][street]'),
@@ -641,10 +670,13 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', 'address', 'street', '[office][street]', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', 'address', 'street', '[office][street]', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', 'address', 'street', '[office][street]', 'children[address].data'),
+            array(self::LEVEL_1, 'address', 'address', 'street', '[office][street]', 'children[address].data.office'),
             array(self::LEVEL_1, 'address', 'address', 'street', '[office][street]', 'children[address].data.office.street'),
             array(self::LEVEL_1, 'address', 'address', 'street', '[office][street]', 'children[address].data.office.street.prop'),
             array(self::LEVEL_1, 'address', 'address', 'street', '[office][street]', 'children[address].data.office[street]'),
             array(self::LEVEL_1, 'address', 'address', 'street', '[office][street]', 'children[address].data.office[street].prop'),
+            array(self::LEVEL_1, 'address', 'address', 'street', '[office][street]', 'children[address].data[office]'),
             array(self::LEVEL_1, 'address', 'address', 'street', '[office][street]', 'children[address].data[office].street'),
             array(self::LEVEL_1, 'address', 'address', 'street', '[office][street]', 'children[address].data[office].street.prop'),
             array(self::LEVEL_2, 'address', 'address', 'street', '[office][street]', 'children[address].data[office][street]'),
@@ -668,10 +700,13 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
             array(self::LEVEL_2, 'address', '[address]', 'street', '[office][street]', 'children[address].children[street].data'),
             array(self::LEVEL_2, 'address', '[address]', 'street', '[office][street]', 'children[address].children[street].data.prop'),
+            array(self::LEVEL_1, 'address', '[address]', 'street', '[office][street]', 'children[address].data'),
+            array(self::LEVEL_1, 'address', '[address]', 'street', '[office][street]', 'children[address].data.office'),
             array(self::LEVEL_1, 'address', '[address]', 'street', '[office][street]', 'children[address].data.office.street'),
             array(self::LEVEL_1, 'address', '[address]', 'street', '[office][street]', 'children[address].data.office.street.prop'),
             array(self::LEVEL_1, 'address', '[address]', 'street', '[office][street]', 'children[address].data.office[street]'),
             array(self::LEVEL_1, 'address', '[address]', 'street', '[office][street]', 'children[address].data.office[street].prop'),
+            array(self::LEVEL_1, 'address', '[address]', 'street', '[office][street]', 'children[address].data[office]'),
             array(self::LEVEL_1, 'address', '[address]', 'street', '[office][street]', 'children[address].data[office].street'),
             array(self::LEVEL_1, 'address', '[address]', 'street', '[office][street]', 'children[address].data[office].street.prop'),
             array(self::LEVEL_2, 'address', '[address]', 'street', '[office][street]', 'children[address].data[office][street]'),
@@ -732,15 +767,15 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         if (self::LEVEL_0 === $target) {
             $this->assertEquals(array($this->getFormError()), $parent->getErrors(), $parent->getName() . ' should have an error, but has none');
-            $this->assertFalse($child->hasErrors(), $childName . ' should not have an error, but has one');
-            $this->assertFalse($grandChild->hasErrors(), $grandChildName . ' should not have an error, but has one');
+            $this->assertCount(0, $child->getErrors(), $childName . ' should not have an error, but has one');
+            $this->assertCount(0, $grandChild->getErrors(), $grandChildName . ' should not have an error, but has one');
         } elseif (self::LEVEL_1 === $target) {
-            $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
+            $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
             $this->assertEquals(array($this->getFormError()), $child->getErrors(), $childName . ' should have an error, but has none');
-            $this->assertFalse($grandChild->hasErrors(), $grandChildName . ' should not have an error, but has one');
+            $this->assertCount(0, $grandChild->getErrors(), $grandChildName . ' should not have an error, but has one');
         } else {
-            $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
-            $this->assertFalse($child->hasErrors(), $childName . ' should not have an error, but has one');
+            $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
+            $this->assertCount(0, $child->getErrors(), $childName . ' should not have an error, but has one');
             $this->assertEquals(array($this->getFormError()), $grandChild->getErrors(), $grandChildName. ' should have an error, but has none');
         }
     }
@@ -1199,20 +1234,20 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->mapper->mapViolation($violation, $parent);
 
         if ($target !== self::LEVEL_0) {
-            $this->assertFalse($distraction->hasErrors(), 'distraction should not have an error, but has one');
+            $this->assertCount(0, $distraction->getErrors(), 'distraction should not have an error, but has one');
         }
 
         if (self::LEVEL_0 === $target) {
             $this->assertEquals(array($this->getFormError()), $parent->getErrors(), $parent->getName() . ' should have an error, but has none');
-            $this->assertFalse($child->hasErrors(), $childName . ' should not have an error, but has one');
-            $this->assertFalse($grandChild->hasErrors(), $grandChildName . ' should not have an error, but has one');
+            $this->assertCount(0, $child->getErrors(), $childName . ' should not have an error, but has one');
+            $this->assertCount(0, $grandChild->getErrors(), $grandChildName . ' should not have an error, but has one');
         } elseif (self::LEVEL_1 === $target) {
-            $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
+            $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
             $this->assertEquals(array($this->getFormError()), $child->getErrors(), $childName . ' should have an error, but has none');
-            $this->assertFalse($grandChild->hasErrors(), $grandChildName . ' should not have an error, but has one');
+            $this->assertCount(0, $grandChild->getErrors(), $grandChildName . ' should not have an error, but has one');
         } else {
-            $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
-            $this->assertFalse($child->hasErrors(), $childName . ' should not have an error, but has one');
+            $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
+            $this->assertCount(0, $child->getErrors(), $childName . ' should not have an error, but has one');
             $this->assertEquals(array($this->getFormError()), $grandChild->getErrors(), $grandChildName. ' should have an error, but has none');
         }
     }
@@ -1385,24 +1420,24 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->mapper->mapViolation($violation, $parent);
 
         if (self::LEVEL_0 === $target) {
-            $this->assertFalse($errorChild->hasErrors(), $errorName . ' should not have an error, but has one');
+            $this->assertCount(0, $errorChild->getErrors(), $errorName . ' should not have an error, but has one');
             $this->assertEquals(array($this->getFormError()), $parent->getErrors(), $parent->getName() . ' should have an error, but has none');
-            $this->assertFalse($child->hasErrors(), $childName . ' should not have an error, but has one');
-            $this->assertFalse($grandChild->hasErrors(), $grandChildName . ' should not have an error, but has one');
+            $this->assertCount(0, $child->getErrors(), $childName . ' should not have an error, but has one');
+            $this->assertCount(0, $grandChild->getErrors(), $grandChildName . ' should not have an error, but has one');
         } elseif (self::LEVEL_1 === $target) {
-            $this->assertFalse($errorChild->hasErrors(), $errorName . ' should not have an error, but has one');
-            $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
+            $this->assertCount(0, $errorChild->getErrors(), $errorName . ' should not have an error, but has one');
+            $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
             $this->assertEquals(array($this->getFormError()), $child->getErrors(), $childName . ' should have an error, but has none');
-            $this->assertFalse($grandChild->hasErrors(), $grandChildName . ' should not have an error, but has one');
+            $this->assertCount(0, $grandChild->getErrors(), $grandChildName . ' should not have an error, but has one');
         } elseif (self::LEVEL_1B === $target) {
             $this->assertEquals(array($this->getFormError()), $errorChild->getErrors(), $errorName . ' should have an error, but has none');
-            $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
-            $this->assertFalse($child->hasErrors(), $childName . ' should not have an error, but has one');
-            $this->assertFalse($grandChild->hasErrors(), $grandChildName . ' should not have an error, but has one');
+            $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
+            $this->assertCount(0, $child->getErrors(), $childName . ' should not have an error, but has one');
+            $this->assertCount(0, $grandChild->getErrors(), $grandChildName . ' should not have an error, but has one');
         } else {
-            $this->assertFalse($errorChild->hasErrors(), $errorName . ' should not have an error, but has one');
-            $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
-            $this->assertFalse($child->hasErrors(), $childName . ' should not have an error, but has one');
+            $this->assertCount(0, $errorChild->getErrors(), $errorName . ' should not have an error, but has one');
+            $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
+            $this->assertCount(0, $child->getErrors(), $childName . ' should not have an error, but has one');
             $this->assertEquals(array($this->getFormError()), $grandChild->getErrors(), $grandChildName. ' should have an error, but has none');
         }
     }
@@ -1449,15 +1484,15 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         if (self::LEVEL_0 === $target) {
             $this->assertEquals(array($this->getFormError()), $parent->getErrors(), $parent->getName() . ' should have an error, but has none');
-            $this->assertFalse($child->hasErrors(), $childName . ' should not have an error, but has one');
-            $this->assertFalse($grandChild->hasErrors(), $grandChildName . ' should not have an error, but has one');
+            $this->assertCount(0, $child->getErrors(), $childName . ' should not have an error, but has one');
+            $this->assertCount(0, $grandChild->getErrors(), $grandChildName . ' should not have an error, but has one');
         } elseif (self::LEVEL_1 === $target) {
-            $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
+            $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
             $this->assertEquals(array($this->getFormError()), $child->getErrors(), $childName . ' should have an error, but has none');
-            $this->assertFalse($grandChild->hasErrors(), $grandChildName . ' should not have an error, but has one');
+            $this->assertCount(0, $grandChild->getErrors(), $grandChildName . ' should not have an error, but has one');
         } else {
-            $this->assertFalse($parent->hasErrors(), $parent->getName() . ' should not have an error, but has one');
-            $this->assertFalse($child->hasErrors(), $childName . ' should not have an error, but has one');
+            $this->assertCount(0, $parent->getErrors(), $parent->getName() . ' should not have an error, but has one');
+            $this->assertCount(0, $child->getErrors(), $childName . ' should not have an error, but has one');
             $this->assertEquals(array($this->getFormError()), $grandChild->getErrors(), $grandChildName. ' should have an error, but has none');
         }
     }

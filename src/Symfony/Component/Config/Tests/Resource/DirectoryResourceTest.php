@@ -38,7 +38,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     {
         $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory), \RecursiveIteratorIterator::CHILD_FIRST);
         foreach ($iterator as $path) {
-            if (preg_match('#/\.\.?$#', $path->__toString())) {
+            if (preg_match('#[/\\\\]\.\.?$#', $path->__toString())) {
                 continue;
             }
             if ($path->isDir()) {

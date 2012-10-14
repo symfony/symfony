@@ -157,7 +157,7 @@ class Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @return integer 0 if everything went fine, or an error code
+     * @return null|integer null or 0 if everything went fine, or an error code
      *
      * @throws \LogicException When this abstract method is not implemented
      * @see    setCode()
@@ -233,10 +233,12 @@ class Command
         $input->validate();
 
         if ($this->code) {
-            return call_user_func($this->code, $input, $output);
+            $statusCode = call_user_func($this->code, $input, $output);
+        } else {
+            $statusCode = $this->execute($input, $output);
         }
 
-        return $this->execute($input, $output);
+        return is_numeric($statusCode) ? $statusCode : 0;
     }
 
     /**
@@ -262,16 +264,20 @@ class Command
 
     /**
      * Merges the application definition with the command definition.
+     *
+     * @param Boolean $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      */
-    private function mergeApplicationDefinition()
+    private function mergeApplicationDefinition($mergeArgs = true)
     {
         if (null === $this->application || true === $this->applicationDefinitionMerged) {
             return;
         }
 
-        $currentArguments = $this->definition->getArguments();
-        $this->definition->setArguments($this->application->getDefinition()->getArguments());
-        $this->definition->addArguments($currentArguments);
+        if ($mergeArgs) {
+            $currentArguments = $this->definition->getArguments();
+            $this->definition->setArguments($this->application->getDefinition()->getArguments());
+            $this->definition->addArguments($currentArguments);
+        }
 
         $this->definition->addOptions($this->application->getDefinition()->getOptions());
 
@@ -548,6 +554,11 @@ class Command
      */
     public function asText()
     {
+        if ($this->application && !$this->applicationDefinitionMerged) {
+            $this->getSynopsis();
+            $this->mergeApplicationDefinition(false);
+        }
+
         $messages = array(
             '<comment>Usage:</comment>',
             ' '.$this->getSynopsis(),
@@ -577,6 +588,11 @@ class Command
      */
     public function asXml($asDom = false)
     {
+        if ($this->application && !$this->applicationDefinitionMerged) {
+            $this->getSynopsis();
+            $this->mergeApplicationDefinition(false);
+        }
+
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
         $dom->appendChild($commandXML = $dom->createElement('command'));

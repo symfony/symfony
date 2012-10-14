@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added numerical type handling for config definitions
+ * added convenience methods for optional configuration sections to ArrayNodeDefinition
+
 2.1.0
 -----
 

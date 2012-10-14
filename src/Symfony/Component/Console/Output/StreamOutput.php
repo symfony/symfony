@@ -54,7 +54,7 @@ class StreamOutput extends Output
         $this->stream = $stream;
 
         if (null === $decorated) {
-            $decorated = $this->hasColorSupport($decorated);
+            $decorated = $this->hasColorSupport();
         }
 
         parent::__construct($verbosity, $decorated, $formatter);
@@ -95,7 +95,7 @@ class StreamOutput extends Output
      *
      * Colorization is disabled if not supported by the stream:
      *
-     *  -  windows without ansicon
+     *  -  windows without ansicon and ConEmu
      *  -  non tty consoles
      *
      * @return Boolean true if the stream supports colorization, false otherwise
@@ -104,7 +104,7 @@ class StreamOutput extends Output
     {
         // @codeCoverageIgnoreStart
         if (DIRECTORY_SEPARATOR == '\\') {
-            return false !== getenv('ANSICON');
+            return false !== getenv('ANSICON') || 'ON' === getenv('ConEmuANSI');
         }
 
         return function_exists('posix_isatty') && @posix_isatty($this->stream);

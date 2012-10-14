@@ -1,8 +1,8 @@
-{% extends 'WebProfilerBundle:Profiler:base.html.twig' %}
+{% extends '@WebProfiler/Profiler/base.html.twig' %}
 
 {% block body %}
     <div id="content">
-        {% include 'WebProfilerBundle:Profiler:header.html.twig' only %}
+        {% include '@WebProfiler/Profiler/header.html.twig' only %}
 
         <div id="main">
             <div class="clear_fix">
@@ -34,8 +34,8 @@
                     </div>
                 </div>
                 <div id="navigation">
-                    {% render 'WebProfilerBundle:Profiler:searchBar' with { 'token': '' } %}
-                    {% include 'WebProfilerBundle:Profiler:admin.html.twig' with { 'token': '' } only %}
+                    {% render 'web_profiler.controller.profiler:searchBarAction' %}
+                    {% include '@WebProfiler/Profiler/admin.html.twig' with { 'token': '' } only %}
                 </div>
             </div>
         </div>

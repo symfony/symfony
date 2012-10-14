@@ -328,4 +328,16 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $inner2 = $services[(string) $args2[0]];
         $this->assertEquals('BarClass2', $inner2->getClass(), '->load() uses the same configuration as for the anonymous ones');
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Document types are not allowed.
+     */
+    public function testDocTypeIsNotAllowed()
+    {
+        $container = new ContainerBuilder();
+
+        $loader1 = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader1->load('withdoctype.xml');
+    }
 }

@@ -50,7 +50,7 @@ class DataEvent extends Event
     /**
      * Returns the data associated with this event.
      *
-     * @return type
+     * @return mixed
      */
     public function getData()
     {
@@ -58,7 +58,7 @@ class DataEvent extends Event
     }
 
     /**
-     * Allows updating with some filtered data
+     * Allows updating with some filtered data.
      *
      * @param mixed $data
      */

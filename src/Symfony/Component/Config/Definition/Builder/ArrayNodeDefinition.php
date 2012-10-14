@@ -210,6 +210,48 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
+     * Adds an "enabled" boolean to enable the current section.
+     *
+     * By default, the section is disabled.
+     *
+     * @return ArrayNodeDefinition
+     */
+    public function canBeEnabled()
+    {
+        $this
+            ->treatFalseLike(array('enabled' => false))
+            ->treatTrueLike(array('enabled' => true))
+            ->treatNullLike(array('enabled' => true))
+            ->children()
+                ->booleanNode('enabled')
+                    ->defaultFalse()
+        ;
+
+        return $this;
+    }
+
+    /**
+     * Adds an "enabled" boolean to enable the current section.
+     *
+     * By default, the section is enabled.
+     *
+     * @return ArrayNodeDefinition
+     */
+    public function canBeDisabled()
+    {
+        $this
+            ->treatFalseLike(array('enabled' => false))
+            ->treatTrueLike(array('enabled' => true))
+            ->treatNullLike(array('enabled' => true))
+            ->children()
+                ->booleanNode('enabled')
+                    ->defaultTrue()
+        ;
+
+        return $this;
+    }
+
+    /**
      * Disables the deep merging of the node.
      *
      * @return ArrayNodeDefinition

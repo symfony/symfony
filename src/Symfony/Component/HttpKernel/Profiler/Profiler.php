@@ -52,6 +52,14 @@ class Profiler
     }
 
     /**
+     * Enables the profiler.
+     */
+    public function enable()
+    {
+        $this->enabled = true;
+    }
+
+    /**
      * Loads the Profile for the given Response.
      *
      * @param Response $response A Response instance
@@ -168,7 +176,7 @@ class Profiler
         $profile = new Profile(uniqid());
         $profile->setTime(time());
         $profile->setUrl($request->getUri());
-        $profile->setIp($request->server->get('REMOTE_ADDR'));
+        $profile->setIp($request->getClientIp());
         $profile->setMethod($request->getMethod());
 
         $response->headers->set('X-Debug-Token', $profile->getToken());

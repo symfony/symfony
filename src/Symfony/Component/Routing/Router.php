@@ -83,17 +83,15 @@ class Router implements RouterInterface
 
         // check option names and live merge, if errors are encountered Exception will be thrown
         $invalid = array();
-        $isInvalid = false;
         foreach ($options as $key => $value) {
             if (array_key_exists($key, $this->options)) {
                 $this->options[$key] = $value;
             } else {
-                $isInvalid = true;
                 $invalid[] = $key;
             }
         }
 
-        if ($isInvalid) {
+        if ($invalid) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the following options: "%s".', implode('\', \'', $invalid)));
         }
     }

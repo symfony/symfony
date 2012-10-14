@@ -15,55 +15,85 @@ namespace Symfony\Component\Routing;
  * RouteCompiler compiles Route instances to CompiledRoute instances.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Tobias Schultze <http://tobion.de>
  */
 class RouteCompiler implements RouteCompilerInterface
 {
     const REGEX_DELIMITER = '#';
 
     /**
+     * This string defines the characters that are automatically considered separators in front of
+     * optional placeholders (with default and no static text following). Such a single separator
+     * can be left out together with the optional placeholder from matching and generating URLs.
+     */
+    const SEPARATORS = '/,;.:-_~+*=@|';
+
+    /**
      * {@inheritDoc}
      *
-     * @throws \LogicException If a variable is referenced more than once
+     * @throws \LogicException  If a variable is referenced more than once
+     * @throws \DomainException If a variable name is numeric because PHP raises an error for such
+     *                          subpatterns in PCRE and thus would break matching, e.g. "(?<123>.+)".
      */
     public function compile(Route $route)
     {
         $pattern = $route->getPattern();
-        $len = strlen($pattern);
         $tokens = array();
         $variables = array();
+        $matches = array();
         $pos = 0;
-        preg_match_all('#.\{(\w+)\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+
+        // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
+        // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
+        preg_match_all('#\{\w+\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
         foreach ($matches as $match) {
-            if ($text = substr($pattern, $pos, $match[0][1] - $pos)) {
-                $tokens[] = array('text', $text);
-            }
-
+            $varName = substr($match[0][0], 1, -1);
+            // get all static text preceding the current variable
+            $precedingText = substr($pattern, $pos, $match[0][1] - $pos);
             $pos = $match[0][1] + strlen($match[0][0]);
-            $var = $match[1][0];
+            $precedingChar = strlen($precedingText) > 0 ? substr($precedingText, -1) : '';
+            $isSeparator = '' !== $precedingChar && false !== strpos(static::SEPARATORS, $precedingChar);
 
-            if ($req = $route->getRequirement($var)) {
-                $regexp = $req;
-            } else {
-                // Use the character preceding the variable as a separator
-                $separators = array($match[0][0][0]);
+            if (is_numeric($varName)) {
+                throw new \DomainException(sprintf('Variable name "%s" cannot be numeric in route pattern "%s". Please use a different name.', $varName, $pattern));
+            }
+            if (in_array($varName, $variables)) {
+                throw new \LogicException(sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $pattern, $varName));
+            }
 
-                if ($pos !== $len) {
-                    // Use the character following the variable as the separator when available
-                    $separators[] = $pattern[$pos];
+            if ($isSeparator && strlen($precedingText) > 1) {
+                $tokens[] = array('text', substr($precedingText, 0, -1));
+            } elseif (!$isSeparator && strlen($precedingText) > 0) {
+                $tokens[] = array('text', $precedingText);
+            }
+
+            $regexp = $route->getRequirement($varName);
+            if (null === $regexp) {
+                $followingPattern = (string) substr($pattern, $pos);
+                // Find the next static character after the variable that functions as a separator. By default, this separator and '/'
+                // are disallowed for the variable. This default requirement makes sure that optional variables can be matched at all
+                // and that the generating-matching-combination of URLs unambiguous, i.e. the params used for generating the URL are
+                // the same that will be matched. Example: new Route('/{page}.{_format}', array('_format' => 'html'))
+                // If {page} would also match the separating dot, {_format} would never match as {page} will eagerly consume everything.
+                // Also even if {_format} was not optional the requirement prevents that {page} matches something that was originally
+                // part of {_format} when generating the URL, e.g. _format = 'mobile.html'.
+                $nextSeparator = $this->findNextSeparator($followingPattern);
+                $regexp = sprintf('[^/%s]+', '/' !== $nextSeparator && '' !== $nextSeparator ? preg_quote($nextSeparator, self::REGEX_DELIMITER) : '');
+                if (('' !== $nextSeparator && !preg_match('#^\{\w+\}#', $followingPattern)) || '' === $followingPattern) {
+                    // When we have a separator, which is disallowed for the variable, we can optimize the regex with a possessive
+                    // quantifier. This prevents useless backtracking of PCRE and improves performance by 20% for matching those patterns.
+                    // Given the above example, there is no point in backtracking into {page} (that forbids the dot) when a dot must follow 
+                    // after it. This optimization cannot be applied when the next char is no real separator or when the next variable is
+                    // directly adjacent, e.g. '/{x}{y}'.
+                    $regexp .= '+';
                 }
-                $regexp = sprintf('[^%s]+', preg_quote(implode('', array_unique($separators)), self::REGEX_DELIMITER));
             }
 
-            $tokens[] = array('variable', $match[0][0][0], $regexp, $var);
-
-            if (in_array($var, $variables)) {
-                throw new \LogicException(sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $route->getPattern(), $var));
-            }
-
-            $variables[] = $var;
+            $tokens[] = array('variable', $isSeparator ? $precedingChar : '', $regexp, $varName);
+            $variables[] = $varName;
         }
 
-        if ($pos < $len) {
+        if ($pos < strlen($pattern)) {
             $tokens[] = array('text', substr($pattern, $pos));
         }
 
@@ -90,6 +120,25 @@ class RouteCompiler implements RouteCompilerInterface
             array_reverse($tokens),
             $variables
         );
+    }
+
+    /**
+     * Returns the next static character in the Route pattern that will serve as a separator.
+     *
+     * @param string $pattern The route pattern
+     *
+     * @return string The next static character that functions as separator (or empty string when none available)
+     */
+    private function findNextSeparator($pattern)
+    {
+        if ('' == $pattern) {
+            // return empty string if pattern is empty or false (false which can be returned by substr)
+            return '';
+        }
+        // first remove all placeholders from the pattern so we can find the next real static character
+        $pattern = preg_replace('#\{\w+\}#', '', $pattern);
+
+        return isset($pattern[0]) && false !== strpos(static::SEPARATORS, $pattern[0]) ? $pattern[0] : '';
     }
 
     /**

@@ -273,6 +273,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('bar' => 'foo'), $form->getValues(), '->setValues() sets the values of fields');
     }
 
+    public function testMultiselectSetValues()
+    {
+        $form = $this->createForm('<form><select multiple="multiple" name="multi"><option value="foo">foo</option><option value="bar">bar</option></select><input type="submit" /></form>');
+        $form->setValues(array('multi' => array("foo", "bar")));
+        $this->assertEquals(array('multi' => array('foo', 'bar')), $form->getValues(), '->setValue() sets tehe values of select');
+    }
+
     public function testGetPhpValues()
     {
         $form = $this->createForm('<form><input type="text" name="foo[bar]" value="foo" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');

@@ -221,11 +221,21 @@ class FlattenException
                 $result[$key] = array('boolean', $value);
             } elseif (is_resource($value)) {
                 $result[$key] = array('resource', get_resource_type($value));
+            } elseif ($value instanceof \__PHP_Incomplete_Class) {
+                // Special case of object, is_object will return false
+                $result[$key] = array('incomplete-object', $this->getClassNameFromIncomplete($value));
             } else {
                 $result[$key] = array('string', (string) $value);
             }
         }
 
         return $result;
+    }
+
+    private function getClassNameFromIncomplete(\__PHP_Incomplete_Class $value)
+    {
+        $array = new \ArrayObject($value);
+
+        return $array['__PHP_Incomplete_Class_Name'];
     }
 }

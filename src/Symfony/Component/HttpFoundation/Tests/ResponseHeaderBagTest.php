@@ -16,6 +16,51 @@ use Symfony\Component\HttpFoundation\Cookie;
 
 class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @covers Symfony\Component\HttpFoundation\ResponseHeaderBag::allPreserveCase
+     * @dataProvider provideAllPreserveCase
+     */
+    public function testAllPreserveCase($headers, $expected)
+    {
+        $bag = new ResponseHeaderBag($headers);
+
+        $this->assertEquals($expected, $bag->allPreserveCase(), '->allPreserveCase() gets all input keys in original case');
+    }
+
+    public function provideAllPreserveCase()
+    {
+        return array(
+            array(
+                array('fOo' => 'BAR'),
+                array('fOo' => array('BAR'), 'Cache-Control' => array('no-cache'))
+            ),
+            array(
+                array('ETag' => 'xyzzy'),
+                array('ETag' => array('xyzzy'), 'Cache-Control' => array('private, must-revalidate'))
+            ),
+            array(
+                array('Content-MD5' => 'Q2hlY2sgSW50ZWdyaXR5IQ=='),
+                array('Content-MD5' => array('Q2hlY2sgSW50ZWdyaXR5IQ=='), 'Cache-Control' => array('no-cache'))
+            ),
+            array(
+                array('P3P' => 'CP="CAO PSA OUR"'),
+                array('P3P' => array('CP="CAO PSA OUR"'), 'Cache-Control' => array('no-cache'))
+            ),
+            array(
+                array('WWW-Authenticate' => 'Basic realm="WallyWorld"'),
+                array('WWW-Authenticate' => array('Basic realm="WallyWorld"'), 'Cache-Control' => array('no-cache'))
+            ),
+            array(
+                array('X-UA-Compatible' => 'IE=edge,chrome=1'),
+                array('X-UA-Compatible' => array('IE=edge,chrome=1'), 'Cache-Control' => array('no-cache'))
+            ),
+            array(
+                array('X-XSS-Protection' => '1; mode=block'),
+                array('X-XSS-Protection' => array('1; mode=block'), 'Cache-Control' => array('no-cache'))
+            ),
+        );
+    }
+
     public function testCacheControlHeader()
     {
         $bag = new ResponseHeaderBag(array());
@@ -76,6 +121,29 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertContains("Set-Cookie: foo=deleted; expires=".gmdate("D, d-M-Y H:i:s T", time() - 31536001)."; httponly", explode("\r\n", $bag->__toString()));
     }
 
+    public function testReplace()
+    {
+        $bag = new ResponseHeaderBag(array());
+        $this->assertEquals('no-cache', $bag->get('Cache-Control'));
+        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
+
+        $bag->replace(array('Cache-Control' => 'public'));
+        $this->assertEquals('public', $bag->get('Cache-Control'));
+        $this->assertTrue($bag->hasCacheControlDirective('public'));
+    }
+
+    public function testReplaceWithRemove()
+    {
+        $bag = new ResponseHeaderBag(array());
+        $this->assertEquals('no-cache', $bag->get('Cache-Control'));
+        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
+
+        $bag->remove('Cache-Control');
+        $bag->replace(array());
+        $this->assertEquals('no-cache', $bag->get('Cache-Control'));
+        $this->assertTrue($bag->hasCacheControlDirective('no-cache'));
+    }
+
     public function testCookiesWithSameNames()
     {
         $bag = new ResponseHeaderBag();
@@ -117,6 +185,34 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
 
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
         $this->assertFalse(isset($cookies['foo.bar']));
+    }
+
+    public function testRemoveCookieWithNullRemove()
+    {
+        $bag = new ResponseHeaderBag();
+        $bag->setCookie(new Cookie('foo', 'bar', 0));
+        $bag->setCookie(new Cookie('bar', 'foo', 0));
+
+        $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
+        $this->assertTrue(isset($cookies['']['/']));
+
+        $bag->removeCookie('foo', null);
+        $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
+        $this->assertFalse(isset($cookies['']['/']['foo']));
+
+        $bag->removeCookie('bar', null);
+        $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
+        $this->assertFalse(isset($cookies['']['/']['bar']));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetCookiesWithInvalidArgument()
+    {
+        $bag = new ResponseHeaderBag();
+
+        $cookies = $bag->getCookies('invalid_argument');
     }
 
     /**

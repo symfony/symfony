@@ -231,12 +231,12 @@ class SimpleFormTest extends AbstractFormTest
     {
         $this->form->addError(new FormError('Error!'));
 
-        $this->assertTrue($this->form->hasErrors());
+        $this->assertCount(1, $this->form->getErrors());
     }
 
     public function testHasNoErrors()
     {
-        $this->assertFalse($this->form->hasErrors());
+        $this->assertCount(0, $this->form->getErrors());
     }
 
     /**
@@ -665,6 +665,14 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertEquals('', $form->getName());
     }
 
+    public function testSetNullParentWorksWithEmptyName()
+    {
+        $form = $this->getBuilder('')->getForm();
+        $form->setParent(null);
+
+        $this->assertNull($form->getParent());
+    }
+
     /**
      * @expectedException Symfony\Component\Form\Exception\FormException
      * @expectedExceptionMessage A form with an empty name cannot have a parent form.
@@ -769,6 +777,25 @@ class SimpleFormTest extends AbstractFormTest
         $form = new Form($config);
 
         $form->setData('foo');
+    }
+
+    public function testBindingWrongDataIsIgnored()
+    {
+        $test = $this;
+
+        $child = $this->getBuilder('child', $this->dispatcher);
+        $child->addEventListener(FormEvents::PRE_BIND, function (FormEvent $event) use ($test) {
+            // child form doesn't receive the wrong data that is bound on parent
+            $test->assertNull($event->getData());
+        });
+
+        $parent = $this->getBuilder('parent', new EventDispatcher())
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->add($child)
+            ->getForm();
+
+        $parent->bind('not-an-array');
     }
 
     protected function createForm()

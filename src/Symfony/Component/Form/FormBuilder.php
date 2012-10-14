@@ -44,7 +44,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     private $unresolvedChildren = array();
 
     /**
-     * The parent of this builder
+     * The parent of this builder.
+     *
      * @var FormBuilder
      */
     private $parent;

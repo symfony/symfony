@@ -44,7 +44,7 @@ class MessageSelector
      *
      * @return string
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      *
      * @api
      */

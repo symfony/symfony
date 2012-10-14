@@ -485,7 +485,9 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 $methods = $this->findAdderAndRemover($reflClass, $singulars);
                 if (null !== $methods) {
                     // At this point the add and remove methods have been found
-                    $itemsToAdd = is_object($value) ? clone $value : $value;
+                    // Use iterator_to_array() instead of clone in order to prevent side effects
+                    // see https://github.com/symfony/symfony/issues/4670
+                    $itemsToAdd = is_object($value) ? iterator_to_array($value) : $value;
                     $itemToRemove = array();
                     $propertyValue = $this->readProperty($objectOrArray, $property, $isIndex);
                     $previousValue = $propertyValue[self::VALUE];

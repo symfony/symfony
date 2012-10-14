@@ -64,7 +64,7 @@ class FormAuthenticationEntryPointTest extends \PHPUnit_Framework_TestCase
         $httpKernel
             ->expects($this->once())
             ->method('handle')
-            ->with($this->equalTo($request), $this->equalTo(HttpKernelInterface::SUB_REQUEST))
+            ->with($this->equalTo($subRequest), $this->equalTo(HttpKernelInterface::SUB_REQUEST))
             ->will($this->returnValue($response))
         ;
 

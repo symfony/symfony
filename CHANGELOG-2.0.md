@@ -7,6 +7,63 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.17 (2012-08-28)
+
+ * 5bf4f92: fixed XML decoding attack vector through external entities
+ * 4e0c992: prevents injection of malicious doc types
+ * 47fe725: disabled network access when loading XML documents
+ * c896d71: refined previous commit
+ * a2a6cdc: prevents injection of malicious doc types
+ * 865461d: standardized the way we handle XML errors
+ * 352e8f5: Redirects are now absolute
+ * 9a355e9: [HttpKernel] excluded a test on PHP 5.3.16, which is buggy (PHP, not Symfony ;))
+ * f694615: [Process] fix ProcessTest::testProcessPipes hangs on Windows on branch 2.0
+ * 9beffff: [HttpKernel] KernelTest::testGetRootDir fails on Windows for branch 2.0
+ * e49afde: Update monolog compatibility
+ * 832f8dd: Add support for Monolog 1.2.0
+ * c51fc10: avoid fatal error on invalid session
+ * 1a4a4ee: [DependencyInjection] Fixed a frozen constructor of a container with no parameters
+ * b3cf36a: [Config] Missing type argument passed to loader.
+ * 55a0b34: Fixes incorrect class used in src/Symfony/Bundle/FrameworkBundle/Console/Application.php
+ * a0709fc: [DoctrineBridge] Fix log of non utf8 data
+ * 0b78fdf: Only call registerCommand on bundles that is an instance of Bundle
+ * 9e28593: fixed error on oracle db related to clob data.
+ * 9f4178b: [Validator] Fixed: StaticMethodLoader does not try to invoke methods of interfaces anymore
+ * 2a3235a: [Validator] Fixed group sequence support in the XML and YAML drivers
+ * 4f93d1a: [Console] Use proc_open instead of exec to suppress errors when run on windows and stty is not present
+ * 16a980b: [Validator] Fix bug order for constraint, property, getter and group-sequence-provider in validation.xml
+ * ed8823c: [HttpFoundation] Allow setting an unknown status code without specifying a text
+ * e9d799c: [Routing] fixed ApacheUrlMatcher and ApachMatcherDumper classes that did not take care of default parameters in urls.
+
+* 2.0.16 (2012-07-11)
+
+ * 854daa8: [Form] Fixed errors not to be added onto non-synchronized forms
+ * facbcdc: [Validator] fixed error message for dates like 2012-02-31 (closes #4223)
+ * 28f002d: [Locale] fixed bug on the parsing of TYPE_INT64 integers in 32 bit and 64 bit environments, caused by PHP bug fix :) (closes #4718)
+ * c1fea1d: fixed incorrect reference to set*Service() method
+ * b89b00f: bumped minimal version of Swiftmailer to 4.2.0
+ * 997bcfc: [SwiftmailerBridge] allowed versions 4.2.*
+ * 680b83c: [Security] Allow "0" as a password
+ * a609d55: [Locale] fixed StubIntlDateFormatter to behave like the ext/intl implementation
+ * 3ce8227: [Security] Only redirect to urls called with http method GET
+ * ba16a51: changed getName() to name on all Reflection* object calls (fixes #4555, refs https://bugs.php.net/bug.php?id=61384)
+ * 5d88255: Authorization header should only be rebuild when Basic Auth scheme is used
+ * 789fc14: Accept calling setLenient(false)
+ * b631073: [Yaml] Fixed double quotes escaping in Dumper.
+
+* 2.0.15 (2012-05-30)
+
+ * 20b556d: [Form] fixed a bug that caused input date validation not to be strict when using the single_text widget with a datetime field
+ * 7e3213c: [Form] fixed a bug that caused input date validation not to be strict when using the single_text widget with a date field
+ * 35b458f: fix kernel root, linux dir separator on windows, to fix cache:clear issue
+ * 8da880c: Fixed notice in AddCacheWarmerPass if there is no cache warmer defined.
+ * 7a85b43: [TwigBundle] Fixed the path to templates when using composer
+ * 8223632: [HttpFoundation] Fix the UploadedFilename name sanitization (fix #2577)
+ * f883953: TypeGuess fixed for Date/Time constraints
+ * 41bed29: [Form] fixed invalid 'type' option in ValidatorTypeGuesser for Date/TimeFields
+ * fff7221: Fixed the proxy autoloading for Doctrine 2.2
+ * a450d00: [HttpFoundation] HTTP Basic authentication is broken with PHP as cgi/fastCGI under Apache
+
 * 2.0.14 (2012-05-17)
 
  * d1c831d: Change must-proxy-revalidate by proxy-revalidate

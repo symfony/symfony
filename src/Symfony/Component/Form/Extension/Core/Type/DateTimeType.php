@@ -140,8 +140,8 @@ class DateTimeType extends AbstractType
                 $dateOptions['format'] = $options['date_format'];
             }
 
-            $dateOptions['input'] = 'array';
-            $timeOptions['input'] = 'array';
+            $dateOptions['input'] = $timeOptions['input'] = 'array';
+            $dateOptions['error_bubbling'] = $timeOptions['error_bubbling'] = true;
 
             $builder
                 ->addViewTransformer(new DataTransformerChain(array(
@@ -231,6 +231,7 @@ class DateTimeType extends AbstractType
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'   => false,
+            'error_bubbling' => false,
             // If initialized with a \DateTime object, FormType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset

@@ -168,6 +168,7 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
         $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth', 4 => 'fifth'));
         $axesMerged = $this->getCollection(array(1 => 'first', 2 => 'second', 3 => 'third'));
         $axesAfter = $this->getCollection(array(1 => 'second', 5 => 'first', 6 => 'third'));
+        $axesMergedCopy = is_object($axesMerged) ? clone $axesMerged : $axesMerged;
 
         // Don't use a mock in order to test whether the collections are
         // modified while iterating them
@@ -178,6 +179,9 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
         $path->setValue($car, $axesMerged);
 
         $this->assertEquals($axesAfter, $car->getAxes());
+
+        // The passed collection was not modified
+        $this->assertEquals($axesMergedCopy, $axesMerged);
     }
 
     public function testSetValueCallsAdderAndRemoverForNestedCollections()

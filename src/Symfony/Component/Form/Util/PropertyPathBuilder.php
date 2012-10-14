@@ -89,6 +89,8 @@ class PropertyPathBuilder
      *
      * @param integer $offset The offset at which to remove.
      * @param integer $length The length of the removed piece.
+     *
+     * @throws \OutOfBoundsException if offset is invalid
      */
     public function remove($offset, $length = 1)
     {
@@ -255,13 +257,23 @@ class PropertyPathBuilder
             }
         } else {
             $diff = $insertionLength - $cutLength;
+
             $newLength = $length + $diff;
             $indexAfterInsertion = $offset + $insertionLength;
+
+            // $diff <= $insertionLength
+            // $indexAfterInsertion >= $insertionLength
+            // => $diff <= $indexAfterInsertion
+
+            // In each of the following loops, $i >= $diff must hold,
+            // otherwise ($i - $diff) becomes negative.
 
             // Shift old elements to the right to make up space for the
             // inserted elements. This needs to be done left-to-right in
             // order to preserve an ascending array index order
-            for ($i = $length; $i < $newLength; ++$i) {
+            // Since $i = max($length, $indexAfterInsertion) and $indexAfterInsertion >= $diff,
+            // $i >= $diff is guaranteed.
+            for ($i = max($length, $indexAfterInsertion); $i < $newLength; ++$i) {
                 $this->elements[$i] = $this->elements[$i - $diff];
                 $this->isIndex[$i] = $this->isIndex[$i - $diff];
             }
@@ -271,6 +283,8 @@ class PropertyPathBuilder
             // The last written index is the immediate index after the inserted
             // string, because the indices before that will be overwritten
             // anyway.
+            // Since $i >= $indexAfterInsertion and $indexAfterInsertion >= $diff,
+            // $i >= $diff is guaranteed.
             for ($i = $length - 1; $i >= $indexAfterInsertion; --$i) {
                 $this->elements[$i] = $this->elements[$i - $diff];
                 $this->isIndex[$i] = $this->isIndex[$i - $diff];

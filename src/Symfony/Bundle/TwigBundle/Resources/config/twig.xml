@@ -26,6 +26,10 @@
         <service id="twig" class="%twig.class%">
             <argument type="service" id="twig.loader" />
             <argument>%twig.options%</argument>
+            <call method="addGlobal">
+                <argument>app</argument>
+                <argument type="service" id="templating.globals" />
+            </call>
         </service>
 
         <service id="twig.cache_warmer" class="%twig.cache_warmer.class%" public="false">
@@ -43,7 +47,6 @@
             <argument type="service" id="twig" />
             <argument type="service" id="templating.name_parser" />
             <argument type="service" id="templating.locator" />
-            <argument type="service" id="templating.globals" />
         </service>
 
         <service id="twig.extension.trans" class="%twig.extension.trans.class%" public="false">

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * The `app` global variable is now injected even when using the twig service directly.
+
 2.1.0
 -----
 

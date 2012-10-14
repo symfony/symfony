@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Negotiation;
 
-use Symfony\Component\Routing\Matcher\Negotiator;
+use Symfony\Component\Routing\Matcher\NegotiatorInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * MatcherNegotiatorBuilderInterface.
@@ -23,16 +24,18 @@ interface MatcherNegotiatorBuilderInterface
     /**
      * Builds the negotiator.
      *
-     * @param Negotiator $negotiator
+     * @param NegotiatorInterface $negotiator
+     * @param Request             $request
      */
-    public function buildNegotiator(Negotiator $negotiator);
+    public function buildNegotiator(NegotiatorInterface $negotiator, Request $request);
 
     /**
      * Returns varying headers according to the negotiator.
      *
-     * @param Negotiator $negotiator
+     * @param NegotiatorInterface $negotiator
+     * @param Request             $request
      *
      * @return array
      */
-    public function getVaryingHeaders(Negotiator $negotiator);
+    public function getVaryingHeaders(NegotiatorInterface $negotiator, Request $request);
 }

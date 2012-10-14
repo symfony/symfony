@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Exception\NegotiationFailureException;
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class Negotiator
+class Negotiator implements NegotiatorInterface
 {
     /**
      * @var array
@@ -32,10 +32,7 @@ class Negotiator
     private $negotiatedParameters = array();
 
     /**
-     * Set values for negotiable parameter.
-     *
-     * @param string $parameter
-     * @param array  $values
+     * {@inheritdoc}
      */
     public function setValues($parameter, array $values)
     {
@@ -43,9 +40,7 @@ class Negotiator
     }
 
     /**
-     * @param Route $route
-     *
-     * @throws NegotiationFailureException
+     * {@inheritdoc}
      */
     public function negotiate(Route $route)
     {
@@ -71,7 +66,7 @@ class Negotiator
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getNegotiatedParameters()
     {

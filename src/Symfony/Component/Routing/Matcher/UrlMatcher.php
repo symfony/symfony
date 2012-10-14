@@ -12,8 +12,6 @@
 namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Negotiation\NegotiationAwareInterface;
-use Symfony\Component\Routing\Negotiation\NegotiationInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
@@ -49,16 +47,17 @@ class UrlMatcher implements UrlMatcherInterface, NegotiatorMatcherInterface
     /**
      * Constructor.
      *
-     * @param RouteCollection $routes  A RouteCollection instance
-     * @param RequestContext  $context The context
+     * @param RouteCollection          $routes     A RouteCollection instance
+     * @param RequestContext           $context    The context
+     * @param null|NegotiatorInterface $negotiator
      *
      * @api
      */
-    public function __construct(RouteCollection $routes, RequestContext $context)
+    public function __construct(RouteCollection $routes, RequestContext $context, NegotiatorInterface $negotiator = null)
     {
         $this->routes = $routes;
         $this->context = $context;
-        $this->negotiator = new Negotiator();
+        $this->negotiator = $negotiator ?: new Negotiator();
     }
 
     /**

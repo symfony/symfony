@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-interface NegotiatorMatcherInterface extends RequestContextAwareInterface
+interface NegotiatorMatcherInterface
 {
     /**
      * @return Negotiator

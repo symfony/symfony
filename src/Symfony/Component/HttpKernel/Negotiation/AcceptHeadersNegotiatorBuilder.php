@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\Negotiation;
 
-use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\AcceptHeader;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
-use Symfony\Component\Routing\Matcher\Negotiator;
+use Symfony\Component\Routing\Matcher\NegotiatorInterface;
 
 /**
  * AcceptHeadersNegotiatorBuilder.
@@ -23,51 +23,38 @@ use Symfony\Component\Routing\Matcher\Negotiator;
  */
 class AcceptHeadersNegotiatorBuilder implements MatcherNegotiatorBuilderInterface
 {
-    private $varyingHeaders;
-    private $parametersValues;
-
     /**
-     * @param HeaderBag $headers
+     * {@inheritdoc}
      */
-    public function __construct(HeaderBag $headers)
+    public function buildNegotiator(NegotiatorInterface $negotiator, Request $request)
     {
-        $this->values = array();
-        $this->headers = array();
-
-        if ($headers->has('Accept-Language')) {
-            $this->parametersValues['_locale'] = $this->buildValues($headers->get('Accept-Language'));
-            $this->varyingHeaders['_locale'] = 'Accept-Language';
+        if ($request->headers->has('Accept-Language')) {
+            $negotiator->setValues('_locale', $this->buildValues($request->headers->get('Accept-Language')));
         }
-        if ($headers->has('Accept-Charset')) {
-            $this->parametersValues['_charset'] = $this->buildValues($headers->get('Accept-Charset'));
-            $this->varyingHeaders['_charset'] = 'Accept-Charset';
+        if ($request->headers->has('Accept-Charset')) {
+            $negotiator->setValues('_charset', $this->buildValues($request->headers->get('Accept-Charset')));
         }
-        if ($headers->has('Accept')) {
-            $this->parametersValues['_format'] = $this->buildValues($headers->get('Accept'), function ($contentType) {
+        if ($request->headers->has('Accept')) {
+            $negotiator->setValues('_format',  $this->buildValues($request->headers->get('Accept'), function ($contentType) {
                 return ExtensionGuesser::getInstance()->guess($contentType);
-            });
-            $this->varyingHeaders['_format'] = 'Accept';
+            }));
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildNegotiator(Negotiator $negotiator)
-    {
-        foreach ($this->parametersValues as $parameter => $values) {
-            $negotiator->setValues($parameter, $values);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVaryingHeaders(Negotiator $negotiator)
+    public function getVaryingHeaders(NegotiatorInterface $negotiator, Request $request)
     {
         $varyingHeaders = array();
-        foreach ($negotiator->getNegotiatedParameters() as $parameter) {
-            $varyingHeaders[] = $this->varyingHeaders[$parameter];
+        if ($request->headers->has('Accept-Language')) {
+            $varyingHeaders[] = 'Accept-Language';
+        }
+        if ($request->headers->has('Accept-Charset')) {
+            $varyingHeaders[] = 'Accept-Charset';
+        }
+        if ($request->headers->has('Accept')) {
+            $varyingHeaders[] = 'Accept';
         }
 
         return $varyingHeaders;

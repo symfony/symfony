@@ -27,6 +27,11 @@ class Negotiator
     private $negotiableValues = array();
 
     /**
+     * @var array
+     */
+    private $negotiatedParameters = array();
+
+    /**
      * Set values for negotiable parameter.
      *
      * @param string $parameter
@@ -38,22 +43,23 @@ class Negotiator
     }
 
     /**
-     * {@inheritdoc}
+     * @param Route $route
+     *
+     * @throws NegotiationFailureException
      */
     public function negotiate(Route $route)
     {
         if (!is_array($route->getOption('negotiate'))) {
-            return array();
+            return;
         }
 
-        $negotiatedParameters = array();
         $failures = array();
         foreach ($route->getOption('negotiate') as $parameter) {
             $values = $this->findValues($parameter, $route->getRequirement($parameter));
 
             if (count($values) > 0) {
                 $route->setDefault($parameter, $values[0]);
-                $negotiatedParameters[] = $parameter;
+                $this->negotiatedParameters[] = $parameter;
             } else {
                 $failures[] = $parameter;
             }
@@ -62,8 +68,14 @@ class Negotiator
         if (count($failures) > 0) {
             throw new NegotiationFailureException($route, $failures);
         }
+    }
 
-        return $negotiatedParameters;
+    /**
+     * @return array
+     */
+    public function getNegotiatedParameters()
+    {
+        return $this->negotiatedParameters;
     }
 
     /**

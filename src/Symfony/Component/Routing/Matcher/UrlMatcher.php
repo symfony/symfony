@@ -153,7 +153,7 @@ class UrlMatcher implements UrlMatcherInterface, NegotiatorMatcherInterface
                 }
             }
 
-            $negotiatedParameters = $this->negotiator->negotiate($route);
+            $this->negotiator->negotiate($route);
             $status = $this->handleRouteRequirements($pathinfo, $name, $route);
 
             if (self::ROUTE_MATCH === $status[0]) {
@@ -165,7 +165,7 @@ class UrlMatcher implements UrlMatcherInterface, NegotiatorMatcherInterface
             }
 
             $parameters = array('_route' => $name);
-            if (count($negotiatedParameters) > 0) {
+            if (count($negotiatedParameters = $this->negotiator->getNegotiatedParameters()) > 0) {
                 $parameters['_negotiated_parameters'] = $negotiatedParameters;
             }
 

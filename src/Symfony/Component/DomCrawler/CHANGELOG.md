@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added a way to set raw path to the file in FileFormField - necessary for
+   simulating HTTP requests
+
 2.1.0
 -----
 

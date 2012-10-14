@@ -49,17 +49,14 @@ class DialogHelper extends Helper
 
         $width = max(array_map('strlen', array_keys($choices))) + 2;
 
-        $messages = array();
-        $messages[] = "<question>$question</question>";
-        foreach($choices as $key => $value) {
+        $messages = (array) $question;
+        foreach ($choices as $key => $value) {
             $messages[] = sprintf("  <info>%-${width}s</info> %s", $key, $value);
         }
 
-        $messages = join(PHP_EOL, $messages);
         $output->writeln($messages);
 
-        $result = $this->askAndValidate($output, '> ', function($picked) use($choices, $options)
-        {
+        $result = $this->askAndValidate($output, '> ', function($picked) use ($choices, $options) {
             if (empty($choices[$picked])) {
                 throw new \InvalidArgumentException(sprintf($options['error_template'], $picked));
             }
@@ -68,8 +65,13 @@ class DialogHelper extends Helper
         }, $options['attempts'], $default);
 
         switch($options['return']) {
-            case 'key': return $result;
-            case 'value': return $choices[$result];
+            case 'key':
+                return $result;
+            case 'value':
+                return $choices[$result];
+            default:
+                $tpl = 'Invalid return type specified: "%s". Should be either "key" or "value".';
+                throw new \InvalidArgumentException(sprintf($tpl . '', $options['return']));
         }
     }
 

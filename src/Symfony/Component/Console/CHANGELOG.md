@@ -17,3 +17,8 @@ CHANGELOG
    `--process-isolation` switch
  * added support for `--`, which disables options parsing after that point
    (tokens will be parsed as arguments)
+
+2.2.0
+-----
+
+ * added support for interactive selections in console (DialogHelper::select())

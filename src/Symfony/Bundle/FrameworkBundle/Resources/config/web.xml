@@ -43,6 +43,7 @@
 
         <service id="content_negotiation_listener" class="%content_negotiation_listener.class%">
             <tag name="kernel.event_subscriber" />
+            <argument type="service" id="router" />
         </service>
     </services>
 </container>

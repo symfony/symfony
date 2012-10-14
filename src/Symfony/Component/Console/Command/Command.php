@@ -45,8 +45,6 @@ class Command
      *
      * @param string $name The name of the command
      *
-     * @throws \LogicException When the command name is empty
-     *
      * @api
      */
     public function __construct($name = null)
@@ -61,10 +59,6 @@ class Command
         }
 
         $this->configure();
-
-        if (!$this->name) {
-            throw new \LogicException('The command name cannot be empty.');
-        }
     }
 
     /**
@@ -82,10 +76,16 @@ class Command
      *
      * @param Application $application An Application instance
      *
+     * @throws \LogicException When the command name is empty
+     *
      * @api
      */
     public function setApplication(Application $application = null)
     {
+        if (!$this->name) {
+            throw new \LogicException('The command name cannot be empty.');
+        }
+
         $this->application = $application;
         if ($application) {
             $this->setHelperSet($application->getHelperSet());

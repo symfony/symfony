@@ -35,13 +35,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructor()
     {
-        try {
-            $command = new Command();
-            $this->fail('__construct() throws a \LogicException if the name is null');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '__construct() throws a \LogicException if the name is null');
-            $this->assertEquals('The command name cannot be empty.', $e->getMessage(), '__construct() throws a \LogicException if the name is null');
-        }
         $command = new Command('foo:bar');
         $this->assertEquals('foo:bar', $command->getName(), '__construct() takes the command name as its first argument');
     }
@@ -52,6 +45,17 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
         $command->setApplication($application);
         $this->assertEquals($application, $command->getApplication(), '->setApplication() sets the current application');
+
+        $application = new Application();
+        $command = new Command();
+
+        try {
+            $command->setApplication($application);
+            $this->fail('__construct() throws a \LogicException if the command name is null or empty');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\LogicException', $e, '->setApplication() throws a \LogicException if the command name is null or empty');
+            $this->assertEquals('The command name cannot be empty.', $e->getMessage(), '->setApplication() throws a \LogicException if the command name is null or empty');
+        }
     }
 
     public function testSetGetDefinition()

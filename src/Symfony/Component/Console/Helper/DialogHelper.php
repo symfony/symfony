@@ -125,6 +125,49 @@ class DialogHelper extends Helper
     }
 
     /**
+     * Asks for a list of values interactively
+     *
+     * Optionally filter callback can be provided to filter out values
+     * and/or throw exception, if they don't pass validation
+     *
+     * @param OutputInterface $output    An Output instance
+     * @param string|array    $question  The question to ask
+     * @param callback        $validator A PHP callback
+     *
+     * @return array
+     */
+    public function askForList(OutputInterface $output, $question, $filter = null)
+    {
+        if (!empty($filter)) {
+            if(!is_callable($filter)) {
+                throw new \InvalidArgumentException('Filter should be callable');
+            }
+
+            $formatter = $this->getHelperSet()->get('formatter');
+        }
+
+        $output->writeln($question);
+
+        $list = array();
+        while (true) {
+            $value = $this->ask($output, '> ');
+            if (empty($value)) {
+                break;
+            }
+
+            if(!empty($filter)) {
+                try {
+                    $list[] = call_user_func($filter, $value);
+                } catch (\Exception $error) {
+                    $output->writeln($formatter->formatBlock($error->getMessage(), 'error'));
+                }
+            }
+        }
+
+        return $list;
+    }
+
+    /**
      * Asks for a value and validates the response.
      *
      * The validator receives the data to validate. It must return the

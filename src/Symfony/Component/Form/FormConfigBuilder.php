@@ -69,7 +69,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @var Boolean
      */
-    private $ignoreMissing = null;
+    private $ignoreMissing;
 
     /**
      * @var ResolvedFormTypeInterface

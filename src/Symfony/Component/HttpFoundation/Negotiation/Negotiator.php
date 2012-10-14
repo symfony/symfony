@@ -21,33 +21,22 @@ class Negotiator implements NegotiatorInterface
     /**
      * @var QualifierInterface[]
      */
-    private $qualifiers;
+    private $qualifiers = array();
 
     /**
      * @var ContentInterface[]
      */
-    private $contents;
+    private $contents = array();
 
     /**
      * @var bool
      */
-    private $frozen;
+    private $frozen = false;
 
     /**
      * @var bool
      */
-    private $sorted;
-
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->qualifiers = array();
-        $this->contents = array();
-        $this->frozen = false;
-        $this->sorted = true;
-    }
+    private $sorted = true;
 
     /**
      * {@inheritdoc}

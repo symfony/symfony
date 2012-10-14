@@ -44,7 +44,7 @@ interface ContentInterface
      *
      * @param $quality
      *
-     * @return mixed
+     * @return float
      */
     function setQuality($quality);
 

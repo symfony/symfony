@@ -30,7 +30,7 @@ interface QualifierInterface
     /**
      * Returns varying headers.
      *
-     * @return mixed
+     * @return array
      */
     function getVaryingHeaders();
 }

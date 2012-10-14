@@ -1275,17 +1275,15 @@ class Request
     }
 
     /**
-     * Gets a list of feature predicates sent by the user agent.
+     * Splitts an Accept-* header.
      *
-     * @return array List of feature predicates
+     * @param string $header
+     *
+     * @return array
      */
-    public function getFeaturePredicates()
+    public function splitHttpAcceptHeader($header)
     {
-        if (null !== $this->featurePredicates) {
-            return $this->featurePredicates;
-        }
-
-        return $this->featurePredicates = array_keys(AcceptHeader::split($this->headers->get('Accept-Features')));
+        return AcceptHeader::split($header);
     }
 
     /**

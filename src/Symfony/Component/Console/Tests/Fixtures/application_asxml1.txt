@@ -10,7 +10,9 @@
  
  You can also output the help as XML by using the &lt;comment&gt;--xml&lt;/comment&gt; option:
  
-   &lt;info&gt;php app/console help --xml list&lt;/info&gt;</help>
+   &lt;info&gt;php app/console help --xml list&lt;/info&gt;
+ 
+ To display the list of available commands, please use the &lt;info&gt;list&lt;/info&gt; command.</help>
   <aliases />
   <arguments>
     <argument name="command_name" is_required="0" is_array="0">

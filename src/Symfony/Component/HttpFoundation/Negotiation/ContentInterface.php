@@ -23,21 +23,21 @@ interface ContentInterface
      *
      * @return string
      */
-    function getType();
+    public function getType();
 
     /**
      * Returns content language code.
      *
      * @return string
      */
-    function getLanguage();
+    public function getLanguage();
 
     /**
      * Returns content charset.
      *
      * @return string
      */
-    function getCharset();
+    public function getCharset();
 
     /**
      * Set the content quality.
@@ -46,12 +46,12 @@ interface ContentInterface
      *
      * @return float
      */
-    function setQuality($quality);
+    public function setQuality($quality);
 
     /**
      * Get the content quality.
      *
      * @return mixed
      */
-    function getQuality();
+    public function getQuality();
 }

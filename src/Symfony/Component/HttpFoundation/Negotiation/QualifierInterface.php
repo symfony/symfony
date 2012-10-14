@@ -25,12 +25,12 @@ interface QualifierInterface
      *
      * @return float A quality, between 0 and 1
      */
-    function qualify(ContentInterface $content);
+    public function qualify(ContentInterface $content);
 
     /**
      * Returns varying headers.
      *
      * @return array
      */
-    function getVaryingHeaders();
+    public function getVaryingHeaders();
 }

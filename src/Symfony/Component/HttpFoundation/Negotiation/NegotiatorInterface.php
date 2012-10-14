@@ -23,26 +23,26 @@ interface NegotiatorInterface
      *
      * @param QualifierInterface $qualifier
      */
-    function addQualifier(QualifierInterface $qualifier);
+    public function addQualifier(QualifierInterface $qualifier);
 
     /**
      * Adds a document to qualify.
      *
      * @param ContentInterface $variant
      */
-    function addContent(ContentInterface $content);
+    public function addContent(ContentInterface $content);
 
     /**
      * Returns best document.
      *
      * @return ContentInterface
      */
-    function getBestContent();
+    public function getBestContent();
 
     /**
      * Returns varying headers.
      *
      * @return array
      */
-    function getVaryingHeaders();
+    public function getVaryingHeaders();
 }

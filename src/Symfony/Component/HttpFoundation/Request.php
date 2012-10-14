@@ -1275,18 +1275,6 @@ class Request
     }
 
     /**
-     * Splitts an Accept-* header.
-     *
-     * @param string $header
-     *
-     * @return array
-     */
-    public function splitHttpAcceptHeader($header)
-    {
-        return AcceptHeader::split($header);
-    }
-
-    /**
      * Returns true if the request is a XMLHttpRequest.
      *
      * It works if your JavaScript library set an X-Requested-With HTTP header.
@@ -1299,6 +1287,18 @@ class Request
     public function isXmlHttpRequest()
     {
         return 'XMLHttpRequest' == $this->headers->get('X-Requested-With');
+    }
+
+    /**
+     * Splitts an Accept-* header.
+     *
+     * @param string $header
+     *
+     * @return array
+     */
+    public function splitHttpAcceptHeader($header)
+    {
+        return AcceptHeader::split($header);
     }
 
     /*

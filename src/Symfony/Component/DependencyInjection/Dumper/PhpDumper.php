@@ -186,6 +186,9 @@ class PhpDumper extends Dumper
      * @param Definition $definition
      *
      * @return string
+     *
+     * @throws \RuntimeException When the factory definition is incomplete
+     * @throws ServiceCircularReferenceException When a circular reference is detected
      */
     private function addServiceInlinedDefinitions($id, $definition)
     {
@@ -1048,9 +1051,6 @@ EOF;
                 };
 
                 $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, var_export($value, true)));
-
-                // optimize string
-                $code = preg_replace(array("/^''\./", "/\.''$/", "/(\w+)(?:'\.')/", "/(.+)(?:\.''\.)/"), array('', '', '$1', '$1.'), $code);
 
                 return $code;
             }

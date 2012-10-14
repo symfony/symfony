@@ -31,6 +31,8 @@ class NodeBuilder implements NodeParentInterface
             'variable'    => __NAMESPACE__.'\\VariableNodeDefinition',
             'scalar'      => __NAMESPACE__.'\\ScalarNodeDefinition',
             'boolean'     => __NAMESPACE__.'\\BooleanNodeDefinition',
+            'integer'     => __NAMESPACE__.'\\IntegerNodeDefinition',
+            'float'       => __NAMESPACE__.'\\FloatNodeDefinition',
             'array'       => __NAMESPACE__.'\\ArrayNodeDefinition',
             'enum'        => __NAMESPACE__.'\\EnumNodeDefinition',
         );
@@ -84,6 +86,30 @@ class NodeBuilder implements NodeParentInterface
     public function booleanNode($name)
     {
         return $this->node($name, 'boolean');
+    }
+
+    /**
+     * Creates a child integer node.
+     *
+     * @param string $name the name of the node
+     *
+     * @return IntegerNodeDefinition The child node
+     */
+    public function integerNode($name)
+    {
+        return $this->node($name, 'integer');
+    }
+
+    /**
+     * Creates a child float node.
+     *
+     * @param string $name the name of the node
+     *
+     * @return FloatNodeDefinition The child node
+     */
+    public function floatNode($name)
+    {
+        return $this->node($name, 'float');
     }
 
     /**

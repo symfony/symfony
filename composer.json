@@ -62,15 +62,16 @@
         "monolog/monolog": "dev-master"
     },
     "autoload": {
-        "psr-0": {
-            "Symfony": "src/",
-            "SessionHandlerInterface": "src/Symfony/Component/HttpFoundation/Resources/stubs"
-        }
+        "psr-0": { "Symfony\\": "src/" },
+        "classmap": [
+            "src/Symfony/Component/HttpFoundation/Resources/stubs",
+            "src/Symfony/Component/Locale/Resources/stubs"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.2-dev"
         }
     }
 }

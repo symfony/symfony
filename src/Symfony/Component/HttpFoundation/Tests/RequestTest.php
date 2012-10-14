@@ -136,7 +136,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($request->isSecure());
 
         $request = Request::create('http://test:test@test.com');
-        $this->assertEquals('http://test:test@test.com/', $request->getUri());
+        $this->assertEquals('http://test.com/', $request->getUri());
         $this->assertEquals('/', $request->getPathInfo());
         $this->assertEquals('', $request->getQueryString());
         $this->assertEquals(80, $request->getPort());
@@ -146,7 +146,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($request->isSecure());
 
         $request = Request::create('http://testnopass@test.com');
-        $this->assertEquals('http://testnopass@test.com/', $request->getUri());
+        $this->assertEquals('http://test.com/', $request->getUri());
         $this->assertEquals('/', $request->getPathInfo());
         $this->assertEquals('', $request->getQueryString());
         $this->assertEquals(80, $request->getPort());
@@ -340,11 +340,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $server['PHP_AUTH_USER'] = 'fabien';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://fabien@hostname:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
+        $this->assertEquals('http://hostname:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
 
         $server['PHP_AUTH_PW'] = 'symfony';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://fabien:symfony@hostname:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
+        $this->assertEquals('http://hostname:8080/ba%20se/index_dev.php/foo%20bar/in+fo?query=string', $request->getUri());
     }
 
     /**
@@ -450,11 +450,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $server['PHP_AUTH_USER'] = 'fabien';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://fabien@servername/some/path', $request->getUriForPath('/some/path'));
+        $this->assertEquals('http://servername/some/path', $request->getUriForPath('/some/path'));
 
         $server['PHP_AUTH_PW'] = 'symfony';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://fabien:symfony@servername/some/path', $request->getUriForPath('/some/path'));
+        $this->assertEquals('http://servername/some/path', $request->getUriForPath('/some/path'));
     }
 
     /**
@@ -491,15 +491,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $server['PHP_AUTH_USER'] = 'fabien';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://fabien@servername:90', $request->getSchemeAndHttpHost());
+        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
 
         $server['PHP_AUTH_USER'] = '0';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://0@servername:90', $request->getSchemeAndHttpHost());
+        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
 
         $server['PHP_AUTH_PW'] = '0';
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals('http://0:0@servername:90', $request->getSchemeAndHttpHost());
+        $this->assertEquals('http://servername:90', $request->getSchemeAndHttpHost());
     }
 
     /**
@@ -913,7 +913,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request = new Request();
         $request->headers->set('Accept-Charset', 'ISO-8859-1,utf-8;q=0.7,*;q=0.7');
-        $this->assertEquals(array('ISO-8859-1', '*', 'utf-8'), $request->getCharsets());
+        $this->assertEquals(array('ISO-8859-1', 'utf-8', '*'), $request->getCharsets());
     }
 
     public function testGetAcceptableContentTypes()
@@ -925,7 +925,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request = new Request();
         $request->headers->set('Accept', 'application/vnd.wap.wmlscriptc, text/vnd.wap.wml, application/vnd.wap.xhtml+xml, application/xhtml+xml, text/html, multipart/mixed, */*');
-        $this->assertEquals(array('multipart/mixed', '*/*', 'text/html', 'application/xhtml+xml', 'text/vnd.wap.wml', 'application/vnd.wap.xhtml+xml', 'application/vnd.wap.wmlscriptc'), $request->getAcceptableContentTypes());
+        $this->assertEquals(array('application/vnd.wap.wmlscriptc', 'text/vnd.wap.wml', 'application/vnd.wap.xhtml+xml', 'application/xhtml+xml', 'text/html', 'multipart/mixed', '*/*'), $request->getAcceptableContentTypes());
     }
 
     public function testGetLanguages()
@@ -937,6 +937,18 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
         $this->assertEquals(array('zh', 'en_US', 'en'), $request->getLanguages());
         $this->assertEquals(array('zh', 'en_US', 'en'), $request->getLanguages());
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.6, en; q=0.8');
+        $this->assertEquals(array('zh', 'en', 'en_US'), $request->getLanguages()); // Test out of order qvalues
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en, en-us');
+        $this->assertEquals(array('zh', 'en', 'en_US'), $request->getLanguages()); // Test equal weighting without qvalues
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh; q=0.6, en, en-us; q=0.6');
+        $this->assertEquals(array('en', 'zh', 'en_US'), $request->getLanguages()); // Test equal weighting with qvalues
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, i-cherokee; q=0.6');

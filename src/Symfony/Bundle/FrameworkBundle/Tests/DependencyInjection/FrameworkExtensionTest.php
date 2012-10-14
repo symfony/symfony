@@ -48,6 +48,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() loads collectors.xml');
         $this->assertTrue($container->getParameter('profiler_listener.only_exceptions'));
         $this->assertEquals('%profiler_listener.only_exceptions%', $container->getDefinition('profiler_listener')->getArgument(2));
+
+        $calls = $container->getDefinition('profiler')->getMethodCalls();
+        $this->assertEquals('disable', $calls[0][0]);
     }
 
     public function testRouter()

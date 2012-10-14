@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added support for colorization on Windows via ConEmu
+
 2.1.0
 -----
 

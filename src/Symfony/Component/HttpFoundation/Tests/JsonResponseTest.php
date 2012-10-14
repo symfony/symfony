@@ -13,11 +13,6 @@ namespace Symfony\Component\HttpFoundation\Tests;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-/**
- * @covers Symfony\Component\HttpFoundation\JsonResponse::__construct
- * @covers Symfony\Component\HttpFoundation\JsonResponse::setData
- * @covers Symfony\Component\HttpFoundation\JsonResponse::setCallback
- */
 class JsonResponseTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructorEmptyCreatesJsonObject()
@@ -87,6 +82,73 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals(204, $response->getStatusCode());
+    }
+
+    public function testStaticCreateEmptyJsonObject()
+    {
+        $response = JsonResponse::create();
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
+        $this->assertSame('{}', $response->getContent());
+    }
+
+    public function testStaticCreateJsonArray()
+    {
+        $response = JsonResponse::create(array(0, 1, 2, 3));
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
+        $this->assertSame('[0,1,2,3]', $response->getContent());
+    }
+
+    public function testStaticCreateJsonObject()
+    {
+        $response = JsonResponse::create(array('foo' => 'bar'));
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
+        $this->assertSame('{"foo":"bar"}', $response->getContent());
+    }
+
+    public function testStaticCreateWithSimpleTypes()
+    {
+        $response = JsonResponse::create('foo');
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
+        $this->assertSame('"foo"', $response->getContent());
+
+        $response = JsonResponse::create(0);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
+        $this->assertSame('0', $response->getContent());
+
+        $response = JsonResponse::create(0.1);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
+        $this->assertSame('0.1', $response->getContent());
+
+        $response = JsonResponse::create(true);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
+        $this->assertSame('true', $response->getContent());
+    }
+
+    public function testStaticCreateWithCustomStatus()
+    {
+        $response = JsonResponse::create(array(), 202);
+        $this->assertSame(202, $response->getStatusCode());
+    }
+
+    public function testStaticCreateAddsContentTypeHeader()
+    {
+        $response = JsonResponse::create();
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
+    }
+
+    public function testStaticCreateWithCustomHeaders()
+    {
+        $response = JsonResponse::create(array(), 200, array('ETag' => 'foo'));
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
+        $this->assertSame('foo', $response->headers->get('ETag'));
+    }
+
+    public function testStaticCreateWithCustomContentType()
+    {
+        $headers = array('Content-Type' => 'application/vnd.acme.blog-v1+json');
+
+        $response = JsonResponse::create(array(), 200, $headers);
+        $this->assertSame('application/vnd.acme.blog-v1+json', $response->headers->get('Content-Type'));
     }
 
     public function testSetCallback()

@@ -43,51 +43,58 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with a variable',
                 array('/foo/{bar}'),
-                '/foo', '#^/foo/(?<bar>[^/]+)$#s', array('bar'), array(
-                    array('variable', '/', '[^/]+', 'bar'),
+                '/foo', '#^/foo/(?<bar>[^/]++)$#s', array('bar'), array(
+                    array('variable', '/', '[^/]++', 'bar'),
                     array('text', '/foo'),
                 )),
 
             array(
                 'Route with a variable that has a default value',
                 array('/foo/{bar}', array('bar' => 'bar')),
-                '/foo', '#^/foo(?:/(?<bar>[^/]+))?$#s', array('bar'), array(
-                    array('variable', '/', '[^/]+', 'bar'),
+                '/foo', '#^/foo(?:/(?<bar>[^/]++))?$#s', array('bar'), array(
+                    array('variable', '/', '[^/]++', 'bar'),
                     array('text', '/foo'),
                 )),
 
             array(
                 'Route with several variables',
                 array('/foo/{bar}/{foobar}'),
-                '/foo', '#^/foo/(?<bar>[^/]+)/(?<foobar>[^/]+)$#s', array('bar', 'foobar'), array(
-                    array('variable', '/', '[^/]+', 'foobar'),
-                    array('variable', '/', '[^/]+', 'bar'),
+                '/foo', '#^/foo/(?<bar>[^/]++)/(?<foobar>[^/]++)$#s', array('bar', 'foobar'), array(
+                    array('variable', '/', '[^/]++', 'foobar'),
+                    array('variable', '/', '[^/]++', 'bar'),
                     array('text', '/foo'),
                 )),
 
             array(
                 'Route with several variables that have default values',
                 array('/foo/{bar}/{foobar}', array('bar' => 'bar', 'foobar' => '')),
-                '/foo', '#^/foo(?:/(?<bar>[^/]+)(?:/(?<foobar>[^/]+))?)?$#s', array('bar', 'foobar'), array(
-                    array('variable', '/', '[^/]+', 'foobar'),
-                    array('variable', '/', '[^/]+', 'bar'),
+                '/foo', '#^/foo(?:/(?<bar>[^/]++)(?:/(?<foobar>[^/]++))?)?$#s', array('bar', 'foobar'), array(
+                    array('variable', '/', '[^/]++', 'foobar'),
+                    array('variable', '/', '[^/]++', 'bar'),
                     array('text', '/foo'),
                 )),
 
             array(
                 'Route with several variables but some of them have no default values',
                 array('/foo/{bar}/{foobar}', array('bar' => 'bar')),
-                '/foo', '#^/foo/(?<bar>[^/]+)/(?<foobar>[^/]+)$#s', array('bar', 'foobar'), array(
-                    array('variable', '/', '[^/]+', 'foobar'),
-                    array('variable', '/', '[^/]+', 'bar'),
+                '/foo', '#^/foo/(?<bar>[^/]++)/(?<foobar>[^/]++)$#s', array('bar', 'foobar'), array(
+                    array('variable', '/', '[^/]++', 'foobar'),
+                    array('variable', '/', '[^/]++', 'bar'),
                     array('text', '/foo'),
                 )),
 
             array(
                 'Route with an optional variable as the first segment',
                 array('/{bar}', array('bar' => 'bar')),
-                '', '#^/(?<bar>[^/]+)?$#s', array('bar'), array(
-                    array('variable', '/', '[^/]+', 'bar'),
+                '', '#^/(?<bar>[^/]++)?$#s', array('bar'), array(
+                    array('variable', '/', '[^/]++', 'bar'),
+                )),
+
+            array(
+                'Route with a requirement of 0',
+                array('/{bar}', array('bar' => null), array('bar' => '0')),
+                '', '#^/(?<bar>0)?$#s', array('bar'), array(
+                    array('variable', '/', '0', 'bar'),
                 )),
 
             array(
@@ -100,25 +107,45 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with only optional variables',
                 array('/{foo}/{bar}', array('foo' => 'foo', 'bar' => 'bar')),
-                '', '#^/(?<foo>[^/]+)?(?:/(?<bar>[^/]+))?$#s', array('foo', 'bar'), array(
-                    array('variable', '/', '[^/]+', 'bar'),
-                    array('variable', '/', '[^/]+', 'foo'),
+                '', '#^/(?<foo>[^/]++)?(?:/(?<bar>[^/]++))?$#s', array('foo', 'bar'), array(
+                    array('variable', '/', '[^/]++', 'bar'),
+                    array('variable', '/', '[^/]++', 'foo'),
                 )),
 
             array(
                 'Route with a variable in last position',
                 array('/foo-{bar}'),
-                '/foo', '#^/foo\-(?<bar>[^\-]+)$#s', array('bar'), array(
-                array('variable', '-', '[^\-]+', 'bar'),
+                '/foo', '#^/foo\-(?<bar>[^/]++)$#s', array('bar'), array(
+                array('variable', '-', '[^/]++', 'bar'),
                 array('text', '/foo'),
+            )),
+
+            array(
+                'Route with nested placeholders',
+                array('/{static{var}static}'),
+                '/{static', '#^/\{static(?<var>[^/]+)static\}$#s', array('var'), array(
+                array('text', 'static}'),
+                array('variable', '', '[^/]+', 'var'),
+                array('text', '/{static'),
+            )),
+
+            array(
+                'Route without separator between variables',
+                array('/{w}{x}{y}{z}.{_format}', array('z' => 'default-z', '_format' => 'html'), array('y' => '(y|Y)')),
+                '', '#^/(?<w>[^/\.]+)(?<x>[^/\.]+)(?<y>(y|Y))(?:(?<z>[^/\.]++)(?:\.(?<_format>[^/]++))?)?$#s', array('w', 'x', 'y', 'z', '_format'), array(
+                array('variable', '.', '[^/]++', '_format'),
+                array('variable', '', '[^/\.]++', 'z'),
+                array('variable', '', '(y|Y)', 'y'),
+                array('variable', '', '[^/\.]+', 'x'),
+                array('variable', '/', '[^/\.]+', 'w'),
             )),
 
             array(
                 'Route with a format',
                 array('/foo/{bar}.{_format}'),
-                '/foo', '#^/foo/(?<bar>[^/\.]+)\.(?<_format>[^\.]+)$#s', array('bar', '_format'), array(
-                array('variable', '.', '[^\.]+', '_format'),
-                array('variable', '/', '[^/\.]+', 'bar'),
+                '/foo', '#^/foo/(?<bar>[^/\.]++)\.(?<_format>[^/]++)$#s', array('bar', '_format'), array(
+                array('variable', '.', '[^/]++', '_format'),
+                array('variable', '/', '[^/\.]++', 'bar'),
                 array('text', '/foo'),
             )),
         );
@@ -131,17 +158,25 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
     {
         $route = new Route('/{name}/{name}');
 
-        $route->compile();
+        $compiled = $route->compile();
     }
 
     /**
-     * @expectedException \LogicException
+     * @dataProvider getNumericVariableNames
+     * @expectedException \DomainException
      */
-    public function testRouteWithRequiredVariableAndBadDefault()
+    public function testRouteWithNumericVariableName($name)
     {
-        $route = new Route('/{foo}/', array('foo' => null));
-        // It should raise an exception when compiling this route because the given default value is absolutely
-        // irrelevant for both matching and generating URLs.
+        $route = new Route('/{'. $name . '}');
         $route->compile();
+    }
+
+    public function getNumericVariableNames()
+    {
+        return array(
+           array('09'),
+           array('123'),
+           array('1e2')
+        );
     }
 }

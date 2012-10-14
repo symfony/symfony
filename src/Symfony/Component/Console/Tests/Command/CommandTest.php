@@ -221,6 +221,13 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testRunReturnsAlwaysInteger()
+    {
+        $command = new \TestCommand();
+
+        $this->assertSame(0, $command->run(new StringInput(''), new NullOutput()));
+    }
+
     public function testSetCode()
     {
         $command = new \TestCommand();

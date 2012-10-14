@@ -161,7 +161,7 @@
 
   * The custom factories for the firewall configuration are now
     registered during the build method of bundles instead of being registered
-    by the end-user. This means that you will you need to remove the 'factories'
+    by the end-user. This means that you will need to remove the 'factories'
     keys in your security configuration.
 
     Before:
@@ -1332,8 +1332,7 @@
 
 ### Session
 
-  * Flash messages now return an array based on their type. The old method is
-    still available but is now deprecated.
+  * Using `get` to retrieve flash messages now returns an array.
 
     ##### Retrieving the flash messages from a Twig template
 

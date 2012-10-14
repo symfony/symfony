@@ -19,24 +19,24 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/config": "2.1.*",
-        "symfony/yaml": "2.1.*",
-        "symfony/http-kernel": "2.1.*",
+        "symfony/config": "2.2.*",
+        "symfony/yaml": "2.2.*",
+        "symfony/http-kernel": "2.2.*",
         "doctrine/common": ">=2.2,<2.4-dev"
     },
     "suggest": {
-        "symfony/config": "self.version",
-        "symfony/yaml": "self.version",
+        "symfony/config": "2.2.*",
+        "symfony/yaml": "2.2.*",
         "doctrine/common": ">=2.2,<2.4-dev"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Routing": "" }
+        "psr-0": { "Symfony\\Component\\Routing\\": "" }
     },
     "target-dir": "Symfony/Component/Routing",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1-dev"
+            "dev-master": "2.2-dev"
         }
     }
 }

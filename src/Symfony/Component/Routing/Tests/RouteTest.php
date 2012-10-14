@@ -112,7 +112,10 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     {
         return array(
            array(''),
-           array(array())
+           array(array()),
+           array('^$'),
+           array('^'),
+           array('$')
         );
     }
 

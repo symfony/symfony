@@ -135,7 +135,6 @@ abstract class DoctrineType extends AbstractType
 
         $resolver->setDefaults(array(
             'em'                => null,
-            'class'             => null,
             'property'          => null,
             'query_builder'     => null,
             'loader'            => $loader,
@@ -143,6 +142,8 @@ abstract class DoctrineType extends AbstractType
             'choice_list'       => $choiceList,
             'group_by'          => null,
         ));
+
+        $resolver->setRequired(array('class'));
 
         $resolver->setNormalizers(array(
             'em' => $emNormalizer,

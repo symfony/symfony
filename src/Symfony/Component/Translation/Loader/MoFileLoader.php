@@ -90,18 +90,13 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
             throw new \InvalidArgumentException("MO stream content has an invalid format.");
         }
 
-        $header = array(
-            'formatRevision' => null,
-            'count' => null,
-            'offsetId' => null,
-            'offsetTranslated' => null,
-            'sizeHashes' => null,
-            'offsetHashes' => null,
-        );
-        foreach ($header as &$value) {
-            $value = $this->readLong($stream, $isBigEndian);
-        }
-        extract($header);
+        $formatRevision = $this->readLong($stream, $isBigEndian);
+        $count = $this->readLong($stream, $isBigEndian);
+        $offsetId = $this->readLong($stream, $isBigEndian);
+        $offsetTranslated = $this->readLong($stream, $isBigEndian);
+        $sizeHashes = $this->readLong($stream, $isBigEndian);
+        $offsetHashes = $this->readLong($stream, $isBigEndian);
+
         $messages = array();
 
         for ($i = 0; $i < $count; $i++) {

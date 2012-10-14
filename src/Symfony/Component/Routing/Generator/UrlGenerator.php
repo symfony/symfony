@@ -133,7 +133,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
     {
         $variables = array_flip($variables);
-        $mergedParams = array_replace($this->context->getParameters(), $defaults, $parameters);
+        $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
 
         // all params must be given
         if ($diff = array_diff_key($variables, $mergedParams)) {

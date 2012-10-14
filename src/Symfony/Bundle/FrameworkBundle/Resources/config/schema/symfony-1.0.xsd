@@ -50,6 +50,7 @@
 
         <xsd:attribute name="only-exceptions" type="xsd:string" />
         <xsd:attribute name="only-master-requests" type="xsd:string" />
+        <xsd:attribute name="enabled" type="xsd:string" />
         <xsd:attribute name="dsn" type="xsd:string" />
         <xsd:attribute name="username" type="xsd:string" />
         <xsd:attribute name="password" type="xsd:string" />

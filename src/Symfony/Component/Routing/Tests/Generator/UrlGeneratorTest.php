@@ -75,13 +75,13 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \LogicException
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
      */
     public function testRelativeUrlWithNullParameterButNotOptional()
     {
         $routes = $this->getRoutes('test', new Route('/testing/{foo}/bar', array('foo' => null)));
-        // It should raise an exception when compiling this route because the given default value is absolutely
-        // irrelevant for both matching and generating URLs.
+        // This must raise an exception because the default requirement for "foo" is "[^/]+" which is not met with these params.
+        // Generating path "/testing//bar" would be wrong as matching this route would fail.
         $this->getGenerator($routes)->generate('test', array(), false);
     }
 
@@ -146,6 +146,18 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $url = $generator->generate('test', array());
 
         $this->assertEquals('/app.php/testing/bar', $url);
+    }
+
+    public function testGlobalParameterHasHigherPriorityThanDefault()
+    {
+        $routes = $this->getRoutes('test', new Route('/{_locale}', array('_locale' => 'en')));
+        $generator = $this->getGenerator($routes);
+        $context = new RequestContext('/app.php');
+        $context->setParameter('_locale', 'de');
+        $generator->setContext($context);
+        $url = $generator->generate('test', array());
+
+        $this->assertSame('/app.php/de', $url);
     }
 
     /**
@@ -298,6 +310,63 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('/app.php/dir/%2E/dir/%2E', $this->getGenerator($routes)->generate('test'));
         $routes = $this->getRoutes('test', new Route('/a./.a/a../..a/...'));
         $this->assertSame('/app.php/a./.a/a../..a/...', $this->getGenerator($routes)->generate('test'));
+    }
+
+    public function testAdjacentVariables()
+    {
+        $routes = $this->getRoutes('test', new Route('/{x}{y}{z}.{_format}', array('z' => 'default-z', '_format' => 'html'), array('y' => '\d+')));
+        $generator = $this->getGenerator($routes);
+        $this->assertSame('/app.php/foo123', $generator->generate('test', array('x' => 'foo', 'y' => '123')));
+        $this->assertSame('/app.php/foo123bar.xml', $generator->generate('test', array('x' => 'foo', 'y' => '123', 'z' => 'bar', '_format' => 'xml')));
+
+        // The default requirement for 'x' should not allow the separator '.' in this case because it would otherwise match everything
+        // and following optional variables like _format could never match.
+        $this->setExpectedException('Symfony\Component\Routing\Exception\InvalidParameterException');
+        $generator->generate('test', array('x' => 'do.t', 'y' => '123', 'z' => 'bar', '_format' => 'xml'));
+    }
+
+    public function testOptionalVariableWithNoRealSeparator()
+    {
+        $routes = $this->getRoutes('test', new Route('/get{what}', array('what' => 'All')));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/get', $generator->generate('test'));
+        $this->assertSame('/app.php/getSites', $generator->generate('test', array('what' => 'Sites')));
+    }
+
+    public function testRequiredVariableWithNoRealSeparator()
+    {
+        $routes = $this->getRoutes('test', new Route('/get{what}Suffix'));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/getSitesSuffix', $generator->generate('test', array('what' => 'Sites')));
+    }
+
+    public function testDefaultRequirementOfVariable()
+    {
+        $routes = $this->getRoutes('test', new Route('/{page}.{_format}'));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/index.mobile.html', $generator->generate('test', array('page' => 'index', '_format' => 'mobile.html')));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
+     */
+    public function testDefaultRequirementOfVariableDisallowsSlash()
+    {
+        $routes = $this->getRoutes('test', new Route('/{page}.{_format}'));
+        $this->getGenerator($routes)->generate('test', array('page' => 'index', '_format' => 'sl/ash'));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
+     */
+    public function testDefaultRequirementOfVariableDisallowsNextSeparator()
+    {
+
+        $routes = $this->getRoutes('test', new Route('/{page}.{_format}'));
+        $this->getGenerator($routes)->generate('test', array('page' => 'do.t', '_format' => 'html'));
     }
 
     protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)

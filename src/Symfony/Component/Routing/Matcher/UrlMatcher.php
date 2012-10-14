@@ -12,12 +12,12 @@
 namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Exception\NotAcceptableException;
+use Symfony\Component\Routing\Negotiation\NegotiationAwareInterface;
+use Symfony\Component\Routing\Negotiation\NegotiationInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteHandlerInterface;
 
 /**
  * UrlMatcher matches URL based on a set of routes.
@@ -26,16 +26,23 @@ use Symfony\Component\Routing\RouteHandlerInterface;
  *
  * @api
  */
-class UrlMatcher implements UrlMatcherInterface
+class UrlMatcher implements UrlMatcherInterface, NegotiatorMatcherInterface
 {
     const REQUIREMENT_MATCH     = 0;
     const REQUIREMENT_MISMATCH  = 1;
     const ROUTE_MATCH           = 2;
 
+    /**
+     * @var RequestContext
+     */
     protected $context;
+
     protected $allow;
-    protected $negotiatedVariables;
-    protected $routeHandlers;
+
+    /**
+     * @var Negotiator
+     */
+    protected $negotiator;
 
     private $routes;
 
@@ -51,7 +58,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $this->routes = $routes;
         $this->context = $context;
-        $this->routeHandlers = array();
+        $this->negotiator = new Negotiator();
     }
 
     /**
@@ -73,9 +80,9 @@ class UrlMatcher implements UrlMatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function addRouteHandler(RouteHandlerInterface $handler)
+    public function getNegotiator()
     {
-        $this->routeHandlers[] = $handler;
+        return $this->negotiator;
     }
 
     /**
@@ -121,10 +128,6 @@ class UrlMatcher implements UrlMatcherInterface
                 return $ret;
             }
 
-            foreach ($this->routeHandlers as $handler) {
-                $handler->updateBeforeCompilation($route);
-            }
-
             $compiledRoute = $route->compile();
 
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
@@ -150,10 +153,7 @@ class UrlMatcher implements UrlMatcherInterface
                 }
             }
 
-            foreach ($this->routeHandlers as $handler) {
-                $handler->checkMatcherExceptions($route, $compiledRoute);
-            }
-
+            $negotiatedParameters = $this->negotiator->negotiate($route);
             $status = $this->handleRouteRequirements($pathinfo, $name, $route);
 
             if (self::ROUTE_MATCH === $status[0]) {
@@ -165,9 +165,8 @@ class UrlMatcher implements UrlMatcherInterface
             }
 
             $parameters = array('_route' => $name);
-
-            foreach ($this->routeHandlers as $handler) {
-                $parameters = $handler->updateMatchedParameters($route, $parameters);
+            if (count($negotiatedParameters) > 0) {
+                $parameters['_negotiated_parameters'] = $negotiatedParameters;
             }
 
             return array_merge($this->mergeDefaults($matches, $route->getDefaults()), $parameters);

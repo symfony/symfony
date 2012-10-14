@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Routing\Exception;
 
-use Symfony\Component\Routing\RequestAcceptance;
-
 /**
  * The resource was found but the Accept-* header does not match requirement.
  *
@@ -20,30 +18,30 @@ use Symfony\Component\Routing\RequestAcceptance;
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
-class NotAcceptableException extends \RuntimeException implements ExceptionInterface
+class NegotiationFailureException extends \RuntimeException implements ExceptionInterface
 {
     /**
      * @var array
      */
-    protected $variables;
+    private $negotiatedParameters;
 
     /**
-     * @param array           $variables
-     * @param string          $message
+     * @param array           $negotiatedParameters
+     * @param array           $failures
      * @param int             $code
      * @param \Exception|null $previous
      */
-    public function __construct(array $variables, $message, $code = 0, \Exception $previous = null)
+    public function __construct(array $negotiatedParameters, array $failures, $code = 0, \Exception $previous = null)
     {
-        $this->variables = $variables;
-        parent::__construct($message, $code, $previous);
+        $this->negotiatedParameters = $negotiatedParameters;
+        parent::__construct(sprintf('Negotiation failed for "%s" parameters.', implode(', ', $failures)), $code, $previous);
     }
 
     /**
      * @return array
      */
-    public function getVariables()
+    public function getNegotiatedParameters()
     {
-        return $this->variables;
+        return $this->negotiatedParameters;
     }
 }

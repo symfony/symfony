@@ -32,7 +32,6 @@ class Router implements RouterInterface
     protected $resource;
     protected $options;
     protected $logger;
-    protected $routeHandlers;
 
     /**
      * Constructor.
@@ -50,7 +49,6 @@ class Router implements RouterInterface
         $this->logger = $logger;
         $this->context = null === $context ? new RequestContext() : $context;
         $this->setOptions($options);
-        $this->routeHandlers = array();
     }
 
     /**
@@ -154,15 +152,6 @@ class Router implements RouterInterface
 
         $this->getMatcher()->setContext($context);
         $this->getGenerator()->setContext($context);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addRouteHandler(RouteHandlerInterface $handler)
-    {
-        $this->getMatcher()->addRouteHandler($handler);
-        $this->getGenerator()->addRouteHandler($handler);
     }
 
     /**

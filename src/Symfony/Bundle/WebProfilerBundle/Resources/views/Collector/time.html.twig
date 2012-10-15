@@ -1,5 +1,7 @@
 {% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
+{% from _self import display_timeline, dump_events, dump_request_data %}
+
 {% if colors is not defined %}
     {% set colors = {
         'default':                '#aacd4e',
@@ -77,7 +79,7 @@
 
     {% set max = collector.events.__section__.endtime %}
 
-    {{ _self.display_timeline('timeline_' ~ token, collector.events, colors) }}
+    {{ display_timeline('timeline_' ~ token, collector.events, colors) }}
 
     {% if profile.children|length %}
         {% for child in profile.children %}
@@ -87,7 +89,7 @@
                 <small> - {{ events.__section__.totaltime }} ms</small>
             </h3>
 
-            {{ _self.display_timeline('timeline_' ~ child.token, events, colors) }}
+            {{ display_timeline('timeline_' ~ child.token, events, colors) }}
         {% endfor %}
     {% endif %}
 
@@ -388,12 +390,12 @@
         var requests_data = {
             "max": {{ "%F"|format(collector.events.__section__.endtime) }},
             "requests": [
-{{ _self.dump_request_data(token, profile, collector.events, collector.events.__section__.origin) }}
+{{ dump_request_data(token, profile, collector.events, collector.events.__section__.origin) }}
 
 {% if profile.children|length %}
                 ,
 {% for child in profile.children %}
-{{ _self.dump_request_data(child.token, child, child.getcollector('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
+{{ dump_request_data(child.token, child, child.getcollector('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
 {% endfor %}
 {% endif %}
             ]
@@ -431,7 +433,7 @@
                     "id": "{{ token }}",
                     "left": {{ "%F"|format(events.__section__.origin - origin) }},
                     "events": [
-{{ _self.dump_events(events) }}
+{{ dump_events(events) }}
                     ]
                 }
 {% endmacro %}

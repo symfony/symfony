@@ -854,8 +854,7 @@ class Application
                 return preg_replace('{^(\d+)x.*$}', '$1', $ansicon);
             }
 
-            exec('mode CON', $execData);
-            if (preg_match('{columns:\s*(\d+)}i', $execData[4], $matches)) {
+            if (preg_match('{columns:\s*(\d+)}i', $this->getConsoleMode(), $matches)) {
                 return $matches[1];
             }
         }
@@ -877,8 +876,7 @@ class Application
                 return preg_replace('{^\d+x\d+ \(\d+x(\d+)\)$}', '$1', trim($ansicon));
             }
 
-            exec('mode CON', $execData);
-            if (preg_match('{lines:\s*(\d+)}i', $execData[3], $matches)) {
+            if (preg_match('{lines:\s*(\d+)}i', $this->getConsoleMode(), $matches)) {
                 return $matches[1];
             }
         }
@@ -956,6 +954,29 @@ class Application
 
         $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
         $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
+        if (is_resource($process)) {
+            $info = stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($process);
+
+            return $info;
+        }
+    }
+
+    /**
+     * Runs and parses mode CON if it's available, suppressing any error output
+     *
+     * @return string
+     */
+    private function getConsoleMode()
+    {
+        if (!function_exists('proc_open')) {
+            return;
+        }
+
+        $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
+        $process = proc_open('mode CON', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
         if (is_resource($process)) {
             $info = stream_get_contents($pipes[1]);
             fclose($pipes[1]);

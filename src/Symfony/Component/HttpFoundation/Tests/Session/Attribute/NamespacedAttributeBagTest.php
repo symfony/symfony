@@ -76,6 +76,22 @@ class NamespacedAttributeBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider wrongAttributesProvider
+     */
+    public function testSetWrongName($key, $value, $expected)
+    {
+        $this->bag->set($key, $value);
+        $this->assertEquals($value, $this->bag->get($key));
+    }
+
+    public function wrongAttributesProvider()
+    {
+        return array(
+            array('', '', true),
+        );
+    }
+
+    /**
      * @dataProvider attributesProvider
      */
     public function testHas($key, $value, $exists)

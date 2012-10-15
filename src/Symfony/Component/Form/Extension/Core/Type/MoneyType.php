@@ -104,14 +104,14 @@ class MoneyType extends AbstractType
             preg_match('/^([^\s\xc2\xa0]*)[\s\xc2\xa0]*123(?:[,.]0+)?[\s\xc2\xa0]*([^\s\xc2\xa0]*)$/u', $pattern, $matches);
 
             if (!empty($matches[1])) {
-                self::$patterns[\Locale::getDefault()] = $matches[1].' {{ widget }}';
+                self::$patterns[\Locale::getDefault()][$currency] = $matches[1].' {{ widget }}';
             } elseif (!empty($matches[2])) {
-                self::$patterns[\Locale::getDefault()] = '{{ widget }} '.$matches[2];
+                self::$patterns[\Locale::getDefault()][$currency] = '{{ widget }} '.$matches[2];
             } else {
-                self::$patterns[\Locale::getDefault()] = '{{ widget }}';
+                self::$patterns[\Locale::getDefault()][$currency] = '{{ widget }}';
             }
         }
 
-        return self::$patterns[\Locale::getDefault()];
+        return self::$patterns[\Locale::getDefault()][$currency];
     }
 }

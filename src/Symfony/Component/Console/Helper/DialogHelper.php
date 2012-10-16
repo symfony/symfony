@@ -74,7 +74,7 @@ class DialogHelper extends Helper
     }
 
     /**
-     * Ask a question to the user, the response is hidden
+     * Asks a question to the user, the response is hidden
      *
      * @param OutputInterface $output   An Output instance
      * @param string|array    $question The question
@@ -82,7 +82,7 @@ class DialogHelper extends Helper
      *
      * @return string         The answer
      *
-     * @throws \RuntimeException In case the fallback is disactivated and the response can not be hidden
+     * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
      */
     public function askHiddenResponse(OutputInterface $output, $question, $fallback = true)
     {
@@ -108,7 +108,6 @@ class DialogHelper extends Helper
         }
 
         if ($this->hasSttyAvailable()) {
-
             $output->write($question);
 
             $sttyMode = shell_exec('/usr/bin/env stty -g');
@@ -128,7 +127,6 @@ class DialogHelper extends Helper
         }
 
         if (false !== $shell = $this->getShell()) {
-
             $output->write($question);
             $readCmd = $shell === 'csh' ? 'set mypassword = $<' : 'read mypassword';
             $command = sprintf("/usr/bin/env %s -c 'stty -echo; %s; stty echo; echo \$mypassword'", $shell, $readCmd);
@@ -189,7 +187,7 @@ class DialogHelper extends Helper
      * @return string         The response
      *
      * @throws \Exception        When any of the validators return an error
-     * @throws \RuntimeException In case the fallback is disactivated and the response can not be hidden
+     * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
      *
      */
     public function askHiddenResponseAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $fallback = true)

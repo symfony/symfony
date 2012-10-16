@@ -18,6 +18,27 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class DialogHelperTest extends \PHPUnit_Framework_TestCase
 {
+    public function testAskForList()
+    {
+        $dialog = new DialogHelper();
+        $dialog->setInputStream($this->getInputStream("1\n2\n3\n\n"));
+
+        $list = $dialog->askForList($this->getOutputStream(), 'Give me a list');
+        $this->assertEquals(array(1,2,3), $list);
+
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $dialog->setHelperSet($helperSet);
+
+        $dialog->setInputStream($this->getInputStream("1\nbanana\n3\n\n"));
+        $list = $dialog->askForList($this->getOutputStream(), 'Give me a list of numbers', function($v) {
+            if(!is_numeric($v)) {
+                throw new \InvalidArgumentException("'$v' is not a number!");
+            }
+            return $v;
+        });
+        $this->assertEquals(array(1,3), $list);
+    }
+
     public function testAsk()
     {
         $dialog = new DialogHelper();

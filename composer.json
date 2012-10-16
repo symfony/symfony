@@ -59,7 +59,8 @@
         "doctrine/orm": ">=2.2.3,<2.4-dev",
         "doctrine/data-fixtures": "1.0.*",
         "propel/propel1": "dev-master",
-        "monolog/monolog": "dev-master"
+        "monolog/monolog": "dev-master",
+        "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\": "src/" },

@@ -480,43 +480,28 @@ class Application
      */
     public function findNamespace($namespace)
     {
-        $allNamespaces = array();
-        foreach ($this->getNamespaces() as $n) {
-            $allNamespaces[$n] = explode(':', $n);
-        }
+        $allNamespaces = $this->getNamespaces();
+        $namespaces = $this->search($namespace, $allNamespaces);
 
-        $found = array();
-        foreach (explode(':', $namespace) as $i => $part) {
-            $abbrevs = static::getAbbreviations(array_unique(array_values(array_filter(array_map(function ($p) use ($i) { return isset($p[$i]) ? $p[$i] : ''; }, $allNamespaces)))));
+        if (empty($namespaces)) {
+            $message = sprintf('There are no commands defined in the "%s" namespace.', $namespace);
 
-            if (!isset($abbrevs[$part])) {
-                $message = sprintf('There are no commands defined in the "%s" namespace.', $namespace);
-
-                if (1 <= $i) {
-                    $part = implode(':', $found).':'.$part;
-                }
-
-                if ($alternatives = $this->findAlternativeNamespace($part, $abbrevs)) {
-                    if (1 == count($alternatives)) {
-                        $message .= "\n\nDid you mean this?\n    ";
-                    } else {
-                        $message .= "\n\nDid you mean one of these?\n    ";
-                    }
-
-                    $message .= implode("\n    ", $alternatives);
-                }
-
-                throw new \InvalidArgumentException($message);
+            if ($alternatives = $this->search($namespace, $allNamespaces, true)) {
+                $message .= (1 === count($alternatives))
+                          ? "\n\nDid you mean this?\n    "
+                          : "\n\nDid you mean one of these?\n    "
+                ;
+                $message .= implode("\n    ", $alternatives);
             }
 
-            if (count($abbrevs[$part]) > 1) {
-                throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($abbrevs[$part])));
-            }
-
-            $found[] = $abbrevs[$part][0];
+            throw new \InvalidArgumentException($message);
         }
 
-        return implode(':', $found);
+        if (count($namespaces) > 1) {
+            throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($namespaces)));
+        }
+
+        return $namespaces[0];
     }
 
     /**
@@ -535,64 +520,39 @@ class Application
      */
     public function find($name)
     {
-        // namespace
-        $namespace = '';
-        $searchName = $name;
-        if (false !== $pos = strrpos($name, ':')) {
-            $namespace = $this->findNamespace(substr($name, 0, $pos));
-            $searchName = $namespace.substr($name, $pos);
-        }
-
-        // name
-        $commands = array();
+        $allCommands = array();
         foreach ($this->commands as $command) {
-            if ($this->extractNamespace($command->getName()) == $namespace) {
-                $commands[] = $command->getName();
-            }
+            $allCommands = array_merge(
+                $allCommands, array($command->getName()), $command->getAliases()
+            );
         }
+        $namespace = $this->extractNamespace($name);
+        $namespace = $namespace ? $this->findNamespace($namespace) : '';
+        $commands = $this->search($name, $allCommands);
 
-        $abbrevs = static::getAbbreviations(array_unique($commands));
-        if (isset($abbrevs[$searchName]) && 1 == count($abbrevs[$searchName])) {
-            return $this->get($abbrevs[$searchName][0]);
-        }
-
-        if (isset($abbrevs[$searchName]) && count($abbrevs[$searchName]) > 1) {
-            $suggestions = $this->getAbbreviationSuggestions($abbrevs[$searchName]);
-
-            throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $name, $suggestions));
-        }
-
-        // aliases
-        $aliases = array();
-        foreach ($this->commands as $command) {
-            foreach ($command->getAliases() as $alias) {
-                if ($this->extractNamespace($alias) == $namespace) {
-                    $aliases[] = $alias;
-                }
-            }
-        }
-
-        $aliases = static::getAbbreviations(array_unique($aliases));
-        if (!isset($aliases[$searchName])) {
+        if (empty($commands)) {
             $message = sprintf('Command "%s" is not defined.', $name);
 
-            if ($alternatives = $this->findAlternativeCommands($searchName, $abbrevs)) {
-                if (1 == count($alternatives)) {
-                    $message .= "\n\nDid you mean this?\n    ";
-                } else {
-                    $message .= "\n\nDid you mean one of these?\n    ";
-                }
+            if ($alternatives = $this->search($name, $allCommands, true)) {
+                $message .= (1 === count($alternatives))
+                          ? "\n\nDid you mean this?\n    "
+                          : "\n\nDid you mean one of these?\n    "
+                ;
                 $message .= implode("\n    ", $alternatives);
             }
 
             throw new \InvalidArgumentException($message);
         }
 
-        if (count($aliases[$searchName]) > 1) {
-            throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $name, $this->getAbbreviationSuggestions($aliases[$searchName])));
+        if (count($commands) > 1) {
+            if ($namespaceCommands = preg_grep("/^".$namespace.":.*/", $commands)) {
+                $commands = $namespaceCommands;
+            }
+
+            throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $name, $this->getAbbreviationSuggestions($commands)));
         }
 
-        return $this->get($aliases[$searchName][0]);
+        return $this->get($commands[0]);
     }
 
     /**
@@ -620,35 +580,6 @@ class Application
         }
 
         return $commands;
-    }
-
-    /**
-     * Returns an array of possible abbreviations given a set of names.
-     *
-     * @param array $names An array of names
-     *
-     * @return array An array of abbreviations
-     */
-    public static function getAbbreviations($names)
-    {
-        $abbrevs = array();
-        foreach ($names as $name) {
-            for ($len = strlen($name) - 1; $len > 0; --$len) {
-                $abbrev = substr($name, 0, $len);
-                if (!isset($abbrevs[$abbrev])) {
-                    $abbrevs[$abbrev] = array($name);
-                } else {
-                    $abbrevs[$abbrev][] = $name;
-                }
-            }
-        }
-
-        // Non-abbreviations always get entered, even if they aren't unique
-        foreach ($names as $name) {
-            $abbrevs[$name] = array($name);
-        }
-
-        return $abbrevs;
     }
 
     /**
@@ -998,7 +929,69 @@ class Application
      */
     private function getAbbreviationSuggestions($abbrevs)
     {
+        sort($abbrevs);
+
         return sprintf('%s, %s%s', $abbrevs[0], $abbrevs[1], count($abbrevs) > 2 ? sprintf(' and %d more', count($abbrevs) - 2) : '');
+    }
+
+    /**
+     * Search for $name in $values, similar names can be matched if $permissive
+     * is set to true.
+     *
+     * @param type $name
+     * @param type $values
+     * @param type $permissive
+     *
+     * @return array An array containing matched values.
+     */
+    private function search($name, $values, $permissive = false)
+    {
+        $matches = array();
+        foreach ($values as $value) {
+            if ($value ===  $name) {
+                return array($name); // return only this value if it's exactly the same
+            }
+            if ($this->match($value, $name, $permissive)) {
+                $matches[] = $value;
+            }
+        }
+
+        return array_unique($matches);
+    }
+
+    /**
+     * Tries to match a command name against another one.
+     *
+     * @param string   $nameToMatch
+     * @param array    $targetName
+     * @param Boolean  $permissive
+     *
+     * @return Boolean Wether or not the names have been matched.
+     */
+    private function match($nameToMatch, $targetName, $permissive)
+    {
+        $targetParts = array_filter(explode(':', $targetName));
+        $partsToMatch = array_filter(explode(':', $nameToMatch));
+
+        if (!$permissive && 1 === count($targetParts) && 1 < count($partsToMatch)) {
+            return false; // strict mode : $nameToMatch has a namespace while $targetName name doesn't
+        }
+        if ($permissive && 1 === count($targetParts) && 1 < count($partsToMatch) && 0 !== strpos($partsToMatch[0], $targetParts[0])) {
+            return false; // permissive mode : the first part of $nameToMatch  doesn't start with the first part of $targetName
+        }
+
+        foreach ($targetParts as $pos => $targetPart) {
+            if (!empty($partsToMatch[$pos]) && 0 === strpos($partsToMatch[$pos], $targetPart)) {
+                continue; // $nameToMatch part starts with $targetName part
+            }
+            if ($permissive && !empty($partsToMatch[$pos]) && levenshtein($partsToMatch[$pos], $targetPart) <= strlen($partsToMatch[$pos]) / 3) {
+                continue; // permissive mode : $nameToMatch part is similar to $targetName part
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -1015,77 +1008,5 @@ class Application
         array_pop($parts);
 
         return implode(':', null === $limit ? $parts : array_slice($parts, 0, $limit));
-    }
-
-    /**
-     * Finds alternative commands of $name
-     *
-     * @param string $name    The full name of the command
-     * @param array  $abbrevs The abbreviations
-     *
-     * @return array A sorted array of similar commands
-     */
-    private function findAlternativeCommands($name, $abbrevs)
-    {
-        $callback = function($item) {
-            return $item->getName();
-        };
-
-        return $this->findAlternatives($name, $this->commands, $abbrevs, $callback);
-    }
-
-    /**
-     * Finds alternative namespace of $name
-     *
-     * @param string $name    The full name of the namespace
-     * @param array  $abbrevs The abbreviations
-     *
-     * @return array A sorted array of similar namespace
-     */
-    private function findAlternativeNamespace($name, $abbrevs)
-    {
-        return $this->findAlternatives($name, $this->getNamespaces(), $abbrevs);
-    }
-
-    /**
-     * Finds alternative of $name among $collection,
-     * if nothing is found in $collection, try in $abbrevs
-     *
-     * @param string               $name       The string
-     * @param array|Traversable    $collection The collection
-     * @param array                $abbrevs    The abbreviations
-     * @param Closure|string|array $callback   The callable to transform collection item before comparison
-     *
-     * @return array A sorted array of similar string
-     */
-    private function findAlternatives($name, $collection, $abbrevs, $callback = null)
-    {
-        $alternatives = array();
-
-        foreach ($collection as $item) {
-            if (null !== $callback) {
-                $item = call_user_func($callback, $item);
-            }
-
-            $lev = levenshtein($name, $item);
-            if ($lev <= strlen($name) / 3 || false !== strpos($item, $name)) {
-                $alternatives[$item] = $lev;
-            }
-        }
-
-        if (!$alternatives) {
-            foreach ($abbrevs as $key => $values) {
-                $lev = levenshtein($name, $key);
-                if ($lev <= strlen($name) / 3 || false !== strpos($key, $name)) {
-                    foreach ($values as $value) {
-                        $alternatives[$value] = $lev;
-                    }
-                }
-            }
-        }
-
-        asort($alternatives);
-
-        return array_keys($alternatives);
     }
 }

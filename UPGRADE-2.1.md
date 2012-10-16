@@ -576,7 +576,7 @@
 
   * Custom styling of individual rows of a collection form has been removed for
     performance reasons. Instead, all rows now have the same block name, where
-    the word "entry" replaces the previous occurence of the row index.
+    the word "entry" replaces the previous occurrence of the row index.
 
     Before:
 

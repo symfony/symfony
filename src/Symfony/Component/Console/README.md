@@ -50,8 +50,8 @@ You can run the unit tests with the following command:
 Third Party
 -----------
 
-`hiddeninput.exe` third party binary is provided within this component. Find
-sources and license at https://github.com/Seldaek/hidden-input.
+`Resources/bin/hiddeninput.exe` is a third party binary provided within this
+component. Find sources and license at https://github.com/Seldaek/hidden-input.
 
 Resources
 ---------

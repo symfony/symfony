@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added support for colorization on Windows via ConEmu
+ * add a method to Dialog Helper to ask for a question and hide the response
 
 2.1.0
 -----

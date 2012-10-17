@@ -85,7 +85,7 @@ class Content implements ContentInterface
     /**
      * {@inheritdoc}
      */
-    function getQuality()
+    public function getQuality()
     {
         return $this->quality;
     }

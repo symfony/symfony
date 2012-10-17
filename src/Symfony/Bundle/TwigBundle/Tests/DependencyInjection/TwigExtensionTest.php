@@ -59,15 +59,18 @@ class TwigExtensionTest extends TestCase
 
         // Globals
         $calls = $container->getDefinition('twig')->getMethodCalls();
-        $this->assertEquals('foo', $calls[0][1][0], '->load() registers services as Twig globals');
-        $this->assertEquals(new Reference('bar'), $calls[0][1][1], '->load() registers services as Twig globals');
-        $this->assertEquals('pi', $calls[1][1][0], '->load() registers variables as Twig globals');
-        $this->assertEquals(3.14, $calls[1][1][1], '->load() registers variables as Twig globals');
+        $this->assertEquals('app', $calls[0][1][0], '->load() registers services as Twig globals');
+
+        $this->assertEquals('foo', $calls[1][1][0], '->load() registers services as Twig globals');
+        $this->assertEquals(new Reference('bar'), $calls[1][1][1], '->load() registers services as Twig globals');
+
+        $this->assertEquals('pi', $calls[2][1][0], '->load() registers variables as Twig globals');
+        $this->assertEquals(3.14, $calls[2][1][1], '->load() registers variables as Twig globals');
 
         // Yaml and Php specific configs
         if (in_array($format, array('yml', 'php'))) {
-            $this->assertEquals('bad', $calls[2][1][0], '->load() registers variables as Twig globals');
-            $this->assertEquals(array('key' => 'foo'), $calls[2][1][1], '->load() registers variables as Twig globals');
+            $this->assertEquals('bad', $calls[3][1][0], '->load() registers variables as Twig globals');
+            $this->assertEquals(array('key' => 'foo'), $calls[3][1][1], '->load() registers variables as Twig globals');
         }
 
         // Twig options
@@ -100,7 +103,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $calls = $container->getDefinition('twig')->getMethodCalls();
-
+        array_shift($calls);
         foreach ($calls as $call) {
             list($name, $value) = each($globals);
             $this->assertEquals($name, $call[1][0]);

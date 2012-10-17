@@ -82,6 +82,6 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function generateOutput($expected)
     {
-        return str_repeat("\x08", 80).$expected.str_repeat(' ', 80 - strlen($expected)).str_repeat("\x08", 80 - strlen($expected));
+        return "\x0D\x1B\x5B\x4B".$expected;
     }
 }

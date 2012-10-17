@@ -12,51 +12,107 @@
 namespace Symfony\Component\HttpFoundation;
 
 /**
- * Accept-* HTTP headers utils.
+ * Accept-* HTTP header parser.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
 class AcceptHeader
 {
     /**
-     * Splits an Accept-* HTTP header.
-     *
-     * @param string $header Header to split
-     *
-     * @return array Array indexed by the values of the Accept-* header in preferred order
+     * @var array
      */
-    public static function split($header)
+    private $values;
+
+    /**
+     * @param string $header
+     * @return AcceptHeader
+     */
+    public static function create($header)
     {
-        if (!$header) {
-            return array();
-        }
+        return new static($header);
+    }
 
-        $values = array();
-        $groups = array();
-        foreach (array_filter(explode(',', $header)) as $value) {
-            // Cut off any q-value that might come after a semi-colon
-            if (preg_match('/;\s*(q=.*$)/', $value, $match)) {
-                $q     = substr(trim($match[1]), 2);
-                $value = trim(substr($value, 0, -strlen($match[0])));
-            } else {
-                $q = 1;
+    /**
+     * @param string $header
+     */
+    public function __construct($header)
+    {
+        $this->values = array();
+        foreach (explode(',', $header) as $value) {
+            $properties = explode(';', $value);
+            if (!$name = trim(array_shift($properties))) {
+                continue;
             }
-
-            $groups[$q][] = $value;
-        }
-
-        krsort($groups);
-
-        foreach ($groups as $q => $items) {
-            $q = (float) $q;
-
-            if (0 < $q) {
-                foreach ($items as $value) {
-                    $values[trim($value)] = $q;
-                }
+            $this->values[$name] = array();
+            foreach ($properties as $property) {
+                $bits = explode('=', $property);
+                $this->values[$name][trim($bits[0])] = isset($bits[1]) ? trim($bits[1]) : null;
             }
         }
+    }
 
-        return $values;
+    /**
+     * @param array $defaults
+     *
+     * @return AcceptHeader
+     */
+    public function setDefaults(array $defaults)
+    {
+        foreach ($this->values as $name => $properties) {
+            $this->values[$name] = array_merge($defaults, $properties);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $property
+     *
+     * @return AcceptHeader
+     */
+    public function sort($property)
+    {
+        uasort($this->values, function (array $a, array $b) use ($property) {
+            return strcmp($a[$property], $b[$property]);
+        });
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValues()
+    {
+        return array_keys($this->values);
+    }
+
+    /**
+     * @param $property
+     *
+     * @return array
+     */
+    public function getHash($property)
+    {
+        $hash = array();
+        foreach ($this->values as $name => $properties) {
+            if (!isset($properties[$property])) {
+                continue;
+            }
+            foreach ($properties as $key => $value) {
+                $name.= $key === $property ? '' : sprintf(';%s=%s', $key, $value);
+            }
+            $hash[$name] = is_numeric($properties[$property]) ? (float) $properties[$property] : $properties[$property];
+        }
+
+        return $hash;
+    }
+
+    /**
+     * @return array
+     */
+    public function all()
+    {
+        return $this->values;
     }
 }

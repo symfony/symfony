@@ -107,11 +107,6 @@ class Request
     protected $encodings;
 
     /**
-     * @var array
-     */
-    protected $featurePredicates;
-
-    /**
      * @var string
      */
     protected $pathInfo;
@@ -209,7 +204,6 @@ class Request
         $this->charsets = null;
         $this->acceptableContentTypes = null;
         $this->encodings = null;
-        $this->featurePredicates = null;
         $this->pathInfo = null;
         $this->requestUri = null;
         $this->baseUrl = null;
@@ -1199,7 +1193,10 @@ class Request
             return $this->languages;
         }
 
-        $languages = AcceptHeader::split($this->headers->get('Accept-Language'));
+        $languages = AcceptHeader::create($this->headers->get('Accept-Language'))
+            ->setDefaults(array('q' => 1))
+            ->sort('q')
+            ->getHash('q');
         $this->languages = array();
         foreach ($languages as $lang => $q) {
             if (strstr($lang, '-')) {
@@ -1241,7 +1238,7 @@ class Request
             return $this->charsets;
         }
 
-        return $this->charsets = array_keys(AcceptHeader::split($this->headers->get('Accept-Charset')));
+        return $this->charsets = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Charset')));
     }
 
     /**
@@ -1257,7 +1254,7 @@ class Request
             return $this->acceptableContentTypes;
         }
 
-        return $this->acceptableContentTypes = array_keys(AcceptHeader::split($this->headers->get('Accept')));
+        return $this->acceptableContentTypes = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept')));
     }
 
     /**
@@ -1271,7 +1268,7 @@ class Request
             return $this->encodings;
         }
 
-        return $this->encodings = array_keys(AcceptHeader::split($this->headers->get('Accept-Encoding')));
+        return $this->encodings = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Encoding')));
     }
 
     /**
@@ -1298,7 +1295,7 @@ class Request
      */
     public function splitHttpAcceptHeader($header)
     {
-        return AcceptHeader::split($header);
+        return AcceptHeader::create($header)->setDefaults(array('q' => 1))->getHash('q');
     }
 
     /*

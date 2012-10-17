@@ -28,7 +28,7 @@ interface NegotiatorInterface
     /**
      * Adds a document to qualify.
      *
-     * @param ContentInterface $variant
+     * @param ContentInterface $content
      */
     public function addContent(ContentInterface $content);
 

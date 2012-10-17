@@ -93,6 +93,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'flashes'            => $flashes,
             'path_info'          => $request->getPathInfo(),
             'controller'         => 'n/a',
+            'locale'             => $request->getLocale(),
         );
 
         if (isset($this->controllers[$request])) {
@@ -187,6 +188,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     public function getFormat()
     {
         return $this->data['format'];
+    }
+
+    public function getLocale()
+    {
+        return $this->data['locale'];
     }
 
     /**

@@ -26,7 +26,7 @@ class TwigEngineTest extends TestCase
         $environment = $this->getTwigEnvironment();
         $container = $this->getContainer();
         $locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
-        $engine = new TwigEngine($environment, new TemplateNameParser(), $locator, $app = new GlobalVariables($container));
+        $engine = new TwigEngine($environment, new TemplateNameParser(), $locator);
 
         $template = $this->getMock('\Twig_TemplateInterface');
 
@@ -35,10 +35,6 @@ class TwigEngineTest extends TestCase
             ->will($this->returnValue($template));
 
         $engine->render('name');
-
-        $request = $container->get('request');
-        $globals = $environment->getGlobals();
-        $this->assertSame($app, $globals['app']);
     }
 
     public function testEvaluateWithoutAvailableRequest()
@@ -46,7 +42,7 @@ class TwigEngineTest extends TestCase
         $environment = $this->getTwigEnvironment();
         $container = new Container();
         $locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
-        $engine = new TwigEngine($environment, new TemplateNameParser(), $locator, new GlobalVariables($container));
+        $engine = new TwigEngine($environment, new TemplateNameParser(), $locator);
 
         $template = $this->getMock('\Twig_TemplateInterface');
 
@@ -57,9 +53,6 @@ class TwigEngineTest extends TestCase
         $container->set('request', null);
 
         $engine->render('name');
-
-        $globals = $environment->getGlobals();
-        $this->assertEmpty($globals['app']->getRequest());
     }
 
     /**

@@ -398,13 +398,8 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('serializer')
                     ->info('serializer configuration')
-                    ->canBeUnset()
-                    ->treatNullLike(array('enabled' => true))
-                    ->treatTrueLike(array('enabled' => true))
-                    ->children()
-                        ->booleanNode('enabled')->defaultTrue()->end()
-                    ->end()
-                ->end()
+                    ->canBeDisabled()
+               ->end()
             ->end()
         ;
     }

@@ -127,6 +127,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test.com', $request->getHttpHost());
         $this->assertFalse($request->isSecure());
 
+        $request = Request::create('http://test.com?test=1');
+        $this->assertEquals('http://test.com/?test=1', $request->getUri());
+        $this->assertEquals('/', $request->getPathInfo());
+        $this->assertEquals('test=1', $request->getQueryString());
+        $this->assertEquals(80, $request->getPort());
+        $this->assertEquals('test.com', $request->getHttpHost());
+        $this->assertFalse($request->isSecure());
+
         $request = Request::create('http://test.com:90/?test=1');
         $this->assertEquals('http://test.com:90/?test=1', $request->getUri());
         $this->assertEquals('/', $request->getPathInfo());
@@ -898,6 +906,27 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->headers->remove('X-Requested-With');
         $this->assertFalse($request->isXmlHttpRequest());
+    }
+
+    public function testIntlLocale()
+    {
+        if (!extension_loaded('intl')) {
+            $this->markTestSkipped('The intl extension is needed to run this test.');
+        }
+
+        $request = new Request();
+
+        $request->setDefaultLocale('fr');
+        $this->assertEquals('fr', $request->getLocale());
+        $this->assertEquals('fr', \Locale::getDefault());
+
+        $request->setLocale('en');
+        $this->assertEquals('en', $request->getLocale());
+        $this->assertEquals('en', \Locale::getDefault());
+
+        $request->setDefaultLocale('de');
+        $this->assertEquals('en', $request->getLocale());
+        $this->assertEquals('en', \Locale::getDefault());
     }
 
     public function testGetCharsets()

@@ -82,7 +82,7 @@ EOF
         if ($input->getOption('force') !== true && $input->getOption('dump-messages') !== true) {
             $output->writeln('<info>You must choose one of --force or --dump-messages</info>');
 
-            return;
+            return 1;
         }
 
         // check format
@@ -92,7 +92,7 @@ EOF
             $output->writeln('<error>Wrong output format</error>');
             $output->writeln('Supported formats are '.implode(', ', $supportedFormats).'.');
 
-            return;
+            return 1;
         }
 
         // get bundle directory

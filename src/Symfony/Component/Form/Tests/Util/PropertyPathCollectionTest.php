@@ -299,8 +299,10 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
         $expectedMessage = sprintf(
             'Neither element "axes" nor method "setAxes()" exists in class '
                 .'"%s", nor could adders and removers be found based on the '
-                .'guessed singulars: %s (provide a singular by suffixing the '
-                .'property path with "|{singular}" to override the guesser)',
+                .'guessed singulars: %s'
+//                . '(provide a singular by suffixing the '
+//                .'property path with "|{singular}" to override the guesser)'
+                ,
             get_class($car),
             implode(', ', (array) $singulars = FormUtil::singularify('Axes'))
         );
@@ -324,9 +326,10 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
         $propertyPath = new PropertyPath('axes');
         $expectedMessage = sprintf(
             'Property "axes" is not public in class "%s", nor could adders and '
-                .'removers be found based on the guessed singulars: %s '
-                .'(provide a singular by suffixing the property path with '
-                .'"|{singular}" to override the guesser). Maybe you should '
+                .'removers be found based on the guessed singulars: %s'
+//                .' (provide a singular by suffixing the property path with '
+//                .'"|{singular}" to override the guesser)'
+                . '. Maybe you should '
                 .'create the method "setAxes()"?',
             get_class($car),
             implode(', ', (array) $singulars = FormUtil::singularify('Axes'))

@@ -358,7 +358,7 @@ class Form extends Link implements \ArrayAccess
         $root->appendChild($button);
         $xpath = new \DOMXPath($document);
 
-        foreach ($xpath->query('descendant::input | descendant::textarea | descendant::select', $root) as $node) {
+        foreach ($xpath->query('descendant::input | descendant::button | descendant::textarea | descendant::select', $root) as $node) {
             if (!$node->hasAttribute('name')) {
                 continue;
             }

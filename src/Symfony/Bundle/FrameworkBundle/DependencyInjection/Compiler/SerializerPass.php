@@ -38,11 +38,11 @@ class SerializerPass implements CompilerPassInterface
         $container->getDefinition('serializer')->replaceArgument(1, $encoders);
     }
 
-    private function findAndSortTaggedServices($tag_name, $container)
+    private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
     {
         // Find tagged services
         $services = array();
-        foreach ($container->findTaggedServiceIds($tag_name) as $serviceId => $tags) {
+        foreach ($container->findTaggedServiceIds($tagName) as $serviceId => $tags) {
             foreach($tags as $tag) {
                 $priority = isset($tag['priority']) ? $tag['priority'] : 0;
                 $services[$priority][] = new Reference($serviceId);

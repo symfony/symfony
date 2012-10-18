@@ -7,6 +7,7 @@ CHANGELOG
  * replaced Symfony\Bundle\FrameworkBundle\Controller\TraceableControllerResolver by Symfony\Component\HttpKernel\Controller\TraceableControllerResolver
  * replaced Symfony\Component\HttpKernel\Debug\ContainerAwareTraceableEventDispatcher by Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher
  * added Client::enableProfiler()
+ * added posibility to load the serializer component in the service container
 
 2.1.0
 -----

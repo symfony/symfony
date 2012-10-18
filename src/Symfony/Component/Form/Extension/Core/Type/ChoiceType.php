@@ -198,6 +198,10 @@ class ChoiceType extends AbstractType
             'empty_value'       => $emptyValue,
             'error_bubbling'    => false,
             'compound'          => $compound,
+            // The view data is always a string, even if the "data" option
+            // is manually set to an object.
+            // See https://github.com/symfony/symfony/pull/5582
+            'data_class'        => null,
         ));
 
         $resolver->setNormalizers(array(

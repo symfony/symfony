@@ -223,25 +223,25 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function addPrefix($prefix, $defaults = array(), $requirements = array(), $options = array())
     {
-        // a prefix must not end with a slash
-        $prefix = rtrim($prefix, '/');
+        $prefix = trim(trim($prefix), '/');
 
         if ('' === $prefix && empty($defaults) && empty($requirements) && empty($options)) {
             return;
         }
 
-        // a prefix must start with a slash
-        if ('' !== $prefix && '/' !== $prefix[0]) {
-            $prefix = '/'.$prefix;
+        // a prefix must start with a single slash and must not end with a slash
+        if ('' !== $prefix) {
+            $this->prefix = '/' . $prefix . $this->prefix;
         }
-
-        $this->prefix = $prefix.$this->prefix;
 
         foreach ($this->routes as $route) {
             if ($route instanceof RouteCollection) {
-                $route->addPrefix($prefix, $defaults, $requirements, $options);
+                // we add the slashes so the prefix is not lost by trimming in the sub-collection
+                $route->addPrefix('/' . $prefix . '/', $defaults, $requirements, $options);
             } else {
-                $route->setPattern($prefix.$route->getPattern());
+                if ('' !== $prefix) {
+                    $route->setPattern('/' . $prefix . $route->getPattern());
+                }
                 $route->addDefaults($defaults);
                 $route->addRequirements($requirements);
                 $route->addOptions($options);

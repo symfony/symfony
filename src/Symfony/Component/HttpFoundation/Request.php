@@ -217,7 +217,7 @@ class Request
     {
         $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
 
-        if (0 === strpos($request->server->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
+        if (0 === strpos($request->headers->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
             && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE', 'PATCH'))
         ) {
             parse_str($request->getContent(), $data);
@@ -286,7 +286,7 @@ class Request
         }
 
         if (!isset($components['path'])) {
-            $components['path'] = '';
+            $components['path'] = '/';
         }
 
         switch (strtoupper($method)) {
@@ -1043,7 +1043,7 @@ class Request
      */
     public function getContentType()
     {
-        return $this->getFormat($this->server->get('CONTENT_TYPE'));
+        return $this->getFormat($this->headers->get('CONTENT_TYPE'));
     }
 
     /**
@@ -1055,7 +1055,11 @@ class Request
      */
     public function setDefaultLocale($locale)
     {
-        $this->setPhpDefaultLocale($this->defaultLocale = $locale);
+        $this->defaultLocale = $locale;
+
+        if (null === $this->locale) {
+            $this->setPhpDefaultLocale($locale);
+        }
     }
 
     /**

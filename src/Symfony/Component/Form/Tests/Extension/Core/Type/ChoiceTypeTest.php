@@ -745,4 +745,22 @@ class ChoiceTypeTest extends TypeTestCase
             'choices' => array(),
         ));
     }
+
+    public function testInitializeWithDefaultObjectChoice()
+    {
+        $obj1 = (object) array('value' => 'a', 'label' => 'A');
+        $obj2 = (object) array('value' => 'b', 'label' => 'B');
+        $obj3 = (object) array('value' => 'c', 'label' => 'C');
+        $obj4 = (object) array('value' => 'd', 'label' => 'D');
+
+        $form = $this->factory->create('choice', null, array(
+            'choice_list' => new ObjectChoiceList(array($obj1, $obj2, $obj3, $obj4), 'label', array(), null, 'value'),
+            // Used to break because "data_class" was inferred, which needs to
+            // remain null in every case (because it refers to the view format)
+            'data' => $obj3,
+        ));
+
+        // Trigger data initialization
+        $form->getViewData();
+    }
 }

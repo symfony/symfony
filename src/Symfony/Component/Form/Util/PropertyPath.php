@@ -521,7 +521,8 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 } else {
                     $adderRemoverError = ', nor could adders and removers be found based on the ';
                     if (null === $singular) {
-                        $adderRemoverError .= 'guessed singulars: '.implode(', ', $singulars).' (provide a singular by suffixing the property path with "|{singular}" to override the guesser)';
+                        // $adderRemoverError .= 'guessed singulars: '.implode(', ', $singulars).' (provide a singular by suffixing the property path with "|{singular}" to override the guesser)';
+                        $adderRemoverError .= 'guessed singulars: '.implode(', ', $singulars);
                     } else {
                         $adderRemoverError .= 'passed singular: '.$singular;
                     }

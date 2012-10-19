@@ -79,7 +79,7 @@ class StubLocale
      *
      * @return array                     The country names with their codes as keys
      *
-     * @throws InvalidArgumentException  When the locale is different than 'en'
+     * @throws \InvalidArgumentException  When the locale is different than 'en'
      */
     public static function getDisplayCountries($locale)
     {
@@ -103,7 +103,7 @@ class StubLocale
      *
      * @return array                     The language names with their codes as keys
      *
-     * @throws InvalidArgumentException  When the locale is different than 'en'
+     * @throws \InvalidArgumentException  When the locale is different than 'en'
      */
     public static function getDisplayLanguages($locale)
     {
@@ -127,7 +127,7 @@ class StubLocale
      *
      * @return array                     The locale names with their codes as keys
      *
-     * @throws InvalidArgumentException  When the locale is different than 'en'
+     * @throws \InvalidArgumentException  When the locale is different than 'en'
      */
     public static function getDisplayLocales($locale)
     {
@@ -163,7 +163,7 @@ class StubLocale
      *
      * @return array                     The currencies names with their codes as keys
      *
-     * @throws InvalidArgumentException  When the locale is different than 'en'
+     * @throws \InvalidArgumentException  When the locale is different than 'en'
      */
     public static function getDisplayCurrencies($locale)
     {
@@ -429,7 +429,7 @@ class StubLocale
      *
      * @see    http://www.php.net/manual/en/locale.lookup.php
      *
-     * @throws RuntimeException       When the intl extension is not loaded
+     * @throws \RuntimeException       When the intl extension is not loaded
      */
     public static function lookup(array $langtag, $locale, $canonicalize = false, $default = null)
     {
@@ -494,7 +494,7 @@ class StubLocale
      *
      * @return array
      *
-     * @throws InvalidArgumentException  When the locale is different than 'en'
+     * @throws \InvalidArgumentException  When the locale is different than 'en'
      */
     private static function getStubData($locale, $cacheVariable, $stubDataDir)
     {

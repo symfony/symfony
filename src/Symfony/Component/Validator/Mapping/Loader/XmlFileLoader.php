@@ -78,7 +78,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses a collection of "constraint" XML nodes.
      *
-     * @param SimpleXMLElement $nodes The XML nodes
+     * @param \SimpleXMLElement $nodes The XML nodes
      *
      * @return array The Constraint instances
      */
@@ -112,7 +112,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses a collection of "value" XML nodes.
      *
-     * @param SimpleXMLElement $nodes The XML nodes
+     * @param \SimpleXMLElement $nodes The XML nodes
      *
      * @return array The values
      */
@@ -146,7 +146,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses a collection of "option" XML nodes.
      *
-     * @param SimpleXMLElement $nodes The XML nodes
+     * @param \SimpleXMLElement $nodes The XML nodes
      *
      * @return array The options
      */

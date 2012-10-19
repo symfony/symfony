@@ -59,6 +59,8 @@ class UrlPackage extends Package
     /**
      * Returns the base URL for a path.
      *
+     * @param string $path
+     *
      * @return string The base URL
      */
     public function getBaseUrl($path)

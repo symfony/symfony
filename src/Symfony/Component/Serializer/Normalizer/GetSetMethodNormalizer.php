@@ -176,7 +176,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     /**
      * Checks if a method's name is get.* and can be called without parameters.
      *
-     * @param ReflectionMethod $method the method to check
+     * @param \ReflectionMethod $method the method to check
+     *
      * @return Boolean whether the method is a getter.
      */
     private function isGetMethod(\ReflectionMethod $method)

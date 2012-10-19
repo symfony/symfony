@@ -50,6 +50,8 @@ interface SessionHandlerInterface
     /**
      * Read session.
      *
+     * @param string $sessionId
+     *
      * @see http://php.net/sessionhandlerinterface.read
      *
      * @throws \RuntimeException On fatal error but not "record not found".

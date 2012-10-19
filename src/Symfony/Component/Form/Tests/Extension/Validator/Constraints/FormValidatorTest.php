@@ -528,6 +528,10 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $name
+     * @param string $dataClass
+     * @param array  $options
+     *
      * @return FormBuilder
      */
     private function getBuilder($name = 'name', $dataClass = null, array $options = array())

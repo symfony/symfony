@@ -19,6 +19,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
+ * @author Arnaud Le Blanc <arnaud.lb@gmail.com>
  */
 class PhpMatcherDumper extends MatcherDumper
 {
@@ -99,56 +100,48 @@ EOF;
     }
 
     /**
-     * Counts the number of routes as direct child of the RouteCollection.
-     *
-     * @param RouteCollection $routes A RouteCollection instance
-     *
-     * @return integer Number of Routes
-     */
-    private function countDirectChildRoutes(RouteCollection $routes)
-    {
-        $count = 0;
-        foreach ($routes as $route) {
-            if ($route instanceof Route) {
-                $count++;
-            }
-        }
-
-        return $count;
-    }
-
-    /**
      * Generates PHP code recursively to match a RouteCollection with all child routes and child collections.
      *
      * @param RouteCollection $routes               A RouteCollection instance
      * @param Boolean         $supportsRedirections Whether redirections are supported by the base class
-     * @param string|null     $parentPrefix         The prefix of the parent collection used to optimize the code
      *
      * @return string PHP code
      */
-    private function compileRoutes(RouteCollection $routes, $supportsRedirections, $parentPrefix = null)
+    private function compileRoutes(RouteCollection $routes, $supportsRedirections)
+    {
+        $collection = $this->flattenRouteCollection($routes);
+        $tree = $this->buildPrefixTree($collection);
+
+        return $this->compilePrefixRoutes($tree, $supportsRedirections);
+    }
+
+    /**
+     * Generates PHP code recursively to match a tree of routes
+     *
+     * @param DumperPrefixCollection $routes A DumperPrefixCollection instance
+     * @param Boolean                $supportsRedirections Whether redirections are supported by the base class
+     * @parma string                 $prefix Prefix of the parent collection
+     *
+     * @return string PHP code
+     */
+    private function compilePrefixRoutes(DumperPrefixCollection $collection, $supportsRedirections, $parentPrefix = '')
     {
         $code = '';
+        $prefix = $collection->getPrefix();
+        $optimizable = 1 < strlen($prefix) && 1 < count($collection->all());
+        $optimizedPrefix = $parentPrefix;
 
-        $prefix = $routes->getPrefix();
-        $countDirectChildRoutes = $this->countDirectChildRoutes($routes);
-        $countAllChildRoutes = count($routes->all());
-        // Can the matching be optimized by wrapping it with the prefix condition
-        // - no need to optimize if current prefix is the same as the parent prefix
-        // - if $countDirectChildRoutes === 0, the sub-collections can do their own optimizations (in case there are any)
-        // - it's not worth wrapping a single child route
-        // - prefixes with variables cannot be optimized because routes within the collection might have different requirements for the same variable
-        $optimizable = '' !== $prefix && $prefix !== $parentPrefix && $countDirectChildRoutes > 0 && $countAllChildRoutes > 1 && false === strpos($prefix, '{');
         if ($optimizable) {
+            $optimizedPrefix = $prefix;
+
             $code .= sprintf("    if (0 === strpos(\$pathinfo, %s)) {\n", var_export($prefix, true));
         }
 
-        foreach ($routes as $name => $route) {
-            if ($route instanceof Route) {
-                // a single route in a sub-collection is not wrapped so it should do its own optimization in ->compileRoute with $parentPrefix = null
-                $code .= $this->compileRoute($route, $name, $supportsRedirections, 1 === $countAllChildRoutes ? null : $prefix)."\n";
-            } elseif ($countAllChildRoutes - $countDirectChildRoutes > 0) { // we can stop iterating recursively if we already know there are no more routes
-                $code .= $this->compileRoutes($route, $supportsRedirections, $prefix);
+        foreach ($collection as $route) {
+            if ($route instanceof DumperCollection) {
+                $code .= $this->compilePrefixRoutes($route, $supportsRedirections, $optimizedPrefix);
+            } else {
+                $code .= $this->compileRoute($route->getRoute(), $route->getName(), $supportsRedirections, $optimizedPrefix)."\n";
             }
         }
 
@@ -160,7 +153,6 @@ EOF;
 
         return $code;
     }
-
 
     /**
      * Compiles a single Route to PHP code used to match it against the path info.
@@ -290,4 +282,54 @@ EOF;
 
         return $code;
     }
+
+    /**
+     * Flattens a tree of routes to a single collection
+     *
+     * @param  RouteCollection  $routes Collection of routes
+     * @param  DumperCollection $to A DumperCollection to add routes to
+     *
+     * @return DumperCollection
+     */
+    private function flattenRouteCollection(RouteCollection $routes, DumperCollection $to = null)
+    {
+        if (null === $to) {
+            $to = new DumperCollection();
+        }
+
+        foreach ($routes as $name => $route) {
+            if ($route instanceof RouteCollection) {
+                $this->flattenRouteCollection($route, $to);
+            } else {
+                $to->add(new DumperRoute($name, $route));
+            }
+        }
+
+        return $to;
+    }
+
+    /**
+     * Organizes the routes into a prefix tree.
+     *
+     * Routes order is preserved such that traversing the tree will traverse the
+     * routes in the origin order
+     *
+     * @param  DumperCollection $collection A collection of routes
+     *
+     * @return DumperPrefixCollection
+     */
+    private function buildPrefixTree(DumperCollection $collection)
+    {
+        $tree = new DumperPrefixCollection();
+        $current = $tree;
+
+        foreach ($collection as $route) {
+            $current = $current->addPrefixRoute($route);
+        }
+
+        $tree->mergeSlashNodes();
+
+        return $tree;
+    }
+
 }

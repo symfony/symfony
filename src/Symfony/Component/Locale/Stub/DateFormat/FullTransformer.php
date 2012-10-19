@@ -127,12 +127,12 @@ class FullTransformer
     /**
      * Parse a pattern based string to a timestamp value
      *
-     * @param DateTime $dateTime A configured DateTime object to use to perform the date calculation
+     * @param \DateTime $dateTime A configured DateTime object to use to perform the date calculation
      * @param string   $value    String to convert to a time value
      *
      * @return int                       The corresponding Unix timestamp
      *
-     * @throws InvalidArgumentException  When the value can not be matched with pattern
+     * @throws \InvalidArgumentException  When the value can not be matched with pattern
      */
     public function parse(\DateTime $dateTime, $value)
     {

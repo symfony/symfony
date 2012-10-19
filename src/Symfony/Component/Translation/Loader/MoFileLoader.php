@@ -68,7 +68,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      * @param resource $resource
      *
      * @return array
-     * @throws InvalidArgumentException If stream content has an invalid format.
+     * @throws \InvalidArgumentException If stream content has an invalid format.
      */
     private function parse($resource)
     {

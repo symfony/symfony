@@ -12,9 +12,9 @@
 namespace Symfony\Bridge\Twig\Node;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexandre Salomé <alexandre.salome@gmail.com>
  */
-class TransDefaultDomainNode extends \Twig_Node
+class TransDefaultVarsNode extends \Twig_Node
 {
     public function __construct(\Twig_Node_Expression $expr, $lineno = 0, $tag = null)
     {

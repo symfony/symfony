@@ -103,10 +103,12 @@ class TranslationExtensionTest extends TestCase
                 {%- extends "base" %}
 
                 {%- trans_default_domain "foo" %}
+                {%- trans_default_vars {"foo ": "bar "} %}
 
                 {%- block content %}
                     {%- trans %}foo{% endtrans %}
                     {%- trans from "custom" %}foo{% endtrans %}
+                    {%- trans with {} from "custom" %}foo{% endtrans %}
                     {{- "foo"|trans }}
                     {{- "foo"|trans({}, "custom") }}
                     {{- "foo"|transchoice(1) }}
@@ -127,7 +129,7 @@ class TranslationExtensionTest extends TestCase
 
         $template = $this->getTemplate($templates, $translator);
 
-        $this->assertEquals('foo (foo)foo (custom)foo (foo)foo (custom)foo (foo)foo (custom)', trim($template->render(array())));
+        $this->assertEquals('bar (foo)bar (custom)foo (custom)bar (foo)foo (custom)bar (foo)foo (custom)', trim($template->render(array())));
     }
 
     protected function getTemplate($template, $translator = null)

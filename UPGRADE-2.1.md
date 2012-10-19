@@ -536,25 +536,43 @@
 
   * In the choice field type's template, the `_form_is_choice_selected` method
     used to identify a selected choice has been replaced with the `selectedchoice`
-    filter.
+    filter. Similarly, the `_form_is_choice_group` method used to check if a 
+    choice is grouped has been removed and can be checked with the `iterable` 
+    test.
 
     Before:
 
     ```
     {% for choice, label in choices %}
-        <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
-            {{ label }}
-        </option>
+        {% if _form_is_choice_group(label) %}
+            <optgroup label="{{ choice|trans }}">
+                {% for nestedChoice, nestedLabel in label %}
+                    ... options tags ...
+                {% endfor %}
+            </optgroup>
+        {% else %}
+            <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
+                {{ label }}
+            </option>
+        {% endif %}
     {% endfor %}
     ```
 
     After:
 
     ```
-    {% for choice, label in choices %}
-        <option value="{{ choice.value }}"{% if choice is selectedchoice(choice.value) %} selected="selected"{% endif %}>
-            {{ label }}
-        </option>
+    {% for label, choice in choices %}
+        {% if choice is iterable %}
+            <optgroup label="{{ label|trans({}, translation_domain) }}">
+                {% for nestedChoice, nestedLabel in choice %}
+                    ... options tags ...
+                {% endfor %}
+            </optgroup>
+        {% else %}
+            <option value="{{ choice.value }}"{% if choice is selectedchoice(choice.value) %} selected="selected"{% endif %}>
+                {{ label }}
+            </option>
+        {% endif %}
     {% endfor %}
     ```
 

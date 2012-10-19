@@ -178,7 +178,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $entity2 = new SingleIdentEntity(2, 'Foo');
 
         $violationsList = $validator->validate($entity2);
-        $this->assertEquals(1, $violationsList->count(), "No violations found on entity after it was saved to the database.");
+        $this->assertEquals(1, $violationsList->count(), "Violation found on entity with conflicting entity existing in the database.");
 
         $violation = $violationsList[0];
         $this->assertEquals('This value is already used.', $violation->getMessage());
@@ -201,7 +201,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $entity2 = new SingleIdentEntity(2, 'Foo');
 
         $violationsList = $validator->validate($entity2);
-        $this->assertEquals(1, $violationsList->count(), "No violations found on entity after it was saved to the database.");
+        $this->assertEquals(1, $violationsList->count(), "Violation found on entity with conflicting entity existing in the database.");
 
         $violation = $violationsList[0];
         $this->assertEquals('This value is already used.', $violation->getMessage());

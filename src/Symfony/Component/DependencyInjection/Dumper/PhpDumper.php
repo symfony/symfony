@@ -880,9 +880,9 @@ EOF;
     /**
      * Builds service calls from arguments
      *
-     * @param array $arguments
-     * @param string &$calls    By reference
-     * @param string &$behavior By reference
+     * @param array  $arguments
+     * @param array  &$calls    By reference
+     * @param array  &$behavior By reference
      */
     private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
     {

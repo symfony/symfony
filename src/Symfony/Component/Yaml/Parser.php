@@ -608,11 +608,11 @@ class Parser
     }
 
     /**
-     * Returns true if the string is unindented collection item
+     * Returns true if the string is un-indented collection item
      *
-     * @return Boolean Returns true if the string is unindented collection item, false otherwise
+     * @return Boolean Returns true if the string is un-indented collection item, false otherwise
      */
-    private function isStringUnIndentedCollectionItem($string)
+    private function isStringUnIndentedCollectionItem()
     {
         return (0 === strpos($this->currentLine, '- '));
     }

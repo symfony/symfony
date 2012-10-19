@@ -17,6 +17,32 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RoutingTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGenerateWithServiceParam()
+    {
+        $routes = new RouteCollection();
+
+        $routes->add('foo', new Route(
+            ' /{_locale}',
+            array(
+                '_locale' => '%locale%'
+            ),
+            array(
+                '_locale' => 'en|es',
+            )
+        ));
+
+        $sc = $this->getServiceContainer($routes);
+
+        $sc->expects($this->at(1))->method('hasParameter')->will($this->returnValue(true));
+        $sc->expects($this->at(2))->method('getParameter')->will($this->returnValue('es'));
+
+        $router = new Router($sc, 'foo');
+        $route = $router->getRouteCollection()->get('foo');
+
+        $this->assertSame('/en', $router->generate('foo', array('_locale' => 'en')));
+        $this->assertSame('/', $router->generate('foo', array('_locale' => 'es')));
+    }
+
     public function testDefaultsPlaceholders()
     {
         $routes = new RouteCollection();

@@ -96,6 +96,7 @@
 
   <xsd:complexType name="tag">
     <xsd:attribute name="name" type="xsd:string" />
+    <xsd:attribute name="priority" type="xsd:integer" />
     <xsd:anyAttribute namespace="##any" processContents="lax" />
   </xsd:complexType>
 

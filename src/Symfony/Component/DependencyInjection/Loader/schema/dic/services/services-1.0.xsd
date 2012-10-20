@@ -96,6 +96,10 @@
 
   <xsd:complexType name="tag">
     <xsd:attribute name="name" type="xsd:string" />
+    <xsd:attribute name="alias" type="xsd:string" />
+    <xsd:attribute name="event" type="xsd:string" />
+    <xsd:attribute name="method" type="xsd:string" />
+    <xsd:attribute name="priority" type="xsd:integer" />
     <xsd:anyAttribute namespace="##any" processContents="lax" />
   </xsd:complexType>
 

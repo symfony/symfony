@@ -33,7 +33,7 @@ class Firewall
     /**
      * Constructor.
      *
-     * @param FirewallMap              $map        A FirewallMap instance
+     * @param FirewallMapInterface     $map        A FirewallMapInterface instance
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      */
     public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)

@@ -102,6 +102,8 @@ class ProfilerController extends ContainerAware
     /**
      * Imports token data.
      *
+     * @param Request $request
+     *
      * @return Response A Response instance
      */
     public function importAction(Request $request)

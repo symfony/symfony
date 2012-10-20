@@ -848,6 +848,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     /**
      * Returns file permissions as three digits (i.e. 755)
      *
+     * @param string $filepath
+     *
      * @return integer
      */
     private function getFilePermissions($filePath)

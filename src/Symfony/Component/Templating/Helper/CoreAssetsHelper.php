@@ -74,7 +74,7 @@ class CoreAssetsHelper extends Helper implements PackageInterface
      *
      * @return PackageInterface An asset package
      *
-     * @throws InvalidArgumentException If there is no package by that name
+     * @throws \InvalidArgumentException If there is no package by that name
      */
     public function getPackage($name = null)
     {

@@ -53,6 +53,8 @@ function intl_get_error_message()
 /**
  * Stub implementation for the intl_error_name function of the intl extension
  *
+ * @param integer $errorCode
+ *
  * @return String will be the same as the name of the error code constant
  *
  * @see    Symfony\Component\Locale\Stub\StubIntl::getErrorName

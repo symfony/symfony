@@ -53,7 +53,7 @@ class SerializerPass implements CompilerPassInterface
         krsort($services);
 
         // Flatten the array
-        if(!empty($services)) {
+        if (!empty($services)) {
             $services = call_user_func_array('array_merge', $services);
         }
 

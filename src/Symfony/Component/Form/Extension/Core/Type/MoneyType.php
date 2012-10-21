@@ -81,7 +81,7 @@ class MoneyType extends AbstractType
      * The pattern contains the placeholder "{{ widget }}" where the HTML tag should
      * be inserted
      */
-    private static function getPattern($currency)
+    protected static function getPattern($currency)
     {
         if (!$currency) {
             return '{{ widget }}';

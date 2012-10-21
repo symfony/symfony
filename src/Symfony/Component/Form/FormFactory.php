@@ -11,10 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\TypeDefinitionException;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormFactory implements FormFactoryInterface
 {

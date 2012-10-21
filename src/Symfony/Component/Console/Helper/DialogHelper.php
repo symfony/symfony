@@ -128,7 +128,7 @@ class DialogHelper extends Helper
 
         if (false !== $shell = $this->getShell()) {
             $output->write($question);
-            $readCmd = $shell === 'csh' ? 'set mypassword = $<' : 'read mypassword';
+            $readCmd = $shell === 'csh' ? 'set mypassword = $<' : 'read -r mypassword';
             $command = sprintf("/usr/bin/env %s -c 'stty -echo; %s; stty echo; echo \$mypassword'", $shell, $readCmd);
             $value = rtrim(shell_exec($command));
             $output->writeln('');

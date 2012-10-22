@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class MoneyType extends AbstractType
 {
-    private static $patterns = array();
+    protected static $patterns = array();
 
     /**
      * {@inheritdoc}

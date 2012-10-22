@@ -1,6 +1,6 @@
 {% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
 
-{% from _self import display_timeline, dump_events, dump_request_data %}
+{% from _self import display_timeline, dump_request_data %}
 
 {% if colors is not defined %}
     {% set colors = {
@@ -429,6 +429,7 @@
 {% endblock %}
 
 {% macro dump_request_data(token, profile, events, origin) %}
+{% from _self import dump_events %}
                 {
                     "id": "{{ token }}",
                     "left": {{ "%F"|format(events.__section__.origin - origin) }},

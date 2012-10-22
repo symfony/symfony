@@ -36,6 +36,36 @@ class DateTypeTest extends LocalizedTestCase
     /**
      * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
+    public function testInvalidWidgetDatePartOption()
+    {
+        $form = $this->factory->create('date', null, array(
+            'widget' => array('fake_widget_part' => 'input'),
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testInvalidWidgetDatePartWidgetOption()
+    {
+        $form = $this->factory->create('date', null, array(
+            'widget' => array('year' => 'fake_widget'),
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testInvalidWidgetDatePartSingleTextOption()
+    {
+        $form = $this->factory->create('date', null, array(
+            'widget' => array('month' => 'single_text'),
+        ));
+    }
+
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
     public function testInvalidInputOption()
     {
         $form = $this->factory->create('date', null, array(
@@ -739,5 +769,75 @@ class DateTypeTest extends LocalizedTestCase
 
         $this->assertSame(array(), $form['day']->getErrors());
         $this->assertSame(array($error), $form->getErrors());
+    }
+
+    public function testSubmitFromYearChoiceAndMonthAndDayTextDateTime()
+    {
+        $form = $this->factory->create('date', null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'widget' => array('year' => 'choice', 'day' => 'text', 'month' => 'text'),
+        ));
+
+        $text = array(
+            'day' => '2',
+            'month' => '6',
+            'year' => '2010',
+        );
+
+        $form->bind($text);
+
+        $dateTime = new \DateTime('2010-06-02 UTC');
+
+        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($text, $form->getViewData());
+    }
+
+    public function testDayWidgetOptions()
+    {
+        $form = $this->factory->create('date', null, array(
+            'day_options' => array(
+                'attr' => array(
+                    'data-mask' => 'd'
+                )
+            )
+        ));
+
+        $view = $form->createView();
+        $attr = $view['day']->vars['attr'];
+
+        $this->assertEquals('d', $attr['data-mask']);
+    }
+
+    public function testMonthWidgetOptions()
+    {
+        $form = $this->factory->create('date', null, array(
+            'month_options' => array(
+                'attr' => array(
+                    'data-mask' => 'm'
+                )
+            )
+        ));
+
+        $view = $form->createView();
+        $attr = $view['month']->vars['attr'];
+
+        $this->assertEquals('m', $attr['data-mask']);
+    }
+
+    public function testYearWidgetOptions()
+    {
+        $form = $this->factory->create('date', null, array(
+            'year_options' => array(
+                'attr' => array(
+                    'data-mask' => 'y'
+                )
+            )
+        ));
+
+        $view = $form->createView();
+        $attr = $view['year']->vars['attr'];
+
+        $this->assertEquals('y', $attr['data-mask']);
     }
 }

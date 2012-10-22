@@ -37,6 +37,23 @@ class DateType extends AbstractType
         \IntlDateFormatter::SHORT,
     );
 
+    private static $allowedSingleWidgets = array(
+        'single_text',
+        'text',
+        'choice'
+    );
+
+    private static $allowedPartWidgets = array(
+        'text',
+        'choice',
+    );
+
+    private static $allowedParts = array(
+        'year',
+        'month',
+        'day',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -79,12 +96,21 @@ class DateType extends AbstractType
             );
             $formatter->setLenient(false);
 
-            if ('choice' === $options['widget']) {
+            if ('choice' === $options['widget']['year']) {
                 // Only pass a subset of the options to children
+                $yearOptions = array_merge($options['year_options'], $yearOptions);
                 $yearOptions['choices'] = $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years']));
                 $yearOptions['empty_value'] = $options['empty_value']['year'];
+            }
+
+            if ('choice' === $options['widget']['month']) {
+                $monthOptions = array_merge($options['month_options'], $monthOptions);
                 $monthOptions['choices'] = $this->formatTimestamps($formatter, '/M+/', $this->listMonths($options['months']));
                 $monthOptions['empty_value'] = $options['empty_value']['month'];
+            }
+
+            if ('choice' === $options['widget']['day']) {
+                $dayOptions = array_merge($options['day_options'], $dayOptions);
                 $dayOptions['choices'] = $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days']));
                 $dayOptions['empty_value'] = $options['empty_value']['day'];
             }
@@ -95,9 +121,9 @@ class DateType extends AbstractType
             }
 
             $builder
-                ->add('year', $options['widget'], $yearOptions)
-                ->add('month', $options['widget'], $monthOptions)
-                ->add('day', $options['widget'], $dayOptions)
+                ->add('year', $options['widget']['year'], $yearOptions)
+                ->add('month', $options['widget']['month'], $monthOptions)
+                ->add('day', $options['widget']['day'], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
                     $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day')
                 ))
@@ -159,6 +185,45 @@ class DateType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
+        $widgetNormalizer = function (Options $options, $widget) {
+            if ("single_text" === $widget) {
+                return $widget;
+            }
+
+            if (is_array($widget)) {
+                if (0 < count(array_diff(array_keys($widget), self::$allowedParts))) {
+                    throw new InvalidOptionsException(sprintf('The "widget" option can only be used to define the ' .
+                        'following date parts: "%s"', implode('", "', self::$allowedParts)));
+
+                }
+
+                if (0 < count(array_diff($widget, self::$allowedPartWidgets))) {
+                    throw new InvalidOptionsException(sprintf(
+                        'The "widget" option date part widgets can only be one of "%s"',
+                        implode('", "', self::$allowedPartWidgets)
+                    ));
+                }
+
+                return array_merge(array(
+                    'year'  => 'choice',
+                    'month' => 'choice',
+                    'day'   => 'choice',
+                ), $widget);
+            }
+
+            if (!in_array($widget, self::$allowedSingleWidgets, true)) {
+                throw new InvalidOptionsException(sprintf('The "widget" option must be one of "%s" or individually'
+                    . ' defined for each date part ("%s")', implode('", "', self::$allowedSingleWidgets),
+                    implode('", "', self::$allowedParts)));
+            }
+
+            return array(
+                'year'  => $widget,
+                'month' => $widget,
+                'day'   => $widget,
+            );
+        };
+
         $emptyValue = $emptyValueDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
@@ -198,6 +263,9 @@ class DateType extends AbstractType
             'years'          => range(date('Y') - 5, date('Y') + 5),
             'months'         => range(1, 12),
             'days'           => range(1, 31),
+            'year_options'   => array(),
+            'month_options'  => array(),
+            'day_options'    => array(),
             'widget'         => 'choice',
             'input'          => 'datetime',
             'format'         => $format,
@@ -220,6 +288,7 @@ class DateType extends AbstractType
         ));
 
         $resolver->setNormalizers(array(
+            'widget'      => $widgetNormalizer,
             'empty_value' => $emptyValueNormalizer,
         ));
 
@@ -229,12 +298,7 @@ class DateType extends AbstractType
                 'string',
                 'timestamp',
                 'array',
-            ),
-            'widget'    => array(
-                'single_text',
-                'text',
-                'choice',
-            ),
+            )
         ));
 
         $resolver->setAllowedTypes(array(

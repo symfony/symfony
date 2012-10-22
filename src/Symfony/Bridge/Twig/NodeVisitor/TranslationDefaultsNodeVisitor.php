@@ -16,7 +16,7 @@ use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
 use Symfony\Bridge\Twig\Node\TransDefaultVarsNode;
 
 /**
- * TranslationDefaultDomainNodeVisitor.
+ * Adds default values to translation filters and blocks.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexandre Salomé <alexandre.salome@gmail.com>
@@ -33,16 +33,20 @@ class TranslationDefaultsNodeVisitor implements \Twig_NodeVisitorInterface
     {
         if ($node instanceof \Twig_Node_Module) {
             $this->domain = null;
+            $this->vars = null;
         }
 
         if ($node instanceof TransDefaultDomainNode || $node instanceof TransDefaultVarsNode) {
             $var = $env->getParser()->getVarName();
             $name = new \Twig_Node_Expression_AssignName($var, $node->getLine());
+
             if ($node instanceof TransDefaultDomainNode) {
                 $this->domain = new \Twig_Node_Expression_Name($var, $node->getLine());
 
                 return new \Twig_Node_Set(false, new \Twig_Node(array($name)), new \Twig_Node(array($node->getNode('expr'))), $node->getLine());
-            } elseif ($node instanceof TransDefaultVarsNode) {
+            }
+
+            if ($node instanceof TransDefaultVarsNode) {
                 $this->vars = new \Twig_Node_Expression_Name($var, $node->getLine());
 
                 return new \Twig_Node_Set(false, new \Twig_Node(array($name)), new \Twig_Node(array($node->getNode('expr'))), $node->getLine());

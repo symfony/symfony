@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+* added a way to specify default translation vars for a Twig template
+  (via the 'trans_default_vars' tag)
+
 2.1.0
 -----
 

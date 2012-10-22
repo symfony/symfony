@@ -22,12 +22,12 @@ class PdoSessionHandler implements \SessionHandlerInterface
     /**
      * @var \PDO PDO instance.
      */
-    private $pdo;
+    protected $pdo;
 
     /**
      * @var array Database options.
      */
-    private $dbOptions;
+    protected $dbOptions;
 
     /**
      * Constructor.

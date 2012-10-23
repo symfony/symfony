@@ -48,10 +48,8 @@ class TranslationCollectionFormListener implements EventSubscriberInterface
             return;
         }
 
-        if (!is_array($data)) {
-            if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
-                throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
-            }
+        if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
+            throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
         //get the class name of the i18nClass
@@ -91,7 +89,9 @@ class TranslationCollectionFormListener implements EventSubscriberInterface
                         break;
                     }
                 }
-                if(!$foundData) throw new UnexpectedTypeException($rootData, 'Propel i18n object');;
+                if(!$foundData) {
+                    throw new UnexpectedTypeException($rootData, 'Propel i18n object');;
+                }
 
                 $newTranslation = new $this->i18nClass();
                 $newTranslation->setLocale($lang);

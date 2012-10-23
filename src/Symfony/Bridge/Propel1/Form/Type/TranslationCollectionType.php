@@ -29,10 +29,10 @@ class TranslationCollectionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!isset($options['options']['data_class']) || $options['options']['data_class'] == null) {
+        if (!isset($options['options']['data_class']) || null === $options['options']['data_class']) {
             throw new MissingOptionsException('data_class must be set');
         }
-        if (!isset($options['options']['columns']) || $options['options']['columns'] == null) {
+        if (!isset($options['options']['columns']) || null === $options['options']['columns']) {
             throw new MissingOptionsException('columns must be set');
         }
 

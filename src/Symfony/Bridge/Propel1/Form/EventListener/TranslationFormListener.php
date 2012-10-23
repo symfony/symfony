@@ -55,7 +55,7 @@ class TranslationFormListener implements EventSubscriberInterface
                 $column = $options;
                 $options = array();
             }
-            if (null == $options) {
+            if (null === $options) {
                 $options = array();
             }
 

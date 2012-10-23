@@ -118,24 +118,6 @@ class TranslationCollectionTypeTest extends TypeTestCase
     }
 
     /**
-     * @exssspectedException Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testTranslationClassHasNoGetLocaleMethod()
-    {
-        $item = new Item(null, array('a', 'b', 'c'));
-
-        $form = $this->factory->createNamed('value', 'propel1_translation_collection', null, array(
-            'languages' => array('en', 'fr'),
-            'options' => array(
-                'data_class' => self::TRANSLATABLE_I18N_CLASS,
-                'columns' => array('value', 'value2' => array('label' => 'Label', 'type' => 'textarea'))
-            )
-        ));
-        $form->bind($item->getValue());
-        //$form->setData($item->getValue());
-    }
-
-    /**
      * @expectedException Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      */
     public function testNoDataClassAdded()

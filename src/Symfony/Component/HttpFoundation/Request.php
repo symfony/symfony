@@ -1187,9 +1187,9 @@ class Request
             return $this->languages;
         }
 
-        $languages = $this->splitHttpAcceptHeader($this->headers->get('Accept-Language'));
+        $languages = AcceptHeader::fromString($this->headers->get('Accept-Language'))->all();
         $this->languages = array();
-        foreach ($languages as $lang => $q) {
+        foreach (array_keys($languages) as $lang) {
             if (strstr($lang, '-')) {
                 $codes = explode('-', $lang);
                 if ($codes[0] == 'i') {
@@ -1229,7 +1229,7 @@ class Request
             return $this->charsets;
         }
 
-        return $this->charsets = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Charset')));
+        return $this->charsets = array_keys(AcceptHeader::fromString($this->headers->get('Accept-Charset'))->all());
     }
 
     /**
@@ -1245,7 +1245,7 @@ class Request
             return $this->acceptableContentTypes;
         }
 
-        return $this->acceptableContentTypes = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept')));
+        return $this->acceptableContentTypes = array_keys(AcceptHeader::fromString($this->headers->get('Accept'))->all());
     }
 
     /**
@@ -1269,40 +1269,21 @@ class Request
      * @param string $header Header to split
      *
      * @return array Array indexed by the values of the Accept-* header in preferred order
+     *
+     * @deprecated Deprecated since version 2.2, to be removed in 2.3.
      */
     public function splitHttpAcceptHeader($header)
     {
-        if (!$header) {
-            return array();
-        }
-
-        $values = array();
-        $groups = array();
-        foreach (array_filter(explode(',', $header)) as $value) {
-            // Cut off any q-value that might come after a semi-colon
-            if (preg_match('/;\s*(q=.*$)/', $value, $match)) {
-                $q     = substr(trim($match[1]), 2);
-                $value = trim(substr($value, 0, -strlen($match[0])));
-            } else {
-                $q = 1;
+        $headers = array();
+        foreach (AcceptHeader::fromString($header)->all() as $item) {
+            $key = $item->getValue();
+            foreach ($item->getAttributes() as $name => $value) {
+                $key .= sprintf(';%s=%s', $name, $value);
             }
-
-            $groups[$q][] = $value;
+            $headers[$key] = $item->getQuality();
         }
 
-        krsort($groups);
-
-        foreach ($groups as $q => $items) {
-            $q = (float) $q;
-
-            if (0 < $q) {
-                foreach ($items as $value) {
-                    $values[trim($value)] = $q;
-                }
-            }
-        }
-
-        return $values;
+        return $headers;
     }
 
     /*

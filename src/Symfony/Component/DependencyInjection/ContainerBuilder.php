@@ -473,7 +473,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @api
      */
-    public function unshiftExtensionConfig($name, $config)
+    public function unshiftExtensionConfig($name, array $config)
     {
         $configs = $this->getExtensionConfig($name);
         $this->extensionConfigs[$name] = array_unshift($configs, $config);
@@ -487,7 +487,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @api
      */
-    public function setExtensionConfig($name, $configs)
+    public function setExtensionConfig($name, array $configs)
     {
         $this->extensionConfigs[$name] = $configs;
     }

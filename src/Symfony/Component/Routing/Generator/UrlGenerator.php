@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Routing\Generator;
 
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Exception\InvalidParameterException;

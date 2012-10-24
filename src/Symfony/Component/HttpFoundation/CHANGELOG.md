@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * Request::splitHttpAcceptHeader() method is deprecated and will be removed in 2.3
+
 2.1.0
 -----
 

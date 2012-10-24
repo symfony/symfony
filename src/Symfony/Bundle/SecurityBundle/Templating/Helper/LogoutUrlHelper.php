@@ -82,7 +82,7 @@ class LogoutUrlHelper extends Helper
      * @param string  $key      The firewall key
      * @param Boolean $absolute Whether to generate an absolute URL
      * @return string The logout URL
-     * @throws InvalidArgumentException if no LogoutListener is registered for the key
+     * @throws \InvalidArgumentException if no LogoutListener is registered for the key
      */
     private function generateLogoutUrl($key, $absolute)
     {

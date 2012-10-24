@@ -29,9 +29,9 @@ class AclCollectionCache
     /**
      * Constructor.
      *
-     * @param AclProviderInterface              $aclProvider
-     * @param ObjectIdentityRetrievalStrategy   $oidRetrievalStrategy
-     * @param SecurityIdentityRetrievalStrategy $sidRetrievalStrategy
+     * @param AclProviderInterface                       $aclProvider
+     * @param ObjectIdentityRetrievalStrategyInterface   $oidRetrievalStrategy
+     * @param SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy
      */
     public function __construct(AclProviderInterface $aclProvider, ObjectIdentityRetrievalStrategyInterface $oidRetrievalStrategy, SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy)
     {

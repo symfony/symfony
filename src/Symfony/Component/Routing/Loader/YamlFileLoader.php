@@ -123,7 +123,7 @@ class YamlFileLoader extends FileLoader
      *
      * @return array
      *
-     * @throws InvalidArgumentException if one of the provided config keys is not supported
+     * @throws \InvalidArgumentException if one of the provided config keys is not supported
      */
     private function normalizeRouteConfig(array $config)
     {

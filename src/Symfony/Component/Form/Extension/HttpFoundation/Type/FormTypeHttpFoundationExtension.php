@@ -14,8 +14,6 @@ namespace Symfony\Component\Form\Extension\HttpFoundation\Type;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

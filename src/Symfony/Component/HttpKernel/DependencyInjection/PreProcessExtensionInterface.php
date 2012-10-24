@@ -20,5 +20,5 @@ interface PreProcessExtensionInterface
      *
      * @param ContainerBuilder $container
      */
-    function preProcess(ContainerBuilder $container);
+    public function preProcess(ContainerBuilder $container);
 }

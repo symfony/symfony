@@ -213,6 +213,12 @@ EOF
                     $default = 'false';
                 } elseif (null === $default) {
                     $default = '~';
+                } elseif (is_array($default)) {
+                    if ($node->hasDefaultValue() && count($defaultArray = $node->getDefaultValue())) {
+                        $default = '';
+                    } elseif (!is_array($example)) {
+                        $default = '[]';
+                    }
                 }
             }
         }

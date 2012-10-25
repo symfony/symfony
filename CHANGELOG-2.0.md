@@ -7,6 +7,21 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.18 (2012-10-25)
+
+ * 20898e5: Add to DateFormats 'D M d H:i:s Y T' (closes #5830)
+ * bf3e358: [Form] Fixed creation of multiple money fields with different currencies
+ * 959c1df: Fixed IPv6 Check in RequestMatcher
+ * b439d13: fixed DomCrwaler/Form to handle <button> when submitted
+ * 22c7a91: [HttpKernel][Translator] Fixed type-hints
+ * a6ae6f6: [Translation] forced the catalogue to be regenerated when a resource is added (closes symfony/Translation#1)
+ * 6c59fbd: [HttpFoundation] Fixed #5611 - Request::splitHttpAcceptHeader incorrect result order.
+ * 1a53b12: [2.0][http-foundation] Fix Response::getDate method
+ * 7444cb9: Support the new Microsoft URL Rewrite Module for IIS 7.0. @see http://framework.zend.com/issues/browse/ZF-4491 @see http://framework.zend.com/code/revision.php?repname=Zend+Framework&rev=24842
+ * ad95364: hasColorSupport does not take an argument
+ * 2ceebdc: fixed stringification of array objects in RequestDataCollector (closes #5295)
+ * de6658b: [Profiler]Use the abstract method to get client IP
+
 * 2.0.17 (2012-08-28)
 
  * 5bf4f92: fixed XML decoding attack vector through external entities

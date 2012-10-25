@@ -21,8 +21,6 @@ namespace Symfony\Component\HttpFoundation;
  */
 class AcceptHeader
 {
-    const EPSILON = 0.00001;
-
     /**
      * @var AcceptHeaderItem[]
      */
@@ -154,10 +152,45 @@ class AcceptHeader
     private function ensureSorted()
     {
         if (!$this->sorted) {
-            $epsilon = self::EPSILON;
-            uasort($this->items, function (AcceptHeaderItem $a, AcceptHeaderItem $b) use ($epsilon) {
-                return $a->getQuality() - $epsilon < $b->getQuality() + $epsilon;
-            });
+            $this->items = $this->sort($this->items);
         }
+    }
+
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    private function sort(array $array)
+    {
+        if (count($array) < 2) {
+            return $array;
+        }
+
+        $middle = count($array) / 2;
+
+        return $this->merge(
+            $this->sort(array_slice($array, 0, $middle)),
+            $this->sort(array_slice($array, $middle))
+        );
+    }
+
+    private function merge(array $left, array $right)
+    {
+        $array = array();
+        while (count($left) + count($right) > 0) {
+            if (0 === count($left) || $shiftLeft = 0 === count($right)) {
+                list($key, $value) = $shiftLeft
+                    ? each(array_splice($left, 0, 1))
+                    : each(array_splice($right, 0, 1));
+            } else {
+                list($key, $value) = current($right)->getQuality() > current($left)->getQuality()
+                    ? each(array_splice($right, 0, 1))
+                    : each(array_splice($left, 0, 1));
+            }
+            $array[$key] = $value;
+        }
+
+        return $array;
     }
 }

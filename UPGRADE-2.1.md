@@ -438,7 +438,7 @@
     After:
 
     ```
-    $builder->add('tags', 'collection', array('prototype' => '__proto__'));
+    $builder->add('tags', 'collection', array('prototype_name' => '__proto__'));
 
     // results in the name "__proto__" in the template
     ```

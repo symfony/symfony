@@ -319,7 +319,7 @@ class StubIntlDateFormatter
     /**
      * Returns whether the formatter is lenient
      *
-     * @return string   The timezone identifier used by the formatter
+     * @return Boolean
      *
      * @see    http://www.php.net/manual/en/intldateformatter.islenient.php
      *
@@ -327,7 +327,7 @@ class StubIntlDateFormatter
      */
     public function isLenient()
     {
-        throw new MethodNotImplementedException(__METHOD__);
+        return false;
     }
 
     /**

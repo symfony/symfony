@@ -126,6 +126,8 @@ class ClassCollectionLoader
     public static function fixNamespaceDeclarations($source)
     {
         if (!function_exists('token_get_all')) {
+            $source = preg_replace('/namespace\s(.*);/', "\nnamespace $1\n{\n", $source)."\n}\n";
+
             return $source;
         }
 

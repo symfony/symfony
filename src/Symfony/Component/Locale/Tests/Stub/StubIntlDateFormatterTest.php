@@ -629,13 +629,10 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertEquals(StubIntlDateFormatter::FULL, $formatter->getTimeType());
     }
 
-    /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
-     */
     public function testIsLenient()
     {
         $formatter = $this->createStubFormatter();
-        $formatter->isLenient();
+        $this->assertFalse($formatter->isLenient());
     }
 
     /**

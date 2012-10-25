@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  * UrlGenerator generates a URL based on a set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Tobias Schultze <http://tobion.de>
  *
  * @api
  */
@@ -98,7 +99,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      */
     public function setStrictRequirements($enabled)
     {
-        $this->strictRequirements = (Boolean) $enabled;
+        $this->strictRequirements = null === $enabled ? null : (Boolean) $enabled;
     }
 
     /**
@@ -131,13 +132,10 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
     {
         $variables = array_flip($variables);
-
-        $originParameters = $parameters;
-        $parameters = array_replace($this->context->getParameters(), $parameters);
-        $tparams = array_replace($defaults, $parameters);
+        $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
 
         // all params must be given
-        if ($diff = array_diff_key($variables, $tparams)) {
+        if ($diff = array_diff_key($variables, $mergedParams)) {
             throw new MissingMandatoryParametersException(sprintf('The "%s" route has some missing mandatory parameters ("%s").', $name, implode('", "', array_keys($diff))));
         }
 
@@ -145,30 +143,26 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $optional = true;
         foreach ($tokens as $token) {
             if ('variable' === $token[0]) {
-                if (false === $optional || !array_key_exists($token[3], $defaults) || (isset($parameters[$token[3]]) && (string) $parameters[$token[3]] != (string) $defaults[$token[3]])) {
-                    if (!$isEmpty = in_array($tparams[$token[3]], array(null, '', false), true)) {
-                        // check requirement
-                        if ($tparams[$token[3]] && !preg_match('#^'.$token[2].'$#', $tparams[$token[3]])) {
-                            $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $tparams[$token[3]]);
-                            if ($this->strictRequirements) {
-                                throw new InvalidParameterException($message);
-                            }
-
-                            if ($this->logger) {
-                                $this->logger->err($message);
-                            }
-
-                            return null;
+                if (!$optional || !array_key_exists($token[3], $defaults) || (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]]) {
+                    // check requirement
+                    if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
+                        $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $mergedParams[$token[3]]);
+                        if ($this->strictRequirements) {
+                            throw new InvalidParameterException($message);
                         }
+
+                        if ($this->logger) {
+                            $this->logger->err($message);
+                        }
+
+                        return null;
                     }
 
-                    if (!$isEmpty || !$optional) {
-                        $url = $token[1].$tparams[$token[3]].$url;
-                    }
-
+                    $url = $token[1].$mergedParams[$token[3]].$url;
                     $optional = false;
                 }
-            } elseif ('text' === $token[0]) {
+            } else {
+                // static text
                 $url = $token[1].$url;
                 $optional = false;
             }
@@ -192,7 +186,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         // add a query string if needed
-        $extra = array_diff_key($originParameters, $variables, $defaults);
+        $extra = array_diff_key($parameters, $variables);
         if ($extra && $query = http_build_query($extra, '', '&')) {
             $url .= '?'.$query;
         }

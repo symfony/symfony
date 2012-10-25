@@ -30,79 +30,88 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             return array_merge($this->mergeDefaults($matches, array (  'def' => 'test',)), array('_route' => 'foo'));
         }
 
-        // bar
-        if (0 === strpos($pathinfo, '/bar') && preg_match('#^/bar/(?<foo>[^/]+)$#s', $pathinfo, $matches)) {
-            if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
-                $allow = array_merge($allow, array('GET', 'HEAD'));
-                goto not_bar;
+        if (0 === strpos($pathinfo, '/bar')) {
+            // bar
+            if (preg_match('#^/bar/(?<foo>[^/]++)$#s', $pathinfo, $matches)) {
+                if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                    $allow = array_merge($allow, array('GET', 'HEAD'));
+                    goto not_bar;
+                }
+
+                $matches['_route'] = 'bar';
+
+                return $matches;
+            }
+            not_bar:
+
+            // barhead
+            if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?<foo>[^/]++)$#s', $pathinfo, $matches)) {
+                if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                    $allow = array_merge($allow, array('GET', 'HEAD'));
+                    goto not_barhead;
+                }
+
+                $matches['_route'] = 'barhead';
+
+                return $matches;
+            }
+            not_barhead:
+
+        }
+
+        if (0 === strpos($pathinfo, '/test')) {
+            if (0 === strpos($pathinfo, '/test/baz')) {
+                // baz
+                if ($pathinfo === '/test/baz') {
+                    return array('_route' => 'baz');
+                }
+
+                // baz2
+                if ($pathinfo === '/test/baz.html') {
+                    return array('_route' => 'baz2');
+                }
+
+                // baz3
+                if ($pathinfo === '/test/baz3/') {
+                    return array('_route' => 'baz3');
+                }
+
             }
 
-            $matches['_route'] = 'bar';
+            // baz4
+            if (preg_match('#^/test/(?<foo>[^/]++)/$#s', $pathinfo, $matches)) {
+                $matches['_route'] = 'baz4';
 
-            return $matches;
-        }
-        not_bar:
-
-        // barhead
-        if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?<foo>[^/]+)$#s', $pathinfo, $matches)) {
-            if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
-                $allow = array_merge($allow, array('GET', 'HEAD'));
-                goto not_barhead;
+                return $matches;
             }
 
-            $matches['_route'] = 'barhead';
+            // baz5
+            if (preg_match('#^/test/(?<foo>[^/]++)/$#s', $pathinfo, $matches)) {
+                if ($this->context->getMethod() != 'POST') {
+                    $allow[] = 'POST';
+                    goto not_baz5;
+                }
 
-            return $matches;
-        }
-        not_barhead:
+                $matches['_route'] = 'baz5';
 
-        // baz
-        if ($pathinfo === '/test/baz') {
-            return array('_route' => 'baz');
-        }
-
-        // baz2
-        if ($pathinfo === '/test/baz.html') {
-            return array('_route' => 'baz2');
-        }
-
-        // baz3
-        if ($pathinfo === '/test/baz3/') {
-            return array('_route' => 'baz3');
-        }
-
-        // baz4
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?<foo>[^/]+)/$#s', $pathinfo, $matches)) {
-            $matches['_route'] = 'baz4';
-
-            return $matches;
-        }
-
-        // baz5
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?<foo>[^/]+)/$#s', $pathinfo, $matches)) {
-            if ($this->context->getMethod() != 'POST') {
-                $allow[] = 'POST';
-                goto not_baz5;
+                return $matches;
             }
+            not_baz5:
 
-            $matches['_route'] = 'baz5';
+            // baz.baz6
+            if (preg_match('#^/test/(?<foo>[^/]++)/$#s', $pathinfo, $matches)) {
+                if ($this->context->getMethod() != 'PUT') {
+                    $allow[] = 'PUT';
+                    goto not_bazbaz6;
+                }
 
-            return $matches;
-        }
-        not_baz5:
+                $matches['_route'] = 'baz.baz6';
 
-        // baz.baz6
-        if (0 === strpos($pathinfo, '/test') && preg_match('#^/test/(?<foo>[^/]+)/$#s', $pathinfo, $matches)) {
-            if ($this->context->getMethod() != 'PUT') {
-                $allow[] = 'PUT';
-                goto not_bazbaz6;
+                return $matches;
             }
+            not_bazbaz6:
 
-            $matches['_route'] = 'baz.baz6';
-
-            return $matches;
         }
-        not_bazbaz6:
 
         // foofoo
         if ($pathinfo === '/foofoo') {
@@ -124,14 +133,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         if (0 === strpos($pathinfo, '/a')) {
             if (0 === strpos($pathinfo, '/a/b\'b')) {
                 // foo1
-                if (preg_match('#^/a/b\'b/(?<foo>[^/]+)$#s', $pathinfo, $matches)) {
+                if (preg_match('#^/a/b\'b/(?<foo>[^/]++)$#s', $pathinfo, $matches)) {
                     $matches['_route'] = 'foo1';
 
                     return $matches;
                 }
 
                 // bar1
-                if (preg_match('#^/a/b\'b/(?<bar>[^/]+)$#s', $pathinfo, $matches)) {
+                if (preg_match('#^/a/b\'b/(?<bar>[^/]++)$#s', $pathinfo, $matches)) {
                     $matches['_route'] = 'bar1';
 
                     return $matches;
@@ -148,14 +157,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
             if (0 === strpos($pathinfo, '/a/b\'b')) {
                 // foo2
-                if (preg_match('#^/a/b\'b/(?<foo1>[^/]+)$#s', $pathinfo, $matches)) {
+                if (preg_match('#^/a/b\'b/(?<foo1>[^/]++)$#s', $pathinfo, $matches)) {
                     $matches['_route'] = 'foo2';
 
                     return $matches;
                 }
 
                 // bar2
-                if (preg_match('#^/a/b\'b/(?<bar1>[^/]+)$#s', $pathinfo, $matches)) {
+                if (preg_match('#^/a/b\'b/(?<bar1>[^/]++)$#s', $pathinfo, $matches)) {
                     $matches['_route'] = 'bar2';
 
                     return $matches;
@@ -167,7 +176,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
         if (0 === strpos($pathinfo, '/multi')) {
             // helloWorld
-            if (0 === strpos($pathinfo, '/multi/hello') && preg_match('#^/multi/hello(?:/(?<who>[^/]+))?$#s', $pathinfo, $matches)) {
+            if (0 === strpos($pathinfo, '/multi/hello') && preg_match('#^/multi/hello(?:/(?<who>[^/]++))?$#s', $pathinfo, $matches)) {
                 return array_merge($this->mergeDefaults($matches, array (  'who' => 'World!',)), array('_route' => 'helloWorld'));
             }
 
@@ -184,32 +193,35 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
         // foo3
-        if (preg_match('#^/(?<_locale>[^/]+)/b/(?<foo>[^/]+)$#s', $pathinfo, $matches)) {
+        if (preg_match('#^/(?<_locale>[^/]++)/b/(?<foo>[^/]++)$#s', $pathinfo, $matches)) {
             $matches['_route'] = 'foo3';
 
             return $matches;
         }
 
         // bar3
-        if (preg_match('#^/(?<_locale>[^/]+)/b/(?<bar>[^/]+)$#s', $pathinfo, $matches)) {
+        if (preg_match('#^/(?<_locale>[^/]++)/b/(?<bar>[^/]++)$#s', $pathinfo, $matches)) {
             $matches['_route'] = 'bar3';
 
             return $matches;
         }
 
-        // ababa
-        if ($pathinfo === '/ababa') {
-            return array('_route' => 'ababa');
-        }
-
-        // foo4
-        if (0 === strpos($pathinfo, '/aba') && preg_match('#^/aba/(?<foo>[^/]+)$#s', $pathinfo, $matches)) {
-            $matches['_route'] = 'foo4';
-
-            return $matches;
-        }
-
         if (0 === strpos($pathinfo, '/a')) {
+            if (0 === strpos($pathinfo, '/aba')) {
+                // ababa
+                if ($pathinfo === '/ababa') {
+                    return array('_route' => 'ababa');
+                }
+
+                // foo4
+                if (preg_match('#^/aba/(?<foo>[^/]++)$#s', $pathinfo, $matches)) {
+                    $matches['_route'] = 'foo4';
+
+                    return $matches;
+                }
+
+            }
+
             // a
             if ($pathinfo === '/a/a...') {
                 return array('_route' => 'a');
@@ -217,14 +229,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
             if (0 === strpos($pathinfo, '/a/b')) {
                 // b
-                if (preg_match('#^/a/b/(?<var>[^/]+)$#s', $pathinfo, $matches)) {
+                if (preg_match('#^/a/b/(?<var>[^/]++)$#s', $pathinfo, $matches)) {
                     $matches['_route'] = 'b';
 
                     return $matches;
                 }
 
                 // c
-                if (0 === strpos($pathinfo, '/a/b/c') && preg_match('#^/a/b/c/(?<var>[^/]+)$#s', $pathinfo, $matches)) {
+                if (0 === strpos($pathinfo, '/a/b/c') && preg_match('#^/a/b/c/(?<var>[^/]++)$#s', $pathinfo, $matches)) {
                     $matches['_route'] = 'c';
 
                     return $matches;

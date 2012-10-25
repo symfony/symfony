@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added a Luhn validator
+
 2.1.0
 -----
 

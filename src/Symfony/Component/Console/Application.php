@@ -26,6 +26,7 @@ use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Helper\ProgressHelper;
 
 /**
  * An Application is the container for a collection of commands.
@@ -937,6 +938,7 @@ class Application
         return new HelperSet(array(
             new FormatterHelper(),
             new DialogHelper(),
+            new ProgressHelper(),
         ));
     }
 

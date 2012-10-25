@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added finder adapters to improve performance on specific platforms
+
 2.1.0
 -----
 

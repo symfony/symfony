@@ -126,6 +126,29 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('auto_reload')->end()
                 ->scalarNode('optimizations')->end()
                 ->arrayNode('paths')
+                    ->beforeNormalization()
+                        ->always()
+                        ->then(function ($paths) {
+                            $normalized = array();
+                            foreach ($paths as $path => $namespace) {
+                                if (is_array($namespace)) {
+                                    // xml
+                                    $path = $namespace['value'];
+                                    $namespace = $namespace['namespace'];
+                                }
+
+                                // path within the default namespace
+                                if (ctype_digit((string) $path)) {
+                                    $path = $namespace;
+                                    $namespace = null;
+                                }
+
+                                $normalized[$path] = $namespace;
+                            }
+
+                            return $normalized;
+                        })
+                    ->end()
                     ->prototype('variable')->end()
                 ->end()
             ->end()

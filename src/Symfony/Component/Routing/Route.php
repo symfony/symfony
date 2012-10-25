@@ -175,7 +175,7 @@ class Route implements \Serializable
      *
      * @param string $name An option name
      *
-     * @return mixed The option value
+     * @return mixed The option value or null when not given
      */
     public function getOption($name)
     {
@@ -232,7 +232,7 @@ class Route implements \Serializable
      *
      * @param string $name A variable name
      *
-     * @return mixed The default value
+     * @return mixed The default value or null when not given
      */
     public function getDefault($name)
     {
@@ -319,7 +319,7 @@ class Route implements \Serializable
      *
      * @param string $key The key
      *
-     * @return string The regex
+     * @return string|null The regex or null when not given
      */
     public function getRequirement($key)
     {
@@ -348,6 +348,8 @@ class Route implements \Serializable
      * Compiles the route.
      *
      * @return CompiledRoute A CompiledRoute instance
+     *
+     * @see RouteCompiler which is responsible for the compilation process
      */
     public function compile()
     {
@@ -367,19 +369,19 @@ class Route implements \Serializable
     private function sanitizeRequirement($key, $regex)
     {
         if (!is_string($regex)) {
-            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string', $key));
+            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string.', $key));
         }
 
-        if ('' === $regex) {
-            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty', $key));
-        }
-
-        if ('^' === $regex[0]) {
-            $regex = substr($regex, 1);
+        if ('' !== $regex && '^' === $regex[0]) {
+            $regex = (string) substr($regex, 1); // returns false for a single character
         }
 
         if ('$' === substr($regex, -1)) {
             $regex = substr($regex, 0, -1);
+        }
+
+        if ('' === $regex) {
+            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty.', $key));
         }
 
         return $regex;

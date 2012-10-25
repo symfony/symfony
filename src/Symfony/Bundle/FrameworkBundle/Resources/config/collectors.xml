@@ -32,9 +32,6 @@
 
         <service id="data_collector.events" class="%data_collector.events.class%" public="false">
             <tag name="data_collector" template="WebProfilerBundle:Collector:events" id="events" priority="255" />
-            <call method="setEventDispatcher">
-                <argument type="service" id="event_dispatcher" />
-            </call>
         </service>
 
         <service id="data_collector.logger" class="%data_collector.logger.class%" public="false">

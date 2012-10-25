@@ -14,6 +14,9 @@ requires adding the following lines to your autoloader:
         $loader->registerPrefixFallback(__DIR__.'/../vendor/symfony/src/Symfony/Component/Locale/Resources/stubs');
     }
 
+If you are using Composer for autoloading, then you can even simplify it by
+removing the ``$loader->registerPrefixFallback`` line.
+
 Resources
 ---------
 

@@ -1,4 +1,4 @@
-{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
     {% if collector.counterrors %}
@@ -12,13 +12,13 @@
                 <span class="sf-toolbar-status sf-toolbar-status-yellow">{{ collector.counterrors }}</span>
             </div>
         {% endset %}
-        {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+        {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
     {% endif %}
 {% endblock %}
 
 {% block menu %}
 <span class="label">
-    <span class="icon"><img src="{{ asset('bundles/webprofiler/images/profiler/logger.png') }}" alt="Logger" /></span>
+    <span class="icon"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAgCAYAAAAMq2gFAAABjElEQVRIx2MIDw+vd3R0/GFvb/+fGtjFxeVJSUmJ1f///5nv37/PAMMMzs7OVLMEhoODgy/k5+cHJCYmagAtZAJbRG1L0DEwxCYALeOgiUXbt2+/X1NT8xTEdnd3/wi0SI4mFgHBDCBeCLXoF5BtwkCEpvNAvB8JnydCTwgQR0It+g1kWxNjUQEQOyDhAiL0gNUiWWRDjEUOyMkUZsCoRaMWjVpEvEVkFkGjFmEUqgc+fvx4hVYWIReqzi9evKileaoDslnu3LkTNLQtGk3edLPIycnpL9Bge5pb1NXVdQNosDmGRcAm7F+QgKur6783b95cBQoeRGv1kII3QPOdAoZF8+fPP4PUqnx55syZVKCEI1rLh1hsAbWEZ8aMGaUoFoFcMG3atKdIjfSPISEhawICAlaQgwMDA1f6+/sfB5rzE2Sej4/PD3C7DkjoAHHVoUOHLpSVlX3w8vL6Sa34Alr6Z8WKFaCoMARZxAHEoFZ/HBD3A/FyIF4BxMvIxCC964F4G6hZDMTxQCwJAGWE8pur5kFDAAAAAElFTkSuQmCC" alt="Logger" /></span>
     <strong>Logs</strong>
     {% if collector.counterrors %}
         <span class="count">
@@ -31,7 +31,7 @@
 {% block panel %}
     <h2>Logs</h2>
 
-    {% set priority = app.request.query.get('priority', 0) %}
+    {% set priority = request.query.get('priority', 0) %}
 
     <table>
         <tr>

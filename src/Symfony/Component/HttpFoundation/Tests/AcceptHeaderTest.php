@@ -1,0 +1,89 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\HttpFoundation\Tests;
+
+use Symfony\Component\HttpFoundation\AcceptHeader;
+use Symfony\Component\HttpFoundation\AcceptHeaderItem;
+
+class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @dataProvider provideFromStringData
+     */
+    public function testFromString($string, array $items)
+    {
+        $header = AcceptHeader::fromString($string);
+        $this->assertEquals($items, array_values($header->all()));
+    }
+
+    /**
+     * @dataProvider provideToStringData
+     */
+    public function testToString(array $items, $string)
+    {
+        $header = new AcceptHeader($items);
+        $this->assertEquals($string, (string) $header);
+    }
+
+    /**
+     * @dataProvider provideFilterData
+     */
+    public function testFilter($string, $filter, array $values)
+    {
+        $header = AcceptHeader::fromString($string)->filter($filter);
+        $this->assertEquals($values, array_keys($header->all()));
+    }
+
+    /**
+     * @dataProvider provideSortingData
+     */
+    public function testSorting($string, array $values)
+    {
+        $header = AcceptHeader::fromString($string);
+        $this->assertEquals($values, array_keys($header->all()));
+    }
+
+    public function provideFromStringData()
+    {
+        return array(
+            array('', array()),
+            array('gzip', array(new AcceptHeaderItem('gzip'))),
+            array('gzip,deflate,sdch', array(new AcceptHeaderItem('gzip'), new AcceptHeaderItem('deflate'), new AcceptHeaderItem('sdch'))),
+            array("gzip, deflate\t,sdch", array(new AcceptHeaderItem('gzip'), new AcceptHeaderItem('deflate'), new AcceptHeaderItem('sdch'))),
+            array('"this;should,not=matter"', array(new AcceptHeaderItem('this;should,not=matter'))),
+        );
+    }
+
+    public function provideFilterData()
+    {
+        return array(
+            array('fr-FR,fr;q=0.8,en-US;q=0.6,en;q=0.4', '/fr.*/', array('fr-FR', 'fr')),
+        );
+    }
+
+    public function provideSortingData()
+    {
+        return array(
+            array('*;q=0.3,ISO-8859-1,utf-8;q=0.7',  array('ISO-8859-1', 'utf-8', '*')),
+        );
+    }
+
+    public function provideToStringData()
+    {
+        return array(
+            array(array(), ''),
+            array(array(new AcceptHeaderItem('gzip')), 'gzip'),
+            array(array(new AcceptHeaderItem('gzip'), new AcceptHeaderItem('deflate'), new AcceptHeaderItem('sdch')), 'gzip,deflate,sdch'),
+            array(array(new AcceptHeaderItem('this;should,not=matter')), 'this;should,not=matter'),
+        );
+    }
+}

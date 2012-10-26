@@ -174,13 +174,12 @@ class UrlMatcher implements UrlMatcherInterface
      */
     protected function mergeDefaults($params, $defaults)
     {
-        $parameters = $defaults;
         foreach ($params as $key => $value) {
             if (!is_int($key)) {
-                $parameters[$key] = $value;
+                $defaults[$key] = $value;
             }
         }
 
-        return $parameters;
+        return $defaults;
     }
 }

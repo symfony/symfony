@@ -14,6 +14,8 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\AcceptHeader;
+use Symfony\Component\HttpFoundation\AcceptHeaderItem;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
@@ -1023,13 +1025,49 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(null, array()),
-            array('text/html;q=0.8', array('text/html' => 0.8)),
-            array('text/html;foo=bar;q=0.8 ', array('text/html;foo=bar' => 0.8)),
-            array('text/html;charset=utf-8; q=0.8', array('text/html;charset=utf-8' => 0.8)),
-            array('text/html,application/xml;q=0.9,*/*;charset=utf-8; q=0.8', array('text/html' => 1, 'application/xml' => 0.9, '*/*;charset=utf-8' => 0.8)),
-            array('text/html,application/xhtml+xml;q=0.9,*/*;q=0.8; foo=bar', array('text/html' => 1, 'application/xhtml+xml' => 0.9, '*/*' => 0.8)),
-            array('text/html,application/xhtml+xml;charset=utf-8;q=0.9; foo=bar,*/*', array('text/html' => 1, '*/*' => 1, 'application/xhtml+xml;charset=utf-8' => 0.9)),
-            array('text/html,application/xhtml+xml', array('application/xhtml+xml' => 1, 'text/html' => 1)),
+            array(
+                'text/html;q=0.8',
+                array('text/html' => new AcceptHeaderItem('text/html', array('q' => 0.8)))
+            ),
+            array(
+                'text/html;foo=bar;q=0.8 ',
+                array('text/html' => new AcceptHeaderItem('text/html', array('q' => 0.8, 'foo' => 'bar')))
+            ),
+            array(
+                'text/html;charset=utf-8; q=0.8',
+                array('text/html' => new AcceptHeaderItem('text/html', array('q' => 0.8, 'charset' => 'utf-8')))
+            ),
+            array(
+                'text/html,application/xml;q=0.9,*/*;charset=utf-8; q=0.8',
+                array(
+                    'text/html' => new AcceptHeaderItem('text/html'),
+                    'application/xml' => new AcceptHeaderItem('application/xml', array('q' => 0.9)),
+                    '*/*' => new AcceptHeaderItem('*/*', array('q' => 0.8, 'charset' => 'utf-8')),
+                )
+            ),
+            array(
+                'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8; foo=bar',
+                array(
+                    'text/html' => new AcceptHeaderItem('text/html'),
+                    'application/xhtml+xml' => new AcceptHeaderItem('application/xhtml+xml', array('q' => 0.9)),
+                    '*/*' => new AcceptHeaderItem('*/*', array('q' => 0.8, 'foo' => 'bar')),
+                )
+            ),
+            array(
+                'text/html,application/xhtml+xml;charset=utf-8;q=0.9; foo=bar,*/*',
+                array(
+                    'text/html' => new AcceptHeaderItem('text/html'),
+                    'application/xhtml+xml' => new AcceptHeaderItem('application/xhtml+xml', array('q' => 0.9, 'charset' => 'utf-8', 'foo' => 'bar')),
+                    '*/*' => new AcceptHeaderItem('*/*'),
+                )
+            ),
+            array(
+                'text/html,application/xhtml+xml',
+                array(
+                    'text/html' => new AcceptHeaderItem('text/html'),
+                    'application/xhtml+xml' => new AcceptHeaderItem('application/xhtml+xml'),
+                )
+            ),
         );
     }
 

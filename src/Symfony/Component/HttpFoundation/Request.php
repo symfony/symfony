@@ -1189,7 +1189,7 @@ class Request
 
         $languages = $this->splitHttpAcceptHeader($this->headers->get('Accept-Language'));
         $this->languages = array();
-        foreach ($languages as $lang => $q) {
+        foreach (array_keys($languages) as $lang) {
             if (strstr($lang, '-')) {
                 $codes = explode('-', $lang);
                 if ($codes[0] == 'i') {
@@ -1272,37 +1272,7 @@ class Request
      */
     public function splitHttpAcceptHeader($header)
     {
-        if (!$header) {
-            return array();
-        }
-
-        $values = array();
-        $groups = array();
-        foreach (array_filter(explode(',', $header)) as $value) {
-            // Cut off any q-value that might come after a semi-colon
-            if (preg_match('/;\s*(q=.*$)/', $value, $match)) {
-                $q     = substr(trim($match[1]), 2);
-                $value = trim(substr($value, 0, -strlen($match[0])));
-            } else {
-                $q = 1;
-            }
-
-            $groups[$q][] = $value;
-        }
-
-        krsort($groups);
-
-        foreach ($groups as $q => $items) {
-            $q = (float) $q;
-
-            if (0 < $q) {
-                foreach ($items as $value) {
-                    $values[trim($value)] = $q;
-                }
-            }
-        }
-
-        return $values;
+        return AcceptHeader::fromString($header)->all();
     }
 
     /*

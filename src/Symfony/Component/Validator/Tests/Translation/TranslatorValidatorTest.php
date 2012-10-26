@@ -44,6 +44,27 @@ class TranslatorValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertConstraintsTranslated($translatedCvl, $cvl);
     }
 
+    public function testValidateTransChoice()
+    {
+        $cvl = new ConstraintViolationList();
+        $cvl->add(new ConstraintViolation('message', array(), null, 'path', 1234, 2));
+        $object = new stdClass;
+
+        $this->translator->expects($this->once())
+                         ->method('transChoice')
+                         ->with($this->equalTo('message'), $this->equalTo(2), $this->equalTo(array()), $this->equalTo('validators'))
+                         ->will($this->returnValue('translated message'));
+
+        $this->parentValidator->expects($this->once())
+                              ->method('validate')
+                              ->with($this->equalTo($object), $this->equalTo(array('GROUP')))
+                              ->will($this->returnValue($cvl));
+
+        $translatedCvl = $this->translatorValidator->validate($object, array('GROUP'));
+
+        $this->assertConstraintsTranslated($translatedCvl, $cvl);
+    }
+
     public function testValidateProperty()
     {
         $object = new stdClass;

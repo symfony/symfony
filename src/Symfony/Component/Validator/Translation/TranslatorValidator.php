@@ -93,12 +93,21 @@ class TranslatorValidator implements ValidatorInterface
         $translatedConstraintViolations = new ConstraintViolationList();
 
         foreach ($constraintViolationList as $violation) {
+            $template = $violation->getMessageTemplate();
+            $params = $violation->getMessageParameters();
+
+            $translatedMessage = $violation->getMessagePluralization() === null
+                ? $this->translator->trans($template, $params, 'validators')
+                : $this->translator->transChoice($template, $violation->getMessagePluralization(), $params, 'validators');
+
             $translatedConstraintViolations->add(new ConstraintViolation(
-                $this->translator->trans($violation->getMessageTemplate(), $violation->getMessageParameters(), 'validators'),
+                $translatedMessage,
                 $violation->getMessageParameters(),
                 $violation->getRoot(),
                 $violation->getPropertyPath(),
-                $violation->getInvalidValue()
+                $violation->getInvalidValue(),
+                $violation->getMessagePluralization(),
+                $violation->getCode()
             ));
         }
 

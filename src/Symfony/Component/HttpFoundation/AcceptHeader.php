@@ -180,14 +180,11 @@ class AcceptHeader
         $array = array();
         while (count($left) + count($right) > 0) {
             if (0 === count($left) || $shiftLeft = 0 === count($right)) {
-                list($key, $value) = $shiftLeft
-                    ? each(array_splice($left, 0, 1))
-                    : each(array_splice($right, 0, 1));
+                $item = $shiftLeft ? array_splice($left, 0, 1) : array_splice($right, 0, 1);
             } else {
-                list($key, $value) = current($right)->getQuality() > current($left)->getQuality()
-                    ? each(array_splice($right, 0, 1))
-                    : each(array_splice($left, 0, 1));
+                $item = current($right)->getQuality() > current($left)->getQuality() ? array_splice($right, 0, 1) : array_splice($left, 0, 1);
             }
+            list($key, $value) = each($item);
             $array[$key] = $value;
         }
 

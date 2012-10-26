@@ -26,12 +26,12 @@ class AcceptHeaderItem
     /**
      * @var float
      */
-    private $quality;
+    private $quality = 1.0;
 
     /**
      * @var array
      */
-    private $attributes;
+    private $attributes = array();
 
     /**
      * Builds an AcceptHeaderInstance instance from a string.
@@ -71,8 +71,6 @@ class AcceptHeaderItem
     public function __construct($value, array $attributes = array())
     {
         $this->value = $value;
-        $this->quality = 1.0;
-        $this->attributes = array();
         foreach ($attributes as $name => $value) {
             $this->setAttribute($name, $value);
         }

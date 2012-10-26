@@ -24,12 +24,12 @@ class AcceptHeader
     /**
      * @var AcceptHeaderItem[]
      */
-    private $items;
+    private $items = array();
 
     /**
      * @var bool
      */
-    private $sorted;
+    private $sorted = true;
 
     /**
      * Builds an AcceptHeader instance from a string.
@@ -52,8 +52,6 @@ class AcceptHeader
      */
     public function __construct(array $items)
     {
-        $this->sorted = true;
-        $this->items = array();
         foreach ($items as $item) {
             $this->add($item);
         }
@@ -143,7 +141,7 @@ class AcceptHeader
     {
         $this->ensureSorted();
 
-        return count($this->items) ? current($this->items) : null;
+        return !empty($this->items) ? current($this->items) : null;
     }
 
     /**
@@ -179,8 +177,10 @@ class AcceptHeader
     {
         $array = array();
         while (count($left) + count($right) > 0) {
-            if (0 === count($left) || $shiftLeft = 0 === count($right)) {
-                $item = $shiftLeft ? array_splice($left, 0, 1) : array_splice($right, 0, 1);
+            if (empty($left)) {
+                $item = array_splice($right, 0, 1);
+            } elseif(empty($right)) {
+                $item = array_splice($left, 0, 1);
             } else {
                 $item = current($right)->getQuality() > current($left)->getQuality() ? array_splice($right, 0, 1) : array_splice($left, 0, 1);
             }

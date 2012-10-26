@@ -29,7 +29,7 @@ class RedisMock
     }
 
     /**
-     * Add a memcached server to connection pool
+     * Add a server to connection pool
      *
      * @param string  $host
      * @param integer $port

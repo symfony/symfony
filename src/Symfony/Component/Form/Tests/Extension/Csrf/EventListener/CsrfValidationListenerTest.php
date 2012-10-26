@@ -63,6 +63,7 @@ class CsrfValidationListenerTest extends \PHPUnit_Framework_TestCase
         return $this->getMock('Symfony\Component\Form\Tests\FormInterface');
     }
 
+    // https://github.com/symfony/symfony/pull/5838
     public function testStringFormData()
     {
         $data = "XP4HUzmHPi";

@@ -19,8 +19,19 @@ use Symfony\Component\HttpKernel\HttpCache\Store;
 
 class StoreTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Request
+     */
     protected $request;
+
+    /**
+     * @var Response
+     */
     protected $response;
+
+    /**
+     * @var Store
+     */
     protected $store;
 
     protected function setUp()
@@ -45,6 +56,19 @@ class StoreTest extends \PHPUnit_Framework_TestCase
     public function testReadsAnEmptyArrayWithReadWhenNothingCachedAtKey()
     {
         $this->assertEmpty($this->getStoreMetadata('/nothing'));
+    }
+
+    public function testUnlockFileThatDoesExist()
+    {
+        $cacheKey = $this->storeSimpleEntry();
+        $this->store->lock($this->request);
+
+        $this->assertTrue($this->store->unlock($this->request));
+    }
+
+    public function testUnlockFileThatDoesNotExist()
+    {
+        $this->assertFalse($this->store->unlock($this->request));
     }
 
     public function testRemovesEntriesForKeyWithPurge()

@@ -38,7 +38,7 @@ interface TranslatorInterface
      * Translates the given choice message by choosing a translation according to a number.
      *
      * @param string  $id         The message id
-     * @param integer $number     The number to use to find the indice of the message
+     * @param mixed   $number     The number or tag to use to find the indice of the message
      * @param array   $parameters An array of parameters for the message
      * @param string  $domain     The domain for the message
      * @param string  $locale     The locale

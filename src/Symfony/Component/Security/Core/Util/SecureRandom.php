@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-final class Prng
+final class SecureRandom
 {
     private $logger;
     private $useOpenSsl;

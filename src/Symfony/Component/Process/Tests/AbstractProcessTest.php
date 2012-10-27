@@ -126,7 +126,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p = new Process(sprintf('php -r %s', escapeshellarg('ini_set(\'display_errors\',\'on\');usleep(50000);$n=0;while($n<3){echo $a;$n++;}')));
 
         $p->start();
-        while($p->isRunning()) {
+        while ($p->isRunning()) {
             $this->assertLessThanOrEqual(1, preg_match_all('/PHP Notice/', $p->getIncrementalOutput(), $matches));
             usleep(20000);
         }
@@ -145,7 +145,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p = new Process(sprintf('php -r %s', escapeshellarg('$n=0;while($n<3){echo \' foo \';usleep(50000);$n++;}')));
 
         $p->start();
-        while($p->isRunning()) {
+        while ($p->isRunning()) {
             $this->assertLessThanOrEqual(1, preg_match_all('/foo/', $p->getIncrementalOutput(), $matches));
             usleep(20000);
         }
@@ -198,14 +198,23 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $process->getExitCode());
     }
 
-    public function testIsRunning()
+    public function testStatus()
     {
         $process = $this->getProcess('php -r "sleep(1);"');
         $this->assertFalse($process->isRunning());
+        $this->assertFalse($process->isStarted());
+        $this->assertFalse($process->isTerminated());
+        $this->assertSame(Process::STATUS_READY, $process->getStatus());
         $process->start();
         $this->assertTrue($process->isRunning());
+        $this->assertTrue($process->isStarted());
+        $this->assertFalse($process->isTerminated());
+        $this->assertSame(Process::STATUS_STARTED, $process->getStatus());
         $process->wait();
         $this->assertFalse($process->isRunning());
+        $this->assertTrue($process->isStarted());
+        $this->assertTrue($process->isTerminated());
+        $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
     }
 
     public function testStop()

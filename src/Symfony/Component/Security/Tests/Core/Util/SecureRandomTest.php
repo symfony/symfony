@@ -3,30 +3,29 @@
 namespace Symfony\Component\Security\Tests\Core\Util;
 
 use Symfony\Component\Security\Core\Util\NullSeedProvider;
-use Symfony\Component\Security\Core\Util\PrngSchema;
-use Symfony\Component\Security\Core\Util\Prng;
+use Symfony\Component\Security\Core\Util\SecureRandom;
 
-class PrngTest extends \PHPUnit_Framework_TestCase
+class SecureRandomTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * T1: Monobit test
      *
-     * @dataProvider getPrngs
+     * @dataProvider getSecureRandoms
      */
-    public function testMonobit($prng)
+    public function testMonobit($secureRandom)
     {
-        $nbOnBits = substr_count($this->getBitSequence($prng, 20000), '1');
+        $nbOnBits = substr_count($this->getBitSequence($secureRandom, 20000), '1');
         $this->assertTrue($nbOnBits > 9654 && $nbOnBits < 10346, 'Monobit test failed, number of turned on bits: '.$nbOnBits);
     }
 
     /**
      * T2: Chi-square test with 15 degrees of freedom (chi-Quadrat-Anpassungstest)
      *
-     * @dataProvider getPrngs
+     * @dataProvider getSecureRandoms
      */
-    public function testPoker($prng)
+    public function testPoker($secureRandom)
     {
-        $b = $this->getBitSequence($prng, 20000);
+        $b = $this->getBitSequence($secureRandom, 20000);
         $c = array();
         for ($i=0;$i<=15;$i++) {
             $c[$i] = 0;
@@ -50,11 +49,11 @@ class PrngTest extends \PHPUnit_Framework_TestCase
     /**
      * Run test
      *
-     * @dataProvider getPrngs
+     * @dataProvider getSecureRandoms
      */
-    public function testRun($prng)
+    public function testRun($secureRandom)
     {
-        $b = $this->getBitSequence($prng, 20000);
+        $b = $this->getBitSequence($secureRandom, 20000);
 
         $runs = array();
         for ($i=1; $i<=6; $i++) {
@@ -98,11 +97,11 @@ class PrngTest extends \PHPUnit_Framework_TestCase
     /**
      * Long-run test
      *
-     * @dataProvider getPrngs
+     * @dataProvider getSecureRandoms
      */
-    public function testLongRun($prng)
+    public function testLongRun($secureRandom)
     {
-        $b = $this->getBitSequence($prng, 20000);
+        $b = $this->getBitSequence($secureRandom, 20000);
 
         $longestRun = 0;
         $currentRun = $lastBit = null;
@@ -127,12 +126,12 @@ class PrngTest extends \PHPUnit_Framework_TestCase
     /**
      * Serial Correlation (Autokorrelationstest)
      *
-     * @dataProvider getPrngs
+     * @dataProvider getSecureRandoms
      */
-    public function testSerialCorrelation($prng)
+    public function testSerialCorrelation($secureRandom)
     {
         $shift = rand(1, 5000);
-        $b = $this->getBitSequence($prng, 20000);
+        $b = $this->getBitSequence($secureRandom, 20000);
 
         $Z = 0;
         for ($i=0; $i<5000; $i++) {
@@ -142,34 +141,34 @@ class PrngTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($Z > 2326 && $Z < 2674, 'Failed serial correlation test: '.$Z);
     }
 
-    public function getPrngs()
+    public function getSecureRandoms()
     {
-        $prngs = array();
+        $secureRandoms = array();
 
         // openssl with fallback
-        $prng = new Prng();
-        $prngs[] = array($prng);
+        $secureRandom = new SecureRandom();
+        $secureRandoms[] = array($secureRandom);
 
         // no-openssl with custom seed provider
-        $prng = new Prng(sys_get_temp_dir().'/_sf2.seed');
-        $this->disableOpenSsl($prng);
-        $prngs[] = array($prng);
+        $secureRandom = new SecureRandom(sys_get_temp_dir().'/_sf2.seed');
+        $this->disableOpenSsl($secureRandom);
+        $secureRandoms[] = array($secureRandom);
 
-        return $prngs;
+        return $secureRandoms;
     }
 
-    protected function disableOpenSsl($prng)
+    protected function disableOpenSsl($secureRandom)
     {
-        $ref = new \ReflectionProperty($prng, 'useOpenSsl');
+        $ref = new \ReflectionProperty($secureRandom, 'useOpenSsl');
         $ref->setAccessible(true);
-        $ref->setValue($prng, false);
+        $ref->setValue($secureRandom, false);
     }
 
-    private function getBitSequence($prng, $length)
+    private function getBitSequence($secureRandom, $length)
     {
         $bitSequence = '';
         for ($i=0;$i<$length; $i+=40) {
-            $value = unpack('H*', $prng->nextBytes(5));
+            $value = unpack('H*', $secureRandom->nextBytes(5));
             $value = str_pad(base_convert($value[1], 16, 2), 40, '0', STR_PAD_LEFT);
             $bitSequence .= $value;
         }

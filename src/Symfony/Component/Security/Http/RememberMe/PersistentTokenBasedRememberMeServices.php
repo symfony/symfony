@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Util\Prng;
+use Symfony\Component\Security\Core\Util\SecureRandom;
 
 /**
  * Concrete implementation of the RememberMeServicesInterface which needs
@@ -31,11 +31,11 @@ use Symfony\Component\Security\Core\Util\Prng;
 class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 {
     private $tokenProvider;
-    private $prng;
+    private $secureRandom;
 
-    public function setPrng(Prng $prng)
+    public function setSecureRandom(SecureRandom $secureRandom)
     {
-        $this->prng = $prng;
+        $this->secureRandom = $secureRandom;
     }
 
     /**
@@ -86,7 +86,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         }
 
         $series = $persistentToken->getSeries();
-        $tokenValue = $this->prng->nextBytes(64);
+        $tokenValue = $this->secureRandom->nextBytes(64);
         $this->tokenProvider->updateToken($series, $tokenValue, new \DateTime());
         $request->attributes->set(self::COOKIE_ATTR_NAME,
             new Cookie(
@@ -108,8 +108,8 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
     {
-        $series = $this->prng->nextBytes(64);
-        $tokenValue = $this->prng->nextBytes(64);
+        $series = $this->secureRandom->nextBytes(64);
+        $tokenValue = $this->secureRandom->nextBytes(64);
 
         $this->tokenProvider->createNewToken(
             new PersistentToken(

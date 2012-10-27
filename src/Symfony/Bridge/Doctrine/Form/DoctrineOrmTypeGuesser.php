@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Form;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
 use Symfony\Component\Form\FormTypeGuesserInterface;
@@ -83,14 +84,39 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessRequired($class, $property)
     {
-        $ret = $this->getMetadata($class);
-        if ($ret && $ret[0]->hasField($property)) {
-            if (!$ret[0]->isNullable($property)) {
+        $classMetadatas = $this->getMetadata($class);
+
+        if (!$classMetadatas) {
+            return null;
+        }
+
+        /* @var ClassMetadataInfo $classMetadata */
+        $classMetadata = $classMetadatas[0];
+
+        // Check whether the field exists and is nullable or not
+        if ($classMetadata->hasField($property)) {
+            if (!$classMetadata->isNullable($property)) {
                 return new ValueGuess(true, Guess::HIGH_CONFIDENCE);
             }
 
             return new ValueGuess(false, Guess::MEDIUM_CONFIDENCE);
         }
+
+        // Check whether the association exists, is a to-one association and its
+        // join column is nullable or not
+        if ($classMetadata->isAssociationWithSingleJoinColumn($property)) {
+            $mapping = $classMetadata->getAssociationMapping($property);
+
+            if (!isset($mapping['joinColumns'][0]['nullable'])) {
+                // The "nullable" option defaults to true, in that case the
+                // field should not be required.
+                return new ValueGuess(false, Guess::HIGH_CONFIDENCE);
+            }
+
+            return new ValueGuess(!$mapping['joinColumns'][0]['nullable'], Guess::HIGH_CONFIDENCE);
+        }
+
+        return null;
     }
 
     /**

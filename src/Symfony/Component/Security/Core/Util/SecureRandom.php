@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-final class SecureRandom
+final class SecureRandom implements SecureRandomInterface
 {
     private $logger;
     private $useOpenSsl;
@@ -56,10 +56,7 @@ final class SecureRandom
     }
 
     /**
-     * Generates the specified number of secure random bytes.
-     *
-     * @param integer $nbBytes
-     * @return string
+     * {@inheritdoc}
      */
     public function nextBytes($nbBytes)
     {

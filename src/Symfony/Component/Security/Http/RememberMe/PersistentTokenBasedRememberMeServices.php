@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Util\SecureRandom;
+use Symfony\Component\Security\Core\Util\SecureRandomInterface;
 
 /**
  * Concrete implementation of the RememberMeServicesInterface which needs
@@ -43,7 +43,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      * @param array           $options
      * @param LoggerInterface $logger
      */
-    public function __construct(array $userProviders, $key, $providerKey, array $options = array(), LoggerInterface $logger = null, SecureRandom $secureRandom)
+    public function __construct(array $userProviders, $key, $providerKey, array $options = array(), LoggerInterface $logger = null, SecureRandomInterface $secureRandom)
     {
         parent::__construct($userProviders, $key, $providerKey, $options, $logger);
 

@@ -19,6 +19,7 @@ namespace Symfony\Component\ClassLoader;
 class ClassCollectionLoader
 {
     private static $loaded;
+    private static $useTokenizer = true;
 
     /**
      * Loads a list of classes and caches them in one big file.
@@ -125,7 +126,11 @@ class ClassCollectionLoader
      */
     public static function fixNamespaceDeclarations($source)
     {
-        if (!function_exists('token_get_all')) {
+        if (!function_exists('token_get_all') || !self::$useTokenizer) {
+            if (preg_match('/namespace(.*?)\s*;/', $source)) {
+                $source = preg_replace('/namespace(.*?)(\s*);/', "namespace$1$2\n{", $source)."}\n";
+            }
+
             return $source;
         }
 
@@ -218,5 +223,13 @@ class ClassCollectionLoader
         $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
 
         return $output;
+    }
+
+    /**
+     * This method is only useful for testing.
+     */
+    public static function enableTokenizer($bool)
+    {
+        self::$useTokenizer = (Boolean) $bool;
     }
 }

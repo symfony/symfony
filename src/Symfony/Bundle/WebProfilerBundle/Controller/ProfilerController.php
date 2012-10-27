@@ -331,7 +331,7 @@ class ProfilerController
     }
 
     /**
-     * Get the Template Manager
+     * Gets the Template Manager.
      *
      * @return TemplateManager The Template Manager
      */

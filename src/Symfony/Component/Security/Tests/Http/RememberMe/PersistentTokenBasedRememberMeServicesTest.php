@@ -319,10 +319,7 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
             $userProvider = $this->getProvider();
         }
 
-        $r = new PersistentTokenBasedRememberMeServices(array($userProvider), 'fookey', 'fookey', $options, $logger);
-        $r->setSecureRandom(new SecureRandom());
-
-        return $r;
+        return new PersistentTokenBasedRememberMeServices(array($userProvider), 'fookey', 'fookey', $options, $logger, new SecureRandom());
     }
 
     protected function getProvider()

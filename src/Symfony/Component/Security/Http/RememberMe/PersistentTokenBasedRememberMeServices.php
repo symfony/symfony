@@ -34,14 +34,14 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
     private $secureRandom;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param array           $userProviders
-     * @param string          $key
-     * @param string          $providerKey
-     * @param SecureRandom    $secureRandom
-     * @param array           $options
-     * @param LoggerInterface $logger
+     * @param array                 $userProviders
+     * @param string                $key
+     * @param string                $providerKey
+     * @param array                 $options
+     * @param LoggerInterface       $logger
+     * @param SecureRandomInterface $secureRandom
      */
     public function __construct(array $userProviders, $key, $providerKey, array $options = array(), LoggerInterface $logger = null, SecureRandomInterface $secureRandom)
     {

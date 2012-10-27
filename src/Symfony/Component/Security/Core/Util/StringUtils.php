@@ -18,7 +18,7 @@ namespace Symfony\Component\Security\Core\Util;
  */
 final class StringUtils
 {
-    private final function __construct()
+    final private function __construct()
     {
     }
 

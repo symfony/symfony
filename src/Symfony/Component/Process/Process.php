@@ -654,6 +654,42 @@ class Process
     }
 
     /**
+     * Checks if the process has been started with no regard to the current state.
+     *
+     * @return Boolean true if status is ready, false otherwise
+     */
+    public function isStarted()
+    {
+        return $this->status != self::STATUS_READY;
+    }
+
+    /**
+     * Checks if the process is terminated.
+     *
+     * @return Boolean true if process is terminated, false otherwise
+     */
+    public function isTerminated()
+    {
+        $this->updateStatus();
+
+        return $this->status == self::STATUS_TERMINATED;
+    }
+
+    /**
+     * Gets the process status.
+     *
+     * The status is one of: ready, started, terminated.
+     *
+     * @return string The current process status
+     */
+    public function getStatus()
+    {
+        $this->updateStatus();
+
+        return $this->status;
+    }
+
+    /**
      * Stops the process.
      *
      * @param float $timeout The timeout in seconds
@@ -925,30 +961,6 @@ class Process
         $this->enhanceSigchildCompatibility = (Boolean) $enhance;
 
         return $this;
-    }
-
-    public function getStatus()
-    {
-        $this->updateStatus();
-
-        return $this->status;
-    }
-
-    /**
-     * Checks if the process has been started with no regard to current state.
-     *
-     * @return Boolean true if status is started or terminated, false otherwise
-     */
-    public function isStarted()
-    {
-        return $this->status != self::STATUS_READY;
-    }
-
-    public function isTerminated()
-    {
-        $this->updateStatus();
-
-        return $this->status == self::STATUS_TERMINATED;
     }
 
     /**

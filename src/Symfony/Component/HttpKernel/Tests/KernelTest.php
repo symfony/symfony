@@ -93,6 +93,27 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel->boot();
     }
 
+    public function testBootTriggersExtensionPreProcessing()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('preProcessExtensionConfigs', 'getCacheDir', 'getLogDir', 'registerBundles'))
+            ->getMock();
+        $kernel->expects($this->any())
+            ->method('getCacheDir')
+            ->will($this->returnValue(__DIR__));
+        $kernel->expects($this->any())
+            ->method('getLogDir')
+            ->will($this->returnValue(__DIR__));
+        $kernel->expects($this->once())
+            ->method('registerBundles')
+            ->will($this->returnValue(array()));
+        $kernel->expects($this->once())
+            ->method('preProcessExtensionConfigs');
+
+        $kernel->boot();
+    }
+
     public function testBootSetsTheBootedFlagToTrue()
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')

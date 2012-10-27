@@ -34,6 +34,15 @@ class ProfilerController
     private $templates;
     private $toolbarPosition;
 
+    /**
+     * Constructor.
+     *
+     * @param UrlGeneratorInterface $generator       The Url Generator
+     * @param Profiler              $profiler        The profiler
+     * @param \Twig_Environment     $twig            The twig environment
+     * @param array                 $templates       The templates
+     * @param string                $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
+     */
     public function __construct(UrlGeneratorInterface $generator, Profiler $profiler, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal')
     {
         $this->generator = $generator;
@@ -46,7 +55,7 @@ class ProfilerController
     /**
      * Renders a profiler panel for the given token.
      *
-     * @param Request $request The HTTP request
+     * @param Request $request The current HTTP request
      * @param string  $token   The profiler token
      *
      * @return Response A Response instance
@@ -115,7 +124,7 @@ class ProfilerController
     /**
      * Imports token data.
      *
-     * @param Request $request
+     * @param Request $request The current HTTP Request
      *
      * @return Response A Response instance
      */
@@ -139,7 +148,7 @@ class ProfilerController
     /**
      * Displays information page.
      *
-     * @param string $about
+     * @param string $about The about message
      *
      * @return Response A Response instance
      */
@@ -155,7 +164,7 @@ class ProfilerController
     /**
      * Renders the Web Debug Toolbar.
      *
-     * @param Request $request  The current Request
+     * @param Request $request  The current HTTP Request
      * @param string  $token    The profiler token
      * @param string  $position The toolbar position (top, bottom, normal, or null -- use the configuration)
      *
@@ -203,7 +212,7 @@ class ProfilerController
     /**
      * Renders the profiler search bar.
      *
-     * @param Request $request  The current Request
+     * @param Request $request The current HTTP Request
      *
      * @return Response A Response instance
      */
@@ -237,8 +246,8 @@ class ProfilerController
     /**
      * Search results.
      *
-     * @param Request $request  The current Request
-     * @param string  $token    The token
+     * @param Request $request The current HTTP Request
+     * @param string  $token   The token
      *
      * @return Response A Response instance
      */
@@ -268,7 +277,7 @@ class ProfilerController
     /**
      * Narrow the search bar.
      *
-     * @param Request $request  The current Request
+     * @param Request $request The current HTTP Request
      *
      * @return Response A Response instance
      */
@@ -321,6 +330,11 @@ class ProfilerController
         return new Response($phpinfo);
     }
 
+    /**
+     * Get the Template Manager
+     *
+     * @return TemplateManager The Template Manager
+     */
     protected function getTemplateManager()
     {
         if (null === $this->templateManager) {

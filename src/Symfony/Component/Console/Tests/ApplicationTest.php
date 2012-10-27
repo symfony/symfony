@@ -611,6 +611,30 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($inputDefinition->hasOption('custom'));
     }
+           
+    public function testSettingCustomInputDefinitionOverwritesDefaultValues()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        
+        $application->setDefinition(new InputDefinition(array(new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.'))));
+        
+        $inputDefinition = $application->getDefinition();
+
+        // check wether the default arguments and options are not returned any more
+        $this->assertFalse($inputDefinition->hasArgument('command'));
+
+        $this->assertFalse($inputDefinition->hasOption('help'));
+        $this->assertFalse($inputDefinition->hasOption('quiet'));
+        $this->assertFalse($inputDefinition->hasOption('verbose'));
+        $this->assertFalse($inputDefinition->hasOption('version'));
+        $this->assertFalse($inputDefinition->hasOption('ansi'));
+        $this->assertFalse($inputDefinition->hasOption('no-ansi'));
+        $this->assertFalse($inputDefinition->hasOption('no-interaction'));
+
+        $this->assertTrue($inputDefinition->hasOption('custom'));
+    }
 }
 
 class CustomApplication extends Application

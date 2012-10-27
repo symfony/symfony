@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * UrlMatcher matches URL based on a set of routes.
@@ -30,8 +31,12 @@ class UrlMatcher implements UrlMatcherInterface
     const REQUIREMENT_MISMATCH  = 1;
     const ROUTE_MATCH           = 2;
 
+    const EVENT_HANDLE_REQUIREMENTS = 'routing.match.requirements';
+
     protected $context;
     protected $allow;
+
+    protected $dispatcher;
 
     private $routes;
 
@@ -63,6 +68,14 @@ class UrlMatcher implements UrlMatcherInterface
     public function getContext()
     {
         return $this->context;
+    }
+
+    /**
+     * @param EventDispatcherInterface $event_dispatcher
+     */
+    public function setEventDispatcher(EventDispatcherInterface $event_dispatcher)
+    {
+        $this->dispatcher = $event_dispatcher;
     }
 
     /**
@@ -160,6 +173,16 @@ class UrlMatcher implements UrlMatcherInterface
         // check HTTP scheme requirement
         $scheme = $route->getRequirement('_scheme');
         $status = $scheme && $scheme !== $this->context->getScheme() ? self::REQUIREMENT_MISMATCH : self::REQUIREMENT_MATCH;
+
+        if (self::REQUIREMENT_MISMATCH === $status) {
+            return array($status, null);
+        }
+
+        if ($this->dispatcher) {
+            $event = new UrlMatcherEvent($route);
+            $this->dispatcher->dispatch(self::EVENT_HANDLE_REQUIREMENTS, $event);
+            $status = $event->getStatus();
+        }
 
         return array($status, null);
     }

@@ -105,7 +105,7 @@ class ClassCollectionLoader
 
             // fakes namespace declaration for global code
             if (!$class->inNamespace()) {
-                $c = "\nnamespace ;".$c;
+                $c = "\nnamespace\n{\n".$c."\n}\n";
             }
 
             $c = self::fixNamespaceDeclarations('<?php '.$c);

@@ -171,12 +171,58 @@ EOF;
      */
     public function testUnableToLoadClassException()
     {
-        ClassCollectionLoader::load(array('SomeNotExistingClass'), '', 'foo', false);
+        if (is_file($file = sys_get_temp_dir().'/foo.php')) {
+            unlink($file);
+        }
+
+        ClassCollectionLoader::load(array('SomeNotExistingClass'), sys_get_temp_dir(), 'foo', false);
     }
 
-    public function testLoadTwiceClass()
+    public function testCommentStripping()
     {
-        ClassCollectionLoader::load(array('Foo'), '', 'foo', false);
-        ClassCollectionLoader::load(array('Foo'), '', 'foo', false);
+        if (is_file($file = sys_get_temp_dir().'/bar.php')) {
+            unlink($file);
+        }
+        spl_autoload_register($r = function ($class) {
+            require_once __DIR__.'/Fixtures/'.str_replace(array('\\', '_'), '/', $class).'.php';
+        });
+
+        ClassCollectionLoader::load(array('Namespaced\\WithComments', 'Pearlike_WithComments'), sys_get_temp_dir(), 'bar', false);
+
+        spl_autoload_unregister($r);
+
+        $this->assertEquals(<<<EOF
+<?php  
+
+
+
+namespace Namespaced
+{
+
+class WithComments
+{
+    
+    public static \$loaded = true;
+}
+}
+ 
+namespace
+{
+
+
+
+
+class Pearlike_WithComments
+{
+    
+    public static \$loaded = true;
+}
+
+}
+
+EOF
+        , file_get_contents($file));
+
+        unlink($file);
     }
 }

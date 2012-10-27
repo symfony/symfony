@@ -20,6 +20,7 @@ class ClassCollectionLoader
 {
     private static $loaded;
     private static $seen;
+    private static $useTokenizer = true;
 
     /**
      * Loads a list of classes and caches them in one big file.
@@ -135,7 +136,11 @@ class ClassCollectionLoader
      */
     public static function fixNamespaceDeclarations($source)
     {
-        if (!function_exists('token_get_all')) {
+        if (!function_exists('token_get_all') || !self::$useTokenizer) {
+            if (preg_match('/namespace(.*?)\s*;/', $source)) {
+                $source = preg_replace('/namespace(.*?)\s*;/', "namespace$1\n{", $source)."}\n";
+            }
+
             return $source;
         }
 
@@ -316,5 +321,13 @@ class ClassCollectionLoader
         }
 
         return $classes;
+    }
+
+    /**
+     * This method is only useful for testing.
+     */
+    public static function enableTokenizer($bool)
+    {
+        self::$useTokenizer = (Boolean) $bool;
     }
 }

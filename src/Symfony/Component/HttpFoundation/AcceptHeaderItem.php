@@ -29,6 +29,11 @@ class AcceptHeaderItem
     private $quality = 1.0;
 
     /**
+     * @var int
+     */
+    private $index = 0;
+
+    /**
      * @var array
      */
     private $attributes = array();
@@ -139,6 +144,30 @@ class AcceptHeaderItem
     public function getQuality()
     {
         return $this->quality;
+    }
+
+    /**
+     * Set the item index.
+     *
+     * @param int $index
+     *
+     * @return AcceptHeaderItem
+     */
+    public function setIndex($index)
+    {
+        $this->index = $index;
+
+        return $this;
+    }
+
+    /**
+     * Returns the item index.
+     *
+     * @return int
+     */
+    public function getIndex()
+    {
+        return $this->index;
     }
 
     /**

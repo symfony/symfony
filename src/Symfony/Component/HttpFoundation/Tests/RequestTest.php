@@ -1018,7 +1018,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
-        $this->assertEquals($expected, $request->splitHttpAcceptHeader($acceptHeader));
+        $items = $request->splitHttpAcceptHeader($acceptHeader);
+        // reset index since the fixtures don't have them set
+        foreach ($items as $item) {
+            $item->setIndex(0);
+        }
+        $this->assertEquals($expected, $items);
     }
 
     public function splitHttpAcceptHeaderData()

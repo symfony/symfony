@@ -40,8 +40,13 @@ class AcceptHeader
      */
     public static function fromString($headerValue)
     {
-        return new static(array_map(function ($itemValue) {
-            return AcceptHeaderItem::fromString($itemValue);
+        $index = 0;
+
+        return new static(array_map(function ($itemValue) use (&$index) {
+            $item = AcceptHeaderItem::fromString($itemValue);
+            $item->setIndex($index++);
+
+            return $item;
         }, preg_split('/\s*(?:,*("[^"]+"),*|,*(\'[^\']+\'),*|,+)\s*/', $headerValue, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
     }
 
@@ -150,44 +155,16 @@ class AcceptHeader
     private function ensureSorted()
     {
         if (!$this->sorted) {
-            $this->items = $this->sort($this->items);
+            uasort($this->items, function ($a, $b) {
+                $qA = $a->getQuality();
+                $qB = $b->getQuality();
+
+                if ($qA === $qB) {
+                    return $a->getIndex() > $b->getIndex() ? 1 : -1;
+                }
+
+                return $qA > $qB ? -1 : 1;
+            });
         }
-    }
-
-    /**
-     * @param array $array
-     *
-     * @return array
-     */
-    private function sort(array $array)
-    {
-        if (count($array) < 2) {
-            return $array;
-        }
-
-        $middle = count($array) / 2;
-
-        return $this->merge(
-            $this->sort(array_slice($array, 0, $middle)),
-            $this->sort(array_slice($array, $middle))
-        );
-    }
-
-    private function merge(array $left, array $right)
-    {
-        $array = array();
-        while (count($left) + count($right) > 0) {
-            if (empty($left)) {
-                $item = array_splice($right, 0, 1);
-            } elseif(empty($right)) {
-                $item = array_splice($left, 0, 1);
-            } else {
-                $item = current($right)->getQuality() > current($left)->getQuality() ? array_splice($right, 0, 1) : array_splice($left, 0, 1);
-            }
-            list($key, $value) = each($item);
-            $array[$key] = $value;
-        }
-
-        return $array;
     }
 }

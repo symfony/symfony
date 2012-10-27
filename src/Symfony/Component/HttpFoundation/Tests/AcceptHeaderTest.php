@@ -22,7 +22,12 @@ class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
     public function testFromString($string, array $items)
     {
         $header = AcceptHeader::fromString($string);
-        $this->assertEquals($items, array_values($header->all()));
+        $parsed = array_values($header->all());
+        // reset index since the fixtures don't have them set
+        foreach ($parsed as $item) {
+            $item->setIndex(0);
+        }
+        $this->assertEquals($items, $parsed);
     }
 
     /**
@@ -73,7 +78,9 @@ class AcceptHeaderTest extends \PHPUnit_Framework_TestCase
     public function provideSortingData()
     {
         return array(
-            array('*;q=0.3,ISO-8859-1,utf-8;q=0.7',  array('ISO-8859-1', 'utf-8', '*')),
+            'quality has priority' => array('*;q=0.3,ISO-8859-1,utf-8;q=0.7',  array('ISO-8859-1', 'utf-8', '*')),
+            'order matters when q is equal' => array('*;q=0.3,ISO-8859-1;q=0.7,utf-8;q=0.7',  array('ISO-8859-1', 'utf-8', '*')),
+            'order matters when q is equal2' => array('*;q=0.3,utf-8;q=0.7,ISO-8859-1;q=0.7',  array('utf-8', 'ISO-8859-1', '*')),
         );
     }
 

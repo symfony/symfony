@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use Symfony\Component\Process\Process;
+
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
  */

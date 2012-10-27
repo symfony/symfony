@@ -27,17 +27,17 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
     {
         $b = $this->getBitSequence($secureRandom, 20000);
         $c = array();
-        for ($i=0;$i<=15;$i++) {
+        for ($i = 0; $i <= 15; $i++) {
             $c[$i] = 0;
         }
 
-        for ($j=1; $j<=5000; $j++) {
+        for ($j = 1; $j <= 5000; $j++) {
             $k = 4 * $j - 1;
             $c[8 * $b[$k - 3] + 4 * $b[$k - 2] + 2 * $b[$k - 1] + $b[$k]] += 1;
         }
 
         $f = 0;
-        for ($i=0; $i<= 15; $i++) {
+        for ($i = 0; $i <= 15; $i++) {
             $f += $c[$i] * $c[$i];
         }
 
@@ -56,7 +56,7 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
         $b = $this->getBitSequence($secureRandom, 20000);
 
         $runs = array();
-        for ($i=1; $i<=6; $i++) {
+        for ($i = 1; $i <= 6; $i++) {
             $runs[$i] = 0;
         }
 
@@ -70,7 +70,7 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
 
         $currentRun = 0;
         $lastBit = null;
-        for ($i=0; $i<20000; $i++) {
+        for ($i = 0; $i < 20000; $i++) {
             if ($lastBit === $b[$i]) {
                 $currentRun += 1;
             } else {
@@ -105,7 +105,7 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
 
         $longestRun = 0;
         $currentRun = $lastBit = null;
-        for ($i=0;$i<20000;$i++) {
+        for ($i = 0; $i < 20000; $i++) {
             if ($lastBit === $b[$i]) {
                 $currentRun += 1;
             } else {
@@ -134,8 +134,8 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
         $b = $this->getBitSequence($secureRandom, 20000);
 
         $Z = 0;
-        for ($i=0; $i<5000; $i++) {
-            $Z += $b[$i] === $b[$i+$shift] ? 1 : 0;
+        for ($i = 0; $i < 5000; $i++) {
+            $Z += $b[$i] === $b[$i + $shift] ? 1 : 0;
         }
 
         $this->assertTrue($Z > 2326 && $Z < 2674, 'Failed serial correlation test: '.$Z);
@@ -167,7 +167,7 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
     private function getBitSequence($secureRandom, $length)
     {
         $bitSequence = '';
-        for ($i=0;$i<$length; $i+=40) {
+        for ($i = 0; $i < $length; $i += 40) {
             $value = unpack('H*', $secureRandom->nextBytes(5));
             $value = str_pad(base_convert($value[1], 16, 2), 40, '0', STR_PAD_LEFT);
             $bitSequence .= $value;

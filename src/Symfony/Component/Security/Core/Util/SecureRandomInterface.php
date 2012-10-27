@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Util;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
- * A secure random number generator implementation.
+ * Interface that needs to be implemented by all secure random number generators.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

@@ -117,53 +117,34 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testFixNamespaceDeclarations()
+    /**
+     * @dataProvider getFixNamespaceDeclarationsData
+     */
+    public function testFixNamespaceDeclarations($source, $expected)
     {
-        $source = <<<EOF
-<?php
+        $this->assertEquals('<?php '.$expected, ClassCollectionLoader::fixNamespaceDeclarations('<?php '.$source));
+    }
 
-namespace Foo;
-class Foo {}
-namespace   Bar ;
-class Foo {}
-namespace Foo\Bar;
-class Foo {}
-namespace Foo\Bar\Bar
-{
-    class Foo {}
-}
-namespace
-{
-    class Foo {}
-}
-EOF;
+    /**
+     * @dataProvider getFixNamespaceDeclarationsData
+     */
+    public function testFixNamespaceDeclarationsWithoutTokenizer($source, $expected)
+    {
+        ClassCollectionLoader::enableTokenizer(false);
+        $this->assertEquals('<?php '.$expected, ClassCollectionLoader::fixNamespaceDeclarations('<?php '.$source));
+        ClassCollectionLoader::enableTokenizer(true);
+    }
 
-        $expected = <<<EOF
-<?php
-
-namespace Foo
-{
-class Foo {}
-}
-namespace   Bar
-{
-class Foo {}
-}
-namespace Foo\Bar
-{
-class Foo {}
-}
-namespace Foo\Bar\Bar
-{
-    class Foo {}
-}
-namespace
-{
-    class Foo {}
-}
-EOF;
-
-        $this->assertEquals($expected, ClassCollectionLoader::fixNamespaceDeclarations($source));
+    public function getFixNamespaceDeclarationsData()
+    {
+        return array(
+            array("namespace;\nclass Foo {}\n", "namespace\n{\nclass Foo {}\n}\n"),
+            array("namespace Foo;\nclass Foo {}\n", "namespace Foo\n{\nclass Foo {}\n}\n"),
+            array("namespace   Bar ;\nclass Foo {}\n", "namespace   Bar\n{\nclass Foo {}\n}\n"),
+            array("namespace Foo\Bar;\nclass Foo {}\n", "namespace Foo\Bar\n{\nclass Foo {}\n}\n"),
+            array("namespace Foo\Bar\Bar\n{\nclass Foo {}\n}\n", "namespace Foo\Bar\Bar\n{\nclass Foo {}\n}\n"),
+            array("namespace\n{\nclass Foo {}\n}\n", "namespace\n{\nclass Foo {}\n}\n"),
+        );
     }
 
     /**

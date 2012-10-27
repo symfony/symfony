@@ -475,8 +475,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function unshiftExtensionConfig($name, array $config)
     {
-        $configs = $this->getExtensionConfig($name);
-        $this->extensionConfigs[$name] = array_unshift($configs, $config);
+        if (!isset($this->extensionConfigs[$name])) {
+            $this->extensionConfigs[$name] = array();
+        }
+
+        array_unshift($this->extensionConfigs[$name], $config);
     }
 
     /**

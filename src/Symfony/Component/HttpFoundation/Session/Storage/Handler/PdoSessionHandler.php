@@ -183,7 +183,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
                 $stmt->execute();
             }
-            else if('oci' === $driver) {
+            elseif('oci' === $driver) {
                 $stmt = $this->pdo->prepare("MERGE INTO $dbTable USING DUAL ON($dbIdCol = :id) ". 
                        "WHEN NOT MATCHED THEN INSERT ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, sysdate) " .
                        "WHEN MATCHED THEN UPDATE SET $dbDataCol = :data WHERE $dbIdCol = :id");

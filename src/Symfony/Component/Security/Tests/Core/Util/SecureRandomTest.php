@@ -154,13 +154,10 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
     {
         $secureRandoms = array();
 
-        // openssl
-        $secureRandom = new SecureRandom();
         // only add if openssl is indeed present
+        $secureRandom = new SecureRandom();
         if ($this->hasOpenSsl($secureRandom)) {
             $secureRandoms[] = array($secureRandom);
-        } else {
-            $this->markTestSkipped('OpenSSL is not available');
         }
 
         // no-openssl with custom seed provider

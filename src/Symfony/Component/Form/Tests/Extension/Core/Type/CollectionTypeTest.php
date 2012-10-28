@@ -141,7 +141,7 @@ class CollectionTypeTest extends TypeTestCase
         $this->assertTrue($form->createView()->vars['multipart']);
     }
 
-    public function testGetDataDoesNotContainsProtypeNameBeforeDataAreSet()
+    public function testGetDataDoesNotContainsPrototypeNameBeforeDataAreSet()
     {
         $form = $this->factory->create('collection', array(), array(
             'type'      => 'file',

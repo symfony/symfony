@@ -51,6 +51,42 @@ class DigestDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('\"user\"', $digestAuth->getUsername());
     }
 
+    public function testGetUsernameWithQuoteAndEscape()
+    {
+        $digestAuth = new DigestData(
+            'username="\"u\\\\\"ser\"", realm="Welcome, robot!", ' .
+            'nonce="MTM0NzMyMTgyMy42NzkzOmRlZjM4NmIzOGNjMjE0OWJiNDU0MDAxNzJmYmM1MmZl", ' .
+            'uri="/path/info?p1=5&p2=5", cnonce="MDIwODkz", nc=00000001, qop="auth", ' .
+            'response="b52938fc9e6d7c01be7702ece9031b42"'
+        );
+
+        $this->assertEquals('\"u\\\\\"ser\"', $digestAuth->getUsername());
+    }
+
+    public function testGetUsernameWithSingleQuote()
+    {
+        $digestAuth = new DigestData(
+            'username="\"u\'ser\"", realm="Welcome, robot!", ' .
+            'nonce="MTM0NzMyMTgyMy42NzkzOmRlZjM4NmIzOGNjMjE0OWJiNDU0MDAxNzJmYmM1MmZl", ' .
+            'uri="/path/info?p1=5&p2=5", cnonce="MDIwODkz", nc=00000001, qop="auth", ' .
+            'response="b52938fc9e6d7c01be7702ece9031b42"'
+        );
+
+        $this->assertEquals('\"u\'ser\"', $digestAuth->getUsername());
+    }
+
+    public function testGetUsernameWithEscape()
+    {
+        $digestAuth = new DigestData(
+            'username="\"u\\ser\"", realm="Welcome, robot!", ' .
+            'nonce="MTM0NzMyMTgyMy42NzkzOmRlZjM4NmIzOGNjMjE0OWJiNDU0MDAxNzJmYmM1MmZl", ' .
+            'uri="/path/info?p1=5&p2=5", cnonce="MDIwODkz", nc=00000001, qop="auth", ' .
+            'response="b52938fc9e6d7c01be7702ece9031b42"'
+        );
+
+        $this->assertEquals('\"u\\ser\"', $digestAuth->getUsername());
+    }
+
     public function testValidateAndDecode()
     {
         $time = microtime(true);
@@ -78,6 +114,17 @@ class DigestDataTest extends \PHPUnit_Framework_TestCase
     public function testCalculateServerDigestWithQuote()
     {
         $this->calculateServerDigest('\"user\"', 'Welcome, \"robot\"!', 'pass,word=password', 'ThisIsAKey', '00000001', 'MDIwODkz', 'auth', 'GET', '/path/info?p1=5&p2=5');
+    }
+
+    public function testCalculateServerDigestWithQuoteAndEscape()
+    {
+        $this->calculateServerDigest('\"u\\\\\"ser\"', 'Welcome, \"robot\"!', 'pass,word=password', 'ThisIsAKey', '00000001', 'MDIwODkz', 'auth', 'GET', '/path/info?p1=5&p2=5');
+    }
+
+    public function testCalculateServerDigestEscape()
+    {
+        $this->calculateServerDigest('\"u\\ser\"', 'Welcome, \"robot\"!', 'pass,word=password', 'ThisIsAKey', '00000001', 'MDIwODkz', 'auth', 'GET', '/path/info?p1=5&p2=5');
+        $this->calculateServerDigest('\"u\\ser\\\\\"', 'Welcome, \"robot\"!', 'pass,word=password', 'ThisIsAKey', '00000001', 'MDIwODkz', 'auth', 'GET', '/path/info?p1=5&p2=5');
     }
 
     public function testIsNonceExpired()

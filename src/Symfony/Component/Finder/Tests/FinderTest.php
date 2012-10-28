@@ -528,7 +528,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     /**
      * Searching in multiple locations involves AppendIterator which does an unnecessary rewind which leaves FilterIterator
-     * with inner FilesystemIterator in an ivalid state.
+     * with inner FilesystemIterator in an invalid state.
      *
      * @see https://bugs.php.net/bug.php?id=49104
      *

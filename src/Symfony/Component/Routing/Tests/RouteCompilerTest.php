@@ -130,6 +130,20 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             )),
 
             array(
+                'Route with escaped variable as static text',
+                array('/\{static}'),
+                '/{static}', '#^/\{static\}$#s', array(), array(
+                array('text', '/{static}'),
+            )),
+
+            array(
+                'Route with escaped variable and a "\" preceding it',
+                array('/\\\\{static}'), // i.e. two backslashes
+                '/\{static}', '#^/\\\\\\{static\}$#s', array(), array(
+                array('text', '/\{static}'),
+            )),
+
+            array(
                 'Route without separator between variables',
                 array('/{w}{x}{y}{z}.{_format}', array('z' => 'default-z', '_format' => 'html'), array('y' => '(y|Y)')),
                 '', '#^/(?<w>[^/\.]+)(?<x>[^/\.]+)(?<y>(y|Y))(?:(?<z>[^/\.]++)(?:\.(?<_format>[^/]++))?)?$#s', array('w', 'x', 'y', 'z', '_format'), array(
@@ -138,6 +152,17 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 array('variable', '', '(y|Y)', 'y'),
                 array('variable', '', '[^/\.]+', 'x'),
                 array('variable', '/', '[^/\.]+', 'w'),
+            )),
+
+            array(
+                'Route without separator between variables + escaped variables',
+                array('/\{w}{x}\{z}{y}\\\\{z}.'),
+                '/{w}', '#^/\{w\}(?<x>[^/]+)\{z\}(?<y>[^/]+)\\\\\\{z\}\.$#s', array('x', 'y'), array(
+                array('text', '\{z}.'),
+                array('variable', '', '[^/]+', 'y'),
+                array('text', '{z}'),
+                array('variable', '', '[^/]+', 'x'),
+                array('text', '/{w}'),
             )),
 
             array(

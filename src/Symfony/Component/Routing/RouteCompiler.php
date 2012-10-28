@@ -54,6 +54,13 @@ class RouteCompiler implements RouteCompilerInterface
             $precedingChar = strlen($precedingText) > 0 ? substr($precedingText, -1) : '';
             $isSeparator = '' !== $precedingChar && false !== strpos(static::SEPARATORS, $precedingChar);
 
+            if ('\\' === $precedingChar) {
+                // When the variable placeholder is excaped with "\", e.g. "static\{static}", treat it as static text (without the escape char).
+                // This allows "{static}" to be used in the route without being considered as variable.
+                $this->addTextToken($tokens, substr($precedingText, 0, -1) . $match[0][0]);
+                continue;
+            }
+
             if (is_numeric($varName)) {
                 throw new \DomainException(sprintf('Variable name "%s" cannot be numeric in route pattern "%s". Please use a different name.', $varName, $pattern));
             }
@@ -62,9 +69,9 @@ class RouteCompiler implements RouteCompilerInterface
             }
 
             if ($isSeparator && strlen($precedingText) > 1) {
-                $tokens[] = array('text', substr($precedingText, 0, -1));
+                $this->addTextToken($tokens, substr($precedingText, 0, -1));
             } elseif (!$isSeparator && strlen($precedingText) > 0) {
-                $tokens[] = array('text', $precedingText);
+                $this->addTextToken($tokens, $precedingText);
             }
 
             $regexp = $route->getRequirement($varName);
@@ -94,7 +101,7 @@ class RouteCompiler implements RouteCompilerInterface
         }
 
         if ($pos < strlen($pattern)) {
-            $tokens[] = array('text', substr($pattern, $pos));
+            $this->addTextToken($tokens, substr($pattern, $pos));
         }
 
         // find the first optional token
@@ -123,6 +130,22 @@ class RouteCompiler implements RouteCompilerInterface
     }
 
     /**
+     * Adds a text token to the tokens array.
+     *
+     * @param array  $tokens The route tokens
+     * @param string $text   The static text
+     */
+    private function addTextToken(array &$tokens, $text)
+    {
+        // when the last token is a text token, we can simply add the new text to it
+        if (false !== end($tokens) && 'text' === $tokens[key($tokens)][0]) {
+            $tokens[key($tokens)][1] .= $text;
+        } else {
+            $tokens[] = array('text', $text);
+        }
+    }
+
+    /**
      * Returns the next static character in the Route pattern that will serve as a separator.
      *
      * @param string $pattern The route pattern
@@ -135,8 +158,13 @@ class RouteCompiler implements RouteCompilerInterface
             // return empty string if pattern is empty or false (false which can be returned by substr)
             return '';
         }
-        // first remove all placeholders from the pattern so we can find the next real static character
-        $pattern = preg_replace('#\{\w+\}#', '', $pattern);
+
+        // first remove all (non-escaped) placeholders from the pattern so we can find the next real static character
+        $pattern = preg_replace('#(?<!\\\\)\{\w+\}#', '', $pattern);
+        if (preg_match('#^\\\\\\{\w+\}#', $pattern)) {
+            // an escaped placeholder is the next static text which means the next char is "{" char and not "\"
+            return false !== strpos(static::SEPARATORS, '{') ? '{' : '';
+        }
 
         return isset($pattern[0]) && false !== strpos(static::SEPARATORS, $pattern[0]) ? $pattern[0] : '';
     }

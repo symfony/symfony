@@ -309,6 +309,15 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher->match('/do.t.html');
     }
 
+    public function testEscapedVariable()
+    {
+        $coll = new RouteCollection();
+        $coll->add('test', new Route('/{foo}\{static}{bar}'));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+
+        $this->assertEquals(array('foo' => 'foo', 'bar' => 'bar', '_route' => 'test'), $matcher->match('/foo{static}bar'));
+    }
+
     /**
      * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
      */

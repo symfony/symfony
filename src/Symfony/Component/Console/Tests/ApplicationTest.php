@@ -598,7 +598,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $inputDefinition = $application->getDefinition();
 
-        // check wether the default arguments and options are not returned any more
+        // check whether the default arguments and options are not returned any more
         $this->assertFalse($inputDefinition->hasArgument('command'));
 
         $this->assertFalse($inputDefinition->hasOption('help'));
@@ -622,7 +622,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         
         $inputDefinition = $application->getDefinition();
 
-        // check wether the default arguments and options are not returned any more
+        // check whether the default arguments and options are not returned any more
         $this->assertFalse($inputDefinition->hasArgument('command'));
 
         $this->assertFalse($inputDefinition->hasOption('help'));

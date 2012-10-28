@@ -15,11 +15,6 @@ use Symfony\Component\Security\Http\Firewall\DigestData;
 
 class DigestDataTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
-    {
-        class_exists('Symfony\Component\Security\Http\Firewall\DigestAuthenticationListener', true);
-    }
-
     public function testGetResponse()
     {
         $digestAuth = new DigestData(
@@ -85,6 +80,28 @@ class DigestDataTest extends \PHPUnit_Framework_TestCase
         $this->calculateServerDigest('\"user\"', 'Welcome, \"robot\"!', 'pass,word=password', 'ThisIsAKey', '00000001', 'MDIwODkz', 'auth', 'GET', '/path/info?p1=5&p2=5');
     }
 
+    public function testIsNonceExpired()
+    {
+        $time = microtime(true) + 10;
+        $key = 'ThisIsAKey';
+        $nonce = base64_encode($time . ':' . md5($time . ':' . $key));
+
+        $digestAuth = new DigestData(
+            'username="user", realm="Welcome, robot!", nonce="' . $nonce . '", ' .
+            'uri="/path/info?p1=5&p2=5", cnonce="MDIwODkz", nc=00000001, qop="auth", ' .
+            'response="b52938fc9e6d7c01be7702ece9031b42"'
+        );
+
+        $digestAuth->validateAndDecode($key, 'Welcome, robot!');
+
+        $this->assertFalse($digestAuth->isNonceExpired());
+    }
+
+    protected function setUp()
+    {
+        class_exists('Symfony\Component\Security\Http\Firewall\DigestAuthenticationListener', true);
+    }
+
     private function calculateServerDigest($username, $realm, $password, $key, $nc, $cnonce, $qop, $method, $uri)
     {
         $time = microtime(true);
@@ -101,22 +118,5 @@ class DigestDataTest extends \PHPUnit_Framework_TestCase
         $digestAuth = new DigestData($digest);
 
         $this->assertEquals($digestAuth->getResponse(), $digestAuth->calculateServerDigest($password, $method));
-    }
-
-    public function testIsNonceExpired()
-    {
-        $time = microtime(true) + 10;
-        $key = 'ThisIsAKey';
-        $nonce = base64_encode($time . ':' . md5($time . ':' . $key));
-
-        $digestAuth = new DigestData(
-            'username="user", realm="Welcome, robot!", nonce="' . $nonce . '", ' .
-            'uri="/path/info?p1=5&p2=5", cnonce="MDIwODkz", nc=00000001, qop="auth", ' .
-            'response="b52938fc9e6d7c01be7702ece9031b42"'
-        );
-
-        $digestAuth->validateAndDecode($key, 'Welcome, robot!');
-
-        $this->assertFalse($digestAuth->isNonceExpired());
     }
 }

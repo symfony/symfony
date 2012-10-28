@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Tests\Core\Util;
 
 use Symfony\Component\Security\Core\Util\NullSeedProvider;
@@ -145,9 +154,14 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
     {
         $secureRandoms = array();
 
-        // openssl with fallback
+        // openssl
         $secureRandom = new SecureRandom();
-        $secureRandoms[] = array($secureRandom);
+        // only add if openssl is indeed present
+        if ($this->hasOpenSsl($secureRandom)) {
+            $secureRandoms[] = array($secureRandom);
+        } else {
+            $this->markTestSkipped('OpenSSL is not available');
+        }
 
         // no-openssl with custom seed provider
         $secureRandom = new SecureRandom(sys_get_temp_dir().'/_sf2.seed');
@@ -162,6 +176,19 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
         $ref = new \ReflectionProperty($secureRandom, 'useOpenSsl');
         $ref->setAccessible(true);
         $ref->setValue($secureRandom, false);
+        $ref->setAccessible(false);
+    }
+
+    protected function hasOpenSsl($secureRandom)
+    {
+        $ref = new \ReflectionProperty($secureRandom, 'useOpenSsl');
+        $ref->setAccessible(true);
+
+        $ret = $ref->getValue($secureRandom);
+
+        $ref->setAccessible(false);
+
+        return $ret;
     }
 
     private function getBitSequence($secureRandom, $length)

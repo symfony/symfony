@@ -22,12 +22,12 @@ class PdoSessionHandler implements \SessionHandlerInterface
     /**
      * @var \PDO PDO instance.
      */
-    protected $pdo;
+    private $pdo;
 
     /**
      * @var array Database options.
      */
-    protected $dbOptions;
+    private $dbOptions;
 
     /**
      * Constructor.
@@ -184,12 +184,10 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 $stmt->execute();
             }
             else if('oci' === $driver) {
-               
-                $sql = "MERGE INTO $dbTable USING DUAL ON($dbIdCol = :id) ". 
+                $stmt = $this->pdo->prepare("MERGE INTO $dbTable USING DUAL ON($dbIdCol = :id) ". 
                        "WHEN NOT MATCHED THEN INSERT ($dbIdCol, $dbDataCol, $dbTimeCol) VALUES (:id, :data, sysdate) " .
-                       "WHEN MATCHED THEN UPDATE SET $dbDataCol = :data WHERE $dbIdCol = :id"
+                       "WHEN MATCHED THEN UPDATE SET $dbDataCol = :data WHERE $dbIdCol = :id");
                 
-                $stmt = $this->pdo->prepare($sql);
                 $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
                 $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
                 $stmt->execute();
@@ -222,7 +220,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
      *
      * @return boolean True.
      */
-    protected function createNewSession($id, $data = '')
+    private function createNewSession($id, $data = '')
     {
         // get table/column
         $dbTable   = $this->dbOptions['db_table'];

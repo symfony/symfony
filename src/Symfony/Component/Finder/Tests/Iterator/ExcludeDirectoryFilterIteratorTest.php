@@ -40,7 +40,8 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
                 $tmpDir.DIRECTORY_SEPARATOR.'.git',
                 $tmpDir.DIRECTORY_SEPARATOR.'test.py',
                 $tmpDir.DIRECTORY_SEPARATOR.'test.php',
-                $tmpDir.DIRECTORY_SEPARATOR.'toto'
+                $tmpDir.DIRECTORY_SEPARATOR.'toto',
+                $tmpDir.DIRECTORY_SEPARATOR.'foo bar',
             )),
             array(array('fo'), array(
                 $tmpDir.DIRECTORY_SEPARATOR.'.bar',
@@ -51,7 +52,8 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
                 $tmpDir.DIRECTORY_SEPARATOR.'foo',
                 $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp',
                 $tmpDir.DIRECTORY_SEPARATOR.'test.php',
-                $tmpDir.DIRECTORY_SEPARATOR.'toto'
+                $tmpDir.DIRECTORY_SEPARATOR.'toto',
+                $tmpDir.DIRECTORY_SEPARATOR.'foo bar',
             )),
         );
     }

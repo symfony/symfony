@@ -80,6 +80,8 @@ class GnuFindAdapter extends AbstractAdapter
 
         $this->buildNamesFiltering($find, $this->names);
         $this->buildNamesFiltering($find, $this->notNames, true);
+        $this->buildPathsFiltering($find, $dir, $this->paths);
+        $this->buildPathsFiltering($find, $dir, $this->notPaths, true);
         $this->buildSizesFiltering($find, $this->sizes);
         $this->buildDatesFiltering($find, $this->dates);
 
@@ -151,7 +153,7 @@ class GnuFindAdapter extends AbstractAdapter
         foreach ($names as $i => $name) {
             $expr = Expression::create($name);
 
-            // Fixes 'not search' and 'fuls path matching' regex problems.
+            // Fixes 'not search' and 'full path matching' regex problems.
             // - Jokers '.' are replaced by [^/].
             // - We add '[^/]*' before and after regex (if no ^|$ flags are present).
             if ($expr->isRegex()) {
@@ -172,6 +174,44 @@ class GnuFindAdapter extends AbstractAdapter
                     : ($expr->isCaseSensitive() ? '-name' : '-iname')
                 )
                 ->arg($expr->renderPattern());
+        }
+
+        $command->cmd(')');
+    }
+
+    /**
+     * @param Command  $command
+     * @param string   $dir
+     * @param string[] $paths
+     * @param bool     $not
+     * @return void
+     */
+    private function buildPathsFiltering(Command $command, $dir, array $paths, $not = false)
+    {
+        if (0 === count($paths)) {
+            return;
+        }
+
+        $command->add($not ? '-not' : null)->cmd('(');
+
+        foreach ($paths as $i => $path) {
+            $expr = Expression::create($path);
+
+            // Fixes 'not search' regex problems.
+            if ($expr->isRegex()) {
+                $regex = $expr->getRegex();
+                $regex->prepend($regex->hasStartFlag() ? '' : '.*')->setEndJoker(!$regex->hasEndFlag());
+            } else {
+                $expr->prepend('*')->append('*');
+            }
+
+            $command
+                ->add($i > 0 ? '-or' : null)
+                ->add($expr->isRegex()
+                    ? ($expr->isCaseSensitive() ? '-regex' : '-iregex')
+                    : ($expr->isCaseSensitive() ? '-path' : '-ipath')
+                )
+                ->arg($expr->prepend($dir.DIRECTORY_SEPARATOR)->renderPattern());
         }
 
         $command->cmd(')');

@@ -24,12 +24,12 @@ class MethodNotAllowedHttpException extends HttpException
      * @param array      $allow    An array of allowed methods
      * @param string     $message  The internal exception message
      * @param \Exception $previous The previous exception
-     * @param integer    $code     The internal exception code
+     * @param array      $headers  An array of HTTP headers
      */
-    public function __construct(array $allow, $message = null, \Exception $previous = null, $code = 0)
+    public function __construct(array $allow, $message = null, \Exception $previous = null, array $headers = array())
     {
-        $headers = array('Allow' => strtoupper(implode(', ', $allow)));
+        $headers = array_merge($headers, array('Allow' => strtoupper(implode(', ', $allow))));
 
-        parent::__construct(405, $message, $previous, $headers, $code);
+        parent::__construct(405, $message, $previous, $headers);
     }
 }

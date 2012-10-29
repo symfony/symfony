@@ -455,4 +455,3 @@ Symfony2 is the result of the work of many people who made the code better
  - Nicolas de Marqué Fromentin (nicodmf)
  - Florent Cailhol (ooflorent)
  - Pierre (ptheg)
- - Leevi Graham (leevigraham)

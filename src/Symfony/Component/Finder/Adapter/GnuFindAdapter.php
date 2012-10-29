@@ -230,7 +230,7 @@ class GnuFindAdapter extends AbstractAdapter
             if (0 > $mins) {
                 // mtime is in the future
                 $command->add(' -mmin -0');
-                // we will have no result so we dont need to continue
+                // we will have no result so we don't need to continue
                 return;
             }
 

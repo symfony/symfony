@@ -87,6 +87,26 @@ class Expression implements ValueInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function prepend($expr)
+    {
+        $this->value->prepend($expr);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function append($expr)
+    {
+        $this->value->append($expr);
+
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     public function isRegex()

@@ -63,7 +63,7 @@ class UniqueEntityValidator extends ConstraintValidator
         $criteria = array();
         foreach ($fields as $fieldName) {
             if (!isset($class->reflFields[$fieldName])) {
-                throw new ConstraintDefinitionException('Only field names mapped by Doctrine can be validated for uniqueness.');
+                throw new ConstraintDefinitionException(sprintf("The field '%s' is not mapped by Doctrine, so it cannot be validated for uniqueness.", $fieldName));
             }
 
             $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);

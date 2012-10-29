@@ -1187,7 +1187,7 @@ class Request
             return $this->languages;
         }
 
-        $languages = $this->splitHttpAcceptHeader($this->headers->get('Accept-Language'));
+        $languages = AcceptHeader::fromString($this->headers->get('Accept-Language'))->all();
         $this->languages = array();
         foreach (array_keys($languages) as $lang) {
             if (strstr($lang, '-')) {
@@ -1229,7 +1229,7 @@ class Request
             return $this->charsets;
         }
 
-        return $this->charsets = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Charset')));
+        return $this->charsets = array_keys(AcceptHeader::fromString($this->headers->get('Accept-Charset'))->all());
     }
 
     /**
@@ -1245,7 +1245,7 @@ class Request
             return $this->acceptableContentTypes;
         }
 
-        return $this->acceptableContentTypes = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept')));
+        return $this->acceptableContentTypes = array_keys(AcceptHeader::fromString($this->headers->get('Accept'))->all());
     }
 
     /**
@@ -1269,10 +1269,21 @@ class Request
      * @param string $header Header to split
      *
      * @return array Array indexed by the values of the Accept-* header in preferred order
+     *
+     * @deprecated
      */
     public function splitHttpAcceptHeader($header)
     {
-        return AcceptHeader::fromString($header)->all();
+        $headers = array();
+        foreach (AcceptHeader::fromString($header)->all() as $item) {
+            $key = $item->getValue();
+            foreach ($item->getAttributes() as $name => $value) {
+                $key.= sprintf(';%s=%s', $name, $value);
+            }
+            $headers[$key] = $item->getQuality();
+        }
+
+        return $headers;
     }
 
     /*

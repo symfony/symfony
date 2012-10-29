@@ -1018,61 +1018,20 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
-        $items = $request->splitHttpAcceptHeader($acceptHeader);
-        // reset index since the fixtures don't have them set
-        foreach ($items as $item) {
-            $item->setIndex(0);
-        }
-        $this->assertEquals($expected, $items);
+        $this->assertEquals($expected, $request->splitHttpAcceptHeader($acceptHeader));
     }
 
     public function splitHttpAcceptHeaderData()
     {
         return array(
             array(null, array()),
-            array(
-                'text/html;q=0.8',
-                array('text/html' => new AcceptHeaderItem('text/html', array('q' => 0.8)))
-            ),
-            array(
-                'text/html;foo=bar;q=0.8 ',
-                array('text/html' => new AcceptHeaderItem('text/html', array('q' => 0.8, 'foo' => 'bar')))
-            ),
-            array(
-                'text/html;charset=utf-8; q=0.8',
-                array('text/html' => new AcceptHeaderItem('text/html', array('q' => 0.8, 'charset' => 'utf-8')))
-            ),
-            array(
-                'text/html,application/xml;q=0.9,*/*;charset=utf-8; q=0.8',
-                array(
-                    'text/html' => new AcceptHeaderItem('text/html'),
-                    'application/xml' => new AcceptHeaderItem('application/xml', array('q' => 0.9)),
-                    '*/*' => new AcceptHeaderItem('*/*', array('q' => 0.8, 'charset' => 'utf-8')),
-                )
-            ),
-            array(
-                'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8; foo=bar',
-                array(
-                    'text/html' => new AcceptHeaderItem('text/html'),
-                    'application/xhtml+xml' => new AcceptHeaderItem('application/xhtml+xml', array('q' => 0.9)),
-                    '*/*' => new AcceptHeaderItem('*/*', array('q' => 0.8, 'foo' => 'bar')),
-                )
-            ),
-            array(
-                'text/html,application/xhtml+xml;charset=utf-8;q=0.9; foo=bar,*/*',
-                array(
-                    'text/html' => new AcceptHeaderItem('text/html'),
-                    'application/xhtml+xml' => new AcceptHeaderItem('application/xhtml+xml', array('q' => 0.9, 'charset' => 'utf-8', 'foo' => 'bar')),
-                    '*/*' => new AcceptHeaderItem('*/*'),
-                )
-            ),
-            array(
-                'text/html,application/xhtml+xml',
-                array(
-                    'text/html' => new AcceptHeaderItem('text/html'),
-                    'application/xhtml+xml' => new AcceptHeaderItem('application/xhtml+xml'),
-                )
-            ),
+            array('text/html;q=0.8', array('text/html' => 0.8)),
+            array('text/html;foo=bar;q=0.8 ', array('text/html;foo=bar' => 0.8)),
+            array('text/html;charset=utf-8; q=0.8', array('text/html;charset=utf-8' => 0.8)),
+            array('text/html,application/xml;q=0.9,*/*;charset=utf-8; q=0.8', array('text/html' => 1.0, 'application/xml' => 0.9, '*/*;charset=utf-8' => 0.8)),
+            array('text/html,application/xhtml+xml;q=0.9,*/*;q=0.8; foo=bar', array('text/html' => 1.0, 'application/xhtml+xml' => 0.9, '*/*;foo=bar' => 0.8)),
+            array('text/html,application/xhtml+xml;charset=utf-8;q=0.9; foo=bar,*/*', array('text/html' => 1.0, '*/*' => 1.0, 'application/xhtml+xml;charset=utf-8;foo=bar' => 0.9)),
+            array('text/html,application/xhtml+xml', array('text/html' => 1.0, 'application/xhtml+xml' => 1.0)),
         );
     }
 

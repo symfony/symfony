@@ -84,7 +84,7 @@ class GnuFindAdapter extends AbstractAdapter
         $this->buildDatesFiltering($find, $this->dates);
 
         $useGrep = $this->shell->testCommand('grep') && $this->shell->testCommand('xargs');
-        $useSort = is_int($this->sort) && $this->shell->testCommand('sort') && $this->shell->testCommand('awk');
+        $useSort = is_int($this->sort) && $this->shell->testCommand('sort') && $this->shell->testCommand('cut');
 
         if ($useGrep && ($this->contains || $this->notContains)) {
             $grep = $command->ins('grep');
@@ -286,8 +286,8 @@ class GnuFindAdapter extends AbstractAdapter
     {
         switch ($sort) {
             case SortableIterator::SORT_BY_NAME:
-                $format = null;
-                break;
+                $command->ins('sort')->add('| sort');
+                return;
             case SortableIterator::SORT_BY_TYPE:
                 $format = '%y';
                 break;
@@ -306,6 +306,6 @@ class GnuFindAdapter extends AbstractAdapter
 
         $command->get('find')->add('-printf')->arg($format.' %h/%f\\n');
         $command->ins('sort')->add('| sort');
-        $command->ins('awk')->add('| awk')->arg('{ print $'.(null === $format ? '1' : '2').' }');
+        $command->ins('awk')->add('| cut')->arg('-d ')->arg('-f2-');
     }
 }

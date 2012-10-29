@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
- * AnyValidator class.
+ * AnyOfValidator class.
  *
  * Validates against all constraints and leaves all violations only if not
  * validated against any of given constraint. If successfully validated against

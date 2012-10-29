@@ -101,7 +101,7 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
     public function testGetContent()
     {
         $response = new StreamedResponse(function () { echo 'foo'; });
-        $this->assertFalse($response->getContent());
+        $this->assertNull($response->getContent());
     }
 
     public function testCreate()

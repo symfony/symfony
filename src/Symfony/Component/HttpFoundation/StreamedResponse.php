@@ -120,10 +120,10 @@ class StreamedResponse extends Response
     /**
      * {@inheritdoc}
      *
-     * @return false
+     * @return null
      */
     public function getContent()
     {
-        return false;
+        return null;
     }
 }

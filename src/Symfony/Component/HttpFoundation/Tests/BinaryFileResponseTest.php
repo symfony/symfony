@@ -44,7 +44,7 @@ class BinaryFileResponseTest extends \PHPUnit_Framework_TestCase
     public function testGetContent()
     {
         $response = new BinaryFileResponse('README.md');
-        $this->assertFalse($response->getContent());
+        $this->assertNull($response->getContent());
     }
 
     public function testRequests()

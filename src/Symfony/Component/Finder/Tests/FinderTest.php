@@ -602,7 +602,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
             array('dolor sit amet', '@^L@m', array('dolor.txt', 'ipsum.txt')),
             array('/^lorem ipsum dolor sit amet$/m', 'foobar', array('lorem.txt')),
             array('lorem', 'foobar', array('lorem.txt')),
-
             array('', 'lorem', array('dolor.txt', 'ipsum.txt')),
             array('ipsum dolor sit amet', '/^IPSUM/m', array('lorem.txt')),
         );
@@ -650,9 +649,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
     /**
      * @dataProvider getTestPathData
      */
-    public function testPath($matchPatterns, $noMatchPatterns, $expected)
+    public function testPath(Adapter\AdapterInterface $adapter, $matchPatterns, $noMatchPatterns, $expected)
     {
-        $finder = new Finder();
+        $finder = $this->buildFinder($adapter);
         $finder->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures')
             ->path($matchPatterns)
             ->notPath($noMatchPatterns);
@@ -662,13 +661,11 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function getTestPathData()
     {
-        return array(
+        $tests = array(
             array('', '', array()),
-
             array('/^A\/B\/C/', '/C$/',
                 array('A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat')
             ),
-
             array('/^A\/B/', 'foobar',
                 array(
                     'A'.DIRECTORY_SEPARATOR.'B',
@@ -677,7 +674,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
                     'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
                 )
             ),
-
             array('A/B/C', 'foobar',
                 array(
                     'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
@@ -686,7 +682,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
                     'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat.copy',
                 )
             ),
-
             array('A/B', 'foobar',
                 array(
                     //dirs
@@ -694,7 +689,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
                     'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
                     'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B',
                     'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
-
                     //files
                     'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'ab.dat',
                     'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
@@ -702,9 +696,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
                     'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat.copy',
                 )
             ),
-
-
         );
-    }
 
+        return $this->buildTestData($tests);
+    }
 }

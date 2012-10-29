@@ -8,7 +8,6 @@
         <parameter key="serializer.class">Symfony\Component\Serializer\Serializer</parameter>
         <parameter key="serializer.encoder.xml.class">Symfony\Component\Serializer\Encoder\XmlEncoder</parameter>
         <parameter key="serializer.encoder.json.class">Symfony\Component\Serializer\Encoder\JsonEncoder</parameter>
-    </parameters>
 
     <services>
         <service id="serializer" class="%serializer.class%" >

@@ -1270,7 +1270,7 @@ class Request
      *
      * @return array Array indexed by the values of the Accept-* header in preferred order
      *
-     * @deprecated
+     * @deprecated Deprecated since version 2.2, to be removed in 2.3.
      */
     public function splitHttpAcceptHeader($header)
     {

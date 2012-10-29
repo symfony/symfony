@@ -102,6 +102,11 @@ class Request
     protected $acceptableContentTypes;
 
     /**
+     * @var array
+     */
+    protected $encodings;
+
+    /**
      * @var string
      */
     protected $pathInfo;
@@ -198,6 +203,7 @@ class Request
         $this->languages = null;
         $this->charsets = null;
         $this->acceptableContentTypes = null;
+        $this->encodings = null;
         $this->pathInfo = null;
         $this->requestUri = null;
         $this->baseUrl = null;
@@ -1179,7 +1185,7 @@ class Request
     }
 
     /**
-     * Gets a list of languages acceptable by the client browser.
+     * Gets a list of languages acceptable by the user agent.
      *
      * @return array Languages ordered in the user browser preferences
      *
@@ -1191,7 +1197,10 @@ class Request
             return $this->languages;
         }
 
-        $languages = $this->splitHttpAcceptHeader($this->headers->get('Accept-Language'));
+        $languages = AcceptHeader::create($this->headers->get('Accept-Language'))
+            ->setDefaults(array('q' => 1))
+            ->sort('q')
+            ->getHash('q');
         $this->languages = array();
         foreach ($languages as $lang => $q) {
             if (strstr($lang, '-')) {
@@ -1221,7 +1230,7 @@ class Request
     }
 
     /**
-     * Gets a list of charsets acceptable by the client browser.
+     * Gets a list of charsets acceptable by the user agent.
      *
      * @return array List of charsets in preferable order
      *
@@ -1237,7 +1246,7 @@ class Request
     }
 
     /**
-     * Gets a list of content types acceptable by the client browser
+     * Gets a list of content types acceptable by the user agent.
      *
      * @return array List of content types in preferable order
      *
@@ -1250,6 +1259,20 @@ class Request
         }
 
         return $this->acceptableContentTypes = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept')));
+    }
+
+    /**
+     * Gets a list of encodings acceptable by the user agent.
+     *
+     * @return array List of encodings
+     */
+    public function getEncodings()
+    {
+        if (null !== $this->encodings) {
+            return $this->encodings;
+        }
+
+        return $this->encodings = array_keys($this->splitHttpAcceptHeader($this->headers->get('Accept-Encoding')));
     }
 
     /**
@@ -1268,45 +1291,15 @@ class Request
     }
 
     /**
-     * Splits an Accept-* HTTP header.
+     * Splitts an Accept-* header.
      *
-     * @param string $header Header to split
+     * @param string $header
      *
-     * @return array Array indexed by the values of the Accept-* header in preferred order
+     * @return array
      */
     public function splitHttpAcceptHeader($header)
     {
-        if (!$header) {
-            return array();
-        }
-
-        $values = array();
-        $groups = array();
-        foreach (array_filter(explode(',', $header)) as $value) {
-            // Cut off any q-value that might come after a semi-colon
-            if (preg_match('/;\s*(q=.*$)/', $value, $match)) {
-                $q     = substr(trim($match[1]), 2);
-                $value = trim(substr($value, 0, -strlen($match[0])));
-            } else {
-                $q = 1;
-            }
-
-            $groups[$q][] = $value;
-        }
-
-        krsort($groups);
-
-        foreach ($groups as $q => $items) {
-            $q = (float) $q;
-
-            if (0 < $q) {
-                foreach ($items as $value) {
-                    $values[trim($value)] = $q;
-                }
-            }
-        }
-
-        return $values;
+        return AcceptHeader::create($header)->setDefaults(array('q' => 1))->getHash('q');
     }
 
     /*

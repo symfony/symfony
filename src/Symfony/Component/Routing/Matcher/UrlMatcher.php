@@ -24,29 +24,40 @@ use Symfony\Component\Routing\Route;
  *
  * @api
  */
-class UrlMatcher implements UrlMatcherInterface
+class UrlMatcher implements UrlMatcherInterface, NegotiatorMatcherInterface
 {
     const REQUIREMENT_MATCH     = 0;
     const REQUIREMENT_MISMATCH  = 1;
     const ROUTE_MATCH           = 2;
 
+    /**
+     * @var RequestContext
+     */
     protected $context;
+
     protected $allow;
+
+    /**
+     * @var Negotiator
+     */
+    protected $negotiator;
 
     private $routes;
 
     /**
      * Constructor.
      *
-     * @param RouteCollection $routes  A RouteCollection instance
-     * @param RequestContext  $context The context
+     * @param RouteCollection          $routes     A RouteCollection instance
+     * @param RequestContext           $context    The context
+     * @param null|NegotiatorInterface $negotiator
      *
      * @api
      */
-    public function __construct(RouteCollection $routes, RequestContext $context)
+    public function __construct(RouteCollection $routes, RequestContext $context, NegotiatorInterface $negotiator = null)
     {
         $this->routes = $routes;
         $this->context = $context;
+        $this->negotiator = $negotiator ?: new Negotiator();
     }
 
     /**
@@ -63,6 +74,14 @@ class UrlMatcher implements UrlMatcherInterface
     public function getContext()
     {
         return $this->context;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNegotiator()
+    {
+        return $this->negotiator;
     }
 
     /**
@@ -94,6 +113,7 @@ class UrlMatcher implements UrlMatcherInterface
      */
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
+        /** @var Route $route */
         foreach ($routes as $name => $route) {
             if ($route instanceof RouteCollection) {
                 if (false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
@@ -132,6 +152,7 @@ class UrlMatcher implements UrlMatcherInterface
                 }
             }
 
+            $this->negotiator->negotiate($route);
             $status = $this->handleRouteRequirements($pathinfo, $name, $route);
 
             if (self::ROUTE_MATCH === $status[0]) {
@@ -142,7 +163,12 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
-            return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));
+            $parameters = array('_route' => $name);
+            if (count($negotiatedParameters = $this->negotiator->getNegotiatedParameters()) > 0) {
+                $parameters['_negotiated_parameters'] = $negotiatedParameters;
+            }
+
+            return array_merge($this->mergeDefaults($matches, $route->getDefaults()), $parameters);
         }
     }
 

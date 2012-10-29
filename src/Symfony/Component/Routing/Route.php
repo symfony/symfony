@@ -189,7 +189,7 @@ class Route implements \Serializable
      */
     public function getDefaults()
     {
-        return $this->defaults;
+        return $this->resolveDefaults();
     }
 
     /**
@@ -236,7 +236,9 @@ class Route implements \Serializable
      */
     public function getDefault($name)
     {
-        return isset($this->defaults[$name]) ? $this->defaults[$name] : null;
+        $defaults = $this->resolveDefaults();
+
+        return isset($defaults[$name]) ? $defaults[$name] : null;
     }
 
     /**
@@ -248,7 +250,9 @@ class Route implements \Serializable
      */
     public function hasDefault($name)
     {
-        return array_key_exists($name, $this->defaults);
+        $defaults = $this->resolveDefaults();
+
+        return array_key_exists($name, $defaults);
     }
 
     /**
@@ -385,5 +389,31 @@ class Route implements \Serializable
         }
 
         return $regex;
+    }
+
+    /**
+     * Resolve default values.
+     *
+     * Negotiated parameters are added to the defaults with a null value
+     * in order to allow matching and generation without value for these parameters.
+     *
+     * @return array
+     *
+     * @throws \LogicException
+     */
+    private function resolveDefaults()
+    {
+        if (isset($this->options['negotiate'])) {
+            if (!is_array($this->options['negotiate'])) {
+                throw new \LogicException('Route "negotiate" option must be an array of negotiated parameters.');
+            }
+
+            $defaults = array();
+            foreach ($this->options['negotiate'] as $parameter) {
+                $defaults[$parameter] = null;
+            }
+
+            return array_merge($defaults, $this->defaults);
+        }
     }
 }

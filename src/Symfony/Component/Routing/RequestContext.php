@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
 /**
  * Holds information about the current request.
@@ -51,6 +52,7 @@ class RequestContext
         $this->httpPort = $httpPort;
         $this->httpsPort = $httpsPort;
         $this->parameters = array();
+        $this->routeHandlers = array();
     }
 
     public function fromRequest(Request $request)

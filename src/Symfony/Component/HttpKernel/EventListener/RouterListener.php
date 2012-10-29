@@ -15,14 +15,20 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Negotiation\MatcherNegotiatorBuilderInterface;
+use Symfony\Component\HttpKernel\Negotiation\AcceptHeadersNegotiatorBuilder;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\NegotiationFailureException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Component\Routing\Matcher\NegotiatorMatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Initializes the context from the request and sets request attributes based on a matching route.
@@ -36,11 +42,18 @@ class RouterListener implements EventSubscriberInterface
     private $logger;
 
     /**
+     * @var MatcherNegotiatorBuilderInterface[]
+     */
+    private $matcherNegotiatorBuilders;
+
+    /**
      * Constructor.
      *
      * @param UrlMatcherInterface|RequestMatcherInterface $matcher The Url or Request matcher
      * @param RequestContext|null                         $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
      * @param LoggerInterface|null                        $logger  The logger
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null)
     {
@@ -55,6 +68,15 @@ class RouterListener implements EventSubscriberInterface
         $this->matcher = $matcher;
         $this->context = $context ?: $matcher->getContext();
         $this->logger = $logger;
+        $this->matcherNegotiatorBuilders = array();
+    }
+
+    /**
+     * @param MatcherNegotiatorBuilderInterface $builder
+     */
+    public function addMatcherNegotiatorBuilder(MatcherNegotiatorBuilderInterface $builder)
+    {
+        $this->matcherNegotiatorBuilders[] = $builder;
     }
 
     public function onKernelRequest(GetResponseEvent $event)
@@ -64,9 +86,17 @@ class RouterListener implements EventSubscriberInterface
         // initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
         $this->context->fromRequest($request);
 
+        $this->addMatcherNegotiatorBuilder(new AcceptHeadersNegotiatorBuilder());
+
         if ($request->attributes->has('_controller')) {
             // routing is already done
             return;
+        }
+
+        if ($this->matcher instanceof NegotiatorMatcherInterface) {
+            foreach ($this->matcherNegotiatorBuilders as $builder) {
+                $builder->buildNegotiator($this->matcher->getNegotiator(), $event->getRequest());
+            }
         }
 
         // add attributes based on the request (routing)
@@ -94,7 +124,30 @@ class RouterListener implements EventSubscriberInterface
             $message = sprintf('No route found for "%s %s": Method Not Allowed (Allow: %s)', $request->getMethod(), $request->getPathInfo(), strtoupper(implode(', ', $e->getAllowedMethods())));
 
             throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
+        } catch (NegotiationFailureException $e) {
+            $message = sprintf('No acceptable value found for "%s" parameters.', implode(', ', $e->getNegotiatedParameters()));
+
+
+            throw new NotAcceptableHttpException($message, $e, array('Vary' => implode(', ', $this->getMatcherNegotiatorVaryingHeaders($event->getRequest()))));
         }
+    }
+
+    public function onKernelResponse(GetResponseEvent $event)
+    {
+        $headers = $event->getResponse()->headers;
+        $vary = implode(', ', $this->getMatcherNegotiatorVaryingHeaders($event->getRequest()));
+
+        if (strlen($vary) > 0) {
+            $headers->set('Vary', $headers->has('Vary') ? $headers->get('Vary').', '.$vary : $vary);
+        }
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
+            KernelEvents::RESPONSE => 'onKernelResponse',
+        );
     }
 
     private function parametersToString(array $parameters)
@@ -107,10 +160,15 @@ class RouterListener implements EventSubscriberInterface
         return implode(', ', $pieces);
     }
 
-    public static function getSubscribedEvents()
+    private function getMatcherNegotiatorVaryingHeaders(Request $request)
     {
-        return array(
-            KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
-        );
+        $varyingHeaders = array();
+        if ($this->matcher instanceof NegotiatorMatcherInterface) {
+            foreach ($this->matcherNegotiatorBuilders as $builder) {
+                $varyingHeaders = array_merge($varyingHeaders, $builder->getVaryingHeaders($this->matcher->getNegotiator(), $request));
+            }
+        }
+
+        return array_unique($varyingHeaders);
     }
 }

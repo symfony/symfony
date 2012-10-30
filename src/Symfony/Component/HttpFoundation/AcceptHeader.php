@@ -34,7 +34,7 @@ class AcceptHeader
     /**
      * Constructor.
      *
-     * @param array $items
+     * @param AcceptHeaderItem[] $items
      */
     public function __construct(array $items)
     {
@@ -54,7 +54,7 @@ class AcceptHeader
     {
         $index = 0;
 
-        return new static(array_map(function ($itemValue) use (&$index) {
+        return new self(array_map(function ($itemValue) use (&$index) {
             $item = AcceptHeaderItem::fromString($itemValue);
             $item->setIndex($index++);
 
@@ -63,7 +63,7 @@ class AcceptHeader
     }
 
     /**
-     * Returns header  value's string representation.
+     * Returns header value's string representation.
      *
      * @return string
      */
@@ -77,7 +77,7 @@ class AcceptHeader
      *
      * @param string $value
      *
-     * @return bool
+     * @return Boolean
      */
     public function has($value)
     {
@@ -132,7 +132,7 @@ class AcceptHeader
      */
     public function filter($pattern)
     {
-        return new static(array_filter($this->items, function (AcceptHeaderItem $item) use ($pattern) {
+        return new self(array_filter($this->items, function (AcceptHeaderItem $item) use ($pattern) {
             return preg_match($pattern, $item->getValue());
         }));
     }

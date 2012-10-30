@@ -78,7 +78,7 @@ class AcceptHeaderItem
             }
         }
 
-        return new static(($start = substr($value, 0, 1)) === ($end = substr($value, -1)) && ($start === '"' || $start === '\'') ? substr($value, 1, -1) : $value, $attributes);
+        return new self(($start = substr($value, 0, 1)) === ($end = substr($value, -1)) && ($start === '"' || $start === '\'') ? substr($value, 1, -1) : $value, $attributes);
     }
 
     /**
@@ -175,7 +175,7 @@ class AcceptHeaderItem
      *
      * @param string $name
      *
-     * @return bool
+     * @return Boolean
      */
     public function hasAttribute($name)
     {

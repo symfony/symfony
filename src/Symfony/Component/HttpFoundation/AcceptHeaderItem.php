@@ -39,6 +39,20 @@ class AcceptHeaderItem
     private $attributes = array();
 
     /**
+     * Constructor.
+     *
+     * @param string $value
+     * @param array  $attributes
+     */
+    public function __construct($value, array $attributes = array())
+    {
+        $this->value = $value;
+        foreach ($attributes as $name => $value) {
+            $this->setAttribute($name, $value);
+        }
+    }
+
+    /**
      * Builds an AcceptHeaderInstance instance from a string.
      *
      * @param string $itemValue
@@ -65,20 +79,6 @@ class AcceptHeaderItem
         }
 
         return new static(($start = substr($value, 0, 1)) === ($end = substr($value, -1)) && ($start === '"' || $start === '\'') ? substr($value, 1, -1) : $value, $attributes);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param string $value
-     * @param array  $attributes
-     */
-    public function __construct($value, array $attributes = array())
-    {
-        $this->value = $value;
-        foreach ($attributes as $name => $value) {
-            $this->setAttribute($name, $value);
-        }
     }
 
     /**

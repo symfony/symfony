@@ -32,6 +32,18 @@ class AcceptHeader
     private $sorted = true;
 
     /**
+     * Constructor.
+     *
+     * @param array $items
+     */
+    public function __construct(array $items)
+    {
+        foreach ($items as $item) {
+            $this->add($item);
+        }
+    }
+
+    /**
      * Builds an AcceptHeader instance from a string.
      *
      * @param string $headerValue
@@ -48,18 +60,6 @@ class AcceptHeader
 
             return $item;
         }, preg_split('/\s*(?:,*("[^"]+"),*|,*(\'[^\']+\'),*|,+)\s*/', $headerValue, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param array $items
-     */
-    public function __construct(array $items)
-    {
-        foreach ($items as $item) {
-            $this->add($item);
-        }
     }
 
     /**
@@ -118,7 +118,7 @@ class AcceptHeader
      */
     public function all()
     {
-        $this->ensureSorted();
+        $this->sort();
 
         return $this->items;
     }
@@ -144,15 +144,15 @@ class AcceptHeader
      */
     public function first()
     {
-        $this->ensureSorted();
+        $this->sort();
 
         return !empty($this->items) ? current($this->items) : null;
     }
 
     /**
-     * Ensures items are sorted by descending quality
+     * Sorts items by descending quality
      */
-    private function ensureSorted()
+    private function sort()
     {
         if (!$this->sorted) {
             uasort($this->items, function ($a, $b) {

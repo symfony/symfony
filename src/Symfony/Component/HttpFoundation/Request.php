@@ -1278,7 +1278,7 @@ class Request
         foreach (AcceptHeader::fromString($header)->all() as $item) {
             $key = $item->getValue();
             foreach ($item->getAttributes() as $name => $value) {
-                $key.= sprintf(';%s=%s', $name, $value);
+                $key .= sprintf(';%s=%s', $name, $value);
             }
             $headers[$key] = $item->getQuality();
         }

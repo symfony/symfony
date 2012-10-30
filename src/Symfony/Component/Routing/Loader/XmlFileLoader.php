@@ -15,6 +15,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Loader\FileLoader;
+use Symfony\Component\Config\Util\XmlUtils;
 
 /**
  * XmlFileLoader loads XML routing files.
@@ -172,74 +173,7 @@ class XmlFileLoader extends FileLoader
      */
     protected function loadFile($file)
     {
-        $internalErrors = libxml_use_internal_errors(true);
-        $disableEntities = libxml_disable_entity_loader(true);
-        libxml_clear_errors();
-
-        $dom = new \DOMDocument();
-        $dom->validateOnParse = true;
-        if (!$dom->loadXML(file_get_contents($file), LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
-            libxml_disable_entity_loader($disableEntities);
-
-            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($internalErrors)));
-        }
-        $dom->normalizeDocument();
-
-        libxml_use_internal_errors($internalErrors);
-        libxml_disable_entity_loader($disableEntities);
-
-        foreach ($dom->childNodes as $child) {
-            if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
-                throw new \InvalidArgumentException('Document types are not allowed.');
-            }
-        }
-
-        $this->validate($dom);
-
-        return $dom;
-    }
-
-    /**
-     * Validates a loaded XML file.
-     *
-     * @param \DOMDocument $dom A loaded XML file
-     *
-     * @throws \InvalidArgumentException When XML doesn't validate its XSD schema
-     */
-    protected function validate(\DOMDocument $dom)
-    {
-        $current = libxml_use_internal_errors(true);
-        libxml_clear_errors();
-
-        if (!$dom->schemaValidate(__DIR__ . static::SCHEME_PATH)) {
-            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($current)));
-        }
-        libxml_use_internal_errors($current);
-    }
-
-    /**
-     * Retrieves libxml errors and clears them.
-     *
-     * @return array An array of libxml error strings
-     */
-    private function getXmlErrors($internalErrors)
-    {
-        $errors = array();
-        foreach (libxml_get_errors() as $error) {
-            $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
-                LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
-                $error->code,
-                trim($error->message),
-                $error->file ? $error->file : 'n/a',
-                $error->line,
-                $error->column
-            );
-        }
-
-        libxml_clear_errors();
-        libxml_use_internal_errors($internalErrors);
-
-        return $errors;
+        return XmlUtils::loadFile($file, __DIR__ . static::SCHEME_PATH);
     }
 
     /**

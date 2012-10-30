@@ -718,7 +718,7 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         if (static::IGNORE_DOT_FILES === (static::IGNORE_DOT_FILES & $this->ignore)) {
-            $this->notNames[] = '/^\..+/';
+            $this->notPaths[] = '#(^|/)\..+(/|$)#';
         }
 
         foreach ($this->adapters as $adapter) {

@@ -165,6 +165,8 @@ class AcceptHeader
 
                 return $qA > $qB ? -1 : 1;
             });
+
+            $this->sorted = true;
         }
     }
 }

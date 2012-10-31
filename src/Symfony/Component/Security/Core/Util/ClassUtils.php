@@ -52,4 +52,9 @@ class ClassUtils
 
         return substr($class, $pos + self::MARKER_LENGTH + 2);
     }
+
+    /**
+     * This class should not be instantiated
+     */
+    private function __construct() {}
 }

@@ -16,12 +16,8 @@ namespace Symfony\Component\Security\Core\Util;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class StringUtils
+class StringUtils
 {
-    final private function __construct()
-    {
-    }
-
     /**
      * Compares two strings.
      *
@@ -45,4 +41,9 @@ final class StringUtils
 
         return 0 === $result;
     }
+
+    /**
+     * This class should not be instantiated
+     */
+    private function __construct() {}
 }

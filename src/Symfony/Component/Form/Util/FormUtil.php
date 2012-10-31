@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Util;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class FormUtil
+class FormUtil
 {
     /**
      * Map english plural to singular suffixes
@@ -201,4 +201,9 @@ abstract class FormUtil
         // not considered to be empty, ever.
         return null === $data || '' === $data;
     }
+
+    /**
+     * This class should not be instantiated
+     */
+    private function __construct() {}
 }

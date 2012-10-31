@@ -18,18 +18,18 @@ use Symfony\Component\Finder\Shell\Command;
 use Symfony\Component\Finder\Iterator\SortableIterator;
 
 /**
- * Shell engine implementation using GNU find command.
+ * Shell engine implementation using BSD find command.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class GnuFindAdapter extends AbstractFindAdapter
+class BsdFindAdapter extends AbstractFindAdapter
 {
     /**
      * {@inheritdoc}
      */
     public function isSupported()
     {
-        return $this->shell->getType() === Shell::TYPE_UNIX && parent::isSupported();
+        return in_array($this->shell->getType(), array(Shell::TYPE_BSD, Shell::TYPE_DARWIN)) && parent::isSupported();
     }
 
     /**
@@ -37,7 +37,7 @@ class GnuFindAdapter extends AbstractFindAdapter
      */
     public function getName()
     {
-        return 'gnu_find';
+        return 'bsd_find';
     }
 
     /**
@@ -45,7 +45,7 @@ class GnuFindAdapter extends AbstractFindAdapter
      */
     protected function buildFormatSorting(Command $command, $format)
     {
-        $command->get('find')->add('-printf')->arg($format.' %h/%f\\n')
+        $command->get('find')->add('-print0 | xargs -0 stat -f')->arg($format.' %h/%f\\n')
             ->add('| sort | cut')->arg('-d ')->arg('-f2-');
     }
 }

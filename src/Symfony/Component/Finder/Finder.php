@@ -13,6 +13,7 @@ namespace Symfony\Component\Finder;
 
 use Symfony\Component\Finder\Adapter\AdapterInterface;
 use Symfony\Component\Finder\Adapter\GnuFindAdapter;
+use Symfony\Component\Finder\Adapter\BsdFindAdapter;
 use Symfony\Component\Finder\Adapter\PhpAdapter;
 use Symfony\Component\Finder\Exception\ExceptionInterface;
 
@@ -65,6 +66,7 @@ class Finder implements \IteratorAggregate, \Countable
         $this->ignore = static::IGNORE_VCS_FILES | static::IGNORE_DOT_FILES;
 
         $this->addAdapter(new GnuFindAdapter());
+        $this->addAdapter(new BsdFindAdapter());
         $this->addAdapter(new PhpAdapter(), -50);
     }
 

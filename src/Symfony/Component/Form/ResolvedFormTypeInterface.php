@@ -42,7 +42,7 @@ interface ResolvedFormTypeInterface
     /**
      * Returns the extensions of the wrapped form type.
      *
-     * @return array An array of {@link FormTypeExtensionInterface} instances.
+     * @return FormTypeExtensionInterface[] An array of {@link FormTypeExtensionInterface} instances.
      */
     public function getTypeExtensions();
 

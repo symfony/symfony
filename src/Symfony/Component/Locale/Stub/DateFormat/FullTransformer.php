@@ -27,7 +27,11 @@ class FullTransformer
     private $notImplementedChars = 'GYuwWFgecSAZvVW';
     private $regExp;
 
+    /**
+     * @var Transformer[]
+     */
     private $transformers;
+
     private $pattern;
     private $timezone;
 
@@ -69,7 +73,7 @@ class FullTransformer
     /**
      * Return the array of Transformer objects
      *
-     * @return  array  Associative array of Transformer objects (format char => Transformer)
+     * @return Transformer[] Associative array of Transformer objects (format char => Transformer)
      */
     public function getTransformers()
     {

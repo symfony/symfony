@@ -23,12 +23,15 @@ use Symfony\Component\CssSelector\XPathExprOr;
  */
 class OrNode implements NodeInterface
 {
+    /**
+     * @var NodeInterface[]
+     */
     protected $items;
 
     /**
      * Constructor.
      *
-     * @param array $items An array of NodeInterface objects
+     * @param NodeInterface[] $items An array of NodeInterface objects
      */
     public function __construct($items)
     {

@@ -288,7 +288,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * Returns the types used by this builder.
      *
-     * @return array An array of FormTypeInterface
+     * @return FormTypeInterface[] An array of FormTypeInterface
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link FormConfigInterface::getType()} instead.

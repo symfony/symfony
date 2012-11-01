@@ -89,6 +89,8 @@ class FilesystemLoader extends Loader
      *
      * @param TemplateReferenceInterface $template A template
      * @param integer                    $time     The last modification time of the cached template (timestamp)
+     * 
+     * @return Boolean true if the template is still fresh, false otherwise
      *
      * @api
      */
@@ -106,7 +108,7 @@ class FilesystemLoader extends Loader
      *
      * @param string $file A path
      *
-     * @return true if the path exists and is absolute, false otherwise
+     * @return Boolean true if the path exists and is absolute, false otherwise
      */
     protected static function isAbsolutePath($file)
     {

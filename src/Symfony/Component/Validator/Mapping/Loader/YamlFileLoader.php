@@ -18,7 +18,8 @@ class YamlFileLoader extends FileLoader
 {
     /**
      * An array of YAML class descriptions
-     * @val array
+     *
+     * @var array
      */
     protected $classes = null;
 

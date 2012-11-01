@@ -31,12 +31,36 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 class ContainerBuilder extends Container implements TaggedContainerInterface
 {
-    private $extensions       = array();
-    private $extensionsByNs   = array();
-    private $definitions      = array();
-    private $aliases          = array();
-    private $resources        = array();
+    /**
+     * @var ExtensionInterface[]
+     */
+    private $extensions = array();
+
+    /**
+     * @var ExtensionInterface[]
+     */
+    private $extensionsByNs = array();
+
+    /**
+     * @var Definition[]
+     */
+    private $definitions = array();
+
+    /**
+     * @var Alias[]
+     */
+    private $aliases = array();
+
+    /**
+     * @var ResourceInterface[]
+     */
+    private $resources = array();
+
     private $extensionConfigs = array();
+
+    /**
+     * @var Compiler
+     */
     private $compiler;
 
     /**
@@ -82,7 +106,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns all registered extensions.
      *
-     * @return array An array of ExtensionInterface
+     * @return ExtensionInterface[] An array of ExtensionInterface
      *
      * @api
      */
@@ -133,6 +157,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this;
     }
 
+    /**
+     * Sets the resources for this configuration.
+     * 
+     * @param ResourceInterface[] $resources An array of resources
+     * 
+     * @return ContainerBuilder The current instance
+     * 
+     * @api
+     */
     public function setResources(array $resources)
     {
         $this->resources = $resources;
@@ -484,7 +517,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the service aliases.
      *
-     * @param array $aliases An array of service definitions
+     * @param array $aliases An array of aliases
      *
      * @api
      */
@@ -619,7 +652,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the service definitions.
      *
-     * @param array $definitions An array of service definitions
+     * @param Definition[] $definitions An array of service definitions
      *
      * @api
      */

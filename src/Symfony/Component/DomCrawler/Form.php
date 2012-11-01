@@ -26,6 +26,7 @@ class Form extends Link implements \ArrayAccess
      * @var \DOMNode
      */
     private $button;
+
     /**
      * @var Field\FormField[]
      */
@@ -271,7 +272,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets all fields.
      *
-     * @return array An array of fields
+     * @return FormField[] An array of fields
      *
      * @api
      */
@@ -329,6 +330,13 @@ class Form extends Link implements \ArrayAccess
         $this->fields->remove($name);
     }
 
+    /**
+     * Sets current \DOMNode instance.
+     *
+     * @param \DOMNode $node A \DOMNode instance
+     *
+     * @throws \LogicException If given node is not a button or input or does not have a form ancestor
+     */
     protected function setNode(\DOMNode $node)
     {
         $this->button = $node;

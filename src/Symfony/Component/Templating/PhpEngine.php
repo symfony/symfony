@@ -47,7 +47,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
      * @param LoaderInterface             $loader  A loader instance
-     * @param array                       $helpers An array of helper instances
+     * @param HelperInterface[]           $helpers An array of helper instances
      */
     public function __construct(TemplateNameParserInterface $parser, LoaderInterface $loader, array $helpers = array())
     {
@@ -235,7 +235,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     }
 
     /**
-     * @param Helper[] $helpers An array of helper
+     * Adds some helpers.
+     * 
+     * @param HelperInterface[] $helpers An array of helper
      *
      * @api
      */
@@ -249,7 +251,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Sets the helpers.
      *
-     * @param Helper[] $helpers An array of helper
+     * @param HelperInterface[] $helpers An array of helper
      *
      * @api
      */

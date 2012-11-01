@@ -32,7 +32,7 @@ class Request
      * Constructor.
      *
      * @param string $uri        The request URI
-     * @param array  $method     The HTTP method request
+     * @param string $method     The HTTP method request
      * @param array  $parameters The request parameters
      * @param array  $files      An array of uploaded files
      * @param array  $cookies    An array of cookies

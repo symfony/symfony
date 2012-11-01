@@ -22,11 +22,34 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
  */
 class Translator implements TranslatorInterface
 {
-    protected $catalogues;
+    /**
+     * @var MessageCatalogueInterface[]
+     */
+    protected $catalogues = array();
+
+    /**
+     * @var string
+     */
     protected $locale;
-    private $fallbackLocales;
-    private $loaders;
-    private $resources;
+
+    /**
+     * @var array
+     */
+    private $fallbackLocales = array();
+
+    /**
+     * @var LoaderInterface[]
+     */
+    private $loaders = array();
+
+    /**
+     * @var array
+     */
+    private $resources = array();
+
+    /**
+     * @var MessageSelector
+     */
     private $selector;
 
     /**
@@ -41,10 +64,6 @@ class Translator implements TranslatorInterface
     {
         $this->locale = $locale;
         $this->selector = null === $selector ? new MessageSelector() : $selector;
-        $this->loaders = array();
-        $this->resources = array();
-        $this->catalogues = array();
-        $this->fallbackLocales = array();
     }
 
     /**

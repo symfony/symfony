@@ -86,14 +86,14 @@ interface FormConfigInterface
     /**
      * Returns the view transformers of the form.
      *
-     * @return array An array of {@link DataTransformerInterface} instances.
+     * @return DataTransformerInterface[] An array of {@link DataTransformerInterface} instances.
      */
     public function getViewTransformers();
 
     /**
      * Returns the model transformers of the form.
      *
-     * @return array An array of {@link DataTransformerInterface} instances.
+     * @return DataTransformerInterface[] An array of {@link DataTransformerInterface} instances.
      */
     public function getModelTransformers();
 

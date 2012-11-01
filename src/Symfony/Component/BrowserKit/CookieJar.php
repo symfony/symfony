@@ -127,7 +127,7 @@ class CookieJar
     /**
      * Returns not yet expired cookies.
      *
-     * @return array An array of cookies
+     * @return Cookie[] An array of cookies
      */
     public function all()
     {

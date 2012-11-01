@@ -49,7 +49,7 @@ class CheckCircularReferencesPass implements CompilerPassInterface
     /**
      * Checks for circular references.
      *
-     * @param array $edges An array of Nodes
+     * @param ServiceReferenceGraphEdge[] $edges An array of Edges
      *
      * @throws ServiceCircularReferenceException When a circular reference is found.
      */

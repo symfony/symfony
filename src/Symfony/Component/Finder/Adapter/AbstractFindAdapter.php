@@ -53,13 +53,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
         }
 
         $command = Command::create();
-
-        $find = $command
-            ->ins('find')
-            ->add('find ')
-            ->arg($dir)
-            ->add('-noleaf') // -noleaf option is required for filesystems who doesn't follow '.' and '..' convention
-            ->add('-regextype posix-extended');
+        $find = $this->buildFindCommand($command, $dir);
 
         if ($this->followLinks) {
             $find->add('-follow');
@@ -127,6 +121,20 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     public function isSupported()
     {
         return $this->shell->testCommand('find');
+    }
+
+    /**
+     * @param Command $command
+     *
+     * @return Command
+     */
+    protected function buildFindCommand(Command $command, $dir)
+    {
+        return $command
+            ->ins('find')
+            ->add('find ')
+            ->arg($dir)
+            ->add('-noleaf'); // the -noleaf option is required for filesystems that don't follow the '.' and '..' conventions
     }
 
     /**

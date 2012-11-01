@@ -48,4 +48,12 @@ class GnuFindAdapter extends AbstractFindAdapter
         $command->get('find')->add('-printf')->arg($format.' %h/%f\\n')
             ->add('| sort | cut')->arg('-d ')->arg('-f2-');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildFindCommand(Command $command, $dir)
+    {
+      return parent::buildFindCommand($command, $dir)->add('-regextype posix-extended');
+    }
 }

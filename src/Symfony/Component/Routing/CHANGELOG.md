@@ -19,6 +19,12 @@ CHANGELOG
    check on URL generation completely by calling `setStrictRequirements(null)`. It
    improves performance in production environment as you should know that params always
    pass the requirements (otherwise it would break your link anyway).
+ * [BC BREAK] Added possibility to generate URLs that include the default param, whereas before
+   a param that equals the default value of an optional placeholder was never part of the URL.
+   Example: Given the route `new Route('/index.{_format}', array('_format' => 'html'));`
+   Previously generating this route with params `array('_format' => 'html')` resulted in `/index` 
+   which means one could not generate `/index.html` at all. This has been changed. You can of course
+   still generate just `/index` by passing array('_format' => null) or not passing the param at all.
 
 2.1.0
 -----

@@ -253,7 +253,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($crawler, $crawler->filterXPath('yt|accessControl'), '->filterXPath() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->filterXPath() returns a new instance of a crawler');
 
-        $controls = $crawler->filter('ns1|accessControl', array('ns1'=>'http://namespace.uir.com/schema/'));
+        $controls = $crawler->filter('ns1|accessControl', array('ns1' => 'http://namespace.uir.com/schema/'));
         $this->assertCount(3, $controls , '->filterXPath() filters the node list with the XPath expression');
     }
 

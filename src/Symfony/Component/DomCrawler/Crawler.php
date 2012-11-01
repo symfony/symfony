@@ -487,8 +487,8 @@ class Crawler extends \SplObjectStorage
     /**
      * Filters the list of nodes with an XPath expression.
      *
-     * @param string $xpath An XPath expression
-     * @param array $namespaces A list of namespaces
+     * @param string $xpath     An XPath expression
+     * @param array $namespaces An associative array of namespaces that contains (prefix => uri) elements
      *
      * @return Crawler A new instance of Crawler with the filtered list of nodes
      *
@@ -503,7 +503,7 @@ class Crawler extends \SplObjectStorage
         }
 
         $domxpath = new \DOMXPath($document);
-        foreach($namespaces as $prefix=>$uri) {
+        foreach($namespaces as $prefix => $uri) {
             $domxpath->registerNamespace($prefix, $uri);
         }
 
@@ -515,8 +515,8 @@ class Crawler extends \SplObjectStorage
      *
      * This method only works if you have installed the CssSelector Symfony Component.
      *
-     * @param string $selector A CSS selector
-     * @param array $namespaces A list of namespaces
+     * @param string $selector  A CSS selector
+     * @param array $namespaces An associative array of namespaces that contains (prefix => uri) elements
      *
      * @return Crawler A new instance of Crawler with the filtered list of nodes
      *

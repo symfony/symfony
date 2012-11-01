@@ -75,16 +75,16 @@ class Interval
     {
         return <<<EOF
         ({\s*
-            (\-?\d+[\s*,\s*\-?\d+]*)
+            (\-?\d+(\.\d+)?[\s*,\s*\-?\d+(\.\d+)?]*)
         \s*})
 
             |
 
         (?P<left_delimiter>[\[\]])
             \s*
-            (?P<left>-Inf|\-?\d+)
+            (?P<left>-Inf|\-?\d+(\.\d+)?)
             \s*,\s*
-            (?P<right>\+?Inf|\-?\d+)
+            (?P<right>\+?Inf|\-?\d+(\.\d+)?)
             \s*
         (?P<right_delimiter>[\[\]])
 EOF;
@@ -98,6 +98,6 @@ EOF;
             return -log(0);
         }
 
-        return (int) $number;
+        return (float) $number;
     }
 }

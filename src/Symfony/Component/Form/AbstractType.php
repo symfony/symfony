@@ -96,7 +96,7 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * Sets the extensions for this type.
      *
-     * @param array $extensions An array of FormTypeExtensionInterface
+     * @param FormTypeExtensionInterface[] $extensions An array of FormTypeExtensionInterface
      *
      * @throws Exception\UnexpectedTypeException if any extension does not implement FormTypeExtensionInterface
      *
@@ -110,7 +110,7 @@ abstract class AbstractType implements FormTypeInterface
     /**
      * Returns the extensions associated with this type.
      *
-     * @return array An array of FormTypeExtensionInterface
+     * @return FormTypeExtensionInterface[] An array of FormTypeExtensionInterface
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link ResolvedFormTypeInterface::getTypeExtensions()} instead.

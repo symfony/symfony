@@ -61,6 +61,6 @@ class GetResponseForControllerResultEvent extends GetResponseEvent
      */
     public function setControllerResult(array $controllerResult)
     {
-        $this->controllerResult = controllerResult;
+        $this->controllerResult = $controllerResult;
     }
 }

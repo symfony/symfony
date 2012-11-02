@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="router.class">Symfony\Bundle\FrameworkBundle\Routing\Router</parameter>
+        <parameter key="routing.config_cache_factory.class">Symfony\Component\Config\ConfigCacheFactory</parameter>
         <parameter key="router.request_context.class">Symfony\Component\Routing\RequestContext</parameter>
         <parameter key="routing.loader.class">Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader</parameter>
         <parameter key="routing.resolver.class">Symfony\Component\Config\Loader\LoaderResolver</parameter>
@@ -44,6 +45,10 @@
             <argument type="service" id="file_locator" />
         </service>
 
+        <service id="routing.config_cache_factory" class="%routing.config_cache_factory.class%" public="false">
+            <argument>%kernel.debug%</argument>
+        </service>
+
         <service id="routing.loader" class="%routing.loader.class%">
             <tag name="monolog.logger" channel="router" />
             <argument type="service" id="controller_name_converter" />
@@ -69,6 +74,9 @@
             </argument>
             <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <call method="setConfigCacheFactory">
+                <argument type="service" id="routing.config_cache_factory" />
+            </call>
         </service>
 
         <service id="router" alias="router.default" />

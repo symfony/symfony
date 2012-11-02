@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
+use Symfony\Component\Routing\RequestContextAwareInterface;
 
 /**
  * The Router class is an example of the integration of all pieces of the
@@ -24,7 +25,7 @@ use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Router implements RouterInterface
+class Router implements RouterInterface, RequestContextAwareInterface
 {
     /**
      * @var UrlMatcherInterface|null

@@ -20,20 +20,21 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface RequestMatcherInterface
+interface RequestMatcherInterface extends UrlMatcherInterface
 {
     /**
-     * Tries to match a request with a set of routes.
+     * Tries to match a Request or a URL path with a set of routes.
      *
-     * If the matcher can not find information, it must throw one of the exceptions documented
-     * below.
+     * In contrast to the UrlMatcherInterface, a request matcher also accepts a Request object.
      *
-     * @param Request $request The request to match
+     * @see UrlMatcherInterface
+     *
+     * @param Request|string $request A Request or a string with the path component of a URL (raw format, i.e. not urldecoded).
      *
      * @return array An array of parameters
      *
      * @throws ResourceNotFoundException If no matching resource could be found
      * @throws MethodNotAllowedException If a matching resource was found but the request method is not allowed
      */
-    public function matchRequest(Request $request);
+    public function match($request);
 }

@@ -35,7 +35,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort)
     {
-        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')
+        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcher')
                              ->disableOriginalConstructor()
                              ->getMock();
         $context = new RequestContext();
@@ -78,14 +78,6 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
         return new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testInvalidMatcher()
-    {
-        new RouterListener(new \stdClass());
-    }
-
     public function testRequestMatcher()
     {
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
@@ -94,11 +86,11 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
 
         $requestMatcher = $this->getMock('Symfony\Component\Routing\Matcher\RequestMatcherInterface');
         $requestMatcher->expects($this->once())
-                       ->method('matchRequest')
+                       ->method('match')
                        ->with($this->isInstanceOf('Symfony\Component\HttpFoundation\Request'))
                        ->will($this->returnValue(array()));
 
-        $listener = new RouterListener($requestMatcher, new RequestContext());
+        $listener = new RouterListener($requestMatcher);
         $listener->onKernelRequest($event);
     }
 
@@ -110,7 +102,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
 
         $requestMatcher = $this->getMock('Symfony\Component\Routing\Matcher\RequestMatcherInterface');
         $requestMatcher->expects($this->any())
-                       ->method('matchRequest')
+                       ->method('match')
                        ->with($this->isInstanceOf('Symfony\Component\HttpFoundation\Request'))
                        ->will($this->returnValue(array()));
 
@@ -119,7 +111,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
                        ->method('getContext')
                        ->will($this->returnValue($context));
 
-        $listener = new RouterListener($requestMatcher, new RequestContext());
+        $listener = new RouterListener($requestMatcher);
         $listener->onKernelRequest($event);
 
         // sub-request with another HTTP method

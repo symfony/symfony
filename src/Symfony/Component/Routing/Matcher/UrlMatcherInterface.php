@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
-use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
@@ -22,20 +21,24 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
  *
  * @api
  */
-interface UrlMatcherInterface extends RequestContextAwareInterface
+interface UrlMatcherInterface
 {
     /**
      * Tries to match a URL path with a set of routes.
      *
-     * If the matcher can not find information, it must throw one of the exceptions documented
-     * below.
+     * As matching a path only is quite limiting, the UrlMatcher likely also needs to implement {@link \Symfony\Component\Routing\RequestContextAwareInterface}
+     * to access more metadata about the request context like the domain and HTTP method. Alternatively, you can implement
+     * {@link \Symfony\Component\Routing\Matcher\RequestMatcherInterface} to express that you also accept a {@link \Symfony\Component\HttpFoundation\Request}
+     * object in the `match` method, that directly exposes all needed information.
      *
-     * @param string $pathinfo The path info to be parsed (raw format, i.e. not urldecoded)
+     * If the matcher can not find a corresponding resource, it must throw one of the exceptions documented below.
+     *
+     * @param string $pathinfo A string with the path component of a URL (raw format, i.e. not urldecoded).
      *
      * @return array An array of parameters
      *
-     * @throws ResourceNotFoundException If the resource could not be found
-     * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
+     * @throws ResourceNotFoundException If no matching resource could be found
+     * @throws MethodNotAllowedException If a matching resource was found but the request method is not allowed
      *
      * @api
      */

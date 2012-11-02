@@ -19,6 +19,11 @@ namespace Symfony\Component\Security\Core\Util;
 class StringUtils
 {
     /**
+     * This class should not be instantiated
+     */
+    private function __construct() {}
+
+    /**
      * Compares two strings.
      *
      * This method implements a constant-time algorithm to compare strings.
@@ -41,9 +46,4 @@ class StringUtils
 
         return 0 === $result;
     }
-
-    /**
-     * This class should not be instantiated
-     */
-    private function __construct() {}
 }

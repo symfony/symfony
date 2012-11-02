@@ -98,6 +98,11 @@ class FormUtil
     );
 
     /**
+     * This class should not be instantiated
+     */
+    private function __construct() {}
+
+    /**
      * Returns the singular form of a word
      *
      * If the method can't determine the form with certainty, an array of the
@@ -201,9 +206,4 @@ class FormUtil
         // not considered to be empty, ever.
         return null === $data || '' === $data;
     }
-
-    /**
-     * This class should not be instantiated
-     */
-    private function __construct() {}
 }

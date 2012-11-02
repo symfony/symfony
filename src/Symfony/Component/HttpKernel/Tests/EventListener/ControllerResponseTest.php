@@ -50,11 +50,11 @@ class ControllerResponseTest extends \PHPUnit_Framework_TestCase
     public function testControllerResponseIsChainable()
     {
         
-        $controllerResponse = ['foo' => 'foo'];
+        $controllerResponse = array('foo' => 'foo');
         
         $event = new GetResponseForControllerResultEvent($this->kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $controllerResponse);
         $this->dispatcher->dispatch(KernelEvents::VIEW, $event);
         
-        $this->assertEquals(['foo' => 'foo', 'bar' => 'bar'], $event->getControllerResult());
+        $this->assertEquals(array('foo' => 'foo', 'bar' => 'bar'), $event->getControllerResult());
     }
 }

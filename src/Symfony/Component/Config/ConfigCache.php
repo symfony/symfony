@@ -83,8 +83,8 @@ class ConfigCache
     /**
      * Writes cache.
      *
-     * @param string $content  The content to write in the cache
-     * @param array  $metadata An array of ResourceInterface instances
+     * @param string              $content  The content to write in the cache
+     * @param ResourceInterface[] $metadata An array of ResourceInterface instances
      *
      * @throws \RuntimeException When cache file can't be wrote
      */

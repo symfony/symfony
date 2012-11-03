@@ -1,0 +1,98 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        <img width="28" height="28" alt="cache" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAQAAADYBBcfAAACvElEQVR42tVTbUhTYRTerDCnKVoUUr/KCZmypA9Koet0bXNLJ5XazDJ/WFaCUY0pExRZXxYiJgsxWWjkaL+yK+po1gjyR2QfmqWxtBmaBtqWGnabT++c11Fu4l/P4VzOPc95zoHznsNZodIbLDdRcKnc1Bu8DAK45ZsOnykQNMopsNooLxCknb0cDq5vml9FtHiIgpBR0R6iihYyFMTDt2Lg56ObPkI6TMGXSof1EV67IqCwisJSWliFAG/E0CfFIiebdNypcxi/1zgyFiIiZ3sJQr0RQx5frLa6k7SOKRo3oMFNR5t62h2rttKXEOKFqDCxtXNmmBokO2KKTlp3IdWuT2dYRNGKwEXEBCcL172G5FG0aIxC0kR9PBTVH1kkwQn+IqJnCE33EalVzT9GJQS1tAdD3CKicJYFrxqx7W2ejCEdZy1FiC5tZxHhLJKOZaRdQJAyV/YAvDliySALHxmxR4Hqe2iwvaOR/CEuZYJFSgYhVbZRkA8KGdEktrqnqra90NndCdkt77fjIHIhexOrfO6O3bbbOj/rqu5IptgyR3sU93QbOYhquZK4MCDp0Ina/PLsu5JvbCTRaapUdUmIV/RzoMdsk/0hWRNdAvKOmvqlN0drsJbJf1P4YsQ5lGrJeuosiOUgbOC8cto3LfOXTdVd7BqZsQKbse+0jUL6WPcesqs4MNSUTQAxGjwFiC8m3yzmqwHJBWYKBJ9WNqW/dHkpU/osch1Yj5RJfXPfSEe/2UPsN490NPfZG5CKyJmcV5ayHyzy7BMqsXfuHhGK/cjAIeSpR92gehR55D8TcQhDEKJwytBJ4fr4NULvrEM8NszfJPyxDoHYAQ1oPCWmIX4gifmDS/DV2DKeb25FHWr76yEG7/9L4YFPeiQQ4/8LkgJ8Et+NncTCsYqzXAEXa7CWdPZzGWdlyV+vST0JanfPvwAAAABJRU5ErkJggg=="/>
+        <span class="sf-toolbar-status">Cache</span>
+        <span class="sf-toolbar-status sf-toolbar-status-green sf-toolbar-info-piece-additional">{{ collector.totalHits }} hits</span>
+        <span class="sf-toolbar-status sf-toolbar-status-red sf-toolbar-info-piece-additional-detail">{{ collector.totalMisses }} misses</span>
+        <span class="sf-toolbar-status sf-toolbar-status-green sf-toolbar-info-piece-additional-detail">{{ collector.totalTime }} ms</span>
+    {% endset %}
+    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon">
+        <img alt="Cache" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAQAAADYBBcfAAACvElEQVR42tVTbUhTYRTerDCnKVoUUr/KCZmypA9Koet0bXNLJ5XazDJ/WFaCUY0pExRZXxYiJgsxWWjkaL+yK+po1gjyR2QfmqWxtBmaBtqWGnabT++c11Fu4l/P4VzOPc95zoHznsNZodIbLDdRcKnc1Bu8DAK45ZsOnykQNMopsNooLxCknb0cDq5vml9FtHiIgpBR0R6iihYyFMTDt2Lg56ObPkI6TMGXSof1EV67IqCwisJSWliFAG/E0CfFIiebdNypcxi/1zgyFiIiZ3sJQr0RQx5frLa6k7SOKRo3oMFNR5t62h2rttKXEOKFqDCxtXNmmBokO2KKTlp3IdWuT2dYRNGKwEXEBCcL172G5FG0aIxC0kR9PBTVH1kkwQn+IqJnCE33EalVzT9GJQS1tAdD3CKicJYFrxqx7W2ejCEdZy1FiC5tZxHhLJKOZaRdQJAyV/YAvDliySALHxmxR4Hqe2iwvaOR/CEuZYJFSgYhVbZRkA8KGdEktrqnqra90NndCdkt77fjIHIhexOrfO6O3bbbOj/rqu5IptgyR3sU93QbOYhquZK4MCDp0Ina/PLsu5JvbCTRaapUdUmIV/RzoMdsk/0hWRNdAvKOmvqlN0drsJbJf1P4YsQ5lGrJeuosiOUgbOC8cto3LfOXTdVd7BqZsQKbse+0jUL6WPcesqs4MNSUTQAxGjwFiC8m3yzmqwHJBWYKBJ9WNqW/dHkpU/osch1Yj5RJfXPfSEe/2UPsN490NPfZG5CKyJmcV5ayHyzy7BMqsXfuHhGK/cjAIeSpR92gehR55D8TcQhDEKJwytBJ4fr4NULvrEM8NszfJPyxDoHYAQ1oPCWmIX4gifmDS/DV2DKeb25FHWr76yEG7/9L4YFPeiQQ4/8LkgJ8Et+NncTCsYqzXAEXa7CWdPZzGWdlyV+vST0JanfPvwAAAABJRU5ErkJggg==" />
+    </span>
+    <strong>Cache</strong>
+    <small>
+        <span class="count">
+            <span>{{ collector.totalHits }}</span>
+            <span style="background-color: red">{{ collector.totalMisses }}</span>
+            <span>{{ collector.totalTime }} ms</span>
+        </span>
+    </small>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2 style="margin-bottom: 0;">Cache information</h2>
+    <div><small>Hits: {{ collector.totalHits }} Misses: {{ collector.totalMisses }} Operations: {{ collector.totalOps }} Time: {{ collector.totalTime }}ms</small></div>
+
+    {% for driverType, driverInfo in collector.drivers %}
+        <h3 style="margin-bottom: 0; margin-top: 20px;">Driver type <em>{{ driverType }}</em></h3>
+
+        <div style="margin-left: 20px;">
+        {% for driverName, driverData in driverInfo %}
+            <h3 style="margin-bottom: 0; margin-top: 20px;">Driver name <em>{{ driverName }}</em></h3>
+
+            {% set driverOps = 0 %}
+            {% set driverHits = 0 %}
+            {% set driverTime = 0 %}
+
+            <table style="margin-left: 20px; margin-bottom: 10px;">
+                <tr>
+                    <th>Operation</th>
+                    <th>Data</th>
+                </tr>
+                {% for operation, operationInfo in driverData %}
+                    <tr>
+                        <th style="width: 60px">{{ operation }}</th>
+                        <td>
+
+                            {% set instanceOps = 0 %}
+                            {% set instanceHits = 0 %}
+                            {% set instanceTime = 0 %}
+
+                            <table style="margin-bottom: 10px;">
+                                <tr>
+                                    <th>Key</th>
+                                    <th>Time</th>
+                                    <th>Success</th>
+                                </tr>
+                                {% for key, info in operationInfo %}
+                                    {% set driverOps = driverOps + 1 %}
+                                    {% set driverTime = driverTime + info['duration'] %}
+
+                                    {% set instanceOps = instanceOps + 1 %}
+                                    {% set instanceTime = instanceTime + info['duration'] %}
+
+                                    <tr>
+                                        <th>{{ key }}</th>
+                                        <td>{{ info['duration'] }}</td>
+                                        <td>
+                                            {% if info['result'] %}
+                                                {% set driverHits = driverHits + 1 %}
+                                                {% set instanceHits = instanceHits + 1 %}
+                                                YES
+                                            {% else %}
+                                                NO
+                                            {% endif %}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+
+                            Total hits: {{ instanceHits }} Total misses {{ instanceOps - instanceHits }} Total operations {{ instanceOps }} Total time: {{ instanceTime }}ms
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+            Total hits: {{ driverHits }} Total misses {{ driverOps - driverHits }} Total operations {{ driverOps }} Total time: {{ driverTime }}ms
+        {% endfor %}
+        </div>
+
+    {% endfor %}
+{% endblock %}

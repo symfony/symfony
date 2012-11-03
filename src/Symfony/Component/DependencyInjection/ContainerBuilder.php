@@ -517,7 +517,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the service aliases.
      *
-     * @param array $aliases An array of service definitions
+     * @param array $aliases An array of aliases
      *
      * @api
      */
@@ -652,7 +652,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the service definitions.
      *
-     * @param array $definitions An array of service definitions
+     * @param Definition[] $definitions An array of service definitions
      *
      * @api
      */

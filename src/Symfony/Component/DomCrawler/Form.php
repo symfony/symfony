@@ -330,7 +330,7 @@ class Form extends Link implements \ArrayAccess
     }
 
     /**
-     * Sets current \DOMNode instance
+     * Sets current \DOMNode instance.
      *
      * @param \DOMNode $node A \DOMNode instance
      *

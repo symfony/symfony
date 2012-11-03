@@ -130,7 +130,7 @@ class Link
     }
 
     /**
-     * Returns raw uri data
+     * Returns raw uri data.
      *
      * @return string
      */
@@ -140,7 +140,7 @@ class Link
     }
 
     /**
-     * Sets current \DOMNode instance
+     * Sets current \DOMNode instance.
      *
      * @param \DOMNode $node A \DOMNode instance
      *

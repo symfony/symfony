@@ -32,7 +32,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     {
         self::$fixturesPath = __DIR__.'/../Fixtures/';
         require_once self::$fixturesPath.'/TestCommand.php';
-        require_once self::$fixturesPath.'/FooCommand.php';
+        require_once self::$fixturesPath.'/OtherCommand.php';
     }
 
     public function testConstructor()
@@ -263,7 +263,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     public function testRunAutoCommandNameOnInput()
     {
         $command = new \TestCommand();
-        $otherCommand = new \FooCommand();
+        $otherCommand = new \OtherCommand();
         $application = new Application();
         $application->add($command);
         $application->add($otherCommand);

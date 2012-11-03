@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -626,5 +627,57 @@ class Command
         if (!preg_match('/^[^\:]+(\:[^\:]+)*$/', $name)) {
             throw new \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
         }
+    }
+
+    /**
+     * Runs a command available in the same application
+     * without adding a command key again on the arguments
+     *
+     * use case: run command from installer command
+     *
+     *    $this->runCommand('cache:clear', $input, $output);
+     *    $this->runCommand('doctrine:fixtures:load', $input, $output);
+     *
+     * @param  string          $command Command name e.g. cache:clear
+     * @param  InputInterface  $input
+     * @param  OutputInterface $output
+     * @return integer
+     */
+    protected function runCommand($command, InputInterface $input, OutputInterface $output)
+    {
+        $consoleCommand = $this->getApplication()->find($command);
+
+        $mergedInput = $input;
+
+        if (!$input->hasArgument('command')) {
+
+            // builds array for new input definition
+            $arrayOfArgumentsAndOptions = array(new InputArgument('command'));
+
+            // adds the current arguments
+            foreach ($input->getArguments() as $arg) {
+                $arrayOfArgumentsAndOptions = array_merge (
+                    $arrayOfArgumentsAndOptions,
+                    array(new InputArgument($arg->getName()))
+                );
+            }
+
+            // adds the current options
+            foreach ($input->getOptions() as $arg) {
+                $arrayOfArgumentsAndOptions = array_merge (
+                    $arrayOfArgumentsAndOptions,
+                    array(new InputOption($arg->getName()))
+                );
+            }
+
+            // actual creation of new definition including the command key
+            $definition = new InputDefinition($arrayOfArgumentsAndOptions);
+
+            $args = ??;
+
+            $mergedInput = new ArrayInput($args, $definition);
+        }
+
+        return $consoleCommand->run($mergedInput, $output);
     }
 }

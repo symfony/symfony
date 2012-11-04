@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\Extension\Core\CoreExtension;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

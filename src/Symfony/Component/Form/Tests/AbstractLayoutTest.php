@@ -13,8 +13,6 @@ namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 
 abstract class AbstractLayoutTest extends FormIntegrationTestCase

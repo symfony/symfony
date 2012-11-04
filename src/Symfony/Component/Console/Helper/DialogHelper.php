@@ -264,9 +264,9 @@ class DialogHelper extends Helper
             return self::$stty;
         }
 
-        exec('/usr/bin/env stty', $output, $exicode);
+        exec('/usr/bin/env stty', $output, $exitcode);
 
-        return self::$stty = $exicode === 0;
+        return self::$stty = $exitcode === 0;
     }
 
     /**

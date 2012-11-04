@@ -62,6 +62,26 @@ class Glob implements ValueInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function prepend($expr)
+    {
+        $this->pattern = $expr.$this->pattern;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function append($expr)
+    {
+        $this->pattern .= $expr;
+
+        return $this;
+    }
+
+    /**
      * @param bool $strictLeadingDot
      * @param bool $strictWildcardSlash
      *

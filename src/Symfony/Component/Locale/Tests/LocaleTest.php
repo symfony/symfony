@@ -19,6 +19,9 @@ class LocaleTest extends LocaleTestCase
     public function testGetDisplayCountriesReturnsFullListForSubLocale()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+
+        Locale::setDefault('de_CH');
+
         $countriesDe = Locale::getDisplayCountries('de');
         $countriesDeCh = Locale::getDisplayCountries('de_CH');
 
@@ -30,6 +33,9 @@ class LocaleTest extends LocaleTestCase
     public function testGetDisplayLanguagesReturnsFullListForSubLocale()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+
+        Locale::setDefault('de_CH');
+
         $languagesDe = Locale::getDisplayLanguages('de');
         $languagesDeCh = Locale::getDisplayLanguages('de_CH');
 
@@ -41,6 +47,9 @@ class LocaleTest extends LocaleTestCase
     public function testGetDisplayLocalesReturnsFullListForSubLocale()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
+
+        Locale::setDefault('de_CH');
+
         $localesDe = Locale::getDisplayLocales('de');
         $localesDeCh = Locale::getDisplayLocales('de_CH');
 

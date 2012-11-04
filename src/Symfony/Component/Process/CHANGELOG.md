@@ -4,6 +4,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * added a way to retrieve the standard and error output incrementally
  * added Process:restart()
 
 2.1.0

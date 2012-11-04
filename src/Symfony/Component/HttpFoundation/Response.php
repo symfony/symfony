@@ -1097,7 +1097,7 @@ class Response
     }
 
     /**
-     * Is the reponse forbidden?
+     * Is the response forbidden?
      *
      * @return Boolean
      *

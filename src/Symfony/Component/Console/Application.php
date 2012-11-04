@@ -18,7 +18,6 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Command\Command;
@@ -219,6 +218,18 @@ class Application
     public function getHelperSet()
     {
         return $this->helperSet;
+    }
+
+    /**
+     * Set an input definition set to be used with this application
+     *
+     * @param InputDefinition $definition The input definition
+     *
+     * @api
+     */
+    public function setDefinition(InputDefinition $definition)
+    {
+        $this->definition = $definition;
     }
 
     /**

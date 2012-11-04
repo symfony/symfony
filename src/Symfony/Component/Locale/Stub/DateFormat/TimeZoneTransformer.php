@@ -75,7 +75,7 @@ class TimeZoneTransformer extends Transformer
      * @see    http://www.twinsun.com/tz/tz-link.htm
      *
      * @throws NotImplementedException   When the GMT time zone have minutes offset different than zero
-     * @throws InvalidArgumentException  When the value can not be matched with pattern
+     * @throws \InvalidArgumentException  When the value can not be matched with pattern
      */
     public static function getEtcTimeZoneId($formattedTimeZone)
     {

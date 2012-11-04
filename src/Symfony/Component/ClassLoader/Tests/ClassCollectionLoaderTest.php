@@ -117,53 +117,34 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testFixNamespaceDeclarations()
+    /**
+     * @dataProvider getFixNamespaceDeclarationsData
+     */
+    public function testFixNamespaceDeclarations($source, $expected)
     {
-        $source = <<<EOF
-<?php
+        $this->assertEquals('<?php '.$expected, ClassCollectionLoader::fixNamespaceDeclarations('<?php '.$source));
+    }
 
-namespace Foo;
-class Foo {}
-namespace   Bar ;
-class Foo {}
-namespace Foo\Bar;
-class Foo {}
-namespace Foo\Bar\Bar
-{
-    class Foo {}
-}
-namespace
-{
-    class Foo {}
-}
-EOF;
+    /**
+     * @dataProvider getFixNamespaceDeclarationsData
+     */
+    public function testFixNamespaceDeclarationsWithoutTokenizer($source, $expected)
+    {
+        ClassCollectionLoader::enableTokenizer(false);
+        $this->assertEquals('<?php '.$expected, ClassCollectionLoader::fixNamespaceDeclarations('<?php '.$source));
+        ClassCollectionLoader::enableTokenizer(true);
+    }
 
-        $expected = <<<EOF
-<?php
-
-namespace Foo
-{
-class Foo {}
-}
-namespace   Bar
-{
-class Foo {}
-}
-namespace Foo\Bar
-{
-class Foo {}
-}
-namespace Foo\Bar\Bar
-{
-    class Foo {}
-}
-namespace
-{
-    class Foo {}
-}
-EOF;
-
-        $this->assertEquals($expected, ClassCollectionLoader::fixNamespaceDeclarations($source));
+    public function getFixNamespaceDeclarationsData()
+    {
+        return array(
+            array("namespace;\nclass Foo {}\n", "namespace\n{\nclass Foo {}\n}\n"),
+            array("namespace Foo;\nclass Foo {}\n", "namespace Foo\n{\nclass Foo {}\n}\n"),
+            array("namespace   Bar ;\nclass Foo {}\n", "namespace   Bar\n{\nclass Foo {}\n}\n"),
+            array("namespace Foo\Bar;\nclass Foo {}\n", "namespace Foo\Bar\n{\nclass Foo {}\n}\n"),
+            array("namespace Foo\Bar\Bar\n{\nclass Foo {}\n}\n", "namespace Foo\Bar\Bar\n{\nclass Foo {}\n}\n"),
+            array("namespace\n{\nclass Foo {}\n}\n", "namespace\n{\nclass Foo {}\n}\n"),
+        );
     }
 
     /**
@@ -171,12 +152,58 @@ EOF;
      */
     public function testUnableToLoadClassException()
     {
-        ClassCollectionLoader::load(array('SomeNotExistingClass'), '', 'foo', false);
+        if (is_file($file = sys_get_temp_dir().'/foo.php')) {
+            unlink($file);
+        }
+
+        ClassCollectionLoader::load(array('SomeNotExistingClass'), sys_get_temp_dir(), 'foo', false);
     }
 
-    public function testLoadTwiceClass()
+    public function testCommentStripping()
     {
-        ClassCollectionLoader::load(array('Foo'), '', 'foo', false);
-        ClassCollectionLoader::load(array('Foo'), '', 'foo', false);
+        if (is_file($file = sys_get_temp_dir().'/bar.php')) {
+            unlink($file);
+        }
+        spl_autoload_register($r = function ($class) {
+            require_once __DIR__.'/Fixtures/'.str_replace(array('\\', '_'), '/', $class).'.php';
+        });
+
+        ClassCollectionLoader::load(array('Namespaced\\WithComments', 'Pearlike_WithComments'), sys_get_temp_dir(), 'bar', false);
+
+        spl_autoload_unregister($r);
+
+        $this->assertEquals(<<<EOF
+<?php  
+
+
+
+namespace Namespaced
+{
+
+class WithComments
+{
+    
+    public static \$loaded = true;
+}
+}
+ 
+namespace
+{
+
+
+
+
+class Pearlike_WithComments
+{
+    
+    public static \$loaded = true;
+}
+
+}
+
+EOF
+        , file_get_contents($file));
+
+        unlink($file);
     }
 }

@@ -71,7 +71,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a normalized date into a localized date string/array.
      *
-     * @param DateTime $dateTime Normalized date.
+     * @param \DateTime $dateTime Normalized date.
      *
      * @return string|array        Localized date string/array.
      *
@@ -108,7 +108,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @param string|array $value Localized date string/array
      *
-     * @return DateTime Normalized date
+     * @return \DateTime Normalized date
      *
      * @throws UnexpectedTypeException if the given value is not a string
      * @throws TransformationFailedException if the date could not be parsed

@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Tests;
 use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\Form;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 

@@ -73,6 +73,10 @@ class PhpAdapter extends AbstractAdapter
             $iterator = $iteratorAggregate->getIterator();
         }
 
+        if ($this->paths || $this->notPaths) {
+            $iterator = new Iterator\PathFilterIterator($iterator, $this->paths, $this->notPaths);
+        }
+
         return $iterator;
     }
 

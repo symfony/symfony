@@ -43,4 +43,18 @@ interface ValueInterface
      * @return int
      */
     function getType();
+
+    /**
+     * @param string $expr
+     *
+     * @return ValueInterface
+     */
+    public function prepend($expr);
+
+    /**
+     * @param string $expr
+     *
+     * @return ValueInterface
+     */
+    public function append($expr);
 }

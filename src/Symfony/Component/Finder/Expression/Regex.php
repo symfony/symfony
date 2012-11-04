@@ -66,7 +66,7 @@ class Regex implements ValueInterface
             $end   = substr($m[1], -1);
 
             if (($start === $end && !preg_match('/[*?[:alnum:] \\\\]/', $start)) || ($start === '{' && $end === '}')) {
-                return new self(substr($m[1], 1, -1), $m[2]);
+                return new self(substr($m[1], 1, -1), $m[2], $end);
             }
         }
 
@@ -76,9 +76,15 @@ class Regex implements ValueInterface
     /**
      * @param string $pattern
      * @param string $options
+     * @param string $delimiter
      */
-    public function __construct($pattern, $options = '')
+    public function __construct($pattern, $options = '', $delimiter = null)
     {
+        if (null !== $delimiter) {
+            // removes delimiter escaping
+            $pattern = str_replace('\\'.$delimiter, $delimiter, $pattern);
+        }
+
         $this->parsePattern($pattern);
         $this->options = $options;
     }
@@ -109,7 +115,7 @@ class Regex implements ValueInterface
     {
         return ($this->startFlag ? self::START_FLAG : '')
             .($this->startJoker ? self::JOKER : '')
-            .$this->pattern
+            .str_replace(self::BOUNDARY, '\\'.self::BOUNDARY, $this->pattern)
             .($this->endJoker ? self::JOKER : '')
             .($this->endFlag ? self::END_FLAG : '');
     }
@@ -128,6 +134,26 @@ class Regex implements ValueInterface
     public function getType()
     {
         return Expression::TYPE_REGEX;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend($expr)
+    {
+        $this->pattern = $expr.$this->pattern;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function append($expr)
+    {
+        $this->pattern .= $expr;
+
+        return $this;
     }
 
     /**
@@ -244,30 +270,6 @@ class Regex implements ValueInterface
     public function hasEndJoker()
     {
         return $this->endJoker;
-    }
-
-    /**
-     * @param string $expr
-     *
-     * @return Regex
-     */
-    public function prepend($expr)
-    {
-        $this->pattern = $expr.$this->pattern;
-
-        return $this;
-    }
-
-    /**
-     * @param string $expr
-     *
-     * @return Regex
-     */
-    public function append($expr)
-    {
-        $this->pattern .= $expr;
-
-        return $this;
     }
 
     /**

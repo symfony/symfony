@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Tests\Helper;
 
 use Symfony\Component\Console\Helper\ProgressHelper;
-use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Output\StreamOutput;
 
 class ProgressHelperTest extends \PHPUnit_Framework_TestCase

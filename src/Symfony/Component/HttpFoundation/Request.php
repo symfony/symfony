@@ -508,7 +508,7 @@ class Request
      *
      * This method is mainly useful for libraries that want to provide some flexibility.
      *
-     * Order of precedence: GET, PATH, POST, COOKIE
+     * Order of precedence: GET, PATH, POST
      *
      * Avoid using this method in controllers:
      *
@@ -516,7 +516,7 @@ class Request
      *  * prefer to get from a "named" source
      *
      * It is better to explicitly get request parameters from the appropriate
-     * public property instead (query, request, attributes, ...).
+     * public property instead (query, attributes, request).
      *
      * @param string  $key     the key
      * @param mixed   $default the default value

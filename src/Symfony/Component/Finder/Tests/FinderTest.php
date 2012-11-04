@@ -202,7 +202,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertSame($finder, $finder->ignoreDotFiles(false)->ignoreVCS(false));
         $this->assertIterator($this->toAbsolute(array('.git', '.bar', '.foo', '.foo/.bar', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
 
-        $finder = new Finder();
+        $finder = $this->buildFinder($adapter);
         $finder->ignoreDotFiles(false)->ignoreDotFiles(false)->ignoreVCS(false);
         $this->assertIterator($this->toAbsolute(array('.git', '.bar', '.foo', '.foo/.bar', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
 
@@ -602,7 +602,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
             array('dolor sit amet', '@^L@m', array('dolor.txt', 'ipsum.txt')),
             array('/^lorem ipsum dolor sit amet$/m', 'foobar', array('lorem.txt')),
             array('lorem', 'foobar', array('lorem.txt')),
-
             array('', 'lorem', array('dolor.txt', 'ipsum.txt')),
             array('ipsum dolor sit amet', '/^IPSUM/m', array('lorem.txt')),
         );
@@ -645,5 +644,60 @@ class FinderTest extends Iterator\RealIteratorTestCase
         }
 
         return $data;
+    }
+
+    /**
+     * @dataProvider getTestPathData
+     */
+    public function testPath(Adapter\AdapterInterface $adapter, $matchPatterns, $noMatchPatterns, $expected)
+    {
+        $finder = $this->buildFinder($adapter);
+        $finder->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures')
+            ->path($matchPatterns)
+            ->notPath($noMatchPatterns);
+
+        $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
+    }
+
+    public function getTestPathData()
+    {
+        $tests = array(
+            array('', '', array()),
+            array('/^A\/B\/C/', '/C$/',
+                array('A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat')
+            ),
+            array('/^A\/B/', 'foobar',
+                array(
+                    'A'.DIRECTORY_SEPARATOR.'B',
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'ab.dat',
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
+                )
+            ),
+            array('A/B/C', 'foobar',
+                array(
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
+                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
+                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat.copy',
+                )
+            ),
+            array('A/B', 'foobar',
+                array(
+                    //dirs
+                    'A'.DIRECTORY_SEPARATOR.'B',
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
+                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B',
+                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C',
+                    //files
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'ab.dat',
+                    'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
+                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'ab.dat.copy',
+                    'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat.copy',
+                )
+            ),
+        );
+
+        return $this->buildTestData($tests);
     }
 }

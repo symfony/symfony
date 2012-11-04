@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Templating\TemplateNameParser;
-use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 
 class TwigEngineTest extends TestCase
 {

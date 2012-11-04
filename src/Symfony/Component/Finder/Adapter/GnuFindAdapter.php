@@ -13,9 +13,7 @@ namespace Symfony\Component\Finder\Adapter;
 
 use Symfony\Component\Finder\Iterator;
 use Symfony\Component\Finder\Shell\Shell;
-use Symfony\Component\Finder\Expression\Expression;
 use Symfony\Component\Finder\Shell\Command;
-use Symfony\Component\Finder\Iterator\SortableIterator;
 
 /**
  * Shell engine implementation using GNU find command.

@@ -3,7 +3,6 @@
 namespace Symfony\Component\Routing\Tests\Matcher\Dumper;
 
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Matcher\Dumper\DumperPrefixCollection;
 use Symfony\Component\Routing\Matcher\Dumper\DumperRoute;
 use Symfony\Component\Routing\Matcher\Dumper\DumperCollection;

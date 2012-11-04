@@ -14,11 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Templating\EngineInterface;
-use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
-use Symfony\Component\Form\Util\FormUtil;
 
 /**
  * FormHelper provides helpers to help display forms.

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Finder\Tests\Iterator;
 
 use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
-use Symfony\Component\Finder\Comparator\NumberComparator;
 
 class DepthRangeFilterIteratorTest extends RealIteratorTestCase
 {

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Tests\Core\Util;
 
-use Symfony\Component\Security\Core\Util\NullSeedProvider;
 use Symfony\Component\Security\Core\Util\SecureRandom;
 
 class SecureRandomTest extends \PHPUnit_Framework_TestCase

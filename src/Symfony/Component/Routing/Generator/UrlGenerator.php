@@ -199,24 +199,31 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             }
 
             if ($hostnameTokens) {
-                $ghost = '';
+                $routeHost = '';
                 foreach ($hostnameTokens as $token) {
                     if ('variable' === $token[0]) {
-                        if (in_array($mergedParams[$token[3]], array(null, '', false), true)) {
-                            // check requirement
-                            if ($mergedParams[$token[3]] && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
-                                throw new InvalidParameterException(sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $mergedParams[$token[3]]));
+                        if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
+                            $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $mergedParams[$token[3]]);
+
+                            if ($this->strictRequirements) {
+                                throw new InvalidParameterException($message);
                             }
+
+                            if ($this->logger) {
+                                $this->logger->err($message);
+                            }
+
+                            return null;
                         }
 
-                        $ghost = $token[1].$mergedParams[$token[3]].$ghost;
+                        $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;
                     } elseif ('text' === $token[0]) {
-                        $ghost = $token[1].$ghost;
+                        $routeHost = $token[1].$routeHost;
                     }
                 }
 
-                if ($ghost != $host) {
-                    $host = $ghost;
+                if ($routeHost != $host) {
+                    $host = $routeHost;
                     $absolute = true;
                 }
             }

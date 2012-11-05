@@ -82,7 +82,7 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
             $this->fail('->setDefault() throws an Exception if you give a default value for a required argument');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\Exception', $e, '->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
-            $this->assertEquals('Cannot set a default value except for Parameter::OPTIONAL mode.', $e->getMessage());
+            $this->assertEquals('Cannot set a default value except for InputArgument::OPTIONAL mode.', $e->getMessage());
         }
 
         try {

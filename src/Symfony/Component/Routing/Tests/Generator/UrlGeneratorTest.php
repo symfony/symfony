@@ -398,6 +398,41 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://fr.example.com/app.php/Fabien', $this->getGenerator($routes, array('host' => 'fr.example.com'))->generate('test', array('name' =>'Fabien', 'locale' => 'fr'), true));
     }
 
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
+     */
+    public function testUrlWithInvalidParameterInHostname()
+    {
+        $routes = $this->getRoutes('test', new Route('/', array(), array('foo' => 'bar'), array(), '{foo}.example.com'));
+        $this->getGenerator($routes)->generate('test', array('foo' => 'baz'), false);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
+     */
+    public function testUrlWithInvalidParameterInHostnameWhenParamHasADefaultValue()
+    {
+        $routes = $this->getRoutes('test', new Route('/', array('foo' => 'bar'), array('foo' => 'bar'), array(), '{foo}.example.com'));
+        $this->getGenerator($routes)->generate('test', array('foo' => 'baz'), false);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
+     */
+    public function testUrlWithInvalidParameterEqualsDefaultValueInHostname()
+    {
+        $routes = $this->getRoutes('test', new Route('/', array('foo' => 'baz'), array('foo' => 'bar'), array(), '{foo}.example.com'));
+        $this->getGenerator($routes)->generate('test', array('foo' => 'baz'), false);
+    }
+
+    public function testUrlWithInvalidParameterInHostnameInNonStrictMode()
+    {
+        $routes = $this->getRoutes('test', new Route('/', array(), array('foo' => 'bar'), array(), '{foo}.example.com'));
+        $generator = $this->getGenerator($routes);
+        $generator->setStrictRequirements(false);
+        $this->assertNull($generator->generate('test', array('foo' => 'baz'), false));
+    }
+
     protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)
     {
         $context = new RequestContext('/app.php');

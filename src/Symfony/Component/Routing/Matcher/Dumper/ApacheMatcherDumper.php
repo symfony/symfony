@@ -111,6 +111,7 @@ class ApacheMatcherDumper extends MatcherDumper
      * @param  Route  $route The route
      * @param  array  $options Options
      * @param  bool   $hostnameRegexUnique Unique identifier for the hostname regex
+     *
      * @return string The compiled route
      */
     private function dumpRoute($name, $route, array $options, $hostnameRegexUnique)

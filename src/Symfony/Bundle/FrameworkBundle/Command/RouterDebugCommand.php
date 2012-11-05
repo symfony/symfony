@@ -93,7 +93,7 @@ EOF
                     ? implode(', ', $requirements['_method']) : $requirements['_method']
                 )
                 : 'ANY';
-            $hostname = null !== $route->getHostnamePattern()
+            $hostname = '' !== $route->getHostnamePattern()
                 ? $route->getHostnamePattern() : 'ANY';
 
             $maxName = max($maxName, strlen($name));

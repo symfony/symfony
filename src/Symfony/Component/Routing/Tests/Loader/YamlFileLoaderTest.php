@@ -90,7 +90,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $route = $routes['blog_show'];
         $this->assertEquals('/blog/{slug}', $route->getPattern());
         $this->assertEquals('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
-        $this->assertEquals('\d+', $route->getRequirement('foo'));
+        $this->assertEquals('\d+', $route->getRequirement('locale'));
         $this->assertEquals('{locale}.example.com', $route->getHostnamePattern());
         $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
     }

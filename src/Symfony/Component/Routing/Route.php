@@ -44,7 +44,7 @@ class Route implements \Serializable
      *
      * @api
      */
-    public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array(), $hostnamePattern = null)
+    public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array(), $hostnamePattern = '')
     {
         $this->setPattern($pattern);
         $this->setDefaults($defaults);
@@ -106,14 +106,24 @@ class Route implements \Serializable
         return $this;
     }
 
+    /**
+     * Returns the hostname pattern.
+     *
+     * @return string The pattern
+     */
     public function getHostnamePattern()
     {
         return $this->hostnamePattern;
     }
 
+    /**
+     * Sets the hostname pattern.
+     *
+     * @param string $pattern The pattern
+     */
     public function setHostnamePattern($pattern)
     {
-        $this->hostnamePattern = $pattern;
+        $this->hostnamePattern = (string) $pattern;
 
         return $this;
     }

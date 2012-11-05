@@ -282,7 +282,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
                 // route13
                 if (0 === strpos($pathinfo, '/route13') && preg_match('#^/route13/(?<name>[^/]++)$#s', $pathinfo, $matches)) {
-                    $matches = $matches + $hostnameMatches;
+                    $matches = array_merge($hostnameMatches, $matches);
                     $matches['_route'] = 'route13';
 
                     return $matches;
@@ -290,7 +290,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
                 // route14
                 if (0 === strpos($pathinfo, '/route14') && preg_match('#^/route14/(?<name>[^/]++)$#s', $pathinfo, $matches)) {
-                    return array_merge($this->mergeDefaults($matches + $hostnameMatches, array (  'var1' => 'val',)), array('_route' => 'route14'));
+                    return array_merge($this->mergeDefaults(array_merge($hostnameMatches, $matches), array (  'var1' => 'val',)), array('_route' => 'route14'));
                 }
 
             }

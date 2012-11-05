@@ -22,4 +22,3 @@ class DumperCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($a, $c->getRoot());
     }
 }
-

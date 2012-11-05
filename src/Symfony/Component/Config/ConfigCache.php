@@ -21,7 +21,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ConfigCache
+class ConfigCache implements ConfigCacheInterface
 {
     private $debug;
     private $file;

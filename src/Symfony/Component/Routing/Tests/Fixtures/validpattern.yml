@@ -2,6 +2,6 @@ blog_show:
     pattern:          /blog/{slug}
     defaults:         { _controller: MyBlogBundle:Blog:show }
     hostname_pattern: "{locale}.example.com"
-    requirements:     { 'locale': '\d+' }
+    requirements:     { '_method': 'GET', 'locale': '\w+' }
     options:
         compiler_class: RouteCompiler

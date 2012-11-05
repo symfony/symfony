@@ -7,6 +7,7 @@
     <route id="blog_show" pattern="/blog/{slug}" hostname-pattern="{locale}.example.com">
         <default key="_controller">MyBundle:Blog:show</default>
         <requirement key="_method">GET</requirement>
+        <requirement key="locale">\w+</requirement>
         <option key="compiler_class">RouteCompiler</option>
     </route>
 </routes>

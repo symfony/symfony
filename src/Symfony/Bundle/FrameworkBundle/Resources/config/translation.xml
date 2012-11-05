@@ -31,6 +31,7 @@
         <parameter key="translation.loader.class">Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader</parameter>
         <parameter key="translation.extractor.class">Symfony\Component\Translation\Extractor\ChainExtractor</parameter>
         <parameter key="translation.writer.class">Symfony\Component\Translation\Writer\TranslationWriter</parameter>
+        <parameter key="translator.config_cache_factory.class">Symfony\Component\Config\ConfigCacheFactory</parameter>
     </parameters>
 
     <services>
@@ -42,6 +43,13 @@
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
+            <call method="setConfigCacheFactory">
+                <argument type="service" id="translator.config_cache_factory" />
+            </call>
+        </service>
+
+        <service id="translator.config_cache_factory" class="%translator.config_cache_factory.class%" public="false">
+            <argument>%kernel.debug%</argument>
         </service>
 
         <service id="translator" class="%translator.identity.class%">

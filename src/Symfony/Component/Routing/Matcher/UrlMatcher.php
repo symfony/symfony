@@ -147,7 +147,7 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
-            return array_merge($this->mergeDefaults($hostnameMatches + $matches, $route->getDefaults()), array('_route' => $name));
+            return array_merge($this->mergeDefaults(array_merge($matches, $hostnameMatches), $route->getDefaults()), array('_route' => $name));
         }
     }
 

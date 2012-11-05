@@ -70,7 +70,7 @@ class YamlFileLoader extends FileLoader
                 $defaults = isset($config['defaults']) ? $config['defaults'] : array();
                 $requirements = isset($config['requirements']) ? $config['requirements'] : array();
                 $options = isset($config['options']) ? $config['options'] : array();
-                $hostnamePattern = isset($config['hostname_pattern']) ? $config['hostname_pattern'] : null;
+                $hostnamePattern = isset($config['hostname_pattern']) ? $config['hostname_pattern'] : '';
 
                 $this->setCurrentDir(dirname($path));
                 $collection->addCollection($this->import($config['resource'], $type, false, $file), $prefix, $defaults, $requirements, $options, $hostnamePattern);

@@ -101,7 +101,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
             'requirements'     => array(),
             'options'          => array(),
             'defaults'         => array(),
-            'hostname_pattern' => null,
+            'hostname_pattern' => '',
         );
 
         $class = new \ReflectionClass($class);

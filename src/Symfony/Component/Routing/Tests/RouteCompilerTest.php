@@ -197,7 +197,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($hostnameRegex, str_replace(array("\n", ' '), '', $compiled->getHostnameRegex()), $name.' (hostname regex)');
         $this->assertEquals($hostnameVariables, $compiled->getHostnameVariables(), $name.' (hostname variables)');
         $this->assertEquals($hostnameTokens, $compiled->getHostnameTokens(), $name.' (hostname tokens)');
-    } 
+    }
 
     public function provideCompileWithHostnameData()
     {
@@ -247,8 +247,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                     array('text', '.example'),
                     array('variable', '', '[^\.]++', 'locale'),
                 ),
-            ),            
+            ),
         );
     }
 }
-

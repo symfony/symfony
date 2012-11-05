@@ -309,6 +309,6 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection->setHostnamePattern('{locale}.example.com');
 
         $this->assertEquals('{locale}.example.com', $routea->getHostnamePattern());
-        $this->assertEquals('{locale}.example.net', $routeb->getHostnamePattern());
+        $this->assertEquals('{locale}.example.com', $routeb->getHostnamePattern());
     }
 }

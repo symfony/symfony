@@ -144,9 +144,9 @@ EOF;
     /**
      * Generates PHP code recursively to match a tree of routes
      *
-     * @param DumperPrefixCollection $routes A DumperPrefixCollection instance
+     * @param DumperPrefixCollection $routes               A DumperPrefixCollection instance
      * @param Boolean                $supportsRedirections Whether redirections are supported by the base class
-     * @parma string                 $prefix Prefix of the parent collection
+     * @parma string                 $prefix               Prefix of the parent collection
      *
      * @return string PHP code
      */
@@ -302,7 +302,11 @@ EOF;
             if ($hostnameMatches) {
                 $vars[] = '$hostnameMatches';
             }
-            $matchesExpr = implode(' + ', $vars);
+            if (count($vars) > 1) {
+                $matchesExpr = 'array_merge(' . implode(', ', array_reverse($vars)) . ')';
+            } else {
+                $matchesExpr = current($vars);
+            }
 
             $code .= sprintf("            return array_merge(\$this->mergeDefaults(%s, %s), array('_route' => '%s'));\n"
                 , $matchesExpr, str_replace("\n", '', var_export($route->getDefaults(), true)), $name);
@@ -313,7 +317,7 @@ EOF;
                 $code .= "            \$matches = \$hostnameMatches;\n";
             } else {
                 if ($hostnameMatches) {
-                    $code .= "            \$matches = \$matches + \$hostnameMatches;\n";
+                    $code .= "            \$matches = array_merge(\$hostnameMatches, \$matches);\n";
                 }
             }
 
@@ -336,8 +340,8 @@ EOF;
     /**
      * Flattens a tree of routes to a single collection.
      *
-     * @param  RouteCollection  $routes Collection of routes
-     * @param  DumperCollection $to A DumperCollection to add routes to
+     * @param RouteCollection  $routes Collection of routes
+     * @param DumperCollection $to     A DumperCollection to add routes to
      *
      * @return DumperCollection
      */
@@ -394,7 +398,7 @@ EOF;
      * Routes order is preserved such that traversing the tree will traverse the
      * routes in the origin order
      *
-     * @param  DumperCollection $collection A collection of routes
+     * @param DumperCollection $collection A collection of routes
      *
      * @return DumperPrefixCollection
      */

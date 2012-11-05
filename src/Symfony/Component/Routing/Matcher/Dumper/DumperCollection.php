@@ -102,7 +102,7 @@ class DumperCollection implements \IteratorAggregate
     /**
      * Returns true if the attribute is defined.
      *
-     * @param  string  $name The attribute name
+     * @param string $name The attribute name
      *
      * @return Boolean true if the attribute is defined, false otherwise
      */
@@ -117,7 +117,7 @@ class DumperCollection implements \IteratorAggregate
      * @param string $name    The attribute name
      * @param mixed  $default Default value is the attribute doesn't exist
      *
-     * @return mixed  The attribute value
+     * @return mixed The attribute value
      */
     public function getAttribute($name, $default = null)
     {
@@ -138,7 +138,7 @@ class DumperCollection implements \IteratorAggregate
     /**
      * Sets multiple attributes.
      *
-     * @param array $attributes  The attributes
+     * @param array $attributes The attributes
      */
     public function setAttributes($attributes)
     {

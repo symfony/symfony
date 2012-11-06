@@ -56,6 +56,7 @@ class MainConfiguration implements ConfigurationInterface
         $rootNode = $tb->root('security');
 
         $rootNode
+            ->canBeDisabled()
             ->children()
                 ->scalarNode('access_denied_url')->defaultNull()->example('/foo/error403')->end()
                 ->scalarNode('session_fixation_strategy')->cannotBeEmpty()->info('strategy can be: none, migrate, invalidate')->defaultValue('migrate')->end()
@@ -185,8 +186,6 @@ class MainConfiguration implements ConfigurationInterface
             ->fixXmlConfig('firewall')
             ->children()
                 ->arrayNode('firewalls')
-                    ->isRequired()
-                    ->requiresAtLeastOneElement()
                     ->disallowNewKeysInSubsequentConfigs()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
@@ -313,8 +312,6 @@ class MainConfiguration implements ConfigurationInterface
                         'entity' => array('entity' => array('class' => 'SecurityBundle:User', 'property' => 'username'))
                     ))
                     ->disallowNewKeysInSubsequentConfigs()
-                    ->isRequired()
-                    ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
         ;

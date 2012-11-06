@@ -53,6 +53,10 @@ class SecurityExtension extends Extension
 
         $config = $this->processConfiguration($mainConfig, $configs);
 
+        if (!$config['enabled']) {
+            return;
+        }
+
         // load services
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security.xml');

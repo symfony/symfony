@@ -28,7 +28,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         if (!class_exists('\Mongo')) {
-            $this->markTestSkipped('MongoDbSessionHandler requires the php "mongo" extension');
+            $this->markTestSkipped('MongoDbSessionHandler requires the mongo extension.');
         }
 
         $this->mongo = $this->getMockBuilder('Mongo')
@@ -36,9 +36,9 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->options = array(
-            'id_field'   => 'sess_id',
-            'data_field' => 'sess_data',
-            'time_field' => 'sess_time',
+            'id_field'   => '_id',
+            'data_field' => 'data',
+            'time_field' => 'time',
             'database' => 'sf2-test',
             'collection' => 'session-test'
         );
@@ -81,17 +81,17 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $collection->expects($this->once())
             ->method('update')
-            ->will($this->returnCallback(function($citeria, $updateData, $options) use ($that, &$data) {
-                $that->assertEquals(array($that->options['id_field'] => 'foo'), $citeria);
-                $that->assertEquals(array('upsert' => true), $options);
+            ->will($this->returnCallback(function($criteria, $updateData, $options) use ($that, &$data) {
+                $that->assertEquals(array($that->options['id_field'] => 'foo'), $criteria);
+                $that->assertEquals(array('upsert' => true, 'multiple' => false), $options);
 
                 $data = $updateData['$set'];
             }));
 
         $this->assertTrue($this->storage->write('foo', 'bar'));
 
-        $this->assertEquals('foo', $data[$this->options['id_field']]);
         $this->assertEquals('bar', $data[$this->options['data_field']]->bin);
+        $that->assertInstanceOf('MongoDate', $data[$this->options['time_field']]);
     }
 
     public function testReplaceSessionData()
@@ -118,7 +118,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $collection->expects($this->exactly(2))
             ->method('update')
-            ->will($this->returnCallback(function($citeria, $updateData, $options) use (&$data) {
+            ->will($this->returnCallback(function($criteria, $updateData, $options) use (&$data) {
                 $data = $updateData;
             }));
 
@@ -150,13 +150,9 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $collection->expects($this->once())
             ->method('remove')
-            ->with(
-                array($this->options['id_field'] => 'foo'),
-                array('justOne' => true)
-            );
+            ->with(array($this->options['id_field'] => 'foo'));
 
-
-        $this->storage->destroy('foo');
+        $this->assertTrue($this->storage->destroy('foo'));
     }
 
     public function testGc()
@@ -183,11 +179,11 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $collection->expects($this->once())
             ->method('remove')
-            ->will($this->returnCallback(function($citeria) use($that) {
-                $that->assertInstanceOf('MongoTimestamp', $citeria[$that->options['time_field']]['$lt']);
-                $that->assertGreaterThanOrEqual(time() - -1, $citeria[$that->options['time_field']]['$lt']->sec);
+            ->will($this->returnCallback(function($criteria) use($that) {
+                $that->assertInstanceOf('MongoDate', $criteria[$that->options['time_field']]['$lt']);
+                $that->assertGreaterThanOrEqual(time() - -1, $criteria[$that->options['time_field']]['$lt']->sec);
             }));
 
-        $this->storage->gc(-1);
+        $this->assertTrue($this->storage->gc(-1));
     }
 }

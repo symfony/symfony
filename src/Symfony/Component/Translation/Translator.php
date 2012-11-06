@@ -157,7 +157,7 @@ class Translator implements TranslatorInterface
             }
         }
 
-        return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
+        return strtr($this->selector->choose($catalogue->get($id, $domain), (float) $number, $locale), $parameters);
     }
 
     protected function loadCatalogue($locale)

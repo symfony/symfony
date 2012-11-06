@@ -36,6 +36,13 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     /**
      * Constructor.
      *
+     * List of available options:
+     *  * database: The name of the database [required]
+     *  * collection: The name of the collection [required]
+     *  * id_field: The field name for storing the session id [default: _id]
+     *  * data_field: The field name for storing the session data [default: data]
+     *  * time_field: The field name for storing the timestamp [default: time]
+     *
      * @param \Mongo $mongo   A "Mongo" instance
      * @param array  $options An associative array of field options
      *

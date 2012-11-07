@@ -477,7 +477,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function addAliases(array $aliases)
     {
         foreach ($aliases as $alias => $id) {
-            $this->setAlias($alias, $id);
+            $this->setAlias($alias, $this->getParameterBag()->resolveValue($id));
         }
     }
 

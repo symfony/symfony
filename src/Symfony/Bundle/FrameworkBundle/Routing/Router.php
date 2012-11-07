@@ -114,7 +114,7 @@ class Router extends BaseRouter implements WarmableInterface
     {
         $container = $this->container;
 
-        if (null === $value || false === $value || true === $value || is_object($value)) {
+        if (null === $value || false === $value || true === $value || is_object($value) || is_array($value)) {
             return $value;
         }
 

@@ -273,7 +273,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException('Setting service on a frozen container is not allowed');
         }
 
-        $id = strtolower($id);
+        $id = $this->resolveDefinitionId($id);
 
         unset($this->definitions[$id], $this->aliases[$id]);
 
@@ -289,7 +289,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function removeDefinition($id)
     {
-        unset($this->definitions[strtolower($id)]);
+        unset($this->definitions[$this->resolveDefinitionId($id)]);
     }
 
     /**
@@ -303,7 +303,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function has($id)
     {
-        $id = strtolower($id);
+        $id = $this->resolveDefinitionId($id);
 
         return isset($this->definitions[$id]) || isset($this->aliases[$id]) || parent::has($id);
     }
@@ -325,7 +325,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        $id = strtolower($id);
+        $id = $this->resolveDefinitionId($id);
 
         try {
             return parent::get($id, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
@@ -477,7 +477,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function addAliases(array $aliases)
     {
         foreach ($aliases as $alias => $id) {
-            $this->setAlias($alias, $id);
+            $this->setAlias($alias, $this->resolveDefinitionId($id));
         }
     }
 
@@ -515,7 +515,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new InvalidArgumentException('$id must be a string, or an Alias object.');
         }
 
-        if ($alias === strtolower($id)) {
+        if ($alias === $this->resolveDefinitionId($id)) {
             throw new InvalidArgumentException('An alias can not reference itself, got a circular reference on "'.$alias.'".');
         }
 
@@ -547,7 +547,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function hasAlias($id)
     {
-        return isset($this->aliases[strtolower($id)]);
+        return isset($this->aliases[$this->resolveDefinitionId($id)]);
     }
 
     /**
@@ -575,7 +575,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getAlias($id)
     {
-        $id = strtolower($id);
+        $id = $this->resolveDefinitionId($id);
 
         if (!$this->hasAlias($id)) {
             throw new InvalidArgumentException(sprintf('The service alias "%s" does not exist.', $id));
@@ -599,7 +599,19 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function register($id, $class = null)
     {
-        return $this->setDefinition(strtolower($id), new Definition($class));
+        return $this->setDefinition($this->resolveDefinitionId($id), new Definition($class));
+    }
+
+    /**
+     * Resolves the definition id.
+     *
+     * @param string $id The service identifier
+     *
+     * @api
+     */
+    public function resolveDefinitionId($id)
+    {
+        return strtolower($this->getParameterBag()->resolveValue($id));
     }
 
     /**
@@ -659,7 +671,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException('Adding definition to a frozen container is not allowed');
         }
 
-        $id = strtolower($id);
+        $id = $this->resolveDefinitionId($id);
 
         unset($this->aliases[$id]);
 
@@ -677,7 +689,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function hasDefinition($id)
     {
-        return array_key_exists(strtolower($id), $this->definitions);
+        return array_key_exists($this->resolveDefinitionId($id), $this->definitions);
     }
 
     /**
@@ -693,7 +705,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getDefinition($id)
     {
-        $id = strtolower($id);
+        $id = $this->resolveDefinitionId($id);
 
         if (!$this->hasDefinition($id)) {
             throw new InvalidArgumentException(sprintf('The service definition "%s" does not exist.', $id));
@@ -769,7 +781,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 throw new RuntimeException('You tried to create a service of an inactive scope.');
             }
 
-            $this->services[$lowerId = strtolower($id)] = $service;
+            $this->services[$lowerId = $this->resolveDefinitionId($id)] = $service;
 
             if (self::SCOPE_CONTAINER !== $scope) {
                 $this->scopedServices[$scope][$lowerId] = $service;

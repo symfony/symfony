@@ -602,6 +602,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->setDefinition($this->resolveDefinitionId($id), new Definition($class));
     }
 
+    /**
+     * Resolves the definition id.
+     *
+     * @param string $id The service identifier
+     *
+     * @api
+     */
     public function resolveDefinitionId($id)
     {
         return strtolower($this->getParameterBag()->resolveValue($id));

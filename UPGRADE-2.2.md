@@ -1,6 +1,15 @@
 ﻿UPGRADE FROM 2.1 to 2.2
 =======================
 
+### HttpFoundation
+
+ * The MongoDbSessionHandler default field names and timestamp type have changed.
+
+   The `sess_` prefix was removed from default field names. The session ID is
+   now stored in the `_id` field by default. The session date is now stored as a
+   `MongoDate` instead of `MongoTimestamp`, which also makes it possible to use
+   TTL collections in MongoDB 2.2+ instead of relying on the `gc()` method.
+
 #### Deprecations
 
  * The `Request::splitHttpAcceptHeader()` is deprecated and will be removed in 2.3.

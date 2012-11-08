@@ -93,7 +93,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testTransformExpectsNumeric()
     {
@@ -103,7 +103,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testReverseTransformExpectsString()
     {
@@ -113,7 +113,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformExpectsValidNumber()
     {
@@ -123,7 +123,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      * @link https://github.com/symfony/symfony/issues/3161
      */
     public function testReverseTransformDisallowsNaN()
@@ -134,7 +134,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformDisallowsNaN2()
     {
@@ -144,7 +144,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformDisallowsInfinity()
     {
@@ -154,7 +154,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformDisallowsInfinity2()
     {
@@ -164,12 +164,42 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformDisallowsNegativeInfinity()
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
         $transformer->reverseTransform('-∞');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformDisallowsLeadingExtraCharacters()
+    {
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('foo123');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformDisallowsCenteredExtraCharacters()
+    {
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('12foo3');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformDisallowsTrailingExtraCharacters()
+    {
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('123foo');
     }
 }

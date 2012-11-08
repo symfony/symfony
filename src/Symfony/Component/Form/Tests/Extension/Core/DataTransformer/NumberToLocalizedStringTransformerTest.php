@@ -86,14 +86,104 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     {
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 
+        // completely valid format
         $this->assertEquals(1234.5, $transformer->reverseTransform('1.234,5'));
         $this->assertEquals(12345.912, $transformer->reverseTransform('12.345,912'));
+        // omit group separator
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
         $this->assertEquals(12345.912, $transformer->reverseTransform('12345,912'));
     }
 
+    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsNotDot()
+    {
+        \Locale::setDefault('fr');
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        // completely valid format
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1 234,5'));
+        // accept dots
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1 234.5'));
+        // omit group separator
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
+    }
+
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot()
+    {
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        $transformer->reverseTransform('1.234.5');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot_noGroupSep()
+    {
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        $transformer->reverseTransform('1234.5');
+    }
+
+    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsDotButNoGroupingUsed()
+    {
+        \Locale::setDefault('fr');
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
+    }
+
+    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsNotComma()
+    {
+        \Locale::setDefault('ak');
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        // completely valid format
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1 234.5'));
+        // accept commas
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1 234,5'));
+        // omit group separator
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma()
+    {
+        \Locale::setDefault('en');
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        $transformer->reverseTransform('1,234,5');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma_noGroupSep()
+    {
+        \Locale::setDefault('en');
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        $transformer->reverseTransform('1234,5');
+    }
+
+    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsCommaButNoGroupingUsed()
+    {
+        \Locale::setDefault('en');
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testTransformExpectsNumeric()
     {
@@ -103,7 +193,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testReverseTransformExpectsString()
     {
@@ -113,7 +203,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformExpectsValidNumber()
     {
@@ -123,7 +213,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      * @link https://github.com/symfony/symfony/issues/3161
      */
     public function testReverseTransformDisallowsNaN()
@@ -134,7 +224,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformDisallowsNaN2()
     {
@@ -144,7 +234,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformDisallowsInfinity()
     {
@@ -154,7 +244,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformDisallowsInfinity2()
     {
@@ -164,7 +254,7 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformDisallowsNegativeInfinity()
     {

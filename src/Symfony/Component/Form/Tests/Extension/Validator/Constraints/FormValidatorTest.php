@@ -250,6 +250,37 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($form, new Form());
     }
 
+    // https://github.com/symfony/symfony/issues/4359
+    public function testDontMarkInvalidIfAnyChildIsNotSynchronized()
+    {
+        $context = $this->getExecutionContext();
+        $object = $this->getMock('\stdClass');
+
+        $failingTransformer = new CallbackTransformer(
+            function ($data) { return $data; },
+            function () { throw new TransformationFailedException(); }
+        );
+
+        $form = $this->getBuilder('name', '\stdClass')
+            ->setData($object)
+            ->addViewTransformer($failingTransformer)
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->add(
+                $this->getBuilder('child')
+                    ->addViewTransformer($failingTransformer)
+            )
+            ->getForm();
+
+        // Launch transformer
+        $form->bind(array('child' => 'foo'));
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+
+        $this->assertCount(0, $context->getViolations());
+    }
+
     public function testHandleCallbackValidationGroups()
     {
         $context = $this->getExecutionContext();

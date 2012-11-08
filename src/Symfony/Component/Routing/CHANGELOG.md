@@ -22,6 +22,7 @@ CHANGELOG
    pass the requirements (otherwise it would break your link anyway).
  * There is no restriction on the route name anymore. So non-alphanumeric characters
    are now also allowed.
+ * For processing XML and YAML routing files is used Config component.
 
 2.1.0
 -----
@@ -44,6 +45,6 @@ CHANGELOG
    been used anyway without creating inconsistencies
  * [BC BREAK] RouteCollection::remove also removes a route from parent
    collections (not only from its children)
- * added ConfigurableRequirementsInterface that allows to disable exceptions 
+ * added ConfigurableRequirementsInterface that allows to disable exceptions
    (and generate empty URLs instead) when generating a route with an invalid
    parameter value

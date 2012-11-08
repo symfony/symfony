@@ -115,7 +115,7 @@ class File extends \SplFileInfo
             throw new FileException(sprintf('Unable to write in the "%s" directory', $directory));
         }
 
-        $target = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : basename($name));
+        $target = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : $this->getName($name));
 
         if (!@rename($this->getPathname(), $target)) {
             $error = error_get_last();
@@ -125,5 +125,21 @@ class File extends \SplFileInfo
         @chmod($target, 0666 & ~umask());
 
         return new File($target);
+    }
+
+    /**
+     * Returns locale independent base name of the given path.
+     *
+     * @param string $name The new file name
+     *
+     * @return string containing
+     */
+    protected function getName($name)
+    {
+        $originalName = str_replace('\\', '/', $name);
+        $pos = strrpos($originalName, '/');
+        $originalName = false === $pos ? $originalName : substr($originalName, $pos + 1);
+
+        return $originalName;
     }
 }

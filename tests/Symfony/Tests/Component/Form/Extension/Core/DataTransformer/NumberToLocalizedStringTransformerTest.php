@@ -98,6 +98,10 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
 
     public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsNotDot()
     {
+        if ($this->isLowerThanIcuVersion('4.5')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        }
+
         \Locale::setDefault('fr');
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 
@@ -115,6 +119,10 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
      */
     public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot()
     {
+        if ($this->isLowerThanIcuVersion('4.5')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        }
+
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 
         $transformer->reverseTransform('1.234.5');
@@ -125,6 +133,10 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
      */
     public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot_noGroupSep()
     {
+        if ($this->isLowerThanIcuVersion('4.5')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        }
+
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 
         $transformer->reverseTransform('1234.5');
@@ -141,6 +153,10 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
 
     public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsNotComma()
     {
+        if ($this->isLowerThanIcuVersion('4.5')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        }
+
         \Locale::setDefault('ak');
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 
@@ -158,6 +174,10 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
      */
     public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma()
     {
+        if ($this->isLowerThanIcuVersion('4.5')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        }
+
         \Locale::setDefault('en');
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 
@@ -169,6 +189,10 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
      */
     public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma_noGroupSep()
     {
+        if ($this->isLowerThanIcuVersion('4.5')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        }
+
         \Locale::setDefault('en');
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 

@@ -49,6 +49,19 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($this->getStoreMetadata('/nothing'));
     }
 
+    public function testUnlockFileThatDoesExist()
+    {
+        $cacheKey = $this->storeSimpleEntry();
+        $this->store->lock($this->request);
+
+        $this->assertTrue($this->store->unlock($this->request));
+    }
+
+    public function testUnlockFileThatDoesNotExist()
+    {
+        $this->assertFalse($this->store->unlock($this->request));
+    }
+
     public function testRemovesEntriesForKeyWithPurge()
     {
         $request = Request::create('/foo');

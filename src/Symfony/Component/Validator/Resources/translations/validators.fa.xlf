@@ -150,6 +150,70 @@
                 <source>This value is not a valid country.</source>
                 <target>این مقدار یک کشور صحیح نیست.</target>
             </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used.</source>
+                <target>این مقدار قبلا مورد استفاده قرار گرفته است.</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected.</source>
+                <target>اندازه تصویر قابل شناسایی نیست.</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>طول تصویر بسیار بزرگ است ({{ width }}px). بشینه طول مجاز {{ max_width }}px است.</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>طول تصویر بسیار کوچک است ({{ width }}px). کمینه طول موردنظر {{ min_width }}px است.</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>ارتفاع تصویر بسیار بزرگ است ({{ height }}px). بشینه ارتفاع مجاز {{ max_height }}px است.</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>ارتفاع تصویر بسیار کوچک است ({{ height }}px). کمینه ارتفاع موردنظر {{ min_height }}px است.</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user current password.</source>
+                <target>این مقدار می بایست کلمه عبور کنونی کاربر باشد.</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} characters.</source>
+                <target>این مقدار می بایست دقیفا {{ limit }} کاراکتر داشته باشد.|این مقدرا می بایشت دقیقا {{ limit }} کاراکتر داشته باشد.</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded.</source>
+                <target>فایل به صورت جزیی بارگذاری شده است.</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded.</source>
+                <target>هیچ فایلی بارگذاری نشد.</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini.</source>
+                <target>فولدر موقت در php.ini پیکربندی نشده است.</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk.</source>
+                <target>فایل موقت را نمی توان در دیسک نوشت.</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail.</source>
+                <target>اکستنشن PHP موجب شد که بارگذاری فایل با شکست مواجه شود.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} elements or more.</source>
+                <target>این مجموعه می بایست دارای {{ limit }} عنصر یا بیشتر باشد.|این مجموعه می بایست دارای {{ limit }} عنصر یا بیشتر باشد.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} elements or less.</source>
+                <target>این مجموعه می بایست دارای حداقل {{ limit }} عنصر یا کمتر باشد.|این مجموعه می بایست دارای {{ limit }} عنصر یا کمتر باشد.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} elements.</source>
+                <target>این مجموعه می بایست به طور دقیق دارا {{ limit }} عنصر باشد.|این مجموعه می بایست به طور دقیق دارای {{ limit }} قلم باشد.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

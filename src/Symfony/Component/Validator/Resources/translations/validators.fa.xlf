@@ -176,7 +176,7 @@
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user current password.</source>
-                <target>This value should be the user current password.</target>
+                <target>این مقدار می بایست کلمه عبور کنونی کاربر باشد.</target>
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} characters.</source>

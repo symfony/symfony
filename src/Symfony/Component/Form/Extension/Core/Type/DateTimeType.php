@@ -87,10 +87,6 @@ class DateTimeType extends AbstractType
             throw new InvalidOptionsException('The "date_format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
         }
 
-        if (null !== $pattern && (false === strpos($pattern, 'y') || false === strpos($pattern, 'M') || false === strpos($pattern, 'd') || false === strpos($pattern, 'H') || false === strpos($pattern, 'm'))) {
-            throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M", "d", "H" and "m". Its current value is "%s".', $pattern));
-        }
-
         if ('single_text' === $options['widget']) {
             if (self::HTML5_FORMAT === $pattern) {
                 $builder->addViewTransformer(new DateTimeToRfc3339Transformer(

@@ -28,7 +28,8 @@
         "symfony/dependency-injection": "2.2.*",
         "symfony/finder": "2.2.*",
         "symfony/process": "2.2.*",
-        "symfony/routing": "2.2.*"
+        "symfony/routing": "2.2.*",
+        "symfony/stopwatch": "2.2.*"
     },
     "suggest": {
         "symfony/browser-kit": "2.2.*",

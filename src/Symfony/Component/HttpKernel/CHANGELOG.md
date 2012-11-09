@@ -4,6 +4,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * moved the Stopwatch classes to a new component
  * added TraceableControllerResolver
  * added TraceableEventDispatcher (removed ContainerAwareTraceableEventDispatcher)
  * added support for WinCache opcode cache in ConfigDataCollector

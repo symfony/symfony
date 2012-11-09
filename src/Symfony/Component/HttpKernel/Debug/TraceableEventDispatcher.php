@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Debug;
 
-use Symfony\Component\HttpKernel\Debug\Stopwatch;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;

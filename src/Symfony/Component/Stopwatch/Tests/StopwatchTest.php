@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Tests\Debug;
+namespace Symfony\Component\Stopwatch\Tests;
 
-use Symfony\Component\HttpKernel\Debug\Stopwatch;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * StopwatchTest
@@ -25,7 +25,7 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
         $stopwatch = new Stopwatch();
         $event = $stopwatch->start('foo', 'cat');
 
-        $this->assertInstanceof('Symfony\Component\HttpKernel\Debug\StopwatchEvent', $event);
+        $this->assertInstanceof('Symfony\Component\Stopwatch\StopwatchEvent', $event);
         $this->assertEquals('cat', $event->getCategory());
     }
 
@@ -36,7 +36,7 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
         usleep(20000);
         $event = $stopwatch->stop('foo');
 
-        $this->assertInstanceof('Symfony\Component\HttpKernel\Debug\StopwatchEvent', $event);
+        $this->assertInstanceof('Symfony\Component\Stopwatch\StopwatchEvent', $event);
         $total = $event->getTotalTime();
         $this->assertTrue($total > 10 && $total <= 29, $total.' should be 20 (between 10 and 29)');
     }
@@ -50,7 +50,7 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
         usleep(10000);
         $stopwatch->stop('foo');
 
-        $this->assertInstanceof('Symfony\Component\HttpKernel\Debug\StopwatchEvent', $event);
+        $this->assertInstanceof('Symfony\Component\Stopwatch\StopwatchEvent', $event);
         $total = $event->getTotalTime();
         $this->assertTrue($total > 10 && $total <= 29, $total.' should be 20 (between 10 and 29)');
     }

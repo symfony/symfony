@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Acl\Domain;
 
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
-use Symfony\Component\Security\Core\Role\Role;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 
 /**
  * A SecurityIdentity implementation for roles
@@ -26,14 +26,20 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
     /**
      * Constructor
      *
-     * @param mixed $role a Role instance, or its string representation
+     * @param mixed $role an object implementing RoleInterface, or its string representation
      */
     public function __construct($role)
     {
-        if ($role instanceof Role) {
+        if (!is_string($role) && !($role instanceof RoleInterface)) {
+            throw new \InvalidArgumentException('$role must be a string or object implementing RoleInterface.');
+        }
+        if ($role instanceof RoleInterface) {
             $role = $role->getRole();
         }
-
+        if (empty($role)) {
+            throw new \InvalidArgumentException('$role must not be empty.');
+        }
+        
         $this->role = $role;
     }
 

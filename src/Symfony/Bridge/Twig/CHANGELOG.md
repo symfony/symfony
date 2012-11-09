@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * The `app` global variable is now injected even when using the twig service directly.
- * The `_context` variable may be passed to `form_theme` tag instead of a specific form variable
+ * Any iterable element may be passed to `form_theme` tag instead of a specific form variable
 
 2.1.0
 -----

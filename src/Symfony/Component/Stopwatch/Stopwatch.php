@@ -18,7 +18,14 @@ namespace Symfony\Component\Stopwatch;
  */
 class Stopwatch
 {
+    /**
+     * @var Section[]
+     */
     private $sections;
+
+    /**
+     * @var array
+     */
     private $activeSections;
 
     public function __construct()
@@ -54,6 +61,8 @@ class Stopwatch
      * @see getSectionEvents
      *
      * @param string $id The identifier of the section
+     *
+     * @throws \LogicException When there's no started section to be stopped
      */
     public function stopSection($id)
     {
@@ -117,11 +126,32 @@ class Stopwatch
     }
 }
 
+
+/**
+ * @internal This class is for internal usage only
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ */
 class Section
 {
+    /**
+     * @var StopwatchEvent[]
+     */
     private $events = array();
+
+    /**
+     * @var null|float
+     */
     private $origin;
+
+    /**
+     * @var string
+     */
     private $id;
+
+    /**
+     * @var Section[]
+     */
     private $children = array();
 
     /**
@@ -236,7 +266,7 @@ class Section
      */
     public function lap($name)
     {
-        return $this->stop($name)->start();
+        return $this->stopEvent($name)->start();
     }
 
     /**
@@ -249,3 +279,4 @@ class Section
         return $this->events;
     }
 }
+

@@ -55,13 +55,17 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                'if (%1$s instanceof \\Symfony\\Component\\Form\\FormView) {
-    $this->env->getExtension(\'form\')->renderer->setTheme(%1$s, array(0 => "tpl1", 1 => "tpl2"));
+                '$formVar = %1$s;
+$resources = array(0 => "tpl1", 1 => "tpl2");
+
+if ($formVar instanceof \\Symfony\\Component\\Form\\FormView) {
+    $this->env->getExtension(\'form\')->renderer->setTheme($formVar, $resources);
 } else {
-    $forms = array();
-    foreach (%1$s as $contextVar) {
-        if ($contextVar instanceof \\Symfony\\Component\\Form\\FormView) {
-            $this->env->getExtension(\'form\')->renderer->setTheme($contextVar, array(0 => "tpl1", 1 => "tpl2"));
+    $formVar = twig_ensure_traversable($formVar);
+
+    foreach ($formVar as $nestedVar) {
+        if ($nestedVar instanceof \\Symfony\\Component\\Form\\FormView) {
+            $this->env->getExtension(\'form\')->renderer->setTheme($nestedVar, $resources);
         }
     }
 }',
@@ -76,13 +80,17 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                'if (%1$s instanceof \\Symfony\\Component\\Form\\FormView) {
-    $this->env->getExtension(\'form\')->renderer->setTheme(%1$s, "tpl1");
+                '$formVar = %1$s;
+$resources = "tpl1";
+
+if ($formVar instanceof \\Symfony\\Component\\Form\\FormView) {
+    $this->env->getExtension(\'form\')->renderer->setTheme($formVar, $resources);
 } else {
-    $forms = array();
-    foreach (%1$s as $contextVar) {
-        if ($contextVar instanceof \\Symfony\\Component\\Form\\FormView) {
-            $this->env->getExtension(\'form\')->renderer->setTheme($contextVar, "tpl1");
+    $formVar = twig_ensure_traversable($formVar);
+
+    foreach ($formVar as $nestedVar) {
+        if ($nestedVar instanceof \\Symfony\\Component\\Form\\FormView) {
+            $this->env->getExtension(\'form\')->renderer->setTheme($nestedVar, $resources);
         }
     }
 }',

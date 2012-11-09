@@ -19,6 +19,9 @@
         "php": ">=5.3.3",
         "doctrine/common": ">=2.2,<2.4-dev"
     },
+    "require-dev": {
+        "symfony/stopwatch": "2.2.*"
+    },
     "suggest": {
         "symfony/form": "2.2.*",
         "symfony/validator": "2.2.*",

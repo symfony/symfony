@@ -111,15 +111,20 @@ class XmlUtils
      *
      *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
      *
-     * @param \DomElement $element A \DomElement instance
+     * @param \DomElement $element     A \DomElement instance
+     * @param Boolean     $checkPrefix Check prefix in an element or an attribute name
      *
      * @return array A PHP array
      */
-    public static function convertDomElementToArray(\DomElement $element)
+    public static function convertDomElementToArray(\DomElement $element, $checkPrefix = true)
     {
+        $prefix = (string) $element->prefix;
         $empty = true;
         $config = array();
         foreach ($element->attributes as $name => $node) {
+            if ($checkPrefix && !in_array((string) $node->prefix, array('', $prefix), true)) {
+                continue;
+            }
             $config[$name] = static::phpize($node->value);
             $empty = false;
         }
@@ -131,8 +136,10 @@ class XmlUtils
                     $nodeValue = trim($node->nodeValue);
                     $empty = false;
                 }
+            } elseif ($checkPrefix && $prefix != (string) $node->prefix) {
+                continue;
             } elseif (!$node instanceof \DOMComment) {
-                $value = static::convertDomElementToArray($node);
+                $value = static::convertDomElementToArray($node, $checkPrefix);
 
                 $key = $node->localName;
                 if (isset($config[$key])) {

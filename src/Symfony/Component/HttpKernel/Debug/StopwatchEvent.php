@@ -82,7 +82,7 @@ class StopwatchEvent
             throw new \LogicException('stop() called but start() has not been called before.');
         }
 
-        $this->periods[] = array(array_pop($this->started), $this->getNow());
+        $this->periods[] = new StopwatchPeriod(array_pop($this->started), $this->getNow());
 
         return $this;
     }
@@ -110,7 +110,7 @@ class StopwatchEvent
     /**
      * Gets all event periods.
      *
-     * @return array An array of periods
+     * @return StopwatchPeriod[] An array of StopwatchPeriod instances
      */
     public function getPeriods()
     {
@@ -124,7 +124,7 @@ class StopwatchEvent
      */
     public function getStartTime()
     {
-        return isset($this->periods[0]) ? $this->periods[0][0] : 0;
+        return isset($this->periods[0]) ? $this->periods[0]->getStartTime() : 0;
     }
 
     /**
@@ -134,7 +134,7 @@ class StopwatchEvent
      */
     public function getEndTime()
     {
-        return ($count = count($this->periods)) ? $this->periods[$count - 1][1] : 0;
+        return ($count = count($this->periods)) ? $this->periods[$count - 1]->getEndTime() : 0;
     }
 
     /**
@@ -146,10 +146,27 @@ class StopwatchEvent
     {
         $total = 0;
         foreach ($this->periods as $period) {
-            $total += $period[1] - $period[0];
+            $total += $period->getTime();
         }
 
         return $this->formatTime($total);
+    }
+
+    /**
+     * Gets the max memory usage of all periods.
+     *
+     * @return integer The memory usage (in bytes)
+     */
+    public function getMemory()
+    {
+        $memory = 0;
+        foreach ($this->periods as $period) {
+            if ($period->getMemory() > $memory) {
+                $memory = $period->getMemory();
+            }
+        }
+
+        return $memory;
     }
 
     /**

@@ -214,11 +214,11 @@
 
                 drawableEvents.forEach(function(event) {
                     event.periods.forEach(function(period) {
-                        var timelineHeadPosition = x + period.begin * ratio;
+                        var timelineHeadPosition = x + period.start * ratio;
 
                         if (isChildEvent(event)) {
                             ctx.fillStyle = colors.child_sections;
-                            ctx.fillRect(timelineHeadPosition, 0, (period.end - period.begin) * ratio, canvasHeight);
+                            ctx.fillRect(timelineHeadPosition, 0, (period.end - period.start) * ratio, canvasHeight);
                         } else if (isSectionEvent(event)) {
                             var timelineTailPosition = x + period.end * ratio;
 
@@ -259,11 +259,11 @@
                         }
 
                         // Draw the timeline
-                        var timelineHeadPosition = x + period.begin * ratio;
+                        var timelineHeadPosition = x + period.start * ratio;
 
                         if ( ! isSectionEvent(event)) {
                             ctx.fillRect(timelineHeadPosition, h + 3, 2, 6);
-                            ctx.fillRect(timelineHeadPosition, h, (period.end - period.begin) * ratio || 2, 6);
+                            ctx.fillRect(timelineHeadPosition, h, (period.end - period.start) * ratio || 2, 6);
                         } else {
                             var timelineTailPosition = x + period.end * ratio;
 
@@ -315,7 +315,7 @@
                     ctx.fillStyle = "#444";
                     ctx.font = "12px sans-serif";
                     text = event.name;
-                    ms = " ~ " + (event.totaltime < 1 ? event.totaltime : parseInt(event.totaltime, 10)) + " ms";
+                    ms = " ~ " + (event.totaltime < 1 ? event.totaltime : parseInt(event.totaltime, 10)) + " ms / ~ " + event.memory + " MB";
                     if (x + event.starttime * ratio + ctx.measureText(text + ms).width > width) {
                         ctx.textAlign = "end";
                         ctx.font = "10px sans-serif";
@@ -454,9 +454,10 @@
                             "starttime": {{ "%F"|format(event.starttime) }},
                             "endtime": {{ "%F"|format(event.endtime) }},
                             "totaltime": {{ "%F"|format(event.totaltime) }},
+                            "memory": {{ "%.1f"|format(event.memory / 1024 / 1024) }},
                             "periods": [
                                 {%- for period in event.periods -%}
-                                    {"begin": {{ "%F"|format(period.0) }}, "end": {{ "%F"|format(period.1) }}}{{ loop.last ? '' : ', ' }}
+                                    {"start": {{ "%F"|format(period.starttime) }}, "end": {{ "%F"|format(period.endtime) }}}{{ loop.last ? '' : ', ' }}
                                 {%- endfor -%}
                             ]
                         }{{ loop.last ? '' : ',' }}

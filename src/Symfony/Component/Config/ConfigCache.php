@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Config;
 
+use Symfony\Component\Config\Resource\ResourceInterface;
+
 /**
  * ConfigCache manages PHP cache files.
  *

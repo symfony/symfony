@@ -24,7 +24,7 @@ class RepeatedPass implements CompilerPassInterface
     /**
      * @var Boolean
      */
-    private $repeat;
+    private $repeat = false;
     
     /**
      * @var RepeatablePassInterface[]

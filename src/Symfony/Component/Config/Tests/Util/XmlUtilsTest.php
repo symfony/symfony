@@ -63,18 +63,20 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getDataForConvertDomToArray
      */
-    public function testConvertDomToArray($expected, $xml)
+    public function testConvertDomToArray($expected, $xml, $root = false, $checkPrefix = true)
     {
         $dom = new \DOMDocument();
-        $dom->loadXML('<root>'.$xml.'</root>');
+        $dom->loadXML($root ? $xml : '<root>'.$xml.'</root>');
 
-        $this->assertSame($expected, XmlUtils::convertDomElementToArray($dom->documentElement));
+        $this->assertSame($expected, XmlUtils::convertDomElementToArray($dom->documentElement, $checkPrefix));
     }
 
     public function getDataForConvertDomToArray()
     {
         return array(
             array(null, ''),
+            array('bar', 'bar'),
+            array(array('bar' => 'foobar'), '<foo bar="foobar" />', true),
             array(array('foo' => null), '<foo />'),
             array(array('foo' => 'bar'), '<foo>bar</foo>'),
             array(array('foo' => array('foo' => 'bar')), '<foo foo="bar"/>'),
@@ -85,6 +87,9 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
             array(array('foo' => array(array('foo' => 'bar'), array('foo' => 'text'))), '<foo foo="bar"/><foo foo="text" />'),
             array(array('foo' => array('foo' => array('bar', 'text'))), '<foo foo="bar"><foo>text</foo></foo>'),
             array(array('foo' => 'bar'), '<foo><!-- Comment -->bar</foo>'),
+            array(array('foo' => 'text'), '<foo xmlns:h="http://www.example.org/bar" h:bar="bar">text</foo>'),
+            array(array('foo' => array('bar' => 'bar', 'value' => 'text')), '<foo xmlns:h="http://www.example.org/bar" h:bar="bar">text</foo>', false, false),
+            array(array('attr' => 1, 'b' => 'hello'), '<foo:a xmlns:foo="http://www.example.org/foo" xmlns:h="http://www.example.org/bar" attr="1" h:bar="bar"><foo:b>hello</foo:b><h:c>2</h:c></foo:a>', true),
         );
     }
 

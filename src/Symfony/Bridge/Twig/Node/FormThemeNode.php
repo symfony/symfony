@@ -30,11 +30,26 @@ class FormThemeNode extends \Twig_Node
     {
         $compiler
             ->addDebugInfo($this)
-            ->write('$this->env->getExtension(\'form\')->renderer->setTheme(')
+            ->write('if (')
+            ->subcompile($this->getNode('form'))
+            ->raw(" instanceof \\Symfony\\Component\\Form\\FormView) {\n")
+            ->write('    $this->env->getExtension(\'form\')->renderer->setTheme(')
             ->subcompile($this->getNode('form'))
             ->raw(', ')
             ->subcompile($this->getNode('resources'))
-            ->raw(");\n");
+            ->raw(");\n")
+            ->write("} else {\n")
+            ->write('    $forms = array();'."\n")
+            ->write('    foreach (')
+            ->subcompile($this->getNode('form'))
+            ->raw(' as $contextVar) {' . "\n")
+            ->write('        if ($contextVar instanceof \\Symfony\\Component\\Form\\FormView) {'."\n")
+            ->write('            $this->env->getExtension(\'form\')->renderer->setTheme($contextVar, ')
+            ->subcompile($this->getNode('resources'))
+            ->raw(");\n")
+            ->write("        }\n")
+            ->write("    }\n")
+            ->write("}\n");
         ;
     }
 }

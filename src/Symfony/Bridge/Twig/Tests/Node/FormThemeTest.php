@@ -55,7 +55,16 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->setTheme(%s, array(0 => "tpl1", 1 => "tpl2"));',
+                'if (%1$s instanceof \\Symfony\\Component\\Form\\FormView) {
+    $this->env->getExtension(\'form\')->renderer->setTheme(%1$s, array(0 => "tpl1", 1 => "tpl2"));
+} else {
+    $forms = array();
+    foreach (%1$s as $contextVar) {
+        if ($contextVar instanceof \\Symfony\\Component\\Form\\FormView) {
+            $this->env->getExtension(\'form\')->renderer->setTheme($contextVar, array(0 => "tpl1", 1 => "tpl2"));
+        }
+    }
+}',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())
@@ -67,7 +76,16 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->setTheme(%s, "tpl1");',
+                'if (%1$s instanceof \\Symfony\\Component\\Form\\FormView) {
+    $this->env->getExtension(\'form\')->renderer->setTheme(%1$s, "tpl1");
+} else {
+    $forms = array();
+    foreach (%1$s as $contextVar) {
+        if ($contextVar instanceof \\Symfony\\Component\\Form\\FormView) {
+            $this->env->getExtension(\'form\')->renderer->setTheme($contextVar, "tpl1");
+        }
+    }
+}',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())

@@ -6,7 +6,7 @@
 
     <parameters>
         <parameter key="debug.event_dispatcher.class">Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher</parameter>
-        <parameter key="debug.stopwatch.class">Symfony\Component\HttpKernel\Debug\Stopwatch</parameter>
+        <parameter key="debug.stopwatch.class">Symfony\Component\Stopwatch\Stopwatch</parameter>
         <parameter key="debug.container.dump">%kernel.cache_dir%/%kernel.container_class%.xml</parameter>
         <parameter key="debug.controller_resolver.class">Symfony\Component\HttpKernel\Controller\TraceableControllerResolver</parameter>
     </parameters>

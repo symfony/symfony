@@ -204,7 +204,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         $skipped = false;
 
         foreach ($skippedListeners as $skippedListener) {
-            $skippedListener = $this->unwrapListener($skippedListener, $eventName);
+            $skippedListener = $this->unwrapListener($skippedListener);
 
             if ($skipped) {
                 $info = $this->getListenerInfo($skippedListener, $eventName);
@@ -254,7 +254,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      */
     private function getListenerInfo($listener, $eventName)
     {
-        $listener = $this->unwrapListener($listener, $eventName);
+        $listener = $this->unwrapListener($listener);
 
         $info = array(
             'event' => $eventName,
@@ -329,9 +329,25 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      */
     private function saveInfoInProfile(Profile $profile, $updateChildren)
     {
-        $profile->getCollector('time')->setEvents($this->stopwatch->getSectionEvents($profile->getToken()));
-        $profile->getCollector('events')->setCalledListeners($this->getCalledListeners());
-        $profile->getCollector('events')->setNotCalledListeners($this->getNotCalledListeners());
+        try {
+            $collector = $profile->getCollector('memory');
+            $collector->updateMemoryUsage();
+        } catch (\InvalidArgumentException $e) {
+        }
+
+        try {
+            $collector = $profile->getCollector('time');
+            $collector->setEvents($this->stopwatch->getSectionEvents($profile->getToken()));
+        } catch (\InvalidArgumentException $e) {
+        }
+
+        try {
+            $collector = $profile->getCollector('events');
+            $collector->setCalledListeners($this->getCalledListeners());
+            $collector->setNotCalledListeners($this->getNotCalledListeners());
+        } catch (\InvalidArgumentException $e) {
+        }
+
         $this->profiler->saveProfile($profile);
 
         if ($updateChildren) {
@@ -339,19 +355,6 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
                 $this->saveInfoInProfile($child, true);
             }
         }
-    }
-
-    private function getListenerAsString($listener)
-    {
-        if (is_string($listener)) {
-            return '[string] '.$listener;
-        } elseif (is_array($listener)) {
-            return '[array] '.(is_object($listener[0]) ? get_class($listener[0]) : $listener[0]).'::'.$listener[1];
-        } elseif (is_object($listener)) {
-            return '[object] '.get_class($listener);
-        }
-
-        return '[?] '.var_export($listener, true);
     }
 
     private function preDispatch($eventName, Event $event)
@@ -437,7 +440,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         };
     }
 
-    private function unwrapListener($listener, $eventName)
+    private function unwrapListener($listener)
     {
         // get the original listener
         if (is_object($listener) && isset($this->wrappedListeners[$this->id][$listener])) {

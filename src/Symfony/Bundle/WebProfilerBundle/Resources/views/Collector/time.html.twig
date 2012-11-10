@@ -16,15 +16,15 @@
 {% endif %}
 
 {% block toolbar %}
-    {% set total_time = collector.events|length ? '%.0f ms'|format(collector.totaltime) : 'n/a' %}
+    {% set duration = collector.events|length ? '%.0f ms'|format(collector.duration) : 'n/a' %}
     {% set icon %}
         <img width="16" height="28" alt="Time" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAcCAYAAABoMT8aAAABqUlEQVR42t2Vv0sCYRyHX9OmEhsMx/YKGlwLQ69DTEUSBJEQEy5J3FRc/BsuiFqEIIcQIRo6ysUhoaBBWhoaGoJwiMJLglRKrs8bXgienmkQdPDAwX2f57j3fhFJkkbiPwTK5bIiFoul3kmPud8MqKMewDXpwuGww+12n9hsNhFnlijYf/Z4PDmO45Yxo+10ZFGTyWRMEItU6AdCx7lczkgd6n7J2Wx2xm63P6jJMk6n80YQBBN1aUDv9XqvlAbbm2LE7/cLODRB0un0VveAeoDC8/waCQQC18MGQqHQOcEKvw8bcLlcL6TfYnVtCrGRAlartUUYhmn1jKg/E3USjUYfhw3E4/F7ks/nz4YNFIvFQ/ogbUYikdefyqlU6gnuOg2YK5XKvs/n+xhUDgaDTVEUt+HO04ABOBA5isViDTU5kUi81Wq1AzhWMEkDGmAEq2C3UCjcYXGauDvfEsuyUjKZbJRKpVvM8IABU9SVX+cxYABmwIE9cFqtVi9xtgvsC2AHbIAFoKey0gdlHEyDObAEWLACFsEsMALdIJ80+dK0bTS95v7+v/AJnis0eO906QwAAAAASUVORK5CYII="/>
-        <span>{{ total_time }}</span>
+        <span>{{ duration }}</span>
     {% endset %}
     {% set text %}
         <div class="sf-toolbar-info-piece">
             <b>Total time</b>
-            <span>{{ total_time }}</span>
+            <span>{{ duration }}</span>
         </div>
     {% endset %}
     {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
@@ -54,7 +54,7 @@
         <table>
             <tr>
                 <th style="width: 20%">Total time</th>
-                <td>{{ '%.0f'|format(collector.totaltime) }} ms</td>
+                <td>{{ '%.0f'|format(collector.duration) }} ms</td>
             </tr>
             <tr>
                 <th>Initialization time</th>
@@ -70,7 +70,7 @@
     <h3>
         {{ profile.parent ? "Request" : "Main Request" }}
         <small>
-            - {{ collector.events.__section__.totaltime }} ms
+            - {{ collector.events.__section__.duration }} ms
             {% if profile.parent %}
                 - <a href="{{ path('_profiler', { 'token': profile.parent.token, 'panel': 'time' }) }}">parent</a>
             {% endif %}
@@ -86,7 +86,7 @@
             {% set events = child.getcollector('time').events %}
             <h3>
                 Sub-request "<a href="{{ path('_profiler', { 'token': child.token, 'panel': 'time' }) }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>"
-                <small> - {{ events.__section__.totaltime }} ms</small>
+                <small> - {{ events.__section__.duration }} ms</small>
             </h3>
 
             {{ display_timeline('timeline_' ~ child.token, events, colors) }}
@@ -198,7 +198,7 @@
 
                 // Filter events whose total time is below the threshold.
                 drawableEvents = request.events.filter(function(event) {
-                    return event.totaltime >= threshold;
+                    return event.duration >= threshold;
                 });
 
                 canvasHeight += gapPerEvent * drawableEvents.length;
@@ -315,7 +315,7 @@
                     ctx.fillStyle = "#444";
                     ctx.font = "12px sans-serif";
                     text = event.name;
-                    ms = " ~ " + (event.totaltime < 1 ? event.totaltime : parseInt(event.totaltime, 10)) + " ms / ~ " + event.memory + " MB";
+                    ms = " ~ " + (event.duration < 1 ? event.duration : parseInt(event.duration, 10)) + " ms / ~ " + event.memory + " MB";
                     if (x + event.starttime * ratio + ctx.measureText(text + ms).width > width) {
                         ctx.textAlign = "end";
                         ctx.font = "10px sans-serif";
@@ -453,8 +453,8 @@
                             "origin": {{ "%F"|format(event.origin) }},
                             "starttime": {{ "%F"|format(event.starttime) }},
                             "endtime": {{ "%F"|format(event.endtime) }},
-                            "totaltime": {{ "%F"|format(event.totaltime) }},
-                            "memory": {{ "%.1f"|format(event.memory / 1024 / 1024) }},
+                            "duration": {{ "%F"|format(event.duration) }},
+                            "memory": {{ "%.1F"|format(event.memory / 1024 / 1024) }},
                             "periods": [
                                 {%- for period in event.periods -%}
                                     {"start": {{ "%F"|format(period.starttime) }}, "end": {{ "%F"|format(period.endtime) }}}{{ loop.last ? '' : ', ' }}

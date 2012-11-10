@@ -88,43 +88,44 @@ class Router extends BaseRouter implements WarmableInterface
                 $this->resolveParameters($route);
             } else {
                 foreach ($route->getDefaults() as $name => $value) {
-                    $route->setDefault($name, $this->resolveString($value));
+                    $route->setDefault($name, $this->resolve($value));
                 }
 
                 foreach ($route->getRequirements() as $name => $value) {
-                     $route->setRequirement($name, $this->resolveString($value));
+                     $route->setRequirement($name, $this->resolve($value));
                 }
 
-                $route->setPattern($this->resolveString($route->getPattern()));
+                $route->setPattern($this->resolve($route->getPattern()));
             }
         }
     }
 
     /**
-     * Replaces placeholders with the service container parameters in the given string.
+     * Recursively replaces placeholders with the service container parameters.
      *
-     * @param mixed $value The source string which might contain %placeholders%
+     * @param mixed $value The source which might contain "%placeholders%"
      *
-     * @return mixed A string where the placeholders have been replaced, or the original value if not a string.
+     * @return mixed The source with the placeholders replaced by the container
+     *               parameters. Array are resolved recursively.
      *
      * @throws ParameterNotFoundException When a placeholder does not exist as a container parameter
      * @throws RuntimeException           When a container value is not a string or a numeric value
      */
-    private function resolveString($value)
+    private function resolve($value)
     {
-        $container = $this->container;
-
         if (is_array($value)) {
             foreach ($value as $key => $val) {
-                $value[$key] = $this->resolveString($val);
+                $value[$key] = $this->resolve($val);
             }
 
             return $value;
         }
 
-        if (null === $value || false === $value || true === $value || is_object($value)) {
+        if (!is_string($value)) {
             return $value;
         }
+
+        $container = $this->container;
 
         $escapedValue = preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($container, $value) {
             // skip %%

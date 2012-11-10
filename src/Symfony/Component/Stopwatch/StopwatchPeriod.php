@@ -30,9 +30,9 @@ class StopwatchPeriod
      */
     public function __construct($start, $end)
     {
-        $this->start = $start;
-        $this->end = $end;
-        $this->memory = memory_get_usage();
+        $this->start = (integer) $start;
+        $this->end = (integer) $end;
+        $this->memory = memory_get_usage(true);
     }
 
     /**
@@ -60,7 +60,7 @@ class StopwatchPeriod
      *
      * @return integer The time (in milliseconds)
      */
-    public function getTime()
+    public function getDuration()
     {
         return $this->end - $this->start;
     }

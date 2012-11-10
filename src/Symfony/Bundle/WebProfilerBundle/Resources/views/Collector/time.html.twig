@@ -454,7 +454,7 @@
                             "starttime": {{ "%F"|format(event.starttime) }},
                             "endtime": {{ "%F"|format(event.endtime) }},
                             "totaltime": {{ "%F"|format(event.totaltime) }},
-                            "memory": {{ "%.1f"|format(event.memory / 1024 / 1024) }},
+                            "memory": {{ "%.1F"|format(event.memory / 1024 / 1024) }},
                             "periods": [
                                 {%- for period in event.periods -%}
                                     {"start": {{ "%F"|format(period.starttime) }}, "end": {{ "%F"|format(period.endtime) }}}{{ loop.last ? '' : ', ' }}

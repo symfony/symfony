@@ -75,6 +75,8 @@ class StopwatchEvent
      * Stops the last started event period.
      *
      * @return StopwatchEvent The event
+     *
+     * @throws \LogicException When stop() is called with a matching call to start()
      */
     public function stop()
     {
@@ -146,7 +148,7 @@ class StopwatchEvent
     {
         $total = 0;
         foreach ($this->periods as $period) {
-            $total += $period->getTime();
+            $total += $period->getDuration();
         }
 
         return $this->formatTime($total);

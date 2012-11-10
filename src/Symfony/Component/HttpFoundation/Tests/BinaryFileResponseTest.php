@@ -49,7 +49,7 @@ class BinaryFileResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testRequests()
     {
-        $response = BinaryFileResponse::create('src/Symfony/Component/HttpFoundation/Tests/File/Fixtures/test.gif')->setAutoEtag();
+        $response = BinaryFileResponse::create(__DIR__.'/File/Fixtures/test.gif')->setAutoEtag();
 
         // do a request to get the ETag
         $request = Request::create('/');

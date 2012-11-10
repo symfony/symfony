@@ -241,7 +241,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
         $this->called[$eventName.'.'.$info['pretty']] = $info;
 
-        return $this->stopwatch->start(isset($info['class']) ? substr($info['class'], strrpos($info['class'], '\\') + 1) : $info['type'], 'event_listener');
+        return $this->stopwatch->start(isset($info['class']) ? $info['class'] : $info['type'], 'event_listener');
     }
 
     /**

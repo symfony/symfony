@@ -1,6 +1,11 @@
 ﻿UPGRADE FROM 2.1 to 2.2
 =======================
 
+### HttpKernel
+
+ * TimeDataCollector::getTotalTime() has been renamed to
+ TimeDataCollector::getDuration()
+
 ### HttpFoundation
 
  * The MongoDbSessionHandler default field names and timestamp type have changed.

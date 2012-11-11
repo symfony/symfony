@@ -75,14 +75,23 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     public function getLoadTests()
     {
         return array(
-            array(array('name'=>'route1')),
+            array(
+                'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
+                array('name'=>'route1'),
+                array('arg2' => 'defaultValue2', 'arg3' =>'defaultValue3')
+            ),
+            array(
+                'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
+                array('name'=>'route1', 'defaults' => array('arg2' => 'foo')),
+                array('arg2' => 'defaultValue2', 'arg3' =>'defaultValue3')
+            ),
         );
     }
 
     /**
      * @dataProvider getLoadTests
      */
-    public function testLoad($routeDatas)
+    public function testLoad($className, $routeDatas = array(), $methodArgs = array())
     {
         $routeDatas = array_replace(array(
             'name'         => 'route',
@@ -97,13 +106,13 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
             ->method('getMethodAnnotations')
             ->will($this->returnValue(array($this->getAnnotedRoute($routeDatas))))
         ;
-        $routeCollection = $this->loader->load('Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass');
+        $routeCollection = $this->loader->load($className);
         $route = $routeCollection->get($routeDatas['name']);
 
         $this->assertSame($routeDatas['pattern'], $route->getPattern(), '->load preserves pattern annotation');
         $this->assertSame($routeDatas['requirements'],$route->getRequirements(), '->load preserves requirements annotation');
         $this->assertCount(0, array_intersect($route->getOptions(), $routeDatas['options']), '->load preserves options annotation');
-        $this->assertSame($routeDatas['defaults'], $route->getDefaults(), '->load preserves defaults annotation');
+        $this->assertSame(array_replace($routeDatas['defaults'], $methodArgs), $route->getDefaults(), '->load preserves defaults annotation');
     }
 
     private function getAnnotedRoute($datas)

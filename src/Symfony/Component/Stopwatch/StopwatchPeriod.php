@@ -58,7 +58,7 @@ class StopwatchPeriod
     /**
      * Gets the time spent in this period.
      *
-     * @return integer The time (in milliseconds)
+     * @return integer The period duration (in milliseconds)
      */
     public function getDuration()
     {

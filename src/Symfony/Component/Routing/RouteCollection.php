@@ -282,7 +282,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function setHostnamePattern($pattern)
     {
-        $this->hostnamePattern = $pattern;
+        $this->hostnamePattern = (string) $pattern;
 
         if ('' === $pattern) {
             return;

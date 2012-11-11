@@ -117,8 +117,8 @@ class UrlMatcher implements UrlMatcherInterface
             if (!preg_match($compiledRoute->getRegex(), $pathinfo, $matches)) {
                 continue;
             }
-            $hostnameMatches = array();
 
+            $hostnameMatches = array();
             if ($compiledRoute->getHostnameRegex() && !preg_match($compiledRoute->getHostnameRegex(), $this->context->getHost(), $hostnameMatches)) {
                 continue;
             }
@@ -147,7 +147,7 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
-            return array_merge($this->mergeDefaults(array_merge($matches, $hostnameMatches), $route->getDefaults()), array('_route' => $name));
+            return $this->mergeDefaults(array_replace($matches, $hostnameMatches, array('_route' => $name)), $route->getDefaults());
         }
     }
 

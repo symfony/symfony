@@ -37,7 +37,7 @@ class PhpMatcherDumper extends MatcherDumper
      */
     public function dump(array $options = array())
     {
-        $options = array_merge(array(
+        $options = array_replace(array(
             'class'      => 'ProjectUrlMatcher',
             'base_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
         ), $options);
@@ -296,35 +296,29 @@ EOF;
         // optimize parameters array
         if (($matches || $hostnameMatches) && $route->getDefaults()) {
             $vars = array();
-            if ($matches) {
-                $vars[] = '$matches';
-            }
             if ($hostnameMatches) {
                 $vars[] = '$hostnameMatches';
             }
-            if (count($vars) > 1) {
-                $matchesExpr = 'array_merge(' . implode(', ', array_reverse($vars)) . ')';
-            } else {
-                $matchesExpr = current($vars);
+            if ($matches) {
+                $vars[] = '$matches';
             }
+            $vars[] = "array('_route' => '$name')";
 
-            $code .= sprintf("            return array_merge(\$this->mergeDefaults(%s, %s), array('_route' => '%s'));\n"
-                , $matchesExpr, str_replace("\n", '', var_export($route->getDefaults(), true)), $name);
+            $code .= sprintf("            return \$this->mergeDefaults(array_replace(%s), %s);\n"
+                , implode(', ', $vars), str_replace("\n", '', var_export($route->getDefaults(), true)));
 
         } elseif ($matches || $hostnameMatches) {
 
             if (!$matches) {
                 $code .= "            \$matches = \$hostnameMatches;\n";
-            } else {
-                if ($hostnameMatches) {
-                    $code .= "            \$matches = array_merge(\$hostnameMatches, \$matches);\n";
-                }
+            } elseif ($hostnameMatches) {
+                $code .= "            \$matches = array_replace(\$hostnameMatches, \$matches);\n";
             }
 
             $code .= sprintf("            \$matches['_route'] = '%s';\n\n", $name);
             $code .= "            return \$matches;\n";
         } elseif ($route->getDefaults()) {
-            $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_merge($route->getDefaults(), array('_route' => $name)), true)));
+            $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), array('_route' => $name)), true)));
         } else {
             $code .= sprintf("            return array('_route' => '%s');\n", $name);
         }

@@ -27,7 +27,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         // foo
         if (0 === strpos($pathinfo, '/foo') && preg_match('#^/foo/(?<bar>baz|symfony)$#s', $pathinfo, $matches)) {
-            return array_merge($this->mergeDefaults($matches, array (  'def' => 'test',)), array('_route' => 'foo'));
+            return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo')), array (  'def' => 'test',));
         }
 
         if (0 === strpos($pathinfo, '/bar')) {
@@ -185,7 +185,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         if (0 === strpos($pathinfo, '/multi')) {
             // helloWorld
             if (0 === strpos($pathinfo, '/multi/hello') && preg_match('#^/multi/hello(?:/(?<who>[^/]++))?$#s', $pathinfo, $matches)) {
-                return array_merge($this->mergeDefaults($matches, array (  'who' => 'World!',)), array('_route' => 'helloWorld'));
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'helloWorld')), array (  'who' => 'World!',));
             }
 
             // overridden2
@@ -289,12 +289,12 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                 // route12
                 if ($pathinfo === '/route12') {
-                    return array_merge($this->mergeDefaults($hostnameMatches, array (  'var1' => 'val',)), array('_route' => 'route12'));
+                    return $this->mergeDefaults(array_replace($hostnameMatches, array('_route' => 'route12')), array (  'var1' => 'val',));
                 }
 
                 // route13
                 if (0 === strpos($pathinfo, '/route13') && preg_match('#^/route13/(?<name>[^/]++)$#s', $pathinfo, $matches)) {
-                    $matches = array_merge($hostnameMatches, $matches);
+                    $matches = array_replace($hostnameMatches, $matches);
                     $matches['_route'] = 'route13';
 
                     return $matches;
@@ -302,7 +302,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                 // route14
                 if (0 === strpos($pathinfo, '/route14') && preg_match('#^/route14/(?<name>[^/]++)$#s', $pathinfo, $matches)) {
-                    return array_merge($this->mergeDefaults(array_merge($hostnameMatches, $matches), array (  'var1' => 'val',)), array('_route' => 'route14'));
+                    return $this->mergeDefaults(array_replace($hostnameMatches, $matches, array('_route' => 'route14')), array (  'var1' => 'val',));
                 }
 
             }
@@ -322,7 +322,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         if (0 === strpos($pathinfo, '/route1')) {
             // route16
             if (0 === strpos($pathinfo, '/route16') && preg_match('#^/route16/(?<name>[^/]++)$#s', $pathinfo, $matches)) {
-                return array_merge($this->mergeDefaults($matches, array (  'var1' => 'val',)), array('_route' => 'route16'));
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'route16')), array (  'var1' => 'val',));
             }
 
             // route17

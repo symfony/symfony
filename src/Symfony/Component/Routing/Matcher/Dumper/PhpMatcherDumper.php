@@ -294,7 +294,7 @@ EOF;
         }
 
         // optimize parameters array
-        if (($matches || $hostnameMatches) && $route->getDefaults()) {
+        if ($matches || $hostnameMatches) {
             $vars = array();
             if ($hostnameMatches) {
                 $vars[] = '$hostnameMatches';
@@ -307,16 +307,6 @@ EOF;
             $code .= sprintf("            return \$this->mergeDefaults(array_replace(%s), %s);\n"
                 , implode(', ', $vars), str_replace("\n", '', var_export($route->getDefaults(), true)));
 
-        } elseif ($matches || $hostnameMatches) {
-
-            if (!$matches) {
-                $code .= "            \$matches = \$hostnameMatches;\n";
-            } elseif ($hostnameMatches) {
-                $code .= "            \$matches = array_replace(\$hostnameMatches, \$matches);\n";
-            }
-
-            $code .= sprintf("            \$matches['_route'] = '%s';\n\n", $name);
-            $code .= "            return \$matches;\n";
         } elseif ($route->getDefaults()) {
             $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), array('_route' => $name)), true)));
         } else {

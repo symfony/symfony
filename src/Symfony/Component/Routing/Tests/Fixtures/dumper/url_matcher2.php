@@ -38,9 +38,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     goto not_bar;
                 }
 
-                $matches['_route'] = 'bar';
-
-                return $matches;
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'bar')), array ());
             }
             not_bar:
 
@@ -51,9 +49,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     goto not_barhead;
                 }
 
-                $matches['_route'] = 'barhead';
-
-                return $matches;
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'barhead')), array ());
             }
             not_barhead:
 
@@ -88,9 +84,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     return $this->redirect($pathinfo.'/', 'baz4');
                 }
 
-                $matches['_route'] = 'baz4';
-
-                return $matches;
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'baz4')), array ());
             }
 
             // baz5
@@ -100,9 +94,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     goto not_baz5;
                 }
 
-                $matches['_route'] = 'baz5';
-
-                return $matches;
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'baz5')), array ());
             }
             not_baz5:
 
@@ -113,9 +105,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     goto not_bazbaz6;
                 }
 
-                $matches['_route'] = 'baz.baz6';
-
-                return $matches;
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'baz.baz6')), array ());
             }
             not_bazbaz6:
 
@@ -128,9 +118,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         // quoter
         if (preg_match('#^/(?<quoter>[\']+)$#s', $pathinfo, $matches)) {
-            $matches['_route'] = 'quoter';
-
-            return $matches;
+            return $this->mergeDefaults(array_replace($matches, array('_route' => 'quoter')), array ());
         }
 
         // space
@@ -142,40 +130,30 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             if (0 === strpos($pathinfo, '/a/b\'b')) {
                 // foo1
                 if (preg_match('#^/a/b\'b/(?<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                    $matches['_route'] = 'foo1';
-
-                    return $matches;
+                    return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo1')), array ());
                 }
 
                 // bar1
                 if (preg_match('#^/a/b\'b/(?<bar>[^/]++)$#s', $pathinfo, $matches)) {
-                    $matches['_route'] = 'bar1';
-
-                    return $matches;
+                    return $this->mergeDefaults(array_replace($matches, array('_route' => 'bar1')), array ());
                 }
 
             }
 
             // overridden
             if (preg_match('#^/a/(?<var>.*)$#s', $pathinfo, $matches)) {
-                $matches['_route'] = 'overridden';
-
-                return $matches;
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'overridden')), array ());
             }
 
             if (0 === strpos($pathinfo, '/a/b\'b')) {
                 // foo2
                 if (preg_match('#^/a/b\'b/(?<foo1>[^/]++)$#s', $pathinfo, $matches)) {
-                    $matches['_route'] = 'foo2';
-
-                    return $matches;
+                    return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo2')), array ());
                 }
 
                 // bar2
                 if (preg_match('#^/a/b\'b/(?<bar1>[^/]++)$#s', $pathinfo, $matches)) {
-                    $matches['_route'] = 'bar2';
-
-                    return $matches;
+                    return $this->mergeDefaults(array_replace($matches, array('_route' => 'bar2')), array ());
                 }
 
             }
@@ -206,16 +184,12 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         // foo3
         if (preg_match('#^/(?<_locale>[^/]++)/b/(?<foo>[^/]++)$#s', $pathinfo, $matches)) {
-            $matches['_route'] = 'foo3';
-
-            return $matches;
+            return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo3')), array ());
         }
 
         // bar3
         if (preg_match('#^/(?<_locale>[^/]++)/b/(?<bar>[^/]++)$#s', $pathinfo, $matches)) {
-            $matches['_route'] = 'bar3';
-
-            return $matches;
+            return $this->mergeDefaults(array_replace($matches, array('_route' => 'bar3')), array ());
         }
 
         if (0 === strpos($pathinfo, '/aba')) {
@@ -226,9 +200,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // foo4
             if (preg_match('#^/aba/(?<foo>[^/]++)$#s', $pathinfo, $matches)) {
-                $matches['_route'] = 'foo4';
-
-                return $matches;
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo4')), array ());
             }
 
         }
@@ -281,10 +253,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             if (0 === strpos($pathinfo, '/route1')) {
                 // route11
                 if ($pathinfo === '/route11') {
-                    $matches = $hostnameMatches;
-                    $matches['_route'] = 'route11';
-
-                    return $matches;
+                    return $this->mergeDefaults(array_replace($hostnameMatches, array('_route' => 'route11')), array ());
                 }
 
                 // route12
@@ -294,10 +263,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                 // route13
                 if (0 === strpos($pathinfo, '/route13') && preg_match('#^/route13/(?<name>[^/]++)$#s', $pathinfo, $matches)) {
-                    $matches = array_replace($hostnameMatches, $matches);
-                    $matches['_route'] = 'route13';
-
-                    return $matches;
+                    return $this->mergeDefaults(array_replace($hostnameMatches, $matches, array('_route' => 'route13')), array ());
                 }
 
                 // route14
@@ -312,9 +278,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         if (preg_match('#^c\\.example\\.com$#s', $hostname, $hostnameMatches)) {
             // route15
             if (0 === strpos($pathinfo, '/route15') && preg_match('#^/route15/(?<name>[^/]++)$#s', $pathinfo, $matches)) {
-                $matches['_route'] = 'route15';
-
-                return $matches;
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'route15')), array ());
             }
 
         }
@@ -341,16 +305,12 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             if (0 === strpos($pathinfo, '/a/b')) {
                 // b
                 if (preg_match('#^/a/b/(?<var>[^/]++)$#s', $pathinfo, $matches)) {
-                    $matches['_route'] = 'b';
-
-                    return $matches;
+                    return $this->mergeDefaults(array_replace($matches, array('_route' => 'b')), array ());
                 }
 
                 // c
                 if (0 === strpos($pathinfo, '/a/b/c') && preg_match('#^/a/b/c/(?<var>[^/]++)$#s', $pathinfo, $matches)) {
-                    $matches['_route'] = 'c';
-
-                    return $matches;
+                    return $this->mergeDefaults(array_replace($matches, array('_route' => 'c')), array ());
                 }
 
             }

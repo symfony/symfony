@@ -10,13 +10,6 @@
    `MongoDate` instead of `MongoTimestamp`, which also makes it possible to use
    TTL collections in MongoDB 2.2+ instead of relying on the `gc()` method.
 
-### Routing
-
-  * A new parameter has been added to the DIC: `router.request_context.base_url`
-    You can customize it for your functional tests or for generating urls with
-    the right base url when your are in the cli context.
-
-
 #### Deprecations
 
  * The `Request::splitHttpAcceptHeader()` is deprecated and will be removed in 2.3.

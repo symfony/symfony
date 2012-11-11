@@ -21,22 +21,22 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 class Profile
 {
     private $token;
-    
+
     /**
      * @var DataCollectorInterface[]
      */
     private $collectors = array();
-    
+
     private $ip;
     private $method;
     private $url;
     private $time;
-    
+
     /**
      * @var Profile
      */
     private $parent;
-    
+
     /**
      * @var Profile[]
      */

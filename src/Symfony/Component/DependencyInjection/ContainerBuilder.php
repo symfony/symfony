@@ -35,29 +35,29 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @var ExtensionInterface[]
      */
     private $extensions = array();
-    
+
     /**
      * @var ExtensionInterface[]
      */
     private $extensionsByNs = array();
-    
+
     /**
      * @var Definition[]
      */
     private $definitions = array();
-    
+
     /**
      * @var Alias[]
      */
     private $aliases = array();
-    
+
     /**
      * @var ResourceInterface[]
      */
     private $resources = array();
-    
+
     private $extensionConfigs = array();
-    
+
     /**
      * @var Compiler
      */

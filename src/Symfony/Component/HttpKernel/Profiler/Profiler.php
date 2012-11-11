@@ -28,17 +28,17 @@ class Profiler
      * @var ProfilerStorageInterface
      */
     private $storage;
-    
+
     /**
      * @var DataCollectorInterface[]
      */
     private $collectors = array();
-    
+
     /**
      * @var LoggerInterface
      */
     private $logger;
-    
+
     /**
      * @var Boolean
      */

@@ -50,7 +50,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * @var BundleInterface[]
      */
     protected $bundles;
-    
+
     protected $bundleMap;
     protected $container;
     protected $rootDir;

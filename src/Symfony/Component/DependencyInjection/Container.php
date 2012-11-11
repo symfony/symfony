@@ -65,7 +65,7 @@ class Container implements IntrospectableContainerInterface
      * @var ParameterBagInterface
      */
     protected $parameterBag;
-    
+
     protected $services;
     protected $scopes;
     protected $scopeChildren;

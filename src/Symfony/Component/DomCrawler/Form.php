@@ -26,6 +26,7 @@ class Form extends Link implements \ArrayAccess
      * @var \DOMNode
      */
     private $button;
+
     /**
      * @var Field\FormField[]
      */
@@ -271,7 +272,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets all fields.
      *
-     * @return array An array of fields
+     * @return FormField[] An array of fields
      *
      * @api
      */

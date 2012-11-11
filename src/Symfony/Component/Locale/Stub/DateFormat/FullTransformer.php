@@ -31,7 +31,7 @@ class FullTransformer
      * @var Transformer[]
      */
     private $transformers;
-    
+
     private $pattern;
     private $timezone;
 

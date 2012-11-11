@@ -26,27 +26,27 @@ class Translator implements TranslatorInterface
      * @var MessageCatalogueInterface[]
      */
     protected $catalogues = array();
-    
+
     /**
      * @var string
      */
     protected $locale;
-    
+
     /**
      * @var array
      */
     private $fallbackLocales = array();
-    
+
     /**
      * @var LoaderInterface[]
      */
     private $loaders = array();
-    
+
     /**
      * @var array
      */
     private $resources = array();
-    
+
     /**
      * @var MessageSelector
      */

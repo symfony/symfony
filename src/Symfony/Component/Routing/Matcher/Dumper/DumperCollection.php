@@ -20,6 +20,7 @@ class DumperCollection implements \IteratorAggregate
 {
     private $parent;
     private $children = array();
+    private $attributes = array();
 
     /**
      * Returns the children routes and collections.

@@ -15,7 +15,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Console\Output\Output;
 
 /**
  * A console command for retrieving information about routes
@@ -112,7 +111,7 @@ EOF
                     ? implode(', ', $requirements['_method']) : $requirements['_method']
                 )
                 : 'ANY';
-            $hostname = null !== $route->getHostnamePattern()
+            $hostname = '' !== $route->getHostnamePattern()
                 ? $route->getHostnamePattern() : 'ANY';
             $output->writeln(sprintf($format, $name, $method, $hostname, $route->getPattern()));
         }

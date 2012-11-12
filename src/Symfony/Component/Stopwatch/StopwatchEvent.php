@@ -18,9 +18,24 @@ namespace Symfony\Component\Stopwatch;
  */
 class StopwatchEvent
 {
+    /**
+     * @var StopwatchPeriod[]
+     */
     private $periods;
+
+    /**
+     * @var float
+     */
     private $origin;
+
+    /**
+     * @var string
+     */
     private $category;
+
+    /**
+     * @var float[]
+     */
     private $started;
 
     /**
@@ -73,6 +88,8 @@ class StopwatchEvent
 
     /**
      * Stops the last started event period.
+     *
+     * @throws \LogicException When start wasn't called before stopping
      *
      * @return StopwatchEvent The event
      *
@@ -184,7 +201,7 @@ class StopwatchEvent
     /**
      * Formats a time.
      *
-     * @param numerical $time A raw time
+     * @param integer|float $time A raw time
      *
      * @return float The formatted time
      *

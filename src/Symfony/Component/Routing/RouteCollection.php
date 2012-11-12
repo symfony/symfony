@@ -212,7 +212,9 @@ class RouteCollection implements \IteratorAggregate, \Countable
         // necessarily already have it applied (depending on the order RouteCollections are added to each other)
         $collection->addPrefix($this->getPrefix() . $prefix, $defaults, $requirements, $options);
 
-        $collection->setHostnamePattern($hostnamePattern);
+        if ('' !== $hostnamePattern) {
+            $collection->setHostnamePattern($hostnamePattern);
+        }
 
         $this->routes[] = $collection;
     }
@@ -283,10 +285,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function setHostnamePattern($pattern)
     {
         $this->hostnamePattern = (string) $pattern;
-
-        if ('' === $pattern) {
-            return;
-        }
 
         foreach ($this->routes as $name => $route) {
             $route->setHostnamePattern($pattern);

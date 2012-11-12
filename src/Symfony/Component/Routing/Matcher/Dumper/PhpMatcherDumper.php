@@ -324,8 +324,8 @@ EOF;
     /**
      * Flattens a tree of routes to a single collection.
      *
-     * @param RouteCollection  $routes Collection of routes
-     * @param DumperCollection $to     A DumperCollection to add routes to
+     * @param RouteCollection       $routes Collection of routes
+     * @param DumperCollection|null $to     A DumperCollection to add routes to
      *
      * @return DumperCollection
      */

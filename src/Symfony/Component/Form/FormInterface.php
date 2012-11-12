@@ -98,7 +98,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Updates the form with default data.
      *
-     * @param  array $modelData The data formatted as expected for the underlying object
+     * @param  mixed $modelData The data formatted as expected for the underlying object
      *
      * @return FormInterface The form instance
      *

@@ -29,7 +29,13 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
 
     public function testLoad()
     {
-        $this->reader->expects($this->once())->method('getClassAnnotation');
+        $this->reader->expects($this->exactly(2))->method('getClassAnnotation');
+
+        $this->reader
+            ->expects($this->any())
+            ->method('getMethodAnnotations')
+            ->will($this->returnValue(array()))
+        ;
 
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses');
     }

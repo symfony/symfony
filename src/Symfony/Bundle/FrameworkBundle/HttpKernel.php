@@ -105,6 +105,7 @@ class HttpKernel extends BaseHttpKernel
             'alt'           => array(),
             'standalone'    => false,
             'comment'       => '',
+            'default'		=> null,
         ), $options);
 
         if (!is_array($options['alt'])) {
@@ -130,8 +131,16 @@ class HttpKernel extends BaseHttpKernel
             $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query'], false);
             $defaultContent = null;
 
-            if ($template = $this->container->getParameter('templating.hinclude.default_template')) {
-                $defaultContent = $this->container->get('templating')->render($template);
+            $templating = $this->container->get('templating');
+
+            if ($options['default']) {
+                if ($templating->exists($options['default'])) {
+                    $defaultContent = $templating->render($options['default']);
+                } else {
+                    $defaultContent = $options['default'];
+                }
+            } elseif ($template = $this->container->getParameter('templating.hinclude.default_template')) {
+                $defaultContent = $templating->render($template);
             }
 
             return $this->renderHIncludeTag($uri, $defaultContent);
@@ -226,7 +235,7 @@ class HttpKernel extends BaseHttpKernel
     /**
      * Renders an HInclude tag.
      *
-     * @param string $uri A URI
+     * @param string $uri            A URI
      * @param string $defaultContent Default content
      */
     public function renderHIncludeTag($uri, $defaultContent = null)

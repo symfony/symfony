@@ -149,6 +149,11 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         $defaults = array_merge($globals['defaults'], $annot->getDefaults());
+        foreach ($method->getParameters() as $param) {
+            if ($param->isOptional()) {
+                $defaults[$param->getName()] = $param->getDefaultValue();
+            }
+        }
         $requirements = array_merge($globals['requirements'], $annot->getRequirements());
         $options = array_merge($globals['options'], $annot->getOptions());
 

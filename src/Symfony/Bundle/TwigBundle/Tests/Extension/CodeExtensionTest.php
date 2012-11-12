@@ -9,23 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
+namespace Symfony\Bundle\TwigBundle\Tests\Extension;
 
-use Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper;
+use Symfony\Bundle\TwigBundle\Extension\CodeExtension;
 
-class CodeHelperTest extends \PHPUnit_Framework_TestCase
+class CodeExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    protected static $helper;
-
-    public static function setUpBeforeClass()
-    {
-        self::$helper = new CodeHelper('txmt://open?url=file://%f&line=%l', '/root', 'UTF-8');
-    }
+    protected $helper;
 
     public function testFormatFile()
     {
         $expected = sprintf('<a href="txmt://open?url=file://%s&amp;line=25" title="Click to open this file" class="file_link">%s at line 25</a>', __FILE__, __FILE__);
-        $this->assertEquals($expected, self::$helper->formatFile(__FILE__, 25));
+        $this->assertEquals($expected, $this->getExtension()->formatFile(__FILE__, 25));
     }
 
     /**
@@ -33,7 +28,7 @@ class CodeHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGettingClassAbbreviation($class, $abbr)
     {
-        $this->assertEquals(self::$helper->abbrClass($class), $abbr);
+        $this->assertEquals($this->getExtension()->abbrClass($class), $abbr);
     }
 
     /**
@@ -41,7 +36,7 @@ class CodeHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGettingMethodAbbreviation($method, $abbr)
     {
-        $this->assertEquals(self::$helper->abbrMethod($method), $abbr);
+        $this->assertEquals($this->getExtension()->abbrMethod($method), $abbr);
     }
 
     public function getClassNameProvider()
@@ -64,6 +59,11 @@ class CodeHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals('code', self::$helper->getName());
+        $this->assertEquals('code', $this->getExtension()->getName());
+    }
+
+    protected function getExtension()
+    {
+        return new CodeExtension('txmt://open?url=file://%f&line=%l', '/root', 'UTF-8');
     }
 }

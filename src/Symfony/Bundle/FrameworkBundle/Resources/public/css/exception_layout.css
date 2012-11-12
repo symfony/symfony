@@ -17,26 +17,26 @@ img {
     font-size: 0;
     line-height: 0;
 }
-.clear_fix:after {
+.clear-fix:after {
     content: "\0020";
     display: block;
     height: 0;
     clear: both;
     visibility: hidden;
 }
-.clear_fix {
+.clear-fix {
     display: inline-block;
 }
-* html .clear_fix {
+* html .clear-fix {
     height: 1%;
 }
-.clear_fix {
+.clear-fix {
     display: block;
 }
 .header {
     padding: 30px 30px 20px 30px;
 }
-.header_logo {
+.header-logo {
     float: left;
 }
 .search {

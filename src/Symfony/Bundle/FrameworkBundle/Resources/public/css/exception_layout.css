@@ -7,7 +7,7 @@ body {
     color: #333;
 }
 
-.sf-exceptionreset, .sf-exceptionreset .block, .sf-exceptionreset #message {
+.sf-reset, .sf-reset .block, .sf-reset #message {
     margin: auto;
 }
 

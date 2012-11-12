@@ -66,7 +66,9 @@
 
         <service id="twig.extension.code" class="%twig.extension.code.class%" public="false">
             <tag name="twig.extension" />
-            <argument type="service" id="service_container" />
+            <argument>%templating.helper.code.file_link_format%</argument>
+            <argument>%kernel.root_dir%</argument>
+            <argument>%kernel.charset%</argument>
         </service>
 
         <service id="twig.extension.routing" class="%twig.extension.routing.class%" public="false">

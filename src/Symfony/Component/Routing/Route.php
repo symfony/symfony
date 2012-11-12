@@ -59,11 +59,11 @@ class Route implements \Serializable
      *
      *  * compiler_class: A class name able to compile this route instance (RouteCompiler by default)
      *
-     * @param string $pattern          The path pattern to match
-     * @param array  $defaults         An array of default parameter values
-     * @param array  $requirements     An array of requirements for parameters (regexes)
-     * @param array  $options          An array of options
-     * @param string $hostnamePattern  The hostname pattern to match
+     * @param string $pattern         The path pattern to match
+     * @param array  $defaults        An array of default parameter values
+     * @param array  $requirements    An array of requirements for parameters (regexes)
+     * @param array  $options         An array of options
+     * @param string $hostnamePattern The hostname pattern to match
      *
      * @api
      */

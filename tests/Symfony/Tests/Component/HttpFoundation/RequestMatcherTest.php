@@ -66,6 +66,9 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
         return array(
             array(true, '2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'),
             array(false, '2a00:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65'),
+            array(false, '2a01:198:603:0:396e:4789:8e99:890f', '::1'),
+            array(true, '0:0:0:0:0:0:0:1', '::1'),
+            array(false, '0:0:603:0:396e:4789:8e99:0001', '::1'),
         );
     }
 
@@ -89,38 +92,59 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testMethod()
+    /**
+     * @dataProvider testMethodFixtures
+     */
+    public function testMethod($requestMethod, $matcherMethod, $isMatch)
     {
         $matcher = new RequestMatcher();
+        $matcher->matchMethod($matcherMethod);
+        $request = Request::create('', $requestMethod);
+        $this->assertSame($isMatch, $matcher->matches($request));
 
-        $matcher->matchMethod('get');
-        $request = Request::create('', 'get');
-        $this->assertTrue($matcher->matches($request));
-
-        $matcher->matchMethod('post');
-        $this->assertFalse($matcher->matches($request));
-
-        $matcher->matchMethod(array('get', 'post'));
-        $this->assertTrue($matcher->matches($request));
+        $matcher = new RequestMatcher(null, null, $matcherMethod);
+        $request = Request::create('', $requestMethod);
+        $this->assertSame($isMatch, $matcher->matches($request));
     }
 
-    public function testHost()
+    public function testMethodFixtures()
+    {
+        return array(
+            array('get', 'get', true),
+            array('get', array('get', 'post'), true),
+            array('get', 'post', false),
+            array('get', 'GET', true),
+            array('get', array('GET', 'POST'), true),
+            array('get', 'POST', false),
+        );
+    }
+
+    /**
+     * @dataProvider testHostFixture
+     */
+    public function testHost($pattern, $isMatch)
     {
         $matcher = new RequestMatcher();
-
         $request = Request::create('', 'get', array(), array(), array(), array('HTTP_HOST' => 'foo.example.com'));
 
-        $matcher->matchHost('.*\.example\.com');
-        $this->assertTrue($matcher->matches($request));
+        $matcher->matchHost($pattern);
+        $this->assertSame($isMatch, $matcher->matches($request));
 
-        $matcher->matchHost('\.example\.com$');
-        $this->assertTrue($matcher->matches($request));
+        $matcher= new RequestMatcher(null, $pattern);
+        $this->assertSame($isMatch, $matcher->matches($request));
+    }
 
-        $matcher->matchHost('^.*\.example\.com$');
-        $this->assertTrue($matcher->matches($request));
-
-        $matcher->matchMethod('.*\.sensio\.com');
-        $this->assertFalse($matcher->matches($request));
+    public function testHostFixture()
+    {
+        return array(
+            array('.*\.example\.com', true),
+            array('\.example\.com$', true),
+            array('^.*\.example\.com$', true),
+            array('.*\.sensio\.com', false),
+            array('.*\.example\.COM', true),
+            array('\.example\.COM$', true),
+            array('^.*\.example\.COM$', true),
+            array('.*\.sensio\.COM', false),        );
     }
 
     public function testPath()
@@ -175,3 +199,4 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($matcher->matches($request));
     }
 }
+

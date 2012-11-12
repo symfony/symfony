@@ -33,8 +33,8 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads a Yaml file.
      *
-     * @param string $file A Yaml file path
-     * @param string $type The resource type
+     * @param string      $file A Yaml file path
+     * @param string|null $type The resource type
      *
      * @return RouteCollection A RouteCollection instance
      *

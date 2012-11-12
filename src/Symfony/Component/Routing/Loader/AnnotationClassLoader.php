@@ -57,7 +57,7 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
 abstract class AnnotationClassLoader implements LoaderInterface
 {
     protected $reader;
-    protected $routeAnnotationClass  = 'Symfony\\Component\\Routing\\Annotation\\Route';
+    protected $routeAnnotationClass = 'Symfony\\Component\\Routing\\Annotation\\Route';
     protected $defaultRouteIndex;
 
     /**
@@ -97,10 +97,11 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         $globals = array(
-            'pattern'      => '',
-            'requirements' => array(),
-            'options'      => array(),
-            'defaults'     => array(),
+            'pattern'          => '',
+            'requirements'     => array(),
+            'options'          => array(),
+            'defaults'         => array(),
+            'hostname_pattern' => '',
         );
 
         $class = new \ReflectionClass($class);
@@ -123,6 +124,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
             if (null !== $annot->getDefaults()) {
                 $globals['defaults'] = $annot->getDefaults();
+            }
+
+            if (null !== $annot->getHostnamePattern()) {
+                $globals['hostname_pattern'] = $annot->getHostnamePattern();
             }
         }
 
@@ -148,16 +153,21 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $name = $this->getDefaultRouteName($class, $method);
         }
 
-        $defaults = array_merge($globals['defaults'], $annot->getDefaults());
+        $defaults = array_replace($globals['defaults'], $annot->getDefaults());
         foreach ($method->getParameters() as $param) {
             if ($param->isOptional()) {
                 $defaults[$param->getName()] = $param->getDefaultValue();
             }
         }
-        $requirements = array_merge($globals['requirements'], $annot->getRequirements());
-        $options = array_merge($globals['options'], $annot->getOptions());
+        $requirements = array_replace($globals['requirements'], $annot->getRequirements());
+        $options = array_replace($globals['options'], $annot->getOptions());
 
-        $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options);
+        $hostnamePattern = $annot->getHostnamePattern();
+        if (null === $hostnamePattern) {
+            $hostnamePattern = $globals['hostname_pattern'];
+        }
+
+        $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options, $hostnamePattern);
 
         $this->configureRoute($route, $class, $method, $annot);
 

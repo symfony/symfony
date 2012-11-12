@@ -23,6 +23,7 @@
 
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="pattern" type="xsd:string" />
+    <xsd:attribute name="hostname-pattern" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="import">
@@ -36,6 +37,7 @@
     <xsd:attribute name="type" type="xsd:string" />
     <xsd:attribute name="prefix" type="xsd:string" />
     <xsd:attribute name="class" type="xsd:string" />
+    <xsd:attribute name="hostname-pattern" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="element" mixed="true">

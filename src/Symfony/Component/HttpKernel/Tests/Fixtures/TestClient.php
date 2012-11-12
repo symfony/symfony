@@ -21,7 +21,7 @@ class TestClient extends Client
 
         $autoload = file_exists(__DIR__.'/../../vendor/autoload.php')
             ? __DIR__.'/../../vendor/autoload.php'
-            : __DIR__.'/../../../../../../../../autoload.php'
+            : __DIR__.'/../../../../../../vendor/autoload.php'
         ;
 
         $script = preg_replace('/(\->register\(\);)/', "$0\nrequire_once '$autoload';\n", $script);

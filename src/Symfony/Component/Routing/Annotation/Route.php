@@ -25,6 +25,7 @@ class Route
     private $requirements;
     private $options;
     private $defaults;
+    private $hostnamePattern;
 
     /**
      * Constructor.
@@ -43,7 +44,7 @@ class Route
         }
 
         foreach ($data as $key => $value) {
-            $method = 'set'.$key;
+            $method = 'set'.str_replace('_', '', $key);
             if (!method_exists($this, $method)) {
                 throw new \BadMethodCallException(sprintf("Unknown property '%s' on annotation '%s'.", $key, get_class($this)));
             }
@@ -59,6 +60,16 @@ class Route
     public function getPattern()
     {
         return $this->pattern;
+    }
+
+    public function setHostnamePattern($pattern)
+    {
+        $this->hostnamePattern = $pattern;
+    }
+
+    public function getHostnamePattern()
+    {
+        return $this->hostnamePattern;
     }
 
     public function setName($name)

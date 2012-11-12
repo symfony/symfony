@@ -40,7 +40,6 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $basePath = __DIR__.'/../../Fixtures/dumper/';
 
         $dumper = new PhpMatcherDumper($collection);
-
         $this->assertStringEqualsFile($basePath.$fixture, $dumper->dump($options), '->dump() correctly dumps routes as optimized PHP code.');
     }
 
@@ -155,6 +154,59 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection1 = new RouteCollection();
         $collection1->add('foo4', new Route('/{foo}'));
         $collection->addCollection($collection1, '/aba');
+
+        // prefix and hostname
+
+        $collection1 = new RouteCollection();
+
+        $route1 = new Route('/route1', array(), array(), array(), 'a.example.com');
+        $collection1->add('route1', $route1);
+
+        $collection2 = new RouteCollection();
+
+        $route2 = new Route('/c2/route2', array(), array(), array(), 'a.example.com');
+        $collection1->add('route2', $route2);
+
+        $route3 = new Route('/c2/route3', array(), array(), array(), 'b.example.com');
+        $collection1->add('route3', $route3);
+
+        $route4 = new Route('/route4', array(), array(), array(), 'a.example.com');
+        $collection1->add('route4', $route4);
+
+        $route5 = new Route('/route5', array(), array(), array(), 'c.example.com');
+        $collection1->add('route5', $route5);
+
+        $route6 = new Route('/route6', array(), array(), array(), null);
+        $collection1->add('route6', $route6);
+
+        $collection->addCollection($collection1);
+
+        // hostname and variables
+
+        $collection1 = new RouteCollection();
+
+        $route11 = new Route('/route11', array(), array(), array(), '{var1}.example.com');
+        $collection1->add('route11', $route11);
+
+        $route12 = new Route('/route12', array('var1' => 'val'), array(), array(), '{var1}.example.com');
+        $collection1->add('route12', $route12);
+
+        $route13 = new Route('/route13/{name}', array(), array(), array(), '{var1}.example.com');
+        $collection1->add('route13', $route13);
+
+        $route14 = new Route('/route14/{name}', array('var1' => 'val'), array(), array(), '{var1}.example.com');
+        $collection1->add('route14', $route14);
+
+        $route15 = new Route('/route15/{name}', array(), array(), array(), 'c.example.com');
+        $collection1->add('route15', $route15);
+
+        $route16 = new Route('/route16/{name}', array('var1' => 'val'), array(), array(), null);
+        $collection1->add('route16', $route16);
+
+        $route17 = new Route('/route17', array(), array(), array(), null);
+        $collection1->add('route17', $route17);
+
+        $collection->addCollection($collection1);
 
         // multiple sub-collections with a single route and a prefix each
         $collection1 = new RouteCollection();

@@ -56,9 +56,20 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  */
 abstract class AnnotationClassLoader implements LoaderInterface
 {
+    /**
+     * @var Reader
+     */
     protected $reader;
+
+    /**
+     * @var string
+     */
     protected $routeAnnotationClass = 'Symfony\\Component\\Routing\\Annotation\\Route';
-    protected $defaultRouteIndex;
+
+    /**
+     * @var integer
+     */
+    protected $defaultRouteIndex = 0;
 
     /**
      * Constructor.
@@ -83,8 +94,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
     /**
      * Loads from annotations from a class.
      *
-     * @param string $class A class name
-     * @param string $type  The resource type
+     * @param string      $class A class name
+     * @param string|null $type  The resource type
      *
      * @return RouteCollection A RouteCollection instance
      *

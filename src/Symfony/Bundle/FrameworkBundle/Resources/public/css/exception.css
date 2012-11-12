@@ -89,7 +89,7 @@ build: 56
     margin: 10px 0 20px;
 }
 .sf-reset .block,
-.sf-reset .block_exception {
+.sf-reset .block-exception {
     -moz-border-radius: 16px;
     -webkit-border-radius: 16px;
     border-radius: 16px;
@@ -100,44 +100,44 @@ build: 56
     border: 1px solid #dfdfdf;
     padding: 40px 50px;
 }
-.sf-reset .block_exception {
+.sf-reset .block-exception {
     background-color: #f6f6f6;
     border: 1px solid #dfdfdf;
     padding: 30px 28px;
 }
-.sf-reset .block_exception div {
+.sf-reset .block-exception div {
     color: #313131;
     font-size: 10px;
 }
-.sf-reset .block_exception_detected .illustration_exception,
-.sf-reset .block_exception_detected .text_exception {
+.sf-reset .block-exception-detected .illustration-exception,
+.sf-reset .block-exception-detected .text-exception {
     float: left;
 }
-.sf-reset .block_exception_detected .illustration_exception {
+.sf-reset .block-exception-detected .illustration-exception {
     width: 152px;
 }
-.sf-reset .block_exception_detected .text_exception {
+.sf-reset .block-exception-detected .text-exception {
     width: 670px;
     padding: 30px 44px 24px 46px;
     position: relative;
 }
-.sf-reset .text_exception .open_quote,
-.sf-reset .text_exception .close_quote {
+.sf-reset .text-exception .open-quote,
+.sf-reset .text-exception .close-quote {
     position: absolute;
 }
-.sf-reset .open_quote {
+.sf-reset .open-quote {
     top: 0;
     left: 0;
 }
-.sf-reset .close_quote {
+.sf-reset .close-quote {
     bottom: 0;
     right: 50px;
 }
-.sf-reset .block_exception p {
+.sf-reset .block-exception p {
     font-family: Arial, Helvetica, sans-serif;
 }
-.sf-reset .block_exception p a,
-.sf-reset .block_exception p a:hover {
+.sf-reset .block-exception p a,
+.sf-reset .block-exception p a:hover {
     color: #565656;
 }
 .sf-reset h2 {
@@ -159,12 +159,12 @@ build: 56
     float: left;
     width: 654px;
 }
-.sf-reset .error_count {
+.sf-reset .error-count {
     float: right;
     width: 170px;
     text-align: right;
 }
-.sf-reset .error_count span {
+.sf-reset .error-count span {
     display: inline-block;
     background-color: #aacd4e;
     -moz-border-radius: 6px;
@@ -183,7 +183,7 @@ build: 56
 .sf-reset .linked li {
     display: inline;
 }
-.sf-reset #output_content {
+.sf-reset #output-content {
     color: #000;
     font-size: 12px;
 }

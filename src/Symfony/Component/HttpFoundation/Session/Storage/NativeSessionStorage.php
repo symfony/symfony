@@ -55,7 +55,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * Constructor.
      *
      * Depending on how you want the storage driver to behave you probably
-     * want top override this constructor entirely.
+     * want to override this constructor entirely.
      *
      * List of options for $options array with their defaults.
      * @see http://php.net/session.configuration for options

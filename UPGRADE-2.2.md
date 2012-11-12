@@ -10,6 +10,8 @@
    `MongoDate` instead of `MongoTimestamp`, which also makes it possible to use
    TTL collections in MongoDB 2.2+ instead of relying on the `gc()` method.
 
+ * The Stopwatch functionality was moved from HttpKernel\Debug to its own component
+
 #### Deprecations
 
  * The `Request::splitHttpAcceptHeader()` is deprecated and will be removed in 2.3.

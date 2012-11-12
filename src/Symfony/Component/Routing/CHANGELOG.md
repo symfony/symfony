@@ -4,6 +4,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * added support for the method default argument values when defining a @Route
  * Adjacent placeholders without separator work now, e.g. `/{x}{y}{z}.{_format}`.
  * Characters that function as separator between placeholders are now whitelisted
    to fix routes with normal text around a variable, e.g. `/prefix{var}suffix`.

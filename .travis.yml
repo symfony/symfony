@@ -6,6 +6,6 @@ php:
   - 5.4
 
 before_script:
-    - COMPOSER_ROOT_VERSION=2.1.x-dev composer --dev install
+    - COMPOSER_ROOT_VERSION=2.1.x-dev composer --prefer-source --dev install
     - php src/Symfony/Component/Locale/Resources/data/build-data.php
     - export USE_INTL_ICU_DATA_VERSION=1

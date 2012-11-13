@@ -3,9 +3,10 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset={{ _charset }}"/>
         <meta name="robots" content="noindex,nofollow" />
-        <title>{% block title '' %}</title>
-        <link href="{{ asset('bundles/framework/css/exception_layout.css') }}" rel="stylesheet" type="text/css" media="all" />
-        <link href="{{ asset('bundles/framework/css/exception.css') }}" rel="stylesheet" type="text/css" media="all" />
+        <title>{% block title %}{% endblock %}</title>
+        <link href="{{ asset('bundles/framework/css/structure.css') }}" rel="stylesheet" type="text/css" media="all" />
+        <link href="{{ asset('bundles/framework/css/body.css') }}" rel="stylesheet" type="text/css" media="all" />
+        {% block head %}{% endblock %}
     </head>
     <body>
         <div id="content">
@@ -15,28 +16,29 @@
                 </div>
 
                 <div class="search">
-                  <form method="get" action="http://symfony.com/search">
-                    <div class="form-row">
+                    <form method="get" action="http://symfony.com/search" target="_blank">
+                        <div class="form-row">
+                            <label for="search-id">
+                                <img src="{{ asset('bundles/framework/images/grey_magnifier.png') }}" alt="Search on Symfony website" />
+                            </label>
 
-                      <label for="search-id">
-                          <img src="{{ asset('bundles/framework/images/grey_magnifier.png') }}" alt="Search on Symfony website" />
-                      </label>
+                            <input name="q" id="search-id" type="search" placeholder="Search on Symfony website" />
 
-                      <input name="q" id="search-id" type="search" placeholder="Search on Symfony website" />
-
-                      <button type="submit">
-                        <span class="border-l">
-                          <span class="border-r">
-                            <span class="btn-bg">OK</span>
-                          </span>
-                        </span>
-                      </button>
-                    </div>
+                            <button type="submit" class="sf-button">
+                                <span class="border-l">
+                                    <span class="border-r">
+                                        <span class="btn-bg">OK</span>
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
                    </form>
                 </div>
             </div>
 
-            {% block body '' %}
+            <div class="sf-reset">
+                {% block body %}{% endblock %}
+            </div>
         </div>
     </body>
 </html>

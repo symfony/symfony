@@ -1,100 +1,94 @@
-<div class="sf-reset">
-
-    <div class="block-exception">
-        <div class="block-exception-detected clear-fix">
-            <div class="illustration-exception">
-                <img alt="Exception detected!" src="{{ asset('bundles/framework/images/exception_detected.png') }}"/>
+<div class="block-exception">
+    <div class="block-exception-detected clear-fix">
+        <div class="illustration-exception">
+            <img alt="Exception detected!" src="{{ asset('bundles/framework/images/exception_detected.png') }}"/>
+        </div>
+        <div class="text-exception">
+            <div class="open-quote">
+                <img alt="" src="{{ asset('bundles/framework/images/open_quote.gif') }}"/>
             </div>
-            <div class="text-exception">
 
-                <div class="open-quote">
-                    <img alt="" src="{{ asset('bundles/framework/images/open_quote.gif') }}"/>
+            <h1>
+                {{ exception.message|nl2br|format_file_from_text }}
+            </h1>
+
+            <div>
+                <strong>{{ status_code }}</strong> {{ status_text }} - {{ exception.class|abbr_class }}
+            </div>
+
+            {% set previous_count = exception.allPrevious|length %}
+            {% if previous_count %}
+                <div class="linked"><span><strong>{{ previous_count }}</strong> linked Exception{{ previous_count > 1 ? 's' : '' }}:</span>
+                    <ul>
+                        {% for i, previous in exception.allPrevious %}
+                            <li>
+                                {{ previous.class|abbr_class }} <a href="#traces-link-{{ i + 1 }}" onclick="toggle('traces-{{ i + 1 }}', 'traces'); switchIcons('icon-traces-{{ i + 1 }}-open', 'icon-traces-{{ i + 1 }}-close');">&#187;</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
+            {% endif %}
 
-                <h1>
-                    {{ exception.message|nl2br|format_file_from_text }}
-                </h1>
-
-                <div>
-                    <strong>{{ status_code }}</strong> {{ status_text }} - {{ exception.class|abbr_class }}
-                </div>
-
-                {% set previous_count = exception.allPrevious|length %}
-                {% if previous_count %}
-                    <div class="linked"><span><strong>{{ previous_count }}</strong> linked Exception{{ previous_count > 1 ? 's' : '' }}:</span>
-                        <ul>
-                            {% for i, previous in exception.allPrevious %}
-                                <li>
-                                    {{ previous.class|abbr_class }} <a href="#traces-link-{{ i + 1 }}" onclick="toggle('traces-{{ i + 1 }}', 'traces'); switchIcons('icon-traces-{{ i + 1 }}-open', 'icon-traces-{{ i + 1 }}-close');">&#187;</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
-
-                <div class="close-quote">
-                    <img alt="" src="{{ asset('bundles/framework/images/close_quote.gif') }}"/>
-                </div>
-
+            <div class="close-quote">
+                <img alt="" src="{{ asset('bundles/framework/images/close_quote.gif') }}"/>
             </div>
         </div>
     </div>
+</div>
 
-    {% for position, e in exception.toarray %}
-        {% include 'TwigBundle:Exception:traces.html.twig' with { 'exception': e, 'position': position, 'count': previous_count } only %}
-    {% endfor %}
+{% for position, e in exception.toarray %}
+    {% include 'TwigBundle:Exception:traces.html.twig' with { 'exception': e, 'position': position, 'count': previous_count } only %}
+{% endfor %}
 
-    {% if logger %}
-        <div class="block">
-            <div class="logs clear-fix">
-                {% spaceless %}
-                <h2>
-                    Logs&nbsp;
-                    <a href="#" onclick="toggle('logs'); switchIcons('icon-logs-open', 'icon-logs-close'); return false;">
-                        <img class="toggle" id="icon-logs-open" alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="visibility: hidden" />
-                        <img class="toggle" id="icon-logs-close" alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="visibility: visible; margin-left: -18px" />
-                    </a>
-                </h2>
-                {% endspaceless %}
-
-                {% if logger.counterrors %}
-                    <div class="error-count">
-                        <span>
-                            {{ logger.counterrors }} error{{ logger.counterrors > 1 ? 's' : ''}}
-                        </span>
-                    </div>
-                {% endif %}
-
-            </div>
-
-            <div id="logs">
-                {% include 'TwigBundle:Exception:logs.html.twig' with { 'logs': logger.logs } only %}
-            </div>
-
-        </div>
-    {% endif %}
-
-    {% if currentContent %}
-        <div class="block">
+{% if logger %}
+    <div class="block">
+        <div class="logs clear-fix">
             {% spaceless %}
             <h2>
-                Content of the Output&nbsp;
-                <a href="#" onclick="toggle('output-content'); switchIcons('icon-content-open', 'icon-content-close'); return false;">
-                    <img class="toggle" id="icon-content-close" alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="visibility: hidden" />
-                    <img class="toggle" id="icon-content-open" alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="visibility: visible; margin-left: -18px" />
+                Logs&nbsp;
+                <a href="#" onclick="toggle('logs'); switchIcons('icon-logs-open', 'icon-logs-close'); return false;">
+                    <img class="toggle" id="icon-logs-open" alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="visibility: hidden" />
+                    <img class="toggle" id="icon-logs-close" alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="visibility: visible; margin-left: -18px" />
                 </a>
             </h2>
             {% endspaceless %}
 
-            <div id="output-content" style="display: none">
-                {{ currentContent }}
-            </div>
+            {% if logger.counterrors %}
+                <div class="error-count">
+                    <span>
+                        {{ logger.counterrors }} error{{ logger.counterrors > 1 ? 's' : ''}}
+                    </span>
+                </div>
+            {% endif %}
 
-            <div style="clear: both"></div>
         </div>
-    {% endif %}
 
-</div>
+        <div id="logs">
+            {% include 'TwigBundle:Exception:logs.html.twig' with { 'logs': logger.logs } only %}
+        </div>
+    </div>
+{% endif %}
+
+{% if currentContent %}
+    <div class="block">
+        {% spaceless %}
+        <h2>
+            Content of the Output&nbsp;
+            <a href="#" onclick="toggle('output-content'); switchIcons('icon-content-open', 'icon-content-close'); return false;">
+                <img class="toggle" id="icon-content-close" alt="-" src="{{ asset('bundles/framework/images/blue_picto_less.gif') }}" style="visibility: hidden" />
+                <img class="toggle" id="icon-content-open" alt="+" src="{{ asset('bundles/framework/images/blue_picto_more.gif') }}" style="visibility: visible; margin-left: -18px" />
+            </a>
+        </h2>
+        {% endspaceless %}
+
+        <div id="output-content" style="display: none">
+            {{ currentContent }}
+        </div>
+
+        <div style="clear: both"></div>
+    </div>
+{% endif %}
+
 
 <script type="text/javascript">//<![CDATA[
     function toggle(id, clazz) {

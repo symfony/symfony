@@ -31,6 +31,19 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class Controller extends ContainerAware
 {
+    /** 
+	  * Generates a URL from the given parameters.
+    * If you use Twig Template Engine, you are familiar with
+    * its path function. So, you can use this method
+    * to generate a URL at a controller at the same way as Twig.
+		*
+    * @see generateUrl
+		* @author Manoel Campos da Silva Filho <manoelcampos@gmail.com>
+    */
+    public function path($route, $parameters = array(), $absolute = false) {
+			return $this->generateUrl($route, $parameters, $absolute);
+		}
+
     /**
      * Generates a URL from the given parameters.
      *

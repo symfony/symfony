@@ -28,8 +28,24 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  */
 class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
 {
+    /**
+     * @var RouteCollection 
+     */
+    protected $routes;
+
+    /**
+     * @var RequestContext
+     */
     protected $context;
+
+    /**
+     * @var Boolean|null
+     */
     protected $strictRequirements = true;
+
+    /**
+     * @var LoggerInterface|null
+     */
     protected $logger;
 
     /**
@@ -60,14 +76,12 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%7C' => '|',
     );
 
-    protected $routes;
-
     /**
      * Constructor.
      *
-     * @param RouteCollection $routes  A RouteCollection instance
-     * @param RequestContext  $context The context
-     * @param LoggerInterface $logger  A logger instance
+     * @param RouteCollection      $routes  A RouteCollection instance
+     * @param RequestContext       $context The context
+     * @param LoggerInterface|null $logger  A logger instance
      *
      * @api
      */

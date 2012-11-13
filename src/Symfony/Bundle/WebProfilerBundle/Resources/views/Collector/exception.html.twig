@@ -25,6 +25,8 @@
             <em>No exception was thrown and uncaught during the request.</em>
         </p>
     {% else %}
-        {% render 'WebProfilerBundle:Exception:show' with { 'exception': collector.exception, 'format': 'html' } %}
+        <div class="sf-reset">
+            {% render 'WebProfilerBundle:Exception:show' with { 'exception': collector.exception, 'format': 'html' } %}
+        </div>
     {% endif %}
 {% endblock %}

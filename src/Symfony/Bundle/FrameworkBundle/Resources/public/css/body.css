@@ -1,0 +1,150 @@
+/*
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.com/yui/license.html
+version: 3.1.2
+build: 56
+*/
+.sf-reset html{color:#000;background:#FFF;}.sf-reset body,.sf-reset div,.sf-reset dl,.sf-reset dt,.sf-reset dd,.sf-reset ul,.sf-reset ol,.sf-reset li,.sf-reset h1,.sf-reset h2,.sf-reset h3,.sf-reset h4,.sf-reset h5,.sf-reset h6,.sf-reset pre,.sf-reset code,.sf-reset form,.sf-reset fieldset,.sf-reset legend,.sf-reset input,.sf-reset textarea,.sf-reset p,.sf-reset blockquote,.sf-reset th,.sf-reset td{margin:0;padding:0;}.sf-reset table{border-collapse:collapse;border-spacing:0;}.sf-reset fieldset,.sf-reset img{border:0;}.sf-reset address,.sf-reset caption,.sf-reset cite,.sf-reset code,.sf-reset dfn,.sf-reset em,.sf-reset strong,.sf-reset th,.sf-reset var{font-style:normal;font-weight:normal;}.sf-reset li{list-style:none;}.sf-reset caption,.sf-reset th{text-align:left;}.sf-reset h1,.sf-reset h2,.sf-reset h3,.sf-reset h4,.sf-reset h5,.sf-reset h6{font-size:100%;font-weight:normal;}.sf-reset q:before,.sf-reset q:after{content:'';}.sf-reset abbr,.sf-reset acronym{border:0;font-variant:normal;}.sf-reset sup{vertical-align:text-top;}.sf-reset sub{vertical-align:text-bottom;}.sf-reset input,.sf-reset textarea,.sf-reset select{font-family:inherit;font-size:inherit;font-weight:inherit;}.sf-reset input,.sf-reset textarea,.sf-reset select{*font-size:100%;}.sf-reset legend{color:#000;}
+.sf-reset html,
+.sf-reset body {
+    width: 100%;
+    min-height: 100%;
+    _height: 100%;
+    margin: 0;
+    padding: 0;
+}
+.sf-reset body {
+    font: 1em "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+    text-align: left;
+    background-color: #efefef;
+}
+.sf-reset abbr {
+    border-bottom: 1px dotted #000;
+    cursor: help;
+}
+.sf-reset p {
+    font-size: 14px;
+    line-height: 20px;
+    padding-bottom: 20px;
+}
+.sf-reset strong {
+    color: #313131;
+    font-weight: bold;
+}
+.sf-reset a {
+    color: #6c6159;
+}
+.sf-reset a img {
+    border: none;
+}
+.sf-reset a:hover {
+    text-decoration: underline;
+}
+.sf-reset em {
+    font-style: italic;
+}
+.sf-reset h2,
+.sf-reset h3 {
+    font-weight: bold;
+}
+.sf-reset h1 {
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 20px;
+    color: #313131;
+    word-break: break-all;
+}
+.sf-reset li {
+    padding-bottom: 10px;
+}
+.sf-reset .block {
+    -moz-border-radius: 16px;
+    -webkit-border-radius: 16px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    background-color: #FFFFFF;
+    border: 1px solid #dfdfdf;
+    padding: 40px 50px;
+}
+.sf-reset h2 {
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.sf-reset li a {
+    background: none;
+    color: #868686;
+    text-decoration: none;
+}
+.sf-reset li a:hover {
+    background: none;
+    color: #313131;
+    text-decoration: underline;
+}
+.sf-reset ol {
+    padding: 10px 0;
+}
+.sf-reset ol li {
+    list-style: decimal;
+    margin-left: 20px;
+    padding: 2px;
+    padding-bottom: 20px;
+}
+.sf-reset ol ol li {
+    list-style-position: inside;
+    margin-left: 0;
+    white-space: nowrap;
+    font-size: 12px;
+    padding-bottom: 0;
+}
+.sf-reset li .selected {
+    background-color: #ffd;
+}
+.sf-button {
+    display: -moz-inline-box;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    border: 0;
+    background: transparent none;
+    text-transform: uppercase;
+    cursor: pointer;
+    font: bold 11px Arial, Helvetica, sans-serif;
+}
+.sf-button span {
+    text-decoration: none;
+    display: block;
+    height: 28px;
+    float: left;
+}
+.sf-button .border-l {
+    text-decoration: none;
+    display: block;
+    height: 28px;
+    float: left;
+    padding: 0 0 0 7px;
+    background: transparent url(../images/border_l.png) no-repeat top left;
+}
+.sf-button .border-r {
+    padding: 0 7px 0 0;
+    background: transparent url(../images/border_r.png) right top no-repeat;
+}
+.sf-button .btn-bg {
+    padding: 0px 14px;
+    color: #636363;
+    line-height: 28px;
+    background: transparent url(../images/btn_bg.png) repeat-x top left;
+}
+.sf-button:hover .border-l,
+.sf-button-selected .border-l {
+    background: transparent url(../images/border_l_hover.png) no-repeat top left;
+}
+.sf-button:hover .border-r,
+.sf-button-selected .border-r {
+    background: transparent url(../images/border_r_hover.png) right top no-repeat;
+}
+.sf-button:hover .btn-bg,
+.sf-button-selected .btn-bg {
+    color: #FFFFFF;
+    text-shadow:0 1px 1px #6b9311;
+    background: transparent url(../images/btn_bg_hover.png) repeat-x top left;
+}

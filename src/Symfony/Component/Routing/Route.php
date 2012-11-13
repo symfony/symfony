@@ -15,6 +15,7 @@ namespace Symfony\Component\Routing;
  * A Route describes a route and its parameters.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Tobias Schultze <http://tobion.de>
  *
  * @api
  */
@@ -30,7 +31,17 @@ class Route implements \Serializable
      */
     private $hostnamePattern = '';
 
-   /**
+    /**
+     * @var array
+     */
+    private $schemes = array();
+
+    /**
+     * @var array
+     */
+    private $methods = array();
+
+    /**
      * @var array
      */
     private $defaults = array();
@@ -59,21 +70,32 @@ class Route implements \Serializable
      *
      *  * compiler_class: A class name able to compile this route instance (RouteCompiler by default)
      *
-     * @param string $pattern         The path pattern to match
-     * @param array  $defaults        An array of default parameter values
-     * @param array  $requirements    An array of requirements for parameters (regexes)
-     * @param array  $options         An array of options
-     * @param string $hostnamePattern The hostname pattern to match
+     * @param string       $pattern         The path pattern to match
+     * @param array        $defaults        An array of default parameter values
+     * @param array        $requirements    An array of requirements for parameters (regexes)
+     * @param array        $options         An array of options
+     * @param string       $hostnamePattern The hostname pattern to match
+     * @param string|array $schemes         A required URI scheme or an array of restricted schemes
+     * @param string|array $methods         A required HTTP method or an array of restricted methods
      *
      * @api
      */
-    public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array(), $hostnamePattern = '')
+    public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array(),
+                                $hostnamePattern = '', $schemes = array(), $methods = array())
     {
         $this->setPattern($pattern);
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
         $this->setOptions($options);
         $this->setHostnamePattern($hostnamePattern);
+        // The conditions make sure that an initial empty $schemes/$methods does not override the corresponding requirement.
+        // They can be removed when the BC layer is removed.
+        if ($schemes) {
+            $this->setSchemes($schemes);
+        }
+        if ($methods) {
+            $this->setMethods($methods);
+        }
     }
 
     public function serialize()
@@ -84,6 +106,8 @@ class Route implements \Serializable
             'defaults' => $this->defaults,
             'requirements' => $this->requirements,
             'options' => $this->options,
+            'schemes' => $this->schemes,
+            'methods' => $this->methods,
         ));
     }
 
@@ -95,6 +119,8 @@ class Route implements \Serializable
         $this->defaults = $data['defaults'];
         $this->requirements = $data['requirements'];
         $this->options = $data['options'];
+        $this->schemes = $data['schemes'];
+        $this->methods = $data['methods'];
     }
 
     /**
@@ -144,6 +170,80 @@ class Route implements \Serializable
     public function setHostnamePattern($pattern)
     {
         $this->hostnamePattern = (string) $pattern;
+        $this->compiled = null;
+
+        return $this;
+    }
+
+    /**
+     * Returns the lowercased schemes this route is restricted to.
+     * So an empty array means that any scheme is allowed.
+     *
+     * @return array The schemes
+     */
+    public function getSchemes()
+    {
+        return $this->schemes;
+    }
+
+    /**
+     * Sets the schemes (e.g. 'https') this route is restricted to.
+     * So an empty array means that any scheme is allowed.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param string|array $schemes The scheme or an array of schemes
+     *
+     * @return Route The current Route instance
+     */
+    public function setSchemes($schemes)
+    {
+        $this->schemes = array_map('strtolower', (array) $schemes);
+
+        // this is to keep BC and will be removed in a future version
+        if ($this->schemes) {
+            $this->requirements['_scheme'] = implode('|', $this->schemes);
+        } else {
+            unset($this->requirements['_scheme']);
+        }
+
+        $this->compiled = null;
+
+        return $this;
+    }
+
+    /**
+     * Returns the uppercased HTTP methods this route is restricted to.
+     * So an empty array means that any method is allowed.
+     *
+     * @return array The schemes
+     */
+    public function getMethods()
+    {
+        return $this->methods;
+    }
+
+    /**
+     * Sets the HTTP methods (e.g. 'POST') this route is restricted to.
+     * So an empty array means that any method is allowed.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param string|array $methods The method or an array of methods
+     *
+     * @return Route The current Route instance
+     */
+    public function setMethods($methods)
+    {
+        $this->methods = array_map('strtoupper', (array) $methods);
+
+        // this is to keep BC and will be removed in a future version
+        if ($this->methods) {
+            $this->requirements['_method'] = implode('|', $this->methods);
+        } else {
+            unset($this->requirements['_method']);
+        }
+
         $this->compiled = null;
 
         return $this;
@@ -452,6 +552,13 @@ class Route implements \Serializable
 
         if ('' === $regex) {
             throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty.', $key));
+        }
+
+        // this is to keep BC and will be removed in a future version
+        if ('_scheme' === $key) {
+            $this->setSchemes(explode('|', $regex));
+        } elseif ('_method' === $key) {
+            $this->setMethods(explode('|', $regex));
         }
 
         return $regex;

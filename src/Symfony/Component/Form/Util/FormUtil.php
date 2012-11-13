@@ -55,8 +55,8 @@ class FormUtil
         // oxen (ox)
         array('nexo', 4, false, false, 'ox'),
 
-        // indices (index), appendices (appendix)
-        array('seci', 4, false, true, array('ex', 'ix')),
+        // indices (index), appendices (appendix), prices (price)
+        array('seci', 4, false, true, array('ex', 'ix', 'ice')),
 
         // babies (baby)
         array('sei', 3, false, true, 'y'),

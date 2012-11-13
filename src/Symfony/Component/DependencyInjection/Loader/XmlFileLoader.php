@@ -204,7 +204,7 @@ class XmlFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException When loading of XML file returns error
      */
-    private function parseFile($file)
+    protected function parseFile($file)
     {
         $internalErrors = libxml_use_internal_errors(true);
         $disableEntities = libxml_disable_entity_loader(true);

@@ -191,7 +191,7 @@ class Route implements \Serializable
     public function addOptions(array $options)
     {
         foreach ($options as $name => $option) {
-            $this->options[(string) $name] = $option;
+            $this->options[$name] = $option;
         }
         $this->compiled = null;
 
@@ -268,7 +268,7 @@ class Route implements \Serializable
     public function addDefaults(array $defaults)
     {
         foreach ($defaults as $name => $default) {
-            $this->defaults[(string) $name] = $default;
+            $this->defaults[$name] = $default;
         }
         $this->compiled = null;
 
@@ -311,7 +311,7 @@ class Route implements \Serializable
      */
     public function setDefault($name, $default)
     {
-        $this->defaults[(string) $name] = $default;
+        $this->defaults[$name] = $default;
         $this->compiled = null;
 
         return $this;

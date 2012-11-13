@@ -86,10 +86,124 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
     {
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 
+        // completely valid format
         $this->assertEquals(1234.5, $transformer->reverseTransform('1.234,5'));
         $this->assertEquals(12345.912, $transformer->reverseTransform('12.345,912'));
+        // omit group separator
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
         $this->assertEquals(12345.912, $transformer->reverseTransform('12345,912'));
+    }
+
+    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsNotDot()
+    {
+        if ($this->isLowerThanIcuVersion('4.5')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        }
+
+        \Locale::setDefault('fr');
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        // completely valid format
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1 234,5'));
+        // accept dots
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1 234.5'));
+        // omit group separator
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot()
+    {
+        if ($this->isLowerThanIcuVersion('4.5')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        }
+
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        $transformer->reverseTransform('1.234.5');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot_noGroupSep()
+    {
+        if ($this->isLowerThanIcuVersion('4.5')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        }
+
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        $transformer->reverseTransform('1234.5');
+    }
+
+    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsDotButNoGroupingUsed()
+    {
+        \Locale::setDefault('fr');
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
+    }
+
+    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsNotComma()
+    {
+        if ($this->isLowerThanIcuVersion('4.5')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        }
+
+        \Locale::setDefault('ak');
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        // completely valid format
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1 234.5'));
+        // accept commas
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1 234,5'));
+        // omit group separator
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma()
+    {
+        if ($this->isLowerThanIcuVersion('4.5')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        }
+
+        \Locale::setDefault('en');
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        $transformer->reverseTransform('1,234,5');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma_noGroupSep()
+    {
+        if ($this->isLowerThanIcuVersion('4.5')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        }
+
+        \Locale::setDefault('en');
+        $transformer = new NumberToLocalizedStringTransformer(null, true);
+
+        $transformer->reverseTransform('1234,5');
+    }
+
+    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsCommaButNoGroupingUsed()
+    {
+        \Locale::setDefault('en');
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
+        $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
     }
 
     /**

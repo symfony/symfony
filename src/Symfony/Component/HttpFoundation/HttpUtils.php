@@ -31,13 +31,13 @@ class HttpUtils
      *
      * @return boolean True valid, false if not.
      */
-    public function checkIp($requestIp, $ip)
+    public static function checkIp($requestIp, $ip)
     {
         if (false !== strpos($requestIp, ':')) {
             return self::checkIp6($requestIp, $ip);
-        } else {
-            return self::checkIp4($requestIp, $ip);
         }
+
+        return self::checkIp4($requestIp, $ip);
     }
 
     /**
@@ -48,7 +48,7 @@ class HttpUtils
      *
      * @return boolean True valid, false if not.
      */
-    public function checkIp4($requestIp, $ip)
+    public static function checkIp4($requestIp, $ip)
     {
         if (false !== strpos($ip, '/')) {
             list($address, $netmask) = explode('/', $ip, 2);
@@ -77,7 +77,7 @@ class HttpUtils
      *
      * @throws RuntimeException When IPV6 support is not enabled
      */
-    public function checkIp6($requestIp, $ip)
+    public static function checkIp6($requestIp, $ip)
     {
         if (!((extension_loaded('sockets') && defined('AF_INET6')) || @inet_pton('::1'))) {
             throw new \RuntimeException('Unable to check Ipv6. Check that PHP was not compiled with option "disable-ipv6".');

@@ -25,6 +25,11 @@ class Route implements \Serializable
      */
     private $pattern;
 
+    /**
+     * @var string
+     */
+    private $hostnamePattern;
+
    /**
      * @var array
      */
@@ -44,11 +49,6 @@ class Route implements \Serializable
      * @var null|RouteCompiler
      */
     private $compiled;
-
-    /**
-     * @var string
-     */
-    private $hostnamePattern;
 
     private static $compilers = array();
 
@@ -85,6 +85,7 @@ class Route implements \Serializable
     {
         return serialize(array(
             'pattern' => $this->pattern,
+            'hostnamePattern' => $this->hostnamePattern,
             'defaults' => $this->defaults,
             'requirements' => $this->requirements,
             'options' => $this->options,
@@ -95,6 +96,7 @@ class Route implements \Serializable
     {
         $data = unserialize($data);
         $this->pattern = $data['pattern'];
+        $this->hostnamePattern = $data['hostnamePattern'];
         $this->defaults = $data['defaults'];
         $this->requirements = $data['requirements'];
         $this->options = $data['options'];

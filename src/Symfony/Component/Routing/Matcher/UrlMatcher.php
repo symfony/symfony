@@ -30,9 +30,19 @@ class UrlMatcher implements UrlMatcherInterface
     const REQUIREMENT_MISMATCH  = 1;
     const ROUTE_MATCH           = 2;
 
+    /**
+     * @var RequestContext
+     */
     protected $context;
-    protected $allow;
 
+    /**
+     * @var array
+     */
+    protected $allow = array();
+
+    /**
+     * @var RouteCollection
+     */
     private $routes;
 
     /**

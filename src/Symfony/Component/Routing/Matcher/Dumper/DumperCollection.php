@@ -18,14 +18,25 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
  */
 class DumperCollection implements \IteratorAggregate
 {
+    /**
+     * @var DumperCollection|null
+     */
     private $parent;
+
+    /**
+     * @var (DumperCollection|DumperRoute)[]
+     */
     private $children = array();
+
+    /**
+     * @var array
+     */
     private $attributes = array();
 
     /**
      * Returns the children routes and collections.
      *
-     * @return array Array of DumperCollection|DumperRoute
+     * @return (DumperCollection|DumperRoute)[] Array of DumperCollection|DumperRoute
      */
     public function all()
     {

@@ -26,24 +26,30 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 class RouteCollection implements \IteratorAggregate, \Countable
 {
-    private $routes;
-    private $resources;
-    private $prefix;
-    private $parent;
-    private $hostnamePattern;
+    /**
+     * @var (RouteCollection|Route)[]
+     */
+    private $routes = array();
 
     /**
-     * Constructor.
-     *
-     * @api
+     * @var array
      */
-    public function __construct()
-    {
-        $this->routes = array();
-        $this->resources = array();
-        $this->prefix = '';
-        $this->hostnamePattern = '';
-    }
+    private $resources = array();
+
+    /**
+     * @var string
+     */
+    private $prefix = '';
+
+    /**
+     * @var RouteCollection|null
+     */
+    private $parent;
+
+    /**
+     * @var string
+     */
+    private $hostnamePattern = '';
 
     public function __clone()
     {
@@ -129,7 +135,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Returns all routes in this collection and its children.
      *
-     * @return array An array of routes
+     * @return Route[] An array of routes
      */
     public function all()
     {

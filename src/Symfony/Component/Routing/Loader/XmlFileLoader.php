@@ -28,8 +28,8 @@ class XmlFileLoader extends FileLoader
     /**
      * Loads an XML file.
      *
-     * @param string $file An XML file path
-     * @param string $type The resource type
+     * @param string      $file An XML file path
+     * @param string|null $type The resource type
      *
      * @return RouteCollection A RouteCollection instance
      *
@@ -65,6 +65,8 @@ class XmlFileLoader extends FileLoader
      * @param \DOMElement      $node       the node to parse
      * @param string           $path       the path of the XML file being processed
      * @param string           $file
+     *
+     * @throws \InvalidArgumentException When a tag can't be parsed
      */
     protected function parseNode(RouteCollection $collection, \DOMElement $node, $path, $file)
     {

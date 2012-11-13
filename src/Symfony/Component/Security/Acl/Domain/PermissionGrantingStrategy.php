@@ -120,10 +120,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * permission/identity combination.
      *
      * This process is repeated until either a granting ACE is found, or no
-     * permission/identity combinations are left. In the latter case, we will
-     * call this method on the parent ACL if it exists, and isEntriesInheriting
-     * is true. Otherwise, we will either throw an NoAceFoundException, or deny
-     * access finally.
+     * permission/identity combinations are left. Finally, we will either throw
+     * an NoAceFoundException, or deny access.
      *
      * @param AclInterface $acl
      * @param array        $aces               An array of ACE to check against

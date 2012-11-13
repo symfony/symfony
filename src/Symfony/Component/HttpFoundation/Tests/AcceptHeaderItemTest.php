@@ -25,6 +25,28 @@ class AcceptHeaderItemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($attributes, $item->getAttributes());
     }
 
+    public function provideFromStringData()
+    {
+        return array(
+            array(
+                'text/html',
+                'text/html', array()
+            ),
+            array(
+                '"this;should,not=matter"',
+                'this;should,not=matter', array()
+            ),
+            array(
+                "text/plain; charset=utf-8;param=\"this;should,not=matter\";\tfootnotes=true",
+                'text/plain', array('charset' => 'utf-8', 'param' => 'this;should,not=matter', 'footnotes' => 'true')
+            ),
+            array(
+                '"this;should,not=matter";charset=utf-8',
+                'this;should,not=matter', array('charset' => 'utf-8')
+            ),
+        );
+    }
+
     /**
      * @dataProvider provideToStringData
      */
@@ -32,6 +54,20 @@ class AcceptHeaderItemTest extends \PHPUnit_Framework_TestCase
     {
         $item = new AcceptHeaderItem($value, $attributes);
         $this->assertEquals($string, (string) $item);
+    }
+
+    public function provideToStringData()
+    {
+        return array(
+            array(
+                'text/html', array(),
+                'text/html'
+            ),
+            array(
+                'text/plain', array('charset' => 'utf-8', 'param' => 'this;should,not=matter', 'footnotes' => 'true'),
+                'text/plain;charset=utf-8;param="this;should,not=matter";footnotes=true'
+            ),
+        );
     }
 
     public function testValue()
@@ -72,41 +108,5 @@ class AcceptHeaderItemTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($item->hasAttribute('test'));
         $this->assertEquals('value', $item->getAttribute('test'));
         $this->assertEquals('value', $item->getAttribute('test', 'default'));
-    }
-
-    public function provideFromStringData()
-    {
-        return array(
-            array(
-                'text/html',
-                'text/html', array()
-            ),
-            array(
-                '"this;should,not=matter"',
-                'this;should,not=matter', array()
-            ),
-            array(
-                "text/plain; charset=utf-8;param=\"this;should,not=matter\";\tfootnotes=true",
-                'text/plain', array('charset' => 'utf-8', 'param' => 'this;should,not=matter', 'footnotes' => 'true')
-            ),
-            array(
-                '"this;should,not=matter";charset=utf-8',
-                'this;should,not=matter', array('charset' => 'utf-8')
-            ),
-        );
-    }
-
-    public function provideToStringData()
-    {
-        return array(
-            array(
-                'text/html', array(),
-                'text/html'
-            ),
-            array(
-                'text/plain', array('charset' => 'utf-8', 'param' => 'this;should,not=matter', 'footnotes' => 'true'),
-                'text/plain;charset=utf-8;param="this;should,not=matter";footnotes=true'
-            ),
-        );
     }
 }

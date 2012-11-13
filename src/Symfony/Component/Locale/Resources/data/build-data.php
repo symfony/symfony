@@ -248,7 +248,6 @@ MESSAGE
 }
 
 check_command('svn');
-check_command('icu-config');
 
 // Script options
 $version = isset($GLOBALS['argv'][1]) ? $GLOBALS['argv'][1] : icu_version();

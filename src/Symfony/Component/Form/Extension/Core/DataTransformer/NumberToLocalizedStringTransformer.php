@@ -109,6 +109,17 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
         $position = 0;
         $formatter = $this->getNumberFormatter();
+        $groupSep = $formatter->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
+        $decSep = $formatter->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
+
+        if ('.' !== $decSep && (!$this->grouping || '.' !== $groupSep)) {
+            $value = str_replace('.', $decSep, $value);
+        }
+
+        if (',' !== $decSep && (!$this->grouping || ',' !== $groupSep)) {
+            $value = str_replace(',', $decSep, $value);
+        }
+
         $result = $formatter->parse($value, \NumberFormatter::TYPE_DOUBLE, $position);
 
         if (intl_is_failure($formatter->getErrorCode())) {

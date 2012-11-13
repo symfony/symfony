@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Util;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class FormUtil
+class FormUtil
 {
     /**
      * Map english plural to singular suffixes
@@ -96,6 +96,11 @@ abstract class FormUtil
         // chateaux (chateau)
         array('xuae', 4, false, true, 'eau'),
     );
+
+    /**
+     * This class should not be instantiated
+     */
+    private function __construct() {}
 
     /**
      * Returns the singular form of a word

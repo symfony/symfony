@@ -798,6 +798,25 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_dir($targetPath.'directory'));
         $this->assertFileEquals($file1, $targetPath.'directory'.DIRECTORY_SEPARATOR.'file1');
         $this->assertFileEquals($file2, $targetPath.'file2');
+
+        $this->filesystem->remove($file1);
+
+        $this->filesystem->mirror($sourcePath, $targetPath, null, array("delete" => FALSE));
+        $this->assertTrue($this->filesystem->exists($targetPath.'directory'.DIRECTORY_SEPARATOR.'file1'));
+
+        $this->filesystem->mirror($sourcePath, $targetPath, null, array("delete" => TRUE));
+        $this->assertFalse($this->filesystem->exists($targetPath.'directory'.DIRECTORY_SEPARATOR.'file1'));
+
+        file_put_contents($file1, 'FILE1');
+
+        $this->filesystem->mirror($sourcePath, $targetPath, null, array("delete" => TRUE));
+        $this->assertTrue($this->filesystem->exists($targetPath.'directory'.DIRECTORY_SEPARATOR.'file1'));
+
+        $this->filesystem->remove($directory);
+        $this->filesystem->mirror($sourcePath, $targetPath, null, array("delete" => TRUE));
+        $this->assertFalse($this->filesystem->exists($targetPath.'directory'));
+        $this->assertFalse($this->filesystem->exists($targetPath.'directory'.DIRECTORY_SEPARATOR.'file1'));
+
     }
 
     public function testMirrorCopiesLinks()

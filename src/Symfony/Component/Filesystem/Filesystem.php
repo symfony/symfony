@@ -336,11 +336,32 @@ class Filesystem
      *                               Valid options are:
      *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
      *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
+     *                                 - $options['delete'] Default FALSE Whether to delete files that are not in the source directory
      *
      * @throws IOException When file type is unknown
      */
     public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array())
     {
+        $targetDir = rtrim($targetDir, '/\\');
+        $originDir = rtrim($originDir, '/\\');
+
+        // Iterate in destination folder to remove obsolete entries
+        if ($this->exists($targetDir)) {
+            if (isset($options['delete']) and $options['delete']) {
+                $l_iterator = $iterator;
+                if (null === $l_iterator) {
+                    $flags = \FilesystemIterator::SKIP_DOTS;
+                    $l_iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST );
+                }
+                foreach ($l_iterator as $file) {
+                    $origin = str_replace($targetDir, $originDir, $file->getPathname());
+                    if (!$this->exists($origin)) {
+                        $this->remove($file);
+                    }
+                }
+            }
+        }
+
         $copyOnWindows = false;
         if (isset($options['copy_on_windows']) && !function_exists('symlink')) {
             $copyOnWindows = $options['copy_on_windows'];
@@ -350,9 +371,6 @@ class Filesystem
             $flags = $copyOnWindows ? \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS : \FilesystemIterator::SKIP_DOTS;
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
         }
-
-        $targetDir = rtrim($targetDir, '/\\');
-        $originDir = rtrim($originDir, '/\\');
 
         foreach ($iterator as $file) {
             $target = str_replace($originDir, $targetDir, $file->getPathname());

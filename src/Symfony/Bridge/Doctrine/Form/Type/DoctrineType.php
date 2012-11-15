@@ -148,6 +148,10 @@ abstract class DoctrineType extends AbstractType
         $resolver->setNormalizers(array(
             'em' => $emNormalizer,
         ));
+
+        $resolver->setAllowedTypes(array(
+            'loader' => array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'),
+        ));
     }
 
     /**

@@ -59,16 +59,20 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      */
     public function setTheme(FormView $view, $themes)
     {
-        $cacheKey = $view->vars[self::CACHE_KEY_VAR];
-
         // Do not cast, as casting turns objects into arrays of properties
-        $this->themes[$cacheKey] = is_array($themes) ? $themes : array($themes);
+        $themes = is_array($themes) ? $themes : array($themes);
 
-        // Unset instead of resetting to an empty array, in order to allow
-        // implementations (like TwigRendererEngine) to check whether $cacheKey
-        // is set at all.
-        unset($this->resources[$cacheKey]);
-        unset($this->resourceHierarchyLevels[$cacheKey]);
+        //set themes for this view specifically
+        $this->setupThemes($view->vars[self::CACHE_KEY_VAR], $themes);
+
+        //now set themes on all children of this form
+        $cacheKey = $view->vars['unique_block_prefix'];
+        $cacheKeyLength = strlen($cacheKey);
+        foreach($this->resources as $key => $value) {
+            if (0 === (strcmp($cacheKey, substr($key, 0, $cacheKeyLength)))) {
+                $this->setupThemes($key, $themes);
+            }
+        }
     }
 
     /**
@@ -202,5 +206,16 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
         $this->resourceHierarchyLevels[$cacheKey][$blockName] = false;
 
         return false;
+    }
+
+    private function setupThemes($key, $themes)
+    {
+        $this->themes[$key] = $themes;
+
+        // Unset instead of resetting to an empty array, in order to allow
+        // implementations (like TwigRendererEngine) to check whether $cacheKey
+        // is set at all.
+        unset($this->resources[$key]);
+        unset($this->resourceHierarchyLevels[$key]);
     }
 }

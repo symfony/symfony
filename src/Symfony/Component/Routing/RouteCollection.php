@@ -187,7 +187,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
 
         // the sub-collection must have the prefix of the parent (current instance) prepended because it does not
         // necessarily already have it applied (depending on the order RouteCollections are added to each other)
-        $collection->addPrefix($this->getPrefix() . $prefix, $defaults, $requirements, $options);
+        $collection->addPrefix($this->getPrefix() . $prefix, $defaults, $requirements);
         $collection->addConfigs($defaults, $requirements, $options);
 
         if ('' !== $hostnamePattern) {
@@ -210,11 +210,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param string $prefix       An optional prefix to add before each pattern of the route collection
      * @param array  $defaults     An array of default values
      * @param array  $requirements An array of requirements
-     * @param array  $options      An array of options
      *
      * @api
      */
-    public function addPrefix($prefix, $defaults = array(), $requirements = array(), $options = array())
+    public function addPrefix($prefix, $defaults = array(), $requirements = array())
     {
         $prefix = trim(trim($prefix), '/');
 
@@ -224,6 +223,9 @@ class RouteCollection implements \IteratorAggregate, \Countable
 
         // a prefix must start with a single slash and must not end with a slash
         $this->prefix = '/' . $prefix . $this->prefix;
+
+        // this is to keep BC
+        $options = func_num_args() > 3 ? func_get_arg(3) : array();
 
         foreach ($this->routes as $route) {
             $route->setPattern('/' . $prefix . $route->getPattern());

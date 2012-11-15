@@ -99,12 +99,10 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
             $random = substr($random, 0, 16);
         }
 
-        $base64_raw = strtr('+', '.', base64_encode($random));
+        $base64_raw = strtr(base64_encode($random), '+', '.');
         $base64_128bit = substr($base64_raw, 0, 21);
         $lastchar = substr($base64_raw, 21, 1);
-        $lastchar = str_replace(array('A','Q','g','w'),
-                                array('.','O','e','u'),
-                                $lastchar);
+        $lastchar = strtr($lastchar, 'AQgw','.Oeu');
         $base64_128bit .= $lastchar;
 
         return $base64_128bit;

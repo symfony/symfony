@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Store implements StoreInterface
 {
-    private $root;
+    protected $root;
     private $keyCache;
     private $locks;
 
@@ -154,7 +154,7 @@ class Store implements StoreInterface
 
         // write the response body to the entity store if this is the original response
         if (!$response->headers->has('X-Content-Digest')) {
-            $digest = 'en'.sha1($response->getContent());
+            $digest = $this->generateContentDigest($response);
 
             if (false === $this->save($digest, $response->getContent())) {
                 throw new \RuntimeException('Unable to store the entity.');
@@ -190,6 +190,18 @@ class Store implements StoreInterface
         }
 
         return $key;
+    }
+
+    /**
+     * Returns content digest for $response.
+     *
+     * @param Response $response
+     *
+     * @return string
+     */
+    protected function generateContentDigest(Response $response)
+    {
+        return 'en'.sha1($response->getContent());
     }
 
     /**

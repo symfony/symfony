@@ -269,7 +269,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Sets the hostname pattern on this collection and all children.
+     * Sets the hostname pattern on all child routes.
      *
      * @param string $pattern The pattern
      */

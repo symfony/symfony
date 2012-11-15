@@ -44,6 +44,16 @@ CHANGELOG
  * [DEPRECATION] The `$options` parameter to `RouteCollection::addPrefix()` has been deprecated
    because adding options has nothing to do with adding a path prefix. If you want to add options
    to all child routes of a RouteCollection, you can use `setConfigs()`.
+ * [DEPRECATION] `RouteCollection::addCollection(RouteCollection $collection)` should now only be
+   used with a single parameter. The other params `$prefix`, `$default`, `$requirements` and `$options`
+   will still work, but have been deprecated. The `addPrefix` method should be used for this
+   use-case instead.
+   Before: `$parentCollection->addCollection($collection, '/prefix', array(...), array(...))`
+   After:
+   ```
+   $collection->addPrefix('/prefix', array(...), array(...));
+   $parentCollection->addCollection($collection);
+   ```
  * added support for the method default argument values when defining a @Route
  * Adjacent placeholders without separator work now, e.g. `/{x}{y}{z}.{_format}`.
  * Characters that function as separator between placeholders are now whitelisted

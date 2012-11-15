@@ -169,15 +169,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * routes of the added collection.
      *
      * @param RouteCollection $collection      A RouteCollection instance
-     * @param string          $prefix          An optional prefix to add before each pattern of the route collection
-     * @param array           $defaults        An array of default values
-     * @param array           $requirements    An array of requirements
-     * @param array           $options         An array of options
-     * @param string          $hostnamePattern Hostname pattern
      *
      * @api
      */
-    public function addCollection(RouteCollection $collection, $prefix = '', $defaults = array(), $requirements = array(), $options = array(), $hostnamePattern = '')
+    public function addCollection(RouteCollection $collection)
     {
         // This is to keep BC for getParent() and getRoot(). It does not prevent
         // infinite loops by recursive referencing. But we don't need that logic
@@ -185,13 +180,22 @@ class RouteCollection implements \IteratorAggregate, \Countable
         // the accepted range.
         $collection->parent = $this;
 
-        // the sub-collection must have the prefix of the parent (current instance) prepended because it does not
-        // necessarily already have it applied (depending on the order RouteCollections are added to each other)
-        $collection->addPrefix($this->getPrefix() . $prefix, $defaults, $requirements);
-        $collection->addConfigs($defaults, $requirements, $options);
+        // this is to keep BC
+        $numargs = func_num_args();
+        if ($numargs > 1) {
+            $collection->addPrefix($this->getPrefix() . func_get_arg(1));
 
-        if ('' !== $hostnamePattern) {
-            $collection->setHostnamePattern($hostnamePattern);
+            if ($numargs > 2) {
+                $defaults = func_get_arg(2);
+                $requirements = $numargs > 3 ? func_get_arg(3) : array();
+                $options = $numargs > 4 ? func_get_arg(4) : array();
+
+                $collection->addConfigs($defaults, $requirements, $options);
+            }
+        } else {
+            // the sub-collection must have the prefix of the parent (current instance) prepended because it does not
+            // necessarily already have it applied (depending on the order RouteCollections are added to each other)
+            $collection->addPrefix($this->getPrefix());
         }
 
         // we need to remove all routes with the same names first because just replacing them

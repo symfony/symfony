@@ -90,23 +90,24 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
      */
     protected function encodeSalt($random)
     {
-      $len = strlen($random);
-      if ($len<16) {
-        throw new \InvalidArguementException('The bcrypt salt needs 16 random bytes');
-      }
-      if ($len>16) {
-        $random = substr($random, 0, 16);
-      }
+        $len = strlen($random);
+        if ($len<16) {
+            throw new \InvalidArguementException(
+                       'The bcrypt salt needs 16 random bytes');
+        }
+        if ($len>16) {
+            $random = substr($random, 0, 16);
+        }
 
-      $base64_raw = strtr('+', '.', base64_encode($random));
-      $base64_128bit = substr($base64_raw, 0, 21);
-      $lastchar = substr($base64_raw, 21, 1);
-      $lastchar = str_replace(array('A','Q','g','w'),
-                              array('.','O','e','u'),
-                              $lastchar);
-      $base64_128bit .= $lastchar;
+        $base64_raw = strtr('+', '.', base64_encode($random));
+        $base64_128bit = substr($base64_raw, 0, 21);
+        $lastchar = substr($base64_raw, 21, 1);
+        $lastchar = str_replace(array('A','Q','g','w'),
+                                array('.','O','e','u'),
+                                $lastchar);
+        $base64_128bit .= $lastchar;
 
-      return $base64_128bit;
+        return $base64_128bit;
     }
 
     /**
@@ -117,31 +118,31 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
      */
     protected function get_random_bytes($count)
     {
-      $random = '';
-      if (@is_readable('/dev/urandom')) {
-        $fh = @fopen('/dev/urandom', 'rb');
-        if ($fh) {
-          stream_set_read_buffer($fh, 0);
-          stream_set_chunk_size($fh, 16);
-          $random=fread($fh, $count);
-          fclose($fh);
-        }
-      }
-
-      if (strlen($random)<$count) {
-        if(function_exists('openssl_random_pseudo_bytes') &&
-           (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')) {//OpenSSL slow on Win
-          $random = openssl_random_pseudo_bytes($count);
+        $random = '';
+        if (@is_readable('/dev/urandom')) {
+            $fh = @fopen('/dev/urandom', 'rb');
+            if ($fh) {
+                stream_set_read_buffer($fh, 0);
+                stream_set_chunk_size($fh, 16);
+                $random=fread($fh, $count);
+                fclose($fh);
+            }
         }
 
-        $len = strlen($random);
-        if ($len<$count) {
-          for ($i=$len;$i<$count;++$i) {
-            $random .= chr(mt_rand(0,255));
-          }
+        if (strlen($random)<$count) {
+            if(function_exists('openssl_random_pseudo_bytes') &&
+               (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')) {
+                $random = openssl_random_pseudo_bytes($count);
+            }
+            
+            $len = strlen($random);
+            if ($len<$count) {
+                for ($i=$len;$i<$count;++$i) {
+                    $random .= chr(mt_rand(0,255));
+                }
+            }
         }
-      }
 
-      return $random;
+        return $random;
     }
 }

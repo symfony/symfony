@@ -21,7 +21,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 use Symfony\Component\Form\Tests\Fixtures\FixedFilterListener;
-use Doctrine\Common\Collections\ArrayCollection;
 
 class SimpleFormTest extends AbstractFormTest
 {
@@ -173,9 +172,9 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertTrue($this->form->isEmpty());
     }
 
-    public function testEmptyIfEmptyArrayCollection()
+    public function testEmptyIfEmptyCountable()
     {
-        $this->form->setData(new ArrayCollection());
+        $this->form->setData(new \ArrayObject());
 
         $this->assertTrue($this->form->isEmpty());
     }

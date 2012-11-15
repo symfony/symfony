@@ -252,12 +252,16 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Sets the hostname pattern on all routes.
      *
-     * @param string $pattern The pattern
+     * @param string $pattern      The pattern
+     * @param array  $defaults     An array of default values
+     * @param array  $requirements An array of requirements
      */
-    public function setHostnamePattern($pattern)
+    public function setHostnamePattern($pattern, array $defaults = array(), array $requirements = array())
     {
         foreach ($this->routes as $route) {
             $route->setHostnamePattern($pattern);
+            $route->addDefaults($defaults);
+            $route->addRequirements($requirements);
         }
     }
 

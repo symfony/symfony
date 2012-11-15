@@ -217,7 +217,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @api
      */
-    public function addPrefix($prefix, $defaults = array(), $requirements = array())
+    public function addPrefix($prefix, array $defaults = array(), array $requirements = array())
     {
         $prefix = trim(trim($prefix), '/');
 

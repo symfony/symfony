@@ -66,14 +66,25 @@ class YamlFileLoader extends FileLoader
 
             if (isset($config['resource'])) {
                 $type = isset($config['type']) ? $config['type'] : null;
-                $prefix = isset($config['prefix']) ? $config['prefix'] : null;
+                $prefix = isset($config['prefix']) ? $config['prefix'] : '';
                 $defaults = isset($config['defaults']) ? $config['defaults'] : array();
                 $requirements = isset($config['requirements']) ? $config['requirements'] : array();
                 $options = isset($config['options']) ? $config['options'] : array();
-                $hostnamePattern = isset($config['hostname_pattern']) ? $config['hostname_pattern'] : '';
+                $hostnamePattern = isset($config['hostname_pattern']) ? $config['hostname_pattern'] : null;
 
                 $this->setCurrentDir(dirname($path));
-                $collection->addCollection($this->import($config['resource'], $type, false, $file), $prefix, $defaults, $requirements, $options, $hostnamePattern);
+
+                $subCollection = $this->import($config['resource'], $type, false, $file);
+                /* @var $subCollection RouteCollection */
+                $subCollection->addPrefix($prefix);
+                if (null !== $hostnamePattern) {
+                    $subCollection->setHostnamePattern($hostnamePattern);
+                }
+                $subCollection->addDefaults($defaults);
+                $subCollection->addRequirements($requirements);
+                $subCollection->addOptions($options);
+
+                $collection->addCollection($subCollection);
             } else {
                 $this->parseRoute($collection, $name, $config, $path);
             }

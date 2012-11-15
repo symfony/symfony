@@ -188,6 +188,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
         // the sub-collection must have the prefix of the parent (current instance) prepended because it does not
         // necessarily already have it applied (depending on the order RouteCollections are added to each other)
         $collection->addPrefix($this->getPrefix() . $prefix, $defaults, $requirements, $options);
+        $collection->addConfigs($defaults, $requirements, $options);
 
         if ('' !== $hostnamePattern) {
             $collection->setHostnamePattern($hostnamePattern);
@@ -204,7 +205,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Adds a prefix to all routes in the current set.
+     * Adds a prefix to the path of all child routes.
      *
      * @param string $prefix       An optional prefix to add before each pattern of the route collection
      * @param array  $defaults     An array of default values
@@ -217,19 +218,15 @@ class RouteCollection implements \IteratorAggregate, \Countable
     {
         $prefix = trim(trim($prefix), '/');
 
-        if ('' === $prefix && empty($defaults) && empty($requirements) && empty($options)) {
+        if ('' === $prefix) {
             return;
         }
 
         // a prefix must start with a single slash and must not end with a slash
-        if ('' !== $prefix) {
-            $this->prefix = '/' . $prefix . $this->prefix;
-        }
+        $this->prefix = '/' . $prefix . $this->prefix;
 
         foreach ($this->routes as $route) {
-            if ('' !== $prefix) {
-                $route->setPattern('/' . $prefix . $route->getPattern());
-            }
+            $route->setPattern('/' . $prefix . $route->getPattern());
             $route->addDefaults($defaults);
             $route->addRequirements($requirements);
             $route->addOptions($options);
@@ -255,6 +252,24 @@ class RouteCollection implements \IteratorAggregate, \Countable
     {
         foreach ($this->routes as $route) {
             $route->setHostnamePattern($pattern);
+        }
+    }
+
+    /**
+     * Adds defaults, requirements and options to all routes.
+     *
+     * Any existing config under the same name in a route will be overridden.
+     *
+     * @param array  $defaults     An array of default values
+     * @param array  $requirements An array of requirements
+     * @param array  $options      An array of options
+     */
+    public function addConfigs(array $defaults = array(), array $requirements = array(), array $options = array())
+    {
+        foreach ($this->routes as $route) {
+            $route->addDefaults($defaults);
+            $route->addRequirements($requirements);
+            $route->addOptions($options);
         }
     }
 

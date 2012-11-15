@@ -157,7 +157,7 @@ class DigestData
 
     public function getUsername()
     {
-        return $this->elements['username'];
+        return strtr($this->elements['username'], array("\\\"" => "\"", "\\\\" => "\\"));
     }
 
     public function validateAndDecode($entryPointKey, $expectedRealm)

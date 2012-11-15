@@ -348,12 +348,12 @@ class Filesystem
         // Iterate in destination folder to remove obsolete entries
         if ($this->exists($targetDir)) {
             if (isset($options['delete']) and $options['delete']) {
-                $l_iterator = $iterator;
-                if (null === $l_iterator) {
+                $deleteIterator = $iterator;
+                if (null === $deleteIterator) {
                     $flags = \FilesystemIterator::SKIP_DOTS;
-                    $l_iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST );
+                    $deleteIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST );
                 }
-                foreach ($l_iterator as $file) {
+                foreach ($deleteIterator as $file) {
                     $origin = str_replace($targetDir, $originDir, $file->getPathname());
                     if (!$this->exists($origin)) {
                         $this->remove($file);

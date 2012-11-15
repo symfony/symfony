@@ -28,7 +28,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'resource', 'type', 'prefix', 'pattern', 'hostname_pattern', 'defaults', 'requirements', 'options',
+        'resource', 'type', 'prefix', 'pattern', 'hostname_pattern', 'schemes', 'methods', 'defaults', 'requirements', 'options',
     );
 
     /**
@@ -98,9 +98,11 @@ class YamlFileLoader extends FileLoader
         $defaults = isset($config['defaults']) ? $config['defaults'] : array();
         $requirements = isset($config['requirements']) ? $config['requirements'] : array();
         $options = isset($config['options']) ? $config['options'] : array();
-        $hostnamePattern = isset($config['hostname_pattern']) ? $config['hostname_pattern'] : null;
+        $hostnamePattern = isset($config['hostname_pattern']) ? $config['hostname_pattern'] : '';
+        $schemes = isset($config['schemes']) ? $config['schemes'] : array();
+        $methods = isset($config['methods']) ? $config['methods'] : array();
 
-        $route = new Route($config['pattern'], $defaults, $requirements, $options, $hostnamePattern);
+        $route = new Route($config['pattern'], $defaults, $requirements, $options, $hostnamePattern, $schemes, $methods);
 
         $collection->add($name, $route);
     }
@@ -121,6 +123,8 @@ class YamlFileLoader extends FileLoader
         $requirements = isset($config['requirements']) ? $config['requirements'] : array();
         $options = isset($config['options']) ? $config['options'] : array();
         $hostnamePattern = isset($config['hostname_pattern']) ? $config['hostname_pattern'] : null;
+        $schemes = isset($config['schemes']) ? $config['schemes'] : null;
+        $methods = isset($config['methods']) ? $config['methods'] : null;
 
         $this->setCurrentDir(dirname($path));
 
@@ -129,6 +133,12 @@ class YamlFileLoader extends FileLoader
         $subCollection->addPrefix($prefix);
         if (null !== $hostnamePattern) {
             $subCollection->setHostnamePattern($hostnamePattern);
+        }
+        if (null !== $schemes) {
+            $subCollection->setSchemes($schemes);
+        }
+        if (null !== $methods) {
+            $subCollection->setMethods($methods);
         }
         $subCollection->addDefaults($defaults);
         $subCollection->addRequirements($requirements);

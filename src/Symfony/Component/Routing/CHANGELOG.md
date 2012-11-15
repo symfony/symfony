@@ -35,8 +35,15 @@ CHANGELOG
    $rootCollection->addCollection($childCollection);
    ```
 
- * The methods `RouteCollection::getParent()` and `RouteCollection::getRoot()`
+ * [DEPRECATION] The methods `RouteCollection::getParent()` and `RouteCollection::getRoot()`
    have been deprecated and will be removed in Symfony 2.3.
+ * [BC BREAK] Misusing the `RouteCollection::addPrefix` method to add requirements or options
+   without adding a prefix is not supported anymore. There is now a dedicated method named
+   `setConfigs()` for this. So if you used something like `addPrefix('', array(...), array(...))`
+   you need to call `setConfigs(array(...), array(...))` instead.
+ * [DEPRECATION] The `$options` parameter to `RouteCollection::addPrefix()` has been deprecated
+   because adding options has nothing to do with adding a path prefix. If you want to add options
+   to all child routes of a RouteCollection, you can use `setConfigs()`.
  * added support for the method default argument values when defining a @Route
  * Adjacent placeholders without separator work now, e.g. `/{x}{y}{z}.{_format}`.
  * Characters that function as separator between placeholders are now whitelisted

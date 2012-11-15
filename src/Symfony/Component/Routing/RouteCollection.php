@@ -46,11 +46,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     private $parent;
 
-    /**
-     * @var string
-     */
-    private $hostnamePattern = '';
-
     public function __clone()
     {
         foreach ($this->routes as $name => $route) {
@@ -274,24 +269,12 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Returns the hostname pattern.
-     *
-     * @return string The pattern
-     */
-    public function getHostnamePattern()
-    {
-        return $this->hostnamePattern;
-    }
-
-    /**
-     * Sets the hostname pattern on this collection and all children.
+     * Sets the hostname pattern on all child routes.
      *
      * @param string $pattern The pattern
      */
     public function setHostnamePattern($pattern)
     {
-        $this->hostnamePattern = (string) $pattern;
-
         foreach ($this->routes as $name => $route) {
             $route->setHostnamePattern($pattern);
         }

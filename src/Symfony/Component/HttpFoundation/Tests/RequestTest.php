@@ -45,6 +45,55 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $request->headers->get('FOO'), '->initialize() takes an array of HTTP headers as its fourth argument');
     }
 
+    public function testGetLocale()
+    {
+        $request = new Request();
+        $request->setLocale('pl');
+        $locale = $request->getLocale();
+        $this->assertEquals('pl', $locale);
+    }
+
+    public function testGetUser()
+    {
+        $request = Request::create('http://user_test:password_test@test.com/');
+        $user = $request->getUser();
+
+        $this->assertEquals('user_test', $user);
+    }
+
+    public function testGetPassword()
+    {
+        $request = Request::create('http://user_test:password_test@test.com/');
+        $password = $request->getPassword();
+
+        $this->assertEquals('password_test', $password);
+    }
+
+    public function testIsNoCache()
+    {
+        $request = new Request();
+        $isNoCache = $request->isNoCache();
+
+        $this->assertFalse($isNoCache);
+    }
+
+    public function testGetContentType()
+    {
+        $request = new Request();
+        $contentType = $request->getContentType();
+
+        $this->assertNull($contentType);
+    }
+
+    public function testSetDefaultLocale()
+    {
+        $request = new Request();
+        $request->setDefaultLocale('pl');
+        $locale = $request->getLocale();
+
+        $this->assertEquals('pl', $locale);
+    }
+
     /**
      * @covers Symfony\Component\HttpFoundation\Request::create
      */
@@ -1018,6 +1067,19 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($request->hasSession());
     }
 
+    public function testGetSession()
+    {
+        $request = new Request();
+
+        $request->setSession(new Session(new MockArraySessionStorage()));
+        $this->assertTrue($request->hasSession());
+
+        $session = $request->getSession();
+        $this->assertObjectHasAttribute('storage', $session);
+        $this->assertObjectHasAttribute('flashName', $session);
+        $this->assertObjectHasAttribute('attributeName', $session);
+    }
+
     public function testHasPreviousSession()
     {
         $request = new Request();
@@ -1055,10 +1117,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('text/html;q=0.8', array('text/html' => 0.8)),
             array('text/html;foo=bar;q=0.8 ', array('text/html;foo=bar' => 0.8)),
             array('text/html;charset=utf-8; q=0.8', array('text/html;charset=utf-8' => 0.8)),
-            array('text/html,application/xml;q=0.9,*/*;charset=utf-8; q=0.8', array('text/html' => 1, 'application/xml' => 0.9, '*/*;charset=utf-8' => 0.8)),
-            array('text/html,application/xhtml+xml;q=0.9,*/*;q=0.8; foo=bar', array('text/html' => 1, 'application/xhtml+xml' => 0.9, '*/*' => 0.8)),
-            array('text/html,application/xhtml+xml;charset=utf-8;q=0.9; foo=bar,*/*', array('text/html' => 1, '*/*' => 1, 'application/xhtml+xml;charset=utf-8' => 0.9)),
-            array('text/html,application/xhtml+xml', array('application/xhtml+xml' => 1, 'text/html' => 1)),
+            array('text/html,application/xml;q=0.9,*/*;charset=utf-8; q=0.8', array('text/html' => 1.0, 'application/xml' => 0.9, '*/*;charset=utf-8' => 0.8)),
+            array('text/html,application/xhtml+xml;q=0.9,*/*;q=0.8; foo=bar', array('text/html' => 1.0, 'application/xhtml+xml' => 0.9, '*/*;foo=bar' => 0.8)),
+            array('text/html,application/xhtml+xml;charset=utf-8;q=0.9; foo=bar,*/*', array('text/html' => 1.0, '*/*' => 1.0, 'application/xhtml+xml;charset=utf-8;foo=bar' => 0.9)),
+            array('text/html,application/xhtml+xml', array('text/html' => 1.0, 'application/xhtml+xml' => 1.0)),
         );
     }
 

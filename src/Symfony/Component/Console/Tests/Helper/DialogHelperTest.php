@@ -31,6 +31,19 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('What time is it?', stream_get_contents($output->getStream()));
     }
 
+    public function testAskHiddenResponse()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('This test is not supported on Windows');
+        }
+
+        $dialog = new DialogHelper();
+
+        $dialog->setInputStream($this->getInputStream("8AM\n"));
+
+        $this->assertEquals('8AM', $dialog->askHiddenResponse($this->getOutputStream(), 'What time is it?'));
+    }
+
     public function testAskConfirmation()
     {
         $dialog = new DialogHelper();

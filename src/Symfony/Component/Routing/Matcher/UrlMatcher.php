@@ -30,9 +30,19 @@ class UrlMatcher implements UrlMatcherInterface
     const REQUIREMENT_MISMATCH  = 1;
     const ROUTE_MATCH           = 2;
 
+    /**
+     * @var RequestContext
+     */
     protected $context;
-    protected $allow;
 
+    /**
+     * @var array
+     */
+    protected $allow = array();
+
+    /**
+     * @var RouteCollection
+     */
     private $routes;
 
     /**
@@ -118,6 +128,11 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
+            $hostnameMatches = array();
+            if ($compiledRoute->getHostnameRegex() && !preg_match($compiledRoute->getHostnameRegex(), $this->context->getHost(), $hostnameMatches)) {
+                continue;
+            }
+
             // check HTTP method requirement
             if ($req = $route->getRequirement('_method')) {
                 // HEAD and GET are equivalent as per RFC
@@ -142,7 +157,7 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
-            return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));
+            return $this->mergeDefaults(array_replace($matches, $hostnameMatches, array('_route' => $name)), $route->getDefaults());
         }
     }
 

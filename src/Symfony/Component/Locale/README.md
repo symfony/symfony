@@ -14,12 +14,17 @@ requires adding the following lines to your autoloader:
         $loader->registerPrefixFallback(__DIR__.'/../vendor/symfony/src/Symfony/Component/Locale/Resources/stubs');
     }
 
+If you are using Composer for autoloading, then you can even simplify it by
+removing the ``$loader->registerPrefixFallback`` line.
+
 Resources
 ---------
 
 You can run the unit tests with the following command:
 
-    phpunit
+    $ cd path/to/Symfony/Component/XXX/
+    $ composer.phar install --dev
+    $ phpunit
 
 If your PHP have the ``intl`` extension enabled but the intl extension ICU data
 version mismatch the one shipped with the component, you can build the data for

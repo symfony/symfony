@@ -515,7 +515,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
             // wait for the lock to be released
             $wait = 0;
-            while (is_file($lock) && $wait < 5000000) {
+            while ($this->store->isLocked($request) && $wait < 5000000) {
                 usleep(50000);
                 $wait += 50000;
             }
@@ -580,7 +580,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     private function restoreResponseBody(Request $request, Response $response)
     {
-        if ('HEAD' === $request->getMethod() || 304 === $response->getStatusCode()) {
+        if ($request->isMethod('HEAD') || 304 === $response->getStatusCode()) {
             $response->setContent(null);
             $response->headers->remove('X-Body-Eval');
             $response->headers->remove('X-Body-File');

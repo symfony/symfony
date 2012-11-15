@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * TrimListener now removes unicode whitespaces
+
 2.1.0
 -----
 

@@ -26,7 +26,13 @@ class TrimListener implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        if (is_string($data)) {
+        if (!is_string($data)) {
+            return;
+        }
+
+        if (null !== $result = @preg_replace('/^[\pZ\p{Cc}]+|[\pZ\p{Cc}]+$/u', '', $data)) {
+            $event->setData($result);
+        } else {
             $event->setData(trim($data));
         }
     }

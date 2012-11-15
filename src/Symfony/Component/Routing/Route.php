@@ -20,10 +20,34 @@ namespace Symfony\Component\Routing;
  */
 class Route implements \Serializable
 {
+    /**
+     * @var string
+     */
     private $pattern;
-    private $defaults;
-    private $requirements;
-    private $options;
+
+    /**
+     * @var string
+     */
+    private $hostnamePattern;
+
+   /**
+     * @var array
+     */
+    private $defaults = array();
+
+    /**
+     * @var array
+     */
+    private $requirements = array();
+
+    /**
+     * @var array
+     */
+    private $options = array();
+
+    /**
+     * @var null|RouteCompiler
+     */
     private $compiled;
 
     private static $compilers = array();
@@ -35,19 +59,21 @@ class Route implements \Serializable
      *
      *  * compiler_class: A class name able to compile this route instance (RouteCompiler by default)
      *
-     * @param string $pattern      The pattern to match
-     * @param array  $defaults     An array of default parameter values
-     * @param array  $requirements An array of requirements for parameters (regexes)
-     * @param array  $options      An array of options
+     * @param string $pattern         The path pattern to match
+     * @param array  $defaults        An array of default parameter values
+     * @param array  $requirements    An array of requirements for parameters (regexes)
+     * @param array  $options         An array of options
+     * @param string $hostnamePattern The hostname pattern to match
      *
      * @api
      */
-    public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array())
+    public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array(), $hostnamePattern = '')
     {
         $this->setPattern($pattern);
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
         $this->setOptions($options);
+        $this->setHostnamePattern($hostnamePattern);
     }
 
     public function __clone()
@@ -59,6 +85,7 @@ class Route implements \Serializable
     {
         return serialize(array(
             'pattern' => $this->pattern,
+            'hostnamePattern' => $this->hostnamePattern,
             'defaults' => $this->defaults,
             'requirements' => $this->requirements,
             'options' => $this->options,
@@ -69,13 +96,14 @@ class Route implements \Serializable
     {
         $data = unserialize($data);
         $this->pattern = $data['pattern'];
+        $this->hostnamePattern = $data['hostnamePattern'];
         $this->defaults = $data['defaults'];
         $this->requirements = $data['requirements'];
         $this->options = $data['options'];
     }
 
     /**
-     * Returns the pattern.
+     * Returns the pattern for the path.
      *
      * @return string The pattern
      */
@@ -85,7 +113,7 @@ class Route implements \Serializable
     }
 
     /**
-     * Sets the pattern.
+     * Sets the pattern for the path.
      *
      * This method implements a fluent interface.
      *
@@ -99,6 +127,28 @@ class Route implements \Serializable
         // generated path for this route would be confused with a network path, e.g. '//domain.com/path'.
         $this->pattern = '/' . ltrim(trim($pattern), '/');
         $this->compiled = null;
+
+        return $this;
+    }
+
+    /**
+     * Returns the hostname pattern.
+     *
+     * @return string The pattern
+     */
+    public function getHostnamePattern()
+    {
+        return $this->hostnamePattern;
+    }
+
+    /**
+     * Sets the hostname pattern.
+     *
+     * @param string $pattern The pattern
+     */
+    public function setHostnamePattern($pattern)
+    {
+        $this->hostnamePattern = (string) $pattern;
 
         return $this;
     }
@@ -175,7 +225,7 @@ class Route implements \Serializable
      *
      * @param string $name An option name
      *
-     * @return mixed The option value
+     * @return mixed The option value or null when not given
      */
     public function getOption($name)
     {
@@ -232,7 +282,7 @@ class Route implements \Serializable
      *
      * @param string $name A variable name
      *
-     * @return mixed The default value
+     * @return mixed The default value or null when not given
      */
     public function getDefault($name)
     {
@@ -319,7 +369,7 @@ class Route implements \Serializable
      *
      * @param string $key The key
      *
-     * @return string The regex
+     * @return string|null The regex or null when not given
      */
     public function getRequirement($key)
     {
@@ -348,6 +398,8 @@ class Route implements \Serializable
      * Compiles the route.
      *
      * @return CompiledRoute A CompiledRoute instance
+     *
+     * @see RouteCompiler which is responsible for the compilation process
      */
     public function compile()
     {
@@ -367,19 +419,19 @@ class Route implements \Serializable
     private function sanitizeRequirement($key, $regex)
     {
         if (!is_string($regex)) {
-            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string', $key));
+            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string.', $key));
         }
 
-        if ('' === $regex) {
-            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty', $key));
-        }
-
-        if ('^' === $regex[0]) {
-            $regex = substr($regex, 1);
+        if ('' !== $regex && '^' === $regex[0]) {
+            $regex = (string) substr($regex, 1); // returns false for a single character
         }
 
         if ('$' === substr($regex, -1)) {
             $regex = substr($regex, 0, -1);
+        }
+
+        if ('' === $regex) {
+            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty.', $key));
         }
 
         return $regex;

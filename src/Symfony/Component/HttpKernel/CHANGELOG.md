@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * [BC BREAK] TimeDataCollector::getTotalTime() has been renamed to
+   TimeDataCollector::getDuration()
+ * the memory usage reported by the MemoryDataCollector now takes the memory used
+   in the kernel.terminate event listeners into account
+ * moved the Stopwatch classes to a new component
+ * added TraceableControllerResolver
+ * added TraceableEventDispatcher (removed ContainerAwareTraceableEventDispatcher)
+ * added support for WinCache opcode cache in ConfigDataCollector
+
 2.1.0
 -----
 

@@ -52,6 +52,14 @@ class Profiler
     }
 
     /**
+     * Enables the profiler.
+     */
+    public function enable()
+    {
+        $this->enabled = true;
+    }
+
+    /**
      * Loads the Profile for the given Response.
      *
      * @param Response $response A Response instance

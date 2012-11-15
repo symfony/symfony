@@ -28,8 +28,8 @@ class XmlFileLoader extends FileLoader
     /**
      * Loads an XML file.
      *
-     * @param string $file An XML file path
-     * @param string $type The resource type
+     * @param string      $file An XML file path
+     * @param string|null $type The resource type
      *
      * @return RouteCollection A RouteCollection instance
      *
@@ -65,6 +65,8 @@ class XmlFileLoader extends FileLoader
      * @param \DOMElement      $node       the node to parse
      * @param string           $path       the path of the XML file being processed
      * @param string           $file
+     *
+     * @throws \InvalidArgumentException When a tag can't be parsed
      */
     protected function parseNode(RouteCollection $collection, \DOMElement $node, $path, $file)
     {
@@ -73,9 +75,10 @@ class XmlFileLoader extends FileLoader
                 $this->parseRoute($collection, $node, $path);
                 break;
             case 'import':
-                $resource = (string) $node->getAttribute('resource');
-                $type = (string) $node->getAttribute('type');
-                $prefix = (string) $node->getAttribute('prefix');
+                $resource = $node->getAttribute('resource');
+                $type = $node->getAttribute('type');
+                $prefix = $node->getAttribute('prefix');
+                $hostnamePattern = $node->getAttribute('hostname-pattern');
 
                 $defaults = array();
                 $requirements = array();
@@ -88,13 +91,13 @@ class XmlFileLoader extends FileLoader
 
                     switch ($n->tagName) {
                         case 'default':
-                            $defaults[(string) $n->getAttribute('key')] = trim((string) $n->nodeValue);
+                            $defaults[$n->getAttribute('key')] = trim($n->nodeValue);
                             break;
                         case 'requirement':
-                            $requirements[(string) $n->getAttribute('key')] = trim((string) $n->nodeValue);
+                            $requirements[$n->getAttribute('key')] = trim($n->nodeValue);
                             break;
                         case 'option':
-                            $options[(string) $n->getAttribute('key')] = trim((string) $n->nodeValue);
+                            $options[$n->getAttribute('key')] = trim($n->nodeValue);
                             break;
                         default:
                             throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $n->tagName));
@@ -102,7 +105,7 @@ class XmlFileLoader extends FileLoader
                 }
 
                 $this->setCurrentDir(dirname($path));
-                $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix, $defaults, $requirements, $options);
+                $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix, $defaults, $requirements, $options, $hostnamePattern);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
@@ -141,22 +144,22 @@ class XmlFileLoader extends FileLoader
 
             switch ($node->tagName) {
                 case 'default':
-                    $defaults[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
+                    $defaults[$node->getAttribute('key')] = trim((string) $node->nodeValue);
                     break;
                 case 'option':
-                    $options[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
+                    $options[$node->getAttribute('key')] = trim((string) $node->nodeValue);
                     break;
                 case 'requirement':
-                    $requirements[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
+                    $requirements[$node->getAttribute('key')] = trim((string) $node->nodeValue);
                     break;
                 default:
                     throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
             }
         }
 
-        $route = new Route((string) $definition->getAttribute('pattern'), $defaults, $requirements, $options);
+        $route = new Route($definition->getAttribute('pattern'), $defaults, $requirements, $options, $definition->getAttribute('hostname-pattern'));
 
-        $collection->add((string) $definition->getAttribute('id'), $route);
+        $collection->add($definition->getAttribute('id'), $route);
     }
 
     /**

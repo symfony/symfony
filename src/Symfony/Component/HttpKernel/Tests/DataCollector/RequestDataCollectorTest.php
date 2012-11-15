@@ -43,6 +43,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag',$c->getRequestQuery());
         $this->assertEquals('html',$c->getFormat());
         $this->assertEquals(array(),$c->getSessionAttributes());
+        $this->assertEquals('en',$c->getLocale());
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\HeaderBag',$c->getResponseHeaders());
         $this->assertEquals(200,$c->getStatusCode());

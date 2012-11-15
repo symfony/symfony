@@ -26,22 +26,30 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 class RouteCollection implements \IteratorAggregate, \Countable
 {
-    private $routes;
-    private $resources;
-    private $prefix;
+    /**
+     * @var (RouteCollection|Route)[]
+     */
+    private $routes = array();
+
+    /**
+     * @var array
+     */
+    private $resources = array();
+
+    /**
+     * @var string
+     */
+    private $prefix = '';
+
+    /**
+     * @var RouteCollection|null
+     */
     private $parent;
 
     /**
-     * Constructor.
-     *
-     * @api
+     * @var string
      */
-    public function __construct()
-    {
-        $this->routes = array();
-        $this->resources = array();
-        $this->prefix = '';
-    }
+    private $hostnamePattern = '';
 
     public function __clone()
     {
@@ -127,7 +135,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Returns all routes in this collection and its children.
      *
-     * @return array An array of routes
+     * @return Route[] An array of routes
      */
     public function all()
     {
@@ -183,17 +191,18 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Adds a route collection to the current set of routes (at the end of the current set).
      *
-     * @param RouteCollection $collection   A RouteCollection instance
-     * @param string          $prefix       An optional prefix to add before each pattern of the route collection
-     * @param array           $defaults     An array of default values
-     * @param array           $requirements An array of requirements
-     * @param array           $options      An array of options
+     * @param RouteCollection $collection      A RouteCollection instance
+     * @param string          $prefix          An optional prefix to add before each pattern of the route collection
+     * @param array           $defaults        An array of default values
+     * @param array           $requirements    An array of requirements
+     * @param array           $options         An array of options
+     * @param string          $hostnamePattern Hostname pattern
      *
      * @throws \InvalidArgumentException When the RouteCollection already exists in the tree
      *
      * @api
      */
-    public function addCollection(RouteCollection $collection, $prefix = '', $defaults = array(), $requirements = array(), $options = array())
+    public function addCollection(RouteCollection $collection, $prefix = '', $defaults = array(), $requirements = array(), $options = array(), $hostnamePattern = '')
     {
         // prevent infinite loops by recursive referencing
         $root = $this->getRoot();
@@ -208,6 +217,11 @@ class RouteCollection implements \IteratorAggregate, \Countable
         // the sub-collection must have the prefix of the parent (current instance) prepended because it does not
         // necessarily already have it applied (depending on the order RouteCollections are added to each other)
         $collection->addPrefix($this->getPrefix() . $prefix, $defaults, $requirements, $options);
+
+        if ('' !== $hostnamePattern) {
+            $collection->setHostnamePattern($hostnamePattern);
+        }
+
         $this->routes[] = $collection;
     }
 
@@ -257,6 +271,30 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function getPrefix()
     {
         return $this->prefix;
+    }
+
+    /**
+     * Returns the hostname pattern.
+     *
+     * @return string The pattern
+     */
+    public function getHostnamePattern()
+    {
+        return $this->hostnamePattern;
+    }
+
+    /**
+     * Sets the hostname pattern on this collection and all children.
+     *
+     * @param string $pattern The pattern
+     */
+    public function setHostnamePattern($pattern)
+    {
+        $this->hostnamePattern = (string) $pattern;
+
+        foreach ($this->routes as $name => $route) {
+            $route->setHostnamePattern($pattern);
+        }
     }
 
     /**

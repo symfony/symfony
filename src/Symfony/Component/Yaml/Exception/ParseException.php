@@ -18,7 +18,7 @@ namespace Symfony\Component\Yaml\Exception;
  *
  * @api
  */
-class ParseException extends \RuntimeException implements ExceptionInterface
+class ParseException extends RuntimeException
 {
     private $parsedFile;
     private $parsedLine;

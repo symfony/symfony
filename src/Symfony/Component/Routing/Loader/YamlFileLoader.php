@@ -27,14 +27,14 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'type', 'resource', 'prefix', 'pattern', 'options', 'defaults', 'requirements'
+        'type', 'resource', 'prefix', 'pattern', 'options', 'defaults', 'requirements', 'hostname_pattern',
     );
 
     /**
      * Loads a Yaml file.
      *
-     * @param string $file A Yaml file path
-     * @param string $type The resource type
+     * @param string      $file A Yaml file path
+     * @param string|null $type The resource type
      *
      * @return RouteCollection A RouteCollection instance
      *
@@ -70,9 +70,10 @@ class YamlFileLoader extends FileLoader
                 $defaults = isset($config['defaults']) ? $config['defaults'] : array();
                 $requirements = isset($config['requirements']) ? $config['requirements'] : array();
                 $options = isset($config['options']) ? $config['options'] : array();
+                $hostnamePattern = isset($config['hostname_pattern']) ? $config['hostname_pattern'] : '';
 
                 $this->setCurrentDir(dirname($path));
-                $collection->addCollection($this->import($config['resource'], $type, false, $file), $prefix, $defaults, $requirements, $options);
+                $collection->addCollection($this->import($config['resource'], $type, false, $file), $prefix, $defaults, $requirements, $options, $hostnamePattern);
             } else {
                 $this->parseRoute($collection, $name, $config, $path);
             }
@@ -106,12 +107,13 @@ class YamlFileLoader extends FileLoader
         $defaults = isset($config['defaults']) ? $config['defaults'] : array();
         $requirements = isset($config['requirements']) ? $config['requirements'] : array();
         $options = isset($config['options']) ? $config['options'] : array();
+        $hostnamePattern = isset($config['hostname_pattern']) ? $config['hostname_pattern'] : null;
 
         if (!isset($config['pattern'])) {
             throw new \InvalidArgumentException(sprintf('You must define a "pattern" for the "%s" route.', $name));
         }
 
-        $route = new Route($config['pattern'], $defaults, $requirements, $options);
+        $route = new Route($config['pattern'], $defaults, $requirements, $options, $hostnamePattern);
 
         $collection->add($name, $route);
     }

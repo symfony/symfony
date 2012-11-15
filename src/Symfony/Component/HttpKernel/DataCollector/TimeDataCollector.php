@@ -70,11 +70,11 @@ class TimeDataCollector extends DataCollector
      *
      * @return float The elapsed time
      */
-    public function getTotalTime()
+    public function getDuration()
     {
         $lastEvent = $this->data['events']['__section__'];
 
-        return $lastEvent->getOrigin() + $lastEvent->getTotalTime() - $this->getStartTime();
+        return $lastEvent->getOrigin() + $lastEvent->getDuration() - $this->getStartTime();
     }
 
     /**

@@ -23,6 +23,7 @@ interface NormalizerInterface
      *
      * @param object $object object to normalize
      * @param string $format format the normalization result will be encoded as
+     *
      * @return array|scalar
      */
     public function normalize($object, $format = null);
@@ -32,6 +33,7 @@ interface NormalizerInterface
      *
      * @param mixed  $data   Data to normalize.
      * @param string $format The format being (de-)serialized from or into.
+     *
      * @return Boolean
      */
     public function supportsNormalization($data, $format = null);

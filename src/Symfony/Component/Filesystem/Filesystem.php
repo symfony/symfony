@@ -336,7 +336,7 @@ class Filesystem
      *                               Valid options are:
      *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
      *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
-     *                                 - $options['delete'] Default FALSE Whether to delete files that are not in the source directory
+     *                                 - $options['delete'] Default false Whether to delete files that are not in the source directory
      *
      * @throws IOException When file type is unknown
      */
@@ -347,11 +347,11 @@ class Filesystem
 
         // Iterate in destination folder to remove obsolete entries
         if ($this->exists($targetDir)) {
-            if (isset($options['delete']) and $options['delete']) {
+            if (isset($options['delete']) && $options['delete']) {
                 $deleteIterator = $iterator;
                 if (null === $deleteIterator) {
                     $flags = \FilesystemIterator::SKIP_DOTS;
-                    $deleteIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST );
+                    $deleteIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST);
                 }
                 foreach ($deleteIterator as $file) {
                     $origin = str_replace($targetDir, $originDir, $file->getPathname());

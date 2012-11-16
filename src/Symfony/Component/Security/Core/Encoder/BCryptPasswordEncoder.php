@@ -117,22 +117,27 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
     protected function get_random_bytes($count)
     {
         $random = '';
-        if (@is_readable('/dev/urandom')) {
-            $fh = @fopen('/dev/urandom', 'rb');
-            if ($fh) {
-                stream_set_read_buffer($fh, 0);
-                stream_set_chunk_size($fh, 16);
-                $random=fread($fh, $count);
-                fclose($fh);
-            }
+
+        if(function_exists('openssl_random_pseudo_bytes') &&
+           (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')) {
+            // This also calls /dev/urandom and all others sorts
+            // of methods to get randomness, but is too slow
+            // on windows because of a bug there.
+            $random = openssl_random_pseudo_bytes($count);
         }
 
         if (strlen($random)<$count) {
-            if(function_exists('openssl_random_pseudo_bytes') &&
-               (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')) {
-                $random = openssl_random_pseudo_bytes($count);
+            // Try /dev/urandom
+            if (@is_readable('/dev/urandom')) {
+                $fh = @fopen('/dev/urandom', 'rb');
+                if ($fh) {
+                    stream_set_read_buffer($fh, 0);
+                    $random=fread($fh, $count);
+                    fclose($fh);
+                }
             }
-            
+
+            // Last resort, fallback to mt_rand
             $len = strlen($random);
             if ($len<$count) {
                 for ($i=$len;$i<$count;++$i) {

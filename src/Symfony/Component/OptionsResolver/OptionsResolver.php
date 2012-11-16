@@ -54,6 +54,12 @@ class OptionsResolver implements OptionsResolverInterface
     private $allowedTypes = array();
 
     /**
+     * A list of mutually exclusive options.
+     * @var array
+     */
+    private $mutuallyExclusive = array();
+
+    /**
      * Creates a new instance.
      */
     public function __construct()
@@ -184,6 +190,18 @@ class OptionsResolver implements OptionsResolverInterface
     /**
      * {@inheritdoc}
      */
+    public function setMutuallyExclusive(array $mutuallyExclusive)
+    {
+        $this->validateOptionsExistence($mutuallyExclusive = array_flip($mutuallyExclusive));
+
+        $this->mutuallyExclusive = array_merge($this->mutuallyExclusive, $mutuallyExclusive);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setNormalizers(array $normalizers)
     {
         $this->validateOptionsExistence($normalizers);
@@ -218,6 +236,7 @@ class OptionsResolver implements OptionsResolverInterface
     {
         $this->validateOptionsExistence($options);
         $this->validateOptionsCompleteness($options);
+        $this->validateOptionsExclusiveness($options);
 
         // Make sure this method can be called multiple times
         $combinedOptions = clone $this->defaultOptions;
@@ -278,6 +297,28 @@ class OptionsResolver implements OptionsResolverInterface
             throw new MissingOptionsException(sprintf(
                 count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is  missing.',
                 implode('", "', array_keys($diff))
+            ));
+        }
+    }
+
+    /**
+     * Validates that the given option names are not mutually exclusive between them.
+     *
+     * @param array $options An list of option names as keys.
+     *
+     * @throws InvalidOptionsException If at least one option cannot coexist.
+     */
+    private function validateOptionsExclusiveness(array $options = array())
+    {
+        $intersection = array_intersect_key($this->mutuallyExclusive, $options);
+
+        if (count($intersection) > 1) {
+            ksort($this->mutuallyExclusive);
+            ksort($intersection);
+
+            throw new InvalidOptionsException(sprintf(
+                'The options "%s" are mutually exclusive and  cannot be used at the same time. You must declare only one of them.',
+                implode('", "', array_keys($this->mutuallyExclusive))
             ));
         }
     }

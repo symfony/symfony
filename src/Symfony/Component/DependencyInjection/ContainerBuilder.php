@@ -145,6 +145,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param object $object An object instance
      *
+     * @return ContainerBuilder The current instance
+     *
      * @api
      */
     public function addObjectResource($object)
@@ -153,6 +155,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         do {
             $this->addResource(new FileResource($parent->getFileName()));
         } while ($parent = $parent->getParentClass());
+
+        return $this;
     }
 
     /**
@@ -187,6 +191,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param CompilerPassInterface $pass A compiler pass
      * @param string                $type The type of compiler pass
      *
+     * @return ContainerBuilder The current instance
+     *
      * @api
      */
     public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
@@ -198,6 +204,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $this->compiler->addPass($pass, $type);
 
         $this->addObjectResource($pass);
+
+        return $this;
     }
 
     /**

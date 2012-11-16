@@ -346,18 +346,16 @@ class Filesystem
         $originDir = rtrim($originDir, '/\\');
 
         // Iterate in destination folder to remove obsolete entries
-        if ($this->exists($targetDir)) {
-            if (isset($options['delete']) && $options['delete']) {
-                $deleteIterator = $iterator;
-                if (null === $deleteIterator) {
-                    $flags = \FilesystemIterator::SKIP_DOTS;
-                    $deleteIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST);
-                }
-                foreach ($deleteIterator as $file) {
-                    $origin = str_replace($targetDir, $originDir, $file->getPathname());
-                    if (!$this->exists($origin)) {
-                        $this->remove($file);
-                    }
+        if ($this->exists($targetDir) && isset($options['delete']) && $options['delete']) {
+            $deleteIterator = $iterator;
+            if (null === $deleteIterator) {
+                $flags = \FilesystemIterator::SKIP_DOTS;
+                $deleteIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST);
+            }
+            foreach ($deleteIterator as $file) {
+                $origin = str_replace($targetDir, $originDir, $file->getPathname());
+                if (!$this->exists($origin)) {
+                    $this->remove($file);
                 }
             }
         }

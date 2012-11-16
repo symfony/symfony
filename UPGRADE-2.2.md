@@ -31,3 +31,7 @@
    $accepts = AcceptHeader::fromString($request->headers->get('Accept'))->all();
 
    ```
+
+### Form
+
+  * The PasswordType is now not trimmed by default.

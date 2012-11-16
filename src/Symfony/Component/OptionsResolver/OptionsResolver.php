@@ -314,7 +314,6 @@ class OptionsResolver implements OptionsResolverInterface
 
         if (count($intersection) > 1) {
             ksort($this->mutuallyExclusive);
-            ksort($intersection);
 
             throw new InvalidOptionsException(sprintf(
                 'The options "%s" are mutually exclusive and  cannot be used at the same time. You must declare only one of them.',

@@ -96,6 +96,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
       * Checks whether the serializer can encode to given format
       *
       * @param string $format format name
+      *
       * @return Boolean
       */
      public function supportsEncoding($format)
@@ -107,6 +108,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
       * Checks whether the serializer can decode from given format
       *
       * @param string $format format name
+      *
       * @return Boolean
       */
      public function supportsDecoding($format)
@@ -116,6 +118,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
     /**
      * Sets the root node name
+     *
      * @param string $name root node name
      */
     public function setRootNodeName($name)

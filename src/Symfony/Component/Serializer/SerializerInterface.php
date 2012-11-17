@@ -23,6 +23,7 @@ interface SerializerInterface
      *
      * @param mixed  $data   any data
      * @param string $format format name
+     *
      * @return string
      */
     public function serialize($data, $format);
@@ -33,6 +34,8 @@ interface SerializerInterface
      * @param mixed  $data
      * @param string $type
      * @param string $format
+     *
+     * @return object
      */
     public function deserialize($data, $type, $format);
 }

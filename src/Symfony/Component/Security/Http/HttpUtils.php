@@ -105,7 +105,8 @@ class HttpUtils
                 return false;
             }
         }
-
+        //var_dump($request->getPathInfo());
+        return $path === rawurldecode($request->getPathInfo());
         return $path === $request->getPathInfo();
     }
 

@@ -3,3 +3,6 @@ _form_login_bundle:
 
 _form_login_localized:
     resource: @FormLoginBundle/Resources/config/localized_routing.yml
+
+_form_login_unicode:
+    resource: @FormLoginBundle/Resources/config/unicode_routing.yml

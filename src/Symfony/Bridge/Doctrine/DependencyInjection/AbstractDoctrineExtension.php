@@ -369,6 +369,7 @@ abstract class AbstractDoctrineExtension extends Extension
      * @example $name is 'entity_manager' then the result would be 'doctrine.orm.entity_manager'
      *
      * @param string $name
+     *
      * @return string
      */
     abstract protected function getObjectManagerElementName($name);

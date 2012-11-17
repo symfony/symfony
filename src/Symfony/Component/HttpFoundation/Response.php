@@ -245,6 +245,12 @@ class Response
             $this->setProtocolVersion('1.1');
         }
 
+        // Check if we need to send extra expire info headers
+        if ('1.0' == $this->getProtocolVersion() && 'no-cache' == $this->headers->get('Cache-Control')) {
+            $this->headers->set('pragma', 'no-cache');
+            $this->headers->set('expires', -1);
+        }
+
         return $this;
     }
 
@@ -686,8 +692,14 @@ class Response
             return $age;
         }
 
-        if (null !== $this->getExpires()) {
-            return $this->getExpires()->format('U') - $this->getDate()->format('U');
+        $expiry = $this->getExpires();
+
+        if (!$expiry instanceof \DateTime && (-1 == $expiry || 0 === $expiry)) {
+            return $expiry;
+        }
+
+        if (null !== $expiry) {
+            return $expiry->format('U') - $this->getDate()->format('U');
         }
 
         return null;

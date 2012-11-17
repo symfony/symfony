@@ -47,16 +47,16 @@ class ApacheMatcherDumper extends MatcherDumper
         $rules = array("# skip \"real\" requests\nRewriteCond %{REQUEST_FILENAME} -f\nRewriteRule .* - [QSA,L]");
         $methodVars = array();
         $hostnameRegexUnique = 0;
-        $prevHosnameRegex = '';
+        $prevHostnameRegex = '';
 
         foreach ($this->getRoutes()->all() as $name => $route) {
 
             $compiledRoute = $route->compile();
             $hostnameRegex = $compiledRoute->getHostnameRegex();
 
-            if (null !== $hostnameRegex && $prevHosnameRegex !== $hostnameRegex) {
+            if (null !== $hostnameRegex && $prevHostnameRegex !== $hostnameRegex) {
 
-                $prevHosnameRegex = $hostnameRegex;
+                $prevHostnameRegex = $hostnameRegex;
                 $hostnameRegexUnique++;
 
                 $rule = array();
@@ -217,7 +217,7 @@ class ApacheMatcherDumper extends MatcherDumper
         $delimiter = $regex[0];
         $regexPatternEnd = strrpos($regex, $delimiter);
         if (strlen($regex) < 2 || 0 === $regexPatternEnd) {
-            throw new \LogicException('The "%s" route regex "%s" is invalid', $name, $regex);
+            throw new \LogicException('The route regex "%s" is invalid', $regex);
         }
         $regex = preg_replace('/\?<.+?>/', '', substr($regex, 1, $regexPatternEnd - 1));
 

@@ -214,14 +214,9 @@ class ApacheMatcherDumper extends MatcherDumper
      */
     private function regexToApacheRegex($regex)
     {
-        $delimiter = $regex[0];
-        $regexPatternEnd = strrpos($regex, $delimiter);
-        if (strlen($regex) < 2 || 0 === $regexPatternEnd) {
-            throw new \LogicException('The route regex "%s" is invalid', $regex);
-        }
-        $regex = preg_replace('/\?<.+?>/', '', substr($regex, 1, $regexPatternEnd - 1));
+        $regexPatternEnd = strrpos($regex, $regex[0]);
 
-        return $regex;
+        return preg_replace('/\?<.+?>/', '', substr($regex, 1, $regexPatternEnd - 1));
     }
 
     /**

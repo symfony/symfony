@@ -65,10 +65,19 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
         //set themes for this view specifically
         $this->setupThemes($view->vars[self::CACHE_KEY_VAR], $themes);
 
-        //now set themes on all children of this form
+        //this will set theme for all children of this view
         $cacheKey = $view->vars['unique_block_prefix'];
         $cacheKeyLength = strlen($cacheKey);
         foreach($this->resources as $key => $value) {
+            if (0 === (strcmp($cacheKey, substr($key, 0, $cacheKeyLength)))) {
+                $this->setupThemes($key, $themes);
+            }
+        }
+
+        //the loop above might have already set the theme. However the user might
+        //change the theme a few levels deeper. This makes sure that the correct theme
+        //is set on those deeper levels
+        foreach ($this->themes as $key => $value) {
             if (0 === (strcmp($cacheKey, substr($key, 0, $cacheKeyLength)))) {
                 $this->setupThemes($key, $themes);
             }

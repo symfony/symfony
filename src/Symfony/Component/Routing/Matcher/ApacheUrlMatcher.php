@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
 /**
@@ -20,6 +21,17 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
  */
 class ApacheUrlMatcher extends UrlMatcher
 {
+
+    public function __construct($routes, RequestContext $context)
+    {
+        $this->routes = $routes;
+        $this->context = $context;
+
+        if (null !== $routes) {
+            parent::__construct($routes, $context);
+        }
+    }
+
     /**
      * Tries to match a URL based on Apache mod_rewrite matching.
      *
@@ -67,10 +79,23 @@ class ApacheUrlMatcher extends UrlMatcher
 
         if ($match) {
             return $this->mergeDefaults($parameters, $defaults);
-        } elseif (0 < count($allow)) {
+        } elseif (!empty($allow)) {
             throw new MethodNotAllowedException($allow);
-        } else {
-            return parent::match($pathinfo);
         }
+    }
+
+    /**
+     * Tries to match a URL with a set of routes using the fallback strategy.
+     *
+     * @param string $pathinfo The path info to be parsed
+     *
+     * @return array An array of parameters
+     *
+     * @throws ResourceNotFoundException If the resource could not be found
+     * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
+     */
+    public function parentMatch($pathinfo)
+    {
+        return parent::match($pathinfo);
     }
 }

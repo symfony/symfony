@@ -30,6 +30,8 @@ class UrlMatcher implements UrlMatcherInterface
 
     private $routes;
 
+    private $hasDefaultRoutesSet = false;
+
     /**
      * Constructor.
      *
@@ -42,6 +44,10 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $this->routes = $routes;
         $this->context = $context;
+
+        if (null !== $routes) {
+            $this->hasDefaultRoutesSet = true;
+        }
     }
 
     /**
@@ -89,6 +95,32 @@ class UrlMatcher implements UrlMatcherInterface
         throw 0 < count($this->allow)
             ? new MethodNotAllowedException(array_unique(array_map('strtoupper', $this->allow)))
             : new ResourceNotFoundException();
+    }
+
+    /**
+     * Check if the extra defaults have been set
+     *
+     * @return Boolean
+     */
+    public function hasDefaultRoutesSet()
+    {
+        return $this->hasDefaultRoutesSet;
+    }
+
+    /**
+     * Set the default routes
+     *
+     * @param RouteCollection $routes
+     *
+     * @return UrlMatcher
+     */
+    public function setDefaultRoutes(RouteCollection $routes)
+    {
+        $this->routes = $routes;
+
+        $this->hasDefaultRoutesSet = true;
+
+        return $this;
     }
 
     protected function matchCollection($pathinfo, RouteCollection $routes)

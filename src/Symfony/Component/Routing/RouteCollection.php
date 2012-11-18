@@ -267,7 +267,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function getResources()
     {
         $resources = $this->resources;
-        foreach ($this as $routes) {
+        foreach ($this->routes as $routes) {
             if ($routes instanceof RouteCollection) {
                 $resources = array_merge($resources, $routes->getResources());
             }

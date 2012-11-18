@@ -270,32 +270,32 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         $append = true;
 
         if (is_array($data) || $data instanceof \Traversable) {
-            foreach ($data as $key => $data) {
+            foreach ($data as $key => $dataValue) {
                 //Ah this is the magic @ attribute types.
-                if (0 === strpos($key, "@") && is_scalar($data) && $this->isElementNameValid($attributeName = substr($key, 1))) {
-                    $parentNode->setAttribute($attributeName, $data);
+                if (0 === strpos($key, "@") && is_scalar($dataValue) && $this->isElementNameValid($attributeName = substr($key, 1))) {
+                    $parentNode->setAttribute($attributeName, $dataValue);
                 } elseif ($key === '#') {
-                    $append = $this->selectNodeType($parentNode, $data);
-                } elseif (is_array($data) && false === is_numeric($key)) {
+                    $append = $this->selectNodeType($parentNode, $dataValue);
+                } elseif (is_array($dataValue) && false === is_numeric($key)) {
                     /**
                      * Is this array fully numeric keys?
                      */
-                    if (ctype_digit(implode('', array_keys($data)))) {
+                    if (ctype_digit(implode('', array_keys($dataValue)))) {
                         /**
                          * Create nodes to append to $parentNode based on the $key of this array
                          * Produces <xml><item>0</item><item>1</item></xml>
                          * From array("item" => array(0,1));
                          */
-                        foreach ($data as $subData) {
+                        foreach ($dataValue as $subData) {
                             $append = $this->appendNode($parentNode, $subData, $key);
                         }
                     } else {
-                        $append = $this->appendNode($parentNode, $data, $key);
+                        $append = $this->appendNode($parentNode, $dataValue, $key);
                     }
                 } elseif (is_numeric($key) || !$this->isElementNameValid($key)) {
-                    $append = $this->appendNode($parentNode, $data, "item", $key);
+                    $append = $this->appendNode($parentNode, $dataValue, "item", $key);
                 } else {
-                    $append = $this->appendNode($parentNode, $data, $key);
+                    $append = $this->appendNode($parentNode, $dataValue, $key);
                 }
             }
 

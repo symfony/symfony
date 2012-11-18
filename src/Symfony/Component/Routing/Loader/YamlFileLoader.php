@@ -61,8 +61,8 @@ class YamlFileLoader extends FileLoader
             throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $file));
         }
 
-        foreach ($config as $name => $config) {
-            $config = $this->normalizeRouteConfig($config);
+        foreach ($config as $name => $cfg) {
+            $config = $this->normalizeRouteConfig($cfg);
 
             if (isset($config['resource'])) {
                 $type = isset($config['type']) ? $config['type'] : null;

@@ -275,7 +275,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function setHostnamePattern($pattern)
     {
-        foreach ($this->routes as $name => $route) {
+        foreach ($this->routes as $route) {
             $route->setHostnamePattern($pattern);
         }
     }

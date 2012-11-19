@@ -33,7 +33,7 @@ class RouteCompiler implements RouteCompilerInterface
      *
      * @throws \LogicException  If a variable is referenced more than once
      * @throws \DomainException If a variable name is numeric because PHP raises an error for such
-     *                          subpatterns in PCRE and thus would break matching, e.g. "(?<123>.+)".
+     *                          subpatterns in PCRE and thus would break matching, e.g. "(?P<123>.+)".
      */
     public function compile(Route $route)
     {
@@ -82,7 +82,6 @@ class RouteCompiler implements RouteCompilerInterface
 
     private function compilePattern(Route $route, $pattern, $isHostname)
     {
-        $len = strlen($pattern);
         $tokens = array();
         $variables = array();
         $matches = array();
@@ -212,9 +211,9 @@ class RouteCompiler implements RouteCompilerInterface
             // Variable tokens
             if (0 === $index && 0 === $firstOptional) {
                 // When the only token is an optional variable token, the separator is required
-                return sprintf('%s(?<%s>%s)?', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
+                return sprintf('%s(?P<%s>%s)?', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
             } else {
-                $regexp = sprintf('%s(?<%s>%s)', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
+                $regexp = sprintf('%s(?P<%s>%s)', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
                 if ($index >= $firstOptional) {
                     // Enclose each optional token in a subpattern to make it optional.
                     // "?:" means it is non-capturing, i.e. the portion of the subject string that

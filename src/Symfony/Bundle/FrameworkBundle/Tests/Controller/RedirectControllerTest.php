@@ -233,7 +233,6 @@ class RedirectControllerTest extends TestCase
 
     public function assertRedirectUrl($returnValue, $expectedUrl)
     {
-        $this->assertTrue($returnValue->isRedirect($expectedUrl),
-            "Expected: $expectedUrl\nGot:      " . $returnValue->headers->get('Location'));
+        $this->assertTrue($returnValue->isRedirect($expectedUrl), "Expected: $expectedUrl\nGot:      ".$returnValue->headers->get('Location'));
     }
 }

@@ -96,10 +96,11 @@ class RedirectController extends ContainerAware
                     $httpPort = $this->container->getParameter('request_listener.http_port');
                 }
             }
+
             if ($httpPort != null && $httpPort != 80) {
                 $port = ":$httpPort";
             }
-        } else if ('https' === $scheme) {
+        } elseif ('https' === $scheme) {
             if ($httpsPort == null) {
                 if ('https' === $request->getScheme()) {
                     $httpsPort = $request->getPort();
@@ -107,6 +108,7 @@ class RedirectController extends ContainerAware
                     $httpsPort = $this->container->getParameter('request_listener.https_port');
                 }
             }
+
             if ($httpsPort != null && $httpsPort != 443) {
                 $port = ":$httpsPort";
             }

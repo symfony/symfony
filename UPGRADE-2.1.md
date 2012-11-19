@@ -1340,6 +1340,9 @@
 
 ### Session
 
+  * The namespace of the Session class changed from `Symfony\Component\HttpFoundation\Session`
+    to `Symfony\Component\HttpFoundation\Session\Session`.
+
   * Using `get` to retrieve flash messages now returns an array.
 
     ##### Retrieving the flash messages from a Twig template

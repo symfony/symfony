@@ -33,7 +33,7 @@ class RouteCompiler implements RouteCompilerInterface
      *
      * @throws \LogicException  If a variable is referenced more than once
      * @throws \DomainException If a variable name is numeric because PHP raises an error for such
-     *                          subpatterns in PCRE and thus would break matching, e.g. "(?<123>.+)".
+     *                          subpatterns in PCRE and thus would break matching, e.g. "(?P<123>.+)".
      */
     public function compile(Route $route)
     {
@@ -82,7 +82,6 @@ class RouteCompiler implements RouteCompilerInterface
 
     private function compilePattern(Route $route, $pattern, $isHostname)
     {
-        $len = strlen($pattern);
         $tokens = array();
         $variables = array();
         $matches = array();

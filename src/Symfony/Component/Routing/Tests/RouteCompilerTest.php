@@ -43,7 +43,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with a variable',
                 array('/foo/{bar}'),
-                '/foo', '#^/foo/(?<bar>[^/]++)$#s', array('bar'), array(
+                '/foo', '#^/foo/(?P<bar>[^/]++)$#s', array('bar'), array(
                     array('variable', '/', '[^/]++', 'bar'),
                     array('text', '/foo'),
                 )),
@@ -51,7 +51,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with a variable that has a default value',
                 array('/foo/{bar}', array('bar' => 'bar')),
-                '/foo', '#^/foo(?:/(?<bar>[^/]++))?$#s', array('bar'), array(
+                '/foo', '#^/foo(?:/(?P<bar>[^/]++))?$#s', array('bar'), array(
                     array('variable', '/', '[^/]++', 'bar'),
                     array('text', '/foo'),
                 )),
@@ -59,7 +59,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with several variables',
                 array('/foo/{bar}/{foobar}'),
-                '/foo', '#^/foo/(?<bar>[^/]++)/(?<foobar>[^/]++)$#s', array('bar', 'foobar'), array(
+                '/foo', '#^/foo/(?P<bar>[^/]++)/(?P<foobar>[^/]++)$#s', array('bar', 'foobar'), array(
                     array('variable', '/', '[^/]++', 'foobar'),
                     array('variable', '/', '[^/]++', 'bar'),
                     array('text', '/foo'),
@@ -68,7 +68,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with several variables that have default values',
                 array('/foo/{bar}/{foobar}', array('bar' => 'bar', 'foobar' => '')),
-                '/foo', '#^/foo(?:/(?<bar>[^/]++)(?:/(?<foobar>[^/]++))?)?$#s', array('bar', 'foobar'), array(
+                '/foo', '#^/foo(?:/(?P<bar>[^/]++)(?:/(?P<foobar>[^/]++))?)?$#s', array('bar', 'foobar'), array(
                     array('variable', '/', '[^/]++', 'foobar'),
                     array('variable', '/', '[^/]++', 'bar'),
                     array('text', '/foo'),
@@ -77,7 +77,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with several variables but some of them have no default values',
                 array('/foo/{bar}/{foobar}', array('bar' => 'bar')),
-                '/foo', '#^/foo/(?<bar>[^/]++)/(?<foobar>[^/]++)$#s', array('bar', 'foobar'), array(
+                '/foo', '#^/foo/(?P<bar>[^/]++)/(?P<foobar>[^/]++)$#s', array('bar', 'foobar'), array(
                     array('variable', '/', '[^/]++', 'foobar'),
                     array('variable', '/', '[^/]++', 'bar'),
                     array('text', '/foo'),
@@ -86,14 +86,14 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with an optional variable as the first segment',
                 array('/{bar}', array('bar' => 'bar')),
-                '', '#^/(?<bar>[^/]++)?$#s', array('bar'), array(
+                '', '#^/(?P<bar>[^/]++)?$#s', array('bar'), array(
                     array('variable', '/', '[^/]++', 'bar'),
                 )),
 
             array(
                 'Route with a requirement of 0',
                 array('/{bar}', array('bar' => null), array('bar' => '0')),
-                '', '#^/(?<bar>0)?$#s', array('bar'), array(
+                '', '#^/(?P<bar>0)?$#s', array('bar'), array(
                     array('variable', '/', '0', 'bar'),
                 )),
 
@@ -107,7 +107,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with only optional variables',
                 array('/{foo}/{bar}', array('foo' => 'foo', 'bar' => 'bar')),
-                '', '#^/(?<foo>[^/]++)?(?:/(?<bar>[^/]++))?$#s', array('foo', 'bar'), array(
+                '', '#^/(?P<foo>[^/]++)?(?:/(?P<bar>[^/]++))?$#s', array('foo', 'bar'), array(
                     array('variable', '/', '[^/]++', 'bar'),
                     array('variable', '/', '[^/]++', 'foo'),
                 )),
@@ -115,7 +115,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with a variable in last position',
                 array('/foo-{bar}'),
-                '/foo', '#^/foo\-(?<bar>[^/]++)$#s', array('bar'), array(
+                '/foo', '#^/foo\-(?P<bar>[^/]++)$#s', array('bar'), array(
                 array('variable', '-', '[^/]++', 'bar'),
                 array('text', '/foo'),
             )),
@@ -123,7 +123,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with nested placeholders',
                 array('/{static{var}static}'),
-                '/{static', '#^/\{static(?<var>[^/]+)static\}$#s', array('var'), array(
+                '/{static', '#^/\{static(?P<var>[^/]+)static\}$#s', array('var'), array(
                 array('text', 'static}'),
                 array('variable', '', '[^/]+', 'var'),
                 array('text', '/{static'),
@@ -132,7 +132,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route without separator between variables',
                 array('/{w}{x}{y}{z}.{_format}', array('z' => 'default-z', '_format' => 'html'), array('y' => '(y|Y)')),
-                '', '#^/(?<w>[^/\.]+)(?<x>[^/\.]+)(?<y>(y|Y))(?:(?<z>[^/\.]++)(?:\.(?<_format>[^/]++))?)?$#s', array('w', 'x', 'y', 'z', '_format'), array(
+                '', '#^/(?P<w>[^/\.]+)(?P<x>[^/\.]+)(?P<y>(y|Y))(?:(?P<z>[^/\.]++)(?:\.(?P<_format>[^/]++))?)?$#s', array('w', 'x', 'y', 'z', '_format'), array(
                 array('variable', '.', '[^/]++', '_format'),
                 array('variable', '', '[^/\.]++', 'z'),
                 array('variable', '', '(y|Y)', 'y'),
@@ -143,7 +143,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with a format',
                 array('/foo/{bar}.{_format}'),
-                '/foo', '#^/foo/(?<bar>[^/\.]++)\.(?<_format>[^/]++)$#s', array('bar', '_format'), array(
+                '/foo', '#^/foo/(?P<bar>[^/\.]++)\.(?P<_format>[^/]++)$#s', array('bar', '_format'), array(
                 array('variable', '.', '[^/]++', '_format'),
                 array('variable', '/', '[^/\.]++', 'bar'),
                 array('text', '/foo'),
@@ -215,11 +215,11 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with hostname pattern and some variables',
                 array('/hello/{name}', array(), array(), array(), 'www.example.{tld}'),
-                '/hello', '#^/hello/(?<name>[^/]++)$#s', array('tld', 'name'), array('name'), array(
+                '/hello', '#^/hello/(?P<name>[^/]++)$#s', array('tld', 'name'), array('name'), array(
                     array('variable', '/', '[^/]++', 'name'),
                     array('text', '/hello'),
                 ),
-                '#^www\.example\.(?<tld>[^\.]++)$#s', array('tld'), array(
+                '#^www\.example\.(?P<tld>[^\.]++)$#s', array('tld'), array(
                     array('variable', '.', '[^\.]++', 'tld'),
                     array('text', 'www.example'),
                 ),
@@ -230,7 +230,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 '/hello', '#^/hello$#s', array('locale', 'tld'), array(), array(
                     array('text', '/hello'),
                 ),
-                '#^(?<locale>[^\.]++)\.example\.(?<tld>[^\.]++)$#s', array('locale', 'tld'), array(
+                '#^(?P<locale>[^\.]++)\.example\.(?P<tld>[^\.]++)$#s', array('locale', 'tld'), array(
                     array('variable', '.', '[^\.]++', 'tld'),
                     array('text', '.example'),
                     array('variable', '', '[^\.]++', 'locale'),
@@ -242,7 +242,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 '/hello', '#^/hello$#s', array('locale', 'tld'), array(), array(
                     array('text', '/hello'),
                 ),
-                '#^(?<locale>[^\.]++)\.example\.(?<tld>[^\.]++)$#s', array('locale', 'tld'), array(
+                '#^(?P<locale>[^\.]++)\.example\.(?P<tld>[^\.]++)$#s', array('locale', 'tld'), array(
                     array('variable', '.', '[^\.]++', 'tld'),
                     array('text', '.example'),
                     array('variable', '', '[^\.]++', 'locale'),

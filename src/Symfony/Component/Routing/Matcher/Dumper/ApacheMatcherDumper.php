@@ -55,7 +55,6 @@ class ApacheMatcherDumper extends MatcherDumper
             $hostnameRegex = $compiledRoute->getHostnameRegex();
 
             if (null !== $hostnameRegex && $prevHostnameRegex !== $hostnameRegex) {
-
                 $prevHostnameRegex = $hostnameRegex;
                 $hostnameRegexUnique++;
 

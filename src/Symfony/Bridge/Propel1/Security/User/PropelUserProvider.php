@@ -25,18 +25,21 @@ class PropelUserProvider implements UserProviderInterface
 {
     /**
      * A Model class name.
+     *
      * @var string
      */
     protected $class;
 
     /**
      * A Query class name.
+     *
      * @var string
      */
     protected $queryClass;
 
     /**
      * A property to use to retrieve the user.
+     *
      * @var string
      */
     protected $property;

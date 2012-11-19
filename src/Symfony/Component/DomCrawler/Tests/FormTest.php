@@ -127,6 +127,12 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 array(),
             ),
             array(
+                'does not take into account input fields with an empty name attribute value',
+                '<input type="text" name="" value="foo" />
+                 <input type="submit" />',
+                array(),
+            ),
+            array(
                 'takes into account disabled input fields',
                 '<input type="text" name="foo" value="foo" disabled="disabled" />
                  <input type="submit" />',

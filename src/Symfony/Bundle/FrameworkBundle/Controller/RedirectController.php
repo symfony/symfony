@@ -28,7 +28,7 @@ class RedirectController extends ContainerAware
      * It expects a route path parameter.
      * By default, the response status code is 301.
      *
-     * If the route empty, the status code will be 410.
+     * If the route is empty, the status code will be 410.
      * If the permanent path parameter is set, the status code will be 302.
      *
      * @param string  $route     The route pattern to redirect to
@@ -56,11 +56,11 @@ class RedirectController extends ContainerAware
      * If the path is empty, the status code will be 410.
      * If the permanent flag is set, the status code will be 302.
      *
-     * @param string  $path      The path to redirect to
-     * @param Boolean $permanent Whether the redirect is permanent or not
-     * @param Boolean $scheme    The URL scheme (null to keep the current one)
-     * @param integer $httpPort  The HTTP port
-     * @param integer $httpsPort The HTTPS port
+     * @param string       $path      The path to redirect to
+     * @param Boolean      $permanent Whether the redirect is permanent or not
+     * @param string|null  $scheme    The URL scheme (null to keep the current one)
+     * @param integer|null $httpPort  The HTTP port (null to keep the current one for the same scheme or the configured port in the container)
+     * @param integer|null $httpsPort The HTTPS port (null to keep the current one for the same scheme or the configured port in the container)
      *
      * @return Response A Response instance
      */
@@ -89,27 +89,25 @@ class RedirectController extends ContainerAware
 
         $port = '';
         if ('http' === $scheme) {
-            if ($httpPort == null) {
+            if (null === $httpPort) {
                 if ('http' === $request->getScheme()) {
                     $httpPort = $request->getPort();
-                } else {
+                } elseif ($this->container->hasParameter('request_listener.http_port')) {
                     $httpPort = $this->container->getParameter('request_listener.http_port');
                 }
             }
-
-            if ($httpPort != null && $httpPort != 80) {
+            if (null !== $httpPort && 80 != $httpPort) {
                 $port = ":$httpPort";
             }
         } elseif ('https' === $scheme) {
-            if ($httpsPort == null) {
+            if (null === $httpsPort) {
                 if ('https' === $request->getScheme()) {
                     $httpsPort = $request->getPort();
-                } else {
+                } elseif ($this->container->hasParameter('request_listener.https_port')) {
                     $httpsPort = $this->container->getParameter('request_listener.https_port');
-                }
+                };
             }
-
-            if ($httpsPort != null && $httpsPort != 443) {
+            if (null !== $httpsPort && 443 != $httpsPort) {
                 $port = ":$httpsPort";
             }
         }

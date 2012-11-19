@@ -25,12 +25,14 @@ class PropelDataCollector extends DataCollector
 {
     /**
      * Propel logger
+     *
      * @var \Symfony\Bridge\Propel1\Logger\PropelLogger
      */
     private $logger;
 
     /**
      * Propel configuration
+     *
      * @var \PropelConfiguration
      */
     protected $propelConfiguration;

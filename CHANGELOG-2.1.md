@@ -7,6 +7,7 @@ in 2.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.1.0...v2.1.1
 
+* Travis build test, the only change in the code is this line in the changelog
 * 2.1.3 (2012-10-30)
 
  * 6f15c47: [ClassLoader] fixed unbracketed namespaces (closes #5747)

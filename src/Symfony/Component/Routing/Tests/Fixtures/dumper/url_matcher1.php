@@ -71,6 +71,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 if ($pathinfo === '/test/baz3/') {
                     return array('_route' => 'baz3');
                 }
+
             }
 
             // baz4

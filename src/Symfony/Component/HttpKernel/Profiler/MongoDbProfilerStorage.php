@@ -32,14 +32,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Finds profiler tokens for the given criteria.
-     *
-     * @param string $ip     The IP
-     * @param string $url    The URL
-     * @param string $limit  The maximum number of tokens to return
-     * @param string $method The request method
-     *
-     * @return array An array of tokens
+     * {@inheritdoc}
      */
     public function find($ip, $url, $limit, $method)
     {
@@ -54,7 +47,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Purges all data from the database.
+     * {@inheritdoc}
      */
     public function purge()
     {
@@ -62,13 +55,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Reads data associated with the given token.
-     *
-     * The method returns false if the token does not exists in the storage.
-     *
-     * @param string $token A token
-     *
-     * @return Profile The profile associated with token
+     * {@inheritdoc}
      */
     public function read($token)
     {
@@ -82,11 +69,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Saves a Profile.
-     *
-     * @param Profile $profile A Profile instance
-     *
-     * @return Boolean Write operation successful
+     * {@inheritdoc}
      */
     public function write(Profile $profile)
     {
@@ -128,6 +111,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * @param array $data
+     * 
      * @return Profile
      */
     protected function createProfileFromData(array $data)
@@ -148,7 +132,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * @param string $token
-     * @return array
+     * 
+     * @return Profile[] An array of Profile instances
      */
     protected function readChildren($token)
     {
@@ -171,6 +156,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * @param string $ip
      * @param string $url
      * @param string $method
+     * 
      * @return array
      */
     private function buildQuery($ip, $url, $method)
@@ -194,6 +180,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * @param array $data
+     * 
      * @return array
      */
     private function getData(array $data)
@@ -211,6 +198,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * @param array $data
+     * 
      * @return Profile
      */
     private function getProfile(array $data)

@@ -18,7 +18,8 @@ class XmlFileLoader extends FileLoader
 {
     /**
      * An array of SimpleXMLElement instances.
-     * @val array
+     *
+     * @var \SimpleXMLElement[]
      */
     protected $classes = null;
 

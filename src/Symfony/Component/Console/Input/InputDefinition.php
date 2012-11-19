@@ -72,7 +72,7 @@ class InputDefinition
     /**
      * Sets the InputArgument objects.
      *
-     * @param array $arguments An array of InputArgument objects
+     * @param InputArgument[] $arguments An array of InputArgument objects
      *
      * @api
      */
@@ -178,7 +178,7 @@ class InputDefinition
     /**
      * Gets the array of InputArgument objects.
      *
-     * @return array An array of InputArgument objects
+     * @return InputArgument[] An array of InputArgument objects
      *
      * @api
      */
@@ -225,7 +225,7 @@ class InputDefinition
     /**
      * Sets the InputOption objects.
      *
-     * @param array $options An array of InputOption objects
+     * @param InputOption[] $options An array of InputOption objects
      *
      * @api
      */
@@ -310,7 +310,7 @@ class InputDefinition
     /**
      * Gets the array of InputOption objects.
      *
-     * @return array An array of InputOption objects
+     * @return InputOption[] An array of InputOption objects
      *
      * @api
      */

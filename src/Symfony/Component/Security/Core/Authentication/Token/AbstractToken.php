@@ -33,7 +33,7 @@ abstract class AbstractToken implements TokenInterface
     /**
      * Constructor.
      *
-     * @param Role[] $roles An array of roles
+     * @param RoleInterface[] $roles An array of roles
      */
     public function __construct(array $roles = array())
     {

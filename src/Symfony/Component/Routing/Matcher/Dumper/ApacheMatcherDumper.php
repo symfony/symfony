@@ -55,7 +55,7 @@ class ApacheMatcherDumper extends MatcherDumper
             if (strlen($regex) < 2 || 0 === $regexPatternEnd) {
                 throw new \LogicException('The "%s" route regex "%s" is invalid', $name, $regex);
             }
-            $regex = preg_replace('/\?<.+?>/', '', substr($regex, 1, $regexPatternEnd - 1));
+            $regex = preg_replace('/\?P<.+?>/', '', substr($regex, 1, $regexPatternEnd - 1));
             $regex = '^'.self::escape(preg_quote($options['base_uri']).substr($regex, 1), ' ', '\\');
 
             $methods = array();

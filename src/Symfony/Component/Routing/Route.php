@@ -149,6 +149,7 @@ class Route implements \Serializable
     public function setHostnamePattern($pattern)
     {
         $this->hostnamePattern = (string) $pattern;
+        $this->compiled = null;
 
         return $this;
     }

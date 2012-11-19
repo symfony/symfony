@@ -64,7 +64,7 @@ class RedirectController extends ContainerAware
      *
      * @return Response A Response instance
      */
-    public function urlRedirectAction($path, $permanent = false, $scheme = null, $httpPort = 80, $httpsPort = 443)
+    public function urlRedirectAction($path, $permanent = false, $scheme = null, $httpPort = null, $httpsPort = null)
     {
         if (!$path) {
             return new Response(null, 410);
@@ -88,10 +88,28 @@ class RedirectController extends ContainerAware
         }
 
         $port = '';
-        if ('http' === $scheme && 80 != $httpPort) {
-            $port = ':'.$httpPort;
-        } elseif ('https' === $scheme && 443 != $httpsPort) {
-            $port = ':'.$httpsPort;
+        if ('http' === $scheme) {
+            if ($httpPort == null) {
+                if ('http' === $request->getScheme()) {
+                    $httpPort = $request->getPort();
+                } else {
+                    $httpPort = $this->container->getParameter('request_listener.http_port');
+                }
+            }
+            if ($httpPort != null && $httpPort != 80) {
+                $port = ":$httpPort";
+            }
+        } else if ('https' === $scheme) {
+            if ($httpsPort == null) {
+                if ('https' === $request->getScheme()) {
+                    $httpsPort = $request->getPort();
+                } else {
+                    $httpsPort = $this->container->getParameter('request_listener.https_port');
+                }
+            }
+            if ($httpsPort != null && $httpsPort != 443) {
+                $port = ":$httpsPort";
+            }
         }
 
         $url = $scheme.'://'.$request->getHost().$port.$request->getBaseUrl().$path.$qs;

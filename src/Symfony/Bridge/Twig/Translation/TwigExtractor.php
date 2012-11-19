@@ -39,6 +39,7 @@ class TwigExtractor implements ExtractorInterface
 
     /**
      * The twig environment.
+     *
      * @var \Twig_Environment
      */
     private $twig;

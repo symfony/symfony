@@ -81,9 +81,9 @@ EOF
 
         $output->writeln($this->getHelper('formatter')->formatSection('router', 'Current routes'));
 
-        $maxName = strlen('name');
-        $maxMethod = strlen('method');
-        $maxHostname = strlen('hostname');
+        $maxName     = 4; // strlen 'name'
+        $maxMethod   = 6; // strlen 'method'
+        $maxHostname = 8; // strlen 'hostname'
 
         foreach ($routes as $name => $route) {
             $requirements = $route->getRequirements();

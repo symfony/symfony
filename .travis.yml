@@ -9,5 +9,3 @@ before_script:
     - COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install
     - php src/Symfony/Component/Locale/Resources/data/build-data.php
     - export USE_INTL_ICU_DATA_VERSION=1
-
-script: phpunit -dzend.enable_gc=0

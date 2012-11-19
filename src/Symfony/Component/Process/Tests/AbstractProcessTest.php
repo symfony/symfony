@@ -79,8 +79,8 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     public function chainedCommandsOutputProvider()
     {
         return array(
-            array('11', ';', '1'),
-            array('22', '&&', '2'),
+            array("1\n1\n", ';', '1'),
+            array("2\n2\n", '&&', '2'),
         );
     }
 
@@ -94,7 +94,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Does it work on windows ?');
         }
 
-        $process = $this->getProcess(sprintf('echo -n %s %s echo -n %s', $input, $operator, $input));
+        $process = $this->getProcess(sprintf('echo %s %s echo %s', $input, $operator, $input));
         $process->run();
         $this->assertEquals($expected, $process->getOutput());
     }

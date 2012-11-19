@@ -23,12 +23,12 @@ class Route implements \Serializable
     /**
      * @var string
      */
-    private $pattern;
+    private $pattern = '/';
 
     /**
      * @var string
      */
-    private $hostnamePattern;
+    private $hostnamePattern = '';
 
    /**
      * @var array

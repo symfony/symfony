@@ -464,6 +464,18 @@ class SecurityExtension extends Extension
             );
         }
 
+        // bcrypt encoder
+        if ('bcrypt' === $config['algorithm']) {
+            $arguments = array(
+                $config['cost'],
+            );
+
+            return array(
+                'class' => new Parameter('security.encoder.bcrypt.class'),
+                'arguments' => $arguments,
+            );
+        }
+
         // message digest encoder
         $arguments = array(
             $config['algorithm'],

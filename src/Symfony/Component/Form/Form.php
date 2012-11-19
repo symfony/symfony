@@ -70,13 +70,13 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * The children of this form
-     * @var array An array of FormInterface instances
+     * @var FormInterface[] An array of FormInterface instances
      */
     private $children = array();
 
     /**
      * The errors of this form
-     * @var array An array of FormError instances
+     * @var FormError[] An array of FormError instances
      */
     private $errors = array();
 
@@ -203,7 +203,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the types used by this form.
      *
-     * @return array An array of FormTypeInterface
+     * @return FormTypeInterface[] An array of FormTypeInterface
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link getConfig()} and {@link FormConfigInterface::getType()} instead.
@@ -761,9 +761,9 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the DataTransformers.
+     * Returns the model transformers of the form.
      *
-     * @return array An array of DataTransformerInterface
+     * @return DataTransformerInterface[] An array of DataTransformerInterface
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link getConfig()} and {@link FormConfigInterface::getModelTransformers()} instead.
@@ -774,9 +774,9 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Returns the DataTransformers.
+     * Returns the view transformers of the form.
      *
-     * @return array An array of DataTransformerInterface
+     * @return DataTransformerInterface[] An array of DataTransformerInterface
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link getConfig()} and {@link FormConfigInterface::getViewTransformers()} instead.

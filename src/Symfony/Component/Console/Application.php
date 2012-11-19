@@ -619,7 +619,7 @@ class Application
      *
      * @param string $namespace A namespace name
      *
-     * @return array An array of Command instances
+     * @return Command[] An array of Command instances
      *
      * @api
      */
@@ -933,7 +933,7 @@ class Application
     /**
      * Gets the default commands that should always be available.
      *
-     * @return array An array of default Command instances
+     * @return Command[] An array of default Command instances
      */
     protected function getDefaultCommands()
     {

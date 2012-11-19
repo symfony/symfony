@@ -210,7 +210,7 @@ class ClassCollectionLoader
      *
      * @param array $classes
      *
-     * @return array An array of sorted \ReflectionClass instances (dependencies added if needed)
+     * @return \ReflectionClass[] An array of sorted \ReflectionClass instances (dependencies added if needed)
      *
      * @throws \InvalidArgumentException When a class can't be loaded
      */

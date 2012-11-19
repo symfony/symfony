@@ -216,7 +216,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
      * @param string $token  The parent token
      * @param string $parent The parent instance
      *
-     * @return array An array of Profile instance
+     * @return Profile[] An array of Profile instance
      */
     protected function readChildren($token, $parent)
     {

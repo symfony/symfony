@@ -158,7 +158,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Sets the closures used for normalization.
      *
-     * @param array $closures An array of Closures used for normalization
+     * @param \Closure[] $closures An array of Closures used for normalization
      */
     public function setNormalizationClosures(array $closures)
     {
@@ -168,7 +168,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Sets the closures used for final validation.
      *
-     * @param array $closures An array of Closures used for final validation
+     * @param \Closure[] $closures An array of Closures used for final validation
      */
     public function setFinalValidationClosures(array $closures)
     {

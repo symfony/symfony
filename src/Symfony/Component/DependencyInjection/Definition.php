@@ -373,7 +373,7 @@ class Definition
     /**
      * Gets the methods to call after service initialization.
      *
-     * @return  array An array of method calls
+     * @return array An array of method calls
      *
      * @api
      */

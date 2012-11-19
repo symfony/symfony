@@ -806,10 +806,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($callable = $definition->getConfigurator()) {
-            if (is_array($callable) && is_object($callable[0]) && $callable[0] instanceof Reference) {
-                $callable[0] = $this->get((string) $callable[0]);
-            } elseif (is_array($callable)) {
-                $callable[0] = $parameterBag->resolveValue($callable[0]);
+            if (is_array($callable)) {
+                $callable[0] = $callable[0] instanceof Reference ? $this->get((string) $callable[0]) : $parameterBag->resolveValue($callable[0]);
             }
 
             if (!is_callable($callable)) {
@@ -835,9 +833,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             foreach ($value as &$v) {
                 $v = $this->resolveServices($v);
             }
-        } elseif (is_object($value) && $value instanceof Reference) {
+        } elseif ($value instanceof Reference) {
             $value = $this->get((string) $value, $value->getInvalidBehavior());
-        } elseif (is_object($value) && $value instanceof Definition) {
+        } elseif ($value instanceof Definition) {
             $value = $this->createService($value, null);
         }
 
@@ -895,7 +893,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             foreach ($value as $v) {
                 $services = array_unique(array_merge($services, self::getServiceConditionals($v)));
             }
-        } elseif (is_object($value) && $value instanceof Reference && $value->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
+        } elseif ($value instanceof Reference && $value->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
             $services[] = (string) $value;
         }
 

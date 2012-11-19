@@ -23,7 +23,8 @@ class FormRegistry implements FormRegistryInterface
 {
     /**
      * Extensions
-     * @var array An array of FormExtensionInterface
+     *
+     * @var FormExtensionInterface[] An array of FormExtensionInterface
      */
     private $extensions = array();
 
@@ -45,7 +46,7 @@ class FormRegistry implements FormRegistryInterface
     /**
      * Constructor.
      *
-     * @param array                            $extensions          An array of FormExtensionInterface
+     * @param FormExtensionInterface[]         $extensions          An array of FormExtensionInterface
      * @param ResolvedFormTypeFactoryInterface $resolvedTypeFactory The factory for resolved form types.
      *
      * @throws UnexpectedTypeException if any extension does not implement FormExtensionInterface

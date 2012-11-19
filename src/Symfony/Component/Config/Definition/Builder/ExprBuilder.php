@@ -210,7 +210,7 @@ class ExprBuilder
     /**
      * Builds the expressions.
      *
-     * @param array $expressions An array of ExprBuilder instances to build
+     * @param ExprBuilder[] $expressions An array of ExprBuilder instances to build
      *
      * @return array
      */

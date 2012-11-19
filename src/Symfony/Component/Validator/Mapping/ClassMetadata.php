@@ -23,13 +23,44 @@ use Symfony\Component\Validator\Exception\GroupDefinitionException;
  */
 class ClassMetadata extends ElementMetadata
 {
+    /**
+     * @var string
+     */
     public $name;
+
+    /**
+     * @var string
+     */
     public $defaultGroup;
+
+    /**
+     * @var MemberMetadata[]
+     */
     public $members = array();
+
+    /**
+     * @var PropertyMetadata[]
+     */
     public $properties = array();
+
+    /**
+     * @var GetterMetadata[]
+     */
     public $getters = array();
+
+    /**
+     * @var array
+     */
     public $groupSequence = array();
+
+    /**
+     * @var Boolean
+     */
     public $groupSequenceProvider = false;
+
+    /**
+     * @var \ReflectionClass
+     */
     private $reflClass;
 
     /**
@@ -119,7 +150,7 @@ class ClassMetadata extends ElementMetadata
      * @param string     $property   The name of the property
      * @param Constraint $constraint The constraint
      *
-     * @return ClassMetadata           This object
+     * @return ClassMetadata This object
      */
     public function addPropertyConstraint($property, Constraint $constraint)
     {
@@ -197,7 +228,7 @@ class ClassMetadata extends ElementMetadata
     }
 
     /**
-     * Adds a member metadata
+     * Adds a member metadata.
      *
      * @param MemberMetadata $metadata
      */
@@ -221,11 +252,11 @@ class ClassMetadata extends ElementMetadata
     }
 
     /**
-     * Returns all metadatas of members describing the given property
+     * Returns all metadatas of members describing the given property.
      *
      * @param string $property The name of the property
      *
-     * @return array An array of MemberMetadata
+     * @return MemberMetadata[] An array of MemberMetadata
      */
     public function getMemberMetadatas($property)
     {
@@ -289,7 +320,7 @@ class ClassMetadata extends ElementMetadata
     /**
      * Returns a ReflectionClass instance for this class.
      *
-     * @return ReflectionClass
+     * @return \ReflectionClass
      */
     public function getReflectionClass()
     {
@@ -301,9 +332,9 @@ class ClassMetadata extends ElementMetadata
     }
 
     /**
-     * Sets whether a group sequence provider should be used
+     * Sets whether a group sequence provider should be used.
      *
-     * @param boolean $active
+     * @param Boolean $active
      */
     public function setGroupSequenceProvider($active)
     {
@@ -321,7 +352,7 @@ class ClassMetadata extends ElementMetadata
     /**
      * Returns whether the class is a group sequence provider.
      *
-     * @return boolean
+     * @return Boolean
      */
     public function isGroupSequenceProvider()
     {

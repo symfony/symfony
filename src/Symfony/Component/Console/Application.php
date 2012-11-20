@@ -762,7 +762,7 @@ class Application
     /**
      * Renders a caught exception.
      *
-     * @param Exception       $e      An exception instance
+     * @param \Exception      $e      An exception instance
      * @param OutputInterface $output An OutputInterface instance
      */
     public function renderException($e, $output)
@@ -784,10 +784,12 @@ class Application
             $len = $strlen($title);
             $width = $this->getTerminalWidth() ? $this->getTerminalWidth() - 1 : PHP_INT_MAX;
             $lines = array();
-            foreach (preg_split("{\r?\n}", $e->getMessage()) as $line) {
-                foreach (str_split($line, $width - 4) as $line) {
-                    $lines[] = sprintf('  %s  ', $line);
-                    $len = max($strlen($line) + 4, $len);
+            $splitLines = preg_split("{\r?\n}", $e->getMessage());
+            foreach ($splitLines as $line) {
+                $line = str_split($line, $width - 4);
+                foreach ($line as $splitLine) {
+                    $lines[] = sprintf('  %s  ', $splitLine);
+                    $len = max($strlen($splitLine) + 4, $len);
                 }
             }
 

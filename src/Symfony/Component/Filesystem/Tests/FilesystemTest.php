@@ -835,7 +835,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->mirror($sourcePath, $targetPath);
 
         $this->assertTrue(is_dir($targetPath));
-        $this->assertFileEquals($sourcePath.'/nested/file1', $targetPath.DIRECTORY_SEPARATOR.'link1/file1.txt');
+        $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.DIRECTORY_SEPARATOR.'link1/file1.txt');
         $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
     }
 

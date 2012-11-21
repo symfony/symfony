@@ -38,7 +38,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XliffFileLoader();
         $catalogue = $loader->load(__DIR__.'/../fixtures/resources.xlf', 'en', 'domain1');
 
-        $this->assertEquals(array('foo' => 'bar', 'key' => ''), $catalogue->all('domain1'));
+        $this->assertEquals(array('foo' => 'bar', 'key' => '', 'test' => 'with'), $catalogue->all('domain1'));
         $this->assertFalse($catalogue->has('extra', 'domain1'));
     }
 

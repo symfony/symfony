@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
@@ -231,12 +232,65 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher->removeListener('onEvent', array($container->get('service.listener'), 'onEvent'));
         $this->assertFalse($dispatcher->hasListeners('onEvent'));
     }
+
+    public function testOutOfOrderInitialization()
+    {
+        $event = new Event();
+
+        $common = new \stdClass();
+        $common->common = 1;
+
+        $container = new ContainerBuilder();
+        $container
+            ->register('producer.listener', 'Symfony\Component\EventDispatcher\Tests\ProducerService')
+            ->addArgument($common);
+        $container
+            ->register('consumer.listener', 'Symfony\Component\EventDispatcher\Tests\ConsumerService')
+            ->addArgument($common);
+
+        $dispatcher = new ContainerAwareEventDispatcher($container);
+        $dispatcher->addListenerService('onEvent', array('consumer.listener', 'onEvent'));
+        $dispatcher->addListenerService('onEvent', array('producer.listener', 'onEvent'), 100);
+
+        $dispatcher->dispatch('onEvent', $event);
+
+        $this->assertEquals($common->common, $container->get('consumer.listener')->common);
+    }
 }
 
 class Service
 {
     public function onEvent(Event $e)
     {
+    }
+}
+
+class ConsumerService
+{
+    public $common;
+
+    public function __construct($service)
+    {
+        $this->common = $service->common;
+    }
+
+    public function onEvent(Event $e)
+    {
+    }
+}
+
+class ProducerService
+{
+    public $service;
+
+    public function __construct($service)
+    {
+        $this->service = $service;
+    }
+
+    public function onEvent(Event $e)
+    {
+        $this->service->common = 2;
     }
 }
 

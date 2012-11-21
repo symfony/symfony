@@ -4,10 +4,10 @@ CHANGELOG
 2.2.0
 -----
 
- * [BC BREAK] TimeDataCollector::getTotalTime() has been renamed to
+ * [BC BREAK] renamed TimeDataCollector::getTotalTime() to
    TimeDataCollector::getDuration()
- * the memory usage reported by the MemoryDataCollector now takes the memory used
-   in the kernel.terminate event listeners into account
+ * updated the MemoryDataCollector to include the memory used in the 
+   kernel.terminate event listeners
  * moved the Stopwatch classes to a new component
  * added TraceableControllerResolver
  * added TraceableEventDispatcher (removed ContainerAwareTraceableEventDispatcher)

@@ -316,7 +316,7 @@ class OptionsResolver implements OptionsResolverInterface
             ksort($this->mutuallyExclusive);
 
             throw new InvalidOptionsException(sprintf(
-                'The options "%s" are mutually exclusive and  cannot be used at the same time. You must declare only one of them.',
+                'The options "%s" are mutually exclusive and cannot be used at the same time. You must declare only one of them.',
                 implode('", "', array_keys($this->mutuallyExclusive))
             ));
         }

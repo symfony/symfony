@@ -7,6 +7,8 @@ Options:
   --help           -h Display this help message.
   --quiet          -q Do not output any message.
   --verbose        -v Increase verbosity of messages.
+  --verbose-very   -vv Increase verbosity of messages to display even more verbose messages.
+  --verbose-debug  -vvv Increase verbosity of messages to debug level.
   --version        -V Display this application version.
   --ansi              Force ANSI output.
   --no-ansi           Disable ANSI output.

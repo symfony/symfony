@@ -25,11 +25,28 @@ class TemplateController extends ContainerAware
      * Renders a template.
      *
      * @param string $template The template name
+     * @param int|null $maxAge Max age for client caching
+     * @param int|null $sharedAge Max age for shared (proxy) caching
+     * @param Boolean|null $private Whether or not caching should apply for client caches only
      *
      * @return Response A Response instance
      */
-    public function templateAction($template)
+    public function templateAction($template, $maxAge = null, $sharedAge = null, $private = null)
     {
-        return $this->container->get('templating')->renderResponse($template);
+        /** @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $this->container->get('templating')->renderResponse($template);
+        if ($maxAge) {
+            $response->setMaxAge($maxAge);
+        }
+        if ($sharedAge) {
+            $response->setSharedMaxAge($sharedAge);
+        }
+
+        if ($private) {
+            $response->setPrivate();
+        } else if ($private === false  || (is_null($private) && ($maxAge || $sharedAge))) {
+            $response->setPublic($private);
+        }
+        return $response;
     }
 }

@@ -11,15 +11,17 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 
 /**
- * Implementation of ClassMetadataFactoryInterface
+ * A factory for creating metadata for PHP classes.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ClassMetadataFactory implements ClassMetadataFactoryInterface
+class ClassMetadataFactory implements ClassMetadataFactoryInterface, MetadataFactoryInterface
 {
     /**
      * The loader for loading the class metadata
@@ -41,9 +43,16 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         $this->cache = $cache;
     }
 
-    public function getClassMetadata($class)
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadataFor($value)
     {
-        $class = ltrim($class, '\\');
+        if (!is_object($value) && !is_string($value)) {
+            throw new NoSuchMetadataException('Cannot create metadata for non-objects. Got: ' . gettype($value));
+        }
+
+        $class = ltrim(is_object($value) ? get_class($value) : $value, '\\');
 
         if (isset($this->loadedClasses[$class])) {
             return $this->loadedClasses[$class];
@@ -51,6 +60,10 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
 
         if (null !== $this->cache && false !== ($this->loadedClasses[$class] = $this->cache->read($class))) {
             return $this->loadedClasses[$class];
+        }
+
+        if (!class_exists($class) && !interface_exists($class)) {
+            throw new NoSuchMetadataException('The class or interface "' . $class . '" does not exist.');
         }
 
         $metadata = new ClassMetadata($class);
@@ -77,5 +90,34 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         }
 
         return $this->loadedClasses[$class] = $metadata;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasMetadataFor($value)
+    {
+        if (!is_object($value) && !is_string($value)) {
+            return false;
+        }
+
+        $class = ltrim(is_object($value) ? get_class($value) : $value, '\\');
+
+        if (class_exists($class) || interface_exists($class)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
+     *             {@link getMetadataFor} instead.
+     */
+    public function getClassMetadata($class)
+    {
+        return $this->getMetadataFor($class);
     }
 }

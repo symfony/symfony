@@ -6,6 +6,27 @@ CHANGELOG
 
  * added a CardScheme validator
  * added a Luhn validator
+ * moved @api-tags from `Validator` to `ValidatorInterface`
+ * moved @api-tags from `ConstraintViolation` to the new `ConstraintViolationInterface`
+ * moved @api-tags from `ConstraintViolationList` to the new `ConstraintViolationListInterface`
+ * moved @api-tags from `ExecutionContext` to the new `ExecutionContextInterface`
+ * [BC BREAK] `ConstraintValidatorInterface::initialize` is now type hinted against `ExecutionContextInterface` instead of `ExecutionContext`
+ * [BC BREAK] changed the visibility of the properties in `Validator` from protected to private
+ * deprecated `ClassMetadataFactoryInterface` in favor of the new `MetadataFactoryInterface`
+ * deprecated `ClassMetadataFactory::getClassMetadata` in favor of `getMetadataFor`
+ * created `MetadataInterface`, `PropertyMetadataInterface`, `ClassBasedInterface` and `PropertyMetadataContainerInterface`
+ * deprecated `GraphWalker` in favor of the new `ValidationVisitorInterface`
+ * deprecated `ExecutionContext::addViolationAtPath`
+ * deprecated `ExecutionContext::addViolationAtSubPath` in favor of `ExecutionContextInterface::addViolationAt`
+ * deprecated `ExecutionContext::getCurrentClass` in favor of `ExecutionContextInterface::getClassName`
+ * deprecated `ExecutionContext::getCurrentProperty` in favor of `ExecutionContextInterface::getPropertyName`
+ * deprecated `ExecutionContext::getCurrentValue` in favor of `ExecutionContextInterface::getValue`
+ * deprecated `ExecutionContext::getGraphWalker` in favor of `ExecutionContextInterface::validate` and `ExecutionContextInterface::validateValue`
+ * deprecated `ExecutionContext::getMetadataFactory` in favor of `ExecutionContextInterface::getMetadataFor`
+ * improved `ValidatorInterface::validateValue` to accept arrays of constraints
+ * changed `ValidatorInterface::getMetadataFactory` to return a `MetadataFactoryInterface` instead of a `ClassMetadataFactoryInterface`
+ * removed `ClassMetadataFactoryInterface` type hint from `ValidatorBuilderInterface::setMetadataFactory`.
+   As of Symfony 2.3, this method will be typed against `MetadataFactoryInterface` instead.
 
 2.1.0
 -----

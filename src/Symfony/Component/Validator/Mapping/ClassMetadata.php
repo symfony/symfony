@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+use Symfony\Component\Validator\ValidationVisitorInterface;
+use Symfony\Component\Validator\PropertyMetadataContainerInterface;
+use Symfony\Component\Validator\ClassBasedInterface;
+use Symfony\Component\Validator\MetadataInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
@@ -21,7 +25,7 @@ use Symfony\Component\Validator\Exception\GroupDefinitionException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ClassMetadata extends ElementMetadata
+class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassBasedInterface, PropertyMetadataContainerInterface
 {
     public $name;
     public $defaultGroup;
@@ -45,6 +49,40 @@ class ClassMetadata extends ElementMetadata
             $this->defaultGroup = substr($class, $nsSep + 1);
         } else {
             $this->defaultGroup = $class;
+        }
+    }
+    
+    public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
+    {
+        if (null === $propagatedGroup && Constraint::DEFAULT_GROUP === $group
+                && ($this->hasGroupSequence() || $this->isGroupSequenceProvider())) {
+            if ($this->hasGroupSequence()) {
+                $groups = $this->getGroupSequence();
+            } else {
+                $groups = $value->getGroupSequence();
+            }
+
+            foreach ($groups as $group) {
+                $this->accept($visitor, $value, $group, $propertyPath, Constraint::DEFAULT_GROUP);
+
+                if (count($visitor->getViolations()) > 0) {
+                    break;
+                }
+            }
+
+            return;
+        }
+
+        $visitor->visit($this, $value, $group, $propertyPath);
+
+        if (null !== $value) {
+            $pathPrefix = empty($propertyPath) ? '' : $propertyPath.'.';
+
+            foreach ($this->getConstrainedProperties() as $property) {
+                foreach ($this->getMemberMetadatas($property) as $member) {
+                    $member->accept($visitor, $member->getValue($value), $group, $pathPrefix.$property, $propagatedGroup);
+                }
+            }
         }
     }
 
@@ -225,9 +263,17 @@ class ClassMetadata extends ElementMetadata
      *
      * @param string $property The name of the property
      *
-     * @return array An array of MemberMetadata
+     * @return MemberMetadata[] An array of MemberMetadata
      */
     public function getMemberMetadatas($property)
+    {
+        return $this->members[$property];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPropertyMetadata($property)
     {
         return $this->members[$property];
     }

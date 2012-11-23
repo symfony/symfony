@@ -43,7 +43,7 @@ class UrlMatcher implements UrlMatcherInterface
     /**
      * @var RouteCollection
      */
-    private $routes;
+    protected $routes;
 
     /**
      * Constructor.

@@ -49,12 +49,17 @@ class TemplateController extends ContainerAware
     {
         /** @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $this->container->get('templating')->renderResponse($template);
-        $response->setMaxAge($maxAge ? : self::MAX_AGE);
-        $response->setSharedMaxAge($sharedAge ? : self::SHARED_AGE);
+        if ($maxAge) {
+            $response->setMaxAge($maxAge);
+        }
+        if ($sharedAge) {
+            $response->setSharedMaxAge($sharedAge ? : self::SHARED_AGE);
+        }
+
         if ($private) {
             $response->setPrivate();
-        } else {
-            $response->setPublic();
+        } else if ($private === false  || (is_null($private) && ($maxAge || $sharedAge))) {
+            $response->setPublic($private);
         }
         return $response;
     }

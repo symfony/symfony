@@ -157,8 +157,24 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
-            return $this->mergeDefaults(array_replace($matches, $hostnameMatches, array('_route' => $name)), $route->getDefaults());
+            return $this->getAttributes($route, $matches, $hostnameMatches);
         }
+    }
+
+    /**
+     * Returns an array of values to use as request attributes
+     *
+     * @param Route $route The route we are matching against
+     * @param array        (optional) A variable number of array arguments to be merged into parameters
+     *
+     * @return array An array of parameters
+     */
+    protected function getAttributes(Route $route)
+    {
+        $args = func_get_args();
+        array_shift($args);
+        $args[] = array('_route' => $name);
+        return $this->mergeDefaults(call_user_func_array('array_replace', $args), $route->getDefaults());
     }
 
     /**

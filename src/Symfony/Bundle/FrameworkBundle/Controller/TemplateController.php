@@ -22,20 +22,6 @@ use Symfony\Component\HttpFoundation\Response;
 class TemplateController extends ContainerAware
 {
     /**
-     * Default max age time in seconds for client (browser) caching
-     *
-     * @var int
-     */
-    const MAX_AGE = 86400;
-
-    /**
-     * Default max age time in seconds for shared (proxy) caching
-     *
-     * @var int
-     */
-    const SHARED_AGE = 86400;
-
-    /**
      * Renders a template.
      *
      * @param string $template The template name
@@ -53,7 +39,7 @@ class TemplateController extends ContainerAware
             $response->setMaxAge($maxAge);
         }
         if ($sharedAge) {
-            $response->setSharedMaxAge($sharedAge ? : self::SHARED_AGE);
+            $response->setSharedMaxAge($sharedAge);
         }
 
         if ($private) {

@@ -92,7 +92,10 @@ class FormFactory implements FormFactoryInterface
      */
     public function createBuilderForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null)
     {
-        $guesser = $this->registry->getTypeGuesser();
+        if (null === $guesser = $this->registry->getTypeGuesser()) {
+            return $this->createNamedBuilder($property, 'text', $data, $options, $parent);
+        }
+
         $typeGuess = $guesser->guessType($class, $property);
         $maxLengthGuess = $guesser->guessMaxLength($class, $property);
         // Keep $minLengthGuess for BC until Symfony 2.3

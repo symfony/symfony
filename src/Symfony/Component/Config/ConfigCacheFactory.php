@@ -18,7 +18,6 @@ namespace Symfony\Component\Config;
  */
 class ConfigCacheFactory implements ConfigCacheFactoryInterface
 {
-
     protected $debug;
 
     /**

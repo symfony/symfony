@@ -15,6 +15,7 @@ use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
+use Symfony\Component\Config\ConfigCacheFactory;
 
 /**
  * Translator.
@@ -81,7 +82,7 @@ class Translator extends BaseTranslator
     private function getConfigCacheFactory()
     {
         if (!$this->configCacheFactory) {
-            $this->configCacheFactory = new \Symfony\Component\Config\ConfigCacheFactory($this->options['debug']);
+            $this->configCacheFactory = new ConfigCacheFactory($this->options['debug']);
         }
 
         return $this->configCacheFactory;

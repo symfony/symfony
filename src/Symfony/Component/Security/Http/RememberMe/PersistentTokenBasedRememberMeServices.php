@@ -63,10 +63,12 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
     /**
      * {@inheritDoc}
      */
-    public function logout(Request $request, Response $response, TokenInterface $token)
+    protected function cancelCookie(Request $request)
     {
-        parent::logout($request, $response, $token);
+        // Delete cookie on the client
+        parent::cancelCookie($request);
 
+        // Delete cookie from the tokenProvider
         if (null !== ($cookie = $request->cookies->get($this->options['name']))
             && count($parts = $this->decodeCookie($cookie)) === 2
         ) {
@@ -88,8 +90,6 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         $persistentToken = $this->tokenProvider->loadTokenBySeries($series);
 
         if ($persistentToken->getTokenValue() !== $tokenValue) {
-            $this->tokenProvider->deleteTokenBySeries($series);
-
             throw new CookieTheftException('This token was already used. The account is possibly compromised.');
         }
 
@@ -133,6 +133,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
             )
         );
 
+        $request->attributes->remove(self::COOKIE_ATTR_NAME);
         $response->headers->setCookie(
             new Cookie(
                 $this->options['name'],

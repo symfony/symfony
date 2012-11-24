@@ -12,25 +12,21 @@
 namespace Symfony\Component\Validator;
 
 /**
- * A list of ConstrainViolation objects.
+ * Default implementation of {@ConstraintViolationListInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
-class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayAccess
+class ConstraintViolationList implements \IteratorAggregate, ConstraintViolationListInterface
 {
     /**
-     * The constraint violations
-     *
-     * @var array
+     * @var ConstraintViolationInterface[]
      */
-    protected $violations = array();
+    private $violations = array();
 
     /**
      * Creates a new constraint violation list.
      *
-     * @param array $violations The constraint violations to add to the list
+     * @param ConstraintViolationInterface[] $violations The constraint violations to add to the list
      */
     public function __construct(array $violations = array())
     {
@@ -40,7 +36,9 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
     }
 
     /**
-     * @return string
+     * Converts the violation into a string for debugging purposes.
+     *
+     * @return string The violation as string.
      */
     public function __toString()
     {
@@ -54,39 +52,25 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
     }
 
     /**
-     * Add a ConstraintViolation to this list.
-     *
-     * @param ConstraintViolation $violation
-     *
-     * @api
+     * {@inheritDoc}
      */
-    public function add(ConstraintViolation $violation)
+    public function add(ConstraintViolationInterface $violation)
     {
         $this->violations[] = $violation;
     }
 
     /**
-     * Merge an existing ConstraintViolationList into this list.
-     *
-     * @param ConstraintViolationList $otherList
-     *
-     * @api
+     * {@inheritDoc}
      */
-    public function addAll(ConstraintViolationList $otherList)
+    public function addAll(ConstraintViolationListInterface $otherList)
     {
-        foreach ($otherList->violations as $violation) {
+        foreach ($otherList as $violation) {
             $this->violations[] = $violation;
         }
     }
 
     /**
-     * Returns the violation at a given offset.
-     *
-     * @param  integer $offset The offset of the violation.
-     *
-     * @return ConstraintViolation The violation.
-     *
-     * @throws \OutOfBoundsException If the offset does not exist.
+     * {@inheritDoc}
      */
     public function get($offset)
     {
@@ -98,11 +82,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
     }
 
     /**
-     * Returns whether the given offset exists.
-     *
-     * @param  integer $offset The violation offset.
-     *
-     * @return Boolean Whether the offset exists.
+     * {@inheritDoc}
      */
     public function has($offset)
     {
@@ -110,20 +90,15 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
     }
 
     /**
-     * Sets a violation at a given offset.
-     *
-     * @param integer             $offset    The violation offset.
-     * @param ConstraintViolation $violation The violation.
+     * {@inheritDoc}
      */
-    public function set($offset, ConstraintViolation $violation)
+    public function set($offset, ConstraintViolationInterface $violation)
     {
         $this->violations[$offset] = $violation;
     }
 
     /**
-     * Removes a violation at a given offset.
-     *
-     * @param integer $offset The offset to remove.
+     * {@inheritDoc}
      */
     public function remove($offset)
     {
@@ -131,9 +106,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
     }
 
     /**
-     * @see IteratorAggregate
-     *
-     * @api
+     * {@inheritDoc}
      */
     public function getIterator()
     {
@@ -141,9 +114,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
     }
 
     /**
-     * @see Countable
-     *
-     * @api
+     * {@inheritDoc}
      */
     public function count()
     {
@@ -151,9 +122,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
     }
 
     /**
-     * @see ArrayAccess
-     *
-     * @api
+     * {@inheritDoc}
      */
     public function offsetExists($offset)
     {
@@ -161,9 +130,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
     }
 
     /**
-     * @see ArrayAccess
-     *
-     * @api
+     * {@inheritDoc}
      */
     public function offsetGet($offset)
     {
@@ -171,9 +138,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
     }
 
     /**
-     * @see ArrayAccess
-     *
-     * @api
+     * {@inheritDoc}
      */
     public function offsetSet($offset, $violation)
     {
@@ -185,9 +150,7 @@ class ConstraintViolationList implements \IteratorAggregate, \Countable, \ArrayA
     }
 
     /**
-     * @see ArrayAccess
-     *
-     * @api
+     * {@inheritDoc}
      */
     public function offsetUnset($offset)
     {

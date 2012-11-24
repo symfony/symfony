@@ -13,7 +13,7 @@ namespace Symfony\Component\Validator\Tests;
 
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity;
-use Symfony\Component\Validator\Tests\Fixtures\FakeClassMetadataFactory;
+use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
 use Symfony\Component\Validator\Tests\Fixtures\FailingConstraint;
 use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -24,18 +24,25 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class ValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    protected $factory;
-    protected $validator;
+    /**
+     * @var FakeMetadataFactory
+     */
+    private $metadataFactory;
+
+    /**
+     * @var Validator
+     */
+    private $validator;
 
     protected function setUp()
     {
-        $this->factory = new FakeClassMetadataFactory();
-        $this->validator = new Validator($this->factory, new ConstraintValidatorFactory());
+        $this->metadataFactory = new FakeMetadataFactory();
+        $this->validator = new Validator($this->metadataFactory, new ConstraintValidatorFactory());
     }
 
     protected function tearDown()
     {
-        $this->factory = null;
+        $this->metadataFactory = null;
         $this->validator = null;
     }
 
@@ -47,7 +54,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
             'groups' => 'Custom',
         )));
-        $this->factory->addClassMetadata($metadata);
+        $this->metadataFactory->addMetadata($metadata);
 
         // Only the constraint of group "Default" failed
         $violations = new ConstraintViolationList();
@@ -70,7 +77,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
             'groups' => 'Custom',
         )));
-        $this->factory->addClassMetadata($metadata);
+        $this->metadataFactory->addMetadata($metadata);
 
         // Only the constraint of group "Custom" failed
         $violations = new ConstraintViolationList();
@@ -95,7 +102,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $metadata->addPropertyConstraint('lastName', new FailingConstraint(array(
             'groups' => 'Second',
         )));
-        $this->factory->addClassMetadata($metadata);
+        $this->metadataFactory->addMetadata($metadata);
 
         // The constraints of both groups failed
         $violations = new ConstraintViolationList();
@@ -130,7 +137,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
             'groups' => 'Second',
         )));
         $metadata->setGroupSequenceProvider(true);
-        $this->factory->addClassMetadata($metadata);
+        $this->metadataFactory->addMetadata($metadata);
 
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
@@ -168,7 +175,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $entity = new Entity();
         $metadata = new ClassMetadata(get_class($entity));
         $metadata->addPropertyConstraint('firstName', new FailingConstraint());
-        $this->factory->addClassMetadata($metadata);
+        $this->metadataFactory->addMetadata($metadata);
 
         $result = $this->validator->validateProperty($entity, 'firstName');
 
@@ -180,7 +187,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $entity = new Entity();
         $metadata = new ClassMetadata(get_class($entity));
         $metadata->addPropertyConstraint('firstName', new FailingConstraint());
-        $this->factory->addClassMetadata($metadata);
+        $this->metadataFactory->addMetadata($metadata);
 
         $result = $this->validator->validatePropertyValue(get_class($entity), 'firstName', 'Bernhard');
 
@@ -202,21 +209,55 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ValidatorException
+     * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
      */
     public function testValidateValueRejectsValid()
     {
         $entity = new Entity();
         $metadata = new ClassMetadata(get_class($entity));
-        $this->factory->addClassMetadata($metadata);
+        $this->metadataFactory->addMetadata($metadata);
 
         $this->validator->validateValue($entity, new Valid());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
+     */
+    public function testValidatePropertyFailsIfPropertiesNotSupported()
+    {
+        // $metadata does not implement PropertyMetadataContainerInterface
+        $metadata = $this->getMock('Symfony\Component\Validator\MetadataInterface');
+        $this->metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
+        $this->metadataFactory->expects($this->any())
+            ->method('getMetadataFor')
+            ->with('VALUE')
+            ->will($this->returnValue($metadata));
+        $this->validator = new Validator($this->metadataFactory, new ConstraintValidatorFactory());
+
+        $this->validator->validateProperty('VALUE', 'someProperty');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
+     */
+    public function testValidatePropertyValueFailsIfPropertiesNotSupported()
+    {
+        // $metadata does not implement PropertyMetadataContainerInterface
+        $metadata = $this->getMock('Symfony\Component\Validator\MetadataInterface');
+        $this->metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
+        $this->metadataFactory->expects($this->any())
+            ->method('getMetadataFor')
+            ->with('VALUE')
+            ->will($this->returnValue($metadata));
+        $this->validator = new Validator($this->metadataFactory, new ConstraintValidatorFactory());
+
+        $this->validator->validatePropertyValue('VALUE', 'someProperty', 'propertyValue');
     }
 
     public function testGetMetadataFactory()
     {
         $this->assertInstanceOf(
-            'Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface',
+            'Symfony\Component\Validator\MetadataFactoryInterface',
             $this->validator->getMetadataFactory()
         );
     }

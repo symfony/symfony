@@ -102,7 +102,7 @@ class GraphWalker
         $currentClass = $metadata->getClassName();
 
         foreach ($metadata->findConstraints($group) as $constraint) {
-            $this->walkConstraint($constraint, $object, $group, $propertyPath, $currentClass);
+            $this->walkConstraint($constraint, $object, $object, $group, $propertyPath, $currentClass);
         }
 
         if (null !== $object) {
@@ -116,7 +116,7 @@ class GraphWalker
     public function walkProperty(ClassMetadata $metadata, $property, $object, $group, $propertyPath, $propagatedGroup = null)
     {
         foreach ($metadata->getMemberMetadatas($property) as $member) {
-            $this->walkMember($member, $member->getValue($object), $group, $propertyPath, $propagatedGroup);
+            $this->walkMember($member, $member->getValue($object), $group, $propertyPath, $object, $propagatedGroup);
         }
     }
 
@@ -127,13 +127,13 @@ class GraphWalker
         }
     }
 
-    protected function walkMember(MemberMetadata $metadata, $value, $group, $propertyPath, $propagatedGroup = null)
+    protected function walkMember(MemberMetadata $metadata, $value, $group, $propertyPath, $object = null, $propagatedGroup = null)
     {
         $currentClass = $metadata->getClassName();
         $currentProperty = $metadata->getPropertyName();
 
         foreach ($metadata->findConstraints($group) as $constraint) {
-            $this->walkConstraint($constraint, $value, $group, $propertyPath, $currentClass, $currentProperty);
+            $this->walkConstraint($constraint, $object, $value, $group, $propertyPath, $currentClass, $currentProperty);
         }
 
         if ($metadata->isCascaded()) {
@@ -165,12 +165,13 @@ class GraphWalker
         }
     }
 
-    public function walkConstraint(Constraint $constraint, $value, $group, $propertyPath, $currentClass = null, $currentProperty = null)
+    public function walkConstraint(Constraint $constraint, $object, $value, $group, $propertyPath, $currentClass = null, $currentProperty = null)
     {
         $validator = $this->validatorFactory->getInstance($constraint);
 
         $localContext = new ExecutionContext(
             $this->globalContext,
+            $object,
             $value,
             $propertyPath,
             $group,

@@ -31,7 +31,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         $this->walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
         $this->metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
         $this->globalContext = new GlobalExecutionContext('Root', $this->walker, $this->metadataFactory);
-        $this->context = new ExecutionContext($this->globalContext, 'currentValue', 'foo.bar', 'Group', 'ClassName', 'propertyName');
+        $this->context = new ExecutionContext($this->globalContext, 'object', 'currentValue', 'foo.bar', 'Group', 'ClassName', 'propertyName');
     }
 
     protected function tearDown()
@@ -243,7 +243,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPropertyPathWithEmptyCurrentPropertyPath()
     {
-        $this->context = new ExecutionContext($this->globalContext, 'currentValue', '', 'Group', 'ClassName', 'propertyName');
+        $this->context = new ExecutionContext($this->globalContext, 'object', 'currentValue', '', 'Group', 'ClassName', 'propertyName');
 
         $this->assertEquals('bam.baz', $this->context->getPropertyPath('bam.baz'));
     }

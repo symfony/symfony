@@ -480,7 +480,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = new ConstraintA();
 
-        $this->walker->walkConstraint($constraint, 'foobar', 'Default', 'firstName.path');
+        $this->walker->walkConstraint($constraint, 'object', 'foobar', 'Default', 'firstName.path');
 
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
@@ -498,7 +498,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = new ConstraintA();
 
-        $this->walker->walkConstraint($constraint, 'VALID', 'Default', 'firstName.path');
+        $this->walker->walkConstraint($constraint, 'object', 'VALID', 'Default', 'firstName.path');
 
         $this->assertCount(0, $this->walker->getViolations());
     }
@@ -510,7 +510,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
             'bar' => new ConstraintA(),
         ));
 
-        $this->walker->walkConstraint($constraint, array('foo' => 'VALID'), 'Default', 'collection');
+        $this->walker->walkConstraint($constraint, 'object', array('foo' => 'VALID'), 'Default', 'collection');
         $violations = $this->walker->getViolations();
         $this->assertEquals('collection[bar]', $violations[0]->getPropertyPath());
     }
@@ -524,7 +524,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
             )),
         ));
 
-        $this->walker->walkConstraint($constraint, array('foo' => array('foo' => 'VALID')), 'Default', 'collection');
+        $this->walker->walkConstraint($constraint, 'object', array('foo' => array('foo' => 'VALID')), 'Default', 'collection');
         $violations = $this->walker->getViolations();
         $this->assertEquals('collection[foo][bar]', $violations[0]->getPropertyPath());
     }

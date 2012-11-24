@@ -76,7 +76,7 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
         foreach ($array as $key => $value) {
             $this->walker->expects($this->at($i++))
                 ->method('walkConstraint')
-                ->with($constraint, $value, 'MyGroup', 'foo.bar['.$key.']');
+                ->with($constraint, $array, $value, 'MyGroup', 'foo.bar['.$key.']');
         }
 
         $this->context->expects($this->never())
@@ -99,10 +99,10 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
         foreach ($array as $key => $value) {
             $this->walker->expects($this->at($i++))
                 ->method('walkConstraint')
-                ->with($constraint1, $value, 'MyGroup', 'foo.bar['.$key.']');
+                ->with($constraint1, $array, $value, 'MyGroup', 'foo.bar['.$key.']');
             $this->walker->expects($this->at($i++))
                 ->method('walkConstraint')
-                ->with($constraint2, $value, 'MyGroup', 'foo.bar['.$key.']');
+                ->with($constraint2, $array, $value, 'MyGroup', 'foo.bar['.$key.']');
         }
 
         $this->context->expects($this->never())

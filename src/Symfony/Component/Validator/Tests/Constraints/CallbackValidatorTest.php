@@ -23,6 +23,13 @@ class CallbackValidatorTest_Class
 
         return false;
     }
+
+    public static function validateStaticTwo($object, ExecutionContext $context)
+    {
+        $context->addViolation('Static message two', array('{{ value }}' => $object), 'invalidValue2');
+
+        return false;
+    }
 }
 
 class CallbackValidatorTest_Object
@@ -37,6 +44,13 @@ class CallbackValidatorTest_Object
     public function validateTwo(ExecutionContext $context)
     {
         $context->addViolation('Other message', array('{{ value }}' => 'baz'), 'otherInvalidValue');
+
+        return false;
+    }
+
+    public function validateProperty(ExecutionContext $context)
+    {
+        $context->addViolation('Property message', array('{{ value }}' => 'property'), 'invalidProperty');
 
         return false;
     }
@@ -74,6 +88,9 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint = new Callback(array('validateOne'));
 
         $this->context->expects($this->once())
+            ->method('getCurrentObject')
+            ->will($this->returnValue($object));
+        $this->context->expects($this->once())
             ->method('addViolation')
             ->with('My message', array(
                 '{{ value }}' => 'foobar',
@@ -86,6 +103,9 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $object = new CallbackValidatorTest_Object();
 
+        $this->context->expects($this->once())
+            ->method('getCurrentObject')
+            ->will($this->returnValue($object));
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('Static message', array(
@@ -101,12 +121,15 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $object = new CallbackValidatorTest_Object();
 
-        $this->context->expects($this->at(0))
+        $this->context->expects($this->once())
+            ->method('getCurrentObject')
+            ->will($this->returnValue($object));
+        $this->context->expects($this->at(1))
             ->method('addViolation')
             ->with('My message', array(
                 '{{ value }}' => 'foobar',
             ));
-        $this->context->expects($this->at(1))
+        $this->context->expects($this->at(2))
             ->method('addViolation')
             ->with('Other message', array(
                 '{{ value }}' => 'baz',
@@ -117,12 +140,73 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
         )));
     }
 
+    public function testPropertyCallbackMethod()
+    {
+        $attribute = 'test value';
+        $object = new CallbackValidatorTest_Object();
+
+        $this->context->expects($this->once())
+            ->method('getCurrentObject')
+            ->will($this->returnValue($object));
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('Property message', array(
+                '{{ value }}' => 'property',
+            ));
+
+        $this->validator->validate($attribute, new Callback(array('validateProperty')));
+    }
+
+    public function testPropertyCallbackStaticMethod()
+    {
+        $attribute = 'test value';
+        $object = new CallbackValidatorTest_Object();
+
+        $this->context->expects($this->once())
+            ->method('getCurrentObject')
+            ->will($this->returnValue($object));
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('Static message two', array(
+                '{{ value }}' => $attribute,
+            ));
+
+        $this->validator->validate($attribute, new Callback(array(
+            array(__CLASS__.'_Class', 'validateStaticTwo')
+        )));
+    }
+
+     public function testCallbackClosure()
+    {
+        $object = new CallbackValidatorTest_Object();
+        $constraint = new Callback(function($object, ExecutionContext $context) {
+            $context->addViolation('Closure message', array('{{ value }}' => 'closure'), 'invalidClosureValue');
+
+            return false;
+        });
+
+        $this->context->expects($this->once())
+            ->method('getCurrentObject')
+            ->will($this->returnValue($object));
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('Closure message', array(
+                '{{ value }}' => 'closure',
+            ));
+
+        $this->validator->validate($object, $constraint);
+    }
+
     /**
      * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
     public function testExpectCallbackArray()
     {
         $object = new CallbackValidatorTest_Object();
+
+        $this->context->expects($this->once())
+            ->method('getCurrentObject')
+            ->will($this->returnValue($object));
 
         $this->validator->validate($object, new Callback('foobar'));
     }
@@ -134,6 +218,10 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $object = new CallbackValidatorTest_Object();
 
+        $this->context->expects($this->once())
+            ->method('getCurrentObject')
+            ->will($this->returnValue($object));
+
         $this->validator->validate($object, new Callback(array('foobar')));
     }
 
@@ -144,6 +232,10 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $object = new CallbackValidatorTest_Object();
 
+        $this->context->expects($this->once())
+            ->method('getCurrentObject')
+            ->will($this->returnValue($object));
+
         $this->validator->validate($object, new Callback(array(array('foo', 'bar'))));
     }
 
@@ -151,6 +243,6 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = new Callback(array('foo'));
 
-        $this->assertEquals('class', $constraint->getTargets());
+        $this->assertEquals(array('class', 'property'), $constraint->getTargets());
     }
 }

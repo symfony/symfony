@@ -47,7 +47,7 @@ class CollectionValidator extends ConstraintValidator
                 ($value instanceof \ArrayAccess && $value->offsetExists($field))
             ) {
                 foreach ($fieldConstraint->constraints as $constr) {
-                    $walker->walkConstraint($constr, $value[$field], $group, $propertyPath.'['.$field.']');
+                    $walker->walkConstraint($constr, $value, $value[$field], $group, $propertyPath.'['.$field.']');
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
                 $this->context->addViolationAtSubPath('['.$field.']', $constraint->missingFieldsMessage, array(

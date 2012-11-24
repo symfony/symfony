@@ -72,7 +72,7 @@ class FormValidator extends ConstraintValidator
             foreach ($constraints as $constraint) {
                 foreach ($groups as $group) {
                     if (in_array($group, $constraint->groups)) {
-                        $graphWalker->walkConstraint($constraint, $form->getData(), $group, $path . 'data');
+                        $graphWalker->walkConstraint($constraint, $form->getData(), $form->getData(), $group, $path . 'data');
 
                         // Prevent duplicate validation
                         continue 2;

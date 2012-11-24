@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
+use Symfony\Component\Validator\Mapping\ClassMetadataFactoryAdapter;
 
 /**
  * Default implementation of ValidatorContextInterface
@@ -23,6 +24,11 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
  */
 class ValidatorContext implements ValidatorContextInterface
 {
+    /**
+     * @var MetadataFactoryInterface
+     */
+    private $metadataFactory;
+
     /**
      * The class metadata factory used in the new validator
      * @var ClassMetadataFactoryInterface
@@ -43,6 +49,12 @@ class ValidatorContext implements ValidatorContextInterface
      */
     public function setClassMetadataFactory(ClassMetadataFactoryInterface $classMetadataFactory)
     {
+        if ($classMetadataFactory instanceof MetadataFactoryInterface) {
+            $this->metadataFactory = $classMetadataFactory;
+        } else {
+            $this->metadataFactory = new ClassMetadataFactoryAdapter($classMetadataFactory);
+        }
+
         $this->classMetadataFactory = $classMetadataFactory;
 
         return $this;
@@ -70,7 +82,7 @@ class ValidatorContext implements ValidatorContextInterface
     public function getValidator()
     {
         return new Validator(
-            $this->classMetadataFactory,
+            $this->metadataFactory,
             $this->constraintValidatorFactory
         );
     }

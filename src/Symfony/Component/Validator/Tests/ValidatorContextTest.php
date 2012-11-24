@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests;
 
 use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\Mapping\ClassMetadataFactoryAdapter;
 use Symfony\Component\Validator\ValidatorContext;
 
 class ValidatorContextTest extends \PHPUnit_Framework_TestCase
@@ -56,6 +57,6 @@ class ValidatorContextTest extends \PHPUnit_Framework_TestCase
             ->setConstraintValidatorFactory($validatorFactory)
             ->getValidator();
 
-        $this->assertEquals(new Validator($metadataFactory, $validatorFactory), $validator);
+        $this->assertEquals(new Validator(new ClassMetadataFactoryAdapter($metadataFactory), $validatorFactory), $validator);
     }
 }

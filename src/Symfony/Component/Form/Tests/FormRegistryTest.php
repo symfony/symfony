@@ -252,6 +252,12 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
         $expectedGuesser = new FormTypeGuesserChain(array($this->guesser1, $this->guesser2));
 
         $this->assertEquals($expectedGuesser, $this->registry->getTypeGuesser());
+
+        $registry = new FormRegistry(
+            array($this->getMock('Symfony\Component\Form\FormExtensionInterface')),
+            $this->resolvedTypeFactory);
+
+        $this->assertNull($registry->getTypeGuesser());
     }
 
     public function testGetExtensions()

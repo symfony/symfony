@@ -195,6 +195,20 @@ class Translator implements TranslatorInterface
         return $catalogue;
     }
 
+    /**
+     * Extension point for handling catalogue misses or fallbacks.
+     *
+     * @param MessageCatalogueInterface $catalogue
+     * @param string $id
+     * @param string $domain
+     * @return MessageCatalogueInterface
+     */
+    protected function filterCatalogueForId(MessageCatalogueInterface $catalogue, $id, $domain)
+    {
+        // by default, do nothing
+        return $catalogue;
+    }
+
     protected function loadCatalogue($locale)
     {
         $this->doLoadCatalogue($locale);

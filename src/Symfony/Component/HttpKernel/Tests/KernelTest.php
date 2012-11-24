@@ -93,11 +93,11 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel->boot();
     }
 
-    public function testBootTriggersExtensionPreProcessing()
+    public function testBootTriggersExtensionPending()
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
             ->disableOriginalConstructor()
-            ->setMethods(array('preProcessExtensionConfigs', 'getCacheDir', 'getLogDir', 'registerBundles'))
+            ->setMethods(array('prependExtensionConfigs', 'getCacheDir', 'getLogDir', 'registerBundles'))
             ->getMock();
         $kernel->expects($this->any())
             ->method('getCacheDir')
@@ -109,7 +109,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             ->method('registerBundles')
             ->will($this->returnValue(array()));
         $kernel->expects($this->once())
-            ->method('preProcessExtensionConfigs');
+            ->method('prependExtensionConfigs');
 
         $kernel->boot();
     }

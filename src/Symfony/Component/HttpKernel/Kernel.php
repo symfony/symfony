@@ -27,7 +27,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
-use Symfony\Component\HttpKernel\DependencyInjection\PreProcessExtensionInterface;
+use Symfony\Component\HttpKernel\DependencyInjection\PrependExtensionInterface;
 use Symfony\Component\HttpKernel\Debug\ErrorHandler;
 use Symfony\Component\HttpKernel\Debug\ExceptionHandler;
 use Symfony\Component\Config\Loader\LoaderResolver;
@@ -650,7 +650,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         $container->addObjectResource($this);
 
-        $this->preProcessExtensionConfigs($container);
+        $this->prependExtensionConfigs($container);
 
         // ensure these extensions are implicitly loaded
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
@@ -666,26 +666,26 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * Allow extensions to pre-process the extension configurations.
+     * Allow extensions to prepend extension configurations.
      *
      * @param ContainerBuilder $container
      */
-    protected function preProcessExtensionConfigs(ContainerBuilder $container)
+    protected function prependExtensionConfigs(ContainerBuilder $container)
     {
-        foreach ($this->getPreProcessExtensions() as $name) {
+        foreach ($this->getPrependingExtensions() as $name) {
             $extension = $container->getExtension($name);
-            if ($extension instanceof PreProcessExtensionInterface) {
-                $extension->preProcess($container);
+            if ($extension instanceof PrependExtensionInterface) {
+                $extension->prepend($container);
             }
         }
     }
 
     /**
-     * Returns the ordered list of extensions that may pre-process extension configurations.
+     * Returns the ordered list of extensions that may prepend extension configurations.
      *
      * @return array
      */
-    protected function getPreProcessExtensions()
+    protected function getPrependingExtensions()
     {
         return array();
     }

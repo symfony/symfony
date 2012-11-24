@@ -13,12 +13,12 @@ namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-interface PreProcessExtensionInterface
+interface PrependExtensionInterface
 {
     /**
-     * Allow an extension to pre-process the extension configurations.
+     * Allow an extension to prepend the extension configurations.
      *
      * @param ContainerBuilder $container
      */
-    public function preProcess(ContainerBuilder $container);
+    public function prepend(ContainerBuilder $container);
 }

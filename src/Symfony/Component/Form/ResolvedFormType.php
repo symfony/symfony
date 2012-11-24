@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -127,12 +127,10 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         $options = $form->getConfig()->getOptions();
 
         $view = $this->newView($parent);
-
         $this->buildView($view, $form, $options);
 
-        foreach ($form as $name => $child) {
-            /* @var FormInterface $child */
-            $view->children[$name] = $child->createView($view);
+        foreach ($this->getOrderedFormChilds($form) as $name) {
+            $view->children[$name] = $form[$name]->createView($view);
         }
 
         $this->finishView($view, $form, $options);
@@ -280,5 +278,215 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     protected function newView(FormView $parent = null)
     {
         return new FormView($parent);
+    }
+
+    /**
+     * Returns the ordered childs form name of a form.
+     *
+     * @param \Symfony\Component\Form\FormInterface $form The form.
+     *
+     * @return array The ordered childs form name.
+     */
+    protected function getOrderedFormChilds(FormInterface $form)
+    {
+        $cachedPositions = array();
+
+        $weights = array();
+        $afterGapWeights = array();
+        $firstFormWeigth = 0;
+        $lastFormWeigth = 0;
+
+        $differredBefores = array();
+        $differredAfters = array();
+
+        /* @var FormInterface $child */
+        foreach ($form as $child) {
+            $position = $child->getConfig()->getPosition();
+
+            if (is_string($position)) {
+                if (($position !== 'first') && ($position !== 'last')) {
+                    throw new InvalidConfigurationException('If you use position as string, you can only use "first" & "last".');
+                }
+
+                if ($position === 'first') {
+                    if (isset($differredBefores[$child->getName()])) {
+                        foreach ($differredBefores[$child->getName()] as $differredBefore) {
+                            $weights = $this->incrementWeights($weights, $firstFormWeigth);
+                            $weights[$differredBefore] = $firstFormWeigth++;
+                            $lastFormWeigth++;
+                        }
+                    }
+
+                    $weights = $this->incrementWeights($weights, $firstFormWeigth);
+                    $weights[$child->getName()] = $firstFormWeigth++;
+                    $lastFormWeigth++;
+
+                    if (isset($differredAfters[$child->getName()])) {
+                        foreach ($differredAfters[$child->getName()] as $differredAfter) {
+                            $weights = $this->incrementWeights($weights, $firstFormWeigth);
+                            $weights[$differredAfter] = $firstFormWeigth++;
+                            $lastFormWeigth++;
+                        }
+                    }
+                } else {
+                    if (isset($differredBefores[$child->getName()])) {
+                        foreach ($differredBefores[$child->getName()] as $differredBefore) {
+                            $weights[$differredBefore] = empty($weights) ? 0 : max($weights) + 1;
+                            $lastFormWeigth++;
+                        }
+                    }
+
+                    $weights[$child->getName()] = empty($weights) ? 0 : max($weights) + 1;
+
+                    if (isset($differredAfters[$child->getName()])) {
+                        foreach ($differredAfters[$child->getName()] as $differredAfter) {
+                            $weights[$differredAfter] = empty($weights) ? 0 : max($weights) + 1;
+                            $lastFormWeigth++;
+                        }
+                    }
+                }
+
+                continue;
+            } elseif (is_array($position)) {
+                if (!isset($position['before']) && !isset($position['after'])) {
+                    throw new InvalidConfigurationException('If you use position as array, you must at least define the "before" or "after" option.');
+                }
+
+                if (isset($position['before'])) {
+                    $cachedPositions[$child->getName()]['before'] = $position['before'];
+
+                    if (!isset($cachedPositions[$position['before']]['after'])) {
+                        $cachedPositions[$position['before']]['after'] = $child->getName();
+                    }
+                } elseif (!isset($cachedPositions[$child->getName()]['before'])) {
+                    $cachedPositions[$child->getName()]['before'] = null;
+                }
+
+                if (isset($position['after'])) {
+                    $cachedPositions[$child->getName()]['after'] = $position['after'];
+
+                    if (!isset($cachedPositions[$position['after']]['before'])) {
+                        $cachedPositions[$position['after']]['before'] = $child->getName();
+                    }
+                } elseif (!isset($cachedPositions[$child->getName()]['after'])) {
+                    $cachedPositions[$child->getName()]['after'] = null;
+                }
+
+                $before = $cachedPositions[$child->getName()]['before'];
+                if ($before !== null) {
+                    $this->detectCircularBeforeAndAfterReferences($cachedPositions, $before, $child->getName());
+
+                    if (isset($weights[$before])) {
+                        $beforeOrder = $weights[$before];
+                        $weights = $this->incrementWeights($weights, $weights[$before]);
+                        $weights[$child->getName()] = $beforeOrder;
+                        $lastFormWeigth++;
+                    } else {
+                        if (isset($differredBefores[$before])) {
+                            $differredBefores[$before][] = $child->getName();
+                        } else {
+                            $differredBefores[$before] = array($child->getName());
+                        }
+                    }
+
+                    continue;
+                }
+
+                $after = $cachedPositions[$child->getName()]['after'];
+                if ($after !== null) {
+                    if (isset($weights[$after])) {
+                        if (!isset($afterGapWeights[$after])) {
+                            $afterGapWeights[$after] = 0;
+                        }
+
+                        $newOrder = $weights[$after] + $afterGapWeights[$after] + 1;
+                        $weights = $this->incrementWeights($weights, $newOrder);
+                        $weights[$child->getName()] = $newOrder;
+                        $lastFormWeigth++;
+
+                        $afterGapWeights[$after]++;
+                    } else {
+                        if (isset($differredAfters[$after])) {
+                            $differredAfters[$after][] = $child->getName();
+                        } else {
+                            $differredAfters[$after] = array($child->getName());
+                        }
+                    }
+
+                    continue;
+                }
+            }
+
+            if (isset($differredBefores[$child->getName()])) {
+                foreach ($differredBefores[$child->getName()] as $differredBefore) {
+                    $weights = $this->incrementWeights($weights, $lastFormWeigth);
+                    $weights[$differredBefore] = $lastFormWeigth++;
+                }
+            }
+
+            $weights = $this->incrementWeights($weights, $lastFormWeigth);
+            $weights[$child->getName()] = $lastFormWeigth++;
+
+            if (isset($differredAfters[$child->getName()])) {
+                foreach ($differredAfters[$child->getName()] as $differredAfter) {
+                    $weights = $this->incrementWeights($weights, $lastFormWeigth);
+                    $weights[$differredAfter] = $lastFormWeigth++;
+                }
+            }
+        }
+
+        asort($weights, SORT_NUMERIC);
+
+        return array_keys($weights);
+    }
+
+    /**
+     * Increments all fields weights greater than start.
+     *
+     * @param array   $weights The form weigths.
+     * @param integer $start   The start.
+     *
+     * @return array The form weights incremented.
+     */
+    private function incrementWeights(array $weights, $start)
+    {
+        if (!empty($weights) && (max($weights) >= $start)) {
+            foreach ($weights as &$weigth) {
+                if ($weigth >= $start) {
+                    $weigth++;
+                }
+            }
+        }
+
+        return $weights;
+    }
+
+    /**
+     * Detetects a circle before/after references.
+     *
+     * @param array  $positions The cached positions.
+     * @param string $item      The checked item.
+     * @param string $name      The original item name.
+     *
+     * @throws InvalidConfigurationException If there is a circular before/after references.
+     */
+    private function detectCircularBeforeAndAfterReferences(array $positions, $item, $name)
+    {
+        if (isset($positions[$item]['before'])) {
+            if ($positions[$item]['before'] === $name) {
+                throw new InvalidConfigurationException(sprintf(
+                    'The form ordering cannot be resolved due to conflict in after/before options. '.
+                    'The field "%s" can not have "%s" as before field if the field "%s" have "%s" as before field.',
+                    $name,
+                    $item,
+                    $item,
+                    $name
+                ));
+            }
+
+            if ($positions[$item]['before'] !== null) {
+                $this->detectCircularBeforeAndAfterReferences($positions, $positions[$item]['before'], $name);
+            }
+        }
     }
 }

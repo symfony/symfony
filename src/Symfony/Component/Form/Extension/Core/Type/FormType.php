@@ -53,6 +53,7 @@ class FormType extends BaseType
             ->setData(isset($options['data']) ? $options['data'] : null)
             ->setDataLocked(isset($options['data']))
             ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
+            ->setPosition($options['position'])
         ;
 
         if ($options['trim']) {
@@ -167,10 +168,12 @@ class FormType extends BaseType
             'label_attr'         => array(),
             'virtual'            => false,
             'compound'           => true,
+            'position'           => null,
         ));
 
         $resolver->setAllowedTypes(array(
             'label_attr' => 'array',
+            'position'   => array('null', 'string', 'array'),
         ));
     }
 

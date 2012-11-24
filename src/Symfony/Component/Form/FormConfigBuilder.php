@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
-use Symfony\Component\Form\Exception\Exception;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -131,6 +130,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @var Boolean
      */
     private $dataLocked;
+
+    /**
+     * @var null|string|array
+     */
+    private $position;
 
     /**
      * @var FormFactoryInterface
@@ -430,6 +434,14 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getFormFactory()
     {
         return $this->formFactory;
@@ -683,6 +695,20 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         }
 
         $this->formFactory = $formFactory;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPosition($position)
+    {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
+        $this->position = $position;
 
         return $this;
     }

@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Tests;
 use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Form;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -139,7 +138,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($resolvedType, $builder->getType());
     }
 
-    public function testCreateView()
+    public function testCreateViewWithoutOrder()
     {
         $parentType = $this->getMockFormType();
         $type = $this->getMockFormType();
@@ -241,6 +240,860 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
         $view = $resolvedType->createView($form, $parentView);
 
         $this->assertSame($parentView, $view->parent);
+    }
+
+    public function testCreateViewOrderWithSimpleBeforePlacedAfterTheReferencedForm()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+        $field4Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+        $field4ResolvedType = new ResolvedFormType($field4Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType)->setPosition(array('before' => 'bar')))
+            ->add($this->getBuilder('bat')->setType($field4ResolvedType))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['foo']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['baz']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['bar']);
+
+        $this->assertArrayHasKey(3, $children);
+        $this->assertSame($children[3], $view->children['bat']);
+    }
+
+    public function testCreateViewOrderWithSimpleBeforePlacedBeforeTheReferencedForm()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+        $field4Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+        $field4ResolvedType = new ResolvedFormType($field4Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType)->setPosition(array('before' => 'bat')))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType))
+            ->add($this->getBuilder('bat')->setType($field4ResolvedType))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['foo']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['baz']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['bar']);
+
+        $this->assertArrayHasKey(3, $children);
+        $this->assertSame($children[3], $view->children['bat']);
+    }
+
+    public function testCreateViewOrderWithMultipleBeforePlacedAfterTheReferencedForm()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+        $field4Type = $this->getMockFormType();
+        $field5Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+        $field4ResolvedType = new ResolvedFormType($field4Type);
+        $field5ResolvedType = new ResolvedFormType($field5Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType)->setPosition(array('before' => 'bar')))
+            ->add($this->getBuilder('bat')->setType($field4ResolvedType)->setPosition(array('before' => 'bar')))
+            ->add($this->getBuilder('ban')->setType($field5ResolvedType))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['foo']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['baz']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['bat']);
+
+        $this->assertArrayHasKey(3, $children);
+        $this->assertSame($children[3], $view->children['bar']);
+
+        $this->assertArrayHasKey(4, $children);
+        $this->assertSame($children[4], $view->children['ban']);
+    }
+
+    public function testCreateViewOrderWithMultipleBeforePlacedBeforeTheReferencedForm()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+        $field4Type = $this->getMockFormType();
+        $field5Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+        $field4ResolvedType = new ResolvedFormType($field4Type);
+        $field5ResolvedType = new ResolvedFormType($field5Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType)->setPosition(array('before' => 'ban')))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType)->setPosition(array('before' => 'ban')))
+            ->add($this->getBuilder('bat')->setType($field4ResolvedType))
+            ->add($this->getBuilder('ban')->setType($field5ResolvedType))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['foo']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['bat']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['bar']);
+
+        $this->assertArrayHasKey(3, $children);
+        $this->assertSame($children[3], $view->children['baz']);
+
+        $this->assertArrayHasKey(4, $children);
+        $this->assertSame($children[4], $view->children['ban']);
+    }
+
+    public function testCreateViewOrderWithSimpleAfterPlacedBeforeTheReferencedForm()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+        $field4Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+        $field4ResolvedType = new ResolvedFormType($field4Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType)->setPosition(array('after' => 'baz')))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType))
+            ->add($this->getBuilder('bat')->setType($field4ResolvedType))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['foo']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['baz']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['bar']);
+
+        $this->assertArrayHasKey(3, $children);
+        $this->assertSame($children[3], $view->children['bat']);
+    }
+
+    public function testCreateViewOrderWithSimpleAfterPlacedAfterTheReferencedForm()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+        $field4Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+        $field4ResolvedType = new ResolvedFormType($field4Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType)->setPosition(array('after' => 'foo')))
+            ->add($this->getBuilder('bat')->setType($field4ResolvedType))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['foo']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['baz']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['bar']);
+
+        $this->assertArrayHasKey(3, $children);
+        $this->assertSame($children[3], $view->children['bat']);
+    }
+
+    public function testCreateViewOrderWithMultipleAfterPlacedBeforeTheReferencedForm()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+        $field4Type = $this->getMockFormType();
+        $field5Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+        $field4ResolvedType = new ResolvedFormType($field4Type);
+        $field5ResolvedType = new ResolvedFormType($field5Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType)->setPosition(array('after' => 'bat')))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType)->setPosition(array('after' => 'bat')))
+            ->add($this->getBuilder('bat')->setType($field4ResolvedType))
+            ->add($this->getBuilder('ban')->setType($field5ResolvedType))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['foo']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['bat']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['bar']);
+
+        $this->assertArrayHasKey(3, $children);
+        $this->assertSame($children[3], $view->children['baz']);
+
+        $this->assertArrayHasKey(4, $children);
+        $this->assertSame($children[4], $view->children['ban']);
+    }
+
+    public function testCreateViewOrderWithMultipleAfterPlacedAfterTheReferencedForm()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+        $field4Type = $this->getMockFormType();
+        $field5Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+        $field4ResolvedType = new ResolvedFormType($field4Type);
+        $field5ResolvedType = new ResolvedFormType($field5Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType)->setPosition(array('after' => 'foo')))
+            ->add($this->getBuilder('bat')->setType($field4ResolvedType)->setPosition(array('after' => 'foo')))
+            ->add($this->getBuilder('ban')->setType($field5ResolvedType))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['foo']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['baz']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['bat']);
+
+        $this->assertArrayHasKey(3, $children);
+        $this->assertSame($children[3], $view->children['bar']);
+
+        $this->assertArrayHasKey(4, $children);
+        $this->assertSame($children[4], $view->children['ban']);
+    }
+
+    public function testCreateViewWithMultipleBeforeAndAfter()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+        $field4Type = $this->getMockFormType();
+        $field5Type = $this->getMockFormType();
+        $field6Type = $this->getMockFormType();
+        $field7Type = $this->getMockFormType();
+        $field8Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+        $field4ResolvedType = new ResolvedFormType($field4Type);
+        $field5ResolvedType = new ResolvedFormType($field5Type);
+        $field6ResolvedType = new ResolvedFormType($field6Type);
+        $field7ResolvedType = new ResolvedFormType($field7Type);
+        $field8ResolvedType = new ResolvedFormType($field8Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('start')->setType($field1ResolvedType))
+            ->add($this->getBuilder('foo')->setType($field2ResolvedType)->setPosition(array('after' => 'baz')))
+            ->add($this->getBuilder('bar')->setType($field3ResolvedType)->setPosition(array('before' => 'bat')))
+            ->add($this->getBuilder('baz')->setType($field4ResolvedType))
+            ->add($this->getBuilder('bat')->setType($field5ResolvedType))
+            ->add($this->getBuilder('ban')->setType($field6ResolvedType)->setPosition(array('after' => 'foo')))
+            ->add($this->getBuilder('baw')->setType($field7ResolvedType)->setPosition(array('before' => 'bar')))
+            ->add($this->getBuilder('end')->setType($field8ResolvedType))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['start']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['baz']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['foo']);
+
+        $this->assertArrayHasKey(3, $children);
+        $this->assertSame($children[3], $view->children['ban']);
+
+        $this->assertArrayHasKey(4, $children);
+        $this->assertSame($children[4], $view->children['baw']);
+
+        $this->assertArrayHasKey(5, $children);
+        $this->assertSame($children[5], $view->children['bar']);
+
+        $this->assertArrayHasKey(6, $children);
+        $this->assertSame($children[6], $view->children['bat']);
+
+        $this->assertArrayHasKey(7, $children);
+        $this->assertSame($children[7], $view->children['end']);
+    }
+
+    public function testCreateViewOrderWithSimpleFirst()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType)->setPosition('first'))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['bar']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['foo']);
+    }
+
+    public function testCreateViewOrderWithMultipleFirst()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType)->setPosition('first'))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType)->setPosition('first'))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['bar']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['baz']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['foo']);
+    }
+
+    public function testCreateViewOrderWithSimpleLast()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType)->setPosition('last'))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['bar']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['foo']);
+    }
+
+    public function testCreateViewOrderWithMultipleLast()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType)->setPosition('last'))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType)->setPosition('last'))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['baz']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['foo']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['bar']);
+    }
+
+    public function testCreateViewOrderWithSimpleFirstAndLast()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+        $field4Type = $this->getMockFormType();
+        $field5Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+        $field4ResolvedType = new ResolvedFormType($field4Type);
+        $field5ResolvedType = new ResolvedFormType($field5Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType)->setPosition('last'))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType))
+            ->add($this->getBuilder('bat')->setType($field4ResolvedType)->setPosition('first'))
+            ->add($this->getBuilder('ban')->setType($field5ResolvedType))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['bat']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['foo']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['baz']);
+
+        $this->assertArrayHasKey(3, $children);
+        $this->assertSame($children[3], $view->children['ban']);
+
+        $this->assertArrayHasKey(4, $children);
+        $this->assertSame($children[4], $view->children['bar']);
+    }
+
+    public function testCreateViewOrderWithMultipleFirstAndLast()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+        $field4Type = $this->getMockFormType();
+        $field5Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+        $field4ResolvedType = new ResolvedFormType($field4Type);
+        $field5ResolvedType = new ResolvedFormType($field5Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType)->setPosition('last'))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType)->setPosition('last'))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType))
+            ->add($this->getBuilder('bat')->setType($field4ResolvedType)->setPosition('first'))
+            ->add($this->getBuilder('ban')->setType($field5ResolvedType)->setPosition('first'))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['bat']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['ban']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['baz']);
+
+        $this->assertArrayHasKey(3, $children);
+        $this->assertSame($children[3], $view->children['foo']);
+
+        $this->assertArrayHasKey(4, $children);
+        $this->assertSame($children[4], $view->children['bar']);
+    }
+
+    public function testCreateViewWithMultipleFirstAndLastAndBeforeAndAfter()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+        $field4Type = $this->getMockFormType();
+        $field5Type = $this->getMockFormType();
+        $field6Type = $this->getMockFormType();
+        $field7Type = $this->getMockFormType();
+        $field8Type = $this->getMockFormType();
+        $field9Type = $this->getMockFormType();
+        $field10Type = $this->getMockFormType();
+        $field11Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+        $field4ResolvedType = new ResolvedFormType($field4Type);
+        $field5ResolvedType = new ResolvedFormType($field5Type);
+        $field6ResolvedType = new ResolvedFormType($field6Type);
+        $field7ResolvedType = new ResolvedFormType($field7Type);
+        $field8ResolvedType = new ResolvedFormType($field8Type);
+        $field9ResolvedType = new ResolvedFormType($field9Type);
+        $field10ResolvedType = new ResolvedFormType($field10Type);
+        $field11ResolvedType = new ResolvedFormType($field11Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('bri')->setType($field1ResolvedType)->setPosition(array('after' => 'bro')))
+            ->add($this->getBuilder('foo')->setType($field2ResolvedType)->setPosition(array('after' => 'baz')))
+            ->add($this->getBuilder('bar')->setType($field3ResolvedType)->setPosition(array('before' => 'bat')))
+            ->add($this->getBuilder('baz')->setType($field4ResolvedType))
+            ->add($this->getBuilder('pop')->setType($field5ResolvedType)->setPosition(array('before' => 'bro')))
+            ->add($this->getBuilder('psy')->setType($field7ResolvedType)->setPosition(array('after' => 'bat')))
+            ->add($this->getBuilder('bat')->setType($field6ResolvedType)->setPosition('first'))
+            ->add($this->getBuilder('ban')->setType($field8ResolvedType)->setPosition(array('after' => 'foo')))
+            ->add($this->getBuilder('raz')->setType($field9ResolvedType)->setPosition('first'))
+            ->add($this->getBuilder('baw')->setType($field10ResolvedType)->setPosition(array('before' => 'bar')))
+            ->add($this->getBuilder('bro')->setType($field11ResolvedType)->setPosition('last'))
+            ->getForm();
+
+        $parentView = new FormView();
+        $view = $resolvedType->createView($form, $parentView);
+
+        $children = array_values($view->children);
+
+        $this->assertArrayHasKey(0, $children);
+        $this->assertSame($children[0], $view->children['baw']);
+
+        $this->assertArrayHasKey(1, $children);
+        $this->assertSame($children[1], $view->children['bar']);
+
+        $this->assertArrayHasKey(2, $children);
+        $this->assertSame($children[2], $view->children['bat']);
+
+        $this->assertArrayHasKey(3, $children);
+        $this->assertSame($children[3], $view->children['psy']);
+
+        $this->assertArrayHasKey(4, $children);
+        $this->assertSame($children[4], $view->children['raz']);
+
+        $this->assertArrayHasKey(5, $children);
+        $this->assertSame($children[5], $view->children['baz']);
+
+        $this->assertArrayHasKey(6, $children);
+        $this->assertSame($children[6], $view->children['foo']);
+
+        $this->assertArrayHasKey(7, $children);
+        $this->assertSame($children[7], $view->children['ban']);
+
+        $this->assertArrayHasKey(8, $children);
+        $this->assertSame($children[8], $view->children['pop']);
+
+        $this->assertArrayHasKey(9, $children);
+        $this->assertSame($children[9], $view->children['bro']);
+
+        $this->assertArrayHasKey(10, $children);
+        $this->assertSame($children[10], $view->children['bri']);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\InvalidConfigurationException
+     */
+    public function testCreateViewWithInvalidStringPosition()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $fieldType = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($fieldType);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType)->setPosition('foo'))
+            ->getForm();
+
+        $parentView = new FormView();
+        $resolvedType->createView($form, $parentView);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\InvalidConfigurationException
+     */
+    public function testCreateViewWithInvalidBeforeOrder()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType)->setPosition(array('before' => 'bar')))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType)->setPosition(array('before' => 'baz')))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType)->setPosition(array('before' => 'foo')))
+            ->getForm();
+
+        $parentView = new FormView();
+        $resolvedType->createView($form, $parentView);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\InvalidConfigurationException
+     */
+    public function testCreateViewWithInvalidAfterOrder()
+    {
+        $parentType = $this->getMockFormType();
+        $type = $this->getMockFormType();
+        $field1Type = $this->getMockFormType();
+        $field2Type = $this->getMockFormType();
+        $field3Type = $this->getMockFormType();
+
+        $parentResolvedType = new ResolvedFormType($parentType);
+        $resolvedType = new ResolvedFormType($type, array(), $parentResolvedType);
+        $field1ResolvedType = new ResolvedFormType($field1Type);
+        $field2ResolvedType = new ResolvedFormType($field2Type);
+        $field3ResolvedType = new ResolvedFormType($field3Type);
+
+        $form = $this->getBuilder('name')
+            ->setCompound(true)
+            ->setDataMapper($this->dataMapper)
+            ->setType($resolvedType)
+            ->add($this->getBuilder('foo')->setType($field1ResolvedType)->setPosition(array('after' => 'bar')))
+            ->add($this->getBuilder('bar')->setType($field2ResolvedType)->setPosition(array('after' => 'baz')))
+            ->add($this->getBuilder('baz')->setType($field3ResolvedType)->setPosition(array('after' => 'foo')))
+            ->getForm();
+
+        $parentView = new FormView();
+        $resolvedType->createView($form, $parentView);
     }
 
     /**

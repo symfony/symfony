@@ -215,4 +215,13 @@ interface FormConfigInterface
      * @return mixed The option value.
      */
     public function getOption($name, $default = null);
+
+    /**
+     * Gets the form position.
+     *
+     * @see FormConfigBuilderInterface::setPosition
+     *
+     * @return null|string|array The before form name.
+     */
+    public function getPosition();
 }

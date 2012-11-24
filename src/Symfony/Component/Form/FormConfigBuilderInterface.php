@@ -238,6 +238,32 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setFormFactory(FormFactoryInterface $formFactory);
 
     /**
+     * Sets the form position.
+     *
+     *  * The position can be `null` to reflect the original forms order.
+     *  * The position can be `first` to place this form at the very first position
+     *    (if many forms are defined as first, the original order between these
+     *    forms are maintained).
+     *  * The position can be `last` to place this form at the very last position
+     *    (if many forms are defined as last, the original order between these
+     *    forms are maintained).
+     *  * The position can be `array('before' => 'form_name')` to place this form before
+     *    the `form_name` form. (if many forms defines the same before form, the original
+     *    order between these forms are maintained).
+     *  * The position can be `array('after' => 'form_name')` to place this form after
+     *    the `form_name` form. (if many forms defines the same before form, the original
+     *    order between these forms are maintained).
+     *
+     * You can combine the `after` & `before` options together or with `first` and/or `last`
+     * to archieve more complex use cases.
+     *
+     * @param null|string|array $position The form position.
+     *
+     * @return self The configuration object.
+     */
+    public function setPosition($position);
+
+    /**
      * Builds and returns the form configuration.
      *
      * @return FormConfigInterface

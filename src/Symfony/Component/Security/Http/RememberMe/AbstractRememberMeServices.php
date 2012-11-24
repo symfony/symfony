@@ -172,6 +172,9 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      */
     final public function loginSuccess(Request $request, Response $response, TokenInterface $token)
     {
+        // Make sure any old remember-me cookies are cancelled
+        $this->cancelCookie($request);
+
         if (!$token->getUser() instanceof UserInterface) {
             if (null !== $this->logger) {
                 $this->logger->debug('Remember-me ignores token since it does not contain a UserInterface implementation.');

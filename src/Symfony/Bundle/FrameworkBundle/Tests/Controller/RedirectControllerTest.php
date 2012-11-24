@@ -75,9 +75,7 @@ class RedirectControllerTest extends TestCase
 
         $returnResponse = $controller->redirectAction($route, $permanent);
 
-        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
-
-        $this->assertTrue($returnResponse->isRedirect($url));
+        $this->assertRedirectUrl($returnResponse, $url);
         $this->assertEquals($expectedCode, $returnResponse->getStatusCode());
     }
 
@@ -104,9 +102,7 @@ class RedirectControllerTest extends TestCase
         $controller = new RedirectController();
         $returnResponse = $controller->urlRedirectAction('http://foo.bar/');
 
-        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
-
-        $this->assertEquals('http://foo.bar/', $returnResponse->headers->get('Location'));
+        $this->assertRedirectUrl($returnResponse, 'http://foo.bar/');
         $this->assertEquals(302, $returnResponse->getStatusCode());
     }
 
@@ -179,7 +175,7 @@ class RedirectControllerTest extends TestCase
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
 
-    public function createRequestObject($scheme, $host, $port, $baseUrl)
+    private function createRequestObject($scheme, $host, $port, $baseUrl)
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request
@@ -202,7 +198,7 @@ class RedirectControllerTest extends TestCase
         return $request;
     }
 
-    public function createRedirectController($request, $httpPort = null, $httpsPort = null)
+    private function createRedirectController(Request $request, $httpPort = null, $httpsPort = null)
     {
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container
@@ -210,16 +206,26 @@ class RedirectControllerTest extends TestCase
             ->method('get')
             ->with($this->equalTo('request'))
             ->will($this->returnValue($request));
-        if ($httpPort != null) {
+        if (null !== $httpPort) {
             $container
-                ->expects($this->at(1))
+                ->expects($this->once())
+                ->method('hasParameter')
+                ->with($this->equalTo('request_listener.http_port'))
+                ->will($this->returnValue(true));
+            $container
+                ->expects($this->once())
                 ->method('getParameter')
                 ->with($this->equalTo('request_listener.http_port'))
                 ->will($this->returnValue($httpPort));
         }
-        if ($httpsPort != null) {
+        if (null !== $httpsPort) {
             $container
-                ->expects($this->at(1))
+                ->expects($this->once())
+                ->method('hasParameter')
+                ->with($this->equalTo('request_listener.https_port'))
+                ->will($this->returnValue(true));
+            $container
+                ->expects($this->once())
                 ->method('getParameter')
                 ->with($this->equalTo('request_listener.https_port'))
                 ->will($this->returnValue($httpsPort));
@@ -231,8 +237,8 @@ class RedirectControllerTest extends TestCase
         return $controller;
     }
 
-    public function assertRedirectUrl($returnValue, $expectedUrl)
+    public function assertRedirectUrl(Response $returnResponse, $expectedUrl)
     {
-        $this->assertTrue($returnValue->isRedirect($expectedUrl), "Expected: $expectedUrl\nGot:      ".$returnValue->headers->get('Location'));
+        $this->assertTrue($returnResponse->isRedirect($expectedUrl), "Expected: $expectedUrl\nGot:      ".$returnResponse->headers->get('Location'));
     }
 }

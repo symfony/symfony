@@ -234,6 +234,18 @@ class Route implements \Serializable
     }
 
     /**
+     * Checks if a an option has been set
+     *
+     * @param string $name An option name
+     *
+     * @return Boolean true if the option is set, false otherwise
+     */
+    public function hasOption($name)
+    {
+        return array_key_exists($name, $this->options);
+    }
+
+    /**
      * Returns the defaults.
      *
      * @return array The defaults
@@ -375,6 +387,18 @@ class Route implements \Serializable
     public function getRequirement($key)
     {
         return isset($this->requirements[$key]) ? $this->requirements[$key] : null;
+    }
+
+    /**
+     * Checks if a requirement is set for the given key.
+     *
+     * @param string $name A variable name
+     *
+     * @return Boolean true if a requirement is specified, false otherwise
+     */
+    public function hasRequirement($key)
+    {
+        return array_key_exists($key, $this->requirements);
     }
 
     /**

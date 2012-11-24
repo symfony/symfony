@@ -25,6 +25,18 @@ class Callback extends Constraint
     /**
      * {@inheritDoc}
      */
+    public function __construct($options = null)
+    {
+        if ($options instanceof \Closure) {
+            $options = array($options);
+        }
+
+        parent::__construct($options);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getRequiredOptions()
     {
         return array('methods');

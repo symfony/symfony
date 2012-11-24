@@ -176,6 +176,27 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
         )));
     }
 
+     public function testCallbackClosure()
+    {
+        $object = new CallbackValidatorTest_Object();
+        $constraint = new Callback(function($object, ExecutionContext $context) {
+            $context->addViolation('Closure message', array('{{ value }}' => 'closure'), 'invalidClosureValue');
+
+            return false;
+        });
+
+        $this->context->expects($this->once())
+            ->method('getCurrentObject')
+            ->will($this->returnValue($object));
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('Closure message', array(
+                '{{ value }}' => 'closure',
+            ));
+
+        $this->validator->validate($object, $constraint);
+    }
+
     /**
      * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
      */

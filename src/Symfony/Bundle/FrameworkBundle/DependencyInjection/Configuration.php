@@ -73,6 +73,7 @@ class Configuration implements ConfigurationInterface
 
         $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
+        $this->addSsiSection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
@@ -108,6 +109,17 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('esi')
                     ->info('esi configuration')
+                    ->canBeDisabled()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addSsiSection (ArrayNodeDefinition $rootNode) {
+        $rootNode
+            ->children()
+                ->arrayNode('ssi')
+                    ->info('ssi configuration')
                     ->canBeDisabled()
                 ->end()
             ->end()

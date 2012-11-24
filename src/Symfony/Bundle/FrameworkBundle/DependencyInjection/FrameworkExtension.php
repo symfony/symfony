@@ -93,6 +93,9 @@ class FrameworkExtension extends Extension
         if (isset($config['esi'])) {
             $this->registerEsiConfiguration($config['esi'], $loader);
         }
+        if (isset($config['ssi'])) {
+            $this->registerSsiConfiguration($config['ssi'], $loader);
+        }
 
         if (isset($config['profiler'])) {
             $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
@@ -181,6 +184,19 @@ class FrameworkExtension extends Extension
     {
         if (!empty($config['enabled'])) {
             $loader->load('esi.xml');
+        }
+    }
+
+    /**
+     * Loads the ESI configuration.
+     *
+     * @param array         $config An ESI configuration array
+     * @param XmlFileLoader $loader An XmlFileLoader instance
+     */
+    private function registerSsiConfiguration (array $config, XmlFileLoader $loader)
+    {
+        if (!empty($config['enabled'])) {
+            $loader->load('ssi.xml');
         }
     }
 

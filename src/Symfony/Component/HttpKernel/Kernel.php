@@ -633,11 +633,14 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         }
 
         $container = $this->getContainerBuilder();
-        $extensions = array();
+        $extensions = $prependingExtensions = array();
         foreach ($this->bundles as $bundle) {
             if ($extension = $bundle->getContainerExtension()) {
                 $container->registerExtension($extension);
                 $extensions[] = $extension->getAlias();
+                if ($extension instanceof PrependExtensionInterface) {
+                    $prependingExtensions[] = $extension;
+                }
             }
 
             if ($this->debug) {
@@ -650,7 +653,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         $container->addObjectResource($this);
 
-        $this->prependExtensionConfigs($container);
+        $this->prependExtensionConfigs($container, $prependingExtensions);
 
         // ensure these extensions are implicitly loaded
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
@@ -669,25 +672,13 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * Allow extensions to prepend extension configurations.
      *
      * @param ContainerBuilder $container
+     * @param PrependExtensionInterface[] $extensions
      */
-    protected function prependExtensionConfigs(ContainerBuilder $container)
+    protected function prependExtensionConfigs(ContainerBuilder $container, array $extensions)
     {
-        foreach ($this->getPrependingExtensions() as $name) {
-            $extension = $container->getExtension($name);
-            if ($extension instanceof PrependExtensionInterface) {
-                $extension->prepend($container);
-            }
+        foreach ($extensions as $extension) {
+            $extension->prepend($container);
         }
-    }
-
-    /**
-     * Returns the ordered list of extensions that may prepend extension configurations.
-     *
-     * @return array
-     */
-    protected function getPrependingExtensions()
-    {
-        return array();
     }
 
     /**

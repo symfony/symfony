@@ -40,7 +40,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method)
+    public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
         $indexName = $this->getIndexName();
 
@@ -51,6 +51,14 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
 
         $profileList = explode("\n", $indexContent);
         $result = array();
+
+        if (null === $start) {
+            $start = 0;
+        }
+
+        if (null === $end) {
+            $end = time();
+        }
 
         foreach ($profileList as $item) {
 
@@ -64,7 +72,9 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
 
             list($itemToken, $itemIp, $itemMethod, $itemUrl, $itemTime, $itemParent) = explode("\t", $item, 6);
 
-            if ($ip && false === strpos($itemIp, $ip) || $url && false === strpos($itemUrl, $url) || $method && false === strpos($itemMethod, $method)) {
+            $itemTime = (int)$itemTime;
+
+            if ($ip && false === strpos($itemIp, $ip) || $url && false === strpos($itemUrl, $url) || $method && false === strpos($itemMethod, $method) || $start > $itemTime || $end < $itemTime) {
                 continue;
             }
 

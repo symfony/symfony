@@ -44,7 +44,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
     /**
      * {@inheritdoc}
      */
-    protected function buildCriteria($ip, $url, $limit, $method)
+    protected function buildCriteria($ip, $url, $start, $end, $limit, $method)
     {
         $criteria = array();
         $args = array();
@@ -63,6 +63,12 @@ class MysqlProfilerStorage extends PdoProfilerStorage
             $criteria[] = 'method = :method';
             $args[':method'] = $method;
         }
+
+        $criteria[] = 'time >= :start';
+        $args[':start'] = $start;
+
+        $criteria[] = 'time <= :end';
+        $args[':end'] = $end;
 
         return array($criteria, $args);
     }

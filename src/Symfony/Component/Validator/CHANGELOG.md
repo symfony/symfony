@@ -22,7 +22,6 @@ CHANGELOG
  * deprecated `ExecutionContext::getCurrentProperty` in favor of `ExecutionContextInterface::getPropertyName`
  * deprecated `ExecutionContext::getCurrentValue` in favor of `ExecutionContextInterface::getValue`
  * deprecated `ExecutionContext::getGraphWalker` in favor of `ExecutionContextInterface::validate` and `ExecutionContextInterface::validateValue`
- * deprecated `ExecutionContext::getMetadataFactory` in favor of `ExecutionContextInterface::getMetadataFor`
  * improved `ValidatorInterface::validateValue` to accept arrays of constraints
  * changed `ValidatorInterface::getMetadataFactory` to return a `MetadataFactoryInterface` instead of a `ClassMetadataFactoryInterface`
  * removed `ClassMetadataFactoryInterface` type hint from `ValidatorBuilderInterface::setMetadataFactory`.

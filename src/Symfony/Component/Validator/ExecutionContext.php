@@ -24,7 +24,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * @var GlobalExecutionContextInterface
      */
-    private $globalContext;
+    protected $globalContext;
 
     /**
      * @var MetadataInterface

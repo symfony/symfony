@@ -157,7 +157,7 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
-            return $this->getAttributes($route, array_replace($matches, $hostnameMatches));
+            return $this->getAttributes($route, $name, array_replace($matches, $hostnameMatches));
         }
     }
 

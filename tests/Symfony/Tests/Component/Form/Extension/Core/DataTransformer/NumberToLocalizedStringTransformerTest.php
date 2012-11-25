@@ -98,8 +98,8 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
 
     public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsNotDot()
     {
-        if ($this->isLowerThanIcuVersion('4.5')) {
-            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        if ($this->isLowerThanIcuVersion('4.7')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.7+');
         }
 
         \Locale::setDefault('fr');
@@ -119,8 +119,8 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
      */
     public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot()
     {
-        if ($this->isLowerThanIcuVersion('4.5')) {
-            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        if ($this->isLowerThanIcuVersion('4.7')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.7+');
         }
 
         $transformer = new NumberToLocalizedStringTransformer(null, true);
@@ -133,8 +133,8 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
      */
     public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot_noGroupSep()
     {
-        if ($this->isLowerThanIcuVersion('4.5')) {
-            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        if ($this->isLowerThanIcuVersion('4.7')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.7+');
         }
 
         $transformer = new NumberToLocalizedStringTransformer(null, true);
@@ -153,8 +153,8 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
 
     public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsNotComma()
     {
-        if ($this->isLowerThanIcuVersion('4.5')) {
-            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        if ($this->isLowerThanIcuVersion('4.7')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.7+');
         }
 
         \Locale::setDefault('ak');
@@ -174,8 +174,8 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
      */
     public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma()
     {
-        if ($this->isLowerThanIcuVersion('4.5')) {
-            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        if ($this->isLowerThanIcuVersion('4.7')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.7+');
         }
 
         \Locale::setDefault('en');
@@ -189,8 +189,8 @@ class NumberToLocalizedStringTransformerTest extends LocalizedTestCase
      */
     public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma_noGroupSep()
     {
-        if ($this->isLowerThanIcuVersion('4.5')) {
-            $this->markTestSkipped('Please upgrade ICU version to 4.5+');
+        if ($this->isLowerThanIcuVersion('4.7')) {
+            $this->markTestSkipped('Please upgrade ICU version to 4.7+');
         }
 
         \Locale::setDefault('en');

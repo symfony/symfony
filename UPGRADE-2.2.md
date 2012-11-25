@@ -54,7 +54,7 @@
    After:
 
    ```
-   use Symfony\Component\Validator\ExecutionContext;
+   use Symfony\Component\Validator\ExecutionContextInterface;
 
    public function validateCustomLogic(ExecutionContextInterface $context)
    ```

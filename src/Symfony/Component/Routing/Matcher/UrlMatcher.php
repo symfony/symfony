@@ -105,18 +105,6 @@ class UrlMatcher implements UrlMatcherInterface
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
         foreach ($routes as $name => $route) {
-            if ($route instanceof RouteCollection) {
-                if (false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
-                    continue;
-                }
-
-                if (!$ret = $this->matchCollection($pathinfo, $route)) {
-                    continue;
-                }
-
-                return $ret;
-            }
-
             $compiledRoute = $route->compile();
 
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches

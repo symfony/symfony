@@ -325,12 +325,28 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCreateServiceWithNewLineWrapping()
     {
         $builder = new ContainerBuilder();
-        $builder->setParameter('foo1class',"\nFooClass\n");
-        $builder->register('foo1','%foo1class%')->setFile(__DIR__.'/Fixtures/includes/foo.php');
-        $this->assertInstanceOf('\FooClass',$builder->get('foo1'), 'New Line Wrapping \n in Parameter should be stripped out.');
-        $builder->setParameter('foo2class',"\rFooClass\r");
-        $builder->register('foo2','%foo2class%')->setFile(__DIR__.'/Fixtures/includes/foo.php');
-        $this->assertInstanceOf('\FooClass',$builder->get('foo2'), 'New Line Wrapping \r in Parameter should be stripped out.');
+        $builder->setParameter('foo1class', "\nFooClass\n");
+        $builder->register('foo1', '%foo1class%')->setFile(__DIR__ . '/Fixtures/includes/foo.php');
+        try {
+            $this->assertInstanceOf(
+                '\FooClass',
+                $builder->get('foo1'),
+                'New Line Wrapping \n in Parameter should be stripped out.'
+            );
+        } catch (\ReflectionException $e) {
+            $this->fail('FooClass is not callable due to the new lines not being stripped');
+        }
+        $builder->setParameter('foo2class', "\rFooClass\r");
+        $builder->register('foo2', '%foo2class%')->setFile(__DIR__ . '/Fixtures/includes/foo.php');
+        try {
+            $this->assertInstanceOf(
+                '\FooClass',
+                $builder->get('foo2'),
+                'New Line Wrapping \r in Parameter should be stripped out.'
+            );
+        } catch (\ReflectionException $e) {
+            $this->fail('FooClass is not callable due to the new lines not being stripped');
+        }
     }
 
     /**
@@ -339,13 +355,32 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCreateServiceWithNewLineWrappingWithWhiteSpace()
     {
         $builder = new ContainerBuilder();
-        $builder->setParameter('foo1class',"\n      FooClass     \n");
-        $builder->register('foo1','%foo1class%')->setFile(__DIR__.'/Fixtures/includes/foo.php');
-        $this->assertInstanceOf('\FooClass',$builder->get('foo1'),'New Line Wrapping \n in Parameter should be stripped out along with whitespace.');
-        $builder = new ContainerBuilder();
-        $builder->setParameter('foo2class',"\r      FooClass     \r");
-        $builder->register('foo2','%foo2class%')->setFile(__DIR__.'/Fixtures/includes/foo.php');
-        $this->assertInstanceOf('\FooClass',$builder->get('foo2'),'New Line Wrapping \r in Parameter should be stripped out along with whitespace.');
+        $builder->setParameter('foo1class', "\n      FooClass     \n");
+        $builder->register('foo1', '%foo1class%')->setFile(__DIR__ . '/Fixtures/includes/foo.php');
+        try {
+            $this->assertInstanceOf(
+                '\FooClass',
+                $builder->get('foo1'),
+                'New Line Wrapping \n in Parameter should be stripped out along with whitespace.'
+            );
+        } catch (\ReflectionException $e) {
+            $this->fail(
+                'FooClass is not callable due to the new lines not being stripped and/or whitespacing not being trimmed'
+            );
+        }
+        $builder->setParameter('foo2class', "\r      FooClass     \r");
+        $builder->register('foo2', '%foo2class%')->setFile(__DIR__ . '/Fixtures/includes/foo.php');
+        try {
+            $this->assertInstanceOf(
+                '\FooClass',
+                $builder->get('foo2'),
+                'New Line Wrapping \r in Parameter should be stripped out along with whitespace.'
+            );
+        } catch (\ReflectionException $e) {
+            $this->fail(
+                'FooClass is not callable due to the new lines not being stripped and/or whitespacing not being trimmed.'
+            );
+        }
     }
 
     /**

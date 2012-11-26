@@ -38,7 +38,7 @@
 
 ### Validator
 
- * Interfaces were created for created for the classes `ConstraintViolation`,
+ * Interfaces were created for the classes `ConstraintViolation`,
    `ConstraintViolationList`, `GlobalExecutionContext` and `ExecutionContext`.
    If you type hinted against any of these classes, you are recommended to
    type hint against their interfaces now.

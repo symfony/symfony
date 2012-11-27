@@ -96,8 +96,8 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testSetMetadataCache()
     {
-        $this->assertSame($this->builder, $this->builder->setMetadataCache($this->getMock(
-            'Symfony\Component\Validator\Mapping\Cache\CacheInterface'))
+        $this->assertSame($this->builder, $this->builder->setMetadataCache(
+            $this->getMock('Symfony\Component\Validator\Mapping\Cache\CacheInterface'))
         );
     }
 
@@ -106,5 +106,17 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->builder, $this->builder->setConstraintValidatorFactory(
             $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface'))
         );
+    }
+
+    public function testSetTranslator()
+    {
+        $this->assertSame($this->builder, $this->builder->setTranslator(
+            $this->getMock('Symfony\Component\Translation\TranslatorInterface'))
+        );
+    }
+
+    public function testSetTranslationDomain()
+    {
+        $this->assertSame($this->builder, $this->builder->setTranslationDomain('TRANS_DOMAIN'));
     }
 }

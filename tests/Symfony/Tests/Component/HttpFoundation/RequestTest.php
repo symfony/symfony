@@ -496,16 +496,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testGetClientIpProvider
      */
-    public function testGetClientIp($expected, $proxy, $remoteAddr, $httpClientIp, $httpForwardedFor)
+    public function testGetClientIp($expected, $proxy, $remoteAddr, $httpForwardedFor)
     {
         $request = new Request;
         $this->assertEquals('', $request->getClientIp());
         $this->assertEquals('', $request->getClientIp(true));
 
         $server = array('REMOTE_ADDR' => $remoteAddr);
-        if (null !== $httpClientIp) {
-            $server['HTTP_CLIENT_IP'] = $httpClientIp;
-        }
         if (null !== $httpForwardedFor) {
             $server['HTTP_X_FORWARDED_FOR'] = $httpForwardedFor;
         }
@@ -517,15 +514,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testGetClientIpProvider()
     {
         return array(
-            array('88.88.88.88', false, '88.88.88.88', null, null),
-            array('127.0.0.1', false, '127.0.0.1', '88.88.88.88', null),
-            array('88.88.88.88', true, '127.0.0.1', '88.88.88.88', null),
-            array('127.0.0.1', false, '127.0.0.1', null, '88.88.88.88'),
-            array('88.88.88.88', true, '127.0.0.1', null, '88.88.88.88'),
-            array('::1', false, '::1', null, null),
-            array('2620:0:1cfe:face:b00c::3', true, '::1', '2620:0:1cfe:face:b00c::3', null),
-            array('2620:0:1cfe:face:b00c::3', true, '::1', null, '2620:0:1cfe:face:b00c::3, ::1'),
-            array('88.88.88.88', true, '123.45.67.89', null, '88.88.88.88, 87.65.43.21, 127.0.0.1'),
+            array('88.88.88.88', false, '88.88.88.88', null),
+            array('127.0.0.1', false, '127.0.0.1', null),
+            array('127.0.0.1', false, '127.0.0.1', '88.88.88.88'),
+            array('88.88.88.88', true, '127.0.0.1', '88.88.88.88'),
+            array('::1', false, '::1', null),
+            array('2620:0:1cfe:face:b00c::3', true, '::1', '2620:0:1cfe:face:b00c::3, ::1'),
+            array('88.88.88.88', true, '123.45.67.89', '88.88.88.88, 87.65.43.21, 127.0.0.1'),
         );
     }
 

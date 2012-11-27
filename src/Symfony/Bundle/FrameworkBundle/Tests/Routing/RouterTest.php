@@ -117,6 +117,29 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testHostnamePatternPlaceholders()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('foo');
+        $route->setHostnamePattern('/before/%parameter.foo%/after/%%unescaped%%');
+
+        $routes->add('foo', $route);
+
+        $sc = $this->getServiceContainer($routes);
+
+        $sc->expects($this->at(1))->method('hasParameter')->with('parameter.foo')->will($this->returnValue(true));
+        $sc->expects($this->at(2))->method('getParameter')->with('parameter.foo')->will($this->returnValue('foo'));
+
+        $router = new Router($sc, 'foo');
+        $route = $router->getRouteCollection()->get('foo');
+
+        $this->assertEquals(
+            '/before/foo/after/%unescaped%',
+            $route->getHostnamePattern()
+        );
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException
      * @expectedExceptionMessage You have requested a non-existent parameter "nope".

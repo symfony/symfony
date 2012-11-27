@@ -20,7 +20,9 @@ namespace Symfony\Component\HttpFoundation;
  */
 class Request
 {
-    protected static $trustProxy = false;
+    protected static $trustProxyData = false;
+
+    protected static $trustedProxies = array();
 
     /**
      * @var \Symfony\Component\HttpFoundation\ParameterBag
@@ -357,14 +359,26 @@ class Request
     /**
      * Trusts $_SERVER entries coming from proxies.
      *
-     * You should only call this method if your application
-     * is hosted behind a reverse proxy that you manage.
-     *
-     * @api
+     * @deprecated Deprecated since version 2.0, to be removed in 2.3. Use setTrustedProxies instead.
      */
     public static function trustProxyData()
     {
-        self::$trustProxy = true;
+        self::$trustProxyData = true;
+    }
+
+    /**
+     * Sets a list of trusted proxies.
+     *
+     * You should only list the reverse proxies that you manage directly.
+     *
+     * @param array $proxies A list of trusted proxies
+     *
+     * @api
+     */
+    public static function setTrustedProxies(array $proxies)
+    {
+        self::$trustedProxies = $proxies;
+        self::$trustProxyData = $proxies ? true : false;
     }
 
     /**
@@ -441,23 +455,41 @@ class Request
     /**
      * Returns the client IP address.
      *
-     * @param Boolean $proxy Whether the current request has been made behind a proxy or not
+     * This method can read the client IP address from the "X-Forwarded-For" header
+     * when trusted proxies were set via "setTrustedProxies()". The "X-Forwarded-For"
+     * header value is a comma+space separated list of IP addresses, the left-most
+     * being the original client, and each successive proxy that passed the request
+     * adding the IP address where it received the request from.
+     *
+     * @param Boolean $proxy Whether the current request has been made behind a proxy or not (deprecated)
      *
      * @return string The client IP address
+     *
+     * @see http://en.wikipedia.org/wiki/X-Forwarded-For
+     *
+     * @deprecated The proxy argument is deprecated since version 2.0 and will be removed in 2.3. Use setTrustedProxies instead.
      *
      * @api
      */
     public function getClientIp($proxy = false)
     {
-        if ($proxy) {
-            if (self::$trustProxy && $this->server->has('HTTP_X_FORWARDED_FOR')) {
-                $clientIp = explode(',', $this->server->get('HTTP_X_FORWARDED_FOR'), 2);
+        $ip = $this->server->get('REMOTE_ADDR');
 
-                return isset($clientIp[0]) ? trim($clientIp[0]) : '';
-            }
+        if (!$proxy && !self::$trustProxyData) {
+            return $ip;
         }
 
-        return $this->server->get('REMOTE_ADDR');
+        if (!$this->server->has('HTTP_X_FORWARDED_FOR')) {
+            return $ip;
+        }
+
+        $clientIps = array_map('trim', explode(',', $this->server->get('HTTP_X_FORWARDED_FOR')));
+        $clientIps[] = $ip;
+
+        $trustedProxies = ($proxy || self::$trustProxyData) && !self::$trustedProxies ? array($ip) : self::$trustedProxies;
+        $clientIps = array_diff($clientIps, $trustedProxies);
+
+        return array_pop($clientIps);
     }
 
     /**
@@ -560,7 +592,7 @@ class Request
      */
     public function getPort()
     {
-        if (self::$trustProxy && $this->headers->has('X-Forwarded-Port')) {
+        if (self::$trustProxyData && $this->headers->has('X-Forwarded-Port')) {
             return $this->headers->get('X-Forwarded-Port');
         }
 
@@ -683,9 +715,9 @@ class Request
         return (
             (strtolower($this->server->get('HTTPS')) == 'on' || $this->server->get('HTTPS') == 1)
             ||
-            (self::$trustProxy && strtolower($this->headers->get('SSL_HTTPS')) == 'on' || $this->headers->get('SSL_HTTPS') == 1)
+            (self::$trustProxyData && strtolower($this->headers->get('SSL_HTTPS')) == 'on' || $this->headers->get('SSL_HTTPS') == 1)
             ||
-            (self::$trustProxy && strtolower($this->headers->get('X_FORWARDED_PROTO')) == 'https')
+            (self::$trustProxyData && strtolower($this->headers->get('X_FORWARDED_PROTO')) == 'https')
         );
     }
 
@@ -698,7 +730,7 @@ class Request
      */
     public function getHost()
     {
-        if (self::$trustProxy && $host = $this->headers->get('X_FORWARDED_HOST')) {
+        if (self::$trustProxyData && $host = $this->headers->get('X_FORWARDED_HOST')) {
             $elements = explode(',', $host);
 
             $host = trim($elements[count($elements) - 1]);

@@ -19,11 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
-    {
-        Request::trustProxyData();
-    }
-
     /**
      * @covers Symfony\Component\HttpFoundation\Request::__construct
      */
@@ -430,15 +425,17 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->initialize(array(), array(), array(), array(), array(), array('HTTP_HOST' => 'www.exemple.com'));
         $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from Host Header');
 
-        // Host header with port number.
+        // Host header with port number
         $request->initialize(array(), array(), array(), array(), array(), array('HTTP_HOST' => 'www.exemple.com:8080'));
         $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from Host Header with port number');
 
-        // Server values.
+        // Server values
         $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com'));
         $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from server name');
 
-        // X_FORWARDED_HOST.
+        Request::setTrustedProxies(array('1.1.1.1'));
+
+        // X_FORWARDED_HOST
         $request->initialize(array(), array(), array(), array(), array(), array('HTTP_X_FORWARDED_HOST' => 'www.exemple.com'));
         $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from X_FORWARDED_HOST');
 
@@ -458,6 +455,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com', 'HTTP_HOST' => 'www.host.com'));
         $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
+
+        Request::setTrustedProxies(array());
     }
 
     /**
@@ -496,15 +495,17 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testGetClientIpProvider
      */
-    public function testGetClientIp($expected, $proxy, $remoteAddr, $httpForwardedFor)
+    public function testGetClientIp($expected, $proxy, $remoteAddr, $httpForwardedFor, $trustedProxies)
     {
-        $request = new Request;
-        $this->assertEquals('', $request->getClientIp());
-        $this->assertEquals('', $request->getClientIp(true));
+        $request = new Request();
 
         $server = array('REMOTE_ADDR' => $remoteAddr);
         if (null !== $httpForwardedFor) {
             $server['HTTP_X_FORWARDED_FOR'] = $httpForwardedFor;
+        }
+
+        if ($proxy || $trustedProxies) {
+            Request::setTrustedProxies(null === $trustedProxies ? array($remoteAddr) : $trustedProxies);
         }
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
@@ -514,13 +515,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testGetClientIpProvider()
     {
         return array(
-            array('88.88.88.88', false, '88.88.88.88', null),
-            array('127.0.0.1', false, '127.0.0.1', null),
-            array('127.0.0.1', false, '127.0.0.1', '88.88.88.88'),
-            array('88.88.88.88', true, '127.0.0.1', '88.88.88.88'),
-            array('::1', false, '::1', null),
-            array('2620:0:1cfe:face:b00c::3', true, '::1', '2620:0:1cfe:face:b00c::3, ::1'),
-            array('88.88.88.88', true, '123.45.67.89', '88.88.88.88, 87.65.43.21, 127.0.0.1'),
+            array('88.88.88.88',              false, '88.88.88.88',  null,                                  null),
+            array('127.0.0.1',                false, '127.0.0.1',    null,                                  null),
+            array('::1',                      false, '::1',          null,                                  null),
+            array('127.0.0.1',                false, '127.0.0.1',    '88.88.88.88',                         null),
+            array('88.88.88.88',              true,  '127.0.0.1',    '88.88.88.88',                         null),
+            array('2620:0:1cfe:face:b00c::3', true,  '::1',          '2620:0:1cfe:face:b00c::3',            null),
+            array('88.88.88.88',              true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', null),
+            array('87.65.43.21',              true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
+            array('87.65.43.21',              false, '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
         );
     }
 

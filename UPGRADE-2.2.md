@@ -64,6 +64,26 @@
    Symfony\Component\Form\Exception namespace or to create custom exception
    classes for your purpose.
 
+ * Translating validation errors is now optional. You can still do so
+   manually if you like, or you can simplify your templates to simply output
+   the already translated message.
+
+   Before:
+
+   ```
+   {{
+       error.messagePluralization is null
+           ? error.messageTemplate|trans(error.messageParameters, 'validators')
+           : error.messageTemplate|transchoice(error.messagePluralization, error.messageParameters, 'validators')
+   }}
+   ```
+
+   After:
+
+   ```
+   {{ error.message }}
+   ```
+
 #### Deprecations
 
  * The methods `getParent()`, `setParent()` and `hasParent()` in

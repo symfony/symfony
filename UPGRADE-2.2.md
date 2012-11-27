@@ -36,6 +36,42 @@
 
   * The PasswordType is now not trimmed by default.
 
+### Routing
+
+ * RouteCollection does not behave like a tree structure anymore but as a flat
+   array of Routes. So when using PHP to build the RouteCollection, you must
+   make sure to add routes to the sub-collection before adding it to the parent
+   collection (this is not relevant when using YAML or XML for Route definitions).
+
+   Before:
+
+   ```
+   $rootCollection = new RouteCollection();
+   $subCollection = new RouteCollection();
+   $rootCollection->addCollection($subCollection);
+   $subCollection->add('foo', new Route('/foo'));
+   ```
+
+   After:
+
+   ```
+   $rootCollection = new RouteCollection();
+   $subCollection = new RouteCollection();
+   $subCollection->add('foo', new Route('/foo'));
+   $rootCollection->addCollection($subCollection);
+   ```
+
+   Also one must call `addCollection` from the bottom to the top hierarchy.
+   So the correct sequence is the following (and not the reverse):
+
+   ```
+   $childCollection->->addCollection($grandchildCollection);
+   $rootCollection->addCollection($childCollection);
+   ```
+
+ * The methods `RouteCollection::getParent()` and `RouteCollection::getRoot()`
+   have been deprecated and will be removed in Symfony 2.3.
+
 ### Validator
 
  * Interfaces were created for the classes `ConstraintViolation`,

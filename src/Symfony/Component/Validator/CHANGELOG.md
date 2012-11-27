@@ -28,6 +28,8 @@ CHANGELOG
    As of Symfony 2.3, this method will be typed against `MetadataFactoryInterface` instead.
  * [BC BREAK] the switches `traverse` and `deep` in the `Valid` constraint and in `GraphWalker::walkReference`
    are ignored for arrays now. Arrays are always traversed recursively.
+ * added dependency to Translation component
+ * violation messages are now translated with a TranslatorInterface implementation
 
 2.1.0
 -----

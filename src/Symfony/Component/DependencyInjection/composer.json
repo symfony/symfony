@@ -19,7 +19,7 @@
         "php": ">=5.3.2"
     },
     "suggest": {
-        "symfony/config": "self.version"
+        "symfony/config": "self.version",
         "symfony/yaml": "self.version"
     },
     "autoload": {

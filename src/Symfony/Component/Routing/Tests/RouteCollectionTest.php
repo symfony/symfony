@@ -27,16 +27,6 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($collection->get('bar'), '->get() returns null if a route does not exist');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testAddInvalidRoute()
-    {
-        $collection = new RouteCollection();
-        $route = new Route('/foo');
-        $collection->add('f o o', $route);
-    }
-
     public function testOverriddenRoute()
     {
         $collection = new RouteCollection();

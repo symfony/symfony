@@ -112,16 +112,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param string $name  The route name
      * @param Route  $route A Route instance
      *
-     * @throws \InvalidArgumentException When route name contains non valid characters
-     *
      * @api
      */
     public function add($name, Route $route)
     {
-        if (!preg_match('/^[a-z0-9A-Z_.]+$/', $name)) {
-            throw new \InvalidArgumentException(sprintf('The provided route name "%s" contains non valid characters. A route name must only contain digits (0-9), letters (a-z and A-Z), underscores (_) and dots (.).', $name));
-        }
-
         $this->remove($name);
 
         $this->routes[$name] = $route;

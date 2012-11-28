@@ -771,13 +771,11 @@ class Request
      */
     public function isSecure()
     {
-        return (
-            (strtolower($this->server->get('HTTPS')) == 'on' || $this->server->get('HTTPS') == 1)
-            ||
-            (self::$trustProxyData && strtolower($this->headers->get('SSL_HTTPS')) == 'on' || $this->headers->get('SSL_HTTPS') == 1)
-            ||
-            (self::$trustProxyData && self::$trustedHeaders['client_proto'] && strtolower($this->headers->get(self::$trustedHeaders['client_proto'])) == 'https')
-        );
+        if (self::$trustProxyData && self::$trustedHeaders['client_proto'] && $proto = $this->headers->get(self::$trustedHeaders['client_proto'])) {
+            return in_array(strtolower($proto), array('https', 'on', '1'));
+        }
+
+        return 'on' == strtolower($this->server->get('HTTPS')) || 1 == $this->server->get('HTTPS');
     }
 
     /**

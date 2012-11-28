@@ -20,6 +20,11 @@ namespace Symfony\Component\HttpFoundation;
  */
 class Request
 {
+    const HEADER_CLIENT_IP = 'client_ip';
+    const HEADER_CLIENT_HOST = 'client_host';
+    const HEADER_CLIENT_PROTO = 'client_proto';
+    const HEADER_CLIENT_PORT = 'client_port';
+
     protected static $trustProxyData = false;
 
     protected static $trustedProxies = array();
@@ -32,10 +37,10 @@ class Request
      * by popular reverse proxies (like Apache mod_proxy or Amazon EC2).
      */
     protected static $trustedHeaders = array(
-        'client_ip'    => 'X_FORWARDED_FOR',
-        'client_host'  => 'X_FORWARDED_HOST',
-        'client_proto' => 'X_FORWARDED_PROTO',
-        'client_port'  => 'X_FORWARDED_PORT',
+        self::HEADER_CLIENT_IP    => 'X_FORWARDED_FOR',
+        self::HEADER_CLIENT_HOST  => 'X_FORWARDED_HOST',
+        self::HEADER_CLIENT_PROTO => 'X_FORWARDED_PROTO',
+        self::HEADER_CLIENT_PORT  => 'X_FORWARDED_PORT',
     );
 
     /**
@@ -400,10 +405,10 @@ class Request
      *
      * The following header keys are supported:
      *
-     *  * client_ip:    defaults to X-Forwarded-For   (see getClientIp())
-     *  * client_host:  defaults to X-Forwarded-Host  (see getClientHost())
-     *  * client_port:  defaults to X-Forwarded-Port  (see getClientPort())
-     *  * client_proto: defaults to X-Forwarded-Proto (see getScheme() and isSecure())
+     *  * Request::HEADER_CLIENT_IP:    defaults to X-Forwarded-For   (see getClientIp())
+     *  * Request::HEADER_CLIENT_HOST:  defaults to X-Forwarded-Host  (see getClientHost())
+     *  * Request::HEADER_CLIENT_PORT:  defaults to X-Forwarded-Port  (see getClientPort())
+     *  * Request::HEADER_CLIENT_PROTO: defaults to X-Forwarded-Proto (see getScheme() and isSecure())
      *
      * Setting an empty value allows to disable the trusted header for the given key.
      *
@@ -521,11 +526,11 @@ class Request
             return $ip;
         }
 
-        if (!self::$trustedHeaders['client_ip'] || !$this->headers->has(self::$trustedHeaders['client_ip'])) {
+        if (!self::$trustedHeaders[self::HEADER_CLIENT_IP] || !$this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
             return $ip;
         }
 
-        $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders['client_ip'])));
+        $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
         $clientIps[] = $ip;
 
         $trustedProxies = ($proxy || self::$trustProxyData) && !self::$trustedProxies ? array($ip) : self::$trustedProxies;
@@ -642,7 +647,7 @@ class Request
      */
     public function getPort()
     {
-        if (self::$trustProxyData && self::$trustedHeaders['client_port'] && $port = $this->headers->get(self::$trustedHeaders['client_port'])) {
+        if (self::$trustProxyData && self::$trustedHeaders[self::HEADER_CLIENT_PORT] && $port = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PORT])) {
             return $port;
         }
 
@@ -771,7 +776,7 @@ class Request
      */
     public function isSecure()
     {
-        if (self::$trustProxyData && self::$trustedHeaders['client_proto'] && $proto = $this->headers->get(self::$trustedHeaders['client_proto'])) {
+        if (self::$trustProxyData && self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && $proto = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO])) {
             return in_array(strtolower($proto), array('https', 'on', '1'));
         }
 
@@ -795,7 +800,7 @@ class Request
      */
     public function getHost()
     {
-        if (self::$trustProxyData && self::$trustedHeaders['client_host'] && $host = $this->headers->get(self::$trustedHeaders['client_host'])) {
+        if (self::$trustProxyData && self::$trustedHeaders[self::HEADER_CLIENT_HOST] && $host = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_HOST])) {
             $elements = explode(',', $host);
 
             $host = trim($elements[count($elements) - 1]);

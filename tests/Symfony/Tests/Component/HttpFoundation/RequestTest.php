@@ -887,20 +887,20 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($request->isSecure());
 
         // custom header names
-        Request::setTrustedHeaderName('client_ip', 'X_MY_FOR');
-        Request::setTrustedHeaderName('client_host', 'X_MY_HOST');
-        Request::setTrustedHeaderName('client_port', 'X_MY_PORT');
-        Request::setTrustedHeaderName('client_proto', 'X_MY_PROTO');
+        Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, 'X_MY_FOR');
+        Request::setTrustedHeaderName(Request::HEADER_CLIENT_HOST, 'X_MY_HOST');
+        Request::setTrustedHeaderName(Request::HEADER_CLIENT_PORT, 'X_MY_PORT');
+        Request::setTrustedHeaderName(Request::HEADER_CLIENT_PROTO, 'X_MY_PROTO');
         $this->assertEquals('4.4.4.4', $request->getClientIp());
         $this->assertEquals('my.example.com', $request->getHost());
         $this->assertEquals(81, $request->getPort());
         $this->assertFalse($request->isSecure());
 
         // disabling via empty header names
-        Request::setTrustedHeaderName('client_ip', null);
-        Request::setTrustedHeaderName('client_host', null);
-        Request::setTrustedHeaderName('client_port', null);
-        Request::setTrustedHeaderName('client_proto', null);
+        Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, null);
+        Request::setTrustedHeaderName(Request::HEADER_CLIENT_HOST, null);
+        Request::setTrustedHeaderName(Request::HEADER_CLIENT_PORT, null);
+        Request::setTrustedHeaderName(Request::HEADER_CLIENT_PROTO, null);
         $this->assertEquals('3.3.3.3', $request->getClientIp());
         $this->assertEquals('example.com', $request->getHost());
         $this->assertEquals(80, $request->getPort());

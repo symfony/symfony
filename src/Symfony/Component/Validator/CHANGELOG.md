@@ -30,6 +30,12 @@ CHANGELOG
    are ignored for arrays now. Arrays are always traversed recursively.
  * added dependency to Translation component
  * violation messages are now translated with a TranslatorInterface implementation
+ * [BC BREAK] inserted argument `$message` in the constructor of `ConstraintViolation`
+ * [BC BREAK] inserted arguments `$translator` and `$translationDomain` in the constructor of `ExecutionContext`
+ * [BC BREAK] inserted arguments `$translator` and `$translationDomain` in the constructor of `GraphWalker`
+ * [BC BREAK] inserted arguments `$translator` and `$translationDomain` in the constructor of `ValidationVisitor`
+ * [BC BREAK] inserted arguments `$translator` and `$translationDomain` in the constructor of `Validator`
+ * [BC BREAK] added `setTranslator()` and `setTranslationDomain()` to `ValidatorBuilderInterface`
 
 2.1.0
 -----

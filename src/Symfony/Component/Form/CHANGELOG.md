@@ -12,6 +12,7 @@ CHANGELOG
  * deprecated FormException and introduced ExceptionInterface instead
  * [BC BREAK] FormException is now an interface
  * protected FormBuilder methods from being called when it is turned into a FormConfigInterface with getFormConfig()
+ * [BC BREAK] inserted argument `$message` in the constructor of `FormError`
 
 2.1.0
 -----

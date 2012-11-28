@@ -294,6 +294,13 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('/app.php/test', $this->getGenerator($routes)->generate('test'));
     }
 
+    public function testGenerateWithSpecialRouteName()
+    {
+        $routes = $this->getRoutes('$péß^a|', new Route('/bar'));
+
+        $this->assertSame('/app.php/bar', $this->getGenerator($routes)->generate('$péß^a|'));
+    }
+
     public function testUrlEncoding()
     {
         // This tests the encoding of reserved characters that are used for delimiting of URI components (defined in RFC 3986)

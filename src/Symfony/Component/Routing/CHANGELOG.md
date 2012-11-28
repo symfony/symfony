@@ -20,6 +20,8 @@ CHANGELOG
    check on URL generation completely by calling `setStrictRequirements(null)`. It
    improves performance in production environment as you should know that params always
    pass the requirements (otherwise it would break your link anyway).
+ * There is no restriction on the route name anymore. So non-alphanumeric characters
+   are now also allowed.
 
 2.1.0
 -----

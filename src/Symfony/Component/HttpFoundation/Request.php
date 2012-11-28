@@ -32,6 +32,8 @@ class Request
 {
     protected static $trustProxy = false;
 
+    protected static $httpMethodParameterOverride = false;
+
     /**
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
@@ -504,6 +506,19 @@ class Request
     }
 
     /**
+     * Enables support for the _method request parameter to determine the intended HTTP method.
+     *
+     * Be warned that enabling this feature might lead to CSRF issues in your code.
+     * Check that you are using CSRF tokens when required.
+     *
+     * The HTTP method can only be overriden when the real HTTP method is POST.
+     */
+    public static function enableHttpMethodParameterOverride()
+    {
+        self::$httpMethodParameterOverride = true;
+    }
+
+    /**
      * Gets a "parameter" value.
      *
      * This method is mainly useful for libraries that want to provide some flexibility.
@@ -915,24 +930,49 @@ class Request
     }
 
     /**
-     * Gets the request method.
+     * Gets the request "intended" method.
+     *
+     * If the X-HTTP-Method-Override header is set, and if the method is a POST,
+     * then it is used to determine the "real" intended HTTP method.
+     *
+     * The _method request parameter can also be used to determine the HTTP method,
+     * but only if enableHttpMethodParameterOverride() has been called.
      *
      * The method is always an uppercased string.
      *
      * @return string The request method
      *
      * @api
+     *
+     * @see getRealMethod
      */
     public function getMethod()
     {
         if (null === $this->method) {
             $this->method = strtoupper($this->server->get('REQUEST_METHOD', 'GET'));
+
             if ('POST' === $this->method) {
-                $this->method = strtoupper($this->headers->get('X-HTTP-METHOD-OVERRIDE', $this->request->get('_method', $this->query->get('_method', 'POST'))));
+                if ($method = $this->headers->get('X-HTTP-METHOD-OVERRIDE')) {
+                    $this->method = strtoupper($method);
+                } elseif (self::$httpMethodParameterOverride) {
+                    $this->method = strtoupper($this->request->get('_method', $this->query->get('_method', 'POST')));
+                }
             }
         }
 
         return $this->method;
+    }
+
+    /**
+     * Gets the "real" request method.
+     *
+     * @return string The request method
+     *
+     * @see getMethod
+     */
+    public function getRealMethod()
+    {
+        return $this->server->get('REQUEST_METHOD', 'GET');
     }
 
     /**

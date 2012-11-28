@@ -12,6 +12,9 @@
 
  * The Stopwatch functionality was moved from HttpKernel\Debug to its own component
 
+ * The _method request parameter support has been disabled by default (call
+   Request::enableHttpMethodParameterOverride() to enable it).
+
 #### Deprecations
 
  * The `Request::splitHttpAcceptHeader()` is deprecated and will be removed in 2.3.

@@ -675,13 +675,28 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->setMethod('POST');
         $request->request->set('_method', 'purge');
-        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
+        $this->assertEquals('POST', $request->getMethod(), '->getMethod() does not return the method from _method if defined and POST but support not enabled');
 
+        $request = new Request();
         $request->setMethod('POST');
-        $request->request->remove('_method');
-        $request->query->set('_method', 'purge');
+        $request->request->set('_method', 'purge');
+        Request::enableHttpMethodParameterOverride();
         $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
+        $this->disableHttpMethodParameterOverride();
 
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->query->set('_method', 'purge');
+        $this->assertEquals('POST', $request->getMethod(), '->getMethod() does not return the method from _method if defined and POST but support not enabled');
+
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->query->set('_method', 'purge');
+        Request::enableHttpMethodParameterOverride();
+        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
+        $this->disableHttpMethodParameterOverride();
+
+        $request = new Request();
         $request->setMethod('POST');
         $request->headers->set('X-HTTP-METHOD-OVERRIDE', 'delete');
         $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override even though _method is set if defined and POST');
@@ -807,6 +822,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         unset($_SERVER['REQUEST_METHOD'], $_SERVER['CONTENT_TYPE']);
 
+        $request = Request::createFromGlobals();
+        Request::enableHttpMethodParameterOverride();
         $_POST['_method']   = $method;
         $_POST['foo6']      = 'bar6';
         $_SERVER['REQUEST_METHOD'] = 'POST';
@@ -815,6 +832,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar6', $request->request->get('foo6'));
 
         unset($_POST['_method'], $_POST['foo6'], $_SERVER['REQUEST_METHOD']);
+        $this->disableHttpMethodParameterOverride();
     }
 
     public function testOverrideGlobals()
@@ -1251,6 +1269,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $class = new \ReflectionClass('Symfony\\Component\\HttpFoundation\\Request');
         $property = $class->getProperty('trustProxy');
+        $property->setAccessible(true);
+        $property->setValue(false);
+    }
+
+    private function disableHttpMethodParameterOverride()
+    {
+        $class = new \ReflectionClass('Symfony\\Component\\HttpFoundation\\Request');
+        $property = $class->getProperty('httpMethodParameterOverride');
         $property->setAccessible(true);
         $property->setValue(false);
     }

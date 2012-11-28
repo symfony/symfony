@@ -79,6 +79,16 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('incomplete.yml');
     }
 
+    public function testLoadSpecialRouteName()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('special_route_name.yml');
+        $route = $routeCollection->get('#$péß^a|');
+
+        $this->assertInstanceOf('Symfony\Component\Routing\Route', $route);
+        $this->assertSame('/true', $route->getPattern());
+    }
+
     public function testLoadWithPattern()
     {
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));

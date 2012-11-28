@@ -25,6 +25,20 @@ class Request
     protected static $trustedProxies = array();
 
     /**
+     * Names for headers that can be trusted when
+     * using trusted proxies.
+     *
+     * The default names are non-standard, but widely used
+     * by popular reverse proxies (like Apache mod_proxy or Amazon EC2).
+     */
+    protected static $trustedHeaders = array(
+        'client_ip'    => 'X_FORWARDED_FOR',
+        'client_host'  => 'X_FORWARDED_HOST',
+        'client_proto' => 'X_FORWARDED_PROTO',
+        'client_port'  => 'X_FORWARDED_PORT',
+    );
+
+    /**
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
      * @api
@@ -382,6 +396,30 @@ class Request
     }
 
     /**
+     * Sets the name for trusted headers.
+     *
+     * The following header keys are supported:
+     *
+     *  * client_ip:    defaults to X-Forwarded-For   (see getClientIp())
+     *  * client_host:  defaults to X-Forwarded-Host  (see getClientHost())
+     *  * client_port:  defaults to X-Forwarded-Port  (see getClientPort())
+     *  * client_proto: defaults to X-Forwarded-Proto (see getScheme() and isSecure())
+     *
+     * Setting an empty value allows to disable the trusted header for the given key.
+     *
+     * @param string $key   The header key
+     * @param string $value The header name
+     */
+    public static function setTrustedHeaderName($key, $value)
+    {
+        if (!array_key_exists($key, self::$trustedHeaders)) {
+            throw new \InvalidArgumentException(sprintf('Unable to set the trusted header name for key "%s".', $key));
+        }
+
+        self::$trustedHeaders[$key] = $value;
+    }
+
+    /**
      * Gets a "parameter" value.
      *
      * This method is mainly useful for libraries that want to provide some flexibility.
@@ -461,6 +499,10 @@ class Request
      * being the original client, and each successive proxy that passed the request
      * adding the IP address where it received the request from.
      *
+     * If your reverse proxy uses a different header name than "X-Forwarded-For",
+     * ("Client-Ip" for instance), configure it via "setTrustedHeaderName()" with
+     * the "client-ip" key.
+     *
      * @param Boolean $proxy Whether the current request has been made behind a proxy or not (deprecated)
      *
      * @return string The client IP address
@@ -479,11 +521,11 @@ class Request
             return $ip;
         }
 
-        if (!$this->server->has('HTTP_X_FORWARDED_FOR')) {
+        if (!self::$trustedHeaders['client_ip'] || !$this->headers->has(self::$trustedHeaders['client_ip'])) {
             return $ip;
         }
 
-        $clientIps = array_map('trim', explode(',', $this->server->get('HTTP_X_FORWARDED_FOR')));
+        $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders['client_ip'])));
         $clientIps[] = $ip;
 
         $trustedProxies = ($proxy || self::$trustProxyData) && !self::$trustedProxies ? array($ip) : self::$trustedProxies;
@@ -586,14 +628,22 @@ class Request
     /**
      * Returns the port on which the request is made.
      *
+     * This method can read the client port from the "X-Forwarded-Port" header
+     * when trusted proxies were set via "setTrustedProxies()".
+     *
+     * The "X-Forwarded-Port" header must contain the client port.
+     *
+     * If your reverse proxy uses a different header name than "X-Forwarded-Port",
+     * configure it via "setTrustedHeaderName()" with the "client-port" key.
+     *
      * @return string
      *
      * @api
      */
     public function getPort()
     {
-        if (self::$trustProxyData && $this->headers->has('X-Forwarded-Port')) {
-            return $this->headers->get('X-Forwarded-Port');
+        if (self::$trustProxyData && self::$trustedHeaders['client_port'] && $port = $this->headers->get(self::$trustedHeaders['client_port'])) {
+            return $port;
         }
 
         return $this->server->get('SERVER_PORT');
@@ -706,6 +756,15 @@ class Request
     /**
      * Checks whether the request is secure or not.
      *
+     * This method can read the client port from the "X-Forwarded-Proto" header
+     * when trusted proxies were set via "setTrustedProxies()".
+     *
+     * The "X-Forwarded-Proto" header must contain the protocol: "https" or "http".
+     *
+     * If your reverse proxy uses a different header name than "X-Forwarded-Proto"
+     * ("SSL_HTTPS" for instance), configure it via "setTrustedHeaderName()" with
+     * the "client-proto" key.
+     *
      * @return Boolean
      *
      * @api
@@ -717,12 +776,20 @@ class Request
             ||
             (self::$trustProxyData && strtolower($this->headers->get('SSL_HTTPS')) == 'on' || $this->headers->get('SSL_HTTPS') == 1)
             ||
-            (self::$trustProxyData && strtolower($this->headers->get('X_FORWARDED_PROTO')) == 'https')
+            (self::$trustProxyData && self::$trustedHeaders['client_proto'] && strtolower($this->headers->get(self::$trustedHeaders['client_proto'])) == 'https')
         );
     }
 
     /**
      * Returns the host name.
+     *
+     * This method can read the client port from the "X-Forwarded-Host" header
+     * when trusted proxies were set via "setTrustedProxies()".
+     *
+     * The "X-Forwarded-Host" header must contain the client host name.
+     *
+     * If your reverse proxy uses a different header name than "X-Forwarded-Host",
+     * configure it via "setTrustedHeaderName()" with the "client-host" key.
      *
      * @return string
      *
@@ -730,7 +797,7 @@ class Request
      */
     public function getHost()
     {
-        if (self::$trustProxyData && $host = $this->headers->get('X_FORWARDED_HOST')) {
+        if (self::$trustProxyData && self::$trustedHeaders['client_host'] && $host = $this->headers->get(self::$trustedHeaders['client_host'])) {
             $elements = explode(',', $host);
 
             $host = trim($elements[count($elements) - 1]);

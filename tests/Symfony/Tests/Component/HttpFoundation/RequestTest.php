@@ -433,6 +433,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com'));
         $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() from server name');
 
+        $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com', 'HTTP_HOST' => 'www.host.com'));
+        $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
+
         Request::setTrustedProxies(array('1.1.1.1'));
 
         // X_FORWARDED_HOST
@@ -453,10 +456,22 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com', 'HTTP_X_FORWARDED_HOST' => 'www.forward.com'));
         $this->assertEquals('www.forward.com', $request->getHost(), '->getHost() value from X_FORWARDED_HOST has priority over SERVER_NAME ');
 
-        $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com', 'HTTP_HOST' => 'www.host.com'));
-        $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
+        // custom X_FORWARDED_HOST header name
+        Request::setTrustedHeaderName('client_host', 'X_MY_HOST');
+        $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com', 'HTTP_X_MY_HOST' => 'www.forward.com'));
+        $this->assertEquals('www.forward.com', $request->getHost(), '->getHost() value from custom header name has priority over SERVER_NAME ');
 
+        // X_FORWARDED_HOST ignored when custom header name is empty
+        Request::setTrustedHeaderName('client_host', null);
+        $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com', 'HTTP_X_FORWARDED_HOST' => 'www.forward.com'));
+        $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() value from X_FORWARDED_HOST has priority over SERVER_NAME ');
+
+        Request::setTrustedHeaderName('client_host', 'X_FORWARDED_HOST');
         Request::setTrustedProxies(array());
+
+        // X_FORWARDED_HOST ignored when no trusted proxies
+        $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com', 'HTTP_X_FORWARDED_HOST' => 'www.forward.com'));
+        $this->assertEquals('www.exemple.com', $request->getHost(), '->getHost() value from X_FORWARDED_HOST has priority over SERVER_NAME ');
     }
 
     /**
@@ -510,6 +525,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
         $this->assertEquals($expected, $request->getClientIp($proxy));
+
+        Request::setTrustedProxies(array());
     }
 
     public function testGetClientIpProvider()
@@ -619,7 +636,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->headers->set('X_FORWARDED_PROTO', 'https');
 
+        Request::setTrustedProxies(array('1.1.1.1'));
         $this->assertTrue($request->isSecure());
+        Request::setTrustedProxies(array());
 
         $request->overrideGlobals();
 
@@ -813,12 +832,28 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testForwardedSecure()
     {
-        $request = new Request();
+        $request = Request::create('http://test.com/');
         $request->headers->set('X-Forwarded-Proto', 'https');
         $request->headers->set('X-Forwarded-Port', 443);
 
+        $this->assertFalse($request->isSecure());
+        $this->assertEquals(80, $request->getPort());
+
+        Request::setTrustedProxies(array('1.1.1.1'));
+
         $this->assertTrue($request->isSecure());
         $this->assertEquals(443, $request->getPort());
+
+        // custom header names
+        Request::setTrustedHeaderName('client_proto', 'X-My-Proto');
+        Request::setTrustedHeaderName('client_port', 'X-My-Port');
+        $request->headers->set('X-My-Proto', 'http');
+        $request->headers->set('X-My-Port', 81);
+
+        $this->assertFalse($request->isSecure());
+        $this->assertEquals(81, $request->getPort());
+
+        Request::setTrustedProxies(array());
     }
 
     public function testHasSession()

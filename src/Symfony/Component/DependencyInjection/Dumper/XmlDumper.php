@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Martin Hasoň <martin.hason@gmail.com>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * @api
  */
@@ -238,6 +239,14 @@ class XmlDumper extends Dumper
                     $element->setAttribute('on-invalid', 'null');
                 } elseif ($behaviour == ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
                     $element->setAttribute('on-invalid', 'ignore');
+                }
+
+                if ( ! $value->isStrict()) {
+                    $element->setAttribute('strict', 'false');
+                }
+
+                if ($value->isLazy()) {
+                    $element->setAttribute('lazy', 'true');
                 }
             } elseif ($value instanceof Definition) {
                 $element->setAttribute('type', 'service');

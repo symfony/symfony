@@ -74,6 +74,11 @@ class SimpleXMLElement extends \SimpleXMLElement
                     }
 
                     $arguments[$key] = new Reference((string) $arg['id'], $invalidBehavior, $strict);
+
+                    if (isset($arg['lazy'])) {
+                        $arguments[$key]->setLazy(self::phpize($arg['lazy']));
+                    }
+
                     break;
                 case 'collection':
                     $arguments[$key] = $arg->getArgumentsAsPhp($name, false);

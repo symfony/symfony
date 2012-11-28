@@ -15,6 +15,7 @@ namespace Symfony\Component\DependencyInjection;
  * Reference represents a service reference.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * @api
  */
@@ -23,6 +24,7 @@ class Reference
     private $id;
     private $invalidBehavior;
     private $strict;
+    private $lazy = false;
 
     /**
      * Constructor.
@@ -68,5 +70,29 @@ class Reference
     public function isStrict()
     {
         return $this->strict;
+    }
+
+    /**
+     * Whether this reference should be lazily initialized if available.
+     *
+     * @return Boolean
+     */
+    public function isLazy()
+    {
+        return $this->lazy;
+    }
+
+    /**
+     * Sets the lazily initialization status for this reference.
+     *
+     * @param Boolean $bool
+     *
+     * @return Reference
+     */
+    public function setLazy($bool)
+    {
+        $this->lazy = $bool;
+
+        return $this;
     }
 }

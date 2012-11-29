@@ -146,9 +146,13 @@
 {% spaceless %}
     {% if widget == 'single_text' %}
         {{ block('form_widget_simple') }}
-    {% else %}
+    {% elseif widget == 'text' %}
         <div {{ block('widget_container_attributes') }}>
             {{ form_widget(form.hour, { 'attr': { 'size': '1' } }) }}:{{ form_widget(form.minute, { 'attr': { 'size': '1' } }) }}{% if with_seconds %}:{{ form_widget(form.second, { 'attr': { 'size': '1' } }) }}{% endif %}
+        </div>
+    {% else %}
+        <div {{ block('widget_container_attributes') }}>
+            {{ form_widget(form.hour) }}:{{ form_widget(form.minute) }}{% if with_seconds %}:{{ form_widget(form.second) }}{% endif %}
         </div>
     {% endif %}
 {% endspaceless %}

@@ -607,7 +607,7 @@ class Request
             if ($this->server->has('HTTP_CLIENT_IP')) {
                 return $this->server->get('HTTP_CLIENT_IP');
             } elseif ($this->server->has('HTTP_X_FORWARDED_FOR')) {
-                $clientIp = explode(',', $this->server->get('HTTP_X_FORWARDED_FOR'));
+                $clientIp = array_reverse(explode(',', $this->server->get('HTTP_X_FORWARDED_FOR')));
 
                 foreach ($clientIp as $ipAddress) {
                     $cleanIpAddress = trim($ipAddress);

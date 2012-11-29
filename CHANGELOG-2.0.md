@@ -7,6 +7,30 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.19 (2012-11-29)
+
+ * e5536f0: replaced magic strings by proper constants
+ * 6a3ba52: fixed the logic in Request::isSecure() (if the information comes from a source that we trust, don't check other ones)
+ * 67e12f3: added a way to configure the X-Forwarded-XXX header names and a way to disable trusting them
+ * b45873a: fixed algorithm used to determine the trusted client IP
+ * 254b110: removed the non-standard Client-IP HTTP header
+ * fc89d6b: [DependencyInjection] fixed composer.json
+ * ac77c5b: [Form] Updated checks for the ICU version from 4.5+ to 4.7+ due to test failures with ICU 4.6
+ * 29bfa13: small fix of #5984 when the container param is not set
+ * 64b54dc: Use better default ports in urlRedirectAction
+ * f2cbea3: [Security] remove escape charters from username provided by Digest DigestAuthenticationListener
+ * 694697d: [Security] Fixed digest authentication
+ * c067586: [Security] Fixed digest authentication
+ * 32dc31e: [SecurityBundle] Convert Http method to uppercase in the config
+ * b3a8efd: fixed comment. The parent ACL is not accessed in this method.
+ * e12bd12: [HttpFoundation] Make host & methods really case insensitive in the RequestMacther
+ * 15a5868: [Validator] fixed Ukrainian language code (closes #5972)
+ * dc80385: [Form] Fixed NumberToLocalizedStringTransformer to accept both comma and dot as decimal separator, if possible
+ * 9872d26: [HttpFoundation] Fix name sanitization after perfoming move
+ * 6f15c47: [ClassLoader] fixed unbracketed namespaces (closes #5747)
+ * 2d9a6fc: Use Norm Data instead of Data
+ * a094f7e: Add check to Store::unlock to ensure file exists
+
 * 2.0.18 (2012-10-25)
 
  * 20898e5: Add to DateFormats 'D M d H:i:s Y T' (closes #5830)

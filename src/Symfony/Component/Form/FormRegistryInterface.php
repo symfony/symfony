@@ -55,7 +55,7 @@ interface FormRegistryInterface
     /**
      * Returns the guesser responsible for guessing types.
      *
-     * @return FormTypeGuesserInterface
+     * @return FormTypeGuesserInterface|null
      */
     public function getTypeGuesser();
 

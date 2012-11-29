@@ -357,14 +357,24 @@ class Filesystem
         foreach ($iterator as $file) {
             $target = str_replace($originDir, $targetDir, $file->getPathname());
 
-            if (is_dir($file)) {
-                $this->mkdir($target);
-            } elseif (!$copyOnWindows && is_link($file)) {
-                $this->symlink($file, $target);
-            } elseif (is_file($file) || ($copyOnWindows && is_link($file))) {
-                $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+            if ($copyOnWindows) {
+                if (is_link($file) || is_file($file)) {
+                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+                } else if (is_dir($file)) {
+                    $this->mkdir($target);
+                } else {
+                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
+                }
             } else {
-                throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
+                if (is_link($file)) {
+                    $this->symlink($file, $target);
+                } else if (is_dir($file)) {
+                    $this->mkdir($target);
+                } else if (is_file($file)) {
+                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+                } else {
+                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
+                }
             }
         }
     }

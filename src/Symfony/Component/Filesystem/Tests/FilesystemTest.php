@@ -819,6 +819,26 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
     }
 
+    public function testMirrorCopiesLinkedDirectoryContents()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
+
+        mkdir($sourcePath . 'nested/', 0777, true);
+        file_put_contents($sourcePath.'/nested/file1.txt', 'FILE1');
+        // Note: We symlink directory, not file
+        symlink($sourcePath.'nested', $sourcePath.'link1');
+
+        $targetPath = $this->workspace.DIRECTORY_SEPARATOR.'target'.DIRECTORY_SEPARATOR;
+
+        $this->filesystem->mirror($sourcePath, $targetPath);
+
+        $this->assertTrue(is_dir($targetPath));
+        $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.DIRECTORY_SEPARATOR.'link1/file1.txt');
+        $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
+    }
+
     /**
      * @dataProvider providePathsForIsAbsolutePath
      */

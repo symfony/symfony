@@ -15,6 +15,14 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileTypeTest extends TypeTestCase
 {
+    public function testFormBuilderIfEntityHasFile()
+    {
+        $this->factory->createBuilder('file')
+            ->getForm()
+            ->setData($this->createUploadedFileMock('abcdef', 'original.jpg', true))
+        ;
+    }
+
     public function testDontPassValueToView()
     {
         $form = $this->factory->create('file');

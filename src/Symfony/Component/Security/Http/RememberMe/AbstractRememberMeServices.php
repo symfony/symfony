@@ -195,6 +195,12 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             $this->logger->debug('Remember-me was requested; setting cookie.');
         }
 
+        // Remove attribute from request that sets a NULL cookie.
+        // It was set by $this->cancelCookie()
+        // (cancelCookie does other things too for some RememberMeServices
+        // so we should still call it at the start of this method)
+        $request->attributes->remove(self::COOKIE_ATTR_NAME);
+
         $this->onLoginSuccess($request, $response, $token);
     }
 

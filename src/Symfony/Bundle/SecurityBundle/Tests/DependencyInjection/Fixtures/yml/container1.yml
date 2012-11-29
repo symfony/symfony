@@ -51,7 +51,7 @@ security:
         ROLE_REMOTE:      ROLE_USER,ROLE_ADMIN
 
     access_control:
-        - { path: /blog/524, role: ROLE_USER, requires_channel: https }
+        - { path: /blog/524, role: ROLE_USER, requires_channel: https, methods: [get, POST]}
         -
             path: /blog/.*
             role: IS_AUTHENTICATED_ANONYMOUSLY

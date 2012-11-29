@@ -102,6 +102,7 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
         $matcherIds = array();
         foreach ($rules as $rule) {
             list($matcherId, $roles, $channel) = $rule;
+            $requestMatcher = $container->getDefinition($matcherId);
 
             $this->assertFalse(isset($matcherIds[$matcherId]));
             $matcherIds[$matcherId] = true;
@@ -110,9 +111,17 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
             if (1 === $i) {
                 $this->assertEquals(array('ROLE_USER'), $roles);
                 $this->assertEquals('https', $channel);
+                $this->assertEquals(
+                    array('/blog/524', null, array('GET', 'POST')),
+                    $requestMatcher->getArguments()
+                );
             } elseif (2 === $i) {
                 $this->assertEquals(array('IS_AUTHENTICATED_ANONYMOUSLY'), $roles);
                 $this->assertNull($channel);
+                $this->assertEquals(
+                    array('/blog/.*'),
+                    $requestMatcher->getArguments()
+                );
             }
         }
     }

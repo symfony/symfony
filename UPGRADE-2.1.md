@@ -29,6 +29,7 @@
     Therefore you should change the namespace of this bundle in your AppKernel.php:
 
     Before: `new Symfony\Bundle\DoctrineBundle\DoctrineBundle()`
+
     After: `new Doctrine\Bundle\DoctrineBundle\DoctrineBundle()`
 
 ### HttpFoundation
@@ -52,11 +53,6 @@
         default_locale: fr
     ```
 
-  * The methods `getPathInfo()`, `getBaseUrl()` and `getBasePath()` of
-    a `Request` now all return a raw value (vs a urldecoded value before). Any call
-    to one of these methods must be checked and wrapped in a `rawurldecode()` if
-    needed.
-
     ##### Retrieving the locale from a Twig template
 
     Before: `{{ app.request.session.locale }}` or `{{ app.session.locale }}`
@@ -75,13 +71,11 @@
 
     After: `$request->getLocale()`
 
-### HttpFoundation
+    ##### Simulate old behavior
 
- * The current locale for the user is not stored anymore in the session
-
-   You can simulate the old behavior by registering a listener that looks like
-   the following if the parameter which handles the locale value in the
-   request is `_locale`:
+    You can simulate that the locale for the user is still stored in the session by
+    registering a listener that looks like the following if the parameter which 
+    handles the locale value in the request is `_locale`:
 
    ```
    namespace XXX;
@@ -122,6 +116,11 @@
        }
    }
    ```
+
+  * The methods `getPathInfo()`, `getBaseUrl()` and `getBasePath()` of
+    a `Request` now all return a raw value (vs a urldecoded value before). Any call
+    to one of these methods must be checked and wrapped in a `rawurldecode()` if
+    needed.
 
 ### Security
 
@@ -1340,6 +1339,9 @@
     ```
 
 ### Session
+
+  * The namespace of the Session class changed from `Symfony\Component\HttpFoundation\Session`
+    to `Symfony\Component\HttpFoundation\Session\Session`.
 
   * Using `get` to retrieve flash messages now returns an array.
 

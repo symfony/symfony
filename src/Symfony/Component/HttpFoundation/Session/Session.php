@@ -47,6 +47,14 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     private $attributeName;
 
     /**
+     * True if we have no previous session (No session cookie)
+     * and nothing has been written to the session
+     *
+     * @var bool
+     */
+    private $emptySession = false;
+
+    /**
      * Constructor.
      *
      * @param SessionStorageInterface $storage    A SessionStorageInterface instance.
@@ -69,8 +77,21 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
+    public function markAsEmpty()
+    {
+        if (!$this->emptySession && !$this->isStarted()) {
+            $this->emptySession = true;
+        }
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
     public function start()
     {
+        $this->emptySession = false;
+
         return $this->storage->start();
     }
 
@@ -79,6 +100,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function has($name)
     {
+        if ($this->emptySession) {return null;}
+
         return $this->storage->getBag($this->attributeName)->has($name);
     }
 
@@ -87,6 +110,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function get($name, $default = null)
     {
+        if ($this->emptySession) {return $default;}
+
         return $this->storage->getBag($this->attributeName)->get($name, $default);
     }
 
@@ -95,6 +120,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function set($name, $value)
     {
+        $this->emptySession = false;
         $this->storage->getBag($this->attributeName)->set($name, $value);
     }
 
@@ -103,6 +129,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function all()
     {
+        if ($this->emptySession) {return array();}
+
         return $this->storage->getBag($this->attributeName)->all();
     }
 
@@ -111,6 +139,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function replace(array $attributes)
     {
+        $this->emptySession = false;
         $this->storage->getBag($this->attributeName)->replace($attributes);
     }
 
@@ -119,6 +148,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function remove($name)
     {
+        if ($this->emptySession) {return null;}
+
         return $this->storage->getBag($this->attributeName)->remove($name);
     }
 
@@ -127,6 +158,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function clear()
     {
+        if ($this->emptySession) {return null;}
         $this->storage->getBag($this->attributeName)->clear();
     }
 
@@ -145,6 +177,10 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function getIterator()
     {
+        if ($this->emptySession) {
+            return new \ArrayIterator(array());
+        }
+
         return new \ArrayIterator($this->storage->getBag($this->attributeName)->all());
     }
 
@@ -155,6 +191,8 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function count()
     {
+        if ($this->emptySession) {return 0;}
+
         return count($this->storage->getBag($this->attributeName)->all());
     }
 

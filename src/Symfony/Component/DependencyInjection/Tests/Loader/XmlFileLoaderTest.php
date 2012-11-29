@@ -81,7 +81,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
 
         $xml = $m->invoke($loader, self::$fixturesPath.'/xml/services1.xml');
-        $this->assertEquals('Symfony\\Component\\DependencyInjection\\SimpleXMLElement', get_class($xml), '->parseFile() returns an SimpleXMLElement object');
+        $this->assertEquals('DOMDocument', get_class($xml), '->parseFile() returns an DOMDocument object');
     }
 
     public function testLoadParameters()
@@ -270,6 +270,21 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag is not valid');
             $this->assertStringStartsWith('There is no extension able to load the configuration for "project:bar" (in', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag is not valid');
         }
+    }
+
+    public function testLoadWithPrefixedNamespace()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services14.xml');
+
+        $this->assertEquals(array('foo1' => 'bar1', 'foo2' => 'bar2'), $container->getParameter('foo'));
+
+        $this->assertCount(3, $container->getDefinitions());
+        $fooService = $container->getDefinition('foo');
+        $this->assertSame('Foo', $fooService->getClass());
+        $this->assertTrue($fooService->getArgument(1) instanceof Reference);
+        $this->assertTrue($container->getDefinition((string) $fooService->getArgument(1))->hasMethodCall('setFoo'));
     }
 
     public function testExtensionInPhar()

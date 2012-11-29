@@ -759,8 +759,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
             $service = call_user_func_array(array($factory, $definition->getFactoryMethod()), $arguments);
         } else {
-            $classDefinition = trim($parameterBag->resolveValue($definition->getClass()));
-            $r = new \ReflectionClass($classDefinition);
+            $r = new \ReflectionClass(trim($parameterBag->resolveValue($definition->getClass())));
             
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
         }

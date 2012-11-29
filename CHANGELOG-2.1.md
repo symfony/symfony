@@ -7,6 +7,47 @@ in 2.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.1.0...v2.1.1
 
+* 2.1.4 (2012-12-29)
+
+ * e5536f0: replaced magic strings by proper constants
+ * 6a3ba52: fixed the logic in Request::isSecure() (if the information comes from a source that we trust, don't check other ones)
+ * 67e12f3: added a way to configure the X-Forwarded-XXX header names and a way to disable trusting them
+ * b45873a: fixed algorithm used to determine the trusted client IP
+ * 254b110: removed the non-standard Client-IP HTTP header
+ * 06ee53b: [Form] improve error message with a "hasser" hint for PropertyAccessDeniedException
+ * ac77c5b: [Form] Updated checks for the ICU version from 4.5+ to 4.7+ due to test failures with ICU 4.6
+ * 2fe04e1: Update src/Symfony/Component/Form/Extension/Core/Type/FileType.php
+ * bbeff54: Xliff with other node than source or target are ignored
+ * 29bfa13: small fix of #5984 when the container param is not set
+ * f211b19: Filesystem Component mirror symlinked directory fix
+ * 64b54dc: Use better default ports in urlRedirectAction
+ * e7401a2: Update src/Symfony/Component/DomCrawler/Tests/FormTest.php
+ * b0e468f: Update src/Symfony/Component/DomCrawler/Form.php
+ * 1daefa5: [Routing] made it compatible with older PCRE version (pre 8)
+ * f2cbea3: [Security] remove escape charters from username provided by Digest DigestAuthenticationListener
+ * 82334d2: Force loader to be null or a EntityLoaderInterface
+ * 694697d: [Security] Fixed digest authentication
+ * c067586: [Security] Fixed digest authentication
+ * d2920c9: Added HttpCache\Store::generateContentDigest() + changed visibility
+ * e12bd12: [HttpFoundation] Make host & methods really case insensitive in the RequestMacther
+ * c659e78: Make YamlFileLoader and XmlFileLoader file loading extensible
+ * 0f75586: [Form] Removed an exception that prevented valid formats from being passed, e.g. "h" for the hour, "L" for the month etc.
+ * 84b760b: [HttpKernel] fixed Client when using StreamedResponses (closes #5370)
+ * 67e697f: fixed PDO session handler for Oracle (closes #5829)
+ * c2a8a0b: [HttpFoundation] fixed PDO session handler for Oracle (closes #5829)
+ * a30383d: [Locale] removed a check that is done too early (and it is done twice anyways)
+ * 84635bd: [Form] allowed no type guesser to be registered
+ * 8377146: Adding new localized strings for farsi validation.
+ * e34fb41: [HttpFoundation] moved the HTTP protocol check from StreamedResponse to Response (closes #5937)
+ * 4909bc3: [Form] Fixed forms not to be marked invalid if their children are already marked invalid
+ * dc80385: [Form] Fixed NumberToLocalizedStringTransformer to accept both comma and dot as decimal separator, if possible
+ * 208e134: [FrameworkBundle] Router skip defaults resolution for arrays
+ * a0af8bf: [Form] Adapted HTML5 format in DateTimeType as response to a closed ICU ticket
+ * 6b42c8c: The exception message should say which field is not mapped
+ * 9872d26: [HttpFoundation] Fix name sanitization after perfoming move
+ * 2d9a6fc: Use Norm Data instead of Data
+ * a094f7e: Add check to Store::unlock to ensure file exists
+
 * 2.1.3 (2012-10-30)
 
  * 6f15c47: [ClassLoader] fixed unbracketed namespaces (closes #5747)

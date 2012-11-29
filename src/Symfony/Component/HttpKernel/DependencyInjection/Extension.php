@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
@@ -84,6 +85,8 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      * This can be overridden in a sub-class to specify the alias manually.
      *
      * @return string The alias
+     *
+     * @throws \BadMethodCallException When the extension name does not follow conventions
      */
     public function getAlias()
     {
@@ -113,6 +116,9 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
 
         $class = $namespace . '\\Configuration';
         if (class_exists($class)) {
+            $r = new \ReflectionClass($class);
+            $container->addResource(new FileResource($r->getFileName()));
+
             if (!method_exists($class, '__construct')) {
                 $configuration = new $class();
 

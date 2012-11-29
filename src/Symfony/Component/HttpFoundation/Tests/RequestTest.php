@@ -1148,7 +1148,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     private function stopTrustingProxyData()
     {
         $class = new \ReflectionClass('Symfony\\Component\\HttpFoundation\\Request');
-        $property = $class->getProperty('trustProxyData');
+        $property = $class->getProperty('trustProxy');
         $property->setAccessible(true);
         $property->setValue(false);
     }

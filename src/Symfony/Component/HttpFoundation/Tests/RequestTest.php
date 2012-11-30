@@ -770,6 +770,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('PUT'),
             array('DELETE'),
             array('PATCH'),
+            array('put'),
+            array('delete'),
+            array('patch'),
+
         );
     }
 
@@ -778,6 +782,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateFromGlobals($method)
     {
+        $normalizedMethod = strtoupper($method);
+
         $_GET['foo1']    = 'bar1';
         $_POST['foo2']   = 'bar2';
         $_COOKIE['foo3'] = 'bar3';
@@ -796,18 +802,19 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $_SERVER['REQUEST_METHOD'] = $method;
         $_SERVER['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
         $request = RequestContentProxy::createFromGlobals();
-        $this->assertEquals($method, $request->getMethod());
+        $this->assertEquals($normalizedMethod, $request->getMethod());
         $this->assertEquals('mycontent', $request->request->get('content'));
 
         unset($_SERVER['REQUEST_METHOD'], $_SERVER['CONTENT_TYPE']);
 
-        $request = Request::createFromGlobals();
+        Request::createFromGlobals();
         Request::enableHttpMethodParameterOverride();
         $_POST['_method']   = $method;
         $_POST['foo6']      = 'bar6';
-        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['REQUEST_METHOD'] = 'PoSt';
         $request = Request::createFromGlobals();
-        $this->assertEquals($method, $request->getMethod());
+        $this->assertEquals($normalizedMethod, $request->getMethod());
+        $this->assertEquals('POST', $request->getRealMethod());
         $this->assertEquals('bar6', $request->request->get('foo6'));
 
         unset($_POST['_method'], $_POST['foo6'], $_SERVER['REQUEST_METHOD']);

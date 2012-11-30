@@ -14,12 +14,16 @@
     </xsd:choice>
   </xsd:complexType>
 
-  <xsd:complexType name="route">
-    <xsd:choice minOccurs="0" maxOccurs="unbounded">
-      <xsd:element name="default" type="element"/>
+  <xsd:group name="configs">
+    <xsd:choice>
+      <xsd:element name="default" type="element" />
       <xsd:element name="requirement" type="element" />
       <xsd:element name="option" type="element" />
     </xsd:choice>
+  </xsd:group>
+
+  <xsd:complexType name="route">
+    <xsd:group ref="configs" minOccurs="0" maxOccurs="unbounded" />
 
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="pattern" type="xsd:string" />
@@ -27,11 +31,7 @@
   </xsd:complexType>
 
   <xsd:complexType name="import">
-    <xsd:choice minOccurs="0" maxOccurs="unbounded">
-      <xsd:element name="default" type="element" />
-      <xsd:element name="requirement" type="element" />
-      <xsd:element name="option" type="element" />
-    </xsd:choice>
+    <xsd:group ref="configs" minOccurs="0" maxOccurs="unbounded" />
 
     <xsd:attribute name="resource" type="xsd:string" />
     <xsd:attribute name="type" type="xsd:string" />

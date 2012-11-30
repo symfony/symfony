@@ -602,7 +602,7 @@ class Request
      * Whether the request contains a Session which was started in one of the
      * previous requests.
      *
-     * @return boolean
+     * @return Boolean
      *
      * @api
      */
@@ -615,7 +615,11 @@ class Request
     /**
      * Whether the request contains a Session object.
      *
-     * @return boolean
+     * This method does not give any information about the state of the session object,
+     * like whether the session is started or not. It is just a way to check if this Request
+     * is associated with a Session instance.
+     *
+     * @return Boolean true when the Request contains a Session object, false otherwise
      *
      * @api
      */

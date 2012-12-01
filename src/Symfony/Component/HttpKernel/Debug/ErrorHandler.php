@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Debug;
 
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+
 /**
  * ErrorHandler.
  *
@@ -32,6 +34,12 @@ class ErrorHandler
 
     private $level;
 
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var ErrorHandler[] */
+    private static $errorHandlers = array();
+
     /**
      * Register the error handler.
      *
@@ -45,6 +53,7 @@ class ErrorHandler
         $handler->setLevel($level);
 
         set_error_handler(array($handler, 'handle'));
+        self::$errorHandlers[] = $handler;
 
         return $handler;
     }
@@ -54,6 +63,18 @@ class ErrorHandler
         $this->level = null === $level ? error_reporting() : $level;
     }
 
+    public static function addLoggerToHandlers(LoggerInterface $logger)
+    {
+        foreach (self::$errorHandlers as $handler) {
+            $handler->addLogger($logger);
+        }
+    }
+
+    private function addLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * @throws \ErrorException When error_reporting returns error
      */
@@ -61,6 +82,14 @@ class ErrorHandler
     {
         if (0 === $this->level) {
             return false;
+        }
+
+        if ($level & ~E_USER_DEPRECATED || $level & ~E_DEPRECATED) {
+            if (null !== $this->logger) {
+                $this->logger->warn('Deprecated function used');
+            }
+
+            return true;
         }
 
         if (error_reporting() & $level && $this->level & $level) {

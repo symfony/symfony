@@ -1064,7 +1064,7 @@ class Request
      */
     public function getRealMethod()
     {
-        return $this->server->get('REQUEST_METHOD', 'GET');
+        return strtoupper($this->server->get('REQUEST_METHOD', 'GET'));
     }
 
     /**

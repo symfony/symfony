@@ -32,7 +32,7 @@
     <xsd:attribute name="class" type="xsd:string" />
   </xsd:complexType>
 
-  <xsd:complexType name="element" mixed="true">
+  <xsd:complexType name="element">
     <xsd:attribute name="key" type="xsd:string" />
   </xsd:complexType>
 </xsd:schema>

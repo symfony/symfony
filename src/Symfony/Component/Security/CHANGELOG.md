@@ -9,6 +9,7 @@ CHANGELOG
    implements EventSubscriberInterface
  * added secure random number generator
  * added PBKDF2 Password encoder
+ * added BCrypt password encoder
 
 2.1.0
 -----

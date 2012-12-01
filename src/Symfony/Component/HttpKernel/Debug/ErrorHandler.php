@@ -86,7 +86,7 @@ class ErrorHandler
 
         if ($level & ~E_USER_DEPRECATED || $level & ~E_DEPRECATED) {
             if (null !== $this->logger) {
-                $this->logger->warn('Deprecated function used');
+                $this->logger->warn($message, array('file' => $file, 'line' => $line));
             }
 
             return true;

@@ -13,6 +13,7 @@
         <parameter key="data_collector.time.class">Symfony\Component\HttpKernel\DataCollector\TimeDataCollector</parameter>
         <parameter key="data_collector.memory.class">Symfony\Component\HttpKernel\DataCollector\MemoryDataCollector</parameter>
         <parameter key="data_collector.router.class">Symfony\Bundle\FrameworkBundle\DataCollector\RouterDataCollector</parameter>
+        <parameter key="data_collector.deprecation.class">Symfony\Component\HttpKernel\DataCollector\DeprecationDataCollector</parameter>
     </parameters>
 
     <services>
@@ -52,6 +53,12 @@
         <service id="data_collector.router" class="%data_collector.router.class%" >
             <tag name="kernel.event_listener" event="kernel.controller" method="onKernelController"/>
             <tag name="data_collector" template="WebProfilerBundle:Collector:router" id="router" priority="255" />
+        </service>
+
+        <service id="data_collector.deprecation" class="%data_collector.deprecation.class%">
+            <tag name="data_collector" template="WebProfilerBundle:Collector:deprecation" id="deprecation" priority="255" />
+            <tag name="monolog.logger" channel="deprecation" />
+            <argument type="service" id="logger" on-invalid="null" />
         </service>
     </services>
 </container>

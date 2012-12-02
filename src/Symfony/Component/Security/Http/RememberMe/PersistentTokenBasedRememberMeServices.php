@@ -133,7 +133,6 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
             )
         );
 
-        $request->attributes->remove(self::COOKIE_ATTR_NAME);
         $response->headers->setCookie(
             new Cookie(
                 $this->options['name'],

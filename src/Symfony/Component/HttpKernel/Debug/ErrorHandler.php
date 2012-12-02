@@ -84,7 +84,7 @@ class ErrorHandler
             return false;
         }
 
-        if ($level & ~E_USER_DEPRECATED || $level & ~E_DEPRECATED) {
+        if ($level & E_USER_DEPRECATED || $level & E_DEPRECATED) {
             if (null !== $this->logger) {
                 $this->logger->warn($message, array('file' => $file, 'line' => $line));
             }

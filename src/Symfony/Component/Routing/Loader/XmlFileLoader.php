@@ -100,7 +100,7 @@ class XmlFileLoader extends FileLoader
                             $options[$n->getAttribute('key')] = trim($n->nodeValue);
                             break;
                         default:
-                            throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $n->tagName));
+                            throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement" or "option".', $n->tagName, $file));
                     }
                 }
 
@@ -119,7 +119,7 @@ class XmlFileLoader extends FileLoader
                 $collection->addCollection($subCollection);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
+                throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "route" or "import".', $node->tagName, $file));
         }
     }
 
@@ -164,7 +164,7 @@ class XmlFileLoader extends FileLoader
                     $requirements[$node->getAttribute('key')] = trim($node->nodeValue);
                     break;
                 default:
-                    throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
+                    throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement" or "option".', $node->tagName, $file));
             }
         }
 

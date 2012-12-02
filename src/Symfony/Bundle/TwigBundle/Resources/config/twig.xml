@@ -7,6 +7,7 @@
     <parameters>
         <parameter key="twig.class">Twig_Environment</parameter>
         <parameter key="twig.loader.filesystem.class">Symfony\Bundle\TwigBundle\Loader\FilesystemLoader</parameter>
+        <parameter key="twig.loader.chain.class">Twig_Loader_Chain</parameter>
         <parameter key="templating.engine.twig.class">Symfony\Bundle\TwigBundle\TwigEngine</parameter>
         <parameter key="twig.cache_warmer.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
         <parameter key="twig.extension.trans.class">Symfony\Bridge\Twig\Extension\TranslationExtension</parameter>
@@ -41,7 +42,10 @@
         <service id="twig.loader.filesystem" class="%twig.loader.filesystem.class%" public="false">
             <argument type="service" id="templating.locator" />
             <argument type="service" id="templating.name_parser" />
+            <tag name="twig.loader"/>
         </service>
+
+        <service id="twig.loader.chain" class="%twig.loader.chain.class%" public="false"/>
 
         <service id="twig.loader" alias="twig.loader.filesystem" />
 

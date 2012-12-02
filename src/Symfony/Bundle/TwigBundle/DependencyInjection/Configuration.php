@@ -125,6 +125,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('strict_variables')->end()
                 ->scalarNode('auto_reload')->end()
                 ->scalarNode('optimizations')->end()
+                ->scalarNode('loader_service_id')->defaultValue('twig.loader.filesystem')->end()
                 ->arrayNode('paths')
                     ->beforeNormalization()
                         ->always()

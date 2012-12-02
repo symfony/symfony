@@ -155,13 +155,13 @@ class XmlFileLoader extends FileLoader
 
             switch ($node->tagName) {
                 case 'default':
-                    $defaults[$node->getAttribute('key')] = trim((string) $node->nodeValue);
+                    $defaults[$node->getAttribute('key')] = trim($node->nodeValue);
                     break;
                 case 'option':
-                    $options[$node->getAttribute('key')] = trim((string) $node->nodeValue);
+                    $options[$node->getAttribute('key')] = trim($node->nodeValue);
                     break;
                 case 'requirement':
-                    $requirements[$node->getAttribute('key')] = trim((string) $node->nodeValue);
+                    $requirements[$node->getAttribute('key')] = trim($node->nodeValue);
                     break;
                 default:
                     throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));

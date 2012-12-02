@@ -25,9 +25,11 @@ class DeprecationDataCollector extends DataCollector
 {
     private $logger;
 
-    public function __construct(DebugLoggerInterface $logger = null)
+    public function __construct($logger = null)
     {
-        $this->logger = $logger;
+        if ($logger instanceof DebugLoggerInterface) {
+            $this->logger = $logger;
+        }
     }
 
     /**

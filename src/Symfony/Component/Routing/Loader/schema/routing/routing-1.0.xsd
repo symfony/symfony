@@ -5,6 +5,16 @@
     targetNamespace="http://symfony.com/schema/routing"
     elementFormDefault="qualified">
 
+  <xsd:annotation>
+    <xsd:documentation><![CDATA[
+      Symfony XML Routing Schema, version 1.0
+      Authors: Fabien Potencier, Tobias Schultze
+
+      This scheme defines the elements and attributes that can be used to define
+      routes. A route maps an HTTP request to a set of configuration variables.
+    ]]></xsd:documentation>
+  </xsd:annotation>
+
   <xsd:element name="routes" type="routes" />
 
   <xsd:complexType name="routes">

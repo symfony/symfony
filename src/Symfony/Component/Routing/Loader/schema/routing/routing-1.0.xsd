@@ -36,7 +36,7 @@
     <xsd:group ref="configs" minOccurs="0" maxOccurs="unbounded" />
 
     <xsd:attribute name="id" type="xsd:string" use="required" />
-    <xsd:attribute name="pattern" type="xsd:string" default="/" />
+    <xsd:attribute name="pattern" type="xsd:string" use="required" />
     <xsd:attribute name="hostname-pattern" type="xsd:string" />
   </xsd:complexType>
 

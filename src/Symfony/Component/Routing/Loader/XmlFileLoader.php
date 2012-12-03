@@ -112,11 +112,14 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseRoute(RouteCollection $collection, \DOMElement $node, $path)
     {
+        if ('' === ($id = $node->getAttribute('id')) || !$node->hasAttribute('pattern')) {
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" and a "pattern" attribute.', $path));
+        }
+
         list($defaults, $requirements, $options) = $this->parseConfigs($node, $path);
 
         $route = new Route($node->getAttribute('pattern'), $defaults, $requirements, $options, $node->getAttribute('hostname-pattern'));
-
-        $collection->add($node->getAttribute('id'), $route);
+        $collection->add($id, $route);
     }
 
     /**
@@ -131,7 +134,10 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseImport(RouteCollection $collection, \DOMElement $node, $path, $file)
     {
-        $resource = $node->getAttribute('resource');
+        if ('' === $resource = $node->getAttribute('resource')) {
+            throw new \InvalidArgumentException(sprintf('The <import> element in file "%s" must have a "resource" attribute.', $path));
+        }
+
         $type = $node->getAttribute('type');
         $prefix = $node->getAttribute('prefix');
         $hostnamePattern = $node->hasAttribute('hostname-pattern') ? $node->getAttribute('hostname-pattern') : null;

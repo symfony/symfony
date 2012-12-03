@@ -53,8 +53,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
             return true;
         }
 
-        \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
-        return false;
+        return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
     }
 
     public function testStart()

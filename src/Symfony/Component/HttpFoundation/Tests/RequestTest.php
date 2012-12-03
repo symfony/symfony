@@ -706,6 +706,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
         if ($proxy) {
+            $this->setExpectedException('PHPUnit_Framework_Error_Deprecated');
+
             $this->startTrustingProxyData();
         }
         $this->assertEquals($expected, $request->getClientIp($proxy));
@@ -821,6 +823,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->disableHttpMethodParameterOverride();
     }
 
+    /**
+     * @expectedException PHPUnit_Framework_Error_Deprecated
+     */
     public function testOverrideGlobals()
     {
         $request = new Request();
@@ -1095,6 +1100,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider splitHttpAcceptHeaderData
+     * @expectedException   PHPUnit_Framework_Error_Deprecated
      */
     public function testSplitHttpAcceptHeader($acceptHeader, $expected)
     {
@@ -1248,6 +1254,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $property->setValue(false);
     }
 
+    /**
+     * @expectedException   PHPUnit_Framework_Error_Deprecated
+     */
     public function testTrustedProxies()
     {
         $request = Request::create('http://example.com/');

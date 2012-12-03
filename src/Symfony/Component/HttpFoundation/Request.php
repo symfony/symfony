@@ -466,6 +466,8 @@ class Request
      */
     public static function trustProxyData()
     {
+        trigger_error('trustProxyData() is deprecated since version 2.0 and will be removed in 2.3. Use setTrustedProxies() instead.', E_USER_DEPRECATED);
+
         self::$trustProxy = true;
     }
 
@@ -1414,6 +1416,8 @@ class Request
      */
     public function splitHttpAcceptHeader($header)
     {
+        trigger_error('splitHttpAcceptHeader() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         $headers = array();
         foreach (AcceptHeader::fromString($header)->all() as $item) {
             $key = $item->getValue();

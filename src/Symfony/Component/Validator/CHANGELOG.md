@@ -36,6 +36,8 @@ CHANGELOG
  * [BC BREAK] inserted arguments `$translator` and `$translationDomain` in the constructor of `ValidationVisitor`
  * [BC BREAK] inserted arguments `$translator` and `$translationDomain` in the constructor of `Validator`
  * [BC BREAK] added `setTranslator()` and `setTranslationDomain()` to `ValidatorBuilderInterface`
+ * improved the Validator to support pluralized messages by default
+ * [BC BREAK] changed the source of all pluralized messages in the translation files to the pluralized version
 
 2.1.0
 -----

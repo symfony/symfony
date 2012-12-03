@@ -20,6 +20,7 @@ use Symfony\Component\Config\Loader\FileLoader;
  * XmlFileLoader loads XML routing files.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Tobias Schultze <http://tobion.de>
  *
  * @api
  */
@@ -36,7 +37,8 @@ class XmlFileLoader extends FileLoader
      *
      * @return RouteCollection A RouteCollection instance
      *
-     * @throws \InvalidArgumentException When a tag can't be parsed
+     * @throws \InvalidArgumentException When the file cannot be loaded or when the XML cannot be
+     *                                   parsed because it does not validate against the scheme.
      *
      * @api
      */
@@ -64,12 +66,12 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses a node from a loaded XML file.
      *
-     * @param RouteCollection  $collection the collection to associate with the node
-     * @param \DOMElement      $node       the node to parse
-     * @param string           $path       the path of the XML file being processed
-     * @param string           $file
+     * @param RouteCollection $collection Collection to associate with the node
+     * @param \DOMElement     $node       Element to parse
+     * @param string          $path       Full path of the XML file being processed
+     * @param string          $file       Loaded file name
      *
-     * @throws \InvalidArgumentException When a tag can't be parsed
+     * @throws \InvalidArgumentException When the XML is invalid
      */
     protected function parseNode(RouteCollection $collection, \DOMElement $node, $path, $file)
     {
@@ -82,47 +84,10 @@ class XmlFileLoader extends FileLoader
                 $this->parseRoute($collection, $node, $path);
                 break;
             case 'import':
-                $resource = $node->getAttribute('resource');
-                $type = $node->getAttribute('type');
-                $prefix = $node->getAttribute('prefix');
-                $hostnamePattern = $node->hasAttribute('hostname-pattern') ? $node->getAttribute('hostname-pattern') : null;
-
-                $defaults = array();
-                $requirements = array();
-                $options = array();
-
-                foreach ($node->getElementsByTagNameNS(self::NAMESPACE_URI, '*') as $n) {
-                    switch ($n->localName) {
-                        case 'default':
-                            $defaults[$n->getAttribute('key')] = trim($n->textContent);
-                            break;
-                        case 'requirement':
-                            $requirements[$n->getAttribute('key')] = trim($n->textContent);
-                            break;
-                        case 'option':
-                            $options[$n->getAttribute('key')] = trim($n->textContent);
-                            break;
-                        default:
-                            throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement" or "option".', $n->localName, $file));
-                    }
-                }
-
-                $this->setCurrentDir(dirname($path));
-
-                $subCollection = $this->import($resource, ('' !== $type ? $type : null), false, $file);
-                /* @var $subCollection RouteCollection */
-                $subCollection->addPrefix($prefix);
-                if (null !== $hostnamePattern) {
-                    $subCollection->setHostnamePattern($hostnamePattern);
-                }
-                $subCollection->addDefaults($defaults);
-                $subCollection->addRequirements($requirements);
-                $subCollection->addOptions($options);
-
-                $collection->addCollection($subCollection);
+                $this->parseImport($collection, $node, $path, $file);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "route" or "import".', $node->localName, $file));
+                throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "route" or "import".', $node->localName, $path));
         }
     }
 
@@ -139,37 +104,53 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses a route and adds it to the RouteCollection.
      *
-     * @param RouteCollection $collection A RouteCollection instance
-     * @param \DOMElement     $definition Route definition
-     * @param string          $file       An XML file path
+     * @param RouteCollection $collection RouteCollection instance
+     * @param \DOMElement     $node       Element to parse that represents a Route
+     * @param string          $path       Full path of the XML file being processed
      *
-     * @throws \InvalidArgumentException When the definition cannot be parsed
+     * @throws \InvalidArgumentException When the XML is invalid
      */
-    protected function parseRoute(RouteCollection $collection, \DOMElement $definition, $file)
+    protected function parseRoute(RouteCollection $collection, \DOMElement $node, $path)
     {
-        $defaults = array();
-        $requirements = array();
-        $options = array();
+        list($defaults, $requirements, $options) = $this->parseConfigs($node, $path);
 
-        foreach ($definition->getElementsByTagNameNS(self::NAMESPACE_URI, '*') as $node) {
-            switch ($node->localName) {
-                case 'default':
-                    $defaults[$node->getAttribute('key')] = trim($node->textContent);
-                    break;
-                case 'option':
-                    $options[$node->getAttribute('key')] = trim($node->textContent);
-                    break;
-                case 'requirement':
-                    $requirements[$node->getAttribute('key')] = trim($node->textContent);
-                    break;
-                default:
-                    throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement" or "option".', $node->localName, $file));
-            }
+        $route = new Route($node->getAttribute('pattern'), $defaults, $requirements, $options, $node->getAttribute('hostname-pattern'));
+
+        $collection->add($node->getAttribute('id'), $route);
+    }
+
+    /**
+     * Parses an import and adds the routes in the resource to the RouteCollection.
+     *
+     * @param RouteCollection $collection RouteCollection instance
+     * @param \DOMElement     $node       Element to parse that represents a Route
+     * @param string          $path       Full path of the XML file being processed
+     * @param string          $file       Loaded file name
+     *
+     * @throws \InvalidArgumentException When the XML is invalid
+     */
+    protected function parseImport(RouteCollection $collection, \DOMElement $node, $path, $file)
+    {
+        $resource = $node->getAttribute('resource');
+        $type = $node->getAttribute('type');
+        $prefix = $node->getAttribute('prefix');
+        $hostnamePattern = $node->hasAttribute('hostname-pattern') ? $node->getAttribute('hostname-pattern') : null;
+
+        list($defaults, $requirements, $options) = $this->parseConfigs($node, $path);
+
+        $this->setCurrentDir(dirname($path));
+
+        $subCollection = $this->import($resource, ('' !== $type ? $type : null), false, $file);
+        /* @var $subCollection RouteCollection */
+        $subCollection->addPrefix($prefix);
+        if (null !== $hostnamePattern) {
+            $subCollection->setHostnamePattern($hostnamePattern);
         }
+        $subCollection->addDefaults($defaults);
+        $subCollection->addRequirements($requirements);
+        $subCollection->addOptions($options);
 
-        $route = new Route($definition->getAttribute('pattern'), $defaults, $requirements, $options, $definition->getAttribute('hostname-pattern'));
-
-        $collection->add($definition->getAttribute('id'), $route);
+        $collection->addCollection($subCollection);
     }
 
     /**
@@ -251,5 +232,40 @@ class XmlFileLoader extends FileLoader
         libxml_use_internal_errors($internalErrors);
 
         return $errors;
+    }
+
+    /**
+     * Parses the config elements (default, requirement, option).
+     *
+     * @param \DOMElement $node Element to parse that contains the configs
+     * @param string      $path Full path of the XML file being processed
+     *
+     * @return array An array with the defaults as first item, requirements as second and options as third.
+     *
+     * @throws \InvalidArgumentException When the XML is invalid
+     */
+    private function parseConfigs(\DOMElement $node, $path)
+    {
+        $defaults = array();
+        $requirements = array();
+        $options = array();
+
+        foreach ($node->getElementsByTagNameNS(self::NAMESPACE_URI, '*') as $n) {
+            switch ($n->localName) {
+                case 'default':
+                    $defaults[$n->getAttribute('key')] = trim($n->textContent);
+                    break;
+                case 'requirement':
+                    $requirements[$n->getAttribute('key')] = trim($n->textContent);
+                    break;
+                case 'option':
+                    $options[$n->getAttribute('key')] = trim($n->textContent);
+                    break;
+                default:
+                    throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement" or "option".', $n->localName, $path));
+            }
+        }
+
+        return array($defaults, $requirements, $options);
     }
 }

@@ -25,6 +25,9 @@ use Symfony\Component\Config\Loader\FileLoader;
  */
 class XmlFileLoader extends FileLoader
 {
+    const NAMESPACE_URI = 'http://symfony.com/schema/routing';
+    const SCHEME_PATH = '/schema/routing/routing-1.0.xsd';
+
     /**
      * Loads an XML file.
      *
@@ -70,7 +73,11 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseNode(RouteCollection $collection, \DOMElement $node, $path, $file)
     {
-        switch ($node->tagName) {
+        if (self::NAMESPACE_URI !== $node->namespaceURI) {
+            return;
+        }
+
+        switch ($node->localName) {
             case 'route':
                 $this->parseRoute($collection, $node, $path);
                 break;
@@ -84,23 +91,19 @@ class XmlFileLoader extends FileLoader
                 $requirements = array();
                 $options = array();
 
-                foreach ($node->childNodes as $n) {
-                    if (!$n instanceof \DOMElement) {
-                        continue;
-                    }
-
-                    switch ($n->tagName) {
+                foreach ($node->getElementsByTagNameNS(self::NAMESPACE_URI, '*') as $n) {
+                    switch ($n->localName) {
                         case 'default':
-                            $defaults[$n->getAttribute('key')] = trim($n->nodeValue);
+                            $defaults[$n->getAttribute('key')] = trim($n->textContent);
                             break;
                         case 'requirement':
-                            $requirements[$n->getAttribute('key')] = trim($n->nodeValue);
+                            $requirements[$n->getAttribute('key')] = trim($n->textContent);
                             break;
                         case 'option':
-                            $options[$n->getAttribute('key')] = trim($n->nodeValue);
+                            $options[$n->getAttribute('key')] = trim($n->textContent);
                             break;
                         default:
-                            throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement" or "option".', $n->tagName, $file));
+                            throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement" or "option".', $n->localName, $file));
                     }
                 }
 
@@ -119,7 +122,7 @@ class XmlFileLoader extends FileLoader
                 $collection->addCollection($subCollection);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "route" or "import".', $node->tagName, $file));
+                throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "route" or "import".', $node->localName, $file));
         }
     }
 
@@ -148,23 +151,19 @@ class XmlFileLoader extends FileLoader
         $requirements = array();
         $options = array();
 
-        foreach ($definition->childNodes as $node) {
-            if (!$node instanceof \DOMElement) {
-                continue;
-            }
-
-            switch ($node->tagName) {
+        foreach ($definition->getElementsByTagNameNS(self::NAMESPACE_URI, '*') as $node) {
+            switch ($node->localName) {
                 case 'default':
-                    $defaults[$node->getAttribute('key')] = trim($node->nodeValue);
+                    $defaults[$node->getAttribute('key')] = trim($node->textContent);
                     break;
                 case 'option':
-                    $options[$node->getAttribute('key')] = trim($node->nodeValue);
+                    $options[$node->getAttribute('key')] = trim($node->textContent);
                     break;
                 case 'requirement':
-                    $requirements[$node->getAttribute('key')] = trim($node->nodeValue);
+                    $requirements[$node->getAttribute('key')] = trim($node->textContent);
                     break;
                 default:
-                    throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement" or "option".', $node->tagName, $file));
+                    throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement" or "option".', $node->localName, $file));
             }
         }
 
@@ -220,12 +219,10 @@ class XmlFileLoader extends FileLoader
      */
     protected function validate(\DOMDocument $dom)
     {
-        $location = __DIR__.'/schema/routing/routing-1.0.xsd';
-
         $current = libxml_use_internal_errors(true);
         libxml_clear_errors();
 
-        if (!$dom->schemaValidate($location)) {
+        if (!$dom->schemaValidate(__DIR__ . static::SCHEME_PATH)) {
             throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($current)));
         }
         libxml_use_internal_errors($current);

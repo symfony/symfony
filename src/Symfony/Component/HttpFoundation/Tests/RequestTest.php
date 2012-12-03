@@ -17,6 +17,16 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
+    public function deprecationErrorHandler($errorNumber, $message, $file, $line, $context)
+    {
+        if ($errorNumber & E_USER_DEPRECATED) {
+            return true;
+        }
+
+        \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
+        return false;
+    }
+
     /**
      * @covers Symfony\Component\HttpFoundation\Request::__construct
      */
@@ -706,9 +716,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
         if ($proxy) {
-            $this->setExpectedException('PHPUnit_Framework_Error_Deprecated');
-
+            set_error_handler(array($this, "deprecationErrorHandler"));
             $this->startTrustingProxyData();
+            restore_error_handler();
         }
         $this->assertEquals($expected, $request->getClientIp($proxy));
 
@@ -823,11 +833,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->disableHttpMethodParameterOverride();
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Deprecated
-     */
     public function testOverrideGlobals()
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
+
         $request = new Request();
         $request->initialize(array('foo' => 'bar'));
 
@@ -858,6 +867,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         // restore initial $_SERVER array
         $_SERVER = $server;
+
+        restore_error_handler();
     }
 
     public function testGetScriptName()
@@ -1100,13 +1111,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider splitHttpAcceptHeaderData
-     * @expectedException   PHPUnit_Framework_Error_Deprecated
      */
     public function testSplitHttpAcceptHeader($acceptHeader, $expected)
     {
         $request = new Request();
 
+        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->assertEquals($expected, $request->splitHttpAcceptHeader($acceptHeader));
+        restore_error_handler();
     }
 
     public function splitHttpAcceptHeaderData()
@@ -1254,9 +1266,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $property->setValue(false);
     }
 
-    /**
-     * @expectedException   PHPUnit_Framework_Error_Deprecated
-     */
     public function testTrustedProxies()
     {
         $request = Request::create('http://example.com/');
@@ -1277,11 +1286,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($request->isSecure());
 
         // trusted proxy via deprecated trustProxyData()
+        set_error_handler(array($this, "deprecationErrorHandler"));
         Request::trustProxyData();
         $this->assertEquals('2.2.2.2', $request->getClientIp());
         $this->assertEquals('real.example.com', $request->getHost());
         $this->assertEquals(443, $request->getPort());
         $this->assertTrue($request->isSecure());
+        restore_error_handler();
 
         // disabling proxy trusting
         Request::setTrustedProxies(array());

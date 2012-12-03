@@ -240,7 +240,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function validate($value, $groups = null, $subPath = '', $traverse = false, $deep = false)
+    public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false)
     {
         $propertyPath = $this->getPropertyPath($subPath);
 
@@ -252,7 +252,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function validateValue($value, $constraints, $groups = null, $subPath = '')
+    public function validateValue($value, $constraints, $subPath = '', $groups = null)
     {
         $constraints = is_array($constraints) ? $constraints : array($constraints);
 

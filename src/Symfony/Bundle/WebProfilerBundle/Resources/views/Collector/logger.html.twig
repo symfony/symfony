@@ -1,7 +1,7 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
-    {% if collector.counterrors or collector.deprecationcount %}
+    {% if collector.counterrors or collector.countdeprecations %}
         {% set icon %}
             <img width="15" height="28" alt="Logs" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAcCAYAAABoMT8aAAAA4klEQVQ4y2P4//8/AyWYYXgYwOPp6Xnc3t7+P7EYpB6k7+zZs2ADNEjRjIwDAgKWgAywIUfz8+fPVzg7O/8AGeCATQEQnAfi/SAah/wcV1dXvAYUgORANA75ehcXl+/4DHAABRIe+ZrhbgAhTHsDiEgHBA0glA6GfSDiw5mZma+A+sphBlhVVFQ88vHx+Xfu3Ll7QP5haOjjwtuAuGHv3r3NIMNABqh8+/atsaur666vr+9XUlwSHx//AGQANxCbAnEWyGQicRMQ9wBxIQM0qjiBWAFqkB00/glhayBWHwb1AgB38EJsUtxtWwAAAABJRU5ErkJggg=="/>
             {% if collector.counterrors %}
@@ -9,7 +9,7 @@
             {% else %}
                 {% set statusColor = "yellow" %}
             {% endif %}
-            {% set errorCount = collector.counterrors + collector.deprecationcount %}
+            {% set errorCount = collector.counterrors + collector.countdeprecations %}
             <span class="sf-toolbar-status sf-toolbar-status-{{ statusColor }}">{{ errorCount }}</span>
         {% endset %}
         {% set text %}
@@ -19,10 +19,10 @@
                     <span class="sf-toolbar-status sf-toolbar-status-red">{{ collector.counterrors }}</span>
                 </div>
             {% endif %}
-            {% if collector.deprecationcount %}
+            {% if collector.countdeprecations %}
                 <div class="sf-toolbar-info-piece">
                     <b>Deprecated Calls</b>
-                    <span class="sf-toolbar-status sf-toolbar-status-yellow">{{ collector.deprecationcount }}</span>
+                    <span class="sf-toolbar-status sf-toolbar-status-yellow">{{ collector.countdeprecations }}</span>
                 </div>
             {% endif %}
         {% endset %}
@@ -34,8 +34,8 @@
 <span class="label">
     <span class="icon"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAgCAYAAAAMq2gFAAABjElEQVRIx2MIDw+vd3R0/GFvb/+fGtjFxeVJSUmJ1f///5nv37/PAMMMzs7OVLMEhoODgy/k5+cHJCYmagAtZAJbRG1L0DEwxCYALeOgiUXbt2+/X1NT8xTEdnd3/wi0SI4mFgHBDCBeCLXoF5BtwkCEpvNAvB8JnydCTwgQR0It+g1kWxNjUQEQOyDhAiL0gNUiWWRDjEUOyMkUZsCoRaMWjVpEvEVkFkGjFmEUqgc+fvx4hVYWIReqzi9evKileaoDslnu3LkTNLQtGk3edLPIycnpL9Bge5pb1NXVdQNosDmGRcAm7F+QgKur6783b95cBQoeRGv1kII3QPOdAoZF8+fPP4PUqnx55syZVKCEI1rLh1hsAbWEZ8aMGaUoFoFcMG3atKdIjfSPISEhawICAlaQgwMDA1f6+/sfB5rzE2Sej4/PD3C7DkjoAHHVoUOHLpSVlX3w8vL6Sa34Alr6Z8WKFaCoMARZxAHEoFZ/HBD3A/FyIF4BxMvIxCC964F4G6hZDMTxQCwJAGWE8pur5kFDAAAAAElFTkSuQmCC" alt="Logger" /></span>
     <strong>Logs</strong>
-    {% if collector.counterrors or collector.deprecationcount %}
-        {% set errorCount = collector.counterrors + collector.deprecationcount %}
+    {% if collector.counterrors or collector.countdeprecations %}
+        {% set errorCount = collector.counterrors + collector.countdeprecations %}
         <span class="count">
             <span>{{ errorCount }}</span>
         </span>

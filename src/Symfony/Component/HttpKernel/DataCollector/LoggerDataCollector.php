@@ -38,8 +38,9 @@ class LoggerDataCollector extends DataCollector
     {
         if (null !== $this->logger) {
             $this->data = array(
-                'error_count' => $this->logger->countErrors(),
-                'logs'        => $this->sanitizeLogs($this->logger->getLogs()),
+                'error_count'       => $this->logger->countErrors(),
+                'logs'              => $this->sanitizeLogs($this->logger->getLogs()),
+                'deprecation_count' => $this->countDeprecations()
             );
         }
     }
@@ -64,6 +65,11 @@ class LoggerDataCollector extends DataCollector
     public function getLogs()
     {
         return isset($this->data['logs']) ? $this->data['logs'] : array();
+    }
+
+    public function getDeprecationCount()
+    {
+        return isset($this->data['deprecation_count']) ? $this->data['deprecation_count'] : 0;
     }
 
     /**
@@ -102,5 +108,17 @@ class LoggerDataCollector extends DataCollector
         }
 
         return $context;
+    }
+
+    private function countDeprecations()
+    {
+        $count = 0;
+        foreach ($this->logger->getLogs() as $log) {
+            if (isset($log['context']['type']) && 'deprecation' === $log['context']['type']) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 }

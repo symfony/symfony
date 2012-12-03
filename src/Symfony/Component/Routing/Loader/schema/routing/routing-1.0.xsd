@@ -32,6 +32,10 @@
   </xsd:complexType>
 
   <xsd:complexType name="element">
-    <xsd:attribute name="key" type="xsd:string" />
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="key" type="xsd:string" />
+      </xsd:extension>
+    </xsd:simpleContent>
   </xsd:complexType>
 </xsd:schema>

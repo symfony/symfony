@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Tests\BrowserKit;
+namespace Symfony\Component\BrowserKit\Tests;
 
 use Symfony\Component\BrowserKit\Cookie;
 

@@ -50,7 +50,11 @@
     <xsd:attribute name="hostname-pattern" type="xsd:string" />
   </xsd:complexType>
 
-  <xsd:complexType name="element" mixed="true">
-    <xsd:attribute name="key" type="xsd:string" />
+  <xsd:complexType name="element">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="key" type="xsd:string" />
+      </xsd:extension>
+    </xsd:simpleContent>
   </xsd:complexType>
 </xsd:schema>

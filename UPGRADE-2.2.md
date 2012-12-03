@@ -206,6 +206,27 @@
    }
    ```
 
+ * The sources of the pluralized messages in translation files have changed
+   from the singular to the pluralized version. If you created custom
+   translation files for validator errors, you should adapt them.
+
+   Before:
+
+   <trans-unit id="6">
+       <source>You must select at least {{ limit }} choices.</source>
+       <target>Sie müssen mindestens {{ limit }} Möglichkeit wählen.|Sie müssen mindestens {{ limit }} Möglichkeiten wählen.</target>
+   </trans-unit>
+
+   After:
+
+   <trans-unit id="6">
+       <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+       <target>Sie müssen mindestens {{ limit }} Möglichkeit wählen.|Sie müssen mindestens {{ limit }} Möglichkeiten wählen.</target>
+   </trans-unit>
+
+   Check the file src/Symfony/Component/Validator/Resources/translations/validators.en.xlf
+   for the new message sources.
+
 #### Deprecations
 
  * The interface `ClassMetadataFactoryInterface` was deprecated and will be

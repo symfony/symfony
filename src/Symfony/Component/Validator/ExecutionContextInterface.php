@@ -300,5 +300,5 @@ interface ExecutionContextInterface
      *                string if the validator is currently validating the
      *                root value of the validation graph.
      */
-    public function getPropertyPath($subPath = null);
+    public function getPropertyPath($subPath = '');
 }

@@ -191,6 +191,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     // deprecated since 2.1, will be removed from 2.3
 
+    /**
+     * @expectedException   PHPUnit_Framework_Error_Deprecated
+     */
     public function testGetSetFlashes()
     {
         $array = array('notice' => 'hello', 'error' => 'none');
@@ -205,6 +208,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('notice' => 'foo'), $this->session->getFlashes());
     }
 
+    /**
+     * @expectedException   PHPUnit_Framework_Error_Deprecated
+     */
     public function testGetFlashesWithArray()
     {
         $array = array('notice' => 'hello', 'error' => 'none');
@@ -220,6 +226,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $this->session->getFlashes());
     }
 
+    /**
+     * @expectedException   PHPUnit_Framework_Error_Deprecated
+     */
     public function testGetSetFlash()
     {
         $this->assertNull($this->session->getFlash('notice'));
@@ -232,6 +241,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->session->getFlash('notice'));
     }
 
+    /**
+     * @expectedException   PHPUnit_Framework_Error_Deprecated
+     */
     public function testHasFlash()
     {
         $this->assertFalse($this->session->hasFlash('notice'));
@@ -239,6 +251,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->session->hasFlash('notice'));
     }
 
+    /**
+     * @expectedException   PHPUnit_Framework_Error_Deprecated
+     */
     public function testRemoveFlash()
     {
         $this->session->setFlash('notice', 'foo');
@@ -249,6 +264,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->session->hasFlash('error'));
     }
 
+    /**
+     * @expectedException   PHPUnit_Framework_Error_Deprecated
+     */
     public function testClearFlashes()
     {
         $this->assertFalse($this->session->hasFlash('notice'));

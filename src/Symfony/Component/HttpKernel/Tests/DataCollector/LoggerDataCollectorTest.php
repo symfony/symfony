@@ -27,18 +27,19 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getCollectTestData
      */
-    public function testCollect($nb, $logs, $expected)
+    public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount)
     {
         $logger = $this->getMock('Symfony\Component\HttpKernel\Log\DebugLoggerInterface');
         $logger->expects($this->once())->method('countErrors')->will($this->returnValue($nb));
-        $logger->expects($this->once())->method('getLogs')->will($this->returnValue($logs));
+        $logger->expects($this->exactly(2))->method('getLogs')->will($this->returnValue($logs));
 
         $c = new LoggerDataCollector($logger);
         $c->collect(new Request(), new Response());
 
         $this->assertSame('logger', $c->getName());
         $this->assertSame($nb, $c->countErrors());
-        $this->assertSame($expected ? $expected : $logs, $c->getLogs());
+        $this->assertSame($expectedLogs ? $expectedLogs : $logs, $c->getLogs());
+        $this->assertSame($expectedDeprecationCount, $c->countDeprecations());
     }
 
     public function getCollectTestData()
@@ -48,16 +49,28 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
                 1,
                 array(array('message' => 'foo', 'context' => array())),
                 null,
+                0
             ),
             array(
                 1,
                 array(array('message' => 'foo', 'context' => array('foo' => fopen(__FILE__, 'r')))),
                 array(array('message' => 'foo', 'context' => array('foo' => 'Resource(stream)'))),
+                0
             ),
             array(
                 1,
                 array(array('message' => 'foo', 'context' => array('foo' => new \stdClass()))),
                 array(array('message' => 'foo', 'context' => array('foo' => 'Object(stdClass)'))),
+                0
+            ),
+            array(
+                1,
+                array(
+                    array('message' => 'foo', 'context' => array('type' => 'deprecation')),
+                    array('message' => 'foo2', 'context' => array('type' => 'deprecation'))
+                ),
+                null,
+                2
             ),
         );
     }

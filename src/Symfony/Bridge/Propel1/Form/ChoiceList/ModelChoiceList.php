@@ -77,7 +77,6 @@ class ModelChoiceList extends ObjectChoiceList
         }
 
         if (1 === count($this->identifier)) {
-          // TODO this should be current($this->identifier)->isInteger() when propel ColumnMap contains the isInteger function
           if ($this->isInteger(current($this->identifier))) {
             $this->identifierAsIndex = true;
           }
@@ -368,7 +367,6 @@ class ModelChoiceList extends ObjectChoiceList
 
     /**
      * Whether this column in an integer
-     * TODO we could add this function to propel ColumnMap class instead
      *
      * @return boolean
      */

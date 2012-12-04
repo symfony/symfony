@@ -110,25 +110,31 @@ EOF
             return 1;
         }
         
-        $foundBundles = $this->getApplication()->getKernel()->getBundles();
-        
-        foreach($foundBundles as $key => $foundBundle) {
-            $namespace = explode('\\', $foundBundle->getNamespace());
+        try {
+            $foundBundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
             
-            if($namespace[0] != $this->input->getArgument('bundle')) {
-               unset($foundBundles[$key]);
+            $this->updateBundleTranslations($foundBundle);
+        } catch (\InvalidArgumentException $e) {
+            $foundBundles = $this->getApplication()->getKernel()->getBundles();
+
+            foreach($foundBundles as $key => $foundBundle) {
+                $namespace = explode('\\', $foundBundle->getNamespace());
+
+                if($namespace[0] != $this->input->getArgument('bundle')) {
+                   unset($foundBundles[$key]);
+                }
             }
-        }
-        
-        if (count($foundBundles) == 0 ) {
-            $this->output->writeln(sprintf('No bundle as found in namespace: "<info>%s</info>"', $this->input->getArgument('bundle')));
-        }
-        else if (count($foundBundles) > 1 && $this->input->getOption('common-catalogue') == true) {
-            $this->updateNamespaceTranslations($foundBundles);
-        }
-        else {
-            foreach ($foundBundles as $foundBundle) {
-                $this->updateBundleTranslations($foundBundle);
+
+            if (count($foundBundles) == 0 ) {
+                $this->output->writeln(sprintf('No bundle found in namespace: "<info>%s</info>"', $this->input->getArgument('bundle')));
+            }
+            else if (count($foundBundles) > 1 && $this->input->getOption('common-catalogue') == true) {
+                $this->updateNamespaceTranslations($foundBundles);
+            }
+            else {
+                foreach ($foundBundles as $foundBundle) {
+                    $this->updateBundleTranslations($foundBundle);
+                }
             }
         }
     }

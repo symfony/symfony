@@ -142,15 +142,15 @@ interface ExecutionContextInterface
      * Any violations generated during the validation will be added to the
      * violation list that you can access with {@link getViolations}.
      *
-     * @param mixed  $value    The value to validate.
-     * @param string $subPath  The path to append to the context's property path.
-     * @param null   $groups   The groups to validate in. If you don't pass any
-     *                         groups here, the current group of the context
-     *                         will be used.
-     * @param bool   $traverse Whether to traverse the value if it is an array
-     *                         or an instance of <tt>\Traversable</tt>.
-     * @param bool   $deep     Whether to traverse the value recursively if
-     *                         it is a collection of collections.
+     * @param mixed                $value    The value to validate.
+     * @param string               $subPath  The path to append to the context's property path.
+     * @param null|string|string[] $groups   The groups to validate in. If you don't pass any
+     *                                       groups here, the current group of the context
+     *                                       will be used.
+     * @param Boolean              $traverse Whether to traverse the value if it is an array
+     *                                       or an instance of <tt>\Traversable</tt>.
+     * @param Boolean              $deep     Whether to traverse the value recursively if
+     *                                       it is a collection of collections.
      */
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false);
 
@@ -177,7 +177,7 @@ interface ExecutionContextInterface
      * @param mixed                   $value       The value to validate.
      * @param Constraint|Constraint[] $constraints The constraint(s) to validate against.
      * @param string                  $subPath     The path to append to the context's property path.
-     * @param null                    $groups      The groups to validate in. If you don't pass any
+     * @param null|string|string[]    $groups      The groups to validate in. If you don't pass any
      *                                             groups here, the current group of the context
      *                                             will be used.
      */
@@ -300,5 +300,5 @@ interface ExecutionContextInterface
      *                string if the validator is currently validating the
      *                root value of the validation graph.
      */
-    public function getPropertyPath($subPath = null);
+    public function getPropertyPath($subPath = '');
 }

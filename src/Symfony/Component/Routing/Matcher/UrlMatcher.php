@@ -43,7 +43,7 @@ class UrlMatcher implements UrlMatcherInterface
     /**
      * @var RouteCollection
      */
-    private $routes;
+    protected $routes;
 
     /**
      * Constructor.
@@ -157,8 +157,28 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
-            return $this->mergeDefaults(array_replace($matches, $hostnameMatches, array('_route' => $name)), $route->getDefaults());
+            return $this->getAttributes($route, $name, array_replace($matches, $hostnameMatches));
         }
+    }
+
+    /**
+     * Returns an array of values to use as request attributes.
+     *
+     * As this method requires the Route object, it is not available
+     * in matchers that do not have access to the matched Route instance
+     * (like the PHP and Apache matcher dumpers).
+     *
+     * @param Route  $route      The route we are matching against
+     * @param string $name       The name of the route
+     * @param array  $attributes An array of attributes from the matcher
+     *
+     * @return array An array of parameters
+     */
+    protected function getAttributes(Route $route, $name, array $attributes)
+    {
+        $attributes['_route'] = $name;
+
+        return $this->mergeDefaults($attributes, $route->getDefaults());
     }
 
     /**

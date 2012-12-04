@@ -23,6 +23,7 @@ use Symfony\Component\Yaml\Yaml;
  * A command that parse templates to extract translation messages and add them into the translation files.
  *
  * @author Michel Salib <michelsalib@hotmail.com>
+ * @author Adam Prager <prager.adam87@gmail.com>
  */
 class TranslationUpdateCommand extends ContainerAwareCommand
 {
@@ -31,6 +32,12 @@ class TranslationUpdateCommand extends ContainerAwareCommand
      * @var MessageCatalogue
      */
     protected $catalogue;
+    
+    protected $writer;
+    
+    protected $output;
+    
+    protected $input;
 
     /**
      * {@inheritDoc}
@@ -57,6 +64,10 @@ class TranslationUpdateCommand extends ContainerAwareCommand
                 new InputOption(
                     'force', null, InputOption::VALUE_NONE,
                     'Should the update be done'
+                ),
+                new InputOption(
+                    'common-catalogue', null, InputOption::VALUE_NONE,
+                    'Use a common catalogue'
                 )
             ))
             ->setDescription('Updates the translation file')
@@ -68,6 +79,7 @@ message.
 
 <info>php %command.full_name% --dump-messages en AcmeBundle</info>
 <info>php %command.full_name% --force --prefix="new_" fr AcmeBundle</info>
+<info>php %command.full_name% --force --common-catalogue fr Acme</info>
 EOF
             )
         ;
@@ -78,57 +90,115 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->input = $input;
+        $this->output = $output;
+        
         // check presence of force or dump-message
-        if ($input->getOption('force') !== true && $input->getOption('dump-messages') !== true) {
-            $output->writeln('<info>You must choose one of --force or --dump-messages</info>');
+        if ($this->input->getOption('force') !== true && $this->input->getOption('dump-messages') !== true) {
+            $this->output->writeln('<info>You must choose one of --force or --dump-messages</info>');
 
             return 1;
         }
 
         // check format
-        $writer = $this->getContainer()->get('translation.writer');
-        $supportedFormats = $writer->getFormats();
-        if (!in_array($input->getOption('output-format'), $supportedFormats)) {
-            $output->writeln('<error>Wrong output format</error>');
-            $output->writeln('Supported formats are '.implode(', ', $supportedFormats).'.');
+        $this->writer = $this->getContainer()->get('translation.writer');
+        $supportedFormats = $this->writer->getFormats();
+        if (!in_array($this->input->getOption('output-format'), $supportedFormats)) {
+            $this->output->writeln('<error>Wrong output format</error>');
+            $this->output->writeln('Supported formats are '.implode(', ', $supportedFormats).'.');
 
             return 1;
         }
-
-        // get bundle directory
-        $foundBundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
-        $bundleTransPath = $foundBundle->getPath().'/Resources/translations';
-        $output->writeln(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $foundBundle->getName()));
-
-        // create catalogue
-        $catalogue = new MessageCatalogue($input->getArgument('locale'));
-
-        // load any messages from templates
-        $output->writeln('Parsing templates');
-        $extractor = $this->getContainer()->get('translation.extractor');
-        $extractor->setPrefix($input->getOption('prefix'));
-        $extractor->extract($foundBundle->getPath().'/Resources/views/', $catalogue);
-
-        // load any existing messages from the translation files
-        $output->writeln('Loading translation files');
-        $loader = $this->getContainer()->get('translation.loader');
-        $loader->loadMessages($bundleTransPath, $catalogue);
-
-        // show compiled list of messages
-        if ($input->getOption('dump-messages') === true) {
-            foreach ($catalogue->getDomains() as $domain) {
-                $output->writeln(sprintf("\nDisplaying messages for domain <info>%s</info>:\n", $domain));
-                $output->writeln(Yaml::dump($catalogue->all($domain), 10));
+        
+        $foundBundles = $this->getApplication()->getKernel()->getBundles();
+        
+        foreach($foundBundles as $key => $foundBundle) {
+            $namespace = explode('\\', $foundBundle->getNamespace());
+            
+            if($namespace[0] != $this->input->getArgument('bundle')) {
+               unset($foundBundles[$key]);
             }
-            if ($input->getOption('output-format') == 'xliff') {
-                $output->writeln('Xliff output version is <info>1.2</info>');
+        }
+        
+        if (count($foundBundles) == 0 ) {
+            $this->output->writeln(sprintf('No bundle as found in namespace: "<info>%s</info>"', $this->input->getArgument('bundle')));
+        }
+        else if (count($foundBundles) > 1 && $this->input->getOption('common-catalogue') == true) {
+            $this->updateNamespaceTranslations($foundBundles);
+        }
+        else {
+            foreach ($foundBundles as $foundBundle) {
+                $this->updateBundleTranslations($foundBundle);
+            }
+        }
+    }
+    
+    protected function updateNamespaceTranslations($foundBundles)
+    {
+        $this->output->writeln(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $this->input->getArgument('locale'), $this->input->getArgument('bundle')));
+
+        $catalogue = $this->createCatalogue();
+
+        foreach ($foundBundles as $foundBundle) {
+            $this->loadTemplateMessages($catalogue, $foundBundle->getPath().'/Resources/views/');
+            $this->loadExistingTranslations($catalogue, $foundBundle->getPath().'/Resources/translations');
+        }
+        
+        if(!file_exists($this->getApplication()->getKernel()->getRootDir().'/Resources/translations')) {
+            mkdir($this->getApplication()->getKernel()->getRootDir().'/Resources/translations', '0644');
+        }
+
+        $this->loadExistingTranslations($catalogue, $this->getApplication()->getKernel()->getRootDir().'/Resources/translations');
+        $this->showCompiledListOfMessages($catalogue, $this->getApplication()->getKernel()->getRootDir().'/Resources/translations');
+    }
+    
+    protected function updateBundleTranslations($foundBundle)
+    {
+        $this->output->writeln(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $this->input->getArgument('locale'), $foundBundle->getName()));
+
+        $catalogue = $this->createCatalogue();
+        $this->loadTemplateMessages($catalogue, $foundBundle->getPath().'/Resources/views/');
+        $this->loadExistingTranslations($catalogue, $foundBundle->getPath().'/Resources/translations');
+        $this->showCompiledListOfMessages($catalogue, $foundBundle->getPath().'/Resources/translations');
+    }
+    
+    protected function createCatalogue()
+    {
+        return new MessageCatalogue($this->input->getArgument('locale'));
+    }
+    
+    protected function loadTemplateMessages($catalogue, $path)
+    {
+        $this->output->writeln('Parsing templates');
+        $extractor = $this->getContainer()->get('translation.extractor');
+        $extractor->setPrefix($this->input->getOption('prefix'));
+        $extractor->extract($path, $catalogue);
+    }
+    
+    protected function loadExistingTranslations($catalogue, $path)
+    {
+        $this->output->writeln('Loading translation files');
+        $loader = $this->getContainer()->get('translation.loader');
+        $loader->loadMessages($path, $catalogue);
+    }
+    
+    protected function showCompiledListOfMessages($catalogue, $path)
+    {
+        // show compiled list of messages
+        if ($this->input->getOption('dump-messages') === true) {
+            foreach ($catalogue->getDomains() as $domain) {
+                $this->output->writeln(sprintf("\nDisplaying messages for domain <info>%s</info>:\n", $domain));
+                $this->output->writeln(Yaml::dump($catalogue->all($domain), 10));
+            }
+            if ($this->input->getOption('output-format') == 'xliff') {
+                $this->output->writeln('Xliff output version is <info>1.2</info>');
             }
         }
 
         // save the files
-        if ($input->getOption('force') === true) {
-            $output->writeln('Writing files');
-            $writer->writeTranslations($catalogue, $input->getOption('output-format'), array('path' => $bundleTransPath));
+        if ($this->input->getOption('force') === true) {
+            $this->output->writeln(sprintf("Writing files to: <info>%s</info> in <info>%s</info> format", $path, $this->input->getOption('output-format')));
+            $this->writer->writeTranslations($catalogue, $this->input->getOption('output-format'), array('path' => $path));
         }
     }
 }

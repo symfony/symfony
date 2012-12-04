@@ -56,6 +56,6 @@ class ColumnMap
    */
    public function getPdoType()
    {
-    return PropelColumnTypes::getPdoType($this->type);
+    return \PropelColumnTypes::getPdoType($this->type);
    }
 }

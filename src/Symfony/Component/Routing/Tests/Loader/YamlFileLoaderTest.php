@@ -62,7 +62,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testLoadThrowsExceptionIfArrayHasUnsupportedKeys()
     {

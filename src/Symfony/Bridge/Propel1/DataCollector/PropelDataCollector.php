@@ -63,7 +63,7 @@ class PropelDataCollector extends DataCollector
     /**
      * Returns the collector name.
      *
-     * @return string   The collector name.
+     * @return string The collector name.
      */
     public function getName()
     {
@@ -73,7 +73,7 @@ class PropelDataCollector extends DataCollector
     /**
      * Returns queries.
      *
-     * @return array    Queries
+     * @return array Queries
      */
     public function getQueries()
     {
@@ -83,7 +83,7 @@ class PropelDataCollector extends DataCollector
     /**
      * Returns the query count.
      *
-     * @return int  The query count
+     * @return int The query count
      */
     public function getQueryCount()
     {
@@ -93,7 +93,7 @@ class PropelDataCollector extends DataCollector
     /**
      * Returns the total time of queries.
      *
-     * @return float  The total time of queries
+     * @return float The total time of queries
      */
     public function getTime()
     {
@@ -108,7 +108,7 @@ class PropelDataCollector extends DataCollector
     /**
      * Creates an array of Build objects.
      *
-     * @return array  An array of Build objects
+     * @return array An array of Build objects
      */
     private function buildQueries()
     {
@@ -138,7 +138,7 @@ class PropelDataCollector extends DataCollector
     /**
      * Count queries.
      *
-     * @return int  The number of queries.
+     * @return int The number of queries.
      */
     private function countQueries()
     {

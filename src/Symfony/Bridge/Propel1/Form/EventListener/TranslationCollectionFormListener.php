@@ -89,7 +89,7 @@ class TranslationCollectionFormListener implements EventSubscriberInterface
                         break;
                     }
                 }
-                if(!$foundData) {
+                if (!$foundData) {
                     throw new UnexpectedTypeException($rootData, 'Propel i18n object');
                 }
 

@@ -76,10 +76,9 @@ class ModelChoiceList extends ObjectChoiceList
             $choices = array();
         }
 
-        if (1 === count($this->identifier)) {
-            if ($this->isInteger(current($this->identifier))) {
-              $this->identifierAsIndex = true;
-            }
+        if (   1 === count($this->identifier)
+            && $this->isInteger(current($this->identifier))) {
+            $this->identifierAsIndex = true;
         }
 
         parent::__construct($choices, $labelPath, array(), $groupPath);

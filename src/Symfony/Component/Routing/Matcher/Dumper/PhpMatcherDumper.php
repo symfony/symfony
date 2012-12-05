@@ -111,7 +111,6 @@ EOF;
     {
         $fetchedHostname = false;
 
-        $routes = $this->flattenRouteCollection($routes);
         $groups = $this->groupRoutesByHostnameRegex($routes);
         $code = '';
 
@@ -322,31 +321,6 @@ EOF;
     }
 
     /**
-     * Flattens a tree of routes to a single collection.
-     *
-     * @param RouteCollection       $routes Collection of routes
-     * @param DumperCollection|null $to     A DumperCollection to add routes to
-     *
-     * @return DumperCollection
-     */
-    private function flattenRouteCollection(RouteCollection $routes, DumperCollection $to = null)
-    {
-        if (null === $to) {
-            $to = new DumperCollection();
-        }
-
-        foreach ($routes as $name => $route) {
-            if ($route instanceof RouteCollection) {
-                $this->flattenRouteCollection($route, $to);
-            } else {
-                $to->add(new DumperRoute($name, $route));
-            }
-        }
-
-        return $to;
-    }
-
-    /**
      * Groups consecutive routes having the same hostname regex.
      *
      * The results is a collection of collections of routes having the same hostname regex.
@@ -355,7 +329,7 @@ EOF;
      *
      * @return DumperCollection A collection with routes grouped by hostname regex in sub-collections
      */
-    private function groupRoutesByHostnameRegex(DumperCollection $routes)
+    private function groupRoutesByHostnameRegex(RouteCollection $routes)
     {
         $groups = new DumperCollection();
 
@@ -363,14 +337,14 @@ EOF;
         $currentGroup->setAttribute('hostname_regex', null);
         $groups->add($currentGroup);
 
-        foreach ($routes as $route) {
-            $hostnameRegex = $route->getRoute()->compile()->getHostnameRegex();
+        foreach ($routes as $name => $route) {
+            $hostnameRegex = $route->compile()->getHostnameRegex();
             if ($currentGroup->getAttribute('hostname_regex') !== $hostnameRegex) {
                 $currentGroup = new DumperCollection();
                 $currentGroup->setAttribute('hostname_regex', $hostnameRegex);
                 $groups->add($currentGroup);
             }
-            $currentGroup->add($route);
+            $currentGroup->add(new DumperRoute($name, $route));
         }
 
         return $groups;

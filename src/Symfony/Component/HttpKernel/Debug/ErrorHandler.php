@@ -35,10 +35,7 @@ class ErrorHandler
     private $level;
 
     /** @var LoggerInterface */
-    private $logger;
-
-    /** @var ErrorHandler[] */
-    private static $errorHandlers = array();
+    private static $logger;
 
     /**
      * Register the error handler.
@@ -53,7 +50,6 @@ class ErrorHandler
         $handler->setLevel($level);
 
         set_error_handler(array($handler, 'handle'));
-        self::$errorHandlers[] = $handler;
 
         return $handler;
     }
@@ -63,16 +59,9 @@ class ErrorHandler
         $this->level = null === $level ? error_reporting() : $level;
     }
 
-    public static function addLoggerToHandlers(LoggerInterface $logger)
+    public static function setLogger(LoggerInterface $logger)
     {
-        foreach (self::$errorHandlers as $handler) {
-            $handler->addLogger($logger);
-        }
-    }
-
-    private function addLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+        self::$logger = $logger;
     }
 
     /**
@@ -85,8 +74,8 @@ class ErrorHandler
         }
 
         if ($level & E_USER_DEPRECATED || $level & E_DEPRECATED) {
-            if (null !== $this->logger) {
-                $this->logger->warn($message, array('type' => 'deprecation', 'file' => $file, 'line' => $line));
+            if (null !== self::$logger) {
+                self::$logger->warn($message, array('type' => 'deprecation', 'file' => $file, 'line' => $line));
             }
 
             return true;

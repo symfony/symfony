@@ -13,13 +13,15 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Debug\ErrorHandler;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Injects the logger into the ErrorHandler, so that it can log deprecation errors.
  *
  * @author Colin Frei <colin@colinfrei.com>
  */
-class DeprecationLoggerListener
+class DeprecationLoggerListener implements EventSubscriberInterface
 {
     private $logger;
 
@@ -31,7 +33,12 @@ class DeprecationLoggerListener
     public function injectLogger()
     {
         if (null !== $this->logger) {
-            ErrorHandler::addLoggerToHandlers($this->logger);
+            ErrorHandler::setLogger($this->logger);
         }
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return array(KernelEvents::REQUEST => 'injectLogger');
     }
 }

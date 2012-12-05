@@ -1,0 +1,7 @@
+SVN info data
+=============
+
+URL: http://source.icu-project.org/repos/icu/icu/tags/release-50-1/source/data
+Revision: 32746
+Author: yoshito
+Date: 2012-11-02T20:30:23.222936Z

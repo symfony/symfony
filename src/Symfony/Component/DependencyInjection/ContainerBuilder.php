@@ -470,8 +470,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $name    The name of the extension
      * @param array  $config  The config to set
-     *
-     * @api
      */
     public function unshiftExtensionConfig($name, array $config)
     {
@@ -480,19 +478,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         array_unshift($this->extensionConfigs[$name], $config);
-    }
-
-    /**
-     * Sets the configuration array for the given extension.
-     *
-     * @param string $name    The name of the extension
-     * @param array  $configs The configs to set
-     *
-     * @api
-     */
-    public function setExtensionConfig($name, array $configs)
-    {
-        $this->extensionConfigs[$name] = $configs;
     }
 
     /**

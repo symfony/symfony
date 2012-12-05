@@ -552,7 +552,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::getExtensionConfig
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::unshiftExtensionConfig
-     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::setExtensionConfig
      */
     public function testExtensionConfig()
     {
@@ -570,10 +569,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->unshiftExtensionConfig('foo', $second);
         $configs = $container->getExtensionConfig('foo');
         $this->assertEquals(array($second, $first), $configs);
-
-        $container->setExtensionConfig('foo', array($first, $second));
-        $configs = $container->getExtensionConfig('foo');
-        $this->assertEquals(array($first, $second), $configs);
     }
 }
 

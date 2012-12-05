@@ -36,7 +36,7 @@ class ColumnMap
     */
     public function setType($type)
     {
-      $this->type = $type;
+        $this->type = $type;
     }
 
     /**
@@ -46,7 +46,7 @@ class ColumnMap
      */
     public function getType()
     {
-      return $this->type;
+        return $this->type;
     }
 
    /**
@@ -56,6 +56,6 @@ class ColumnMap
    */
    public function getPdoType()
    {
-    return \PropelColumnTypes::getPdoType($this->type);
+       return \PropelColumnTypes::getPdoType($this->type);
    }
 }

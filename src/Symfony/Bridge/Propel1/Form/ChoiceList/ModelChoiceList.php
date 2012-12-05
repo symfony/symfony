@@ -372,6 +372,6 @@ class ModelChoiceList extends ObjectChoiceList
      */
     private function isInteger($col)
     {
-        return $col->getPdoType() === PDO::PARAM_INT;
+        return $col->getPdoType() === \PDO::PARAM_INT;
     }
 }

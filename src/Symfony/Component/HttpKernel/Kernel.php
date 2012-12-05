@@ -653,10 +653,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         $container->addObjectResource($this);
 
-        $this->prependExtensionConfigs($container, $prependingExtensions);
-
         // ensure these extensions are implicitly loaded
-        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
+        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions, $prependingExtensions));
 
         if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
             $container->merge($cont);
@@ -666,19 +664,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $container->compile();
 
         return $container;
-    }
-
-    /**
-     * Allow extensions to prepend extension configurations.
-     *
-     * @param ContainerBuilder $container
-     * @param PrependExtensionInterface[] $extensions
-     */
-    protected function prependExtensionConfigs(ContainerBuilder $container, array $extensions)
-    {
-        foreach ($extensions as $extension) {
-            $extension->prepend($container);
-        }
     }
 
     /**

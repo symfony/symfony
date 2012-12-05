@@ -142,18 +142,10 @@ class StubNumberFormatterTest extends LocaleTestCase
 
     public function formatCurrencyWithCurrencyStyleProvider()
     {
-        return array(
+        $data = array(
             array(100, 'ALL', 'ALL100'),
             array(-100, 'ALL', '(ALL100)'),
             array(1000.12, 'ALL', 'ALL1,000'),
-
-            array(100, 'BRL', 'R$100.00'),
-            array(-100, 'BRL', '(R$100.00)'),
-            array(1000.12, 'BRL', 'R$1,000.12'),
-
-            array(100, 'CRC', '₡100'),
-            array(-100, 'CRC', '(₡100)'),
-            array(1000.12, 'CRC', '₡1,000'),
 
             array(100, 'JPY', '¥100'),
             array(-100, 'JPY', '(¥100)'),
@@ -162,16 +154,29 @@ class StubNumberFormatterTest extends LocaleTestCase
             array(100, 'EUR', '€100.00'),
             array(-100, 'EUR', '(€100.00)'),
             array(1000.12, 'EUR', '€1,000.12'),
-
-            // Rounding checks
-            array(1000.121, 'BRL', 'R$1,000.12'),
-            array(1000.123, 'BRL', 'R$1,000.12'),
-            array(1000.125, 'BRL', 'R$1,000.12'),
-            array(1000.127, 'BRL', 'R$1,000.13'),
-            array(1000.129, 'BRL', 'R$1,000.13'),
-            array(11.50999, 'BRL', 'R$11.51'),
-            array(11.9999464, 'BRL', 'R$12.00')
         );
+
+        if (!$this->isIntlExtensionLoaded() || !$this->isSameAsIcuVersion('4.8')) {
+            // Rounding checks
+            $data[] = array(100, 'BRL', 'R$100.00');
+            $data[] = array(-100, 'BRL', '(R$100.00)');
+            $data[] = array(1000.12, 'BRL', 'R$1,000.12');
+            $data[] = array(1000.121, 'BRL', 'R$1,000.12');
+            $data[] = array(1000.123, 'BRL', 'R$1,000.12');
+            $data[] = array(1000.125, 'BRL', 'R$1,000.12');
+            $data[] = array(1000.127, 'BRL', 'R$1,000.13');
+            $data[] = array(1000.129, 'BRL', 'R$1,000.13');
+            $data[] = array(11.50999, 'BRL', 'R$11.51');
+            $data[] = array(11.9999464, 'BRL', 'R$12.00');
+        }
+
+        if (!$this->isIntlExtensionLoaded() || $this->isLowerThanIcuVersion('4.8')) {
+            $data[] = array(100, 'CRC', '₡100');
+            $data[] = array(-100, 'CRC', '(₡100)');
+            $data[] = array(1000.12, 'CRC', '₡1,000');
+        }
+
+        return $data;
     }
 
     /**
@@ -180,7 +185,7 @@ class StubNumberFormatterTest extends LocaleTestCase
     public function testFormatCurrencyWithCurrencyStyleSwissRoundingStub($value, $currency, $symbol, $expected)
     {
         $formatter = $this->getStubFormatterWithCurrencyStyle();
-        $this->assertEquals(sprintf($expected, 'CHF'), $formatter->formatCurrency($value, $currency));
+        $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
 
     /**

@@ -471,7 +471,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string $name    The name of the extension
      * @param array  $config  The config to set
      */
-    public function unshiftExtensionConfig($name, array $config)
+    public function prependExtensionConfig($name, array $config)
     {
         if (!isset($this->extensionConfigs[$name])) {
             $this->extensionConfigs[$name] = array();

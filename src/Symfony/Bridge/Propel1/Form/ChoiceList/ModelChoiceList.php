@@ -46,6 +46,13 @@ class ModelChoiceList extends ObjectChoiceList
     private $loaded = false;
 
     /**
+     * Whether to use the identifier for index generation
+     *
+     * @var Boolean
+     */
+    private $identifierAsIndex = false;
+
+    /**
      * @param string         $class
      * @param string         $labelPath
      * @param array          $choices
@@ -67,6 +74,11 @@ class ModelChoiceList extends ObjectChoiceList
             // Make sure the constraints of the parent constructor are
             // fulfilled
             $choices = array();
+        }
+
+        if (   1 === count($this->identifier)
+            && $this->isInteger(current($this->identifier))) {
+            $this->identifierAsIndex = true;
         }
 
         parent::__construct($choices, $labelPath, array(), $groupPath);
@@ -224,7 +236,7 @@ class ModelChoiceList extends ObjectChoiceList
             // know that the IDs are used as indices
 
             // Attention: This optimization does not check choices for existence
-            if (1 === count($this->identifier)) {
+            if ($this->identifierAsIndex) {
                 $indices = array();
 
                 foreach ($models as $model) {
@@ -259,7 +271,7 @@ class ModelChoiceList extends ObjectChoiceList
             // know that the IDs are used as indices and values
 
             // Attention: This optimization does not check values for existence
-            if (1 === count($this->identifier)) {
+            if ($this->identifierAsIndex) {
                 return $this->fixIndices($values);
             }
 
@@ -283,7 +295,7 @@ class ModelChoiceList extends ObjectChoiceList
      */
     protected function createIndex($model)
     {
-        if (1 === count($this->identifier)) {
+        if ($this->identifierAsIndex) {
             return current($this->getIdentifierValues($model));
         }
 
@@ -350,5 +362,15 @@ class ModelChoiceList extends ObjectChoiceList
         }
 
         return $model->getPrimaryKeys();
+    }
+
+    /**
+     * Whether this column in an integer
+     *
+     * @return boolean
+     */
+    private function isInteger($col)
+    {
+        return $col->getPdoType() === \PDO::PARAM_INT;
     }
 }

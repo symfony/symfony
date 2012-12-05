@@ -22,6 +22,9 @@ class ReadOnlyItemQuery
 
     public function getPrimaryKeys()
     {
-        return array('id');
+        $cm = new ColumnMap('id', $this);
+        $cm->setType('INTEGER');
+
+        return array('id' => $cm);
     }
 }

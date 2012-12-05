@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\DependencyInjection;
+namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

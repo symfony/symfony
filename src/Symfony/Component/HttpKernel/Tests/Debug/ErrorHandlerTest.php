@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\Debug;
 
 use Symfony\Component\HttpKernel\Debug\ErrorHandler;
-use Symfony\Component\HttpKernel\Debug\ErrorException;
 
 /**
  * ErrorHandlerTest
@@ -48,10 +47,10 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
         $handler = ErrorHandler::register(3);
         try {
-            $handler->handle(1, 'foo', 'foo.php', 12, 'foo');
+            $handler->handle(111, 'foo', 'foo.php', 12, 'foo');
         } catch (\ErrorException $e) {
-            $this->assertSame('1: foo in foo.php line 12', $e->getMessage());
-            $this->assertSame(1, $e->getSeverity());
+            $this->assertSame('111: foo in foo.php line 12', $e->getMessage());
+            $this->assertSame(111, $e->getSeverity());
             $this->assertSame('foo.php', $e->getFile());
             $this->assertSame(12, $e->getLine());
         }

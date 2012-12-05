@@ -21,5 +21,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Templating": "" }
     },
-    "target-dir": "Symfony/Component/Templating"
+    "target-dir": "Symfony/Component/Templating",
+    "minimum-stability": "dev"
 }

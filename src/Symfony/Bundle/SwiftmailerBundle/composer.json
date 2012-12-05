@@ -22,5 +22,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\SwiftmailerBundle": "" }
     },
-    "target-dir": "Symfony/Bundle/SwiftmailerBundle"
+    "target-dir": "Symfony/Bundle/SwiftmailerBundle",
+    "minimum-stability": "dev"
 }

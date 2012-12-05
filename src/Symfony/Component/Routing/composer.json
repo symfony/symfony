@@ -25,5 +25,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Routing": "" }
     },
-    "target-dir": "Symfony/Component/Routing"
+    "target-dir": "Symfony/Component/Routing",
+    "minimum-stability": "dev"
 }

@@ -21,5 +21,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\EventDispatcher": "" }
     },
-    "target-dir": "Symfony/Component/EventDispatcher"
+    "target-dir": "Symfony/Component/EventDispatcher",
+    "minimum-stability": "dev"
 }

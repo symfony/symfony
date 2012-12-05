@@ -28,5 +28,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Twig": "" }
     },
-    "target-dir": "Symfony/Bridge/Twig"
+    "target-dir": "Symfony/Bridge/Twig",
+    "minimum-stability": "dev"
 }

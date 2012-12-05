@@ -21,5 +21,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Process": "" }
     },
-    "target-dir": "Symfony/Component/Process"
+    "target-dir": "Symfony/Component/Process",
+    "minimum-stability": "dev"
 }

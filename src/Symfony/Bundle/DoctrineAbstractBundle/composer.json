@@ -17,5 +17,10 @@
     ],
     "require": {
         "php": ">=5.3.2"
-    }
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Bundle\\DoctrineAbstractBundle": "" }
+    },
+    "target-dir": "Symfony/Bundle/DoctrineAbstractBundle",
+    "minimum-stability": "dev"
 }

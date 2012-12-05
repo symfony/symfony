@@ -21,5 +21,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\ClassLoader": "" }
     },
-    "target-dir": "Symfony/Component/ClassLoader"
+    "target-dir": "Symfony/Component/ClassLoader",
+    "minimum-stability": "dev"
 }

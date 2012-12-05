@@ -21,5 +21,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Finder": "" }
     },
-    "target-dir": "Symfony/Component/Finder"
+    "target-dir": "Symfony/Component/Finder",
+    "minimum-stability": "dev"
 }

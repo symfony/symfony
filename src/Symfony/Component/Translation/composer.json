@@ -25,5 +25,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Translation": "" }
     },
-    "target-dir": "Symfony/Component/Translation"
+    "target-dir": "Symfony/Component/Translation",
+    "minimum-stability": "dev"
 }

@@ -34,5 +34,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\FrameworkBundle": "" }
     },
-    "target-dir": "Symfony/Bundle/FrameworkBundle"
+    "target-dir": "Symfony/Bundle/FrameworkBundle",
+    "minimum-stability": "dev"
 }

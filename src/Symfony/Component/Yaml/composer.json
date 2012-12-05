@@ -21,5 +21,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Yaml": "" }
     },
-    "target-dir": "Symfony/Component/Yaml"
+    "target-dir": "Symfony/Component/Yaml",
+    "minimum-stability": "dev"
 }

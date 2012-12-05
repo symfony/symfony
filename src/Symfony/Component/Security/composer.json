@@ -30,5 +30,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security": "" }
     },
-    "target-dir": "Symfony/Component/Security"
+    "target-dir": "Symfony/Component/Security",
+    "minimum-stability": "dev"
 }

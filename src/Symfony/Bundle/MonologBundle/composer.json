@@ -22,5 +22,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\MonologBundle": "" }
     },
-    "target-dir": "Symfony/Bundle/MonologBundle"
+    "target-dir": "Symfony/Bundle/MonologBundle",
+    "minimum-stability": "dev"
 }

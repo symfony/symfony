@@ -76,8 +76,7 @@ class ModelChoiceList extends ObjectChoiceList
             $choices = array();
         }
 
-        if (   1 === count($this->identifier)
-            && $this->isInteger(current($this->identifier))) {
+        if (1 === count($this->identifier) && $this->isInteger(current($this->identifier))) {
             $this->identifierAsIndex = true;
         }
 
@@ -347,7 +346,8 @@ class ModelChoiceList extends ObjectChoiceList
      * be persisted or added to the idmodel map before. Otherwise an
      * exception is thrown.
      *
-     * @param  object        $model The model for which to get the identifier
+     * @param object $model The model for which to get the identifier
+     *
      * @throws FormException If the model does not exist
      */
     private function getIdentifierValues($model)

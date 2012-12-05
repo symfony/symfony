@@ -161,7 +161,7 @@ class PropelLogger
     /**
      * Returns queries.
      *
-     * @return array    Queries
+     * @return array Queries
      */
     public function getQueries()
     {

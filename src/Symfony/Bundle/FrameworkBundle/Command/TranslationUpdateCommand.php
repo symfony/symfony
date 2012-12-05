@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Finder\Finder;
 
 /**
  * A command that parse templates to extract translation messages and add them into the translation files.
@@ -68,7 +69,11 @@ class TranslationUpdateCommand extends ContainerAwareCommand
                 new InputOption(
                     'common-catalogue', null, InputOption::VALUE_NONE,
                     'Use a common catalogue'
-                )
+                ),
+                new InputOption(
+                    'form-label-fallback', null, InputOption::VALUE_OPTIONAL,
+                    'Which attribute to fall back to when label is not set directly', 'name'
+                ),
             ))
             ->setDescription('Updates the translation file')
             ->setHelp(<<<EOF
@@ -146,7 +151,11 @@ EOF
         $catalogue = $this->createCatalogue();
 
         foreach ($foundBundles as $foundBundle) {
-            $this->loadTemplateMessages($catalogue, $foundBundle->getPath().'/Resources/views/');
+            $this->loadMessages($catalogue, $foundBundle);
+        }
+        
+        // important to use separate foreaches, first import all messages, then add translations
+        foreach ($foundBundles as $foundBundle) {
             $this->loadExistingTranslations($catalogue, $foundBundle->getPath().'/Resources/translations');
         }
         
@@ -163,7 +172,7 @@ EOF
         $this->output->writeln(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $this->input->getArgument('locale'), $foundBundle->getName()));
 
         $catalogue = $this->createCatalogue();
-        $this->loadTemplateMessages($catalogue, $foundBundle->getPath().'/Resources/views/');
+        $this->loadMessages($catalogue, $foundBundle);
         $this->loadExistingTranslations($catalogue, $foundBundle->getPath().'/Resources/translations');
         $this->showCompiledListOfMessages($catalogue, $foundBundle->getPath().'/Resources/translations');
     }
@@ -173,17 +182,47 @@ EOF
         return new MessageCatalogue($this->input->getArgument('locale'));
     }
     
-    protected function loadTemplateMessages($catalogue, $path)
+    protected function loadMessages($catalogue, $foundBundle)
     {
-        $this->output->writeln('Parsing templates');
+        // load twig and php
         $extractor = $this->getContainer()->get('translation.extractor');
         $extractor->setPrefix($this->input->getOption('prefix'));
-        $extractor->extract($path, $catalogue);
+        $extractor->extract($foundBundle->getPath(), $catalogue);
+        
+        // load form labels
+        $finder = new Finder();
+        if(file_exists($foundBundle->getPath().'/Form')) {
+            $files = $finder->files()->name('*.php')->in($foundBundle->getPath().'/Form');
+            foreach ($files as $file) {
+                $class = $foundBundle->getNamespace().'\\Form\\'.str_replace('.php', '', str_replace('/', '\\', $file->getRelativePathname()));
+
+                $reflection = new \ReflectionClass($class);
+
+                if ($reflection->getConstructor() == NULL || $reflection->getConstructor()->getNumberOfRequiredParameters() == 0) {
+                    if ($reflection->isSubclassOf('Symfony\Component\Form\AbstractType') && !$reflection->isAbstract()) {                        
+                        $form = $this->getApplication()->getKernel()->getContainer()->get('form.factory')->create(new $class())->createView();
+
+                        foreach ($form as $field) {
+                            $vars = $field->getVars();
+                            
+                            if ($vars['name'] == '_token') {
+                                continue;
+                            }
+
+                            $message = $vars['label'] == NULL
+                                            ? str_replace('_', '.', $vars[$this->input->getOption('form-label-fallback')])
+                                            : $vars['label'];
+
+                            $catalogue->set($message, $this->input->getOption('prefix').$message);
+                        }
+                    }
+                }
+            }
+        }
     }
     
     protected function loadExistingTranslations($catalogue, $path)
     {
-        $this->output->writeln('Loading translation files');
         $loader = $this->getContainer()->get('translation.loader');
         $loader->loadMessages($path, $catalogue);
     }

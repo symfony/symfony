@@ -347,8 +347,8 @@ class ModelChoiceList extends ObjectChoiceList
      * be persisted or added to the idmodel map before. Otherwise an
      * exception is thrown.
      *
-     * @param object $model The model for which to get the identifier
-     * @throws FormException   If the model does not exist
+     * @param  object        $model The model for which to get the identifier
+     * @throws FormException If the model does not exist
      */
     private function getIdentifierValues($model)
     {
@@ -367,10 +367,12 @@ class ModelChoiceList extends ObjectChoiceList
     /**
      * Whether this column in an integer
      *
+     * @param ColumnMap $column
+     *
      * @return boolean
      */
-    private function isInteger($col)
+    private function isInteger(\ColumnMap $column)
     {
-        return $col->getPdoType() === \PDO::PARAM_INT;
+        return $column->getPdoType() === \PDO::PARAM_INT;
     }
 }

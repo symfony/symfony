@@ -77,9 +77,9 @@ class ModelChoiceList extends ObjectChoiceList
         }
 
         if (1 === count($this->identifier)) {
-          if ($this->isInteger(current($this->identifier))) {
-            $this->identifierAsIndex = true;
-          }
+            if ($this->isInteger(current($this->identifier))) {
+              $this->identifierAsIndex = true;
+            }
         }
 
         parent::__construct($choices, $labelPath, array(), $groupPath);
@@ -372,6 +372,6 @@ class ModelChoiceList extends ObjectChoiceList
      */
     private function isInteger($col)
     {
-      return $col->getPdoType() === \PDO::PARAM_INT;
+        return $col->getPdoType() === PDO::PARAM_INT;
     }
 }

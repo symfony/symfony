@@ -24,6 +24,7 @@ class ReadOnlyItemQuery
     {
         $cm = new ColumnMap('id', $this);
         $cm->setType('INTEGER');
+
         return array('id' => $cm);
     }
 }

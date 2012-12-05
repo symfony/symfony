@@ -33,6 +33,7 @@ class ItemQuery
     {
         $cm = new ColumnMap('id', $this);
         $cm->setType('INTEGER');
+
         return array('id' => $cm);
     }
 

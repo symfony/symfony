@@ -878,6 +878,13 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('y-LLLLL-d', '1970-J-1'),
             array('y-LLLLL-d', '1970-S-1'),
         );
+
+        if (!$this->isIntlExtensionLoaded() || $this->isLowerThanIcuVersion('4.8')) {
+            $data[] = array('y-M-d', '1970/1/1');
+            $data[] = array('yy-M-d', '70/1/1');
+        }
+
+        return $data;
     }
 
     /*

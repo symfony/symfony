@@ -147,7 +147,7 @@ EOF
         foreach ($r as $name => $value) {
             $requirements .= ($requirements ? "\n".str_repeat(' ', 13) : '').$name.': '.$this->formatValue($value);
         }
-        $requirements = '' !== $requirements ? $route->getHostnamePattern() : 'NONE';
+        $requirements = '' !== $requirements ? $requirements : 'NONE';
         $output->writeln(sprintf('<comment>Requirements</comment>     %s', $requirements));
 
         $options = '';

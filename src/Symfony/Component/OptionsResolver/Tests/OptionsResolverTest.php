@@ -678,4 +678,34 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             'three' => '3',
         ), $clone->resolve());
     }
+
+    public function testResolveSucceedsIfNotContainMutuallyExclusiveOptions()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => '1',
+            'two' => '2',
+        ));
+        $this->resolver->setMutuallyExclusive(array('one', 'two'));
+
+        $this->assertEquals(array(
+            'one' => '10',
+            'two' => '2'
+        ), $this->resolver->resolve(array('one' => '10')));
+    }
+
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testResolveFailsIfContainMutuallyExclusiveOptions()
+    {
+        $options = array(
+            'one' => '1',
+            'two' => '2',
+        );
+
+        $this->resolver->setDefaults($options);
+        $this->resolver->setMutuallyExclusive(array('one', 'two'));
+
+        $this->resolver->resolve($options);
+    }
 }

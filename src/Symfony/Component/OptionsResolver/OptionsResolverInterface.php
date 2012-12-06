@@ -147,6 +147,23 @@ interface OptionsResolverInterface
      */
     public function addAllowedTypes(array $allowedTypes);
 
+     /**
+     * Sets mutually exclusive options.
+     *
+     * This is usefull when you want to define options which cannot coexist
+     * between them. If at least two of this options are defined, an Exception
+     * will be thrown.
+     *
+     * @param array $mutuallyExclusive A list of options names.
+     *
+     * @return OptionsResolverInterface The resolver instance.
+     *
+     * @throws Exception\InvalidOptionsException If are defined more than two
+     *                                           options which are listed as
+     *                                           mutually exclusive.
+     */
+    public function setMutuallyExclusive(array $mutuallyExclusive);
+
     /**
      * Sets normalizers that are applied on resolved options.
      *

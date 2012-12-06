@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpFoundation;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HttpUtils
+class IpUtils
 {
     /**
      * This class should not be instantiated
@@ -29,7 +29,7 @@ class HttpUtils
      * @param string $requestIp
      * @param string $ip
      *
-     * @return boolean True valid, false if not.
+     * @return boolean Whether the IP is valid
      */
     public static function checkIp($requestIp, $ip)
     {
@@ -46,7 +46,7 @@ class HttpUtils
      * @param string $requestIp
      * @param string $ip
      *
-     * @return boolean True valid, false if not.
+     * @return boolean Whether the IP is valid
      */
     public static function checkIp4($requestIp, $ip)
     {
@@ -73,9 +73,9 @@ class HttpUtils
      * @param string $requestIp
      * @param string $ip
      *
-     * @return boolean True valid, false if not.
+     * @return boolean Whether the IP is valid
      *
-     * @throws RuntimeException When IPV6 support is not enabled
+     * @throws \RuntimeException When IPV6 support is not enabled
      */
     public static function checkIp6($requestIp, $ip)
     {

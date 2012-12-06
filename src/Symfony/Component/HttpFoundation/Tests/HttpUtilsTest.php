@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
-use Symfony\Component\HttpFoundation\HttpUtils;
+use Symfony\Component\HttpFoundation\IpUtils;
 
 class HttpUtilsTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +20,7 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
      */
     public function testIpv4($matches, $remoteAddr, $cidr)
     {
-        $this->assertSame($matches, HttpUtils::checkIp($remoteAddr, $cidr));
+        $this->assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
     }
 
     public function testIpv4Provider()
@@ -43,7 +43,7 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Only works when PHP is compiled without the option "disable-ipv6".');
         }
 
-        $this->assertSame($matches, HttpUtils::checkIp($remoteAddr, $cidr));
+        $this->assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
     }
 
     public function testIpv6Provider()
@@ -66,6 +66,6 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Only works when PHP is compiled with the option "disable-ipv6".');
         }
 
-        HttpUtils::checkIp('2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65');
+        IpUtils::checkIp('2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65');
     }
 }

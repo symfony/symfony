@@ -143,7 +143,7 @@ class RequestMatcher implements RequestMatcherInterface
             return false;
         }
 
-        if (null !== $this->ip && !HttpUtils::checkIp($request->getClientIp(), $this->ip)) {
+        if (null !== $this->ip && !IpUtils::checkIp($request->getClientIp(), $this->ip)) {
             return false;
         }
 

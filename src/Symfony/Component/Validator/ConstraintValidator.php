@@ -58,6 +58,8 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     public function getMessageTemplate()
     {
+        trigger_error('getMessageTemplate() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         return $this->messageTemplate;
     }
 
@@ -68,6 +70,8 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     public function getMessageParameters()
     {
+        trigger_error('getMessageParameters() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         return $this->messageParameters;
     }
 
@@ -78,6 +82,8 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     protected function setMessage($template, array $parameters = array())
     {
+        trigger_error('setMessage() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         $this->messageTemplate = $template;
         $this->messageParameters = $parameters;
 
@@ -107,5 +113,6 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     protected function isValid($value, Constraint $constraint)
     {
+        trigger_error('isValid() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
     }
 }

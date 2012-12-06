@@ -23,6 +23,11 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class MaxValidator extends ConstraintValidator
 {
+    public function __construct($options = null)
+    {
+        trigger_error('MaxValidator is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+    }
+
     /**
      * {@inheritDoc}
      */

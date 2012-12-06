@@ -155,6 +155,8 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
      */
     public function getGraphWalker()
     {
+        trigger_error('getGraphWalker() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         if (null === $this->graphWalker) {
             $this->graphWalker = new GraphWalker($this, $this->metadataFactory, $this->validatedObjects);
         }

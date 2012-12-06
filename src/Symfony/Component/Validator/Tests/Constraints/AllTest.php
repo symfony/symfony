@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Allator\Tests\Constraints;
+namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Valid;

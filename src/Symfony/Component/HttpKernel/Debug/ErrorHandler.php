@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\HttpKernel\Exception\FatalErrorException;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
  * ErrorHandler.
@@ -40,6 +41,9 @@ class ErrorHandler
 
     private $reservedMemory;
 
+    /** @var LoggerInterface */
+    private static $logger;
+
     /**
      * Register the error handler.
      *
@@ -64,6 +68,11 @@ class ErrorHandler
         $this->level = null === $level ? error_reporting() : $level;
     }
 
+    public static function setLogger(LoggerInterface $logger)
+    {
+        self::$logger = $logger;
+    }
+
     /**
      * @throws \ErrorException When error_reporting returns error
      */
@@ -71,6 +80,14 @@ class ErrorHandler
     {
         if (0 === $this->level) {
             return false;
+        }
+
+        if ($level & E_USER_DEPRECATED || $level & E_DEPRECATED) {
+            if (null !== self::$logger) {
+                self::$logger->warn($message, array('type' => 'deprecation', 'file' => $file, 'line' => $line));
+            }
+
+            return true;
         }
 
         if (error_reporting() & $level && $this->level & $level) {

@@ -22,22 +22,12 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    private $debug;
-
-    /**
-     * Constructor
-     *
-     * @param Boolean $debug Whether to use the debug mode
-     */
-    public function  __construct($debug)
-    {
-        $this->debug = (Boolean) $debug;
-    }
-
     /**
      * Generates the configuration tree builder.
      *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     * @return TreeBuilder The tree builder
+     *
+     * @throws \RuntimeException When using the deprecated 'charset' setting
      */
     public function getConfigTreeBuilder()
     {
@@ -54,7 +44,7 @@ class Configuration implements ConfigurationInterface
                             $message = 'The charset setting is deprecated. Just remove it from your configuration file.';
 
                             if ('UTF-8' !== $v) {
-                                $message .= sprintf(' You need to define a getCharset() method in your Application Kernel class that returns "%s".', $v);
+                                $message .= sprintf('You need to define a getCharset() method in your Application Kernel class that returns "%s".', $v);
                             }
 
                             throw new \RuntimeException($message);
@@ -384,7 +374,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('cache')->defaultValue('file')->end()
                         ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
-                        ->booleanNode('debug')->defaultValue($this->debug)->end()
+                        ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                     ->end()
                 ->end()
             ->end()

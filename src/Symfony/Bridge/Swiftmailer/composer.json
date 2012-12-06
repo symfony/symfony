@@ -26,10 +26,5 @@
         "psr-0": { "Symfony\\Bridge\\Swiftmailer": "" }
     },
     "target-dir": "Symfony/Bridge/Swiftmailer",
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.1-dev"
-        }
-    }
+    "minimum-stability": "dev"
 }

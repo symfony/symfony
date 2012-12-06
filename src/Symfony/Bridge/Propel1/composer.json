@@ -26,10 +26,5 @@
         "psr-0": { "Symfony\\Bridge\\Propel1": "" }
     },
     "target-dir": "Symfony/Bridge/Propel1",
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.1-dev"
-        }
-    }
+    "minimum-stability": "dev"
 }

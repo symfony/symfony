@@ -30,10 +30,5 @@
         "psr-0": { "Symfony\\Component\\DependencyInjection": "" }
     },
     "target-dir": "Symfony/Component/DependencyInjection",
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.1-dev"
-        }
-    }
+    "minimum-stability": "dev"
 }

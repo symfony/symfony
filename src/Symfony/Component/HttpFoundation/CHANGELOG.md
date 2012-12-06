@@ -4,6 +4,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * added a IpUtils class to check if an IP belongs to a CIDR
  * added Request::getRealMethod() to get the "real" HTTP method (getMethod() returns the "intended" HTTP method)
  * disabled _method request parameter support by default (call Request::enableHttpMethodParameterOverride() to enable it)
  * Request::splitHttpAcceptHeader() method is deprecated and will be removed in 2.3

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added support for translations depending on gender and number of multiple variables.
+
 2.1.0
 -----
 

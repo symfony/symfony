@@ -77,4 +77,30 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
             array('There is no apples', '{0.0} There is no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0),
         );
     }
+
+    /**
+     * @dataProvider getChooseByParamsTests
+     */
+    public function testChooseByParams($expected, $id, $parameters)
+    {
+        $selector = new MessageSelector();
+
+        $this->assertEquals($expected, $selector->chooseByParams($id, $parameters, 'en'));
+    }
+
+    public function getChooseByParamsTests()
+    {
+        return array(
+            array('There is %count% apples', '%count% 0:There is one apple|%count% 1: There is %count% apples', array('%count%' => array('number' => 0))),
+            array('There is %count% apples', '%count%  0:     There is one apple|%count% 1: There is %count% apples', array('%count%' => array('number' => 0))),
+            array('There is %count% apples', 'There is one apple|%count% 1: There is %count% apples', array('%count%' => array('number' => 0))),
+
+            array('There is one apple', '%count% 0:There is one apple|%count% 1: There is %count% apples', array('%count%' => array('number' => 1))),
+
+            array('%user% wrote on %friend%\'s wall for his/her birthday','%user% wrote on %friend%\'s wall for his/her birthday | %friend% f: %user% wrote on %friend%\'s wall for her birthday | %friend% m: %user% wrote on %friend%\'s wall for his birthday', array()),
+            array('%user% wrote on %friend%\'s wall for her birthday','%user% wrote on %friend%\'s wall for his/her birthday | %friend% f: %user% wrote on %friend%\'s wall for her birthday | %friend% m: %user% wrote on %friend%\'s wall for his birthday', array('%friend%' => array('gender' => 'f', 'number' => 1))),
+            array('%user% wrote on %friend%\'s wall for his birthday','%user% wrote on %friend%\'s wall for his/her birthday|%friend% f:%user% wrote on %friend%\'s wall for her birthday | %friend% m: %user% wrote on %friend%\'s wall for his birthday', array('%friend%' => array('gender' => 'm', 'number' => 1))),
+            array('%user% wrote on %friend%\' walls for their birthdays','   %friend% f: %user% wrote on %friend%\'s wall for her birthday | %friend% m: %user% wrote on %friend%\'s wall for his birthday|%friend% 1: %user% wrote on %friend%\' walls for their birthdays', array('%friend%' => array('number' => 10))),
+        );
+    }
 }

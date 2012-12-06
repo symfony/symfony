@@ -56,6 +56,18 @@ class ProcessBuilder
         return $this;
     }
 
+    /**
+     * @param array $arguments
+     *
+     * @return ProcessBuilder
+     */
+    public function setArguments(array $arguments)
+    {
+        $this->arguments = $arguments;
+
+        return $this;
+    }
+
     public function setWorkingDirectory($cwd)
     {
         $this->cwd = $cwd;

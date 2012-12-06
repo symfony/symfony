@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added an Extension base class with sensible defaults to be used in conjunction
+ with the Config component.
+
 2.1.0
 -----
 

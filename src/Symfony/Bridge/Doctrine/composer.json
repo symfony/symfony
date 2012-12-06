@@ -30,10 +30,5 @@
         "psr-0": { "Symfony\\Bridge\\Doctrine": "" }
     },
     "target-dir": "Symfony/Bridge/Doctrine",
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.1-dev"
-        }
-    }
+    "minimum-stability": "dev"
 }

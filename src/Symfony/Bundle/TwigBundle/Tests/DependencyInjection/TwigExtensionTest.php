@@ -135,7 +135,7 @@ class TwigExtensionTest extends TestCase
             array('namespaced_path1', 'namespace'),
             array('namespaced_path2', 'namespace'),
             array(__DIR__.'/Fixtures/Resources/TwigBundle/views', 'Twig'),
-            array(realpath(__DIR__.'/../../Resources/views'), 'Twig'),
+            array(realpath(__DIR__.'/../..').'/Resources/views', 'Twig'),
             array(__DIR__.'/Fixtures/Resources/views'),
         ), $paths);
     }

@@ -39,6 +39,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
 
     /**
      * @var string
+     * @deprecated since version 2.2, will be removed in 2.3
      */
     private $prefix = '';
 
@@ -183,7 +184,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
         // this is to keep BC
         $numargs = func_num_args();
         if ($numargs > 1) {
-            $collection->addPrefix($this->getPrefix() . func_get_arg(1));
+            $collection->addPrefix($this->prefix . func_get_arg(1));
             if ($numargs > 2) {
                 $collection->addDefaults(func_get_arg(2));
                 if ($numargs > 3) {
@@ -196,7 +197,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
         } else {
             // the sub-collection must have the prefix of the parent (current instance) prepended because it does not
             // necessarily already have it applied (depending on the order RouteCollections are added to each other)
-            $collection->addPrefix($this->getPrefix());
+            // this will be removed when the BC layer for getPrefix() is removed
+            $collection->addPrefix($this->prefix);
         }
 
         // we need to remove all routes with the same names first because just replacing them
@@ -244,6 +246,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Returns the prefix that may contain placeholders.
      *
      * @return string The prefix
+     *
+     * @deprecated since version 2.2, will be removed in 2.3
      */
     public function getPrefix()
     {

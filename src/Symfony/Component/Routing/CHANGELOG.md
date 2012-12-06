@@ -46,6 +46,11 @@ CHANGELOG
  * [DEPRECATION] The `$options` parameter to `RouteCollection::addPrefix()` has been deprecated
    because adding options has nothing to do with adding a path prefix. If you want to add options
    to all child routes of a RouteCollection, you can use `addOptions()`.
+ * [DEPRECATION] The method `RouteCollection::getPrefix()` has been deprecated
+   because it suggested that all routes in the collection would have this prefix, which is
+   not necessarily true. On top of that, since there is no tree structure anymore, this method
+   is also useless. Don't worry about performance, prefix optimization for matching is still done
+   in the dumper, which was also improved in 2.2.0 to find even more grouping possibilities.
  * [DEPRECATION] `RouteCollection::addCollection(RouteCollection $collection)` should now only be
    used with a single parameter. The other params `$prefix`, `$default`, `$requirements` and `$options`
    will still work, but have been deprecated. The `addPrefix` method should be used for this

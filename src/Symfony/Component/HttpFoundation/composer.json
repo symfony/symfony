@@ -23,10 +23,5 @@
         "classmap": [ "Symfony/Component/HttpFoundation/Resources/stubs" ]
     },
     "target-dir": "Symfony/Component/HttpFoundation",
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.1-dev"
-        }
-    }
+    "minimum-stability": "dev"
 }

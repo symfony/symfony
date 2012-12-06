@@ -57,6 +57,10 @@ class TranslationUpdateCommand extends ContainerAwareCommand
                 new InputOption(
                     'force', null, InputOption::VALUE_NONE,
                     'Should the update be done'
+                ),
+                new InputOption(
+                    'nest-level', null, InputOption::VALUE_REQUIRED,
+                    'If YAML is used for file format, will nest message keys using dot as separator', 0
                 )
             ))
             ->setDescription('Updates the translation file')
@@ -127,8 +131,16 @@ EOF
 
         // save the files
         if ($input->getOption('force') === true) {
-            $output->writeln('Writing files');
-            $writer->writeTranslations($catalogue, $input->getOption('output-format'), array('path' => $bundleTransPath));
+            
+			$options = array('path' => $bundleTransPath);
+			
+			// case of nested yaml files
+			if ($input->getOption('output-format') == 'yml' && $input->hasOption('nest-level')) {
+				$options['nest-level'] = $input->getOption('nest-level');
+			}
+
+			$output->writeln('Writing files');
+            $writer->writeTranslations($catalogue, $input->getOption('output-format'), $options);
         }
     }
 }

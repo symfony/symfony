@@ -184,13 +184,14 @@ class RouteCollection implements \IteratorAggregate, \Countable
         $numargs = func_num_args();
         if ($numargs > 1) {
             $collection->addPrefix($this->getPrefix() . func_get_arg(1));
-
             if ($numargs > 2) {
-                $defaults = func_get_arg(2);
-                $requirements = $numargs > 3 ? func_get_arg(3) : array();
-                $options = $numargs > 4 ? func_get_arg(4) : array();
-
-                $collection->addConfigs($defaults, $requirements, $options);
+                $collection->addDefaults(func_get_arg(2));
+                if ($numargs > 3) {
+                    $collection->addRequirements(func_get_arg(3));
+                    if ($numargs > 4) {
+                        $collection->addOptions(func_get_arg(4));
+                    }
+                }
             }
         } else {
             // the sub-collection must have the prefix of the parent (current instance) prepended because it does not
@@ -266,20 +267,50 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Adds defaults, requirements and options to all routes.
+     * Adds defaults to all routes.
      *
-     * Any existing config under the same name in a route will be overridden.
+     * An existing default value under the same name in a route will be overridden.
      *
-     * @param array  $defaults     An array of default values
-     * @param array  $requirements An array of requirements
-     * @param array  $options      An array of options
+     * @param array $defaults An array of default values
      */
-    public function addConfigs(array $defaults = array(), array $requirements = array(), array $options = array())
+    public function addDefaults(array $defaults)
     {
-        foreach ($this->routes as $route) {
-            $route->addDefaults($defaults);
-            $route->addRequirements($requirements);
-            $route->addOptions($options);
+        if ($defaults) {
+            foreach ($this->routes as $route) {
+                $route->addDefaults($defaults);
+            }
+        }
+    }
+
+    /**
+     * Adds requirements to all routes.
+     *
+     * An existing requirement under the same name in a route will be overridden.
+     *
+     * @param array $requirements An array of requirements
+     */
+    public function addRequirements(array $requirements)
+    {
+        if ($requirements) {
+            foreach ($this->routes as $route) {
+                $route->addRequirements($requirements);
+            }
+        }
+    }
+
+    /**
+     * Adds options to all routes.
+     *
+     * An existing option value under the same name in a route will be overridden.
+     *
+     * @param array $options An array of options
+     */
+    public function addOptions(array $options)
+    {
+        if ($options) {
+            foreach ($this->routes as $route) {
+                $route->addOptions($options);
+            }
         }
     }
 

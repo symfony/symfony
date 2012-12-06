@@ -107,12 +107,15 @@ class XmlFileLoader extends FileLoader
                 $this->setCurrentDir(dirname($path));
 
                 $subCollection = $this->import($resource, ('' !== $type ? $type : null), false, $file);
-                /* @var RouteCollection $subCollection */
+                /* @var $subCollection RouteCollection */
                 $subCollection->addPrefix($prefix);
                 if (null !== $hostnamePattern) {
                     $subCollection->setHostnamePattern($hostnamePattern);
                 }
-                $subCollection->addConfigs($defaults, $requirements, $options);
+                $subCollection->addDefaults($defaults);
+                $subCollection->addRequirements($requirements);
+                $subCollection->addOptions($options);
+
                 $collection->addCollection($subCollection);
                 break;
             default:

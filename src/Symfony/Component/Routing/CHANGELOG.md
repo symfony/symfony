@@ -37,13 +37,15 @@ CHANGELOG
 
  * [DEPRECATION] The methods `RouteCollection::getParent()` and `RouteCollection::getRoot()`
    have been deprecated and will be removed in Symfony 2.3.
- * [BC BREAK] Misusing the `RouteCollection::addPrefix` method to add requirements or options
-   without adding a prefix is not supported anymore. There is now a dedicated method named
-   `setConfigs()` for this. So if you used something like `addPrefix('', array(...), array(...))`
-   you need to call `setConfigs(array(...), array(...))` instead.
+ * [BC BREAK] Misusing the `RouteCollection::addPrefix` method to add defaults, requirements
+   or options without adding a prefix is not supported anymore. So if you called `addPrefix`
+   with an empty prefix or `/` only (both have no relevance), like
+   `addPrefix('', $defaultsArray, $requirementsArray, $optionsArray)`
+   you need to use the new dedicated methods `addDefaults($defaultsArray)`,
+   `addRequirements($requirementsArray)` or `addOptions($optionsArray)` instead.
  * [DEPRECATION] The `$options` parameter to `RouteCollection::addPrefix()` has been deprecated
    because adding options has nothing to do with adding a path prefix. If you want to add options
-   to all child routes of a RouteCollection, you can use `setConfigs()`.
+   to all child routes of a RouteCollection, you can use `addOptions()`.
  * [DEPRECATION] `RouteCollection::addCollection(RouteCollection $collection)` should now only be
    used with a single parameter. The other params `$prefix`, `$default`, `$requirements` and `$options`
    will still work, but have been deprecated. The `addPrefix` method should be used for this

@@ -75,12 +75,15 @@ class YamlFileLoader extends FileLoader
                 $this->setCurrentDir(dirname($path));
 
                 $subCollection = $this->import($config['resource'], $type, false, $file);
-                /* @var RouteCollection $subCollection */
+                /* @var $subCollection RouteCollection */
                 $subCollection->addPrefix($prefix);
                 if (null !== $hostnamePattern) {
                     $subCollection->setHostnamePattern($hostnamePattern);
                 }
-                $subCollection->addConfigs($defaults, $requirements, $options);
+                $subCollection->addDefaults($defaults);
+                $subCollection->addRequirements($requirements);
+                $subCollection->addOptions($options);
+
                 $collection->addCollection($subCollection);
             } else {
                 $this->parseRoute($collection, $name, $config, $path);

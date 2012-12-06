@@ -179,7 +179,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode('auto_start')
                             ->info('DEPRECATED! Session starts on demand')
-                            ->defaultNull()
+                            ->defaultFalse()
                             ->beforeNormalization()
                                 ->ifTrue(function($v) { return null !== $v; })
                                 ->then(function($v) {

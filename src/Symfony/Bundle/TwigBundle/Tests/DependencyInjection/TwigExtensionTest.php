@@ -60,10 +60,9 @@ class TwigExtensionTest extends TestCase
         // Globals
         $calls = $container->getDefinition('twig')->getMethodCalls();
         $this->assertEquals('app', $calls[0][1][0], '->load() registers services as Twig globals');
-
+        $this->assertEquals(new Reference('templating.globals'), $calls[0][1][1]);
         $this->assertEquals('foo', $calls[1][1][0], '->load() registers services as Twig globals');
         $this->assertEquals(new Reference('bar'), $calls[1][1][1], '->load() registers services as Twig globals');
-
         $this->assertEquals('pi', $calls[2][1][0], '->load() registers variables as Twig globals');
         $this->assertEquals(3.14, $calls[2][1][1], '->load() registers variables as Twig globals');
 
@@ -103,8 +102,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $calls = $container->getDefinition('twig')->getMethodCalls();
-        array_shift($calls);
-        foreach ($calls as $call) {
+        foreach (array_slice($calls, 1) as $call) {
             list($name, $value) = each($globals);
             $this->assertEquals($name, $call[1][0]);
             $this->assertSame($value, $call[1][1]);

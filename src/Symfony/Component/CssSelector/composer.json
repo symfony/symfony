@@ -22,10 +22,5 @@
         "psr-0": { "Symfony\\Component\\CssSelector": "" }
     },
     "target-dir": "Symfony/Component/CssSelector",
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.1-dev"
-        }
-    }
+    "minimum-stability": "dev"
 }

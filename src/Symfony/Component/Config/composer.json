@@ -22,10 +22,5 @@
         "psr-0": { "Symfony\\Component\\Config": "" }
     },
     "target-dir": "Symfony/Component/Config",
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.1-dev"
-        }
-    }
+    "minimum-stability": "dev"
 }

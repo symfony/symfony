@@ -38,6 +38,7 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals(__DIR__.'/twig', $options['cache'], '->load() sets default value for cache option');
         $this->assertEquals('UTF-8', $options['charset'], '->load() sets default value for charset option');
         $this->assertFalse($options['debug'], '->load() sets default value for debug option');
+        $this->assertEquals('twig.loader.filesystem', $options['loader_service_id']);
     }
 
     /**
@@ -81,6 +82,7 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals('ISO-8859-1', $options['charset'], '->load() sets the charset option');
         $this->assertTrue($options['debug'], '->load() sets the debug option');
         $this->assertTrue($options['strict_variables'], '->load() sets the strict_variables option');
+        $this->assertEquals('foo.bar', $options['loader_service_id']);
     }
 
     public function testGlobalsWithDifferentTypesAndValues()

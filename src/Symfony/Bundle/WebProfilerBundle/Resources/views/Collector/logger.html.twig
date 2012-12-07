@@ -5,12 +5,12 @@
         {% set icon %}
             <img width="15" height="28" alt="Logs" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAcCAYAAABoMT8aAAAA4klEQVQ4y2P4//8/AyWYYXgYwOPp6Xnc3t7+P7EYpB6k7+zZs2ADNEjRjIwDAgKWgAywIUfz8+fPVzg7O/8AGeCATQEQnAfi/SAah/wcV1dXvAYUgORANA75ehcXl+/4DHAABRIe+ZrhbgAhTHsDiEgHBA0glA6GfSDiw5mZma+A+sphBlhVVFQ88vHx+Xfu3Ll7QP5haOjjwtuAuGHv3r3NIMNABqh8+/atsaur666vr+9XUlwSHx//AGQANxCbAnEWyGQicRMQ9wBxIQM0qjiBWAFqkB00/glhayBWHwb1AgB38EJsUtxtWwAAAABJRU5ErkJggg=="/>
             {% if collector.counterrors %}
-                {% set statusColor = "red" %}
+                {% set status_color = "red" %}
             {% else %}
-                {% set statusColor = "yellow" %}
+                {% set status_color = "yellow" %}
             {% endif %}
-            {% set errorCount = collector.counterrors + collector.countdeprecations %}
-            <span class="sf-toolbar-status sf-toolbar-status-{{ statusColor }}">{{ errorCount }}</span>
+            {% set error_count = collector.counterrors + collector.countdeprecations %}
+            <span class="sf-toolbar-status sf-toolbar-status-{{ status_color }}">{{ error_count }}</span>
         {% endset %}
         {% set text %}
             {% if collector.counterrors %}
@@ -35,9 +35,9 @@
     <span class="icon"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAgCAYAAAAMq2gFAAABjElEQVRIx2MIDw+vd3R0/GFvb/+fGtjFxeVJSUmJ1f///5nv37/PAMMMzs7OVLMEhoODgy/k5+cHJCYmagAtZAJbRG1L0DEwxCYALeOgiUXbt2+/X1NT8xTEdnd3/wi0SI4mFgHBDCBeCLXoF5BtwkCEpvNAvB8JnydCTwgQR0It+g1kWxNjUQEQOyDhAiL0gNUiWWRDjEUOyMkUZsCoRaMWjVpEvEVkFkGjFmEUqgc+fvx4hVYWIReqzi9evKileaoDslnu3LkTNLQtGk3edLPIycnpL9Bge5pb1NXVdQNosDmGRcAm7F+QgKur6783b95cBQoeRGv1kII3QPOdAoZF8+fPP4PUqnx55syZVKCEI1rLh1hsAbWEZ8aMGaUoFoFcMG3atKdIjfSPISEhawICAlaQgwMDA1f6+/sfB5rzE2Sej4/PD3C7DkjoAHHVoUOHLpSVlX3w8vL6Sa34Alr6Z8WKFaCoMARZxAHEoFZ/HBD3A/FyIF4BxMvIxCC964F4G6hZDMTxQCwJAGWE8pur5kFDAAAAAElFTkSuQmCC" alt="Logger" /></span>
     <strong>Logs</strong>
     {% if collector.counterrors or collector.countdeprecations %}
-        {% set errorCount = collector.counterrors + collector.countdeprecations %}
+        {% set error_count = collector.counterrors + collector.countdeprecations %}
         <span class="count">
-            <span>{{ errorCount }}</span>
+            <span>{{ error_count }}</span>
         </span>
     {% endif %}
 </span>
@@ -73,12 +73,7 @@
             {% for log in collector.logs if log.priority >= priority %}
                 <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if log.priority >= 400 %} error{% elseif log.priority >= 300 %} warning{% endif %}">
                     {{ log.priorityName }} - {{ log.message }}
-                    {% if log.context is defined and log.context is not empty %}
-                        <br />
-                        <small>
-                            <strong>Context</strong>: {{ log.context|yaml_encode }}
-                        </small>
-                    {% endif %}
+                    {{ _self.displayContext(log.context) }}
                 </li>
             {% else %}
                 <li><em>No logs available for this priority.</em></li>
@@ -90,3 +85,14 @@
         </p>
     {% endif %}
 {% endblock %}
+
+
+{% macro displayContext(context) %}
+    {% if context %}
+        {% if 'deprecation' == context.type %}
+            <small>Deprecated call in {{ context.file|format_file(context.line) }}.</small>
+        {% else %}
+            <small><strong>Context</strong>: {{ context|yaml_encode }}</small>
+        {% endif %}
+    {% endif %}
+{% endmacro %}

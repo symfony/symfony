@@ -91,7 +91,6 @@ class ExceptionHandler
      */
     public function getContent(FlattenException $exception)
     {
-        $title = '';
         switch ($exception->getStatusCode()) {
             case 404:
                 $title = 'Sorry, the page you are looking for could not be found.';
@@ -103,13 +102,10 @@ class ExceptionHandler
         $content = '';
         if ($this->debug) {
             try {
-                $message = nl2br($exception->getMessage());
-                $class = $this->abbrClass($exception->getClass());
                 $count = count($exception->getAllPrevious());
-                $content = '';
+                $total = $count + 1;
                 foreach ($exception->toArray() as $position => $e) {
                     $ind = $count - $position + 1;
-                    $total = $count + 1;
                     $class = $this->abbrClass($e['class']);
                     $message = nl2br($e['message']);
                     $content .= sprintf(<<<EOF
@@ -121,7 +117,7 @@ class ExceptionHandler
 
 EOF
                         , $ind, $total, $class, $message);
-                    foreach ($e['trace'] as $i => $trace) {
+                    foreach ($e['trace'] as $trace) {
                         $content .= '       <li>';
                         if ($trace['function']) {
                             $content .= sprintf('at %s%s%s(%s)', $this->abbrClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));

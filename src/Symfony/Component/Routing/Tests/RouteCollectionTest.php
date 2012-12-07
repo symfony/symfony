@@ -197,11 +197,29 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection2 = new RouteCollection();
         $collection2->add('b', $b = new Route('/b'));
         $collection1->addCollection($collection2);
+        $collection1->add('$péß^a|', $c = new Route('/special'));
 
         $this->assertSame($b, $collection1->get('b'), '->get() returns correct route in child collection');
+        $this->assertSame($c, $collection1->get('$péß^a|'), '->get() can handle special characters');
         $this->assertNull($collection2->get('a'), '->get() does not return the route defined in parent collection');
         $this->assertNull($collection1->get('non-existent'), '->get() returns null when route does not exist');
         $this->assertNull($collection1->get(0), '->get() does not disclose internal child RouteCollection');
+    }
+
+    public function testRemove()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', $foo = new Route('/foo'));
+
+        $collection1 = new RouteCollection();
+        $collection1->add('bar', $bar = new Route('/bar'));
+        $collection->addCollection($collection1);
+        $collection->add('last', $last = new Route('/last'));
+
+        $collection->remove('foo');
+        $this->assertSame(array('bar' => $bar, 'last' => $last), $collection->all(), '->remove() can remove a single route');
+        $collection->remove(array('bar', 'last'));
+        $this->assertSame(array(), $collection->all(), '->remove() accepts an array and can remove multiple routes at once');
     }
 
     public function testSetHost()

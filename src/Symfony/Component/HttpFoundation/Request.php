@@ -813,7 +813,7 @@ class Request
         }
 
         // Trim and remove port number from host
-        $host = trim(preg_replace('/:\d+$/', '', $host));
+        $host = preg_replace('/:\d+$/', '', trim($host));
 
         // as the host can come from the user (HTTP_HOST and depending on the configuration, SERVER_NAME too can come from the user)
         // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)

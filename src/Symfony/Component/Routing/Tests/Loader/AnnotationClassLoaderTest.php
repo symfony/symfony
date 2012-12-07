@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
-use Symfony\Component\Routing\Loader\AnnotationClassLoader;
-
 class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 {
     protected $loader;
@@ -42,7 +40,6 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     }
 
     /**
-     * @covers Symfony\Component\Routing\Loader\AnnotationClassLoader::supports
      * @dataProvider provideTestSupportsChecksResource
      */
     public function testSupportsChecksResource($resource, $expectedSupports)
@@ -63,9 +60,6 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         );
     }
 
-    /**
-     * @covers Symfony\Component\Routing\Loader\AnnotationClassLoader::supports
-     */
     public function testSupportsChecksTypeIfSpecified()
     {
         $this->assertTrue($this->loader->supports('class', 'annotation'), '->supports() checks the resource type if specified');

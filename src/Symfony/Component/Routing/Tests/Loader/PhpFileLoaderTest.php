@@ -13,7 +13,6 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
-use Symfony\Component\Routing\Route;
 
 class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,9 +23,6 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @covers Symfony\Component\Routing\Loader\PhpFileLoader::supports
-     */
     public function testSupports()
     {
         $loader = new PhpFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));

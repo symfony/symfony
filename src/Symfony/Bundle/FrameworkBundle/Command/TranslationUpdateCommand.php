@@ -131,15 +131,15 @@ EOF
 
         // save the files
         if ($input->getOption('force') === true) {
-            
-			$options = array('path' => $bundleTransPath);
-			
-			// case of nested yaml files
-			if ($input->getOption('output-format') == 'yml' && $input->hasOption('nest-level')) {
-				$options['nest-level'] = $input->getOption('nest-level');
-			}
 
-			$output->writeln('Writing files');
+            $options = array('path' => $bundleTransPath);
+
+            // case of nested yaml files
+            if ($input->getOption('output-format') == 'yml' && $input->hasOption('nest-level')) {
+                $options['nest-level'] = $input->getOption('nest-level');
+            }
+
+            $output->writeln('Writing files');
             $writer->writeTranslations($catalogue, $input->getOption('output-format'), $options);
         }
     }

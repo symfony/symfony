@@ -115,6 +115,33 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($foo, $foo1), $collection->getResources(), '->addCollection() merges resources');
     }
 
+    public function testAddDefaultsAndRequirementsAndOptions()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/{placeholder}'));
+        $collection1 = new RouteCollection();
+        $collection1->add('bar', new Route('/{placeholder}',
+            array('_controller' => 'fixed', 'placeholder' => 'default'), array('placeholder' => '.+'), array('option' => 'value'))
+        );
+        $collection->addCollection($collection1);
+
+        $collection->addDefaults(array('placeholder' => 'new-default'));
+        $this->assertEquals(array('placeholder' => 'new-default'), $collection->get('foo')->getDefaults(), '->addDefaults() adds defaults to all routes');
+        $this->assertEquals(array('_controller' => 'fixed', 'placeholder' => 'new-default'), $collection->get('bar')->getDefaults(),
+            '->addDefaults() adds defaults to all routes and overwrites existing ones');
+
+        $collection->addRequirements(array('placeholder' => '\d+'));
+        $this->assertEquals(array('placeholder' => '\d+'), $collection->get('foo')->getRequirements(), '->addRequirements() adds requirements to all routes');
+        $this->assertEquals(array('placeholder' => '\d+'), $collection->get('bar')->getRequirements(),
+            '->addRequirements() adds requirements to all routes and overwrites existing ones');
+
+        $collection->addOptions(array('option' => 'new-value'));
+        $this->assertEquals(
+            array('option' => 'new-value', 'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler'),
+            $collection->get('bar')->getOptions(), '->addOptions() adds options to all routes and overwrites existing ones'
+        );
+    }
+
     public function testAddPrefix()
     {
         $collection = new RouteCollection();

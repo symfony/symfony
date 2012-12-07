@@ -184,7 +184,11 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
         $collection = new RouteCollection();
         $collection->addResource($foo = new FileResource(__DIR__.'/Fixtures/foo.xml'));
-        $this->assertEquals(array($foo), $collection->getResources(), '->addResources() adds a resource');
+        $collection->addResource($bar = new FileResource(__DIR__.'/Fixtures/bar.xml'));
+        $collection->addResource(new FileResource(__DIR__.'/Fixtures/foo.xml'));
+
+        $this->assertEquals(array($foo, $bar), $collection->getResources(),
+            '->addResource() adds a resource and getResources() only returns unique ones by comparing the string representation');
     }
 
     public function testUniqueRouteWithGivenName()

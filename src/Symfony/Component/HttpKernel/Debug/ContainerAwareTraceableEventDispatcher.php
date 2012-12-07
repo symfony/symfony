@@ -68,8 +68,11 @@ class ContainerAwareTraceableEventDispatcher extends ContainerAwareEventDispatch
                 }
                 break;
             case 'kernel.terminate':
-                $token = $event->getResponse()->headers->get('X-Debug-Token');
-                $this->stopwatch->openSection($token);
+                try {
+                    $token = $event->getResponse()->headers->get('X-Debug-Token');
+                    $this->stopwatch->openSection($token);
+                } catch (\LogicException $e) {
+                }
                 break;
         }
 
@@ -84,20 +87,26 @@ class ContainerAwareTraceableEventDispatcher extends ContainerAwareEventDispatch
                 $this->stopwatch->start('controller', 'section');
                 break;
             case 'kernel.response':
-                $token = $event->getResponse()->headers->get('X-Debug-Token');
-                $this->stopwatch->stopSection($token);
-                if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
-                    // The profiles can only be updated once they have been created
-                    // that is after the 'kernel.response' event of the main request
-                    $this->updateProfiles($token, true);
+                try {
+                    $token = $event->getResponse()->headers->get('X-Debug-Token');
+                    $this->stopwatch->stopSection($token);
+                    if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
+                        // The profiles can only be updated once they have been created
+                        // that is after the 'kernel.response' event of the main request
+                        $this->updateProfiles($token, true);
+                    }
+                } catch (\LogicException $e) {
                 }
                 break;
             case 'kernel.terminate':
-                $this->stopwatch->stopSection($token);
-                // The children profiles have been updated by the previous 'kernel.response'
-                // event. Only the root profile need to be updated with the 'kernel.terminate'
-                // timing informations.
-                $this->updateProfiles($token, false);
+                try {
+                    $this->stopwatch->stopSection($token);
+                    // The children profiles have been updated by the previous 'kernel.response'
+                    // event. Only the root profile need to be updated with the 'kernel.terminate'
+                    // timing informations.
+                    $this->updateProfiles($token, false);
+                } catch (\LogicException $e) {
+                }
                 break;
         }
 

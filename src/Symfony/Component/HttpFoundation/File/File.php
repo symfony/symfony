@@ -117,11 +117,12 @@ class File extends \SplFileInfo
 
         $target = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : $this->getName($name));
 
-        if (!@rename($this->getPathname(), $target)) {
+        if (!@copy($this->getPathname(), $target)) {
             $error = error_get_last();
             throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
         }
 
+        @unlink($this->getPathname());
         @chmod($target, 0666 & ~umask());
 
         return new File($target);

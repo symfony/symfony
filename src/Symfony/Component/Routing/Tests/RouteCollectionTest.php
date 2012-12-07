@@ -83,30 +83,29 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddCollection()
     {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo'));
+
+        $collection1 = new RouteCollection();
+        $collection1->add('bar', $bar = new Route('/bar'));
+        $collection1->add('foo', $foo = new Route('/foo-new'));
+
+        $collection2 = new RouteCollection();
+        $collection2->add('grandchild', $grandchild = new Route('/grandchild'));
+
+        $collection1->addCollection($collection2);
+        $collection->addCollection($collection1);
+        $collection->add('last', $last = new Route('/last'));
+
+        $this->assertSame(array('bar' => $bar, 'foo' => $foo, 'grandchild' => $grandchild, 'last' => $last), $collection->all(), 
+            '->addCollection() imports routes of another collection, overrides if necessary and adds them at the end');
+    }
+
+    public function testAddCollectionWithResources()
+    {
         if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
             $this->markTestSkipped('The "Config" component is not available');
         }
-
-        $collection = new RouteCollection();
-        $collection->add('foo', $foo = new Route('/foo'));
-        $collection1 = new RouteCollection();
-        $collection1->add('foo', $foo1 = new Route('/foo1'));
-        $collection1->add('bar', $bar1 = new Route('/bar1'));
-        $collection->addCollection($collection1);
-        $this->assertEquals(array('foo' => $foo1, 'bar' => $bar1), $collection->all(), '->addCollection() adds routes from another collection');
-
-        $collection = new RouteCollection();
-        $collection->add('foo', $foo = new Route('/foo'));
-        $collection1 = new RouteCollection();
-        $collection1->add('foo', $foo1 = new Route('/foo1'));
-        $collection->addCollection($collection1, '/{foo}', array('foo' => 'foo'), array('foo' => '\d+'), array('foo' => 'bar'));
-        $this->assertEquals('/{foo}/foo1', $collection->get('foo')->getPath(), '->addCollection() can add a prefix to all merged routes');
-        $this->assertEquals(array('foo' => 'foo'), $collection->get('foo')->getDefaults(), '->addCollection() can add a prefix to all merged routes');
-        $this->assertEquals(array('foo' => '\d+'), $collection->get('foo')->getRequirements(), '->addCollection() can add a prefix to all merged routes');
-        $this->assertEquals(
-            array('foo' => 'bar', 'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler'),
-            $collection->get('foo')->getOptions(), '->addCollection() can add an option to all merged routes'
-        );
 
         $collection = new RouteCollection();
         $collection->addResource($foo = new FileResource(__DIR__.'/Fixtures/foo.xml'));
@@ -148,19 +147,6 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('https', $collection->get('foo')->getRequirement('_scheme'), '->addPrefix() overrides existing requirements');
         $this->assertEquals('https', $collection->get('bar')->getRequirement('_scheme'), '->addPrefix() overrides existing requirements');
-    }
-
-    public function testAddCollectionOverridesDefaultsAndRequirements()
-    {
-        $imported = new RouteCollection();
-        $imported->add('foo', $foo = new Route('/foo'));
-        $imported->add('bar', $bar = new Route('/bar', array(), array('_scheme' => 'http')));
-
-        $collection = new RouteCollection();
-        $collection->addCollection($imported, null, array(), array('_scheme' => 'https'));
-
-        $this->assertEquals('https', $collection->get('foo')->getRequirement('_scheme'), '->addCollection() overrides existing requirements');
-        $this->assertEquals('https', $collection->get('bar')->getRequirement('_scheme'), '->addCollection() overrides existing requirements');
     }
 
     public function testResource()

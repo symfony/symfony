@@ -133,9 +133,8 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection2 = new RouteCollection();
         $collection2->add('bar', $bar = new Route('/bar'));
         $collection->addCollection($collection2);
-        $this->assertSame('', $collection->getPrefix(), '->getPrefix() is initialized with ""');
         $collection->addPrefix(' / ');
-        $this->assertSame('', $collection->getPrefix(), '->addPrefix() trims the prefix and a single slash has no effect');
+        $this->assertSame('/foo', $collection->get('foo')->getPattern(), '->addPrefix() trims the prefix and a single slash has no effect');
         $collection->addPrefix('/{admin}', array('admin' => 'admin'), array('admin' => '\d+'), array('foo' => 'bar'));
         $this->assertEquals('/{admin}/foo', $collection->get('foo')->getPath(), '->addPrefix() adds a prefix to all routes');
         $this->assertEquals('/{admin}/bar', $collection->get('bar')->getPath(), '->addPrefix() adds a prefix to all routes');
@@ -152,11 +151,10 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
             $collection->get('bar')->getOptions(), '->addPrefix() adds an option to all routes'
         );
         $collection->addPrefix('0');
-        $this->assertEquals('/0/{admin}', $collection->getPrefix(), '->addPrefix() ensures a prefix must start with a slash and must not end with a slash');
+        $this->assertEquals('/0/{admin}/foo', $collection->get('foo')->getPattern(), '->addPrefix() ensures a prefix must start with a slash and must not end with a slash');
         $collection->addPrefix('/ /');
-        $this->assertSame('/ /0/{admin}', $collection->getPrefix(), '->addPrefix() can handle spaces if desired');
-        $this->assertSame('/ /0/{admin}/foo', $collection->get('foo')->getPath(), 'the route path is in synch with the collection prefix');
-        $this->assertSame('/ /0/{admin}/bar', $collection->get('bar')->getPath(), 'the route path in a sub-collection is in synch with the collection prefix');
+        $this->assertSame('/ /0/{admin}/foo', $collection->get('foo')->getPath(), '->addPrefix() can handle spaces if desired');
+        $this->assertSame('/ /0/{admin}/bar', $collection->get('bar')->getPath(), 'the route pattern of an added collection is in synch with the added prefix');
     }
 
     public function testAddPrefixOverridesDefaultsAndRequirements()

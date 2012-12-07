@@ -189,8 +189,21 @@ class UploadedFile extends File
      */
     public function move($directory, $name = null)
     {
-        if ($this->isValid() && ($this->test || is_uploaded_file($this->getPathname()))) {
-            return parent::move($directory, $name);
+        if ($this->isValid()) {
+            if ($this->test) {
+                return parent::move($directory, $name);
+            } elseif (is_uploaded_file($this->getPathname())) {
+                $target = $this->getTargetFile($directory, $name);
+
+                if (!@move_uploaded_file($this->getPathname(), $target)) {
+                    $error = error_get_last();
+                    throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
+                }
+
+                @chmod($target, 0666 & ~umask());
+
+                return $target;
+            }
         }
 
         throw new FileException(sprintf('The file "%s" has not been uploaded via Http', $this->getPathname()));

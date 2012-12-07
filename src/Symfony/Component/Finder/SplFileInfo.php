@@ -62,10 +62,6 @@ class SplFileInfo extends \SplFileInfo
      */
     public function getContents()
     {
-        $file = new \SplFileObject($this->getRealpath(), 'rb');
-        ob_start();
-        $file->fpassthru();
-
-        return ob_get_clean();
+        return file_get_contents($this->getRealPath());
     }
 }

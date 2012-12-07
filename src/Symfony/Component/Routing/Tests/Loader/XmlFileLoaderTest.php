@@ -56,6 +56,21 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
     }
 
+    public function testLoadWithNamespacePrefix()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('namespaceprefix.xml');
+
+        $this->assertCount(1, $routeCollection, 'One route is loaded');
+        $route = $routeCollection->get('blog_show');
+        $this->assertEquals('/blog/{slug}', $route->getPattern());
+        $this->assertEquals('MyBundle:Blog:show', $route->getDefault('_controller'));
+        $this->assertEquals('\w+', $route->getRequirement('slug'));
+        $this->assertEquals('en|fr|de', $route->getRequirement('_locale'));
+        $this->assertEquals('{_locale}.example.com', $route->getHostnamePattern());
+        $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
+    }
+
     public function testLoadWithImport()
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
@@ -94,7 +109,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function getPathsToInvalidFiles()
     {
-        return array(array('nonvalidnode.xml'), array('nonvalidroute.xml'), array('nonvalid.xml'));
+        return array(array('nonvalidnode.xml'), array('nonvalidroute.xml'), array('nonvalid.xml'), array('missing_id.xml'), array('missing_path.xml'));
     }
 
     /**

@@ -75,11 +75,11 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
         return Container::underscore($classBaseName);
     }
 
-    final protected function processConfiguration(ConfigurationInterface $configuration, array $configs)
+    final protected function processConfiguration(ConfigurationInterface $configuration, array $configs, $normalizeKeys = true)
     {
         $processor = new Processor();
 
-        return $processor->processConfiguration($configuration, $configs);
+        return $processor->processConfiguration($configuration, $configs, $normalizeKeys);
     }
 
     /**

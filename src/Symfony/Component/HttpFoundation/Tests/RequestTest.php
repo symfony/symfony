@@ -560,9 +560,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($request->getQueryString(), '->getQueryString() returns null for empty query string');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::getHost
-     */
     public function testGetHost()
     {
         $request = new Request();
@@ -584,6 +581,16 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com', 'HTTP_HOST' => 'www.host.com'));
         $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
         $this->stopTrustingProxyData();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testGetHostWithFakeHttpHostValue()
+    {
+        $request = new Request();
+        $request->initialize(array(), array(), array(), array(), array(), array('HTTP_HOST' => 'www.host.com?query=string'));
+        $request->getHost();
     }
 
     /**

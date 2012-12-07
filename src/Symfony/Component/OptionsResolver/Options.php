@@ -484,28 +484,30 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      */
     private function normalize($option)
     {
-        // The code duplication with resolve() exists for performance
-        // reasons, in order to save a method call.
-        // Remember that this method is potentially called a couple of thousand
-        // times and needs to be as efficient as possible.
-        if (isset($this->lock[$option])) {
-            $conflicts = array();
+        if (array_key_exists($option, $this->options)) {
+            // The code duplication with resolve() exists for performance
+            // reasons, in order to save a method call.
+            // Remember that this method is potentially called a couple of thousand
+            // times and needs to be as efficient as possible.
+            if (isset($this->lock[$option])) {
+                $conflicts = array();
 
-            foreach ($this->lock as $option => $locked) {
-                if ($locked) {
-                    $conflicts[] = $option;
+                foreach ($this->lock as $option => $locked) {
+                    if ($locked) {
+                        $conflicts[] = $option;
+                    }
                 }
+
+                throw new OptionDefinitionException('The options "' . implode('", "', $conflicts) . '" have a cyclic dependency.');
             }
 
-            throw new OptionDefinitionException('The options "' . implode('", "', $conflicts) . '" have a cyclic dependency.');
+            /** @var \Closure $normalizer */
+            $normalizer = $this->normalizers[$option];
+
+            $this->lock[$option] = true;
+            $this->options[$option] = $normalizer($this, $this->options[$option]);
+            unset($this->lock[$option]);
         }
-
-        /** @var \Closure $normalizer */
-        $normalizer = $this->normalizers[$option];
-
-        $this->lock[$option] = true;
-        $this->options[$option] = $normalizer($this, array_key_exists($option, $this->options) ? $this->options[$option] : null);
-        unset($this->lock[$option]);
 
         // The option is now normalized
         unset($this->normalizers[$option]);

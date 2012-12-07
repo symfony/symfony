@@ -107,6 +107,20 @@ class File extends \SplFileInfo
      */
     public function move($directory, $name = null)
     {
+        $target = $this->getTargetFile($directory, $name);
+
+        if (!@rename($this->getPathname(), $target)) {
+            $error = error_get_last();
+            throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
+        }
+
+        @chmod($target, 0666 & ~umask());
+
+        return $target;
+    }
+
+    protected function getTargetFile($directory, $name = null)
+    {
         if (!is_dir($directory)) {
             if (false === @mkdir($directory, 0777, true)) {
                 throw new FileException(sprintf('Unable to create the "%s" directory', $directory));
@@ -117,14 +131,7 @@ class File extends \SplFileInfo
 
         $target = $directory.DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : $this->getName($name));
 
-        if (!@rename($this->getPathname(), $target)) {
-            $error = error_get_last();
-            throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
-        }
-
-        @chmod($target, 0666 & ~umask());
-
-        return new File($target);
+        return new File($target, false);
     }
 
     /**

@@ -54,16 +54,19 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo2', $collection->get('foo')->getPath());
     }
 
-    public function testIteratorWithOverriddenRoutes()
+    public function testIterator()
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));
 
         $collection1 = new RouteCollection();
-        $collection1->add('foo', new Route('/foo1'));
+        $collection1->add('bar', $bar = new Route('/bar'));
+        $collection1->add('foo', $foo = new Route('/foo-new'));
         $collection->addCollection($collection1);
+        $collection->add('last', $last = new Route('/last'));
 
-        $this->assertEquals('/foo1', $this->getFirstNamedRoute($collection, 'foo')->getPath());
+        $this->assertInstanceOf('\ArrayIterator', $collection->getIterator());
+        $this->assertSame(array('bar' => $bar, 'foo' => $foo, 'last' => $last), $collection->getIterator()->getArrayCopy());
     }
 
     public function testCount()
@@ -72,23 +75,10 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection->add('foo', new Route('/foo'));
 
         $collection1 = new RouteCollection();
-        $collection1->add('foo1', new Route('/foo1'));
+        $collection1->add('bar', new Route('/bar'));
         $collection->addCollection($collection1);
 
         $this->assertCount(2, $collection);
-    }
-
-    protected function getFirstNamedRoute(RouteCollection $routeCollection, $name)
-    {
-        foreach ($routeCollection as $key => $route) {
-            if ($route instanceof RouteCollection) {
-                return $this->getFirstNamedRoute($route, $name);
-            }
-
-            if ($name === $key) {
-                return $route;
-            }
-        }
     }
 
     public function testAddCollection()

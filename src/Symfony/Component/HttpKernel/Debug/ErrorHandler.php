@@ -82,15 +82,24 @@ class ErrorHandler
             return false;
         }
 
-        if ($level & E_USER_DEPRECATED || $level & E_DEPRECATED) {
+        if ($level & (E_USER_DEPRECATED | E_DEPRECATED)) {
             if (null !== self::$logger) {
-                self::$logger->warn($message, array('type' => 'deprecation', 'file' => $file, 'line' => $line));
+                $deprecation = array(
+                    'type' => 'deprecation',
+                    'file' => $file,
+                    'line' => $line,
+                    'stack' => version_compare(PHP_VERSION, '5.4', '<')
+                        ? array_slice(debug_backtrace(false), 0, 10)
+                        : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10)
+                );
+
+                self::$logger->warn($message, $deprecation);
             }
 
             return true;
         }
 
-        if (error_reporting() & $level && $this->level & $level) {
+        if ($level & (error_reporting() | $this->level)) {
             throw new \ErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line);
         }
 

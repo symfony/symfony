@@ -69,8 +69,8 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
         $logger = $this->getMock('Symfony\Component\HttpKernel\Log\LoggerInterface');
         $logger->expects($this->once())->method('warn')->with(
-            $this->equalTo('foo'),
-            $this->equalTo(array('type' => 'deprecation', 'file' => 'foo.php', 'line' => '12'))
+            'foo',
+            $this->isType('array')
         );
 
         $handler = ErrorHandler::register(E_USER_DEPRECATED);

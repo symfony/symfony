@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  */
 class ErrorHandler
 {
+    const TYPE_DEPRECATION = -100;
+
     private $levels = array(
         E_WARNING           => 'Warning',
         E_NOTICE            => 'Notice',
@@ -85,7 +87,7 @@ class ErrorHandler
         if ($level & (E_USER_DEPRECATED | E_DEPRECATED)) {
             if (null !== self::$logger) {
                 $deprecation = array(
-                    'type' => 'deprecation',
+                    'type' => self::TYPE_DEPRECATION,
                     'file' => $file,
                     'line' => $line,
                     'stack' => version_compare(PHP_VERSION, '5.4', '<')
@@ -99,7 +101,7 @@ class ErrorHandler
             return true;
         }
 
-        if ($level & (error_reporting() | $this->level)) {
+        if (error_reporting() & $level && $this->level & $level) {
             throw new \ErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line);
         }
 

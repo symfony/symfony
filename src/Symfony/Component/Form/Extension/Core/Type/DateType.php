@@ -181,7 +181,7 @@ class DateType extends AbstractType
         };
 
         $format = function (Options $options) {
-            return $options['widget'] === 'single_text' ? self::HTML5_FORMAT : self::DEFAULT_FORMAT;
+            return $options['widget'] === 'single_text' ? DateType::HTML5_FORMAT : DateType::DEFAULT_FORMAT;
         };
 
         // BC until Symfony 2.3

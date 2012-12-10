@@ -43,8 +43,14 @@ class GnuFindAdapter extends AbstractFindAdapter
      */
     protected function buildFormatSorting(Command $command, $format)
     {
-        $command->get('find')->add('-printf')->arg($format.' %h/%f\\n')
-            ->add('| sort | cut')->arg('-d ')->arg('-f2-');
+        $command
+            ->get('find')
+            ->add('-printf')
+            ->arg($format.' %h/%f\\n')
+            ->add('| sort | cut')
+            ->arg('-d ')
+            ->arg('-f2-')
+        ;
     }
 
     /**

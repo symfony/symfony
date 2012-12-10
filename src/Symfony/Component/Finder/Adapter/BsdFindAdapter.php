@@ -43,7 +43,12 @@ class BsdFindAdapter extends AbstractFindAdapter
      */
     protected function buildFormatSorting(Command $command, $format)
     {
-        $command->get('find')->add('-print0 | xargs -0 stat -f')->arg($format.' %h/%f\\n')
-            ->add('| sort | cut')->arg('-d ')->arg('-f2-');
+        $command
+            ->get('find')
+            ->add('-print0 | xargs -0 stat -f')
+            ->arg($format.' %h/%f\\n')
+            ->add('| sort | cut')
+            ->arg('-d ')
+            ->arg('-f2-');
     }
 }

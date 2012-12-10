@@ -51,18 +51,6 @@ abstract class AbstractAdapter implements AdapterInterface
     }
 
     /**
-     * This method should be implemented in all adapters.
-     *
-     * Do not implement isSupported in the adapters as the generic implementation
-     * provides a cache layer.
-     *
-     * @see isSupported
-     *
-     * @return Boolean Whether the adapter is supported
-     */
-    abstract protected function canBeUsed();
-
-    /**
      * {@inheritdoc}
      */
     public function setFollowLinks($followLinks)
@@ -221,4 +209,16 @@ abstract class AbstractAdapter implements AdapterInterface
 
         return $this;
     }
+
+    /**
+     * This method should be implemented in all adapters.
+     *
+     * Do not implement isSupported in the adapters as the generic implementation
+     * provides a cache layer.
+     *
+     * @see isSupported
+     *
+     * @return Boolean Whether the adapter is supported
+     */
+    abstract protected function canBeUsed();
 }

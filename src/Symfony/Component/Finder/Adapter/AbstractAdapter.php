@@ -34,6 +34,34 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $paths       = array();
     protected $notPaths    = array();
 
+    private static $areSupported = array();
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isSupported()
+    {
+        $name = $this->getName();
+
+        if (!array_key_exists($name, self::$areSupported)) {
+            self::$areSupported[$name] = $this->canBeUsed();
+        }
+
+        return self::$areSupported[$name];
+    }
+
+    /**
+     * This method should be implemented in all adapters.
+     *
+     * Do not implement isSupported in the adapters as the generic implementation
+     * provides a cache layer.
+     *
+     * @see isSupported
+     *
+     * @return Boolean Whether the adapter is supported
+     */
+    abstract protected function canBeUsed();
+
     /**
      * {@inheritdoc}
      */

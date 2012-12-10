@@ -685,6 +685,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @param $dir
      *
      * @return \Iterator
+     *
+     * @throws \RuntimeException When none of the adapters are supported
      */
     private function searchInDirectory($dir)
     {
@@ -697,16 +699,12 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         foreach ($this->adapters as $adapter) {
-            if (!$adapter['adapter']->isSupported()) {
-                continue;
-            }
-
-            try {
-                return $this
-                    ->buildAdapter($adapter['adapter'])
-                    ->searchInDirectory($dir);
-            } catch(ExceptionInterface $e) {
-                continue;
+            if ($adapter['adapter']->isSupported()) {
+                try {
+                    return $this
+                        ->buildAdapter($adapter['adapter'])
+                        ->searchInDirectory($dir);
+                } catch(ExceptionInterface $e) {}
             }
         }
 

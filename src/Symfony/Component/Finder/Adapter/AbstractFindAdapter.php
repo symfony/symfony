@@ -118,7 +118,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function isSupported()
+    protected function canBeUsed()
     {
         return $this->shell->testCommand('find');
     }

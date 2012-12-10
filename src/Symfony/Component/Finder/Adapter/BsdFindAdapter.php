@@ -25,17 +25,17 @@ class BsdFindAdapter extends AbstractFindAdapter
     /**
      * {@inheritdoc}
      */
-    public function isSupported()
+    public function getName()
     {
-        return in_array($this->shell->getType(), array(Shell::TYPE_BSD, Shell::TYPE_DARWIN)) && parent::isSupported();
+        return 'bsd_find';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    protected function canBeUsed()
     {
-        return 'bsd_find';
+        return in_array($this->shell->getType(), array(Shell::TYPE_BSD, Shell::TYPE_DARWIN)) && parent::canBeUsed();
     }
 
     /**

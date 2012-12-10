@@ -615,8 +615,8 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function getIterator()
     {
-        if (0 === count($this->dirs)) {
-            throw new \LogicException('You must call the in() method before iterating over a Finder.');
+        if (0 === count($this->dirs) && 0 === count($this->iterators)) {
+            throw new \LogicException('You must call one of in() or append() methods before iterating over a Finder.');
         }
 
         if (1 === count($this->dirs) && 0 === count($this->iterators)) {
@@ -641,6 +641,10 @@ class Finder implements \IteratorAggregate, \Countable
      * The set can be another Finder, an Iterator, an IteratorAggregate, or even a plain array.
      *
      * @param mixed $iterator
+     *
+     * @return Finder The finder
+     *
+     * @throws \InvalidArgumentException When the given argument is not iterable.
      */
     public function append($iterator)
     {
@@ -657,6 +661,8 @@ class Finder implements \IteratorAggregate, \Countable
         } else {
             throw new \InvalidArgumentException('Finder::append() method wrong argument type.');
         }
+
+        return $this;
     }
 
     /**

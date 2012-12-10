@@ -65,9 +65,11 @@ class Finder implements \IteratorAggregate, \Countable
     {
         $this->ignore = static::IGNORE_VCS_FILES | static::IGNORE_DOT_FILES;
 
-        $this->addAdapter(new GnuFindAdapter());
-        $this->addAdapter(new BsdFindAdapter());
-        $this->addAdapter(new PhpAdapter(), -50);
+        $this
+            ->addAdapter(new GnuFindAdapter())
+            ->addAdapter(new BsdFindAdapter())
+            ->addAdapter(new PhpAdapter(), -50)
+        ;
     }
 
     /**
@@ -86,7 +88,7 @@ class Finder implements \IteratorAggregate, \Countable
      * Registers a finder engine implementation.
      *
      * @param AdapterInterface $adapter  An adapter instance
-     * @param int              $priority Highest is selected first
+     * @param integer          $priority Highest is selected first
      *
      * @return Finder The current Finder instance
      */
@@ -418,9 +420,20 @@ class Finder implements \IteratorAggregate, \Countable
         return $this;
     }
 
+    /**
+     * Adds VCS patterns.
+     *
+     * @see ignoreVCS
+     *
+     * @param string|string[] $pattern VCS patterns to ignore
+     */
     public static function addVCSPattern($pattern)
     {
-        self::$vcsPatterns[] = $pattern;
+        foreach ((array) $pattern as $p) {
+            self::$vcsPatterns[] = $p;
+        }
+
+        self::$vcsPatterns = array_unique(self::$vcsPatterns);
     }
 
     /**

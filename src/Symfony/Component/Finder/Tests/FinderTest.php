@@ -356,9 +356,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
      */
     public function testRelativePath($adapter)
     {
-        $finder = $this->buildFinder($adapter);
-
-        $finder->in(self::$tmpDir);
+        $finder = $this->buildFinder($adapter)->in(self::$tmpDir);
 
         $paths = array();
 
@@ -379,9 +377,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
      */
     public function testRelativePathname($adapter)
     {
-        $finder = $this->buildFinder($adapter);
-
-        $finder->in(self::$tmpDir)->sortByName();
+        $finder = $this->buildFinder($adapter)->in(self::$tmpDir)->sortByName();
 
         $paths = array();
 
@@ -428,8 +424,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testCountDirectories()
     {
-        $finder = new Finder();
-        $directory = $finder->directories()->in(self::$tmpDir);
+        $directory = Finder::create()->directories()->in(self::$tmpDir);
         $i = 0;
 
         foreach ($directory as $dir) {
@@ -441,8 +436,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testCountFiles()
     {
-        $finder = new Finder();
-        $files = $finder->files()->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $files = Finder::create()->files()->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures');
         $i = 0;
 
         foreach ($files as $file) {
@@ -692,8 +686,14 @@ class FinderTest extends Iterator\RealIteratorTestCase
     private function getValidAdapters()
     {
         return array_filter(
-            array(new Adapter\GnuFindAdapter(), new Adapter\PhpAdapter()),
-            function (Adapter\AdapterInterface $adapter)  { return $adapter->isSupported(); }
+            array(
+                new Adapter\BsdFindAdapter(),
+                new Adapter\GnuFindAdapter(),
+                new Adapter\PhpAdapter()
+            ),
+            function (Adapter\AdapterInterface $adapter)  {
+                return $adapter->isSupported();
+            }
         );
     }
 }

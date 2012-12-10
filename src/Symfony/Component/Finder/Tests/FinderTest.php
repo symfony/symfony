@@ -408,7 +408,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder1 = $this->buildFinder($adapter);
         $finder1->directories()->in(self::$tmpDir);
 
-        $finder->append($finder1);
+        $finder = $finder->append($finder1);
+
 
         $this->assertIterator($this->toAbsolute(array('foo', 'foo/bar.tmp', 'toto')), $finder->getIterator());
     }
@@ -424,6 +425,27 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->append($this->toAbsolute(array('foo', 'toto')));
 
         $this->assertIterator($this->toAbsolute(array('foo', 'foo/bar.tmp', 'toto')), $finder->getIterator());
+    }
+
+    /**
+     * @dataProvider getAdaptersTestData
+     */
+    public function testAppendReturnsAFinder($adapter)
+    {
+        $this->assertInstanceOf('Symfony\\Component\\Finder\\Finder', $this->buildFinder($adapter)->append(array()));
+    }
+
+    /**
+     * @dataProvider getAdaptersTestData
+     */
+    public function testAppendDoesNotRequireIn($adapter)
+    {
+        $finder = $this->buildFinder($adapter);
+        $finder->in(self::$tmpDir.DIRECTORY_SEPARATOR.'foo');
+
+        $finder1 = Finder::create()->append($finder);
+
+        $this->assertIterator(iterator_to_array($finder->getIterator()), $finder1->getIterator());
     }
 
     public function testCountDirectories()

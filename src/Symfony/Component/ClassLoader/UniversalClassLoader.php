@@ -248,6 +248,12 @@ class UniversalClassLoader
     public function loadClass($class)
     {
         if ($file = $this->findFile($class)) {
+
+            if (PHP_VERSION_ID < 50308) {
+                // workaround PHP bug #55156
+                eval('{}');
+            }
+
             require $file;
 
             return true;

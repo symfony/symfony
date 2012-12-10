@@ -196,6 +196,12 @@ class ClassCollectionLoader
     private static function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
+        // Strip leading & trailing ws, multiple EOL, multiple ws
+        $content = preg_replace(
+            array('/^\s+/m', '/\s+$/m', '/([\n\r]+ *[\n\r]+)+/', '/[ \t]+/'),
+            array('', '', "\n", ' '),
+            $content
+        );
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
             @chmod($file, 0666 & ~umask());
 

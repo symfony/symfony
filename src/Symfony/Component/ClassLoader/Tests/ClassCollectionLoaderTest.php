@@ -173,34 +173,21 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         spl_autoload_unregister($r);
 
         $this->assertEquals(<<<EOF
-<?php  
-
-
-
+<?php
 namespace Namespaced
 {
-
 class WithComments
 {
-    
-    public static \$loaded = true;
+public static \$loaded = true;
 }
 }
- 
 namespace
 {
-
-
-
-
 class Pearlike_WithComments
 {
-    
-    public static \$loaded = true;
+public static \$loaded = true;
 }
-
 }
-
 EOF
         , file_get_contents($file));
 

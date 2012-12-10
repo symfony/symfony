@@ -76,11 +76,6 @@ class Route implements \Serializable
         $this->setHostnamePattern($hostnamePattern);
     }
 
-    public function __clone()
-    {
-        $this->compiled = null;
-    }
-
     public function serialize()
     {
         return serialize(array(

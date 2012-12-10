@@ -55,6 +55,15 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('Symfony\Component\Config\Exception\FileLoaderLoadException', $e, '->resolve() throws a FileLoaderLoadException if the resource cannot be loaded');
         }
     }
+
+    public function testImport()
+    {
+        $loader = $this->getMock('Symfony\Component\Config\Loader\Loader', array('supports', 'load'));
+        $loader->expects($this->once())->method('supports')->will($this->returnValue(true));
+        $loader->expects($this->once())->method('load')->will($this->returnValue('yes'));
+
+        $this->assertEquals('yes', $loader->import('foo'));
+    }
 }
 
 class ProjectLoader1 extends Loader

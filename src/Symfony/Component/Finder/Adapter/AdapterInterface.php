@@ -17,14 +17,14 @@ namespace Symfony\Component\Finder\Adapter;
 interface AdapterInterface
 {
     /**
-     * @param bool $followLinks
+     * @param Boolean $followLinks
      *
      * @return AdapterInterface Current instance
      */
     public function setFollowLinks($followLinks);
 
     /**
-     * @param int $mode
+     * @param integer $mode
      *
      * @return AdapterInterface Current instance
      */
@@ -94,14 +94,14 @@ interface AdapterInterface
     public function setFilters(array $filters);
 
     /**
-     * @param \Closure|int $sort
+     * @param \Closure|integer $sort
      *
      * @return AdapterInterface Current instance
      */
     public function setSort($sort);
 
     /**
-     * @param array $path
+     * @param array $paths
      *
      * @return AdapterInterface Current instance
      */
@@ -124,7 +124,7 @@ interface AdapterInterface
     /**
      * Tests adapter support for current platform.
      *
-     * @return bool
+     * @return Boolean
      */
     public function isSupported();
 

@@ -125,6 +125,13 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('max-age=10, public, s-maxage=100', $bag->get('cache-control'));
     }
 
+    public function testCacheControlDirectiveParsingQuotedZero()
+    {
+        $bag = new HeaderBag(array('cache-control' => 'max-age="0"'));
+        $this->assertTrue($bag->hasCacheControlDirective('max-age'));
+        $this->assertEquals(0, $bag->getCacheControlDirective('max-age'));
+    }
+
     public function testCacheControlDirectiveOverrideWithReplace()
     {
         $bag = new HeaderBag(array('cache-control' => 'private, max-age=100'));

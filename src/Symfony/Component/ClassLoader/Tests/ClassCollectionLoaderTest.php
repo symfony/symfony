@@ -20,6 +20,35 @@ require_once __DIR__.'/Fixtures/ClassesWithParents/A.php';
 
 class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    public function testTraitDependencies()
+    {
+        if (version_compare(phpversion(), '5.4', '<')) {
+            $this->markTestSkipped('Requires PHP > 5.4');
+
+            return;
+        }
+
+        require_once __DIR__.'/Fixtures/deps/traits.php';
+
+        $r = new \ReflectionClass('Symfony\Component\ClassLoader\ClassCollectionLoader');
+        $m = $r->getMethod('getOrderedClasses');
+        $m->setAccessible(true);
+
+        $ordered = $m->invoke('Symfony\Component\ClassLoader\ClassCollectionLoader', array('CTFoo'));
+
+        $this->assertEquals(
+            array('TD', 'TC', 'TB', 'TA', 'TZ', 'CTFoo'),
+            array_map(function ($class) { return $class->getName(); }, $ordered)
+        );
+
+        $ordered = $m->invoke('Symfony\Component\ClassLoader\ClassCollectionLoader', array('CTBar'));
+
+        $this->assertEquals(
+            array('TD', 'TZ', 'TC', 'TB', 'TA', 'CTBar'),
+            array_map(function ($class) { return $class->getName(); }, $ordered)
+        );
+    }
+
     /**
      * @dataProvider getDifferentOrders
      */
@@ -71,8 +100,8 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testClassWithTraitsReordering(array $classes)
     {
-        if (version_compare(phpversion(), '5.4.0', '<')) {
-            $this->markTestSkipped('Requires PHP > 5.4.0.');
+        if (version_compare(phpversion(), '5.4', '<')) {
+            $this->markTestSkipped('Requires PHP > 5.4');
 
             return;
         }
@@ -86,9 +115,9 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         $expected = array(
             'ClassesWithParents\\GInterface',
             'ClassesWithParents\\CInterface',
-            'ClassesWithParents\\CTrait',
             'ClassesWithParents\\ATrait',
             'ClassesWithParents\\BTrait',
+            'ClassesWithParents\\CTrait',
             'ClassesWithParents\\B',
             'ClassesWithParents\\A',
             'ClassesWithParents\\D',
@@ -125,8 +154,20 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('<?php '.$expected, ClassCollectionLoader::fixNamespaceDeclarations('<?php '.$source));
     }
 
+    public function getFixNamespaceDeclarationsData()
+    {
+        return array(
+            array("namespace;\nclass Foo {}\n", "namespace\n{\nclass Foo {}\n}"),
+            array("namespace Foo;\nclass Foo {}\n", "namespace Foo\n{\nclass Foo {}\n}"),
+            array("namespace   Bar ;\nclass Foo {}\n", "namespace Bar\n{\nclass Foo {}\n}"),
+            array("namespace Foo\Bar;\nclass Foo {}\n", "namespace Foo\Bar\n{\nclass Foo {}\n}"),
+            array("namespace Foo\Bar\Bar\n{\nclass Foo {}\n}\n", "namespace Foo\Bar\Bar\n{\nclass Foo {}\n}"),
+            array("namespace\n{\nclass Foo {}\n}\n", "namespace\n{\nclass Foo {}\n}"),
+        );
+    }
+
     /**
-     * @dataProvider getFixNamespaceDeclarationsData
+     * @dataProvider getFixNamespaceDeclarationsDataWithoutTokenizer
      */
     public function testFixNamespaceDeclarationsWithoutTokenizer($source, $expected)
     {
@@ -135,7 +176,7 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         ClassCollectionLoader::enableTokenizer(true);
     }
 
-    public function getFixNamespaceDeclarationsData()
+    public function getFixNamespaceDeclarationsDataWithoutTokenizer()
     {
         return array(
             array("namespace;\nclass Foo {}\n", "namespace\n{\nclass Foo {}\n}\n"),
@@ -168,41 +209,47 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
             require_once __DIR__.'/Fixtures/'.str_replace(array('\\', '_'), '/', $class).'.php';
         });
 
-        ClassCollectionLoader::load(array('Namespaced\\WithComments', 'Pearlike_WithComments'), sys_get_temp_dir(), 'bar', false);
+        ClassCollectionLoader::load(
+            array('Namespaced\\WithComments', 'Pearlike_WithComments'),
+            sys_get_temp_dir(),
+            'bar',
+            false
+        );
 
         spl_autoload_unregister($r);
 
         $this->assertEquals(<<<EOF
-<?php  
-
-
-
 namespace Namespaced
 {
-
 class WithComments
 {
-    
-    public static \$loaded = true;
+public static \$loaded = true;
 }
+\$string ='string shoult not be   modified';
+\$heredoc =<<<HD
+
+
+Heredoc should not be   modified
+
+
+HD;
+\$nowdoc =<<<'ND'
+
+
+Nowdoc should not be   modified
+
+
+ND;
 }
- 
 namespace
 {
-
-
-
-
 class Pearlike_WithComments
 {
-    
-    public static \$loaded = true;
+public static \$loaded = true;
 }
-
 }
-
 EOF
-        , file_get_contents($file));
+        , str_replace("<?php \n", '', file_get_contents($file)));
 
         unlink($file);
     }

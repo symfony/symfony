@@ -30,16 +30,16 @@ class FailingAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function isSupported()
+    public function getName()
     {
-        return true;
+        return 'failing';
     }
 
     /**
      * {@inheritdoc}
      */
-    function getName()
+    protected function canBeUsed()
     {
-        return 'failing';
+        return true;
     }
 }

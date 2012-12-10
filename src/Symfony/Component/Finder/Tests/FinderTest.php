@@ -356,9 +356,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
      */
     public function testRelativePath($adapter)
     {
-        $finder = $this->buildFinder($adapter);
-
-        $finder->in(self::$tmpDir);
+        $finder = $this->buildFinder($adapter)->in(self::$tmpDir);
 
         $paths = array();
 
@@ -379,9 +377,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
      */
     public function testRelativePathname($adapter)
     {
-        $finder = $this->buildFinder($adapter);
-
-        $finder->in(self::$tmpDir)->sortByName();
+        $finder = $this->buildFinder($adapter)->in(self::$tmpDir)->sortByName();
 
         $paths = array();
 
@@ -450,8 +446,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testCountDirectories()
     {
-        $finder = new Finder();
-        $directory = $finder->directories()->in(self::$tmpDir);
+        $directory = Finder::create()->directories()->in(self::$tmpDir);
         $i = 0;
 
         foreach ($directory as $dir) {
@@ -463,8 +458,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testCountFiles()
     {
-        $finder = new Finder();
-        $files = $finder->files()->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures');
+        $files = Finder::create()->files()->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures');
         $i = 0;
 
         foreach ($files as $file) {
@@ -474,17 +468,13 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertCount($i, $files);
     }
 
+    /**
+     * @expectedException \LogicException
+     */
     public function testCountWithoutIn()
     {
-        $finder = new Finder();
-        $finder->files();
-
-        try {
-            count($finder);
-            $this->fail('Countable makes use of the getIterator command');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('LogicException', $e, '->getIterator() throws \LogicException when no logic has been entered');
-        }
+        $finder = Finder::create()->files();
+        count($finder);
     }
 
     protected function toAbsolute($files)
@@ -641,37 +631,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
         return $this->buildTestData($tests);
     }
 
-    private function buildFinder(Adapter\AdapterInterface $adapter)
-    {
-        return Finder::create()
-            ->removeAdapters()
-            ->addAdapter($adapter);
-    }
-
-    private function getValidAdapters()
-    {
-        return array_filter(
-            array(new Adapter\GnuFindAdapter(), new Adapter\PhpAdapter()),
-            function (Adapter\AdapterInterface $adapter)  { return $adapter->isSupported(); }
-        );
-    }
-
-    private function buildTestData(array $tests)
-    {
-        $data = array();
-        foreach ($this->getValidAdapters() as $adapter) {
-            foreach ($tests as $test) {
-                $data[] = array_merge(array($adapter), $test);
-            }
-        }
-
-        return $data;
-    }
-
     /**
      * @dataProvider getTestPathData
      */
-    public function testPath(Adapter\AdapterInterface $adapter, $matchPatterns, $noMatchPatterns, $expected)
+    public function testPath(Adapter\AdapterInterface $adapter, $matchPatterns, $noMatchPatterns, array $expected)
     {
         $finder = $this->buildFinder($adapter);
         $finder->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures')
@@ -721,5 +684,38 @@ class FinderTest extends Iterator\RealIteratorTestCase
         );
 
         return $this->buildTestData($tests);
+    }
+
+    private function buildTestData(array $tests)
+    {
+        $data = array();
+        foreach ($this->getValidAdapters() as $adapter) {
+            foreach ($tests as $test) {
+                $data[] = array_merge(array($adapter), $test);
+            }
+        }
+
+        return $data;
+    }
+
+    private function buildFinder(Adapter\AdapterInterface $adapter)
+    {
+        return Finder::create()
+            ->removeAdapters()
+            ->addAdapter($adapter);
+    }
+
+    private function getValidAdapters()
+    {
+        return array_filter(
+            array(
+                new Adapter\BsdFindAdapter(),
+                new Adapter\GnuFindAdapter(),
+                new Adapter\PhpAdapter()
+            ),
+            function (Adapter\AdapterInterface $adapter)  {
+                return $adapter->isSupported();
+            }
+        );
     }
 }

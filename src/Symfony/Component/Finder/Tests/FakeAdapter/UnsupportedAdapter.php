@@ -29,16 +29,16 @@ class UnsupportedAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function isSupported()
+    public function getName()
     {
-        return false;
+        return 'unsupported';
     }
 
     /**
      * {@inheritdoc}
      */
-    function getName()
+    protected function canBeUsed()
     {
-        return 'unsupported';
+        return false;
     }
 }

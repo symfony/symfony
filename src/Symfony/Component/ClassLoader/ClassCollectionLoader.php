@@ -247,17 +247,19 @@ class ClassCollectionLoader
             array_unshift($classes, $parent);
         }
 
+        $traits = array();
+
         if (function_exists('get_declared_traits')) {
             foreach ($classes as $c) {
                 foreach (self::getTraits($c) as $trait) {
                     self::$seen[$trait->getName()] = true;
 
-                    array_unshift($classes, $trait);
+                    array_unshift($traits, $trait);
                 }
             }
         }
 
-        return array_merge(self::getInterfaces($class), $classes);
+        return array_merge(self::getInterfaces($class), $traits, $classes);
     }
 
     private static function getInterfaces(\ReflectionClass $class)

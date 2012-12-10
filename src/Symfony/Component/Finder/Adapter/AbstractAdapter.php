@@ -211,10 +211,11 @@ abstract class AbstractAdapter implements AdapterInterface
     }
 
     /**
-     * This method should be implemented in all adapters.
+     * Returns whether the adapter is supported in the current environment.
      *
-     * Do not implement isSupported in the adapters as the generic implementation
-     * provides a cache layer.
+     * This method should be implemented in all adapters. Do not implement
+     * isSupported in the adapters as the generic implementation provides a cache
+     * layer.
      *
      * @see isSupported
      *

@@ -25,14 +25,6 @@ class BsdFindAdapter extends AbstractFindAdapter
     /**
      * {@inheritdoc}
      */
-    public function isSupported()
-    {
-        return in_array($this->shell->getType(), array(Shell::TYPE_BSD, Shell::TYPE_DARWIN)) && parent::isSupported();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'bsd_find';
@@ -41,9 +33,22 @@ class BsdFindAdapter extends AbstractFindAdapter
     /**
      * {@inheritdoc}
      */
+    protected function canBeUsed()
+    {
+        return in_array($this->shell->getType(), array(Shell::TYPE_BSD, Shell::TYPE_DARWIN)) && parent::canBeUsed();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function buildFormatSorting(Command $command, $format)
     {
-        $command->get('find')->add('-print0 | xargs -0 stat -f')->arg($format.' %h/%f\\n')
-            ->add('| sort | cut')->arg('-d ')->arg('-f2-');
+        $command
+            ->get('find')
+            ->add('-print0 | xargs -0 stat -f')
+            ->arg($format.' %h/%f\\n')
+            ->add('| sort | cut')
+            ->arg('-d ')
+            ->arg('-f2-');
     }
 }

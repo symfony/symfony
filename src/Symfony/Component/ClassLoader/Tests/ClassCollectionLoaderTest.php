@@ -20,6 +20,38 @@ require_once __DIR__.'/Fixtures/ClassesWithParents/A.php';
 
 class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    public function testTraitDependencies()
+    {
+        if (version_compare(phpversion(), '5.4', '<')) {
+            $this->markTestSkipped('Requires PHP > 5.4');
+
+            return;
+        }
+
+        require_once __DIR__.'/Fixtures/deps/traits.php';
+
+        $r = new \ReflectionClass('Symfony\Component\ClassLoader\ClassCollectionLoader');
+        $m = $r->getMethod('getOrderedClasses');
+        $m->setAccessible(true);
+
+        $ordered = $m->invoke('Symfony\Component\ClassLoader\ClassCollectionLoader', array('CTFoo'));
+
+        $this->assertEquals(
+            array('TD', 'TC', 'TB', 'TA', 'TZ', 'CTFoo'),
+            array_map(function ($class) { return $class->getName(); }, $ordered)
+        );
+
+        $ordered = $m->invoke('Symfony\Component\ClassLoader\ClassCollectionLoader', array('CTBar'));
+
+        $this->assertEquals(
+            array('TD', 'TZ', 'TC', 'TB', 'TA', 'CTBar'),
+            array_map(function ($class) { return $class->getName(); }, $ordered)
+        );
+    }
+            array_map(function ($class) { return $class->getName(); }, $ordered)
+        );
+    }
+
     /**
      * @dataProvider getDifferentOrders
      */
@@ -71,8 +103,8 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testClassWithTraitsReordering(array $classes)
     {
-        if (version_compare(phpversion(), '5.4.0', '<')) {
-            $this->markTestSkipped('Requires PHP > 5.4.0.');
+        if (version_compare(phpversion(), '5.4', '<')) {
+            $this->markTestSkipped('Requires PHP > 5.4');
 
             return;
         }
@@ -86,9 +118,9 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         $expected = array(
             'ClassesWithParents\\GInterface',
             'ClassesWithParents\\CInterface',
-            'ClassesWithParents\\CTrait',
             'ClassesWithParents\\ATrait',
             'ClassesWithParents\\BTrait',
+            'ClassesWithParents\\CTrait',
             'ClassesWithParents\\B',
             'ClassesWithParents\\A',
             'ClassesWithParents\\D',

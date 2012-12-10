@@ -186,6 +186,14 @@ class ClassCollectionLoader
     }
 
     /**
+     * This method is only useful for testing.
+     */
+    public static function enableTokenizer($bool)
+    {
+        self::$useTokenizer = (Boolean) $bool;
+    }
+
+    /**
      * Writes a cache file.
      *
      * @param string $file    Filename
@@ -257,10 +265,10 @@ class ClassCollectionLoader
 
         if (function_exists('get_declared_traits')) {
             foreach ($classes as $c) {
-                foreach (self::getTraits($c) as $trait) {
-                    self::$seen[$trait->getName()] = true;
-
-                    array_unshift($traits, $trait);
+                foreach (self::resolveDependencies(self::computeTraitDeps($c), $c) as $trait) {
+                    if ($trait !== $c) {
+                        $traits[] = $trait;
+                    }
                 }
             }
         }
@@ -285,26 +293,58 @@ class ClassCollectionLoader
         return $classes;
     }
 
-    private static function getTraits(\ReflectionClass $class)
+    private static function computeTraitDeps(\ReflectionClass $class)
     {
         $traits = $class->getTraits();
-        $classes = array();
+        $deps = array($class->getName() => $traits);
         while ($trait = array_pop($traits)) {
             if ($trait->isUserDefined() && !isset(self::$seen[$trait->getName()])) {
-                $classes[] = $trait;
-
-                $traits = array_merge($traits, $trait->getTraits());
+                self::$seen[$trait->getName()] = true;
+                $traitDeps = $trait->getTraits();
+                $deps[$trait->getName()] = $traitDeps;
+                $traits = array_merge($traits, $traitDeps);
             }
         }
 
-        return $classes;
+        return $deps;
     }
 
     /**
-     * This method is only useful for testing.
+     * Dependencies resolution
+     *
+     * @param array             $tree       The dependency tree
+     * @param \ReflectionClass  $node       The node
+     * @param \ArrayObject      $resolved   An array of already resolved dependencies
+     * @param \ArrayObject      $unresolved An array of dependencies to be resolved
+     *
+     * @return \ArrayObject The dependencies for the given node
+     *
+     * @throws \RuntimeException if a circular dependency is detected
      */
-    public static function enableTokenizer($bool)
+    private static function resolveDependencies(array $tree, $node, \ArrayObject $resolved = null, \ArrayObject $unresolved = null)
     {
-        self::$useTokenizer = (Boolean) $bool;
+        if (null === $resolved) {
+            $resolved = new \ArrayObject();
+        }
+        if (null === $unresolved) {
+            $unresolved = new \ArrayObject();
+        }
+        $nodeName = $node->getName();
+        $unresolved[$nodeName] = $node;
+        foreach ($tree[$nodeName] as $dependency) {
+            if (!$resolved->offsetExists($dependency->getName())) {
+                if ($unresolved->offsetExists($dependency->getName())) {
+                    throw new \RuntimeException(sprintf(
+                        'Circular dependency "%s" - "%s"',
+                        $node->getName(),
+                        $dependency->getName()
+                    ));
+                }
+                self::resolveDependencies($tree, $dependency, $resolved, $unresolved);
+            }
+        }
+        $resolved[$nodeName] = $node;
+        unset($unresolved[$nodeName]);
+        return $resolved;
     }
 }

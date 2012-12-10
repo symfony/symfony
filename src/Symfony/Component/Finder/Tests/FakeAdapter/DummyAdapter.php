@@ -42,16 +42,16 @@ class DummyAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function isSupported()
+    public function getName()
     {
-        return true;
+        return 'yes';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    protected function canBeUsed()
     {
-        return 'yes';
+        return true;
     }
 }

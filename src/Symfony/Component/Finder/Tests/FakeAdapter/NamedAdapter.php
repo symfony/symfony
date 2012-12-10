@@ -42,16 +42,16 @@ class NamedAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function isSupported()
+    public function getName()
     {
-        return true;
+        return $this->name;
     }
 
     /**
      * {@inheritdoc}
      */
-    function getName()
+    protected function canBeUsed()
     {
-        return $this->name;
+        return true;
     }
 }

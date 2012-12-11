@@ -66,6 +66,7 @@ class ContextListener implements ListenerInterface
 
         if (null === $session || null === $token = $session->get('_security_'.$this->contextKey)) {
             $this->context->setToken(null);
+
             return;
         }
 

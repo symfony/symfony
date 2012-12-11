@@ -182,6 +182,7 @@ class PdoSessionStorage extends NativeSessionStorage
 
             if (count($sessionRows) == 1) {
                 $session = is_resource($sessionRows[0][0]) ? stream_get_contents($sessionRows[0][0]) : $sessionRows[0][0];
+
                 return base64_decode($session);
             }
 

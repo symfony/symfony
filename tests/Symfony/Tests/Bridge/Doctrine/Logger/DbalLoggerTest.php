@@ -11,7 +11,6 @@
 
 namespace Symfony\Tests\Bridge\Doctrine\Logger;
 
-
 class DbalLoggerTest extends \PHPUnit_Framework_TestCase
 {
     public function testLogNonUtf8()

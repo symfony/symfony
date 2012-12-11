@@ -46,7 +46,7 @@ class FileType extends AbstractType
     {
         $resolver->setDefaults(array(
             'compound' => false,
-            'data_class' => 'Symfony\Component\HttpFoundation\File\File'        
+            'data_class' => 'Symfony\Component\HttpFoundation\File\File'
         ));
     }
 

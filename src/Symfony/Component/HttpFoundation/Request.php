@@ -1007,7 +1007,7 @@ class Request
 
         // trim and remove port number from host
         // host is lowercase as per RFC 952/2181
-        $host = strtolower(trim(preg_replace('/:\d+$/', '', $host)));
+        $host = strtolower(preg_replace('/:\d+$/', '', trim($host)));
 
         // as the host can come from the user (HTTP_HOST and depending on the configuration, SERVER_NAME too can come from the user)
         // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)

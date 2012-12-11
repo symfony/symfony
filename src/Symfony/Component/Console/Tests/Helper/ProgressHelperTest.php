@@ -80,8 +80,18 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
         return new StreamOutput(fopen('php://memory', 'r+', false));
     }
 
+    protected $lastMessagesLength;
+
     protected function generateOutput($expected)
     {
-        return "\x0D\x1B\x5B\x4B".$expected;
+        $expectedout = $expected;
+
+        if($this->lastMessagesLength!==null){
+            $expectedout=str_repeat("\x20", $this->lastMessagesLength)."\x0D".$expected;
+        }
+
+        $this->lastMessagesLength=strlen($expected);
+
+        return "\x0D".$expectedout;
     }
 }

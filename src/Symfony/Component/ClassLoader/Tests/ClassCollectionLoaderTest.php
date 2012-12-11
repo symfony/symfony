@@ -48,9 +48,6 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
             array_map(function ($class) { return $class->getName(); }, $ordered)
         );
     }
-            array_map(function ($class) { return $class->getName(); }, $ordered)
-        );
-    }
 
     /**
      * @dataProvider getDifferentOrders
@@ -157,8 +154,20 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('<?php '.$expected, ClassCollectionLoader::fixNamespaceDeclarations('<?php '.$source));
     }
 
+    public function getFixNamespaceDeclarationsData()
+    {
+        return array(
+            array("namespace;\nclass Foo {}\n", "namespace\n{\nclass Foo {}\n}"),
+            array("namespace Foo;\nclass Foo {}\n", "namespace Foo\n{\nclass Foo {}\n}"),
+            array("namespace   Bar ;\nclass Foo {}\n", "namespace Bar\n{\nclass Foo {}\n}"),
+            array("namespace Foo\Bar;\nclass Foo {}\n", "namespace Foo\Bar\n{\nclass Foo {}\n}"),
+            array("namespace Foo\Bar\Bar\n{\nclass Foo {}\n}\n", "namespace Foo\Bar\Bar\n{\nclass Foo {}\n}"),
+            array("namespace\n{\nclass Foo {}\n}\n", "namespace\n{\nclass Foo {}\n}"),
+        );
+    }
+
     /**
-     * @dataProvider getFixNamespaceDeclarationsData
+     * @dataProvider getFixNamespaceDeclarationsDataWithoutTokenizer
      */
     public function testFixNamespaceDeclarationsWithoutTokenizer($source, $expected)
     {
@@ -167,17 +176,17 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         ClassCollectionLoader::enableTokenizer(true);
     }
 
-    public function getFixNamespaceDeclarationsData()
-    {
-        return array(
+     public function getFixNamespaceDeclarationsDataWithoutTokenizer()
+     {
+         return array(
             array("namespace;\nclass Foo {}\n", "namespace\n{\nclass Foo {}\n}\n"),
             array("namespace Foo;\nclass Foo {}\n", "namespace Foo\n{\nclass Foo {}\n}\n"),
             array("namespace   Bar ;\nclass Foo {}\n", "namespace   Bar\n{\nclass Foo {}\n}\n"),
             array("namespace Foo\Bar;\nclass Foo {}\n", "namespace Foo\Bar\n{\nclass Foo {}\n}\n"),
             array("namespace Foo\Bar\Bar\n{\nclass Foo {}\n}\n", "namespace Foo\Bar\Bar\n{\nclass Foo {}\n}\n"),
             array("namespace\n{\nclass Foo {}\n}\n", "namespace\n{\nclass Foo {}\n}\n"),
-        );
-    }
+         );
+     }
 
     /**
      * @expectedException InvalidArgumentException
@@ -200,18 +209,37 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
             require_once __DIR__.'/Fixtures/'.str_replace(array('\\', '_'), '/', $class).'.php';
         });
 
-        ClassCollectionLoader::load(array('Namespaced\\WithComments', 'Pearlike_WithComments'), sys_get_temp_dir(), 'bar', false);
+        ClassCollectionLoader::load(
+            array('Namespaced\\WithComments', 'Pearlike_WithComments'),
+            sys_get_temp_dir(),
+            'bar',
+            false
+        );
 
         spl_autoload_unregister($r);
 
         $this->assertEquals(<<<EOF
-<?php
 namespace Namespaced
 {
 class WithComments
 {
 public static \$loaded = true;
 }
+\$string ='string shoult not be   modified';
+\$heredoc =<<<HD
+
+
+Heredoc should not be   modified
+
+
+HD;
+\$nowdoc =<<<'ND'
+
+
+Nowdoc should not be   modified
+
+
+ND;
 }
 namespace
 {
@@ -221,7 +249,7 @@ public static \$loaded = true;
 }
 }
 EOF
-        , file_get_contents($file));
+        , str_replace("<?php \n", '', file_get_contents($file)));
 
         unlink($file);
     }

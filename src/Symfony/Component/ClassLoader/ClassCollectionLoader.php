@@ -144,45 +144,57 @@ class ClassCollectionLoader
             return $source;
         }
 
+        $rawChunk = '';
         $output = '';
         $inNamespace = false;
         $tokens = token_get_all($source);
 
-        for ($i = 0, $max = count($tokens); $i < $max; $i++) {
-            $token = $tokens[$i];
+        for (reset($tokens); false !== $token = current($tokens); next($tokens)) {
+
             if (is_string($token)) {
-                $output .= $token;
+                $rawChunk .= $token;
             } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
                 // strip comments
                 continue;
             } elseif (T_NAMESPACE === $token[0]) {
                 if ($inNamespace) {
-                    $output .= "}\n";
+                    $rawChunk .= "}\n";
                 }
-                $output .= $token[1];
+                $rawChunk .= $token[1];
 
                 // namespace name and whitespaces
-                while (($t = $tokens[++$i]) && is_array($t) && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
-                    $output .= $t[1];
+                while (($t = next($tokens)) &&
+                    is_array($t)
+                    && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
+                    $rawChunk .= $t[1];
                 }
-                if (is_string($t) && '{' === $t) {
+                if ('{' === $t) {
                     $inNamespace = false;
-                    --$i;
+                    prev($tokens);
                 } else {
-                    $output = rtrim($output);
-                    $output .= "\n{";
+                    $rawChunk = rtrim($rawChunk) . "\n{";
                     $inNamespace = true;
                 }
+            } elseif (T_START_HEREDOC === $token[0]) {
+                $output .= self::compressCode($rawChunk) . $token[1];
+                do {
+                    $token = next($tokens);
+                    $output .= $token[1];
+                } while ($token[0] !== T_END_HEREDOC);
+                $rawChunk = '';
+            } elseif (T_CONSTANT_ENCAPSED_STRING === $token[0]) {
+                $output .= self::compressCode($rawChunk) . $token[1];
+                $rawChunk = '';
             } else {
-                $output .= $token[1];
+                $rawChunk .= $token[1];
             }
         }
 
         if ($inNamespace) {
-            $output .= "}\n";
+            $rawChunk .= "}\n";
         }
 
-        return $output;
+        return $output . self::compressCode($rawChunk);
     }
 
     /**
@@ -191,6 +203,22 @@ class ClassCollectionLoader
     public static function enableTokenizer($bool)
     {
         self::$useTokenizer = (Boolean) $bool;
+    }
+
+    /**
+     * Strips leading & trailing ws, multiple EOL, multiple ws.
+     *
+     * @param string $code Original PHP code
+     *
+     * @return string compressed code
+     */
+    private static function compressCode($code)
+    {
+        return preg_replace(
+            array('/^\s+/m', '/\s+$/m', '/([\n\r]+ *[\n\r]+)+/', '/[ \t]+/'),
+            array('', '', "\n", ' '),
+            $code
+        );
     }
 
     /**
@@ -204,12 +232,6 @@ class ClassCollectionLoader
     private static function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
-        // Strip leading & trailing ws, multiple EOL, multiple ws
-        $content = preg_replace(
-            array('/^\s+/m', '/\s+$/m', '/([\n\r]+ *[\n\r]+)+/', '/[ \t]+/'),
-            array('', '', "\n", ' '),
-            $content
-        );
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
             @chmod($file, 0666 & ~umask());
 

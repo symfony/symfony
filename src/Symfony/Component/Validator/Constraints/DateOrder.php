@@ -6,8 +6,6 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @Annotation
- *
- * @api
  */
 class DateOrder extends Constraint
 {

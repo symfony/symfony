@@ -8,8 +8,6 @@ use Symfony\Component\Form\Util\PropertyPath;
 
 /**
  * @author Julien Stoeffler <julien@nectalis.com>
- *
- * @api
  */
 class DateOrderValidator extends ConstraintValidator
 {

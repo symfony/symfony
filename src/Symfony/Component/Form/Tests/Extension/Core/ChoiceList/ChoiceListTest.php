@@ -184,4 +184,17 @@ class ChoiceListTest extends \PHPUnit_Framework_TestCase
             array('A')
         );
     }
+
+    public function testLabelsContainingNull()
+    {
+        $this->list = new ChoiceList(
+            array($this->obj1, $this->obj2),
+            array('A', null)
+        );
+
+        $this->assertEquals(
+            array(0 => new ChoiceView($this->obj1, '0', 'A'), 1 => new ChoiceView($this->obj2, '1', null)),
+            $this->list->getRemainingViews()
+        );
+    }
 }

@@ -239,7 +239,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             $this->assertRegExp('/Did you mean this/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
         }
 
-
         $application->add(new \Foo1Command());
         $application->add(new \Foo2Command());
 

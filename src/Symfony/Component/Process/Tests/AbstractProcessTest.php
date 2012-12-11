@@ -16,7 +16,7 @@ namespace Symfony\Component\Process\Tests;
  */
 abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 {
-    protected abstract function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array());
+    abstract protected function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array());
 
     /**
      * @expectedException \InvalidArgumentException
@@ -232,7 +232,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $this->markTestSkipped('Windows does not support POSIX signals');
         }
-
 
         $process = $this->getProcess('php -r "while (true) {}"');
         $process->start();

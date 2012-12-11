@@ -62,7 +62,7 @@ class Regex extends Constraint
      * Convert the htmlPattern to a suitable format for HTML5 pattern.
      * Example: /^[a-z]+$/ would be converted to [a-z]+
      * However, if options are specified, it cannot be converted
-     * 
+     *
      * Pattern is also ignored if match=false since the pattern should
      * then be reversed before application.
      *
@@ -78,7 +78,7 @@ class Regex extends Constraint
         if (!$this->match) {
             return null;
         }
-        
+
         if (preg_match('/^(.)(\^?)(.*?)(\$?)\1$/', $this->pattern, $matches)) {
             $delimiter = $matches[1];
             $start     = empty($matches[2]) ? '.*' : '';

@@ -55,7 +55,20 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->setTheme(%s, array(0 => "tpl1", 1 => "tpl2"));',
+                '$formVar = %1$s;
+$resources = array(0 => "tpl1", 1 => "tpl2");
+
+if ($formVar instanceof \\Symfony\\Component\\Form\\FormView) {
+    $this->env->getExtension(\'form\')->renderer->setTheme($formVar, $resources);
+} else {
+    $formVar = twig_ensure_traversable($formVar);
+
+    foreach ($formVar as $nestedVar) {
+        if ($nestedVar instanceof \\Symfony\\Component\\Form\\FormView) {
+            $this->env->getExtension(\'form\')->renderer->setTheme($nestedVar, $resources);
+        }
+    }
+}',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())
@@ -67,7 +80,20 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->setTheme(%s, "tpl1");',
+                '$formVar = %1$s;
+$resources = "tpl1";
+
+if ($formVar instanceof \\Symfony\\Component\\Form\\FormView) {
+    $this->env->getExtension(\'form\')->renderer->setTheme($formVar, $resources);
+} else {
+    $formVar = twig_ensure_traversable($formVar);
+
+    foreach ($formVar as $nestedVar) {
+        if ($nestedVar instanceof \\Symfony\\Component\\Form\\FormView) {
+            $this->env->getExtension(\'form\')->renderer->setTheme($nestedVar, $resources);
+        }
+    }
+}',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())

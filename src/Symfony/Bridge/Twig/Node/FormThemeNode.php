@@ -30,11 +30,29 @@ class FormThemeNode extends \Twig_Node
     {
         $compiler
             ->addDebugInfo($this)
-            ->write('$this->env->getExtension(\'form\')->renderer->setTheme(')
+            ->write('$formVar = ')
             ->subcompile($this->getNode('form'))
-            ->raw(', ')
+            ->raw(";\n")
+            ->write('$resources = ')
             ->subcompile($this->getNode('resources'))
-            ->raw(");\n");
-        ;
+            ->raw(";\n\n")
+            ->write('if ($formVar instanceof \\Symfony\\Component\\Form\\FormView) {'."\n")
+            ->indent(1)
+            ->write('$this->env->getExtension(\'form\')->renderer->setTheme($formVar, $resources);'."\n")
+            ->outdent(1)
+            ->write("} else {\n")
+            ->indent(1)
+            ->write('$formVar = twig_ensure_traversable($formVar);'."\n\n")
+            ->write('foreach ($formVar as $nestedVar) {'."\n")
+            ->indent(1)
+            ->write('if ($nestedVar instanceof \\Symfony\\Component\\Form\\FormView) {'."\n")
+            ->indent(1)
+            ->write('$this->env->getExtension(\'form\')->renderer->setTheme($nestedVar, $resources);'."\n")
+            ->outdent(1)
+            ->write("}\n")
+            ->outdent(1)
+            ->write("}\n")
+            ->outdent(1)
+            ->write("}\n");
     }
 }

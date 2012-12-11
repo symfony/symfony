@@ -155,7 +155,6 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
                 array('justOne' => true)
             );
 
-
         $this->storage->destroy('foo');
     }
 
@@ -183,7 +182,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $collection->expects($this->once())
             ->method('remove')
-            ->will($this->returnCallback(function($citeria) use($that) {
+            ->will($this->returnCallback(function($citeria) use ($that) {
                 $that->assertInstanceOf('MongoTimestamp', $citeria[$that->options['time_field']]['$lt']);
                 $that->assertGreaterThanOrEqual(time() - -1, $citeria[$that->options['time_field']]['$lt']->sec);
             }));

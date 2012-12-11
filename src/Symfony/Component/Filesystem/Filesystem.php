@@ -360,7 +360,7 @@ class Filesystem
             if ($copyOnWindows) {
                 if (is_link($file) || is_file($file)) {
                     $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
-                } else if (is_dir($file)) {
+                } elseif (is_dir($file)) {
                     $this->mkdir($target);
                 } else {
                     throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
@@ -368,9 +368,9 @@ class Filesystem
             } else {
                 if (is_link($file)) {
                     $this->symlink($file, $target);
-                } else if (is_dir($file)) {
+                } elseif (is_dir($file)) {
                     $this->mkdir($target);
-                } else if (is_file($file)) {
+                } elseif (is_file($file)) {
                     $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
                 } else {
                     throw new IOException(sprintf('Unable to guess "%s" file type.', $file));

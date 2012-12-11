@@ -40,7 +40,7 @@ class MongoDbProfilerStorageTestDataCollector extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
     }
-    
+
     public function getName()
     {
         return 'test_data_collector';
@@ -126,4 +126,3 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
         }
     }
 }
-

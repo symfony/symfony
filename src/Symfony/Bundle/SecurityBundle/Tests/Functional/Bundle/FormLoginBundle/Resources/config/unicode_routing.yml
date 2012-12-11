@@ -1,0 +1,19 @@
+unicode_login_path:
+    pattern: /вход
+    defaults: { _controller: FormLoginBundle:Unicode:login }
+
+unicode_check_path:
+    pattern: /аутентификация
+    defaults: { _controller: FormLoginBundle:Unicode:loginCheck }
+
+unicode_default_target_path:
+    pattern: /профайл
+    defaults: { _controller: FormLoginBundle:Unicode:profile }
+
+unicode_logout_path:
+    pattern: /выход
+    defaults: { _controller: FormLoginBundle:Unicode:logout }
+
+unicode_logout_target_path:
+    pattern: /домашняя_страница
+    defaults: { _controller: FormLoginBundle:Unicode:homepage }

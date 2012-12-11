@@ -692,14 +692,8 @@ class Response
             return $age;
         }
 
-        $expiry = $this->getExpires();
-
-        if (!$expiry instanceof \DateTime && (-1 == $expiry || 0 === $expiry)) {
-            return $expiry;
-        }
-
-        if (null !== $expiry) {
-            return $expiry->format('U') - $this->getDate()->format('U');
+        if (null !== $this->getExpires()) {
+            return $this->getExpires()->format('U') - $this->getDate()->format('U');
         }
 
         return null;

@@ -13,7 +13,6 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Tests\Fixtures\CustomXmlFileLoader;
 
 class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
@@ -25,9 +24,6 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @covers Symfony\Component\Routing\Loader\XmlFileLoader::supports
-     */
     public function testSupports()
     {
         $loader = new XmlFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
@@ -53,6 +49,21 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('GET', $route->getRequirement('_method'));
         $this->assertEquals('\w+', $route->getRequirement('locale'));
         $this->assertEquals('{locale}.example.com', $route->getHostnamePattern());
+        $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
+    }
+
+    public function testLoadWithNamespacePrefix()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('namespaceprefix.xml');
+
+        $this->assertCount(1, $routeCollection, 'One route is loaded');
+        $route = $routeCollection->get('blog_show');
+        $this->assertEquals('/blog/{slug}', $route->getPattern());
+        $this->assertEquals('MyBundle:Blog:show', $route->getDefault('_controller'));
+        $this->assertEquals('\w+', $route->getRequirement('slug'));
+        $this->assertEquals('en|fr|de', $route->getRequirement('_locale'));
+        $this->assertEquals('{_locale}.example.com', $route->getHostnamePattern());
         $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
     }
 
@@ -94,7 +105,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function getPathsToInvalidFiles()
     {
-        return array(array('nonvalidnode.xml'), array('nonvalidroute.xml'), array('nonvalid.xml'));
+        return array(array('nonvalidnode.xml'), array('nonvalidroute.xml'), array('nonvalid.xml'), array('missing_id.xml'), array('missing_path.xml'));
     }
 
     /**

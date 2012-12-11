@@ -159,11 +159,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Sets the resources for this configuration.
-     * 
+     *
      * @param ResourceInterface[] $resources An array of resources
-     * 
+     *
      * @return ContainerBuilder The current instance
-     * 
+     *
      * @api
      */
     public function setResources(array $resources)

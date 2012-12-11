@@ -131,7 +131,7 @@ class RouteCompiler implements RouteCompilerInterface
                 if (('' !== $nextSeparator && !preg_match('#^\{\w+\}#', $followingPattern)) || '' === $followingPattern) {
                     // When we have a separator, which is disallowed for the variable, we can optimize the regex with a possessive
                     // quantifier. This prevents useless backtracking of PCRE and improves performance by 20% for matching those patterns.
-                    // Given the above example, there is no point in backtracking into {page} (that forbids the dot) when a dot must follow 
+                    // Given the above example, there is no point in backtracking into {page} (that forbids the dot) when a dot must follow
                     // after it. This optimization cannot be applied when the next char is no real separator or when the next variable is
                     // directly adjacent, e.g. '/{x}{y}'.
                     $regexp .= '+';

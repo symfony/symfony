@@ -179,7 +179,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $collection->expects($this->once())
             ->method('remove')
-            ->will($this->returnCallback(function($criteria) use($that) {
+            ->will($this->returnCallback(function($criteria) use ($that) {
                 $that->assertInstanceOf('MongoDate', $criteria[$that->options['time_field']]['$lt']);
                 $that->assertGreaterThanOrEqual(time() - -1, $criteria[$that->options['time_field']]['$lt']->sec);
             }));

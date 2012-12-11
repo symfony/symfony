@@ -41,7 +41,7 @@ class Expression implements ValueInterface
     {
         try {
             $this->value = Regex::create($expr);
-        } catch(\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->value = new Glob($expr);
         }
     }

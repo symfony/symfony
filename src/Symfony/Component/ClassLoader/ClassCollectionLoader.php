@@ -329,7 +329,10 @@ class ClassCollectionLoader
     }
 
     /**
-     * Dependencies resolution
+     * Dependencies resolution.
+     *
+     * This function does not check for circular dependencies as it should never
+     * occur with PHP traits.
      *
      * @param array             $tree       The dependency tree
      * @param \ReflectionClass  $node       The node
@@ -352,13 +355,6 @@ class ClassCollectionLoader
         $unresolved[$nodeName] = $node;
         foreach ($tree[$nodeName] as $dependency) {
             if (!$resolved->offsetExists($dependency->getName())) {
-                if ($unresolved->offsetExists($dependency->getName())) {
-                    throw new \RuntimeException(sprintf(
-                        'Circular dependency "%s" - "%s"',
-                        $node->getName(),
-                        $dependency->getName()
-                    ));
-                }
                 self::resolveDependencies($tree, $dependency, $resolved, $unresolved);
             }
         }

@@ -145,7 +145,7 @@ EOF;
      *
      * @param DumperPrefixCollection $routes               A DumperPrefixCollection instance
      * @param Boolean                $supportsRedirections Whether redirections are supported by the base class
-     * @parma string                 $prefix               Prefix of the parent collection
+     * @param string                 $prefix               Prefix of the parent collection
      *
      * @return string PHP code
      */

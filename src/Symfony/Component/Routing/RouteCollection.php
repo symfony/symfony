@@ -39,6 +39,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
 
     /**
      * @var string
+     * @deprecated since version 2.2, will be removed in 2.3
      */
     private $prefix = '';
 
@@ -169,15 +170,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * routes of the added collection.
      *
      * @param RouteCollection $collection      A RouteCollection instance
-     * @param string          $prefix          An optional prefix to add before each pattern of the route collection
-     * @param array           $defaults        An array of default values
-     * @param array           $requirements    An array of requirements
-     * @param array           $options         An array of options
-     * @param string          $hostnamePattern Hostname pattern
      *
      * @api
      */
-    public function addCollection(RouteCollection $collection, $prefix = '', $defaults = array(), $requirements = array(), $options = array(), $hostnamePattern = '')
+    public function addCollection(RouteCollection $collection)
     {
         // This is to keep BC for getParent() and getRoot(). It does not prevent
         // infinite loops by recursive referencing. But we don't need that logic
@@ -185,12 +181,24 @@ class RouteCollection implements \IteratorAggregate, \Countable
         // the accepted range.
         $collection->parent = $this;
 
-        // the sub-collection must have the prefix of the parent (current instance) prepended because it does not
-        // necessarily already have it applied (depending on the order RouteCollections are added to each other)
-        $collection->addPrefix($this->getPrefix() . $prefix, $defaults, $requirements, $options);
-
-        if ('' !== $hostnamePattern) {
-            $collection->setHostnamePattern($hostnamePattern);
+        // this is to keep BC
+        $numargs = func_num_args();
+        if ($numargs > 1) {
+            $collection->addPrefix($this->prefix . func_get_arg(1));
+            if ($numargs > 2) {
+                $collection->addDefaults(func_get_arg(2));
+                if ($numargs > 3) {
+                    $collection->addRequirements(func_get_arg(3));
+                    if ($numargs > 4) {
+                        $collection->addOptions(func_get_arg(4));
+                    }
+                }
+            }
+        } else {
+            // the sub-collection must have the prefix of the parent (current instance) prepended because it does not
+            // necessarily already have it applied (depending on the order RouteCollections are added to each other)
+            // this will be removed when the BC layer for getPrefix() is removed
+            $collection->addPrefix($this->prefix);
         }
 
         // we need to remove all routes with the same names first because just replacing them
@@ -204,32 +212,30 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Adds a prefix to all routes in the current set.
+     * Adds a prefix to the path of all child routes.
      *
      * @param string $prefix       An optional prefix to add before each pattern of the route collection
      * @param array  $defaults     An array of default values
      * @param array  $requirements An array of requirements
-     * @param array  $options      An array of options
      *
      * @api
      */
-    public function addPrefix($prefix, $defaults = array(), $requirements = array(), $options = array())
+    public function addPrefix($prefix, array $defaults = array(), array $requirements = array())
     {
         $prefix = trim(trim($prefix), '/');
 
-        if ('' === $prefix && empty($defaults) && empty($requirements) && empty($options)) {
+        if ('' === $prefix) {
             return;
         }
 
         // a prefix must start with a single slash and must not end with a slash
-        if ('' !== $prefix) {
-            $this->prefix = '/' . $prefix . $this->prefix;
-        }
+        $this->prefix = '/' . $prefix . $this->prefix;
+
+        // this is to keep BC
+        $options = func_num_args() > 3 ? func_get_arg(3) : array();
 
         foreach ($this->routes as $route) {
-            if ('' !== $prefix) {
-                $route->setPattern('/' . $prefix . $route->getPattern());
-            }
+            $route->setPattern('/' . $prefix . $route->getPattern());
             $route->addDefaults($defaults);
             $route->addRequirements($requirements);
             $route->addOptions($options);
@@ -240,6 +246,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Returns the prefix that may contain placeholders.
      *
      * @return string The prefix
+     *
+     * @deprecated since version 2.2, will be removed in 2.3
      */
     public function getPrefix()
     {
@@ -249,12 +257,64 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Sets the hostname pattern on all routes.
      *
-     * @param string $pattern The pattern
+     * @param string $pattern      The pattern
+     * @param array  $defaults     An array of default values
+     * @param array  $requirements An array of requirements
      */
-    public function setHostnamePattern($pattern)
+    public function setHostnamePattern($pattern, array $defaults = array(), array $requirements = array())
     {
         foreach ($this->routes as $route) {
             $route->setHostnamePattern($pattern);
+            $route->addDefaults($defaults);
+            $route->addRequirements($requirements);
+        }
+    }
+
+    /**
+     * Adds defaults to all routes.
+     *
+     * An existing default value under the same name in a route will be overridden.
+     *
+     * @param array $defaults An array of default values
+     */
+    public function addDefaults(array $defaults)
+    {
+        if ($defaults) {
+            foreach ($this->routes as $route) {
+                $route->addDefaults($defaults);
+            }
+        }
+    }
+
+    /**
+     * Adds requirements to all routes.
+     *
+     * An existing requirement under the same name in a route will be overridden.
+     *
+     * @param array $requirements An array of requirements
+     */
+    public function addRequirements(array $requirements)
+    {
+        if ($requirements) {
+            foreach ($this->routes as $route) {
+                $route->addRequirements($requirements);
+            }
+        }
+    }
+
+    /**
+     * Adds options to all routes.
+     *
+     * An existing option value under the same name in a route will be overridden.
+     *
+     * @param array $options An array of options
+     */
+    public function addOptions(array $options)
+    {
+        if ($options) {
+            foreach ($this->routes as $route) {
+                $route->addOptions($options);
+            }
         }
     }
 

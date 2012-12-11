@@ -36,14 +36,14 @@
     <xsd:group ref="configs" minOccurs="0" maxOccurs="unbounded" />
 
     <xsd:attribute name="id" type="xsd:string" use="required" />
-    <xsd:attribute name="pattern" type="xsd:string" default="/" />
+    <xsd:attribute name="pattern" type="xsd:string" use="required" />
     <xsd:attribute name="hostname-pattern" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="import">
     <xsd:group ref="configs" minOccurs="0" maxOccurs="unbounded" />
 
-    <xsd:attribute name="resource" type="xsd:string" />
+    <xsd:attribute name="resource" type="xsd:string" use="required" />
     <xsd:attribute name="type" type="xsd:string" />
     <xsd:attribute name="prefix" type="xsd:string" />
     <xsd:attribute name="hostname-pattern" type="xsd:string" />
@@ -52,7 +52,7 @@
   <xsd:complexType name="element">
     <xsd:simpleContent>
       <xsd:extension base="xsd:string">
-        <xsd:attribute name="key" type="xsd:string" />
+        <xsd:attribute name="key" type="xsd:string" use="required" />
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>

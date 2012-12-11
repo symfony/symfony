@@ -85,11 +85,11 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
     {
         $expectedout = $expected;
 
-        if($this->lastMessagesLength!==null){
-            $expectedout=str_repeat("\x20", $this->lastMessagesLength)."\x0D".$expected;
+        if ($this->lastMessagesLength !== null) {
+            $expectedout = str_repeat("\x20", $this->lastMessagesLength)."\x0D".$expected;
         }
 
-        $this->lastMessagesLength=strlen($expected);
+        $this->lastMessagesLength = strlen($expected);
 
         return "\x0D".$expectedout;
     }

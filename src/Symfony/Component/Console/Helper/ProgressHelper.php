@@ -384,10 +384,13 @@ class ProgressHelper extends Helper
      */
     private function overwrite(OutputInterface $output, $messages)
     {
-        $output->write("\x0D"); // carriage return
-        if($this->lastMessagesLength!==null){
-            $output->write(str_repeat("\x20", $this->lastMessagesLength)); //clear the line with the length of the last message
-            $output->write("\x0D"); // carriage return
+        // carriage return
+        $output->write("\x0D");
+        if ($this->lastMessagesLength!==null) {
+            // clear the line with the length of the last message
+            $output->write(str_repeat("\x20", $this->lastMessagesLength));
+            // carriage return
+            $output->write("\x0D");
         }
         $output->write($messages);
 

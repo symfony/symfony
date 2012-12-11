@@ -17,10 +17,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
- * If there are any tagged loaders replace
- * default filesystem loader with chain loader
- *
- * Add tagged loaders to chain loader
+ * Adds services tagged twig.loader as Twig loaders
  *
  * @author Daniel Leech <daniel@dantleech.com>
  */
@@ -45,9 +42,8 @@ class TwigLoaderPass implements CompilerPassInterface
             $chainLoader = $container->getDefinition('twig.loader.chain');
             foreach (array_keys($loaderIds) as $id) {
                 $chainLoader->addMethodCall('addLoader', array(new Reference($id)));
-            };
+            }
             $container->setAlias('twig.loader', 'twig.loader.chain');
         }
     }
 }
-

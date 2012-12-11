@@ -266,7 +266,6 @@ class Form implements \IteratorAggregate, FormInterface
     public function isRequired()
     {
         if (null === $this->parent || $this->parent->isRequired()) {
-
             return $this->required;
         }
 
@@ -287,7 +286,6 @@ class Form implements \IteratorAggregate, FormInterface
     public function isReadOnly()
     {
         if (null === $this->parent || !$this->parent->isReadOnly()) {
-
             return $this->readOnly;
         }
 
@@ -661,7 +659,6 @@ class Form implements \IteratorAggregate, FormInterface
     {
         foreach ($this->children as $child) {
             if (!$child->isEmpty()) {
-
                 return false;
             }
         }
@@ -687,7 +684,6 @@ class Form implements \IteratorAggregate, FormInterface
         if (!$this->readOnly) {
             foreach ($this->children as $child) {
                 if (!$child->isValid()) {
-
                     return false;
                 }
             }
@@ -822,7 +818,6 @@ class Form implements \IteratorAggregate, FormInterface
     public function get($name)
     {
         if (isset($this->children[$name])) {
-
             return $this->children[$name];
         }
 

@@ -193,7 +193,6 @@ class FormHelper extends Helper
     {
         $mainTemplate = in_array($section, array('row', 'widget'));
         if ($mainTemplate && $view->isRendered()) {
-
                 return '';
         }
 

@@ -212,7 +212,6 @@ class FormExtension extends \Twig_Extension
     {
         $mainTemplate = in_array($section, array('widget', 'row'));
         if ($mainTemplate && $view->isRendered()) {
-
                 return '';
         }
 

@@ -52,6 +52,10 @@ class AcceptHeader
      */
     public static function fromString($headerValue)
     {
+        if (empty($headerValue)) {
+            return new self(array());
+        }
+
         $index = 0;
 
         return new self(array_map(function ($itemValue) use (&$index) {

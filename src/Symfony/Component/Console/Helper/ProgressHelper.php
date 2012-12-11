@@ -380,21 +380,12 @@ class ProgressHelper extends Helper
      *
      * @param OutputInterface $output   An Output instance
      * @param string|array    $messages The message as an array of lines or a single string
-     * @param Boolean         $newline  Whether to add a newline or not
-     * @param integer         $size     The size of line
      */
-    private function overwrite(OutputInterface $output, $messages, $newline = false, $size = 80)
+    private function overwrite(OutputInterface $output, $messages)
     {
-        $output->write(str_repeat("\x08", $size));
+        $output->write("\x0D"); // carriage return
+        $output->write("\x1B\x5B\x4B"); // clear line
         $output->write($messages);
-        $output->write(str_repeat(' ', $size - strlen($messages)));
-
-        // clean up the end line
-        $output->write(str_repeat("\x08", $size - strlen($messages)));
-
-        if ($newline) {
-            $output->writeln('');
-        }
     }
 
     /**

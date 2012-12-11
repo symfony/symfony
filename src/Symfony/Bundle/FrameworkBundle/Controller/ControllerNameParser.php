@@ -67,6 +67,28 @@ class ControllerNameParser
         return $class.'::'.$action.'Action';
     }
 
+    public function build($controller) {
+        if (2 != count($parts = explode('::', $controller))) {
+            throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid aController::cAction controller string.', $controller));
+        }
+
+        list ($className, $action) = $parts;
+        if (5 !== strripos($action, 'Action')) {
+            throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid aController::cAction controller string.', $controller));
+        }
+        $action = substr($action, 0, strlen($action) - 6);
+
+        foreach ($this->kernel->getBundles() as $bundles) {
+            foreach($bundles as $bundle) {
+                if (preg_match('/^'.preg_quote($bundle->getNamespace()).'\\\\Controller\\\\(.*)Controller/', $className, $m)) {
+                    return sprintf('%s:%s:%s', $bundle->getName(), $m[1], $action);
+                }
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid aController::cAction controller string.', $controller));
+    }
+
     private function handleControllerNotFoundException($bundle, $controller, array $logs)
     {
         // just one log, return it as the exception

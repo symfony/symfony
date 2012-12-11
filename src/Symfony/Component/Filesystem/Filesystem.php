@@ -336,7 +336,7 @@ class Filesystem
      *                               Valid options are:
      *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
      *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
-     *                                 - $options['delete'] Default false Whether to delete files that are not in the source directory
+     *                                 - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
      *
      * @throws IOException When file type is unknown
      */

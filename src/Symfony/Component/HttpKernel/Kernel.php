@@ -95,17 +95,18 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     public function init()
     {
+        ini_set('display_errors', 0);
+
         if ($this->debug) {
-            ini_set('display_errors', 1);
             error_reporting(-1);
 
             DebugClassLoader::enable();
             ErrorHandler::register($this->errorReportingLevel);
             if ('cli' !== php_sapi_name()) {
                 ExceptionHandler::register();
+            } else {
+                ini_set('display_errors', 1);
             }
-        } else {
-            ini_set('display_errors', 0);
         }
     }
 

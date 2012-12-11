@@ -234,9 +234,6 @@ EOF;
             img { border: 0; }
             #sf-resetcontent { width:970px; margin:0 auto; }
             $css
-            .xdebug-error {
-                display: none;
-            }
         </style>
     </head>
     <body>

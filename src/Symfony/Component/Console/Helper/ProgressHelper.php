@@ -36,6 +36,7 @@ class ProgressHelper extends Helper
     private $format       = null;
     private $redrawFreq   = 1;
 
+    private $lastMessagesLength;
     private $barCharOriginal;
 
     /**
@@ -380,21 +381,17 @@ class ProgressHelper extends Helper
      *
      * @param OutputInterface $output   An Output instance
      * @param string|array    $messages The message as an array of lines or a single string
-     * @param Boolean         $newline  Whether to add a newline or not
-     * @param integer         $size     The size of line
      */
-    private function overwrite(OutputInterface $output, $messages, $newline = false, $size = 80)
+    private function overwrite(OutputInterface $output, $messages)
     {
-        $output->write(str_repeat("\x08", $size));
-        $output->write($messages);
-        $output->write(str_repeat(' ', $size - strlen($messages)));
-
-        // clean up the end line
-        $output->write(str_repeat("\x08", $size - strlen($messages)));
-
-        if ($newline) {
-            $output->writeln('');
+        $output->write("\x0D"); // carriage return
+        if($this->lastMessagesLength!==null){
+            $output->write(str_repeat("\x20", $this->lastMessagesLength)); //clear the line with the length of the last message
+            $output->write("\x0D"); // carriage return
         }
+        $output->write($messages);
+
+        $this->lastMessagesLength=strlen($messages);
     }
 
     /**

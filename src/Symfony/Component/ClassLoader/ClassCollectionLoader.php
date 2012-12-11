@@ -150,7 +150,6 @@ class ClassCollectionLoader
         $tokens = token_get_all($source);
 
         for (reset($tokens); false !== $token = current($tokens); next($tokens)) {
-
             if (is_string($token)) {
                 $rawChunk .= $token;
             } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
@@ -163,9 +162,7 @@ class ClassCollectionLoader
                 $rawChunk .= $token[1];
 
                 // namespace name and whitespaces
-                while (($t = next($tokens)) &&
-                    is_array($t)
-                    && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
+                while (($t = next($tokens)) && is_array($t) && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
                     $rawChunk .= $t[1];
                 }
                 if ('{' === $t) {

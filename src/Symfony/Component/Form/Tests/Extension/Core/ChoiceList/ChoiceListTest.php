@@ -185,9 +185,6 @@ class ChoiceListTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * test for pull request: https://github.com/symfony/symfony/pull/5394
-     */
     public function testLabelsContainingNull()
     {
         $this->list = new ChoiceList(

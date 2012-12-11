@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Finder\Adapter;
 
-use Symfony\Component\Finder\Iterator;
 use Symfony\Component\Finder\Shell\Shell;
 use Symfony\Component\Finder\Shell\Command;
 

@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
 {
     /**
-     * @var RouteCollection 
+     * @var RouteCollection
      */
     protected $routes;
 

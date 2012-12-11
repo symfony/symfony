@@ -89,7 +89,7 @@ class FilesystemLoader extends Loader
      *
      * @param TemplateReferenceInterface $template A template
      * @param integer                    $time     The last modification time of the cached template (timestamp)
-     * 
+     *
      * @return Boolean true if the template is still fresh, false otherwise
      *
      * @api

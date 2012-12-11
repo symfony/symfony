@@ -194,7 +194,7 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
 class EventSubscriber implements EventSubscriberInterface
 {
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array('foo' => 'call');
     }

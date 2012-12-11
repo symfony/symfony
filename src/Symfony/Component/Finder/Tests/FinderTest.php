@@ -406,7 +406,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $finder = $finder->append($finder1);
 
-
         $this->assertIterator($this->toAbsolute(array('foo', 'foo/bar.tmp', 'toto')), $finder->getIterator());
     }
 

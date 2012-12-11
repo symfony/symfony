@@ -316,6 +316,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
         switch ($sort) {
             case SortableIterator::SORT_BY_NAME:
                 $command->ins('sort')->add('| sort');
+
                 return;
             case SortableIterator::SORT_BY_TYPE:
                 $format = '%y';

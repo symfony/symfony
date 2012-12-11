@@ -86,7 +86,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
 
     /**
      * Gets the current RouteCollection as an Iterator that includes all routes.
-     * 
+     *
      * It implements \IteratorAggregate.
      *
      * @see all()

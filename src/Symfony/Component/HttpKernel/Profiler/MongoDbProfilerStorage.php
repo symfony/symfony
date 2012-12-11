@@ -111,7 +111,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * @param array $data
-     * 
+     *
      * @return Profile
      */
     protected function createProfileFromData(array $data)
@@ -132,7 +132,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * @param string $token
-     * 
+     *
      * @return Profile[] An array of Profile instances
      */
     protected function readChildren($token)
@@ -156,7 +156,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * @param string $ip
      * @param string $url
      * @param string $method
-     * 
+     *
      * @return array
      */
     private function buildQuery($ip, $url, $method)
@@ -180,7 +180,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * @param array $data
-     * 
+     *
      * @return array
      */
     private function getData(array $data)
@@ -198,7 +198,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
     /**
      * @param array $data
-     * 
+     *
      * @return Profile
      */
     private function getProfile(array $data)

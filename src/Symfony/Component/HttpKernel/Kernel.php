@@ -208,7 +208,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     * 
+     *
      * @api
      */
     public function getBundles()

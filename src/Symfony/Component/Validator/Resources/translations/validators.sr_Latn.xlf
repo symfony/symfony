@@ -214,6 +214,10 @@
                 <source>This collection should contain exactly {{ limit }} elements.</source>
                 <target>Ova kolekcija treba da sadrži tačno {{ limit }} element.|Ova kolekcija treba da sadrži tačno {{ limit }} elementa.|Ova kolekcija treba da sadrži tačno {{ limit }} elemenata.</target>
             </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>Nevalidan broj kartice.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

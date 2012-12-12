@@ -48,7 +48,7 @@ class CsvFileLoaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testLoadThrowsAnExceptionIfFileNotExists()
+    public function testLoadNonExistingResource()
     {
         $loader = new CsvFileLoader();
         $resource = __DIR__.'/../fixtures/not-exists.csv';
@@ -58,7 +58,7 @@ class CsvFileLoaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testLoadThrowsAnExceptionIfFileNotLocal()
+    public function testLoadNonLocalResource()
     {
         $loader = new CsvFileLoader();
         $resource = 'http://example.com/resources.csv';

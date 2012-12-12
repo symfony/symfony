@@ -43,6 +43,10 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
 
     public function load($resource, $locale, $domain = 'messages')
     {
+        if (!file_exists($resource)) {
+            throw new \InvalidArgumentException(sprintf('File "%s" not found.', $resource));
+        }
+
         $messages = $this->parse($resource);
 
         // empty file
@@ -155,8 +159,8 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
     /**
      * Reads an unsigned long from stream respecting endianess.
      *
-     * @param resource $stream
-     * @param boolean  $isBigEndian
+     * @param  resource $stream
+     * @param  boolean  $isBigEndian
      * @return integer
      */
     private function readLong($stream, $isBigEndian)

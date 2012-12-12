@@ -37,6 +37,16 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
+    public function testLoadNonExistingResource()
+    {
+        $loader = new PhpFileLoader();
+        $resource = __DIR__.'/../fixtures/non-existing.php';
+        $loader->load($resource, 'en', 'domain1');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testLoadThrowsAnExceptionIfFileNotLocal()
     {
         $loader = new PhpFileLoader();

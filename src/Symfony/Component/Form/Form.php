@@ -210,6 +210,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getTypes()
     {
+        trigger_error('getTypes() is deprecated since version 2.1 and will be removed in 2.3. Use getConfig() and FormConfigInterface::getType() instead.', E_USER_DEPRECATED);
+
         $types = array();
 
         for ($type = $this->config->getType(); null !== $type; $type = $type->getParent()) {
@@ -279,6 +281,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function hasParent()
     {
+        trigger_error('hasParent() is deprecated since version 2.1 and will be removed in 2.3. Use getParent() or inverse isRoot() instead.', E_USER_DEPRECATED);
+
         return null !== $this->parent;
     }
 
@@ -310,6 +314,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function hasAttribute($name)
     {
+        trigger_error('hasAttribute() is deprecated since version 2.1 and will be removed in 2.3. Use getConfig() and FormConfigInterface::hasAttribute() instead.', E_USER_DEPRECATED);
+
         return $this->config->hasAttribute($name);
     }
 
@@ -325,6 +331,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getAttribute($name)
     {
+        trigger_error('getAttribute() is deprecated since version 2.1 and will be removed in 2.3. Use getConfig() and FormConfigInterface::getAttribute() instead.', E_USER_DEPRECATED);
+
         return $this->config->getAttribute($name);
     }
 
@@ -470,6 +478,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getClientData()
     {
+        trigger_error('getClientData() is deprecated since version 2.1 and will be removed in 2.3. Use getViewData() instead.', E_USER_DEPRECATED);
+
         return $this->getViewData();
     }
 
@@ -627,6 +637,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function bindRequest(Request $request)
     {
+        trigger_error('bindRequest() is deprecated since version 2.1 and will be removed in 2.3. Use FormConfigInterface::bind() instead.', E_USER_DEPRECATED);
+
         return $this->bind($request);
     }
 
@@ -654,6 +666,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getErrorBubbling()
     {
+        trigger_error('getErrorBubbling() is deprecated since version 2.1 and will be removed in 2.3. Use getConfig() and FormConfigInterface::getErrorBubbling() instead.', E_USER_DEPRECATED);
+
         return $this->config->getErrorBubbling();
     }
 
@@ -721,6 +735,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function hasErrors()
     {
+        trigger_error('hasErrors() is deprecated since version 2.1 and will be removed in 2.3. Count getErrors() instead.', E_USER_DEPRECATED);
+
         return count($this->errors) > 0;
     }
 
@@ -770,6 +786,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getNormTransformers()
     {
+        trigger_error('getNormTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use getConfig() and FormConfigInterface::getModelTransformers() instead.', E_USER_DEPRECATED);
+
         return $this->config->getModelTransformers();
     }
 
@@ -783,6 +801,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getClientTransformers()
     {
+        trigger_error('getClientTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use getConfig() and FormConfigInterface::getViewTransformers() instead.', E_USER_DEPRECATED);
+
         return $this->config->getViewTransformers();
     }
 
@@ -804,6 +824,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getChildren()
     {
+        trigger_error('getChilren() is deprecated since version 2.1 and will be removed in 2.3. Use all() instead.', E_USER_DEPRECATED);
+
         return $this->all();
     }
 
@@ -817,6 +839,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function hasChildren()
     {
+        trigger_error('hasChildren() is deprecated since version 2.1 and will be removed in 2.3. Use count() instead.', E_USER_DEPRECATED);
+
         return count($this->children) > 0;
     }
 

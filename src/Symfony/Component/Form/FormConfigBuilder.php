@@ -196,6 +196,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function addValidator(FormValidatorInterface $validator)
     {
+        trigger_error('addValidator() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -251,6 +253,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function appendClientTransformer(DataTransformerInterface $viewTransformer)
     {
+        trigger_error('appendClientTransformer() is deprecated since version 2.1 and will be removed in 2.3. Use addViewTransformer() instead.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -271,6 +275,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function prependClientTransformer(DataTransformerInterface $viewTransformer)
     {
+        trigger_error('prependClientTransformer() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -290,6 +296,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function resetClientTransformers()
     {
+        trigger_error('resetClientTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use resetViewTransformers() instead.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -342,6 +350,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function appendNormTransformer(DataTransformerInterface $modelTransformer)
     {
+        trigger_error('appendNormTransformer() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -363,6 +373,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function prependNormTransformer(DataTransformerInterface $modelTransformer)
     {
+        trigger_error('prependNormTransformer() is deprecated since version 2.1 and will be removed in 2.3. Use addModelTransformer() instead.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -382,6 +394,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function resetNormTransformers()
     {
+        trigger_error('resetNormTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use resetModelTransformers() instead.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -471,6 +485,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getClientTransformers()
     {
+        trigger_error('getClientTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use getViewTransformers() instead.', E_USER_DEPRECATED);
+
         return $this->getViewTransformers();
     }
 
@@ -492,6 +508,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getNormTransformers()
     {
+        trigger_error('getNormTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use getModelTransformers() instead.', E_USER_DEPRECATED);
+
         return $this->getModelTransformers();
     }
 
@@ -508,6 +526,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getValidators()
     {
+        trigger_error('getValidators() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         return $this->validators;
     }
 

@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Routing;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\Config\Loader\DelegatingLoader as BaseDelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
  * DelegatingLoader delegates route loading to other loaders using a loader resolver.
@@ -27,19 +26,16 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
 class DelegatingLoader extends BaseDelegatingLoader
 {
     protected $parser;
-    protected $logger;
 
     /**
      * Constructor.
      *
      * @param ControllerNameParser    $parser   A ControllerNameParser instance
-     * @param LoggerInterface         $logger   A LoggerInterface instance
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
-    public function __construct(ControllerNameParser $parser, LoggerInterface $logger = null, LoaderResolverInterface $resolver)
+    public function __construct(ControllerNameParser $parser, LoaderResolverInterface $resolver)
     {
         $this->parser = $parser;
-        $this->logger = $logger;
 
         parent::__construct($resolver);
     }

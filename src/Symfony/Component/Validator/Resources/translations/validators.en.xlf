@@ -214,6 +214,10 @@
                 <source>This collection should contain exactly {{ limit }} elements.</source>
                 <target>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</target>
             </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>Invalid card number.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

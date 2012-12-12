@@ -52,6 +52,16 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
+    public function testLoadNonExistingResource()
+    {
+        $loader = new YamlFileLoader();
+        $resource = __DIR__.'/../fixtures/non-existing.yml';
+        $loader->load($resource, 'en', 'domain1');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testLoadThrowsAnExceptionIfNotAnArray()
     {
         $loader = new YamlFileLoader();

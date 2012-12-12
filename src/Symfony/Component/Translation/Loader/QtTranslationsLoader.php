@@ -61,7 +61,7 @@ class QtTranslationsLoader implements LoaderInterface
     /**
      * Returns the XML errors of the internal XML parser
      *
-     * @return array  An array of errors
+     * @return array An array of errors
      */
     private function getXmlErrors()
     {

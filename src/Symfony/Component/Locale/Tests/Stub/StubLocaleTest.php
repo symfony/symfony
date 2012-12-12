@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Locale\Tests\Stub;
 
-use Symfony\Component\Locale\Locale;
 use Symfony\Component\Locale\Stub\StubLocale;
 use Symfony\Component\Locale\Tests\TestCase as LocaleTestCase;
 
@@ -22,7 +21,7 @@ class StubLocaleTest extends LocaleTestCase
      */
     public function testGetDisplayCountriesWithUnsupportedLocale()
     {
-        $countries = StubLocale::getDisplayCountries('pt_BR');
+        StubLocale::getDisplayCountries('pt_BR');
     }
 
     public function testGetDisplayCountries()
@@ -42,7 +41,7 @@ class StubLocaleTest extends LocaleTestCase
      */
     public function testGetDisplayLanguagesWithUnsupportedLocale()
     {
-        $countries = StubLocale::getDisplayLanguages('pt_BR');
+        StubLocale::getDisplayLanguages('pt_BR');
     }
 
     public function testGetDisplayLanguages()
@@ -62,7 +61,7 @@ class StubLocaleTest extends LocaleTestCase
      */
     public function testGetCurrenciesDataWithUnsupportedLocale()
     {
-        $currencies = StubLocale::getCurrenciesData('pt_BR');
+        StubLocale::getCurrenciesData('pt_BR');
     }
 
     public function testGetCurrenciesData()
@@ -97,7 +96,7 @@ class StubLocaleTest extends LocaleTestCase
      */
     public function testGetDisplayLocalesWithUnsupportedLocale()
     {
-        $locales = StubLocale::getDisplayLocales('pt');
+        StubLocale::getDisplayLocales('pt');
     }
 
     public function testGetDisplayLocales()

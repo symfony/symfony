@@ -48,7 +48,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadInvalidResource()
     {
         $loader = new XliffFileLoader();
-        $catalogue = $loader->load(__DIR__.'/../fixtures/resources.php', 'en', 'domain1');
+        $loader->load(__DIR__.'/../fixtures/resources.php', 'en', 'domain1');
     }
 
     /**
@@ -57,7 +57,17 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoadResourceDoesNotValidate()
     {
         $loader = new XliffFileLoader();
-        $catalogue = $loader->load(__DIR__.'/../fixtures/non-valid.xlf', 'en', 'domain1');
+        $loader->load(__DIR__.'/../fixtures/non-valid.xlf', 'en', 'domain1');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadNonExistingResource()
+    {
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../fixtures/non-existing.xlf';
+        $loader->load($resource, 'en', 'domain1');
     }
 
     /**

@@ -218,6 +218,10 @@
                 <source>Invalid card number.</source>
                 <target>Nevalidan broj kartice.</target>
             </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>Nevalidan broj kartice ili tip kartice nije podržan.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -59,7 +59,6 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $this->encoder->decode('<?xml version="1.0"?><!DOCTYPE foo><foo></foo>', 'foo');
     }
 
-
     public function testAttributes()
     {
         $obj = new ScalarDummy;

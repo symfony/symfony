@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class CardScheme extends Constraint
 {
-    public $message = 'Unsupported card type or invalid card number';
+    public $message = 'Unsupported card type or invalid card number.';
     public $schemes;
 
     public function getDefaultOption()

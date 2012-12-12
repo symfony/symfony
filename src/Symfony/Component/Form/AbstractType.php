@@ -67,6 +67,8 @@ abstract class AbstractType implements FormTypeInterface
      */
     public function getDefaultOptions(array $options)
     {
+        trigger_error('getDefaultOptions() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
+
         return array();
     }
 
@@ -82,6 +84,8 @@ abstract class AbstractType implements FormTypeInterface
      */
     public function getAllowedOptionValues(array $options)
     {
+        trigger_error('getAllowedOptionValues() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
+
         return array();
     }
 
@@ -104,6 +108,8 @@ abstract class AbstractType implements FormTypeInterface
      */
     public function setExtensions(array $extensions)
     {
+        trigger_error('setExtensions() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         $this->extensions = $extensions;
     }
 
@@ -117,6 +123,8 @@ abstract class AbstractType implements FormTypeInterface
      */
     public function getExtensions()
     {
+        trigger_error('getExtensions() is deprecated since version 2.1 and will be removed in 2.3. Use ResolvedFormTypeInterface::getTypeExtensions instead.', E_USER_DEPRECATED);
+
         return $this->extensions;
     }
 }

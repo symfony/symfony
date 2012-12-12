@@ -33,4 +33,14 @@ class QtTranslationsLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testLoadNonExistingResource()
+    {
+        $loader = new QtTranslationsLoader();
+        $resource = __DIR__.'/../fixtures/non-existing.ts';
+        $loader->load($resource, 'en', 'domain1');
+    }
 }

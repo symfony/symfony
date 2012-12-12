@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle\Tests\Extension;
+namespace Symfony\Bridge\Twig\Tests\Extension;
 
-use Symfony\Bundle\TwigBundle\Extension\CodeExtension;
+use Symfony\Bridge\Twig\Extension\CodeExtension;
 
 class CodeExtensionTest extends \PHPUnit_Framework_TestCase
 {

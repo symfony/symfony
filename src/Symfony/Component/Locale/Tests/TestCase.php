@@ -89,7 +89,16 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
     protected function normalizeIcuVersion($version)
     {
-        return ((float) $version) * 100;
+        $versionIds = explode(".", $version);
+
+        $multi = 1000;
+        $intVersion = 0;
+        foreach ($versionIds as $id) {
+          $intVersion += $id * $multi;
+          $multi = $multi/10;
+        }
+
+        return (int) $intVersion;
     }
 
     protected function getIntlExtensionIcuVersion()

@@ -97,6 +97,11 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($utils->checkRequestPath($this->getRequest(), '/'));
         $this->assertFalse($utils->checkRequestPath($this->getRequest(), '/foo'));
+        $this->assertTrue($utils->checkRequestPath($this->getRequest('/foo%20bar'), '/foo bar'));
+        // Plus must not decoded to space
+        $this->assertTrue($utils->checkRequestPath($this->getRequest('/foo+bar'), '/foo+bar'));
+        // Checking unicode
+        $this->assertTrue($utils->checkRequestPath($this->getRequest(urlencode('/вход')), '/вход'));
 
         $urlMatcher = $this->getMock('Symfony\Component\Routing\Matcher\UrlMatcherInterface');
         $urlMatcher

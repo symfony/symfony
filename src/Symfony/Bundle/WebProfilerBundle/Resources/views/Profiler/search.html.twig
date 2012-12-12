@@ -6,20 +6,20 @@
     <form action="{{ path('_profiler_search') }}" method="get">
         <label for="ip">IP</label>
         <input type="text" name="ip" id="ip" value="{{ ip }}" />
-        <div class="clear_fix"></div>
+        <div class="clear-fix"></div>
         <label for="method">Method</label>
         <select name="method" id="method">
             {% for m in ['', 'DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'] %}
                 <option{{ m == method ? ' selected="selected"' : '' }}>{{ m }}</option>
             {% endfor %}
         </select>
-        <div class="clear_fix"></div>
+        <div class="clear-fix"></div>
         <label for="url">URL</label>
         <input type="text" name="url" id="url" value="{{ url }}" />
-        <div class="clear_fix"></div>
+        <div class="clear-fix"></div>
         <label for="token">Token</label>
         <input type="text" name="token" id="token" value="{{ token }}" />
-        <div class="clear_fix"></div>
+        <div class="clear-fix"></div>
         <label for="limit">Limit</label>
         <select name="limit" id="limit">
             {% for l in [10, 50, 100] %}
@@ -27,13 +27,13 @@
             {% endfor %}
         </select>
 
-        <button type="submit">
-            <span class="border_l">
-                <span class="border_r">
-                    <span class="btn_bg">SEARCH</span>
+        <button type="submit" class="sf-button">
+            <span class="border-l">
+                <span class="border-r">
+                    <span class="btn-bg">SEARCH</span>
                 </span>
             </span>
         </button>
-        <div class="clear_fix"></div>
+        <div class="clear-fix"></div>
     </form>
 </div>

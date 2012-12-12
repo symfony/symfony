@@ -452,7 +452,7 @@ class PhpDumper extends Dumper
         }
 
         if (is_array($callable)) {
-            if (is_object($callable[0]) && $callable[0] instanceof Reference) {
+            if ($callable[0] instanceof Reference) {
                 return sprintf("        %s->%s(\$%s);\n", $this->getServiceCall((string) $callable[0]), $callable[1], $variableName);
             }
 
@@ -997,7 +997,7 @@ EOF;
             }
 
             return sprintf('array(%s)', implode(', ', $code));
-        } elseif (is_object($value) && $value instanceof Definition) {
+        } elseif ($value instanceof Definition) {
             if (null !== $this->definitionVariables && $this->definitionVariables->contains($value)) {
                 return $this->dumpValue($this->definitionVariables->offsetGet($value), $interpolate);
             }
@@ -1029,15 +1029,15 @@ EOF;
             }
 
             return sprintf("new \\%s(%s)", substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
-        } elseif (is_object($value) && $value instanceof Variable) {
+        } elseif ($value instanceof Variable) {
             return '$'.$value;
-        } elseif (is_object($value) && $value instanceof Reference) {
+        } elseif ($value instanceof Reference) {
             if (null !== $this->referenceVariables && isset($this->referenceVariables[$id = (string) $value])) {
                 return $this->dumpValue($this->referenceVariables[$id], $interpolate);
             }
 
             return $this->getServiceCall((string) $value, $value);
-        } elseif (is_object($value) && $value instanceof Parameter) {
+        } elseif ($value instanceof Parameter) {
             return $this->dumpParameter($value);
         } elseif (true === $interpolate && is_string($value)) {
             if (preg_match('/^%([^%]+)%$/', $value, $match)) {

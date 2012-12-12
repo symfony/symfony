@@ -1,0 +1,3 @@
+blog_show:
+    pattern: /blog/{slug}
+    type:    custom

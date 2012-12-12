@@ -89,6 +89,7 @@ EOF
             }
 
             $this->outputTags($output, $input->getOption('show-private'));
+
             return;
         }
 
@@ -146,8 +147,8 @@ EOF
 
                 if (null !== $showTagAttributes) {
                     $tags = $definition->getTag($showTagAttributes);
-                    foreach($tags as $tag) {
-                        foreach($tag as $key => $value) {
+                    foreach ($tags as $tag) {
+                        foreach ($tag as $key => $value) {
                             if (!isset($maxTags[$key])) {
                                 $maxTags[$key] = strlen($key);
                             }
@@ -173,7 +174,7 @@ EOF
         $format1 .= '%-'.($maxScope + 19).'s %s';
 
         $tags = array();
-        foreach($maxTags as $tagName => $length) {
+        foreach ($maxTags as $tagName => $length) {
             $tags[] = '<comment>'.$tagName.'</comment>';
         }
         $output->writeln(vsprintf($format1, $this->buildArgumentsArray('<comment>Service Id</comment>', '<comment>Scope</comment>', '<comment>Class Name</comment>', $tags)));
@@ -184,9 +185,9 @@ EOF
             if ($definition instanceof Definition) {
                 $lines = array();
                 if (null !== $showTagAttributes) {
-                    foreach($definition->getTag($showTagAttributes) as $key => $tag) {
+                    foreach ($definition->getTag($showTagAttributes) as $key => $tag) {
                         $tagValues = array();
-                        foreach(array_keys($maxTags) as $tagName) {
+                        foreach (array_keys($maxTags) as $tagName) {
                             $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : "";
                         }
                         if (0 === $key) {
@@ -199,7 +200,7 @@ EOF
                     $lines[] = $this->buildArgumentsArray($serviceId, $definition->getScope(), $definition->getClass());
                 }
 
-                foreach($lines as $arguments) {
+                foreach ($lines as $arguments) {
                     $output->writeln(vsprintf($format, $arguments));
                 }
             } elseif ($definition instanceof Alias) {
@@ -216,7 +217,7 @@ EOF
     protected function buildArgumentsArray($serviceId, $scope, $className, array $tagAttributes = array())
     {
         $arguments = array($serviceId);
-        foreach($tagAttributes as $tagAttribute) {
+        foreach ($tagAttributes as $tagAttribute) {
             $arguments[] = $tagAttribute;
         }
         $arguments[] = $scope;

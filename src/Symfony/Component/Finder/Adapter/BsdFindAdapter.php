@@ -11,11 +11,8 @@
 
 namespace Symfony\Component\Finder\Adapter;
 
-use Symfony\Component\Finder\Iterator;
 use Symfony\Component\Finder\Shell\Shell;
-use Symfony\Component\Finder\Expression\Expression;
 use Symfony\Component\Finder\Shell\Command;
-use Symfony\Component\Finder\Iterator\SortableIterator;
 
 /**
  * Shell engine implementation using BSD find command.
@@ -27,14 +24,6 @@ class BsdFindAdapter extends AbstractFindAdapter
     /**
      * {@inheritdoc}
      */
-    public function isSupported()
-    {
-        return in_array($this->shell->getType(), array(Shell::TYPE_BSD, Shell::TYPE_DARWIN)) && parent::isSupported();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'bsd_find';
@@ -43,9 +32,22 @@ class BsdFindAdapter extends AbstractFindAdapter
     /**
      * {@inheritdoc}
      */
+    protected function canBeUsed()
+    {
+        return in_array($this->shell->getType(), array(Shell::TYPE_BSD, Shell::TYPE_DARWIN)) && parent::canBeUsed();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function buildFormatSorting(Command $command, $format)
     {
-        $command->get('find')->add('-print0 | xargs -0 stat -f')->arg($format.' %h/%f\\n')
-            ->add('| sort | cut')->arg('-d ')->arg('-f2-');
+        $command
+            ->get('find')
+            ->add('-print0 | xargs -0 stat -f')
+            ->arg($format.' %h/%f\\n')
+            ->add('| sort | cut')
+            ->arg('-d ')
+            ->arg('-f2-');
     }
 }

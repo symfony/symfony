@@ -37,7 +37,7 @@ class PhpMatcherDumper extends MatcherDumper
      */
     public function dump(array $options = array())
     {
-        $options = array_merge(array(
+        $options = array_replace(array(
             'class'      => 'ProjectUrlMatcher',
             'base_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
         ), $options);
@@ -109,18 +109,43 @@ EOF;
      */
     private function compileRoutes(RouteCollection $routes, $supportsRedirections)
     {
-        $collection = $this->flattenRouteCollection($routes);
-        $tree = $this->buildPrefixTree($collection);
+        $fetchedHostname = false;
 
-        return $this->compilePrefixRoutes($tree, $supportsRedirections);
+        $groups = $this->groupRoutesByHostnameRegex($routes);
+        $code = '';
+
+        foreach ($groups as $collection) {
+            if (null !== $regex = $collection->getAttribute('hostname_regex')) {
+                if (!$fetchedHostname) {
+                    $code .= "        \$hostname = \$this->context->getHost();\n\n";
+                    $fetchedHostname = true;
+                }
+
+                $code .= sprintf("        if (preg_match(%s, \$hostname, \$hostnameMatches)) {\n", var_export($regex, true));
+            }
+
+            $tree = $this->buildPrefixTree($collection);
+            $groupCode = $this->compilePrefixRoutes($tree, $supportsRedirections);
+
+            if (null !== $regex) {
+                // apply extra indention at each line (except empty ones)
+                $groupCode = preg_replace('/^.{2,}$/m', '    $0', $groupCode);
+                $code .= $groupCode;
+                $code .= "        }\n\n";
+            } else {
+                $code .= $groupCode;
+            }
+        }
+
+        return $code;
     }
 
     /**
      * Generates PHP code recursively to match a tree of routes
      *
-     * @param DumperPrefixCollection $routes A DumperPrefixCollection instance
+     * @param DumperPrefixCollection $routes               A DumperPrefixCollection instance
      * @param Boolean                $supportsRedirections Whether redirections are supported by the base class
-     * @parma string                 $prefix Prefix of the parent collection
+     * @param string                 $prefix               Prefix of the parent collection
      *
      * @return string PHP code
      */
@@ -171,6 +196,7 @@ EOF;
         $conditions = array();
         $hasTrailingSlash = false;
         $matches = false;
+        $hostnameMatches = false;
         $methods = array();
 
         if ($req = $route->getRequirement('_method')) {
@@ -183,7 +209,7 @@ EOF;
 
         $supportsTrailingSlash = $supportsRedirections && (!$methods || in_array('HEAD', $methods));
 
-        if (!count($compiledRoute->getVariables()) && false !== preg_match('#^(.)\^(?<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
+        if (!count($compiledRoute->getPathVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
             if ($supportsTrailingSlash && substr($m['url'], -1) === '/') {
                 $conditions[] = sprintf("rtrim(\$pathinfo, '/') === %s", var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
                 $hasTrailingSlash = true;
@@ -203,6 +229,10 @@ EOF;
             $conditions[] = sprintf("preg_match(%s, \$pathinfo, \$matches)", var_export($regex, true));
 
             $matches = true;
+        }
+
+        if ($compiledRoute->getHostnameVariables()) {
+            $hostnameMatches = true;
         }
 
         $conditions = implode(' && ', $conditions);
@@ -263,14 +293,21 @@ EOF;
         }
 
         // optimize parameters array
-        if (true === $matches && $route->getDefaults()) {
-            $code .= sprintf("            return array_merge(\$this->mergeDefaults(\$matches, %s), array('_route' => '%s'));\n"
-                , str_replace("\n", '', var_export($route->getDefaults(), true)), $name);
-        } elseif (true === $matches) {
-            $code .= sprintf("            \$matches['_route'] = '%s';\n\n", $name);
-            $code .= "            return \$matches;\n";
+        if ($matches || $hostnameMatches) {
+            $vars = array();
+            if ($hostnameMatches) {
+                $vars[] = '$hostnameMatches';
+            }
+            if ($matches) {
+                $vars[] = '$matches';
+            }
+            $vars[] = "array('_route' => '$name')";
+
+            $code .= sprintf("            return \$this->mergeDefaults(array_replace(%s), %s);\n"
+                , implode(', ', $vars), str_replace("\n", '', var_export($route->getDefaults(), true)));
+
         } elseif ($route->getDefaults()) {
-            $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_merge($route->getDefaults(), array('_route' => $name)), true)));
+            $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), array('_route' => $name)), true)));
         } else {
             $code .= sprintf("            return array('_route' => '%s');\n", $name);
         }
@@ -284,28 +321,33 @@ EOF;
     }
 
     /**
-     * Flattens a tree of routes to a single collection
+     * Groups consecutive routes having the same hostname regex.
      *
-     * @param  RouteCollection  $routes Collection of routes
-     * @param  DumperCollection $to A DumperCollection to add routes to
+     * The results is a collection of collections of routes having the same hostname regex.
      *
-     * @return DumperCollection
+     * @param DumperCollection $routes Flat collection of DumperRoutes
+     *
+     * @return DumperCollection A collection with routes grouped by hostname regex in sub-collections
      */
-    private function flattenRouteCollection(RouteCollection $routes, DumperCollection $to = null)
+    private function groupRoutesByHostnameRegex(RouteCollection $routes)
     {
-        if (null === $to) {
-            $to = new DumperCollection();
-        }
+        $groups = new DumperCollection();
+
+        $currentGroup = new DumperCollection();
+        $currentGroup->setAttribute('hostname_regex', null);
+        $groups->add($currentGroup);
 
         foreach ($routes as $name => $route) {
-            if ($route instanceof RouteCollection) {
-                $this->flattenRouteCollection($route, $to);
-            } else {
-                $to->add(new DumperRoute($name, $route));
+            $hostnameRegex = $route->compile()->getHostnameRegex();
+            if ($currentGroup->getAttribute('hostname_regex') !== $hostnameRegex) {
+                $currentGroup = new DumperCollection();
+                $currentGroup->setAttribute('hostname_regex', $hostnameRegex);
+                $groups->add($currentGroup);
             }
+            $currentGroup->add(new DumperRoute($name, $route));
         }
 
-        return $to;
+        return $groups;
     }
 
     /**
@@ -314,7 +356,7 @@ EOF;
      * Routes order is preserved such that traversing the tree will traverse the
      * routes in the origin order
      *
-     * @param  DumperCollection $collection A collection of routes
+     * @param DumperCollection $collection A collection of routes
      *
      * @return DumperPrefixCollection
      */
@@ -331,5 +373,4 @@ EOF;
 
         return $tree;
     }
-
 }

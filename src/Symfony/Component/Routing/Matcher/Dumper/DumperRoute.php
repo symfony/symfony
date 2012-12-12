@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Matcher\Dumper;
 
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Container for a Route.
@@ -21,7 +20,14 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class DumperRoute
 {
+    /**
+     * @var string
+     */
     private $name;
+
+    /**
+     * @var Route
+     */
     private $route;
 
     /**

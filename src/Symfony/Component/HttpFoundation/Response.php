@@ -240,6 +240,17 @@ class Response
             }
         }
 
+        // Fix protocol
+        if ('HTTP/1.0' != $request->server->get('SERVER_PROTOCOL')) {
+            $this->setProtocolVersion('1.1');
+        }
+
+        // Check if we need to send extra expire info headers
+        if ('1.0' == $this->getProtocolVersion() && 'no-cache' == $this->headers->get('Cache-Control')) {
+            $this->headers->set('pragma', 'no-cache');
+            $this->headers->set('expires', -1);
+        }
+
         return $this;
     }
 

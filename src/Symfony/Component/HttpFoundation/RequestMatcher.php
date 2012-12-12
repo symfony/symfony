@@ -33,7 +33,7 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * @var array
      */
-    private $methods;
+    private $methods = array();
 
     /**
      * @var string
@@ -41,19 +41,26 @@ class RequestMatcher implements RequestMatcherInterface
     private $ip;
 
     /**
-     * Attributes.
-     *
      * @var array
      */
-    private $attributes;
+    private $attributes = array();
 
+    /**
+     * @param string|null          $path
+     * @param string|null          $host
+     * @param string|string[]|null $methods
+     * @param string|null          $ip
+     * @param array                $attributes
+     */
     public function __construct($path = null, $host = null, $methods = null, $ip = null, array $attributes = array())
     {
-        $this->path = $path;
-        $this->host = $host;
-        $this->methods = $methods;
-        $this->ip = $ip;
-        $this->attributes = $attributes;
+        $this->matchPath($path);
+        $this->matchHost($host);
+        $this->matchMethod($methods);
+        $this->matchIp($ip);
+        foreach ($attributes as $k => $v) {
+            $this->matchAttribute($k, $v);
+        }
     }
 
     /**
@@ -89,11 +96,11 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the HTTP method.
      *
-     * @param string|array $method An HTTP method or an array of HTTP methods
+     * @param string|string[]|null $method An HTTP method or an array of HTTP methods
      */
     public function matchMethod($method)
     {
-        $this->methods = array_map('strtoupper', is_array($method) ? $method : array($method));
+        $this->methods = array_map('strtoupper', (array) $method);
     }
 
     /**
@@ -114,7 +121,7 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matches(Request $request)
     {
-        if (null !== $this->methods && !in_array($request->getMethod(), $this->methods)) {
+        if ($this->methods && !in_array($request->getMethod(), $this->methods)) {
             return false;
         }
 
@@ -132,97 +139,12 @@ class RequestMatcher implements RequestMatcherInterface
             }
         }
 
-        if (null !== $this->host && !preg_match('#'.str_replace('#', '\\#', $this->host).'#', $request->getHost())) {
+        if (null !== $this->host && !preg_match('#'.str_replace('#', '\\#', $this->host).'#i', $request->getHost())) {
             return false;
         }
 
-        if (null !== $this->ip && !$this->checkIp($request->getClientIp(), $this->ip)) {
+        if (null !== $this->ip && !IpUtils::checkIp($request->getClientIp(), $this->ip)) {
             return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Validates an IP address.
-     *
-     * @param string $requestIp
-     * @param string $ip
-     *
-     * @return boolean True valid, false if not.
-     */
-    protected function checkIp($requestIp, $ip)
-    {
-        // IPv6 address
-        if (false !== strpos($requestIp, ':')) {
-            return $this->checkIp6($requestIp, $ip);
-        } else {
-            return $this->checkIp4($requestIp, $ip);
-        }
-    }
-
-    /**
-     * Validates an IPv4 address.
-     *
-     * @param string $requestIp
-     * @param string $ip
-     *
-     * @return boolean True valid, false if not.
-     */
-    protected function checkIp4($requestIp, $ip)
-    {
-        if (false !== strpos($ip, '/')) {
-            list($address, $netmask) = explode('/', $ip, 2);
-
-            if ($netmask < 1 || $netmask > 32) {
-                return false;
-            }
-        } else {
-            $address = $ip;
-            $netmask = 32;
-        }
-
-        return 0 === substr_compare(sprintf('%032b', ip2long($requestIp)), sprintf('%032b', ip2long($address)), 0, $netmask);
-    }
-
-    /**
-     * Validates an IPv6 address.
-     *
-     * @author David Soria Parra <dsp at php dot net>
-     * @see https://github.com/dsp/v6tools
-     *
-     * @param string $requestIp
-     * @param string $ip
-     *
-     * @return boolean True valid, false if not.
-     */
-    protected function checkIp6($requestIp, $ip)
-    {
-        if (!((extension_loaded('sockets') && defined('AF_INET6')) || @inet_pton('::1'))) {
-            throw new \RuntimeException('Unable to check Ipv6. Check that PHP was not compiled with option "disable-ipv6".');
-        }
-
-        if (false !== strpos($ip, '/')) {
-            list($address, $netmask) = explode('/', $ip, 2);
-            
-            if ($netmask < 1 || $netmask > 128) {
-                return false;
-            }
-        } else {
-            $address = $ip;
-            $netmask = 128;
-        }
-
-        $bytesAddr = unpack("n*", inet_pton($address));
-        $bytesTest = unpack("n*", inet_pton($requestIp));
-
-        for ($i = 1, $ceil = ceil($netmask / 16); $i <= $ceil; $i++) {
-            $left = $netmask - 16 * ($i-1);
-            $left = ($left <= 16) ? $left : 16;
-            $mask = ~(0xffff >> $left) & 0xffff;
-            if (($bytesAddr[$i] & $mask) != ($bytesTest[$i] & $mask)) {
-                return false;
-            }
         }
 
         return true;

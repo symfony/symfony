@@ -25,8 +25,8 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
     /**
      * Loads from annotations from a directory.
      *
-     * @param string $path A directory path
-     * @param string $type The resource type
+     * @param string      $path A directory path
+     * @param string|null $type The resource type
      *
      * @return RouteCollection A RouteCollection instance
      *

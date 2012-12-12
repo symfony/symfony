@@ -11,20 +11,15 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Tests\Fixtures\Author;
-use Symfony\Component\Form\Tests\Fixtures\AuthorType;
-use Symfony\Component\Form\Tests\Fixtures\TestExtension;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
 use Symfony\Component\Form\Tests\Fixtures\FooSubType;
 use Symfony\Component\Form\Tests\Fixtures\FooSubTypeWithParentInstance;
-use Symfony\Component\Form\Tests\Fixtures\FooTypeBarExtension;
-use Symfony\Component\Form\Tests\Fixtures\FooTypeBazExtension;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -351,6 +346,24 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('FORM'));
 
         $this->assertSame('FORM', $this->factory->createNamed('name', 'type', null, $options));
+    }
+
+    public function testCreateBuilderForPropertyWithoutTypeGuesser()
+    {
+        $registry = $this->getMock('Symfony\Component\Form\FormRegistryInterface');
+        $factory = $this->getMockBuilder('Symfony\Component\Form\FormFactory')
+            ->setMethods(array('createNamedBuilder'))
+            ->setConstructorArgs(array($registry, $this->resolvedTypeFactory))
+            ->getMock();
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('firstName', 'text', null, array())
+            ->will($this->returnValue('builderInstance'));
+
+        $builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
+
+        $this->assertEquals('builderInstance', $builder);
     }
 
     public function testCreateBuilderForPropertyCreatesFormWithHighestConfidence()

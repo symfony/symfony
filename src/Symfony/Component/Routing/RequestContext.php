@@ -28,7 +28,11 @@ class RequestContext
     private $scheme;
     private $httpPort;
     private $httpsPort;
-    private $parameters;
+
+    /**
+     * @var array
+     */
+    private $parameters = array();
 
     /**
      * Constructor.
@@ -50,7 +54,6 @@ class RequestContext
         $this->scheme = strtolower($scheme);
         $this->httpPort = $httpPort;
         $this->httpsPort = $httpsPort;
-        $this->parameters = array();
     }
 
     public function fromRequest(Request $request)

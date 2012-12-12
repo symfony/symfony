@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 abstract class ConstraintValidator implements ConstraintValidatorInterface
 {
     /**
-     * @var ExecutionContext
+     * @var ExecutionContextInterface
      */
     protected $context;
 
@@ -44,7 +44,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     /**
      * {@inheritDoc}
      */
-    public function initialize(ExecutionContext $context)
+    public function initialize(ExecutionContextInterface $context)
     {
         $this->context = $context;
         $this->messageTemplate = '';

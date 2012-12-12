@@ -18,6 +18,9 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
  */
 class DumperPrefixCollection extends DumperCollection
 {
+    /**
+     * @var string
+     */
     private $prefix = '';
 
     /**

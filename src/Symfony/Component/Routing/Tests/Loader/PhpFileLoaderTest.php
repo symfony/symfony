@@ -13,7 +13,6 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
-use Symfony\Component\Routing\Route;
 
 class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,9 +23,6 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @covers Symfony\Component\Routing\Loader\PhpFileLoader::supports
-     */
     public function testSupports()
     {
         $loader = new PhpFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
@@ -47,6 +43,10 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($routes), 'One route is loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
         $route = $routes['blog_show'];
+        $this->assertEquals('/blog/{slug}', $route->getPattern());
+        $this->assertEquals('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
+        $this->assertEquals('GET', $route->getRequirement('_method'));
+        $this->assertEquals('{locale}.example.com', $route->getHostnamePattern());
         $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
     }
 }

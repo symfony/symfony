@@ -84,21 +84,21 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns all children in this group.
      *
-     * @return array An array of FormInterface instances
+     * @return FormInterface[] An array of FormInterface instances
      */
     public function all();
 
     /**
      * Returns all errors.
      *
-     * @return array An array of FormError instances that occurred during binding
+     * @return FormError[] An array of FormError instances that occurred during binding
      */
     public function getErrors();
 
     /**
      * Updates the form with default data.
      *
-     * @param  array $modelData The data formatted as expected for the underlying object
+     * @param  mixed $modelData The data formatted as expected for the underlying object
      *
      * @return FormInterface The form instance
      *

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Finder\Tests\FakeAdapter;
 
 use Symfony\Component\Finder\Adapter\AbstractAdapter;
-use Symfony\Component\Finder\Exception\AdapterFailureException;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -43,16 +42,16 @@ class DummyAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function isSupported()
+    public function getName()
     {
-        return true;
+        return 'yes';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    protected function canBeUsed()
     {
-        return 'yes';
+        return true;
     }
 }

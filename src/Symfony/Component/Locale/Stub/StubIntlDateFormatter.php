@@ -186,7 +186,7 @@ class StubIntlDateFormatter
         $argumentError = null;
         if (version_compare(\PHP_VERSION, '5.3.4', '<') && !is_int($timestamp)) {
             $argumentError = 'datefmt_format: takes either an array  or an integer timestamp value ';
-        } elseif (version_compare(\PHP_VERSION, '5.3.4', '>=') && !is_int($timestamp) && !$timestamp instanceOf \DateTime) {
+        } elseif (version_compare(\PHP_VERSION, '5.3.4', '>=') && !is_int($timestamp) && !$timestamp instanceof \DateTime) {
             $argumentError = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object';
         }
 
@@ -199,7 +199,7 @@ class StubIntlDateFormatter
         }
 
         // As of PHP 5.3.4, IntlDateFormatter::format() accepts DateTime instances
-        if (version_compare(\PHP_VERSION, '5.3.4', '>=') && $timestamp instanceOf \DateTime) {
+        if (version_compare(\PHP_VERSION, '5.3.4', '>=') && $timestamp instanceof \DateTime) {
             $timestamp = $timestamp->getTimestamp();
         }
 

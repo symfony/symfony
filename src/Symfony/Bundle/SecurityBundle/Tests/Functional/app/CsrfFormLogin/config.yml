@@ -33,6 +33,7 @@ security:
                 check_path: /login_check
                 default_target_path: /profile
                 target_path_parameter: "user_login[_target_path]"
+                failure_path_parameter: "user_login[_failure_path]"
                 username_parameter: "user_login[username]"
                 password_parameter: "user_login[password]"
                 csrf_parameter: "user_login[_token]"

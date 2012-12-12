@@ -83,16 +83,16 @@ class PhpAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function isSupported()
+    public function getName()
     {
-        return true;
+        return 'php';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    protected function canBeUsed()
     {
-        return 'php';
+        return true;
     }
 }

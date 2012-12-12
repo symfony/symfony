@@ -10,5 +10,5 @@ interface ExceptionInterface
     /**
      * @return \Symfony\Component\Finder\Adapter\AdapterInterface
      */
-    function getAdapter();
+    public function getAdapter();
 }

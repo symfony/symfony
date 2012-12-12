@@ -61,7 +61,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class Container implements IntrospectableContainerInterface
 {
+    /**
+     * @var ParameterBagInterface
+     */
     protected $parameterBag;
+
     protected $services;
     protected $scopes;
     protected $scopeChildren;

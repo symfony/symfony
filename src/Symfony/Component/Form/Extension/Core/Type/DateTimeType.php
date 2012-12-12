@@ -42,6 +42,8 @@ class DateTimeType extends AbstractType
      *  * "Z" for UTC
      *  * "(-|+)HH:mm" for other timezones (note the colon!)
      *
+     * For more information see:
+     *
      * http://userguide.icu-project.org/formatparse/datetime#TOC-Date-Time-Format-Syntax
      * http://www.w3.org/TR/html-markup/input.datetime.html
      * http://tools.ietf.org/html/rfc3339
@@ -49,13 +51,11 @@ class DateTimeType extends AbstractType
      * An ICU ticket was created:
      * http://icu-project.org/trac/ticket/9421
      *
-     * To temporarily circumvent this issue, DateTimeToRfc3339Transformer is used
-     * when the format matches this constant.
-     *
-     * ("ZZZZZZ" is not recognized by ICU and used here to differentiate this
-     * pattern from custom patterns).
+     * It was supposedly fixed, but is not available in all PHP installations
+     * yet. To temporarily circumvent this issue, DateTimeToRfc3339Transformer
+     * is used when the format matches this constant.
      */
-    const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZZZZZ";
+    const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
 
     private static $acceptedFormats = array(
         \IntlDateFormatter::FULL,
@@ -85,10 +85,6 @@ class DateTimeType extends AbstractType
 
         if (!in_array($dateFormat, self::$acceptedFormats, true)) {
             throw new InvalidOptionsException('The "date_format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
-        }
-
-        if (null !== $pattern && (false === strpos($pattern, 'y') || false === strpos($pattern, 'M') || false === strpos($pattern, 'd') || false === strpos($pattern, 'H') || false === strpos($pattern, 'm'))) {
-            throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M", "d", "H" and "m". Its current value is "%s".', $pattern));
         }
 
         if ('single_text' === $options['widget']) {

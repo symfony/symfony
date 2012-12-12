@@ -36,6 +36,13 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     /**
      * Constructor.
      *
+     * List of available options:
+     *  * database: The name of the database [required]
+     *  * collection: The name of the collection [required]
+     *  * id_field: The field name for storing the session id [default: _id]
+     *  * data_field: The field name for storing the session data [default: data]
+     *  * time_field: The field name for storing the timestamp [default: time]
+     *
      * @param \Mongo $mongo   A "Mongo" instance
      * @param array  $options An associative array of field options
      *
@@ -50,9 +57,9 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
         $this->mongo = $mongo;
 
         $this->options = array_merge(array(
-            'id_field'   => 'sess_id',
-            'data_field' => 'sess_data',
-            'time_field' => 'sess_time',
+            'id_field'   => '_id',
+            'data_field' => 'data',
+            'time_field' => 'time',
         ), $options);
     }
 
@@ -77,10 +84,9 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     public function destroy($sessionId)
     {
-        $this->getCollection()->remove(
-            array($this->options['id_field'] => $sessionId),
-            array('justOne' => true)
-        );
+        $this->getCollection()->remove(array(
+            $this->options['id_field'] => $sessionId
+        ));
 
         return true;
     }
@@ -90,11 +96,21 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     public function gc($lifetime)
     {
-        $time = new \MongoTimestamp(time() - $lifetime);
+        /* Note: MongoDB 2.2+ supports TTL collections, which may be used in
+         * place of this method by indexing the "time_field" field with an
+         * "expireAfterSeconds" option. Regardless of whether TTL collections
+         * are used, consider indexing this field to make the remove query more
+         * efficient.
+         *
+         * See: http://docs.mongodb.org/manual/tutorial/expire-data/
+         */
+        $time = new \MongoDate(time() - $lifetime);
 
         $this->getCollection()->remove(array(
             $this->options['time_field'] => array('$lt' => $time),
         ));
+
+        return true;
     }
 
     /**
@@ -102,16 +118,13 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     public function write($sessionId, $data)
     {
-        $data = array(
-            $this->options['id_field']   => $sessionId,
-            $this->options['data_field'] => new \MongoBinData($data, \MongoBinData::BYTE_ARRAY),
-            $this->options['time_field'] => new \MongoTimestamp()
-        );
-
         $this->getCollection()->update(
             array($this->options['id_field'] => $sessionId),
-            array('$set' => $data),
-            array('upsert' => true)
+            array('$set' => array(
+                $this->options['data_field'] => new \MongoBinData($data, \MongoBinData::BYTE_ARRAY),
+                $this->options['time_field'] => new \MongoDate(),
+            )),
+            array('upsert' => true, 'multiple' => false)
         );
 
         return true;

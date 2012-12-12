@@ -43,9 +43,19 @@ class IcuResFileLoaderTest extends LocalizedTestCase
     /**
      * @expectedException \RuntimeException
      */
+    public function testLoadNonExistingResource()
+    {
+        $loader = new IcuResFileLoader();
+        $resource = __DIR__.'/../fixtures/non-existing.txt';
+        $loader->load($resource, 'en', 'domain1');
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testLoadInvalidResource()
     {
         $loader = new IcuResFileLoader();
-        $catalogue = $loader->load(__DIR__.'/../fixtures/resourcebundle/res/en.txt', 'en', 'domain1');
+        $loader->load(__DIR__.'/../fixtures/resourcebundle/res/en.txt', 'en', 'domain1');
     }
 }

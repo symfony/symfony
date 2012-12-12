@@ -21,6 +21,10 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
 {
     public function load($resource, $locale, $domain = 'messages')
     {
+        if (!file_exists($resource)) {
+            throw new \InvalidArgumentException(sprintf('File "%s" not found.', $resource));
+        }
+
         $messages = $this->parse($resource);
 
         // empty file

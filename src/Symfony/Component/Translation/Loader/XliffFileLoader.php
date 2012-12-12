@@ -30,6 +30,10 @@ class XliffFileLoader implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
+        if (!file_exists($resource)) {
+            throw new \InvalidArgumentException(sprintf('File "%s" not found.', $resource));
+        }
+
         if (!stream_is_local($resource)) {
             throw new \InvalidArgumentException(sprintf('This is not a local file "%s".', $resource));
         }

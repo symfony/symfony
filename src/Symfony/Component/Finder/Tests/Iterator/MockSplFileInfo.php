@@ -28,7 +28,6 @@ class MockSplFileInfo extends \SplFileInfo
         if (is_string($param)) {
             parent::__construct($param);
         } elseif (is_array($param)) {
-
             $defaults = array(
               'name'             => 'file.txt',
               'contents'         => null,
@@ -132,5 +131,4 @@ class MockSplFileInfo extends \SplFileInfo
     {
         return $this->relativePathname;
     }
-
 }

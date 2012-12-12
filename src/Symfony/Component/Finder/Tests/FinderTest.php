@@ -26,10 +26,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         self::$tmpDir = sys_get_temp_dir().'/symfony2_finder';
     }
 
-    /**
-     * @dataProvider getAdaptersTestData
-     */
-    public function testCreate($adapter)
+    public function testCreate()
     {
         $this->assertInstanceOf('Symfony\Component\Finder\Finder', Finder::create());
     }
@@ -209,7 +206,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder($adapter);
         $this->assertSame($finder, $finder->ignoreDotFiles(true)->ignoreVCS(false));
         $this->assertIterator($this->toAbsolute(array('foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
-
     }
 
     /**

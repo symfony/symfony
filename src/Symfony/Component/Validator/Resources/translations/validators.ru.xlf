@@ -214,6 +214,14 @@
                 <source>This collection should contain exactly {{ limit }} elements.</source>
                 <target>Эта коллекция должна содержать ровно {{ limit }} элемент.|Эта коллекция должна содержать ровно {{ limit }} элемента.|Эта коллекция должна содержать ровно {{ limit }} элементов.</target>
             </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>Неверный номер карты.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>Неподдерживаемый тип или неверный номер карты.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * QtTranslationsLoader loads translations from QT Translations XML files.
@@ -30,10 +32,18 @@ class QtTranslationsLoader implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
+        if (!stream_is_local($resource)) {
+            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
+        }
+
+        if (!file_exists($resource)) {
+            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
+        }
+
         $dom = new \DOMDocument();
         $current = libxml_use_internal_errors(true);
         if (!@$dom->load($resource, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
-            throw new \RuntimeException(implode("\n", $this->getXmlErrors()));
+            throw new InvalidResourceException(implode("\n", $this->getXmlErrors()));
         }
 
         $xpath = new \DOMXPath($dom);

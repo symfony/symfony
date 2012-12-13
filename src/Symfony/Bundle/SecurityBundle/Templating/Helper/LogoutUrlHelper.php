@@ -81,8 +81,8 @@ class LogoutUrlHelper extends Helper
     /**
      * Generates the logout URL for the firewall.
      *
-     * @param string $key           The firewall key
-     * @param string $referenceType The type of reference (see UrlGeneratorInterface)
+     * @param string         $key           The firewall key
+     * @param Boolean|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
      *
      * @return string The logout URL
      *

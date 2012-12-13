@@ -35,11 +35,13 @@ class Controller extends ContainerAware
     /**
      * Generates a URL from the given parameters.
      *
-     * @param string $route         The name of the route
-     * @param mixed  $parameters    An array of parameters
-     * @param string $referenceType The type of reference (see UrlGeneratorInterface)
+     * @param string         $route         The name of the route
+     * @param mixed          $parameters    An array of parameters
+     * @param Boolean|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
      *
      * @return string The generated URL
+     *
+     * @see UrlGeneratorInterface
      */
     public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {

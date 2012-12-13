@@ -4,6 +4,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * moved the exception controller to be a service (`twig.controller.exception:showAction` vs `Symfony\\Bundle\\TwigBundle\\Controller\\ExceptionController::showAction`)
  * added support for multiple loaders via the "twig.loader" tag.
  * added automatic registration of namespaced paths for registered bundles
  * added support for namespaced paths

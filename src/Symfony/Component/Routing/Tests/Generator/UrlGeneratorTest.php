@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing\Tests\Generator;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Generator\UrlGenerator;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
 
 class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
@@ -437,6 +438,58 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $generator = $this->getGenerator($routes);
         $generator->setStrictRequirements(false);
         $this->assertNull($generator->generate('test', array('foo' => 'baz'), false));
+    }
+
+    public function testGenerateNetworkPath()
+    {
+        $routes = $this->getRoutes('test', new Route('/{name}', array(), array('_scheme' => 'http'), array(), '{locale}.example.com'));
+
+        $this->assertSame('//fr.example.com/app.php/Fabien', $this->getGenerator($routes)->generate('test',
+            array('name' =>'Fabien', 'locale' => 'fr'), UrlGeneratorInterface::NETWORK_PATH), 'network path with different host'
+        );
+        $this->assertSame('//fr.example.com/app.php/Fabien?query=string', $this->getGenerator($routes, array('host' => 'fr.example.com'))->generate('test',
+            array('name' =>'Fabien', 'locale' => 'fr', 'query' => 'string'), UrlGeneratorInterface::NETWORK_PATH), 'network path although host same as context'
+        );
+        $this->assertSame('http://fr.example.com/app.php/Fabien', $this->getGenerator($routes, array('scheme' => 'https'))->generate('test',
+            array('name' =>'Fabien', 'locale' => 'fr'), UrlGeneratorInterface::NETWORK_PATH), 'absolute URL because scheme requirement does not match context'
+        );
+        $this->assertSame('http://fr.example.com/app.php/Fabien', $this->getGenerator($routes)->generate('test',
+            array('name' =>'Fabien', 'locale' => 'fr'), UrlGeneratorInterface::ABSOLUTE_URL), 'absolute URL with same scheme because it is requested'
+        );
+    }
+
+    public function testGenerateRelativePath()
+    {
+        $routes = new RouteCollection();
+        $routes->add('article', new Route('/{author}/{article}/'));
+        $routes->add('comments', new Route('/{author}/{article}/comments'));
+        $routes->add('hostname', new Route('/{article}', array(), array(), array(), '{author}.example.com'));
+        $routes->add('scheme', new Route('/{author}', array(), array('_scheme' => 'https')));
+        $routes->add('unrelated', new Route('/about'));
+
+        $generator = $this->getGenerator($routes, array('host' => 'example.com', 'pathInfo' => '/fabien/symfony-is-great/'));
+
+        $this->assertSame('comments', $generator->generate('comments',
+            array('author' =>'fabien', 'article' => 'symfony-is-great'), UrlGeneratorInterface::RELATIVE_PATH)
+        );
+        $this->assertSame('comments?page=2', $generator->generate('comments',
+            array('author' =>'fabien', 'article' => 'symfony-is-great', 'page' => 2), UrlGeneratorInterface::RELATIVE_PATH)
+        );
+        $this->assertSame('../twig-is-great/', $generator->generate('article',
+            array('author' =>'fabien', 'article' => 'twig-is-great'), UrlGeneratorInterface::RELATIVE_PATH)
+        );
+        $this->assertSame('../../bernhard/forms-are-great/', $generator->generate('article',
+            array('author' =>'bernhard', 'article' => 'forms-are-great'), UrlGeneratorInterface::RELATIVE_PATH)
+        );
+        $this->assertSame('//bernhard.example.com/app.php/forms-are-great', $generator->generate('hostname',
+            array('author' =>'bernhard', 'article' => 'forms-are-great'), UrlGeneratorInterface::RELATIVE_PATH)
+        );
+        $this->assertSame('https://example.com/app.php/bernhard', $generator->generate('scheme',
+            array('author' =>'bernhard'), UrlGeneratorInterface::RELATIVE_PATH)
+        );
+        $this->assertSame('../../about', $generator->generate('unrelated',
+            array(), UrlGeneratorInterface::RELATIVE_PATH)
+        );
     }
 
     /**

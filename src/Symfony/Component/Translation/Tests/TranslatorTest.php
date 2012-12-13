@@ -182,7 +182,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array('mo', 'MoFileLoader'),
             array('po', 'PoFileLoader'),
             array('php', 'PhpFileLoader'),
-            array('ts', 'QtTranslationsLoader'),
+            array('ts', 'QtFileLoader'),
             array('xlf', 'XliffFileLoader'),
             array('yml', 'YamlFileLoader'),
         );

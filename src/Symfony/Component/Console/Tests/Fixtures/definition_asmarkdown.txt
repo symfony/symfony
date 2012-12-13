@@ -1,0 +1,13 @@
+Arguments
+---------
+    foo        The foo argument
+    baz        The baz argument (default: true)
+    bar        The bar argument (default: ["http://foo.com/"])
+
+Options
+-------
+    --foo (-f) The foo option
+    --baz      The baz option (default: false)
+    --bar (-b) The bar option (default: "bar")
+    --qux      The qux option (default: ["http://foo.com/","bar"]) (multiple values allowed)
+    --qux2     The qux2 option (default: {"foo":"bar"}) (multiple values allowed)

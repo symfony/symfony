@@ -1,11 +1,12 @@
 Usage:
- help [--xml] [command_name]
+ help [--markdown] [--xml] [command_name]
 
 Arguments:
  command               The command to execute
  command_name          The command name (default: "help")
 
 Options:
+ --markdown            To output help as Markdown
  --xml                 To output help as XML
  --help (-h)           Display this help message.
  --quiet (-q)          Do not output any message.

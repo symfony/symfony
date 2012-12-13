@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
-use Symfony\Component\Translation\Loader\QtTranslationsLoader;
+use Symfony\Component\Translation\Loader\QtFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 
-class QtTranslationsLoaderTest extends \PHPUnit_Framework_TestCase
+class QtFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -25,7 +25,7 @@ class QtTranslationsLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoad()
     {
-        $loader = new QtTranslationsLoader();
+        $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/resources.ts';
         $catalogue = $loader->load($resource, 'en', 'resources');
 
@@ -39,7 +39,7 @@ class QtTranslationsLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadNonExistingResource()
     {
-        $loader = new QtTranslationsLoader();
+        $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.ts';
         $loader->load($resource, 'en', 'domain1');
     }

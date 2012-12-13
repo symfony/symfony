@@ -12,27 +12,37 @@
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
 use Symfony\Component\HttpKernel\Exception\FlattenException;
-use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\TwigBundle\Controller\ExceptionController as BaseExceptionController;
 
 /**
  * ExceptionController.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExceptionController extends BaseExceptionController
+class ExceptionController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function showAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html')
+    protected $twig;
+    protected $debug;
+
+    public function __construct(\Twig_Environment $twig, $debug)
     {
-        $template = $this->container->get('kernel')->isDebug() ? 'exception' : 'error';
+        $this->twig = $twig;
+        $this->debug = $debug;
+    }
+
+    /**
+     * Converts an Exception to a Response.
+     *
+     * @param FlattenException $exception A FlattenException instance
+     *
+     * @return Response
+     */
+    public function showAction(FlattenException $exception)
+    {
         $code = $exception->getStatusCode();
 
-        return $this->container->get('templating')->renderResponse(
-            'TwigBundle:Exception:'.$template.'.html.twig',
+        return new Response($this->twig->render(
+            '@Twig/Exception/'.($this->debug ? 'exception' : 'error').'.html.twig',
             array(
                 'status_code'    => $code,
                 'status_text'    => Response::$statusTexts[$code],
@@ -40,6 +50,6 @@ class ExceptionController extends BaseExceptionController
                 'logger'         => null,
                 'currentContent' => '',
             )
-        );
+        ));
     }
 }

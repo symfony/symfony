@@ -28,7 +28,7 @@
         </p>
     {% else %}
         <div class="sf-reset">
-            {% render 'WebProfilerBundle:Exception:show' with { 'exception': collector.exception, 'format': 'html' } %}
+            {% render 'web_profiler.controller.exception:showAction' with { 'exception': collector.exception, 'format': 'html' } %}
         </div>
     {% endif %}
 {% endblock %}

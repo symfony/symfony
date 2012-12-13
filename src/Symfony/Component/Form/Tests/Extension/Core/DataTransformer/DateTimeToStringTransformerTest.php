@@ -15,30 +15,34 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransf
 
 class DateTimeToStringTransformerTest extends DateTimeTestCase
 {
-    public function testTransform()
+    public function dataProvider()
     {
-        $transformer = new DateTimeToStringTransformer('UTC', 'UTC', 'Y-m-d H:i:s');
-
-        $input = new \DateTime('2010-02-03 04:05:06 UTC');
-        $output = clone $input;
-        $output->setTimezone(new \DateTimeZone('UTC'));
-        $output = $output->format('Y-m-d H:i:s');
-
-        $this->assertEquals($output, $transformer->transform($input));
+        return array(
+            array('Y-m-d H:i:s', '2010-02-03 04:05:06', '2010-02-03 04:05:06 UTC'),
+            array('Y-m-d H:i:00', '2010-02-03 04:05:00', '2010-02-03 04:05:00 UTC'),
+            array('Y-m-d H:i', '2010-02-03 04:05', '2010-02-03 04:05:00 UTC'),
+            array('Y-m-d H', '2010-02-03 04', '2010-02-03 04:00:00 UTC'),
+            array('Y-m-d', '2010-02-03', '2010-02-03 00:00:00 UTC'),
+            array('Y-m', '2010-02', '2010-02-01 00:00:00 UTC'),
+            array('Y', '2010', '2010-01-01 00:00:00 UTC'),
+            array('d-m-Y', '03-02-2010', '2010-02-03 00:00:00 UTC'),
+            array('H:i:s', '04:05:06', '1970-01-01 04:05:06 UTC'),
+            array('H:i:00', '04:05:00', '1970-01-01 04:05:00 UTC'),
+            array('H:i', '04:05', '1970-01-01 04:05:00 UTC'),
+            array('H', '04', '1970-01-01 04:00:00 UTC'),
+        );
     }
 
     /**
-     * @dataProvider getFormatAndDateTime
+     * @dataProvider dataProvider
      */
-    public function testTransformRandomFormat($format, $datetime)
+    public function testTransform($format, $output, $input)
     {
         $transformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);
 
-        $input = new \DateTime($datetime);
-        $output = clone $input;
-        $output->setTimezone(new \DateTimeZone('UTC'));
+        $input = new \DateTime($input);
 
-        $this->assertEquals($output->format($format), $transformer->transform($input));
+        $this->assertEquals($output, $transformer->transform($input));
     }
 
     public function testTransform_empty()
@@ -68,39 +72,16 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
         $transformer->transform('1234');
     }
 
-    public function testReverseTransform()
-    {
-        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', 'Y-m-d H:i:s');
-
-        $output = new \DateTime('2010-02-03 04:05:06 UTC');
-        $input = $output->format('Y-m-d H:i:s');
-
-        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
-    }
-
     /**
-     * @dataProvider getFormatAndDateTime
+     * @dataProvider dataProvider
      */
-    public function testReverseTransformRandomFormat($format, $datetime)
+    public function testReverseTransform($format, $input, $output)
     {
         $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);
 
-        $dateTime = new \DateTime($datetime);
-        $input = $dateTime->format($format);
+        $output = new \DateTime($output);
 
-        $this->assertDateTimeEquals($dateTime, $reverseTransformer->reverseTransform($input));
-    }
-
-    public function getFormatAndDateTime()
-    {
-        return array(
-            array('Y-m-d H:i:s', '2010-02-03 04:05:06 UTC'),
-            array('Y-m-d H:i:00', '2010-02-03 04:05:00 UTC'),
-            array('Y-m-d', '2010-02-03 UTC'),
-            array('d-m-Y', '03-02-2010 UTC'),
-            array('H:i:s', '04:05:06 UTC'),
-            array('H:i:00', '04:05:00 UTC'),
-        );
+        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
     public function testReverseTransform_empty()

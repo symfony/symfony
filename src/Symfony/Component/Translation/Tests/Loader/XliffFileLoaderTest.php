@@ -43,7 +43,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException Symfony\Component\Translation\Exception\InvalidResourceException
      */
     public function testLoadInvalidResource()
     {
@@ -52,7 +52,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException Symfony\Component\Translation\Exception\InvalidResourceException
      */
     public function testLoadResourceDoesNotValidate()
     {
@@ -61,7 +61,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Translation\Exception\NotFoundResourceException
      */
     public function testLoadNonExistingResource()
     {
@@ -71,7 +71,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Translation\Exception\InvalidResourceException
      */
     public function testLoadThrowsAnExceptionIfFileNotLocal()
     {
@@ -81,7 +81,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        \RuntimeException
+     * @expectedException        Symfony\Component\Translation\Exception\InvalidResourceException
      * @expectedExceptionMessage Document types are not allowed.
      */
     public function testDocTypeIsNotAllowed()

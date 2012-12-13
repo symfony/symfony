@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * [BC BREAK] uniformized the exception thrown by the load() method when an error occurs. The load() method now
-   throws Symfony\Component\Translation\Exception\InvalidResourceException when a resource cannot be found
+   throws Symfony\Component\Translation\Exception\NotFoundResourceException when a resource cannot be found
    and Symfony\Component\Translation\Exception\InvalidResourceException when a resource is invalid.
  * changed the exception class thrown by some load() methods from \RuntimeException to \InvalidArgumentException
    (IcuDatFileLoader, IcuResFileLoader, and QtTranslationsLoader)

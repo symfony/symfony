@@ -853,7 +853,7 @@ class Application
                 return preg_replace('{^(\d+)x.*$}', '$1', $ansicon);
             }
 
-            if (preg_match('{columns:\s*(\d+)}i', $this->getConsoleMode(), $matches)) {
+            if (preg_match('{^(\d+)x\d+$}i', $this->getConsoleMode(), $matches)) {
                 return $matches[1];
             }
         }
@@ -875,7 +875,7 @@ class Application
                 return preg_replace('{^\d+x\d+ \(\d+x(\d+)\)$}', '$1', trim($ansicon));
             }
 
-            if (preg_match('{lines:\s*(\d+)}i', $this->getConsoleMode(), $matches)) {
+            if (preg_match('{^\d+x(\d+)$}i', $this->getConsoleMode(), $matches)) {
                 return $matches[1];
             }
         }
@@ -966,7 +966,7 @@ class Application
     /**
      * Runs and parses mode CON if it's available, suppressing any error output
      *
-     * @return string
+     * @return string <width>x<height> or null if it could not be parsed
      */
     private function getConsoleMode()
     {
@@ -982,7 +982,9 @@ class Application
             fclose($pipes[2]);
             proc_close($process);
 
-            return $info;
+            if (preg_match('{--------+\r?\n.+?(\d+)\r?\n.+?(\d+)\r?\n}', $info, $matches)) {
+                return $matches[2].'x'.$matches[1];
+            }
         }
     }
 

@@ -19,7 +19,8 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
- * UrlGenerator generates a URL based on a set of routes.
+ * UrlGenerator can generate a URL or a path for any route in the RouteCollection
+ * based on the passed parameters.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
@@ -140,36 +141,11 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     }
 
     /**
-     * This method converts the reference type to the new value introduced in Symfony 2.2. It can be used by
-     * other UrlGenerator implementations to be BC with Symfony 2.1. Reference type was a Boolean called
-     * $absolute in Symfony 2.1 and only supported two reference types.
-     *
-     * @param Boolean $absolute Whether to generate an absolute URL
-     *
-     * @return string The new reference type
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3.
-     */
-    public static function convertReferenceType($absolute)
-    {
-        if (false === $absolute) {
-            return self::ABSOLUTE_PATH;
-        }
-        if (true === $absolute) {
-            return self::ABSOLUTE_URL;
-        }
-
-        return $absolute;
-    }
-
-    /**
      * @throws MissingMandatoryParametersException When route has some missing mandatory parameters
      * @throws InvalidParameterException When a parameter value is not correct
      */
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostnameTokens)
     {
-        $referenceType = self::convertReferenceType($referenceType);
-
         $variables = array_flip($variables);
         $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
 

@@ -25,17 +25,17 @@ class Validator implements ValidatorInterface
     /**
      * @var MetadataFactoryInterface
      */
-    private $metadataFactory;
+    protected $metadataFactory;
 
     /**
      * @var ConstraintValidatorFactoryInterface
      */
-    private $validatorFactory;
+    protected $validatorFactory;
 
     /**
      * @var array
      */
-    private $objectInitializers;
+    protected $objectInitializers;
 
     public function __construct(
         MetadataFactoryInterface $metadataFactory,
@@ -174,7 +174,7 @@ class Validator implements ValidatorInterface
      *
      * @return ValidationVisitor
      */
-    private function createVisitor($root)
+    protected function createVisitor($root)
     {
         return new ValidationVisitor($root, $this->metadataFactory, $this->validatorFactory, $this->objectInitializers);
     }

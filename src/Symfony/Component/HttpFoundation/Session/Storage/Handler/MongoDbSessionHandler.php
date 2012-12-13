@@ -36,8 +36,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     /**
      * Constructor.
      *
-     * @param object $mongo   A MongoClient or Mongo instance
-     * @param array  $options An associative array of field options
+     * @param \Mongo|\MongoClient $mongo   A MongoClient or Mongo instance
+     * @param array               $options An associative array of field options
      *
      * @throws \InvalidArgumentException When MongoClient or Mongo instance not provided
      * @throws \InvalidArgumentException When "database" or "collection" not provided

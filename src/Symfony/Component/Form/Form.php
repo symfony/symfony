@@ -684,7 +684,11 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-        return FormUtil::isEmpty($this->modelData) || array() === $this->modelData;
+        return FormUtil::isEmpty($this->modelData) ||
+            // arrays, countables
+            0 === count($this->modelData) ||
+            // traversables that are not countable
+            ($this->modelData instanceof \Traversable && 0 === iterator_count($this->modelData));
     }
 
     /**

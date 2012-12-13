@@ -27,11 +27,13 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('\Mongo')) {
-            $this->markTestSkipped('MongoDbSessionHandler requires the php "mongo" extension');
+        if (!extension_loaded('mongo')) {
+            $this->markTestSkipped('MongoDbSessionHandler requires the PHP "mongo" extension.');
         }
 
-        $this->mongo = $this->getMockBuilder('Mongo')
+        $mongoClass = (version_compare(phpversion('mongo'), '1.3.0', '<')) ? 'Mongo' : 'MongoClient';
+
+        $this->mongo = $this->getMockBuilder($mongoClass)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -44,6 +46,22 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->storage = new MongoDbSessionHandler($this->mongo, $this->options);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testConstructorShouldThrowExceptionForInvalidMongo()
+    {
+        new MongoDbSessionHandler(new \stdClass(), $this->options);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testConstructorShouldThrowExceptionForMissingOptions()
+    {
+        new MongoDbSessionHandler($this->mongo, array());
     }
 
     public function testOpenMethodAlwaysReturnTrue()

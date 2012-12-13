@@ -26,6 +26,8 @@ CHANGELOG
  * changed `ValidatorInterface::getMetadataFactory` to return a `MetadataFactoryInterface` instead of a `ClassMetadataFactoryInterface`
  * removed `ClassMetadataFactoryInterface` type hint from `ValidatorBuilderInterface::setMetadataFactory`.
    As of Symfony 2.3, this method will be typed against `MetadataFactoryInterface` instead.
+ * [BC BREAK] the switches `traverse` and `deep` in the `Valid` constraint and in `GraphWalker::walkReference`
+   are ignored for arrays now. Arrays are always traversed recursively.
 
 2.1.0
 -----

@@ -107,7 +107,7 @@ class TemplateManager
                 $template = substr($template, 0, -10);
             }
 
-            if (!$this->twig->getLoader()->exists($template.'.html.twig')) {
+            if (!$this->templateExists($template.'.html.twig')) {
                 throw new \UnexpectedValueException(sprintf('The profiler template "%s.html.twig" for data collector "%s" does not exist.', $template, $name));
             }
 
@@ -115,5 +115,23 @@ class TemplateManager
         }
 
         return $templates;
+    }
+
+    // to be removed when the minimum required version of Twig is >= 2.0
+    protected function templateExists($template)
+    {
+        $loader = $this->twig->getLoader();
+        if ($loader instanceof \Twig_ExistsLoaderInterface && $loader->exists($template)) {
+            return true;
+        }
+
+        try {
+            $loader->getSource($template);
+
+            return true;
+        } catch (Twig_Error_Loader $e) {
+        }
+
+        return false;
     }
 }

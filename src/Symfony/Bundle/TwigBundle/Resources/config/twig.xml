@@ -21,6 +21,7 @@
         <parameter key="twig.form.renderer.class">Symfony\Bridge\Twig\Form\TwigRenderer</parameter>
         <parameter key="twig.translation.extractor.class">Symfony\Bridge\Twig\Translation\TwigExtractor</parameter>
         <parameter key="twig.exception_listener.class">Symfony\Component\HttpKernel\EventListener\ExceptionListener</parameter>
+        <parameter key="twig.controller.exception.class">Symfony\Bundle\TwigBundle\Controller\ExceptionController</parameter>
     </parameters>
 
     <services>
@@ -110,6 +111,11 @@
             <tag name="monolog.logger" channel="request" />
             <argument>%twig.exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="twig.controller.exception" class="%twig.controller.exception.class%">
+            <argument type="service" id="twig" />
+            <argument>%kernel.debug%</argument>
         </service>
     </services>
 </container>

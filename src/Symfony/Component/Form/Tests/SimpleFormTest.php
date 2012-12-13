@@ -16,7 +16,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\FormConfigBuilder;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -169,6 +168,13 @@ class SimpleFormTest extends AbstractFormTest
     public function testEmptyIfEmptyArray()
     {
         $this->form->setData(array());
+
+        $this->assertTrue($this->form->isEmpty());
+    }
+
+    public function testEmptyIfEmptyCountable()
+    {
+        $this->form->setData(new \ArrayObject());
 
         $this->assertTrue($this->form->isEmpty());
     }

@@ -92,9 +92,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator = new Translator('en_GB', new MessageSelector());
         $translator->addLoader($format, new $loaderClass());
         $translator->addResource($format, __DIR__.'/fixtures/non-existing', 'en_GB');
-        $translator->addResource($format, __DIR__.'/fixtures/resources.'.$format, 'en');
+        $translator->addResource($format, __DIR__.'/fixtures/resources.'.$format, 'en', 'resources');
 
-        $this->assertEquals('bar', $translator->trans('foo'));
+        $this->assertEquals('bar', $translator->trans('foo', array(), 'resources'));
     }
 
     public function testTransWithFallbackLocaleBis()
@@ -182,6 +182,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array('mo', 'MoFileLoader'),
             array('po', 'PoFileLoader'),
             array('php', 'PhpFileLoader'),
+            array('ts', 'QtTranslationsLoader'),
             array('xlf', 'XliffFileLoader'),
             array('yml', 'YamlFileLoader'),
         );

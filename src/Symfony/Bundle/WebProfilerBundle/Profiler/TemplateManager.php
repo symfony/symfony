@@ -107,12 +107,10 @@ class TemplateManager
                 $template = substr($template, 0, -10);
             }
 
-// FIXME when Twig is able to check for template existence
-/*
-            if (!$this->twig->exists($template.'.html.twig')) {
+            if (!$this->twig->getLoader()->exists($template.'.html.twig')) {
                 throw new \UnexpectedValueException(sprintf('The profiler template "%s.html.twig" for data collector "%s" does not exist.', $template, $name));
             }
-*/
+
             $templates[$name] = $template.'.html.twig';
         }
 

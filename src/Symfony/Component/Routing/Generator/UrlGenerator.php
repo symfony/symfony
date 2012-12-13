@@ -141,8 +141,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     }
 
     /**
-     * @throws MissingMandatoryParametersException When route has some missing mandatory parameters
-     * @throws InvalidParameterException When a parameter value is not correct
+     * @throws MissingMandatoryParametersException When some parameters are missing that mandatory for the route
+     * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
+     *                                             it does not match the requirement
      */
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostnameTokens)
     {
@@ -151,7 +152,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
         // all params must be given
         if ($diff = array_diff_key($variables, $mergedParams)) {
-            throw new MissingMandatoryParametersException(sprintf('The "%s" route has some missing mandatory parameters ("%s").', $name, implode('", "', array_keys($diff))));
+            throw new MissingMandatoryParametersException(sprintf('Some mandatory parameters are missing ("%s") to generate a URL for route "%s".', implode('", "', array_keys($diff)), $name));
         }
 
         $url = '';
@@ -161,7 +162,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                 if (!$optional || !array_key_exists($token[3], $defaults) || (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]]) {
                     // check requirement
                     if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
-                        $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $mergedParams[$token[3]]);
+                        $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
                         if ($this->strictRequirements) {
                             throw new InvalidParameterException($message);
                         }
@@ -213,7 +214,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                 foreach ($hostnameTokens as $token) {
                     if ('variable' === $token[0]) {
                         if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
-                            $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $mergedParams[$token[3]]);
+                            $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
 
                             if ($this->strictRequirements) {
                                 throw new InvalidParameterException($message);

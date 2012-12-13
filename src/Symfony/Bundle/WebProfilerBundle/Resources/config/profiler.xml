@@ -26,6 +26,7 @@
         </service>
 
         <service id="web_profiler.controller.exception" class="%web_profiler.controller.exception.class%">
+            <argument type="service" id="profiler" />
             <argument type="service" id="twig" />
             <argument>%kernel.debug%</argument>
         </service>

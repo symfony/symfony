@@ -137,7 +137,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     private function getCollection()
     {
         if (null === $this->collection) {
-            $this->collection = $this->mongo->selectDB($this->options['database'])->selectCollection($this->options['collection']);
+            $this->collection = $this->mongo->selectCollection($this->options['database'], $this->options['collection']);
         }
 
         return $this->collection;

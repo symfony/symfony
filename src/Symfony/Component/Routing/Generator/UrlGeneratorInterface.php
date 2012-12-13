@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Routing\Generator;
 
-use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\RequestContextAwareInterface;
 
 /**
  * UrlGeneratorInterface is the interface that all URL generator classes must implement.
@@ -74,7 +76,10 @@ interface UrlGeneratorInterface extends RequestContextAwareInterface
      *
      * @return string The generated URL
      *
-     * @throws RouteNotFoundException if route doesn't exist
+     * @throws RouteNotFoundException              If the named route doesn't exist
+     * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
+     * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
+     *                                             it does not match the requirement
      *
      * @api
      */

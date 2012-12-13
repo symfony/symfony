@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51">
                 <source>No temporary folder was configured in php.ini.</source>
-                <target>Ez da aldi baterako karpetarik konfiguratu php.ini-n</target>
+                <target>Ez da aldi baterako karpetarik konfiguratu php.ini fitxategian.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -200,7 +200,7 @@
             </trans-unit>
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail.</source>
-                <target>PHP-ren luzapen batek igoeraren hutsa eragin du.</target>
+                <target>PHP luzapen batek igoeraren hutsa eragin du.</target>
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} elements or more.</source>

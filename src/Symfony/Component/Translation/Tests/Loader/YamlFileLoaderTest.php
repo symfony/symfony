@@ -50,7 +50,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Translation\Exception\NotFoundResourceException
      */
     public function testLoadNonExistingResource()
     {
@@ -60,7 +60,17 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException Symfony\Component\Translation\Exception\InvalidResourceException
+     */
+    public function testLoadThrowsAnExceptionIfFileNotLocal()
+    {
+        $loader = new YamlFileLoader();
+        $resource = 'http://example.com/resources.yml';
+        $loader->load($resource, 'en', 'domain1');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Translation\Exception\InvalidResourceException
      */
     public function testLoadThrowsAnExceptionIfNotAnArray()
     {

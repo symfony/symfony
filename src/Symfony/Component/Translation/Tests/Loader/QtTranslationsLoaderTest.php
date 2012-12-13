@@ -35,7 +35,7 @@ class QtTranslationsLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException Symfony\Component\Translation\Exception\NotFoundResourceException
      */
     public function testLoadNonExistingResource()
     {

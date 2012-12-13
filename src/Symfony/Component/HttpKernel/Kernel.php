@@ -61,6 +61,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $startTime;
     protected $classes;
     protected $errorReportingLevel;
+    protected $initialized = false;
 
     const VERSION         = '2.2.0-DEV';
     const VERSION_ID      = '20100';
@@ -95,18 +96,22 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     public function init()
     {
-        ini_set('display_errors', 0);
+        if (!$this->initialized) {
+            ini_set('display_errors', 0);
 
-        if ($this->debug) {
-            error_reporting(-1);
+            if ($this->debug) {
+                error_reporting(-1);
 
-            DebugClassLoader::enable();
-            ErrorHandler::register($this->errorReportingLevel);
-            if ('cli' !== php_sapi_name()) {
-                ExceptionHandler::register();
-            } else {
-                ini_set('display_errors', 1);
+                DebugClassLoader::enable();
+                ErrorHandler::register($this->errorReportingLevel);
+                if ('cli' !== php_sapi_name()) {
+                    ExceptionHandler::register();
+                } else {
+                    ini_set('display_errors', 1);
+                }
             }
+
+            $this->initialized = true;
         }
     }
 
@@ -754,6 +759,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         list($environment, $debug) = unserialize($data);
 
+        $this->initialized = true;
         $this->__construct($environment, $debug);
     }
 }

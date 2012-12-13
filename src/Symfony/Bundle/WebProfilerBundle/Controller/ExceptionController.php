@@ -82,7 +82,7 @@ class ExceptionController
         $exception = $this->profiler->loadProfile($token)->getCollector('exception')->getException();
         $template = $this->getTemplate();
 
-        if (!$this->twig->getLoader()->exists($template)) {
+        if (!$this->templateExists($template)) {
             $handler = new ExceptionHandler();
 
             return new Response($handler->getStylesheet($exception));
@@ -94,5 +94,23 @@ class ExceptionController
     protected function getTemplate()
     {
         return '@Twig/Exception/'.($this->debug ? 'exception' : 'error').'.html.twig';
+    }
+
+    // to be removed when the minimum required version of Twig is >= 2.0
+    protected function templateExists($template)
+    {
+        $loader = $this->twig->getLoader();
+        if ($loader instanceof \Twig_ExistsLoaderInterface && $loader->exists($template)) {
+            return true;
+        }
+
+        try {
+            $loader->getSource($template);
+
+            return true;
+        } catch (Twig_Error_Loader $e) {
+        }
+
+        return false;
     }
 }

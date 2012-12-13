@@ -101,14 +101,14 @@ class ExceptionController
         // when not in debug, try to find a template for the specific HTTP status code and format
         if (!$debug) {
             $template = new TemplateReference('TwigBundle', 'Exception', $name.$code, $format, 'twig');
-            if ($this->twig->getLoader()->exists($template)) {
+            if ($this->templateExists($template)) {
                 return $template;
             }
         }
 
         // try to find a template for the given format
         $template = new TemplateReference('TwigBundle', 'Exception', $name, $format, 'twig');
-        if ($this->twig->getLoader()->exists($template)) {
+        if ($this->templateExists($template)) {
             return $template;
         }
 
@@ -116,5 +116,23 @@ class ExceptionController
         $request->setRequestFormat('html');
 
         return new TemplateReference('TwigBundle', 'Exception', $name, 'html', 'twig');
+    }
+
+    // to be removed when the minimum required version of Twig is >= 2.0
+    protected function templateExists($template)
+    {
+        $loader = $this->twig->getLoader();
+        if ($loader instanceof \Twig_ExistsLoaderInterface && $loader->exists($template)) {
+            return true;
+        }
+
+        try {
+            $loader->getSource($template);
+
+            return true;
+        } catch (Twig_Error_Loader $e) {
+        }
+
+        return false;
     }
 }

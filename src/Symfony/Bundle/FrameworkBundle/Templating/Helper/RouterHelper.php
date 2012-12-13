@@ -36,11 +36,13 @@ class RouterHelper extends Helper
     /**
      * Generates a URL from the given parameters.
      *
-     * @param string $name          The name of the route
-     * @param mixed  $parameters    An array of parameters
-     * @param string $referenceType The type of reference (see UrlGeneratorInterface)
+     * @param string         $name          The name of the route
+     * @param mixed          $parameters    An array of parameters
+     * @param Boolean|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
      *
      * @return string The generated URL
+     *
+     * @see UrlGeneratorInterface
      */
     public function generate($name, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {

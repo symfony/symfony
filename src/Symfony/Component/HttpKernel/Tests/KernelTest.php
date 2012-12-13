@@ -40,6 +40,18 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($kernel->isBooted());
         $this->assertLessThanOrEqual(microtime(true), $kernel->getStartTime());
         $this->assertNull($kernel->getContainer());
+        $this->assertEquals(__DIR__.'/Fixtures', $kernel->getRootDir());
+        $this->assertEquals('Fixtures', $kernel->getName());
+    }
+
+    public function testConstructorWithRootDirectoryOverride()
+    {
+        $env = 'test_env';
+        $debug = true;
+        $kernel = new KernelForTest($env, $debug, '/root/path/override');
+
+        $this->assertEquals('/root/path/override', $kernel->getRootDir());
+        $this->assertEquals('override', $kernel->getName());
     }
 
     public function testClone()

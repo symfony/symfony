@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation;
 
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 /**
  * Translator.
@@ -181,7 +182,13 @@ class Translator implements TranslatorInterface
 
     protected function loadCatalogue($locale)
     {
-        $this->doLoadCatalogue($locale);
+        try {
+            $this->doLoadCatalogue($locale);
+        } catch (NotFoundResourceException $e) {
+            if (!$this->computeFallbackLocales($locale)) {
+                throw $e;
+            }
+        }
         $this->loadFallbackCatalogues($locale);
     }
 

@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
 use Symfony\Component\HttpKernel\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\HttpKernel\Debug\ExceptionHandler;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -23,26 +25,39 @@ class ExceptionController
 {
     protected $twig;
     protected $debug;
+    protected $profiler;
 
-    public function __construct(\Twig_Environment $twig, $debug)
+    public function __construct(Profiler $profiler, \Twig_Environment $twig, $debug)
     {
+        $this->profiler = $profiler;
         $this->twig = $twig;
         $this->debug = $debug;
     }
 
     /**
-     * Converts an Exception to a Response.
+     * Renders the exception panel for the given token.
      *
-     * @param FlattenException $exception A FlattenException instance
+     * @param string $token The profiler token
      *
-     * @return Response
+     * @return Response A Response instance
      */
-    public function showAction(FlattenException $exception)
+    public function showAction($token)
     {
+        $this->profiler->disable();
+
+        $exception = $this->profiler->loadProfile($token)->getCollector('exception')->getException();
+        $template = $this->getTemplate();
+
+        if (!$this->twig->getLoader()->exists($template)) {
+            $handler = new ExceptionHandler();
+
+            return new Response($handler->getContent($exception));
+        }
+
         $code = $exception->getStatusCode();
 
         return new Response($this->twig->render(
-            '@Twig/Exception/'.($this->debug ? 'exception' : 'error').'.html.twig',
+            $template,
             array(
                 'status_code'    => $code,
                 'status_text'    => Response::$statusTexts[$code],
@@ -51,5 +66,33 @@ class ExceptionController
                 'currentContent' => '',
             )
         ));
+    }
+
+    /**
+     * Renders the exception panel stylesheet for the given token.
+     *
+     * @param string $token The profiler token
+     *
+     * @return Response A Response instance
+     */
+    public function cssAction($token)
+    {
+        $this->profiler->disable();
+
+        $exception = $this->profiler->loadProfile($token)->getCollector('exception')->getException();
+        $template = $this->getTemplate();
+
+        if (!$this->twig->getLoader()->exists($template)) {
+            $handler = new ExceptionHandler();
+
+            return new Response($handler->getStylesheet($exception));
+        }
+
+        return new Response($this->twig->render('@WebProfiler/Collector/exception.css.twig'));
+    }
+
+    protected function getTemplate()
+    {
+        return '@Twig/Exception/'.($this->debug ? 'exception' : 'error').'.html.twig';
     }
 }

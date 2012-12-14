@@ -110,6 +110,9 @@ interface SessionStorageInterface
      * used for a storage object design for unit or functional testing where
      * a real PHP session would interfere with testing, in which case it
      * it should actually persist the session data if required.
+     *
+     * @throws \RuntimeException If the session is saved without being started, or if the session
+     *                           is already closed.
      */
     public function save();
 

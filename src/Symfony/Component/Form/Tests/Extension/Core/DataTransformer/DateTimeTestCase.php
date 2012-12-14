@@ -18,4 +18,3 @@ abstract class DateTimeTestCase extends LocalizedTestCase
         self::assertEquals($expected->format('c'), $actual->format('c'));
     }
 }
-

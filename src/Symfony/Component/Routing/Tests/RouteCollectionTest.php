@@ -60,8 +60,8 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection->add('foo', new Route('/foo'));
 
         $collection1 = new RouteCollection();
-        $collection->addCollection($collection1);
         $collection1->add('foo', new Route('/foo1'));
+        $collection->addCollection($collection1);
 
         $this->assertEquals('/foo1', $this->getFirstNamedRoute($collection, 'foo')->getPattern());
     }
@@ -72,8 +72,8 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection->add('foo', new Route('/foo'));
 
         $collection1 = new RouteCollection();
-        $collection->addCollection($collection1);
         $collection1->add('foo1', new Route('/foo1'));
+        $collection->addCollection($collection1);
 
         $this->assertCount(2, $collection);
     }
@@ -202,19 +202,12 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection3 = new RouteCollection();
         $collection3->add('foo', $new = new Route('/new'));
 
-        $collection1->addCollection($collection2);
         $collection2->addCollection($collection3);
-
-        $collection1->add('stay', new Route('/stay'));
-
-        $iterator = $collection1->getIterator();
+        $collection1->addCollection($collection2);
 
         $this->assertSame($new, $collection1->get('foo'), '->get() returns new route that overrode previous one');
-        // size of 2 because collection1 contains collection2 and /stay but not /old anymore
-        $this->assertCount(2, $iterator, '->addCollection() removes previous routes when adding new routes with the same name');
-        $this->assertInstanceOf('Symfony\Component\Routing\RouteCollection', $iterator->current(), '->getIterator returns both Routes and RouteCollections');
-        $iterator->next();
-        $this->assertInstanceOf('Symfony\Component\Routing\Route', $iterator->current(), '->getIterator returns both Routes and RouteCollections');
+        // size of 1 because collection1 contains /new but not /old anymore
+        $this->assertCount(1, $collection1->getIterator(), '->addCollection() removes previous routes when adding new routes with the same name');
     }
 
     public function testGet()
@@ -229,63 +222,6 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($collection2->get('a'), '->get() does not return the route defined in parent collection');
         $this->assertNull($collection1->get('non-existent'), '->get() returns null when route does not exist');
         $this->assertNull($collection1->get(0), '->get() does not disclose internal child RouteCollection');
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testCannotSelfJoinCollection()
-    {
-        $collection = new RouteCollection();
-
-        $collection->addCollection($collection);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testCannotAddExistingCollectionToTree()
-    {
-        $collection1 = new RouteCollection();
-        $collection2 = new RouteCollection();
-        $collection3 = new RouteCollection();
-
-        $collection1->addCollection($collection2);
-        $collection1->addCollection($collection3);
-        $collection2->addCollection($collection3);
-    }
-
-    public function testPatternDoesNotChangeWhenDefinitionOrderChanges()
-    {
-        $collection1 = new RouteCollection();
-        $collection1->add('a', new Route('/a...'));
-        $collection2 = new RouteCollection();
-        $collection2->add('b', new Route('/b...'));
-        $collection3 = new RouteCollection();
-        $collection3->add('c', new Route('/c...'));
-
-        $rootCollection_A = new RouteCollection();
-        $collection2->addCollection($collection3, '/c');
-        $collection1->addCollection($collection2, '/b');
-        $rootCollection_A->addCollection($collection1, '/a');
-
-        // above should mean the same as below
-
-        $collection1 = new RouteCollection();
-        $collection1->add('a', new Route('/a...'));
-        $collection2 = new RouteCollection();
-        $collection2->add('b', new Route('/b...'));
-        $collection3 = new RouteCollection();
-        $collection3->add('c', new Route('/c...'));
-
-        $rootCollection_B = new RouteCollection();
-        $collection1->addCollection($collection2, '/b');
-        $collection2->addCollection($collection3, '/c');
-        $rootCollection_B->addCollection($collection1, '/a');
-
-        // test it now
-
-        $this->assertEquals($rootCollection_A, $rootCollection_B);
     }
 
     public function testSetHostnamePattern()

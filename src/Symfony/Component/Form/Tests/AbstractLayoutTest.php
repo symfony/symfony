@@ -811,14 +811,14 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             [@id="name_date"]
             [
                 ./select
-                    [@id="name_date_year"]
-                    [./option[@value="2011"][@selected="selected"]]
-                /following-sibling::select
                     [@id="name_date_month"]
                     [./option[@value="2"][@selected="selected"]]
                 /following-sibling::select
                     [@id="name_date_day"]
                     [./option[@value="3"][@selected="selected"]]
+                /following-sibling::select
+                    [@id="name_date_year"]
+                    [./option[@value="2011"][@selected="selected"]]
             ]
         /following-sibling::div
             [@id="name_time"]
@@ -851,13 +851,13 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             [@id="name_date"]
             [
                 ./select
-                    [@id="name_date_year"]
-                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
-                /following-sibling::select
                     [@id="name_date_month"]
                     [./option[@value=""][.="[trans]Change&Me[/trans]"]]
                 /following-sibling::select
                     [@id="name_date_day"]
+                    [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+                /following-sibling::select
+                    [@id="name_date_year"]
                     [./option[@value=""][.="[trans]Change&Me[/trans]"]]
             ]
         /following-sibling::div
@@ -891,14 +891,14 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             [@id="name_date"]
             [
                 ./select
-                    [@id="name_date_year"]
-                    [./option[@value="2011"][@selected="selected"]]
-                /following-sibling::select
                     [@id="name_date_month"]
                     [./option[@value="2"][@selected="selected"]]
                 /following-sibling::select
                     [@id="name_date_day"]
                     [./option[@value="3"][@selected="selected"]]
+                /following-sibling::select
+                    [@id="name_date_year"]
+                    [./option[@value="2011"][@selected="selected"]]
             ]
         /following-sibling::div
             [@id="name_time"]
@@ -930,14 +930,14 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             [@id="name_date"]
             [
                 ./select
-                    [@id="name_date_year"]
-                    [./option[@value="2011"][@selected="selected"]]
-                /following-sibling::select
                     [@id="name_date_month"]
                     [./option[@value="2"][@selected="selected"]]
                 /following-sibling::select
                     [@id="name_date_day"]
                     [./option[@value="3"][@selected="selected"]]
+                /following-sibling::select
+                    [@id="name_date_year"]
+                    [./option[@value="2011"][@selected="selected"]]
             ]
         /following-sibling::div
             [@id="name_time"]
@@ -1033,14 +1033,14 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 '/div
     [
         ./select
-            [@id="name_year"]
-            [./option[@value="2011"][@selected="selected"]]
-        /following-sibling::select
             [@id="name_month"]
             [./option[@value="2"][@selected="selected"]]
         /following-sibling::select
             [@id="name_day"]
             [./option[@value="3"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_year"]
+            [./option[@value="2011"][@selected="selected"]]
     ]
     [count(./select)=3]
 '
@@ -1060,13 +1060,13 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 '/div
     [
         ./select
-            [@id="name_year"]
-            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
-        /following-sibling::select
             [@id="name_month"]
             [./option[@value=""][.="[trans]Change&Me[/trans]"]]
         /following-sibling::select
             [@id="name_day"]
+            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+        /following-sibling::select
+            [@id="name_year"]
             [./option[@value=""][.="[trans]Change&Me[/trans]"]]
     ]
     [count(./select)=3]
@@ -1087,14 +1087,14 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 '/div
     [
         ./select
-            [@id="name_year"]
-            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
-        /following-sibling::select
             [@id="name_month"]
             [./option[@value="1"]]
         /following-sibling::select
             [@id="name_day"]
             [./option[@value="1"]]
+        /following-sibling::select
+            [@id="name_year"]
+            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
     ]
     [count(./select)=3]
 '
@@ -1112,10 +1112,6 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 '/div
     [
         ./input
-            [@id="name_year"]
-            [@type="text"]
-            [@value="2011"]
-        /following-sibling::input
             [@id="name_month"]
             [@type="text"]
             [@value="2"]
@@ -1123,6 +1119,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             [@id="name_day"]
             [@type="text"]
             [@value="3"]
+        /following-sibling::input
+            [@id="name_year"]
+            [@type="text"]
+            [@value="2011"]
     ]
     [count(./input)=3]
 '
@@ -1166,14 +1166,14 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 '/div
     [
         ./select
-            [@id="name_year"]
-            [./option[@value="2000"][@selected="selected"]]
-        /following-sibling::select
             [@id="name_month"]
             [./option[@value="2"][@selected="selected"]]
         /following-sibling::select
             [@id="name_day"]
             [./option[@value="3"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_year"]
+            [./option[@value="2000"][@selected="selected"]]
     ]
     [count(./select)=3]
 '
@@ -1192,10 +1192,6 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 '/div
     [
         ./select
-            [@id="name_year"]
-            [./option[@value=""][.="[trans][/trans]"]]
-            [./option[@value="1950"][@selected="selected"]]
-        /following-sibling::select
             [@id="name_month"]
             [./option[@value=""][.="[trans][/trans]"]]
             [./option[@value="1"][@selected="selected"]]
@@ -1203,6 +1199,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             [@id="name_day"]
             [./option[@value=""][.="[trans][/trans]"]]
             [./option[@value="1"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_year"]
+            [./option[@value=""][.="[trans][/trans]"]]
+            [./option[@value="1950"][@selected="selected"]]
     ]
     [count(./select)=3]
 '

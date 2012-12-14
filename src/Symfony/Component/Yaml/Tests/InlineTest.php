@@ -127,6 +127,8 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             '2007-10-30' => mktime(0, 0, 0, 10, 30, 2007),
             '2007-10-30T02:59:43Z' => gmmktime(2, 59, 43, 10, 30, 2007),
             '2007-10-30 02:59:43 Z' => gmmktime(2, 59, 43, 10, 30, 2007),
+            '1960-10-30 02:59:43 Z' => gmmktime(2, 59, 43, 10, 30, 1960),
+            '1730-10-30T02:59:43Z' => gmmktime(2, 59, 43, 10, 30, 1730),
 
             '"a \\"string\\" with \'quoted strings inside\'"' => 'a "string" with \'quoted strings inside\'',
             "'a \"string\" with ''quoted strings inside'''" => 'a "string" with \'quoted strings inside\'',

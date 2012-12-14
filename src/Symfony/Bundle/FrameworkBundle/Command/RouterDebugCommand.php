@@ -92,9 +92,7 @@ EOF
                     ? implode(', ', $requirements['_method']) : $requirements['_method']
                 )
                 : 'ANY';
-            $hostname = '' !== $route->getHostnamePattern()
-                ? $route->getHostnamePattern() : 'ANY';
-
+            $hostname = '' !== $route->getHostnamePattern() ? $route->getHostnamePattern() : 'ANY';
             $maxName = max($maxName, strlen($name));
             $maxMethod = max($maxMethod, strlen($method));
             $maxHostname = max($maxHostname, strlen($hostname));
@@ -111,8 +109,7 @@ EOF
                     ? implode(', ', $requirements['_method']) : $requirements['_method']
                 )
                 : 'ANY';
-            $hostname = '' !== $route->getHostnamePattern()
-                ? $route->getHostnamePattern() : 'ANY';
+            $hostname = '' !== $route->getHostnamePattern() ? $route->getHostnamePattern() : 'ANY';
             $output->writeln(sprintf($format, $name, $method, $hostname, $route->getPattern()));
         }
     }
@@ -127,10 +124,13 @@ EOF
             throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
         }
 
+        $hostname = '' !== $route->getHostnamePattern() ? $route->getHostnamePattern() : 'ANY';
+
         $output->writeln($this->getHelper('formatter')->formatSection('router', sprintf('Route "%s"', $name)));
 
         $output->writeln(sprintf('<comment>Name</comment>         %s', $name));
         $output->writeln(sprintf('<comment>Pattern</comment>      %s', $route->getPattern()));
+        $output->writeln(sprintf('<comment>HostnamePattern</comment>  %s', $hostname));
         $output->writeln(sprintf('<comment>Class</comment>        %s', get_class($route)));
 
         $defaults = '';
@@ -139,7 +139,7 @@ EOF
         foreach ($d as $name => $value) {
             $defaults .= ($defaults ? "\n".str_repeat(' ', 13) : '').$name.': '.$this->formatValue($value);
         }
-        $output->writeln(sprintf('<comment>Defaults</comment>     %s', $defaults));
+        $output->writeln(sprintf('<comment>Defaults</comment>         %s', $defaults));
 
         $requirements = '';
         $r = $route->getRequirements();
@@ -147,7 +147,8 @@ EOF
         foreach ($r as $name => $value) {
             $requirements .= ($requirements ? "\n".str_repeat(' ', 13) : '').$name.': '.$this->formatValue($value);
         }
-        $output->writeln(sprintf('<comment>Requirements</comment> %s', $requirements));
+        $requirements = '' !== $requirements ? $requirements : 'NONE';
+        $output->writeln(sprintf('<comment>Requirements</comment>     %s', $requirements));
 
         $options = '';
         $o = $route->getOptions();
@@ -155,8 +156,8 @@ EOF
         foreach ($o as $name => $value) {
             $options .= ($options ? "\n".str_repeat(' ', 13) : '').$name.': '.$this->formatValue($value);
         }
-        $output->writeln(sprintf('<comment>Options</comment>      %s', $options));
-        $output->write('<comment>Regex</comment>        ');
+        $output->writeln(sprintf('<comment>Options</comment>          %s', $options));
+        $output->write('<comment>Regex</comment>            ');
         $output->writeln(preg_replace('/^             /', '', preg_replace('/^/m', '             ', $route->compile()->getRegex())), OutputInterface::OUTPUT_RAW);
     }
 

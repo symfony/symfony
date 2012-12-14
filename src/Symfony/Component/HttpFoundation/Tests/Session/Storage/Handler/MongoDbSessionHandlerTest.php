@@ -27,11 +27,13 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('\Mongo')) {
-            $this->markTestSkipped('MongoDbSessionHandler requires the mongo extension.');
+        if (!extension_loaded('mongo')) {
+            $this->markTestSkipped('MongoDbSessionHandler requires the PHP "mongo" extension.');
         }
 
-        $this->mongo = $this->getMockBuilder('Mongo')
+        $mongoClass = (version_compare(phpversion('mongo'), '1.3.0', '<')) ? 'Mongo' : 'MongoClient';
+
+        $this->mongo = $this->getMockBuilder($mongoClass)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -46,6 +48,22 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->storage = new MongoDbSessionHandler($this->mongo, $this->options);
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testConstructorShouldThrowExceptionForInvalidMongo()
+    {
+        new MongoDbSessionHandler(new \stdClass(), $this->options);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testConstructorShouldThrowExceptionForMissingOptions()
+    {
+        new MongoDbSessionHandler($this->mongo, array());
+    }
+
     public function testOpenMethodAlwaysReturnTrue()
     {
         $this->assertTrue($this->storage->open('test', 'test'), 'The "open" method should always return true');
@@ -58,22 +76,13 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testWrite()
     {
-        $database = $this->getMockBuilder('MongoDB')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $collection = $this->getMockBuilder('MongoCollection')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->mongo->expects($this->once())
-            ->method('selectDB')
-            ->with($this->options['database'])
-            ->will($this->returnValue($database));
-
-        $database->expects($this->once())
             ->method('selectCollection')
-            ->with($this->options['collection'])
+            ->with($this->options['database'], $this->options['collection'])
             ->will($this->returnValue($collection));
 
         $that = $this;
@@ -96,22 +105,13 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testReplaceSessionData()
     {
-        $database = $this->getMockBuilder('MongoDB')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $collection = $this->getMockBuilder('MongoCollection')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->mongo->expects($this->once())
-            ->method('selectDB')
-            ->with($this->options['database'])
-            ->will($this->returnValue($database));
-
-        $database->expects($this->once())
             ->method('selectCollection')
-            ->with($this->options['collection'])
+            ->with($this->options['database'], $this->options['collection'])
             ->will($this->returnValue($collection));
 
         $data = array();
@@ -130,22 +130,13 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testDestroy()
     {
-        $database = $this->getMockBuilder('MongoDB')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $collection = $this->getMockBuilder('MongoCollection')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->mongo->expects($this->once())
-            ->method('selectDB')
-            ->with($this->options['database'])
-            ->will($this->returnValue($database));
-
-        $database->expects($this->once())
             ->method('selectCollection')
-            ->with($this->options['collection'])
+            ->with($this->options['database'], $this->options['collection'])
             ->will($this->returnValue($collection));
 
         $collection->expects($this->once())
@@ -157,29 +148,20 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testGc()
     {
-        $database = $this->getMockBuilder('MongoDB')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $collection = $this->getMockBuilder('MongoCollection')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->mongo->expects($this->once())
-            ->method('selectDB')
-            ->with($this->options['database'])
-            ->will($this->returnValue($database));
-
-        $database->expects($this->once())
             ->method('selectCollection')
-            ->with($this->options['collection'])
+            ->with($this->options['database'], $this->options['collection'])
             ->will($this->returnValue($collection));
 
         $that = $this;
 
         $collection->expects($this->once())
             ->method('remove')
-            ->will($this->returnCallback(function($criteria) use($that) {
+            ->will($this->returnCallback(function($criteria) use ($that) {
                 $that->assertInstanceOf('MongoDate', $criteria[$that->options['time_field']]['$lt']);
                 $that->assertGreaterThanOrEqual(time() - -1, $criteria[$that->options['time_field']]['$lt']->sec);
             }));

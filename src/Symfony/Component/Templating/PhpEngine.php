@@ -236,7 +236,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Adds some helpers.
-     * 
+     *
      * @param HelperInterface[] $helpers An array of helper
      *
      * @api

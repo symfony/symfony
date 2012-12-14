@@ -82,7 +82,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
             $this->defaultGroup = $class;
         }
     }
-    
+
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
     {
         if (null === $propagatedGroup && Constraint::DEFAULT_GROUP === $group

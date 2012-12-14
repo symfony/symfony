@@ -22,6 +22,36 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 use Symfony\Component\Form\Tests\Fixtures\FixedFilterListener;
 
+class SimpleFormTest_Countable implements \Countable
+{
+    private $count;
+
+    public function __construct($count)
+    {
+        $this->count = $count;
+    }
+
+    public function count()
+    {
+        return $this->count;
+    }
+}
+
+class SimpleFormTest_Traversable implements \IteratorAggregate
+{
+    private $iterator;
+
+    public function __construct($count)
+    {
+        $this->iterator = new \ArrayIterator($count > 0 ? array_fill(0, $count, 'Foo') : array());
+    }
+
+    public function getIterator()
+    {
+        return $this->iterator;
+    }
+}
+
 class SimpleFormTest extends AbstractFormTest
 {
     public function testDataIsInitializedToConfiguredValue()
@@ -67,7 +97,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\AlreadyBoundException
+     * @expectedException \Symfony\Component\Form\Exception\AlreadyBoundException
      */
     public function testBindThrowsExceptionIfAlreadyBound()
     {
@@ -172,6 +202,42 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertTrue($this->form->isEmpty());
     }
 
+    public function testEmptyIfEmptyCountable()
+    {
+        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__ . '\SimpleFormTest_Countable', $this->dispatcher));
+
+        $this->form->setData(new SimpleFormTest_Countable(0));
+
+        $this->assertTrue($this->form->isEmpty());
+    }
+
+    public function testNotEmptyIfFilledCountable()
+    {
+        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__ . '\SimpleFormTest_Countable', $this->dispatcher));
+
+        $this->form->setData(new SimpleFormTest_Countable(1));
+
+        $this->assertFalse($this->form->isEmpty());
+    }
+
+    public function testEmptyIfEmptyTraversable()
+    {
+        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__ . '\SimpleFormTest_Traversable', $this->dispatcher));
+
+        $this->form->setData(new SimpleFormTest_Traversable(0));
+
+        $this->assertTrue($this->form->isEmpty());
+    }
+
+    public function testNotEmptyIfFilledTraversable()
+    {
+        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__ . '\SimpleFormTest_Traversable', $this->dispatcher));
+
+        $this->form->setData(new SimpleFormTest_Traversable(1));
+
+        $this->assertFalse($this->form->isEmpty());
+    }
+
     public function testEmptyIfNull()
     {
         $this->form->setData(null);
@@ -239,7 +305,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\AlreadyBoundException
+     * @expectedException \Symfony\Component\Form\Exception\AlreadyBoundException
      */
     public function testSetParentThrowsExceptionIfAlreadyBound()
     {
@@ -261,7 +327,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\AlreadyBoundException
+     * @expectedException \Symfony\Component\Form\Exception\AlreadyBoundException
      */
     public function testSetDataThrowsExceptionIfAlreadyBound()
     {
@@ -675,7 +741,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\FormException
      * @expectedExceptionMessage A form with an empty name cannot have a parent form.
      */
     public function testFormCannotHaveEmptyNameNotInRootLevel()
@@ -721,7 +787,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\FormException
      */
     public function testViewDataMustNotBeObjectIfDataClassIsNull()
     {
@@ -751,7 +817,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\FormException
      */
     public function testViewDataMustBeObjectIfDataClassIsSet()
     {
@@ -766,7 +832,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\FormException
      */
     public function testSetDataCannotInvokeItself()
     {

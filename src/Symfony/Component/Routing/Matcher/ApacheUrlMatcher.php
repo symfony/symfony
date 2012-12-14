@@ -83,6 +83,7 @@ class ApacheUrlMatcher extends UrlMatcher
 
         if (null !== $route) {
             $parameters['_route'] = $route;
+
             return $this->mergeDefaults($parameters, $defaults);
         } elseif (0 < count($allow)) {
             throw new MethodNotAllowedException($allow);

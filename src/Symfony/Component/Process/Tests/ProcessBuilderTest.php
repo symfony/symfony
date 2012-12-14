@@ -105,4 +105,14 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($p->getValue($pb));
     }
+
+    public function testShouldSetArguments()
+    {
+        $pb = new ProcessBuilder(array('initial'));
+        $pb->setArguments(array('second'));
+
+        $proc = $pb->getProcess();
+
+        $this->assertContains("second", $proc->getCommandLine());
+    }
 }

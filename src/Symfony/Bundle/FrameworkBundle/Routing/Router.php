@@ -85,20 +85,16 @@ class Router extends BaseRouter implements WarmableInterface
     private function resolveParameters(RouteCollection $collection)
     {
         foreach ($collection as $route) {
-            if ($route instanceof RouteCollection) {
-                $this->resolveParameters($route);
-            } else {
-                foreach ($route->getDefaults() as $name => $value) {
-                    $route->setDefault($name, $this->resolve($value));
-                }
-
-                foreach ($route->getRequirements() as $name => $value) {
-                     $route->setRequirement($name, $this->resolve($value));
-                }
-
-                $route->setPattern($this->resolve($route->getPattern()));
-                $route->setHostnamePattern($this->resolve($route->getHostnamePattern()));
+            foreach ($route->getDefaults() as $name => $value) {
+                $route->setDefault($name, $this->resolve($value));
             }
+
+            foreach ($route->getRequirements() as $name => $value) {
+                 $route->setRequirement($name, $this->resolve($value));
+            }
+
+            $route->setPattern($this->resolve($route->getPattern()));
+            $route->setHostnamePattern($this->resolve($route->getHostnamePattern()));
         }
     }
 

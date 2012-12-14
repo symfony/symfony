@@ -76,11 +76,6 @@ class Route implements \Serializable
         $this->setHostnamePattern($hostnamePattern);
     }
 
-    public function __clone()
-    {
-        $this->compiled = null;
-    }
-
     public function serialize()
     {
         return serialize(array(
@@ -145,6 +140,8 @@ class Route implements \Serializable
      * Sets the hostname pattern.
      *
      * @param string $pattern The pattern
+     *
+     * @return Route The current Route instance
      */
     public function setHostnamePattern($pattern)
     {

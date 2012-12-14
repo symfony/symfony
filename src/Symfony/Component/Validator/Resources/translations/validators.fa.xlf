@@ -214,6 +214,14 @@
                 <source>This collection should contain exactly {{ limit }} elements.</source>
                 <target>این مجموعه می بایست به طور دقیق دارا {{ limit }} عنصر باشد.|این مجموعه می بایست به طور دقیق دارای {{ limit }} قلم باشد.</target>
             </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>شماره کارت نامعتبر است.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>نوع کارت پشتیبانی نمی شود یا شماره کارت نامعتبر است.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

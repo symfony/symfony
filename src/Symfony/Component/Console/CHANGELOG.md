@@ -6,6 +6,7 @@ CHANGELOG
 
  * added support for colorization on Windows via ConEmu
  * add a method to Dialog Helper to ask for a question and hide the response
+ * added support for interactive selections in console (DialogHelper::select())
 
 2.1.0
 -----

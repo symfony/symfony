@@ -40,9 +40,6 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses');
     }
 
-    /**
-     * @covers Symfony\Component\Routing\Loader\AnnotationDirectoryLoader::supports
-     */
     public function testSupports()
     {
         $fixturesDir = __DIR__.'/../Fixtures';

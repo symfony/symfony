@@ -366,7 +366,9 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Hook to change content of the data
         if ($dispatcher->hasListeners(FormEvents::PRE_SET_DATA) || $dispatcher->hasListeners(FormEvents::SET_DATA)) {
+            set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handleBC'));
             $event = new FormEvent($this, $modelData);
+            restore_error_handler();
             $dispatcher->dispatch(FormEvents::PRE_SET_DATA, $event);
             // BC until 2.3
             $dispatcher->dispatch(FormEvents::SET_DATA, $event);
@@ -529,7 +531,9 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Hook to change content of the data bound by the browser
         if ($dispatcher->hasListeners(FormEvents::PRE_BIND) || $dispatcher->hasListeners(FormEvents::BIND_CLIENT_DATA)) {
+            set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handleBC'));
             $event = new FormEvent($this, $submittedData);
+            restore_error_handler();
             $dispatcher->dispatch(FormEvents::PRE_BIND, $event);
             // BC until 2.3
             $dispatcher->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
@@ -589,7 +593,9 @@ class Form implements \IteratorAggregate, FormInterface
             // Hook to change content of the data into the normalized
             // representation
             if ($dispatcher->hasListeners(FormEvents::BIND) || $dispatcher->hasListeners(FormEvents::BIND_NORM_DATA)) {
+                set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handleBC'));
                 $event = new FormEvent($this, $normData);
+                restore_error_handler();
                 $dispatcher->dispatch(FormEvents::BIND, $event);
                 // BC until 2.3
                 $dispatcher->dispatch(FormEvents::BIND_NORM_DATA, $event);
@@ -613,9 +619,11 @@ class Form implements \IteratorAggregate, FormInterface
             $dispatcher->dispatch(FormEvents::POST_BIND, $event);
         }
 
+        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handleBC'));
         foreach ($this->config->getValidators() as $validator) {
             $validator->validate($this);
         }
+        restore_error_handler();
 
         return $this;
     }

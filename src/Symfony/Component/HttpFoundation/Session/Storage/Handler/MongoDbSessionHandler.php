@@ -36,13 +36,18 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     /**
      * Constructor.
      *
-     * @param \Mongo $mongo   A "Mongo" instance
-     * @param array  $options An associative array of field options
+     * @param \Mongo|\MongoClient $mongo   A MongoClient or Mongo instance
+     * @param array               $options An associative array of field options
      *
+     * @throws \InvalidArgumentException When MongoClient or Mongo instance not provided
      * @throws \InvalidArgumentException When "database" or "collection" not provided
      */
-    public function __construct(\Mongo $mongo, array $options)
+    public function __construct($mongo, array $options)
     {
+        if (!($mongo instanceof \MongoClient || $mongo instanceof \Mongo)) {
+            throw new \InvalidArgumentException('MongoClient or Mongo instance required');
+        }
+
         if (!isset($options['database']) || !isset($options['collection'])) {
             throw new \InvalidArgumentException('You must provide the "database" and "collection" option for MongoDBSessionHandler');
         }
@@ -137,7 +142,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     private function getCollection()
     {
         if (null === $this->collection) {
-            $this->collection = $this->mongo->selectDB($this->options['database'])->selectCollection($this->options['collection']);
+            $this->collection = $this->mongo->selectCollection($this->options['database'], $this->options['collection']);
         }
 
         return $this->collection;

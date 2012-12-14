@@ -102,7 +102,9 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
             'time' => $profile->getTime()
         );
 
-        return $this->getMongo()->update(array('_id' => $profile->getToken()), array_filter($record, function ($v) { return !empty($v); }), array('upsert' => true));
+        $result = $this->getMongo()->update(array('_id' => $profile->getToken()), array_filter($record, function ($v) { return !empty($v); }), array('upsert' => true));
+
+        return (boolean) (isset($result['ok']) ? $result['ok'] : $result);
     }
 
     /**
@@ -114,12 +116,15 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     {
         if ($this->mongo === null) {
             if (preg_match('#^(mongodb://.*)/(.*)/(.*)$#', $this->dsn, $matches)) {
-                $mongo = new \Mongo($matches[1] . (!empty($matches[2]) ? '/' . $matches[2] : ''));
+                $server = $matches[1] . (!empty($matches[2]) ? '/' . $matches[2] : '');
                 $database = $matches[2];
                 $collection = $matches[3];
+
+                $mongoClass = (version_compare(phpversion('mongo'), '1.3.0', '<')) ? '\Mongo' : '\MongoClient';
+                $mongo = new $mongoClass($server);
                 $this->mongo = $mongo->selectCollection($database, $collection);
             } else {
-                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use MongoDB with an invalid dsn "%s". The expected format is "mongodb://user:pass@location/database/collection"', $this->dsn));
+                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use MongoDB with an invalid dsn "%s". The expected format is "mongodb://[user:pass@]host/database/collection"', $this->dsn));
             }
         }
 

@@ -890,8 +890,8 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (!$child instanceof FormInterface) {
-            if (!is_string($child)) {
-                throw new UnexpectedTypeException($child, 'string or Symfony\Component\Form\FormInterface');
+            if (!is_string($child) && !is_int($child)) {
+                throw new UnexpectedTypeException($child, 'string, integer or Symfony\Component\Form\FormInterface');
             }
 
             if (null !== $type && !is_string($type) && !$type instanceof FormTypeInterface) {

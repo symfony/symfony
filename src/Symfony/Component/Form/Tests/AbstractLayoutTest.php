@@ -45,6 +45,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $this->csrfProvider = null;
         $this->factory = null;
+
+        parent::tearDown();
     }
 
     protected function assertXpathNodeValue(\DomElement $element, $expression, $nodeValue)

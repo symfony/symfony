@@ -33,14 +33,6 @@ abstract class TypeTestCase extends FormIntegrationTestCase
 
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
-
-        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
-
-    }
-
-    protected function tearDown()
-    {
-        restore_error_handler();
     }
 
     public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)

@@ -118,12 +118,16 @@ class CompoundFormTest extends AbstractFormTest
     {
         $this->form->add($this->getBuilder()->getForm());
 
+        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
         $this->assertTrue($this->form->hasChildren());
+        restore_error_handler();
     }
 
     public function testHasNoChildren()
     {
+        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
         $this->assertFalse($this->form->hasChildren());
+        restore_error_handler();
     }
 
     public function testAdd()
@@ -151,7 +155,9 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->remove('foo');
 
         $this->assertNull($child->getParent());
+        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
         $this->assertFalse($this->form->hasChildren());
+        restore_error_handler();
     }
 
     /**

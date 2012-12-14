@@ -143,6 +143,13 @@ class CodeHelper extends Helper
     public function fileExcerpt($file, $line)
     {
         if (is_readable($file)) {
+            if (extension_loaded('fileinfo')) {
+                $finfo = new \Finfo();
+                if ('application/octet-stream' === $finfo->file($file, FILEINFO_MIME_TYPE)) {
+                    return;
+                }
+            }
+
             $code = highlight_file($file, true);
             // remove main code/span tags
             $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);

@@ -655,7 +655,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function addError(FormError $error)
     {
-        if ($this->parent && $this->getErrorBubbling()) {
+        if ($this->parent && $this->config->getErrorBubbling()) {
             $this->parent->addError($error);
         } else {
             $this->errors[] = $error;

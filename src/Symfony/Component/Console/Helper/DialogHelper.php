@@ -25,6 +25,40 @@ class DialogHelper extends Helper
     private static $stty;
 
     /**
+     * Asks the user to select a value.
+     *
+     * @param OutputInterface $output       An Output instance
+     * @param string|array    $question     The question to ask
+     * @param array           $choices      List of choices to pick from
+     * @param Boolean         $default      The default answer if the user enters nothing
+     * @param integer|false   $attempts     Max number of times to ask before giving up (false by default, which means infinite)
+     * @param string          $errorMessage Message which will be shown if invalid value from choice list would be picked
+     *
+     * @return integer|string The selected value (the key of the choices array)
+     */
+    public function select(OutputInterface $output, $question, $choices, $default = null, $attempts = false, $errorMessage = 'Value "%s" is invalid')
+    {
+        $width = max(array_map('strlen', array_keys($choices)));
+
+        $messages = (array) $question;
+        foreach ($choices as $key => $value) {
+            $messages[] = sprintf("  [<info>%-${width}s</info>] %s", $key, $value);
+        }
+
+        $output->writeln($messages);
+
+        $result = $this->askAndValidate($output, '> ', function ($picked) use ($choices, $errorMessage) {
+            if (empty($choices[$picked])) {
+                throw new \InvalidArgumentException(sprintf($errorMessage, $picked));
+            }
+
+            return $picked;
+        }, $attempts, $default);
+
+        return $result;
+    }
+
+    /**
      * Asks a question to the user.
      *
      * @param OutputInterface $output   An Output instance

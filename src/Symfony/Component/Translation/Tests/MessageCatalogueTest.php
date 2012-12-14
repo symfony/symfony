@@ -171,38 +171,38 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($r, $r1), $catalogue->getResources());
     }
 
-    public function testMetaDataDelete()
+    public function testMetadataDelete()
     {
         $catalogue = new MessageCatalogue('en');
         $expected = array();
-        $actual = $catalogue->getMetaData();
+        $actual = $catalogue->getMetadata();
         $this->assertEquals($expected, $actual, 'Metadata is empty');
-        $catalogue->deleteMetaData('messages', 'key');
-        $catalogue->deleteMetaData('messages');
-        $catalogue->deleteMetaData();
+        $catalogue->deleteMetadata('messages', 'key');
+        $catalogue->deleteMetadata('messages');
+        $catalogue->deleteMetadata();
     }
 
-    public function testMetaDataSetGetDelete()
+    public function testMetadataSetGetDelete()
     {
         $catalogue = new MessageCatalogue('en');
-        $catalogue->setMetaData('key', 'value');
+        $catalogue->setMetadata('key', 'value');
         $expected = 'value';
-        $actual = $catalogue->getMetaData('messages', 'key');
+        $actual = $catalogue->getMetadata('messages', 'key');
         $this->assertEquals($expected, $actual, "Metadata 'key' = 'value'");
 
-        $catalogue->setMetaData('key2', array());
+        $catalogue->setMetadata('key2', array());
         $expected = array();
-        $actual = $catalogue->getMetaData('messages', 'key2');
+        $actual = $catalogue->getMetadata('messages', 'key2');
         $this->assertEquals($expected, $actual, 'Metadata key2 is array');
 
-        $catalogue->deleteMetaData('messages', 'key2');
+        $catalogue->deleteMetadata('messages', 'key2');
         $expected = null;
-        $actual = $catalogue->getMetaData('messages', 'key2');
+        $actual = $catalogue->getMetadata('messages', 'key2');
         $this->assertEquals($expected, $actual, 'Metadata key2 should is deleted.');
 
-        $catalogue->deleteMetaData('domain', 'key2');
+        $catalogue->deleteMetadata('domain', 'key2');
         $expected = null;
-        $actual = $catalogue->getMetaData('domain', 'key2');
+        $actual = $catalogue->getMetadata('domain', 'key2');
         $this->assertEquals($expected, $actual, 'Metadata key2 should is deleted.');
 
     }
@@ -210,39 +210,38 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testMetaDataExceptionsKey()
+    public function testMetadataExceptionsKey()
     {
         $catalogue = new MessageCatalogue('en');
-        $catalogue->deleteMetaData('messages', array());
+        $catalogue->deleteMetadata('messages', array());
     }
 
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testMetaDataExceptionsDomain()
+    public function testMetadataExceptionsDomain()
     {
         $catalogue = new MessageCatalogue('en');
-        $catalogue->deleteMetaData(array());
+        $catalogue->deleteMetadata(array());
     }
 
-    public function testMetaDataMerge()
+    public function testMetadataMerge()
     {
         $cat1 = new MessageCatalogue('en');
-        $cat1->setMetaData('a','b');
+        $cat1->setMetadata('a','b');
         $expected = array('messages'=>array('a'=>'b'));
-        $actual = $cat1->getMetaData();
+        $actual = $cat1->getMetadata();
         $this->assertEquals($expected, $actual, 'Cat1 contains messages metadata.');
 
         $cat2 = new MessageCatalogue('en');
-        $cat2->setMetaData('b', 'c', 'domain');
+        $cat2->setMetadata('b', 'c', 'domain');
         $expected = array('domain'=>array('b'=>'c'));
-        $actual = $cat2->getMetaData();
+        $actual = $cat2->getMetadata();
         $this->assertEquals($expected, $actual, 'Cat2 contains domain metadata.');
 
         $cat1->addCatalogue($cat2);
         $expected = array('messages'=>array('a'=>'b'),'domain'=>array('b'=>'c'));
-        $actual = $cat1->getMetaData();
+        $actual = $cat1->getMetadata();
         $this->assertEquals($expected, $actual, 'Cat1 contains merged metadata.');
-
     }
 }

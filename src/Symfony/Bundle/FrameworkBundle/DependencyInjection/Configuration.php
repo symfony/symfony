@@ -47,7 +47,15 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('charset')->end()
-                ->scalarNode('trust_proxy_headers')->defaultFalse()->end()
+                ->arrayNode('trusted_proxies')
+                    ->prototype('scalar')
+                        ->validate()
+                            ->ifTrue(function($v) { return !filter_var($v, FILTER_VALIDATE_IP); })
+                            ->thenInvalid('Invalid proxy IP "%s"')
+                        ->end()
+                    ->end()
+                ->end()
+                ->scalarNode('trust_proxy_headers')->defaultFalse()->end() // @deprecated, to be removed in 2.3
                 ->scalarNode('secret')->isRequired()->end()
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()

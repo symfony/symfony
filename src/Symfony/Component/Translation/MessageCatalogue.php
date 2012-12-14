@@ -177,7 +177,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
             $this->addResource($resource);
         }
 
-        $metadata = $catalogue->getMetadata();
+        $metadata = $catalogue->getMetadata('', '');
         $this->addMetadata($metadata);
     }
 
@@ -239,7 +239,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function getMetadata($domain = '', $key = '')
+    public function getMetadata($key = '', $domain = 'messages')
     {
         if (empty($domain)) {
             return $this->metadata;
@@ -267,7 +267,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function deleteMetadata($domain = '', $key = '')
+    public function deleteMetadata($key = '', $domain = 'messages')
     {
         if (empty($domain)) {
             $this->metadata = array();

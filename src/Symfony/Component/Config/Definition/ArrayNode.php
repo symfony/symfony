@@ -238,12 +238,11 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected function validateType($value)
     {
         if (!is_array($value) && (!$this->allowFalse || false !== $value)) {
-            $msg = sprintf(
+            $ex = new InvalidTypeException(sprintf(
                 'Invalid type for path "%s". Expected array, but got %s',
                 $this->getPath(),
                 gettype($value)
-            );
-            $ex = new InvalidTypeException($msg);
+            ));
             $ex->setPath($this->getPath());
             $ex->setHint($this->getInfo());
 
@@ -276,7 +275,10 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
         // if extra fields are present, throw exception
         if (count($value) && !$this->ignoreExtraKeys) {
-            $ex = new InvalidConfigurationException(sprintf('Unrecognized options "%s" under "%s"', implode(', ', array_keys($value)), $this->getPath()));
+            $ex = new InvalidConfigurationException(sprintf('Unrecognized options "%s" under "%s"',
+                implode(', ', array_keys($value)),
+                $this->getPath()
+            ));
             $ex->setPath($this->getPath());
             $ex->setHint($this->getInfo());
 

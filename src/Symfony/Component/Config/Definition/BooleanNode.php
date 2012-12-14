@@ -26,12 +26,11 @@ class BooleanNode extends ScalarNode
     protected function validateType($value)
     {
         if (!is_bool($value)) {
-            $message = sprintf(
+            $ex = new InvalidTypeException(sprintf(
                 'Invalid type for path "%s". Expected boolean, but got %s.',
                 $this->getPath(),
                 gettype($value)
-            );
-            $ex = new InvalidTypeException($message);
+            ));
             $ex->setPath($this->getPath());
 
             throw $ex;

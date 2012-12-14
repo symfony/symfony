@@ -319,3 +319,21 @@
        // ...
    }
    ```
+
+ * The constraint `Choice` was deprecated and will be removed in Symfony 2.3.
+   You should use the new constraint `OneOf` instead.
+
+   Before:
+
+   ```
+   /** @Assert\Choice(choices = {"male", "female"}, message = "Choose a valid gender.") */
+   protected $gender;
+   ```
+
+   After:
+
+   ```
+   /** @Assert\OneOf(choices = {"male", "female"}, message = "Choose a valid gender.") */
+   protected $gender;
+   ```
+

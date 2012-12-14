@@ -18,18 +18,43 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     public function dataProvider()
     {
         return array(
-            array('Y-m-d H:i:s', '2010-02-03 04:05:06', '2010-02-03 04:05:06 UTC'),
-            array('Y-m-d H:i:00', '2010-02-03 04:05:00', '2010-02-03 04:05:00 UTC'),
-            array('Y-m-d H:i', '2010-02-03 04:05', '2010-02-03 04:05:00 UTC'),
-            array('Y-m-d H', '2010-02-03 04', '2010-02-03 04:00:00 UTC'),
+            array('Y-m-d H:i:s', '2010-02-03 16:05:06', '2010-02-03 16:05:06 UTC'),
+            array('Y-m-d H:i:00', '2010-02-03 16:05:00', '2010-02-03 16:05:00 UTC'),
+            array('Y-m-d H:i', '2010-02-03 16:05', '2010-02-03 16:05:00 UTC'),
+            array('Y-m-d H', '2010-02-03 16', '2010-02-03 16:00:00 UTC'),
             array('Y-m-d', '2010-02-03', '2010-02-03 00:00:00 UTC'),
             array('Y-m', '2010-02', '2010-02-01 00:00:00 UTC'),
             array('Y', '2010', '2010-01-01 00:00:00 UTC'),
             array('d-m-Y', '03-02-2010', '2010-02-03 00:00:00 UTC'),
-            array('H:i:s', '04:05:06', '1970-01-01 04:05:06 UTC'),
-            array('H:i:00', '04:05:00', '1970-01-01 04:05:00 UTC'),
-            array('H:i', '04:05', '1970-01-01 04:05:00 UTC'),
-            array('H', '04', '1970-01-01 04:00:00 UTC'),
+            array('H:i:s', '16:05:06', '1970-01-01 16:05:06 UTC'),
+            array('H:i:00', '16:05:00', '1970-01-01 16:05:00 UTC'),
+            array('H:i', '16:05', '1970-01-01 16:05:00 UTC'),
+            array('H', '16', '1970-01-01 16:00:00 UTC'),
+
+            // different day representations
+            array('Y-m-j', '2010-02-3', '2010-02-03 00:00:00 UTC'),
+            array('Y-z', '2010-33', '2010-02-03 00:00:00 UTC'),
+            array('z', '33', '1970-02-03 00:00:00 UTC'),
+
+            // not bijective
+            //array('Y-m-D', '2010-02-Wed', '2010-02-03 00:00:00 UTC'),
+            //array('Y-m-l', '2010-02-Wednesday', '2010-02-03 00:00:00 UTC'),
+
+            // different month representations
+            array('Y-n-d', '2010-2-03', '2010-02-03 00:00:00 UTC'),
+            array('Y-M-d', '2010-Feb-03', '2010-02-03 00:00:00 UTC'),
+            array('Y-F-d', '2010-February-03', '2010-02-03 00:00:00 UTC'),
+
+            // different year representations
+            array('y-m-d', '10-02-03', '2010-02-03 00:00:00 UTC'),
+
+            // different time representations
+            array('G:i:s', '16:05:06', '1970-01-01 16:05:06 UTC'),
+            array('g:i:s a', '4:05:06 pm', '1970-01-01 16:05:06 UTC'),
+            array('h:i:s a', '04:05:06 pm', '1970-01-01 16:05:06 UTC'),
+
+            // seconds since unix
+            array('U', '1265213106', '2010-02-03 16:05:06 UTC'),
         );
     }
 
@@ -75,8 +100,24 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testReverseTransform($format, $input, $output)
+    public function testReverseTransformBeforePhp538($format, $input, $output)
     {
+        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format, false);
+
+        $output = new \DateTime($output);
+
+        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
+    }
+
+    /**
+     * @dataProvider dataProvider
+     */
+    public function testReverseTransformAsOfPhp538($format, $input, $output)
+    {
+        if (version_compare(phpversion(), '5.3.8', '<')) {
+            $this->markTestSkipped('Requires PHP 5.3.8 or newer');
+        }
+
         $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);
 
         $output = new \DateTime($output);
@@ -95,7 +136,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     {
         $reverseTransformer = new DateTimeToStringTransformer('America/New_York', 'Asia/Hong_Kong', 'Y-m-d H:i:s');
 
-        $output = new \DateTime('2010-02-03 04:05:06 Asia/Hong_Kong');
+        $output = new \DateTime('2010-02-03 16:05:06 Asia/Hong_Kong');
         $input = $output->format('Y-m-d H:i:s');
         $output->setTimeZone(new \DateTimeZone('America/New_York'));
 

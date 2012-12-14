@@ -357,7 +357,7 @@ class ModelChoiceList extends ObjectChoiceList
         }
 
         // readonly="true" models do not implement Persistent.
-        if ($model instanceof BaseObject and method_exists($model, 'getPrimaryKey')) {
+        if ($model instanceof BaseObject && method_exists($model, 'getPrimaryKey')) {
             return array($model->getPrimaryKey());
         }
 

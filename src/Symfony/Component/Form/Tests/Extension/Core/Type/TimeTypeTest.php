@@ -105,9 +105,9 @@ class TimeTypeTest extends LocalizedTestCase
             'widget' => 'single_text',
         ));
 
-        $form->bind('03:04:05');
+        $form->bind('03:04');
 
-        $this->assertEquals(new \DateTime('03:04:00 UTC'), $form->getData());
+        $this->assertEquals(new \DateTime('1970-01-01 03:04:00 UTC'), $form->getData());
         $this->assertEquals('03:04', $form->getViewData());
     }
 
@@ -162,7 +162,7 @@ class TimeTypeTest extends LocalizedTestCase
             'widget' => 'single_text',
         ));
 
-        $form->bind('03:04:05');
+        $form->bind('03:04');
 
         $this->assertEquals('03:04:00', $form->getData());
         $this->assertEquals('03:04', $form->getViewData());

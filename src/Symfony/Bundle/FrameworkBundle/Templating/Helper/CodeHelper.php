@@ -145,6 +145,8 @@ class CodeHelper extends Helper
         if (is_readable($file)) {
             if (extension_loaded('fileinfo')) {
                 $finfo = new \Finfo();
+
+                // Check if the file is an application/octet-stream (eg. Phar file) because hightlight_file cannot parse these files
                 if ('application/octet-stream' === $finfo->file($file, FILEINFO_MIME_TYPE)) {
                     return;
                 }

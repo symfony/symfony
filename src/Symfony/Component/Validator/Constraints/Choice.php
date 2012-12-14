@@ -11,31 +11,19 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-
 /**
  * @Annotation
  *
  * @api
+ *
+ * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
+ *             {@link OneOf} instead.
  */
-class Choice extends Constraint
+class Choice extends OneOf
 {
-    public $choices;
-    public $callback;
-    public $multiple = false;
-    public $strict = false;
-    public $min = null;
-    public $max = null;
-    public $message = 'The value you selected is not a valid choice.';
-    public $multipleMessage = 'One or more of the given values is invalid.';
-    public $minMessage = 'You must select at least {{ limit }} choices.';
-    public $maxMessage = 'You must select at most {{ limit }} choices.';
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getDefaultOption()
+    public function __construct($options = null)
     {
-        return 'choices';
+        trigger_error('Choice constraint is deprecated since version 2.2 and will be removed in 2.3. Use OneOf instead', E_USER_DEPRECATED);
+        parent::__construct($options);
     }
 }

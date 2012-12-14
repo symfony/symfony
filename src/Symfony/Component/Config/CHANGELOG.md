@@ -6,6 +6,7 @@ CHANGELOG
 
  * added numerical type handling for config definitions
  * added convenience methods for optional configuration sections to ArrayNodeDefinition
+ * added a utils class for XML manipulations
 
 2.1.0
 -----

@@ -273,7 +273,7 @@ class Regex implements ValueInterface
     }
 
     /**
-     * @param array $replacements
+     * @param array $replacement
      *
      * @return Regex
      */

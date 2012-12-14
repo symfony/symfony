@@ -37,6 +37,7 @@ class ExceptionController
     /**
      * Converts an Exception to a Response.
      *
+     * @param Request              $request   The request
      * @param FlattenException     $exception A FlattenException instance
      * @param DebugLoggerInterface $logger    A DebugLoggerInterface instance
      * @param string               $format    The format to use for rendering (html, xml, ...)

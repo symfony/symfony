@@ -225,7 +225,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
             array(
-                'Route with variable at begining of hostname',
+                'Route with variable at beginning of hostname',
                 array('/hello', array(), array(), array(), '{locale}.example.{tld}'),
                 '/hello', '#^/hello$#s', array('locale', 'tld'), array(), array(
                     array('text', '/hello'),

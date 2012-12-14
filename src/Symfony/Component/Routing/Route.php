@@ -389,7 +389,7 @@ class Route implements \Serializable
     /**
      * Checks if a requirement is set for the given key.
      *
-     * @param string $name A variable name
+     * @param string $key A variable name
      *
      * @return Boolean true if a requirement is specified, false otherwise
      */

@@ -23,16 +23,16 @@ interface MetadataAwareInterface
     /**
      * Gets meta data for given domain and key.
      *
-     * @param string $key    Key to set
      * @param string $domain The domain name
+     * @param string $key    Key
      */
-    public function getMetadata($domain = '', $key = '');
+    public function getMetadata($key = '', $domain = 'messages');
 
     /**
      * Adds meta data to a message domain.
      *
-     * @param string       $key    Key to set
-     * @param string|array $value  Value to store
+     * @param string       $key    Key
+     * @param string|array $value  Value
      * @param string       $domain The domain name
      */
     public function setMetadata($key, $value, $domain = 'messages');
@@ -40,8 +40,8 @@ interface MetadataAwareInterface
     /**
      * Deletes meta data for given key and domain.
      *
-     * @param string $key    Key to set
      * @param string $domain The domain name
+     * @param string $key    Key
      */
-    public function deleteMetadata($domain = '', $key = '');
+    public function deleteMetadata($key = '', $domain = 'messages');
 }

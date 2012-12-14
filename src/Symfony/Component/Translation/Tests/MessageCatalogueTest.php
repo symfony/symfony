@@ -174,9 +174,9 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
     public function testMetadataDelete()
     {
         $catalogue = new MessageCatalogue('en');
-        $this->assertEquals(array(), $catalogue->getMetadata(), 'Metadata is empty');
-        $catalogue->deleteMetadata('messages', 'key');
-        $catalogue->deleteMetadata('messages');
+        $this->assertEquals(array(), $catalogue->getMetadata('', ''), 'Metadata is empty');
+        $catalogue->deleteMetadata('key', 'messages');
+        $catalogue->deleteMetadata('', 'messages');
         $catalogue->deleteMetadata();
     }
 
@@ -184,29 +184,29 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->setMetadata('key', 'value');
-        $this->assertEquals('value', $catalogue->getMetadata('messages', 'key'), "Metadata 'key' = 'value'");
+        $this->assertEquals('value', $catalogue->getMetadata('key', 'messages'), "Metadata 'key' = 'value'");
 
         $catalogue->setMetadata('key2', array());
-        $this->assertEquals(array(), $catalogue->getMetadata('messages', 'key2'), 'Metadata key2 is array');
+        $this->assertEquals(array(), $catalogue->getMetadata('key2', 'messages'), 'Metadata key2 is array');
 
-        $catalogue->deleteMetadata('messages', 'key2');
-        $this->assertEquals(null, $catalogue->getMetadata('messages', 'key2'), 'Metadata key2 should is deleted.');
+        $catalogue->deleteMetadata('key2', 'messages');
+        $this->assertEquals(null, $catalogue->getMetadata('key2', 'messages'), 'Metadata key2 should is deleted.');
 
-        $catalogue->deleteMetadata('domain', 'key2');
-        $this->assertEquals(null, $catalogue->getMetadata('domain', 'key2'), 'Metadata key2 should is deleted.');
+        $catalogue->deleteMetadata('key2', 'domain');
+        $this->assertEquals(null, $catalogue->getMetadata('key2', 'domain'), 'Metadata key2 should is deleted.');
     }
 
     public function testMetadataMerge()
     {
         $cat1 = new MessageCatalogue('en');
         $cat1->setMetadata('a', 'b');
-        $this->assertEquals(array('messages' => array('a' => 'b')), $cat1->getMetadata(), 'Cat1 contains messages metadata.');
+        $this->assertEquals(array('messages' => array('a' => 'b')), $cat1->getMetadata('', ''), 'Cat1 contains messages metadata.');
 
         $cat2 = new MessageCatalogue('en');
         $cat2->setMetadata('b', 'c', 'domain');
-        $this->assertEquals(array('domain' => array('b' => 'c')), $cat2->getMetadata(), 'Cat2 contains domain metadata.');
+        $this->assertEquals(array('domain' => array('b' => 'c')), $cat2->getMetadata('', ''), 'Cat2 contains domain metadata.');
 
         $cat1->addCatalogue($cat2);
-        $this->assertEquals(array('messages' => array('a' => 'b'), 'domain' => array('b' => 'c')), $cat1->getMetadata(), 'Cat1 contains merged metadata.');
+        $this->assertEquals(array('messages' => array('a' => 'b'), 'domain' => array('b' => 'c')), $cat1->getMetadata('', ''), 'Cat1 contains merged metadata.');
     }
 }

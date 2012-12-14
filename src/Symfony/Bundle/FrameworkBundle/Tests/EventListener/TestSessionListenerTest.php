@@ -43,6 +43,7 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSaveMasterRequestSession()
     {
+        $this->sessionHasBeenStarted();
         $this->sessionMustBeSaved();
 
         $this->filterResponse(new Request());
@@ -64,6 +65,14 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
         $cookies = $response->headers->getCookies();
 
         $this->assertEquals(0, reset($cookies)->getExpiresTime());
+    }
+
+    public function testUnstartedSessionIsNotSave()
+    {
+        $this->sessionHasNotBeenStarted();
+        $this->sessionMustNotBeSaved();
+
+        $this->filterResponse(new Request());
     }
 
     private function filterResponse(Request $request, $type = HttpKernelInterface::MASTER_REQUEST)
@@ -90,6 +99,20 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->session->expects($this->once())
             ->method('save');
+    }
+
+    private function sessionHasBeenStarted()
+    {
+        $this->session->expects($this->once())
+            ->method('isStarted')
+            ->will($this->returnValue(true));
+    }
+
+    private function sessionHasNotBeenStarted()
+    {
+        $this->session->expects($this->once())
+            ->method('isStarted')
+            ->will($this->returnValue(false));
     }
 
     private function getSession()

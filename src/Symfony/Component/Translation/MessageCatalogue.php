@@ -20,7 +20,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  *
  * @api
  */
-class MessageCatalogue implements MessageCatalogueInterface
+class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterface
 {
     private $messages = array();
     private $metadata = array();
@@ -238,8 +238,6 @@ class MessageCatalogue implements MessageCatalogueInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getMetadata($domain = '', $key = '')
     {
@@ -266,8 +264,6 @@ class MessageCatalogue implements MessageCatalogueInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setMetadata($key, $value, $domain = 'messages')
     {
@@ -282,8 +278,6 @@ class MessageCatalogue implements MessageCatalogueInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function deleteMetadata($domain = '', $key = '')
     {
@@ -303,9 +297,7 @@ class MessageCatalogue implements MessageCatalogueInterface
     }
 
     /**
-     * Adds or overwrite current values with the new values.
-     *
-     * TODO: do we want to overwrite values?!?
+     * Adds current values with the new values.
      *
      * @param array $values Values to add
      */

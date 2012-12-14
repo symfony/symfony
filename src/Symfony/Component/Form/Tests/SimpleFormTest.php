@@ -16,7 +16,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\FormConfigBuilder;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -579,9 +578,11 @@ class SimpleFormTest extends AbstractFormTest
     {
         $test = $this;
         $validator = $this->getFormValidator();
+        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
         $form = $this->getBuilder()
             ->addValidator($validator)
             ->getForm();
+        restore_error_handler();
 
         $validator->expects($this->once())
             ->method('validate')

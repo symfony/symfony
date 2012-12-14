@@ -23,13 +23,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormBuilderInterface
 {
     /**
-     * The form factory.
-     *
-     * @var FormFactoryInterface
-     */
-    private $factory;
-
-    /**
      * The children of the form builder.
      *
      * @var array
@@ -63,15 +56,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     {
         parent::__construct($name, $dataClass, $dispatcher, $options);
 
-        $this->factory = $factory;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormFactory()
-    {
-        return $this->factory;
+        $this->setFormFactory($factory);
     }
 
     /**
@@ -125,10 +110,10 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         }
 
         if (null !== $type) {
-            return $this->factory->createNamedBuilder($name, $type, null, $options, $this);
+            return $this->getFormFactory()->createNamedBuilder($name, $type, null, $options, $this);
         }
 
-        return $this->factory->createBuilderForProperty($this->getDataClass(), $name, null, $options, $this);
+        return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, null, $options, $this);
     }
 
     /**

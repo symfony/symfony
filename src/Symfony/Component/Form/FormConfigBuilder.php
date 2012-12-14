@@ -132,6 +132,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $dataLocked;
 
     /**
+     * @var FormFactoryInterface
+     */
+    private $formFactory;
+
+    /**
      * @var array
      */
     private $options;
@@ -614,6 +619,14 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function getFormFactory()
+    {
+        return $this->formFactory;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOptions()
     {
         return $this->options;
@@ -845,6 +858,20 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         }
 
         $this->dataLocked = $locked;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setFormFactory(FormFactoryInterface $formFactory)
+    {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
+        $this->formFactory = $formFactory;
 
         return $this;
     }

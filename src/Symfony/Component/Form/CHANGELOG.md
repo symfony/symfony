@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * TrimListener now removes unicode whitespaces
+ * deprecated getParent(), setParent() and hasParent() in FormBuilderInterface
+ * FormInterface::add() now accepts a FormInterface instance OR a field's name, type and options
 
 2.1.0
 -----

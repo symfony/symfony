@@ -41,14 +41,17 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Adds a child to the form.
      *
-     * @param  FormInterface $child The FormInterface to add as a child
+     * @param FormInterface|string $child   The FormInterface instance or the name of the child.
+     * @param string|null          $type    The child's type, if a name was passed.
+     * @param array                $options The child's options, if a name was passed.
      *
      * @return FormInterface The form instance
      *
-     * @throws Exception\AlreadyBoundException If the form has already been bound.
-     * @throws Exception\FormException         When trying to add a child to a non-compound form.
+     * @throws Exception\AlreadyBoundException   If the form has already been bound.
+     * @throws Exception\FormException           When trying to add a child to a non-compound form.
+     * @throws Exception\UnexpectedTypeException If $child or $type has an unexpected type.
      */
-    public function add(FormInterface $child);
+    public function add($child, $type = null, array $options = array());
 
     /**
      * Returns the child with the given name.

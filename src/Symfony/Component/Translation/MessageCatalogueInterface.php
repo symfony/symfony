@@ -169,29 +169,4 @@ interface MessageCatalogueInterface
      * @api
      */
     public function addResource(ResourceInterface $resource);
-
-    /**
-     * Gets meta data for given domain and key.
-     *
-     * @param string $key    Key to set
-     * @param string $domain The domain name
-     */
-    public function getMetaData($domain = '', $key = '');
-
-    /**
-     * Adds meta data to a message domain.
-     *
-     * @param string       $key    Key to set
-     * @param string|array $value  Value to store
-     * @param string       $domain The domain name
-     */
-    public function setMetaData($key, $value, $domain = 'messages');
-
-    /**
-     * Deletes meta data for given key and domain
-     *
-     * @param string $key    Key to set
-     * @param string $domain The domain name
-     */
-    public function deleteMetaData($domain = '', $key = '');
 }

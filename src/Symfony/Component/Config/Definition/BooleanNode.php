@@ -31,9 +31,6 @@ class BooleanNode extends ScalarNode
                 $this->getPath(),
                 gettype($value)
             );
-            if (null !== $this->getInfo()) {
-                $message .= sprintf("\nHint: %s.", $this->getInfo());
-            }
             $ex = new InvalidTypeException($message);
             $ex->setPath($this->getPath());
 

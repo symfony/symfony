@@ -292,10 +292,11 @@ abstract class BaseNode implements NodeInterface
                     $this->getPath(),
                     $invalid->getMessage()
                 );
-                if (null !== $this->getInfo()) {
-                    $message .= sprintf("\nHint: %s.", $this->getInfo());
-                }
-                throw new InvalidConfigurationException($message, $invalid->getCode(), $invalid);
+
+                $ex = new InvalidConfigurationException($message, $invalid->getCode(), $invalid);
+                $ex->setHint($this->getInfo());
+
+                throw $ex;
             }
         }
 

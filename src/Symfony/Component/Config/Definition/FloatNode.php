@@ -31,12 +31,9 @@ class FloatNode extends NumericNode
         }
 
         if (!is_float($value)) {
-            $message = sprintf('Invalid type for path "%s". Expected float, but got %s.', $this->getPath(), gettype($value));
-            if (null !== $this->getInfo()) {
-                $message .= sprintf("\nHint: %s.", $this->getInfo());
-            }
-            $ex = new InvalidTypeException($message);
+            $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected float, but got %s.', $this->getPath(), gettype($value)));
             $ex->setPath($this->getPath());
+            $ex->setHint($this->getInfo());
 
             throw $ex;
         }

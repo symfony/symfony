@@ -39,12 +39,10 @@ class ScalarNode extends VariableNode
                 $this->getPath(),
                 gettype($value)
             );
-            if (null !== $this->getInfo()) {
-                $message .= sprintf("\nHint: %s.", $this->getInfo());
-            }
 
             $ex = new InvalidTypeException($message);
             $ex->setPath($this->getPath());
+            $ex->setHint($this->getInfo());
 
             throw $ex;
         }

@@ -19,9 +19,7 @@ class EnumNode extends ScalarNode
         $values = array_unique($values);
         if (count($values) <= 1) {
             $message = '$values must contain at least two distinct elements.';
-            if (null !== $this->getInfo()) {
-                $message .= sprintf("\nHint: %s.", $this->getInfo());
-            }
+
             throw new \InvalidArgumentException($message);
         }
 
@@ -45,11 +43,9 @@ class EnumNode extends ScalarNode
                 $this->getPath(),
                 implode(', ', array_map('json_encode', $this->values))
             );
-            if (null !== $this->getInfo()) {
-                $message .= sprintf("\nHint: %s.", $this->getInfo());
-            }
             $ex = new InvalidConfigurationException($message);
             $ex->setPath($this->getPath());
+            $ex->setHint($this->getInfo());
 
             throw $ex;
         }

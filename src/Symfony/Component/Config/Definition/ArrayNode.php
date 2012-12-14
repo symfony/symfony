@@ -204,12 +204,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         foreach ($this->children as $name => $child) {
             if (!array_key_exists($name, $value)) {
                 if ($child->isRequired()) {
-                    $msg = sprintf('The child node "%s" at path "%s" must be configured.', $name, $this->getPath());
-                    if (null !== $this->getInfo()) {
-                        $msg .= sprintf("\nHint: %s.", $this->getInfo());
-                    }
-                    $ex = new InvalidConfigurationException($msg);
+                    $ex = new InvalidConfigurationException(sprintf('The child node "%s" at path "%s" must be configured.', $name, $this->getPath()));
                     $ex->setPath($this->getPath());
+                    $ex->setHint($this->getInfo());
 
                     throw $ex;
                 }
@@ -246,11 +243,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                 $this->getPath(),
                 gettype($value)
             );
-            if (null !== $this->getInfo()) {
-                $msg .= sprintf("\nHint: %s.", $this->getInfo());
-            }
             $ex = new InvalidTypeException($msg);
             $ex->setPath($this->getPath());
+            $ex->setHint($this->getInfo());
 
             throw $ex;
         }
@@ -281,12 +276,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
         // if extra fields are present, throw exception
         if (count($value) && !$this->ignoreExtraKeys) {
-            $msg = sprintf('Unrecognized options "%s" under "%s"', implode(', ', array_keys($value)), $this->getPath());
-            if (null !== $this->getInfo()) {
-                $msg .= sprintf("\nHint: %s.", $this->getInfo());
-            }
-            $ex = new InvalidConfigurationException($msg);
+            $ex = new InvalidConfigurationException(sprintf('Unrecognized options "%s" under "%s"', implode(', ', array_keys($value)), $this->getPath()));
             $ex->setPath($this->getPath());
+            $ex->setHint($this->getInfo());
 
             throw $ex;
         }

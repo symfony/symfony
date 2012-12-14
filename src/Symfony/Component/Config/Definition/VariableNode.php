@@ -88,12 +88,10 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
                 $this->getPath(),
                 json_encode($value)
             );
-            if (null !== $this->getInfo()) {
-                $message .= sprintf("\nHint: %s.", $this->getInfo());
-            }
 
             $ex = new InvalidConfigurationException($message);
             $ex->setPath($this->getPath());
+            $ex->setHint($this->getInfo());
 
             throw $ex;
         }

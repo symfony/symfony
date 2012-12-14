@@ -18,7 +18,7 @@ use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 
 /**
- * Widely inspirated by the EntityChoiceList.
+ * Widely inspired by the EntityChoiceList.
  *
  * @author William Durand <william.durand1@gmail.com>
  */
@@ -369,7 +369,7 @@ class ModelChoiceList extends ObjectChoiceList
      *
      * @param ColumnMap $column
      *
-     * @return boolean
+     * @return Boolean
      */
     private function isInteger(\ColumnMap $column)
     {

@@ -510,18 +510,18 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date');
         $view = $form->createView();
 
-        $this->assertSame('{{ year }}-{{ month }}-{{ day }}', $view->vars['date_pattern']);
+        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->vars['date_pattern']);
     }
 
     public function testPassDatePatternToViewDifferentFormat()
     {
         $form = $this->factory->create('date', null, array(
-            'format' => \IntlDateFormatter::MEDIUM,
+            'format' => \IntlDateFormatter::LONG,
         ));
 
         $view = $form->createView();
 
-        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->vars['date_pattern']);
+        $this->assertSame('{{ day }}. {{ month }} {{ year }}', $view->vars['date_pattern']);
     }
 
     public function testPassDatePatternToViewDifferentPattern()

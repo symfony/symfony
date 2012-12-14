@@ -112,8 +112,7 @@ class TranslatableItem implements \Persistent
 
     public function addTranslatableItemI18n(TranslatableItemI18n $i)
     {
-        if(!in_array($i, $this->currentTranslations))
-        {
+        if (!in_array($i, $this->currentTranslations)) {
             $this->currentTranslations[$i->getLocale()] = $i;
             $i->setItem($this);
         }

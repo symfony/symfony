@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Finder\Adapter;
 
-use Symfony\Component\Finder\Iterator;
 use Symfony\Component\Finder\Shell\Shell;
 use Symfony\Component\Finder\Shell\Command;
 
@@ -25,14 +24,6 @@ class GnuFindAdapter extends AbstractFindAdapter
     /**
      * {@inheritdoc}
      */
-    public function isSupported()
-    {
-        return $this->shell->getType() === Shell::TYPE_UNIX && parent::isSupported();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'gnu_find';
@@ -43,8 +34,22 @@ class GnuFindAdapter extends AbstractFindAdapter
      */
     protected function buildFormatSorting(Command $command, $format)
     {
-        $command->get('find')->add('-printf')->arg($format.' %h/%f\\n')
-            ->add('| sort | cut')->arg('-d ')->arg('-f2-');
+        $command
+            ->get('find')
+            ->add('-printf')
+            ->arg($format.' %h/%f\\n')
+            ->add('| sort | cut')
+            ->arg('-d ')
+            ->arg('-f2-')
+        ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function canBeUsed()
+    {
+        return $this->shell->getType() === Shell::TYPE_UNIX && parent::canBeUsed();
     }
 
     /**

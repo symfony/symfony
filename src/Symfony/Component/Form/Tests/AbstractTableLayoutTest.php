@@ -39,6 +39,25 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testLabelIsNotRenderedWhenSetToFalse()
+    {
+        $form = $this->factory->createNamed('name', 'text', null, array(
+            'label' => false
+        ));
+        $html = $this->renderRow($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/tr
+    [
+        ./td
+            [count(//label)=0]
+        /following-sibling::td
+            [./input[@id="name"]]
+    ]
+'
+        );
+    }
+
     public function testRepeatedRow()
     {
         $form = $this->factory->createNamed('name', 'repeated');

@@ -176,9 +176,9 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getPropertyPath($subPath = null)
+    public function getPropertyPath($subPath = '')
     {
-        if (null !== $subPath && '' !== $this->propertyPath && '' !== $subPath && '[' !== $subPath[0]) {
+        if ('' != $subPath && '' !== $this->propertyPath && '[' !== $subPath[0]) {
             return $this->propertyPath . '.' . $subPath;
         }
 

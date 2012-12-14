@@ -279,4 +279,3 @@ class Section
         return $this->events;
     }
 }
-

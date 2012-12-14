@@ -242,7 +242,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             $this->assertRegExp('/Did you mean this/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
         }
 
-
         $application->add(new \Foo1Command());
         $application->add(new \Foo2Command());
 
@@ -611,15 +610,15 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($inputDefinition->hasOption('custom'));
     }
-           
+
     public function testSettingCustomInputDefinitionOverwritesDefaultValues()
     {
         $application = new Application();
         $application->setAutoExit(false);
         $application->setCatchExceptions(false);
-        
+
         $application->setDefinition(new InputDefinition(array(new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.'))));
-        
+
         $inputDefinition = $application->getDefinition();
 
         // check whether the default arguments and options are not returned any more

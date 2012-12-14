@@ -521,6 +521,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
         $this->options->setNormalizer('foo', function (Options $options, $previousValue) use ($test) {
             $test->assertNull($previousValue);
+
             return '';
         });
         $this->assertEquals(array('foo' => ''), $this->options->all());

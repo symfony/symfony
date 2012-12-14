@@ -7,12 +7,13 @@
     <parameters>
         <parameter key="twig.class">Twig_Environment</parameter>
         <parameter key="twig.loader.filesystem.class">Symfony\Bundle\TwigBundle\Loader\FilesystemLoader</parameter>
+        <parameter key="twig.loader.chain.class">Twig_Loader_Chain</parameter>
         <parameter key="templating.engine.twig.class">Symfony\Bundle\TwigBundle\TwigEngine</parameter>
         <parameter key="twig.cache_warmer.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
         <parameter key="twig.extension.trans.class">Symfony\Bridge\Twig\Extension\TranslationExtension</parameter>
         <parameter key="twig.extension.assets.class">Symfony\Bundle\TwigBundle\Extension\AssetsExtension</parameter>
         <parameter key="twig.extension.actions.class">Symfony\Bundle\TwigBundle\Extension\ActionsExtension</parameter>
-        <parameter key="twig.extension.code.class">Symfony\Bundle\TwigBundle\Extension\CodeExtension</parameter>
+        <parameter key="twig.extension.code.class">Symfony\Bridge\Twig\Extension\CodeExtension</parameter>
         <parameter key="twig.extension.routing.class">Symfony\Bridge\Twig\Extension\RoutingExtension</parameter>
         <parameter key="twig.extension.yaml.class">Symfony\Bridge\Twig\Extension\YamlExtension</parameter>
         <parameter key="twig.extension.form.class">Symfony\Bridge\Twig\Extension\FormExtension</parameter>
@@ -20,6 +21,7 @@
         <parameter key="twig.form.renderer.class">Symfony\Bridge\Twig\Form\TwigRenderer</parameter>
         <parameter key="twig.translation.extractor.class">Symfony\Bridge\Twig\Translation\TwigExtractor</parameter>
         <parameter key="twig.exception_listener.class">Symfony\Component\HttpKernel\EventListener\ExceptionListener</parameter>
+        <parameter key="twig.controller.exception.class">Symfony\Bundle\TwigBundle\Controller\ExceptionController</parameter>
     </parameters>
 
     <services>
@@ -41,7 +43,10 @@
         <service id="twig.loader.filesystem" class="%twig.loader.filesystem.class%" public="false">
             <argument type="service" id="templating.locator" />
             <argument type="service" id="templating.name_parser" />
+            <tag name="twig.loader"/>
         </service>
+
+        <service id="twig.loader.chain" class="%twig.loader.chain.class%" public="false"/>
 
         <service id="twig.loader" alias="twig.loader.filesystem" />
 
@@ -106,6 +111,11 @@
             <tag name="monolog.logger" channel="request" />
             <argument>%twig.exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="twig.controller.exception" class="%twig.controller.exception.class%">
+            <argument type="service" id="twig" />
+            <argument>%kernel.debug%</argument>
         </service>
     </services>
 </container>

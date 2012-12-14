@@ -159,11 +159,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Sets the resources for this configuration.
-     * 
+     *
      * @param ResourceInterface[] $resources An array of resources
-     * 
+     *
      * @return ContainerBuilder The current instance
-     * 
+     *
      * @api
      */
     public function setResources(array $resources)
@@ -463,6 +463,21 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $this->extensionConfigs[$name];
+    }
+
+    /**
+     * Prepends a config array to the configs of the given extension.
+     *
+     * @param string $name    The name of the extension
+     * @param array  $config  The config to set
+     */
+    public function prependExtensionConfig($name, array $config)
+    {
+        if (!isset($this->extensionConfigs[$name])) {
+            $this->extensionConfigs[$name] = array();
+        }
+
+        array_unshift($this->extensionConfigs[$name], $config);
     }
 
     /**

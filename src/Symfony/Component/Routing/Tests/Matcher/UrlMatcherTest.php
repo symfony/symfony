@@ -338,6 +338,22 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar%23', '_route' => 'foo'), $matcher->match('/foo/bar%2523'));
     }
 
+    public function testCannotRelyOnPrefix()
+    {
+        $coll = new RouteCollection();
+
+        $subColl = new RouteCollection();
+        $subColl->add('bar', new Route('/bar'));
+        $subColl->addPrefix('/prefix');
+        // overwrite the pattern, so the prefix is not valid anymore for this route in the collection
+        $subColl->get('bar')->setPattern('/new');
+
+        $coll->addCollection($subColl);
+
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $this->assertEquals(array('_route' => 'bar'), $matcher->match('/new'));
+    }
+
     public function testWithHostname()
     {
         $coll = new RouteCollection();

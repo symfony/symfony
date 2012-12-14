@@ -84,6 +84,7 @@ class Store implements StoreInterface
 
             return true;
         }
+
         return !file_exists($path) ?: $path;
     }
 

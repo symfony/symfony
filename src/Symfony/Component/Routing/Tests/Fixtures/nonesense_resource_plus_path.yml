@@ -1,0 +1,3 @@
+blog_show:
+    resource: validpattern.yml
+    pattern:  /test

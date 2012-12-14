@@ -140,6 +140,8 @@ class Route implements \Serializable
      * Sets the hostname pattern.
      *
      * @param string $pattern The pattern
+     *
+     * @return Route The current Route instance
      */
     public function setHostnamePattern($pattern)
     {

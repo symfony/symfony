@@ -131,11 +131,13 @@ class FormRegistry implements FormRegistryInterface
             );
         }
 
+        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handleBC'));
         $this->addType($this->resolvedTypeFactory->createResolvedType(
             $type,
             $typeExtensions,
             $parentType ? $this->getType($parentType) : null
         ));
+        restore_error_handler();
     }
 
     /**

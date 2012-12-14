@@ -256,7 +256,7 @@ class ChoiceType extends AbstractType
                     $choiceType = 'radio';
                 }
 
-                $builder->add((string) $i, $choiceType, $choiceOpts);
+                $builder->add($i, $choiceType, $choiceOpts);
             }
         }
     }

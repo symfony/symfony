@@ -174,9 +174,7 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
     public function testMetadataDelete()
     {
         $catalogue = new MessageCatalogue('en');
-        $expected = array();
-        $actual = $catalogue->getMetadata();
-        $this->assertEquals($expected, $actual, 'Metadata is empty');
+        $this->assertEquals(array(), $catalogue->getMetadata(), 'Metadata is empty');
         $catalogue->deleteMetadata('messages', 'key');
         $catalogue->deleteMetadata('messages');
         $catalogue->deleteMetadata();
@@ -186,62 +184,29 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->setMetadata('key', 'value');
-        $expected = 'value';
-        $actual = $catalogue->getMetadata('messages', 'key');
-        $this->assertEquals($expected, $actual, "Metadata 'key' = 'value'");
+        $this->assertEquals('value', $catalogue->getMetadata('messages', 'key'), "Metadata 'key' = 'value'");
 
         $catalogue->setMetadata('key2', array());
-        $expected = array();
-        $actual = $catalogue->getMetadata('messages', 'key2');
-        $this->assertEquals($expected, $actual, 'Metadata key2 is array');
+        $this->assertEquals(array(), $catalogue->getMetadata('messages', 'key2'), 'Metadata key2 is array');
 
         $catalogue->deleteMetadata('messages', 'key2');
-        $expected = null;
-        $actual = $catalogue->getMetadata('messages', 'key2');
-        $this->assertEquals($expected, $actual, 'Metadata key2 should is deleted.');
+        $this->assertEquals(null, $catalogue->getMetadata('messages', 'key2'), 'Metadata key2 should is deleted.');
 
         $catalogue->deleteMetadata('domain', 'key2');
-        $expected = null;
-        $actual = $catalogue->getMetadata('domain', 'key2');
-        $this->assertEquals($expected, $actual, 'Metadata key2 should is deleted.');
-
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testMetadataExceptionsKey()
-    {
-        $catalogue = new MessageCatalogue('en');
-        $catalogue->deleteMetadata('messages', array());
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testMetadataExceptionsDomain()
-    {
-        $catalogue = new MessageCatalogue('en');
-        $catalogue->deleteMetadata(array());
+        $this->assertEquals(null, $catalogue->getMetadata('domain', 'key2'), 'Metadata key2 should is deleted.');
     }
 
     public function testMetadataMerge()
     {
         $cat1 = new MessageCatalogue('en');
-        $cat1->setMetadata('a','b');
-        $expected = array('messages'=>array('a'=>'b'));
-        $actual = $cat1->getMetadata();
-        $this->assertEquals($expected, $actual, 'Cat1 contains messages metadata.');
+        $cat1->setMetadata('a', 'b');
+        $this->assertEquals(array('messages' => array('a' => 'b')), $cat1->getMetadata(), 'Cat1 contains messages metadata.');
 
         $cat2 = new MessageCatalogue('en');
         $cat2->setMetadata('b', 'c', 'domain');
-        $expected = array('domain'=>array('b'=>'c'));
-        $actual = $cat2->getMetadata();
-        $this->assertEquals($expected, $actual, 'Cat2 contains domain metadata.');
+        $this->assertEquals(array('domain' => array('b' => 'c')), $cat2->getMetadata(), 'Cat2 contains domain metadata.');
 
         $cat1->addCatalogue($cat2);
-        $expected = array('messages'=>array('a'=>'b'),'domain'=>array('b'=>'c'));
-        $actual = $cat1->getMetadata();
-        $this->assertEquals($expected, $actual, 'Cat1 contains merged metadata.');
+        $this->assertEquals(array('messages' => array('a' => 'b'), 'domain' => array('b' => 'c')), $cat1->getMetadata(), 'Cat1 contains merged metadata.');
     }
 }

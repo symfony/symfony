@@ -106,6 +106,23 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $storage2->getBag('attributes')->get('foo'), 'values persist between instances');
     }
 
+    public function testSaveWithoutStart()
+    {
+        $storage1 = $this->getStorage();
+        $storage1->start();
+        $storage1->getBag('attributes')->set('foo', 'bar');
+        $storage1->save();
+
+        $storage2 = $this->getStorage();
+        $storage2->setId($storage1->getId());
+        $storage2->save();
+
+        $storage3 = $this->getStorage();
+        $storage3->setId($storage1->getId());
+        $storage3->start();
+        $this->assertEquals('bar', $storage3->getBag('attributes')->get('foo'), 'values persist between instances');
+    }
+
     private function getStorage()
     {
         $storage = new MockFileSessionStorage($this->sessionDir);

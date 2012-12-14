@@ -97,6 +97,10 @@ class MockFileSessionStorage extends MockArraySessionStorage
      */
     public function save()
     {
+        if (!$this->started) {
+            return;
+        }
+
         file_put_contents($this->getFilePath(), serialize($this->data));
 
         // this is needed for Silex, where the session object is re-used across requests

@@ -145,7 +145,7 @@ class YamlFileLoader extends FileLoader
      * @param string $path   The loaded file path
      *
      * @throws \InvalidArgumentException If one of the provided config keys is not supported,
-     *                                   something is missing or the combination is nonesense
+     *                                   something is missing or the combination is nonsense
      */
     protected function validate($config, $name, $path)
     {
@@ -154,7 +154,7 @@ class YamlFileLoader extends FileLoader
         }
         if ($extraKeys = array_diff(array_keys($config), self::$availableKeys)) {
             throw new \InvalidArgumentException(sprintf(
-                'The routing file "%s" contains unsupport keys for "%s": "%s". Expected one of: "%s".',
+                'The routing file "%s" contains unsupported keys for "%s": "%s". Expected one of: "%s".',
                 $path, $name, implode('", "', $extraKeys), implode('", "', self::$availableKeys)
             ));
         }

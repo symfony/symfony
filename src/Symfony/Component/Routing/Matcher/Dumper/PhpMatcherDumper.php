@@ -143,9 +143,9 @@ EOF;
     /**
      * Generates PHP code recursively to match a tree of routes
      *
-     * @param DumperPrefixCollection $routes               A DumperPrefixCollection instance
+     * @param DumperPrefixCollection $collection           A DumperPrefixCollection instance
      * @param Boolean                $supportsRedirections Whether redirections are supported by the base class
-     * @param string                 $prefix               Prefix of the parent collection
+     * @param string                 $parentPrefix         Prefix of the parent collection
      *
      * @return string PHP code
      */

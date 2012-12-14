@@ -23,7 +23,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 class MessageCatalogue implements MessageCatalogueInterface
 {
     private $messages = array();
-    private $metaData = array();
+    private $metadata = array();
     private $locale;
     private $resources;
     private $fallbackCatalogue;
@@ -177,8 +177,8 @@ class MessageCatalogue implements MessageCatalogueInterface
             $this->addResource($resource);
         }
 
-        $meta = $catalogue->getMetaData();
-        $this->addMetaData($meta);
+        $metadata = $catalogue->getMetadata();
+        $this->addMetadata($metadata);
     }
 
     /**
@@ -241,10 +241,10 @@ class MessageCatalogue implements MessageCatalogueInterface
      *
      * @api
      */
-    public function getMetaData($domain = '', $key = '')
+    public function getMetadata($domain = '', $key = '')
     {
         if (empty($domain)) {
-            return $this->metaData;
+            return $this->metadata;
         }
 
         if (!is_string($domain)) {
@@ -253,13 +253,13 @@ class MessageCatalogue implements MessageCatalogueInterface
         if (!is_string($key)) {
             throw new \InvalidArgumentException("Key should be an string.");
         }
-        if (isset($this->metaData[$domain])) {
+        if (isset($this->metadata[$domain])) {
             if (!empty($key)) {
-                if (isset($this->metaData[$domain][$key])) {
-                    return $this->metaData[$domain][$key];
+                if (isset($this->metadata[$domain][$key])) {
+                    return $this->metadata[$domain][$key];
                 }
             } else {
-                return $this->metaData[$domain];
+                return $this->metadata[$domain];
             }
         }
     }
@@ -269,15 +269,15 @@ class MessageCatalogue implements MessageCatalogueInterface
      *
      * @api
      */
-    public function setMetaData($key, $value, $domain = 'messages')
+    public function setMetadata($key, $value, $domain = 'messages')
     {
         if (!is_string($key)) {
             throw new \InvalidArgumentException("Key should be an string.");
         }
-        if (!isset($this->metaData[$domain])) {
-            $this->metaData[$domain] = array();
+        if (!isset($this->metadata[$domain])) {
+            $this->metadata[$domain] = array();
         }
-        $this->metaData[$domain][$key] = $value;
+        $this->metadata[$domain][$key] = $value;
     }
 
     /**
@@ -285,21 +285,21 @@ class MessageCatalogue implements MessageCatalogueInterface
      *
      * @api
      */
-    public function deleteMetaData($domain = '', $key = '')
+    public function deleteMetadata($domain = '', $key = '')
     {
         if (empty($domain)) {
-            $this->metaData = array();
+            $this->metadata = array();
         }
         if (!is_string($domain)) {
             throw new \InvalidArgumentException("Domain should be an string.");
         }
         if (empty($key)) {
-            unset($this->metaData[$domain]);
+            unset($this->metadata[$domain]);
         }
         if (!is_string($key)) {
             throw new \InvalidArgumentException("Key should be an string.");
         }
-        unset($this->metaData[$domain][$key]);
+        unset($this->metadata[$domain][$key]);
     }
 
     /**
@@ -309,13 +309,12 @@ class MessageCatalogue implements MessageCatalogueInterface
      *
      * @param array $values Values to add
      */
-    private function addMetaData(array $values)
+    private function addMetadata(array $values)
     {
         foreach ($values as $domain => $keys) {
             foreach ($keys as $key => $value) {
-                $this->setMetaData($key, $value, $domain);
+                $this->setMetadata($key, $value, $domain);
             }
         }
     }
-
 }

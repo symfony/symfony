@@ -245,12 +245,6 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
             return $this->metadata;
         }
 
-        if (!is_string($domain)) {
-            throw new \InvalidArgumentException("Domain should be an string.");
-        }
-        if (!is_string($key)) {
-            throw new \InvalidArgumentException("Key should be an string.");
-        }
         if (isset($this->metadata[$domain])) {
             if (!empty($key)) {
                 if (isset($this->metadata[$domain][$key])) {
@@ -267,12 +261,6 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function setMetadata($key, $value, $domain = 'messages')
     {
-        if (!is_string($key)) {
-            throw new \InvalidArgumentException("Key should be an string.");
-        }
-        if (!isset($this->metadata[$domain])) {
-            $this->metadata[$domain] = array();
-        }
         $this->metadata[$domain][$key] = $value;
     }
 
@@ -284,15 +272,11 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
         if (empty($domain)) {
             $this->metadata = array();
         }
-        if (!is_string($domain)) {
-            throw new \InvalidArgumentException("Domain should be an string.");
-        }
+
         if (empty($key)) {
             unset($this->metadata[$domain]);
         }
-        if (!is_string($key)) {
-            throw new \InvalidArgumentException("Key should be an string.");
-        }
+
         unset($this->metadata[$domain][$key]);
     }
 

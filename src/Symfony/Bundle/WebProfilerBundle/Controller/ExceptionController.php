@@ -100,8 +100,8 @@ class ExceptionController
     protected function templateExists($template)
     {
         $loader = $this->twig->getLoader();
-        if ($loader instanceof \Twig_ExistsLoaderInterface && $loader->exists($template)) {
-            return true;
+        if ($loader instanceof \Twig_ExistsLoaderInterface) {
+            return $loader->exists($template);
         }
 
         try {

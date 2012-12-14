@@ -242,6 +242,13 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setDataLocked($locked);
 
     /**
+     * Sets the form factory used for creating new forms.
+     *
+     * @param FormFactoryInterface $formFactory The form factory.
+     */
+    public function setFormFactory(FormFactoryInterface $formFactory);
+
+    /**
      * Builds and returns the form configuration.
      *
      * @return FormConfigInterface

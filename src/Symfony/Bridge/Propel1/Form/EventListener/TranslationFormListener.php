@@ -11,7 +11,6 @@
 namespace Symfony\Bridge\Propel1\Form\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
@@ -24,13 +23,11 @@ class TranslationFormListener implements EventSubscriberInterface
 {
     private $columns;
     private $dataClass;
-    private $formFactory;
 
-    public function __construct(FormFactoryInterface $formFactory, $columns, $dataClass)
+    public function __construct($columns, $dataClass)
     {
         $this->columns = $columns;
         $this->dataClass = $dataClass;
-        $this->formFactory = $formFactory;
     }
 
     public static function getSubscribedEvents()
@@ -78,7 +75,7 @@ class TranslationFormListener implements EventSubscriberInterface
 
             $options = array_merge($options, $customOptions);
 
-            $form->add($this->formFactory->createNamed($column, $type, null, $options));
+            $form->add($column, $type, $options);
         }
     }
 }

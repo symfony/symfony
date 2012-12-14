@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Util\FormUtil;
@@ -859,7 +860,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function add(FormInterface $child)
+    public function add($child, $type = null, array $options = array())
     {
         if ($this->bound) {
             throw new AlreadyBoundException('You cannot add children to a bound form');
@@ -886,6 +887,22 @@ class Form implements \IteratorAggregate, FormInterface
         //  * ... endless recursion ...
         if (!$this->lockSetData) {
             $viewData = $this->getViewData();
+        }
+
+        if (!$child instanceof FormInterface) {
+            if (!is_string($child)) {
+                throw new UnexpectedTypeException($child, 'string or Symfony\Component\Form\FormInterface');
+            }
+
+            if (null !== $type && !is_string($type) && !$type instanceof FormTypeInterface) {
+                throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
+            }
+
+            if (null === $type) {
+                $child = $this->config->getFormFactory()->createForProperty($this->config->getDataClass(), $child, null, $options);
+            } else {
+                $child = $this->config->getFormFactory()->createNamed($child, $type, null, $options);
+            }
         }
 
         $this->children[$child->getName()] = $child;

@@ -37,7 +37,14 @@
 
 ### Form
 
-  * The PasswordType is now not trimmed by default.
+ * The PasswordType is now not trimmed by default.
+
+#### Deprecations
+
+ * The methods `getParent()`, `setParent()` and `hasParent()` in
+   `FormBuilderInterface` were deprecated and will be removed in Symfony 2.3.
+   You should not rely on these methods in your form type because the parent
+   of a form can change after building it.
 
 ### Routing
 

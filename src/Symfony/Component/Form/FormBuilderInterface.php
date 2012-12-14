@@ -52,6 +52,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * @throws Exception\FormException if the given child does not exist
      */
     public function get($name);
+
     /**
      * Removes the field with the given name.
      *
@@ -78,13 +79,6 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
     public function all();
 
     /**
-     * Returns the associated form factory.
-     *
-     * @return FormFactoryInterface The factory
-     */
-    public function getFormFactory();
-
-    /**
      * Creates the form.
      *
      * @return Form The form
@@ -97,6 +91,11 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * @param FormBuilderInterface $parent The parent builder
      *
      * @return FormBuilderInterface The builder object.
+     *
+     * @deprecated Deprecated since version 2.2, to be removed in 2.3. You
+     *             should not rely on the parent of a builder, because it is
+     *             likely that the parent is only set after turning the builder
+     *             into a form.
      */
     public function setParent(FormBuilderInterface $parent = null);
 
@@ -104,6 +103,11 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * Returns the parent builder.
      *
      * @return FormBuilderInterface The parent builder
+     *
+     * @deprecated Deprecated since version 2.2, to be removed in 2.3. You
+     *             should not rely on the parent of a builder, because it is
+     *             likely that the parent is only set after turning the builder
+     *             into a form.
      */
     public function getParent();
 
@@ -111,6 +115,11 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * Returns whether the builder has a parent.
      *
      * @return Boolean
+     *
+     * @deprecated Deprecated since version 2.2, to be removed in 2.3. You
+     *             should not rely on the parent of a builder, because it is
+     *             likely that the parent is only set after turning the builder
+     *             into a form.
      */
     public function hasParent();
 }

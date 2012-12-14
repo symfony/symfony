@@ -34,7 +34,6 @@ class CollectionType extends AbstractType
         }
 
         $resizeListener = new ResizeFormListener(
-            $builder->getFormFactory(),
             $options['type'],
             $options['options'],
             $options['allow_add'],

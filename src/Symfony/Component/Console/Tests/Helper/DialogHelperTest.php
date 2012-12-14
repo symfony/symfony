@@ -25,19 +25,22 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         $helperSet = new HelperSet(array(new FormatterHelper()));
         $dialog->setHelperSet($helperSet);
 
-        $heroes = array('Superman', 'Batman', 'Putin');
+        $heroes = array('Superman', 'Batman', 'Spiderman');
 
-        $dialog->setInputStream($this->getInputStream("\n1\n"));
-        $this->assertEquals('2', $dialog->select($this->getOutputStream(), 'What superhero rocks?', $heroes, '2'));
-        $this->assertEquals('1', $dialog->select($this->getOutputStream(), 'What superhero rocks?', $heroes));
+        $dialog->setInputStream($this->getInputStream("\n1\nFabien\n1\nFabien\nFabien\n"));
+        $this->assertEquals('2', $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, '2'));
+        $this->assertEquals('1', $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes));
+        $this->assertEquals('1', $dialog->select($output = $this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!'));
 
-        $dialog->setInputStream($this->getInputStream("\n1\n"));
-        $this->assertEquals('Putin', $dialog->select($this->getOutputStream(), 'What superhero rocks?', $heroes, '2', array(
-            'return' => 'value'
-        )));
-        $this->assertEquals('Batman', $dialog->select($this->getOutputStream(), 'What superhero rocks?', $heroes, null, array(
-            'return' => 'value'
-        )));
+        rewind($output->getStream());
+        $this->assertContains('Input "Fabien" is not a superhero!', stream_get_contents($output->getStream()));
+
+        try {
+            $this->assertEquals('1', $dialog->select($output = $this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, 1));
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('Value "Fabien" is invalid', $e->getMessage());
+        }
     }
 
     public function testAsk()

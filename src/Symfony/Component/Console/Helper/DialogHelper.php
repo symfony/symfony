@@ -25,56 +25,37 @@ class DialogHelper extends Helper
     private static $stty;
 
     /**
-     * Asks to select array value to the user.
+     * Asks the user to select a value.
      *
-     * @param OutputInterface $output   An Output instance
-     * @param string|array    $question The question to ask
-     * @param array           $choices  List of choices to pick from
-     * @param Boolean         $default  The default answer if the user enters nothing
-     * @param array           $options  Display options:
-     *                                      'attempts' - Max number of times to ask before giving up (false by default,
-     *                                                  which means infinite)
-     *                                      'error_template' - Message which will be shown if invalid value from choice
-     *                                                  list would be picked. Defaults to "Value '%s' is not in provided
-     *                                                  in choice list"
-     *                                      'return' - What should be returned from choice list - 'key' or 'value'
+     * @param OutputInterface $output       An Output instance
+     * @param string|array    $question     The question to ask
+     * @param array           $choices      List of choices to pick from
+     * @param Boolean         $default      The default answer if the user enters nothing
+     * @param integer|false   $attempts     Max number of times to ask before giving up (false by default, which means infinite)
+     * @param string          $errorMessage Message which will be shown if invalid value from choice list would be picked
      *
-     * @return mixed
+     * @return integer|string The selected value (the key of the choices array)
      */
-    public function select(OutputInterface $output, $question, $choices, $default = null, array $options = array())
+    public function select(OutputInterface $output, $question, $choices, $default = null, $attempts = false, $errorMessage = 'Value "%s" is invalid')
     {
-        $options = array_merge(array(
-            'attempts' => false,
-            'error_template' => "Value '%s' is not in provided in choice list",
-            'return' => 'key'
-        ), $options);
-
-        $width = max(array_map('strlen', array_keys($choices))) + 2;
+        $width = max(array_map('strlen', array_keys($choices)));
 
         $messages = (array) $question;
         foreach ($choices as $key => $value) {
-            $messages[] = sprintf("  <info>%-${width}s</info> %s", $key, $value);
+            $messages[] = sprintf("  [<info>%-${width}s</info>] %s", $key, $value);
         }
 
         $output->writeln($messages);
 
-        $result = $this->askAndValidate($output, '> ', function($picked) use ($choices, $options) {
+        $result = $this->askAndValidate($output, '> ', function ($picked) use ($choices, $errorMessage) {
             if (empty($choices[$picked])) {
-                throw new \InvalidArgumentException(sprintf($options['error_template'], $picked));
+                throw new \InvalidArgumentException(sprintf($errorMessage, $picked));
             }
 
             return $picked;
-        }, $options['attempts'], $default);
+        }, $attempts, $default);
 
-        switch($options['return']) {
-            case 'key':
-                return $result;
-            case 'value':
-                return $choices[$result];
-            default:
-                $tpl = 'Invalid return type specified: "%s". Should be either "key" or "value".';
-                throw new \InvalidArgumentException(sprintf($tpl . '', $options['return']));
-        }
+        return $result;
     }
 
     /**

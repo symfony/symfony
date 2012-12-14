@@ -866,7 +866,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function parseErrorProvider()
     {
-        return array(
+        $data = array(
             // 1 char month
             array('y-MMMMM-d', '1970-J-1'),
             array('y-MMMMM-d', '1970-S-1'),

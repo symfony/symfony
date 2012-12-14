@@ -70,7 +70,7 @@ CHANGELOG
    it disallows the slash (`/`) and the next char. Using the previous char added
    no value and was problematic because the route `/index.{_format}` would be
    matched by `/index.ht/ml`.
- * The default requirement now uses possesive quantifiers when possible which
+ * The default requirement now uses possessive quantifiers when possible which
    improves matching performance by up to 20% because it prevents backtracking
    when it's not needed.
  * The ConfigurableRequirementsInterface can now also be used to disable the requirements

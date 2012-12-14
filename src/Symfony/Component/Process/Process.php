@@ -692,13 +692,13 @@ class Process
     /**
      * Stops the process.
      *
-     * @param float $timeout The timeout in seconds
+     * @param integer $timeout The timeout in seconds
      *
      * @return integer The exit-code of the process
      *
      * @throws RuntimeException if the process got signaled
      */
-    public function stop($timeout=10)
+    public function stop($timeout = 10)
     {
         $timeoutMicro = (int) $timeout*10E6;
         if ($this->isRunning()) {

@@ -31,7 +31,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function getTestConfigTreeData()
     {
         return array(
-            array(array('secret' => 's3cr3t'), array('secret' => 's3cr3t', 'trusted_proxies' => array(), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => false))),
+            array(array('secret' => 's3cr3t'), array('secret' => 's3cr3t', 'trusted_proxies' => array(), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => false), 'default_locale' => 'en', 'charset' => null)),
         );
     }
 
@@ -50,9 +50,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function getTestValidTrustedProxiesData()
     {
         return array(
-            array(array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1')), array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1'), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => false))),
-            array(array('secret' => 's3cr3t', 'trusted_proxies' => array('::1')), array('secret' => 's3cr3t', 'trusted_proxies' => array('::1'), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => false))),
-            array(array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1', '::1')), array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1', '::1'), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => false))),
+            array(array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1')), array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1'), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => false), 'default_locale' => 'en', 'charset' => null)),
+            array(array('secret' => 's3cr3t', 'trusted_proxies' => array('::1')), array('secret' => 's3cr3t', 'trusted_proxies' => array('::1'), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => false), 'default_locale' => 'en', 'charset' => null)),
+            array(array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1', '::1')), array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1', '::1'), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => false), 'default_locale' => 'en', 'charset' => null)),
         );
     }
 

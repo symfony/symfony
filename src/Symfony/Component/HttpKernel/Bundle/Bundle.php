@@ -172,7 +172,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function registerCommands(Application $application)
     {
-        if (!$dir = realpath($this->getPath().'/Command')) {
+        if (!is_dir($dir = $this->getPath().'/Command')) {
             return;
         }
 

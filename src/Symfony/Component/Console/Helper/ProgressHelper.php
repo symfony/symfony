@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * The Progress class providers helpers to display progress output.
+ * The Progress class provides helpers to display progress output.
  *
  * @author Chris Jones <leeked@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>

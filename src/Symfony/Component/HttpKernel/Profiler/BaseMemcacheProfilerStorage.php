@@ -52,14 +52,6 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
         $profileList = explode("\n", $indexContent);
         $result = array();
 
-        if (null === $start) {
-            $start = 0;
-        }
-
-        if (null === $end) {
-            $end = time();
-        }
-
         foreach ($profileList as $item) {
 
             if ($limit === 0) {
@@ -74,7 +66,15 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
 
             $itemTime = (int)$itemTime;
 
-            if ($ip && false === strpos($itemIp, $ip) || $url && false === strpos($itemUrl, $url) || $method && false === strpos($itemMethod, $method) || $start > $itemTime || $end < $itemTime) {
+            if ($ip && false === strpos($itemIp, $ip) || $url && false === strpos($itemUrl, $url) || $method && false === strpos($itemMethod, $method)) {
+                continue;
+            }
+
+            if (!empty($start) && $itemTime < $start) {
+                continue;
+            }
+
+            if (!empty($end) && $itemTime > $end) {
                 continue;
             }
 

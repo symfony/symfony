@@ -117,11 +117,15 @@ class SqliteProfilerStorage extends PdoProfilerStorage
             $args[':method'] = $method;
         }
 
-        $criteria[] = 'time >= :start';
-        $args[':start'] = $start;
+        if (!empty($start)) {
+            $criteria[] = 'time >= :start';
+            $args[':start'] = $start;
+        }
 
-        $criteria[] = 'time <= :end';
-        $args[':end'] = $end;
+        if (!empty($end)) {
+            $criteria[] = 'time <= :end';
+            $args[':end'] = $end;
+        }
 
         return array($criteria, $args);
     }

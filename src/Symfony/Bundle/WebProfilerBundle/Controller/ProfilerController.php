@@ -266,14 +266,14 @@ class ProfilerController
         $ip     = $request->query->get('ip');
         $method = $request->query->get('method');
         $url    = $request->query->get('url');
-        $start  = $request->query->get('start');
-        $end    = $request->query->get('end');
+        $start  = $request->query->get('start', null);
+        $end    = $request->query->get('end', null);
         $limit  = $request->query->get('limit');
 
         return new Response($this->twig->render('@WebProfiler/Profiler/results.html.twig', array(
             'token'     => $token,
             'profile'   => $profile,
-            'tokens'    => $this->profiler->find($ip, $url, $start, $end, $limit, $method),
+            'tokens'    => $this->profiler->find($ip, $url, $limit, $method, $start, $end),
             'ip'        => $ip,
             'method'    => $method,
             'url'       => $url,
@@ -298,8 +298,8 @@ class ProfilerController
         $ip     = preg_replace('/[^:\d\.]/', '', $request->query->get('ip'));
         $method = $request->query->get('method');
         $url    = $request->query->get('url');
-        $start  = $request->query->get('start');
-        $end    = $request->query->get('end');
+        $start  = $request->query->get('start', null);
+        $end    = $request->query->get('end', null);
         $limit  = $request->query->get('limit');
         $token  = $request->query->get('token');
 
@@ -317,7 +317,7 @@ class ProfilerController
             return new RedirectResponse($this->generator->generate('_profiler', array('token' => $token)));
         }
 
-        $tokens = $this->profiler->find($ip, $url, $start, $end, $limit, $method);
+        $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end);
 
         return new RedirectResponse($this->generator->generate('_profiler_search_results', array(
             'token'  => $tokens ? $tokens[0]['token'] : 'empty',

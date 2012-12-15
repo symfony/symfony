@@ -98,6 +98,8 @@ class TableHelper extends Helper
     public function setBackgroundChar($backgroundChar)
     {
         $this->backgroundChar = $backgroundChar;
+
+        return $this;
     }
 
     /**
@@ -108,6 +110,8 @@ class TableHelper extends Helper
     public function setHorizontalBorderChar($horizontalBorderChar)
     {
         $this->horizontalBorderChar = $horizontalBorderChar;
+
+        return $this;
     }
 
     /**
@@ -115,9 +119,11 @@ class TableHelper extends Helper
      *
      * @param string $verticalBorderChar
      */
-        public function setVerticalBorderChar($verticalBorderChar)
+    public function setVerticalBorderChar($verticalBorderChar)
     {
         $this->verticalBorderChar = $verticalBorderChar;
+
+        return $this;
     }
 
     /**
@@ -128,6 +134,8 @@ class TableHelper extends Helper
     public function setEdgeChar($edgeChar)
     {
         $this->edgeChar = $edgeChar;
+
+        return $this;
     }
 
     /**
@@ -138,6 +146,8 @@ class TableHelper extends Helper
     public function setCellHeaderFormat($cellHeaderFormat)
     {
         $this->cellHeaderFormat = $cellHeaderFormat;
+
+        return $this;
     }
 
     /**
@@ -148,6 +158,8 @@ class TableHelper extends Helper
     public function setCellRowFormat($cellRowFormat)
     {
         $this->cellRowFormat = $cellRowFormat;
+
+        return $this;
     }
 
     /**
@@ -158,6 +170,8 @@ class TableHelper extends Helper
     public function setBorderFormat($borderFormat)
     {
         $this->borderFormat = $borderFormat;
+
+        return $this;
     }
 
     /**
@@ -168,6 +182,8 @@ class TableHelper extends Helper
     public function setPadType($padType)
     {
         $this->padType = $padType;
+
+        return $this;
     }
 
     /**
@@ -208,12 +224,12 @@ class TableHelper extends Helper
      */
     private function renderRowSeparator()
     {
-        if (0 === $this->getNumberOfColumns()) {
+        if (0 === $count = $this->getNumberOfColumns()) {
             return;
         }
 
         $markup = $this->edgeChar;
-        for ($column = 0; $column < $this->getNumberOfColumns(); $column++) {
+        for ($column = 0; $column < $count; $column++) {
             $markup .= str_repeat($this->horizontalBorderChar, $this->getColumnWidth($column))
                     .$this->edgeChar
             ;
@@ -245,7 +261,7 @@ class TableHelper extends Helper
         }
 
         $this->renderColumnSeparator();
-        for ($column = 0; $column < $this->getNumberOfColumns(); $column++) {
+        for ($column = 0, $count = $this->getNumberOfColumns(); $column < $count; $column++) {
             $this->renderCell($row, $column, $cellFormat);
             $this->renderColumnSeparator();
         }

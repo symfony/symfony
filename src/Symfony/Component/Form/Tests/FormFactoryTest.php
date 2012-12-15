@@ -638,6 +638,6 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
     private function getMockFormBuilder()
     {
-        return $this->getMock('Symfony\Component\Form\Tests\FormBuilderInterface');
+        return $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
     }
 }

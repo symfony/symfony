@@ -109,6 +109,8 @@ class ValidatorFactory implements ValidatorContextInterface
      */
     public static function buildDefault(array $mappingFiles = array(), $annotations = false, $staticMethod = null)
     {
+        trigger_error('buildDefault() is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidatorBuilder() instead.', E_USER_DEPRECATED);
+
         $xmlMappingFiles = array();
         $yamlMappingFiles = array();
         $loaders = array();
@@ -170,6 +172,8 @@ class ValidatorFactory implements ValidatorContextInterface
      */
     public function __construct(ValidatorContextInterface $defaultContext = null)
     {
+        trigger_error('ValidatorFactory is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidatorBuilder() instead.', E_USER_DEPRECATED);
+
         $this->defaultContext = null === $defaultContext ? new ValidatorContext() : $defaultContext;
     }
 
@@ -186,6 +190,8 @@ class ValidatorFactory implements ValidatorContextInterface
      */
     public function setClassMetadataFactory(ClassMetadataFactoryInterface $metadataFactory)
     {
+        trigger_error('setClassMetadataFactory() is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidatorBuilder() instead.', E_USER_DEPRECATED);
+
         $context = clone $this->defaultContext;
 
         return $context->setClassMetadataFactory($metadataFactory);
@@ -204,6 +210,8 @@ class ValidatorFactory implements ValidatorContextInterface
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
     {
+        trigger_error('setConstraintValidatorFactory() is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidatorBuilder() instead.', E_USER_DEPRECATED);
+
         $context = clone $this->defaultContext;
 
         return $context->setConstraintValidatorFactory($validatorFactory);
@@ -219,6 +227,8 @@ class ValidatorFactory implements ValidatorContextInterface
      */
     public function getValidator()
     {
+        trigger_error('getValidator() is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidator() instead.', E_USER_DEPRECATED);
+
         return $this->defaultContext->getValidator();
     }
 }

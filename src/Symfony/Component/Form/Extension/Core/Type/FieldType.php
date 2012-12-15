@@ -22,6 +22,11 @@ use Symfony\Component\Form\AbstractType;
  */
 class FieldType extends AbstractType
 {
+    function __construct()
+    {
+        trigger_error('FieldType is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+    }
+
     /**
      * {@inheritdoc}
      */

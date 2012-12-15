@@ -23,6 +23,11 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class MinValidator extends ConstraintValidator
 {
+    public function __construct($options = null)
+    {
+        trigger_error('MinValidator is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+    }
+
     /**
      * Checks if the passed value is valid.
      *

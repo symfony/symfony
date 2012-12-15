@@ -194,6 +194,8 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      */
     public function getValue($object)
     {
+        trigger_error('getValue() is deprecated since version 2.2 and will be removed in 2.3. Use getPropertyValue() instead.', E_USER_DEPRECATED);
+
         return $this->getPropertyValue($object);
     }
 

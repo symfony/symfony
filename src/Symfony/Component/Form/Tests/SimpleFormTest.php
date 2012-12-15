@@ -644,9 +644,11 @@ class SimpleFormTest extends AbstractFormTest
     {
         $test = $this;
         $validator = $this->getFormValidator();
+        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
         $form = $this->getBuilder()
             ->addValidator($validator)
             ->getForm();
+        restore_error_handler();
 
         $validator->expects($this->once())
             ->method('validate')

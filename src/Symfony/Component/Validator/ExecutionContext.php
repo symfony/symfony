@@ -100,6 +100,8 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function addViolationAtPath($propertyPath, $message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
+        trigger_error('addViolationAtPath() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         $this->globalContext->getViolations()->add(new ConstraintViolation(
             $message,
             $params,
@@ -124,10 +126,12 @@ class ExecutionContext implements ExecutionContextInterface
      * @param integer|null $code          The violation code.
      *
      * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use the
-     *             method {@link atViolationAt} instead.
+     *             method {@link addViolationAt} instead.
      */
     public function addViolationAtSubPath($subPath, $message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
+        trigger_error('addViolationAtSubPath() is deprecated since version 2.2 and will be removed in 2.3. Use addViolationAt() instead.', E_USER_DEPRECATED);
+
         if (func_num_args() >= 4) {
             $this->addViolationAt($subPath, $message, $params, $invalidValue, $pluralization, $code);
         } else {
@@ -288,6 +292,8 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getCurrentClass()
     {
+        trigger_error('getCurrentClass() is deprecated since version 2.2 and will be removed in 2.3. Use getClassName() instead', E_USER_DEPRECATED);
+
         return $this->getClassName();
     }
 
@@ -304,6 +310,8 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getCurrentProperty()
     {
+        trigger_error('getCurrentProperty() is deprecated since version 2.2 and will be removed in 2.3. Use getClassName() instead', E_USER_DEPRECATED);
+
         return $this->getPropertyName();
     }
 
@@ -319,6 +327,8 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getCurrentValue()
     {
+        trigger_error('getCurrentValue() is deprecated since version 2.2 and will be removed in 2.3. Use getValue() instead', E_USER_DEPRECATED);
+
         return $this->value;
     }
 
@@ -332,6 +342,8 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getGraphWalker()
     {
+        trigger_error('getGraphWalker() is deprecated since version 2.2 and will be removed in 2.3. Use validate() and validateValue() instead', E_USER_DEPRECATED);
+
         return $this->globalContext->getVisitor()->getGraphWalker();
     }
 

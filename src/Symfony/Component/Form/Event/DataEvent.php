@@ -33,6 +33,8 @@ class DataEvent extends Event
      */
     public function __construct(FormInterface $form, $data)
     {
+        trigger_error('DataEvent is deprecated since version 2.1 and will be removed in 2.3. Code against \Symfony\Component\Form\FormEvent instead.', E_USER_DEPRECATED);
+
         $this->form = $form;
         $this->data = $data;
     }

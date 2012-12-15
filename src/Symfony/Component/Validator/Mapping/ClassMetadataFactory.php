@@ -70,7 +70,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface, MetadataFac
 
         // Include constraints from the parent class
         if ($parent = $metadata->getReflectionClass()->getParentClass()) {
-            $metadata->mergeConstraints($this->getClassMetadata($parent->name));
+            $metadata->mergeConstraints($this->getMetadataFor($parent->name));
         }
 
         // Include constraints from all implemented interfaces
@@ -78,7 +78,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface, MetadataFac
             if ('Symfony\Component\Validator\GroupSequenceProviderInterface' === $interface->name) {
                 continue;
             }
-            $metadata->mergeConstraints($this->getClassMetadata($interface->name));
+            $metadata->mergeConstraints($this->getMetadataFor($interface->name));
         }
 
         if (null !== $this->loader) {

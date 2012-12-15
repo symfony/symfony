@@ -206,8 +206,8 @@ class Router implements RouterInterface
                 throw $e;
             }
 
-            if (!$matcher->hasDefaultRoutesSet()) {
-                $matcher->setDefaultRoutes($this->getRouteCollection());
+            if (!$matcher->hasDefaultRouteSet()) {
+                $matcher->setDefaultRoute($this->getRouteCollection());
             }
 
             return $matcher->parentMatch($url);

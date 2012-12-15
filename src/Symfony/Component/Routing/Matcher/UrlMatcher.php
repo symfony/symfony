@@ -30,7 +30,7 @@ class UrlMatcher implements UrlMatcherInterface
 
     private $routes;
 
-    private $hasDefaultRoutesSet = false;
+    private $hasDefaultRouteSet = false;
 
     /**
      * Constructor.
@@ -46,7 +46,7 @@ class UrlMatcher implements UrlMatcherInterface
         $this->context = $context;
 
         if (null !== $routes) {
-            $this->hasDefaultRoutesSet = true;
+            $this->hasDefaultRouteSet = true;
         }
     }
 
@@ -98,17 +98,17 @@ class UrlMatcher implements UrlMatcherInterface
     }
 
     /**
-     * Check if the extra defaults have been set
+     * Checks if the defaults have been set.
      *
      * @return Boolean
      */
-    public function hasDefaultRoutesSet()
+    public function hasDefaultRouteSet()
     {
-        return $this->hasDefaultRoutesSet;
+        return $this->hasDefaultRouteSet;
     }
 
     /**
-     * Set the default routes
+     * Sets the default routes.
      *
      * @param RouteCollection $routes
      *
@@ -118,7 +118,7 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $this->routes = $routes;
 
-        $this->hasDefaultRoutesSet = true;
+        $this->hasDefaultRouteSet = true;
 
         return $this;
     }

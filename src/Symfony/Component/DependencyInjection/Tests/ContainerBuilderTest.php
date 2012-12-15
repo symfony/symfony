@@ -82,6 +82,13 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($builder->has('bar'), '->has() returns true if a service exists');
     }
 
+    public function testSet()
+    {
+        $builder = new ContainerBuilder();
+        $obj = new \StdClass();
+        $this->assertSame($obj, $builder->set('stdclass', $obj));
+    }
+
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::get
      */

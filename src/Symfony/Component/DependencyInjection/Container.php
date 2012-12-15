@@ -187,6 +187,8 @@ class Container implements IntrospectableContainerInterface
      * @throws \RuntimeException When trying to set a service in an inactive scope
      * @throws \InvalidArgumentException When trying to set a service in the prototype scope
      *
+     * @returns object The service set
+     *
      * @api
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
@@ -206,6 +208,8 @@ class Container implements IntrospectableContainerInterface
         }
 
         $this->services[$id] = $service;
+
+        return $service;
     }
 
     /**

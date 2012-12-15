@@ -109,6 +109,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $sc = new Container();
         $sc->set('foo', $foo = new \stdClass());
         $this->assertEquals($foo, $sc->get('foo'), '->set() sets a service');
+        $this->assertSame($foo, $sc->set('foo2', $foo));
     }
 
     /**

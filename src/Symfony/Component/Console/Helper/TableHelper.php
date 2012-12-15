@@ -43,7 +43,7 @@ class TableHelper extends Helper
     private $cellRowFormat = '<comment>%s</comment>';
     private $borderFormat = '%s';
     private $padType = STR_PAD_RIGHT;
-    
+
     /**
      * @var OutputInterface
      */
@@ -92,7 +92,7 @@ class TableHelper extends Helper
 
     /**
      * Sets background character, used for cell padding.
-     * 
+     *
      * @param string $backgroundChar
      */
     public function setBackgroundChar($backgroundChar)
@@ -102,7 +102,7 @@ class TableHelper extends Helper
 
     /**
      * Sets horizontal border character.
-     * 
+     *
      * @param string $horizontalBorderChar
      */
     public function setHorizontalBorderChar($horizontalBorderChar)
@@ -112,7 +112,7 @@ class TableHelper extends Helper
 
     /**
      * Sets vertical border character.
-     * 
+     *
      * @param string $verticalBorderChar
      */
         public function setVerticalBorderChar($verticalBorderChar)
@@ -122,7 +122,7 @@ class TableHelper extends Helper
 
     /**
      * Sets edge character.
-     * 
+     *
      * @param string $edgeChar
      */
     public function setEdgeChar($edgeChar)
@@ -132,7 +132,7 @@ class TableHelper extends Helper
 
     /**
      * Sets header cell format.
-     * 
+     *
      * @param string $cellHeaderFormat
      */
     public function setCellHeaderFormat($cellHeaderFormat)
@@ -142,17 +142,17 @@ class TableHelper extends Helper
 
     /**
      * Sets row cell format.
-     * 
+     *
      * @param string $cellRowFormat
      */
     public function setCellRowFormat($cellRowFormat)
     {
         $this->cellRowFormat = $cellRowFormat;
     }
-    
+
     /**
      * Sets table border format.
-     * 
+     *
      * @param string $borderFormat
      */
     public function setBorderFormat($borderFormat)
@@ -162,7 +162,7 @@ class TableHelper extends Helper
 
     /**
      * Sets cell padding type.
-     * 
+     *
      * @param int $padType STR_PAD_*
      */
     public function setPadType($padType)
@@ -172,7 +172,7 @@ class TableHelper extends Helper
 
     /**
      * Renders table to output.
-     * 
+     *
      * Example:
      * +---------------+-----------------------+------------------+
      * | ISBN          | Title                 | Author           |
@@ -181,13 +181,13 @@ class TableHelper extends Helper
      * | 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |
      * | 960-425-059-0 | The Lord of the Rings | J. R. R. Tolkien |
      * +---------------+-----------------------+------------------+
-     * 
+     *
      * @param OutputInterface $output
      */
     public function render(OutputInterface $output)
     {
         $this->output = $output;
-        
+
         $this->renderRowSeparator();
         $this->renderRow($this->headers, $this->cellHeaderFormat);
         if (!empty($this->headers)) {
@@ -200,10 +200,10 @@ class TableHelper extends Helper
             $this->renderRowSeparator();
         }
     }
-    
+
     /**
      * Renders horizontal header separator.
-     * 
+     *
      * Example: +-----+-----------+-------+
      */
     private function renderRowSeparator()
@@ -218,10 +218,10 @@ class TableHelper extends Helper
                     .$this->edgeChar
             ;
         }
-        
+
         $this->output->writeln(sprintf($this->borderFormat, $markup));
     }
-    
+
     /**
      * Renders vertical column separator.
      */
@@ -229,12 +229,12 @@ class TableHelper extends Helper
     {
         $this->output->write(sprintf($this->borderFormat, $this->verticalBorderChar));
     }
-    
+
     /**
      * Renders table row.
-     * 
+     *
      * Example: | 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |
-     * 
+     *
      * @param array  $row
      * @param string $cellFormat
      */
@@ -254,7 +254,7 @@ class TableHelper extends Helper
 
     /**
      * Renders table cell with padding.
-     * 
+     *
      * @param array  $row
      * @param int    $column
      * @param string $cellFormat
@@ -276,7 +276,7 @@ class TableHelper extends Helper
 
     /**
      * Gets number of columns for this table.
-     * 
+     *
      * @return int
      */
     private function getNumberOfColumns()
@@ -292,9 +292,9 @@ class TableHelper extends Helper
 
     /**
      * Gets column width.
-     * 
+     *
      * @param int $column
-     * 
+     *
      * @return int
      */
     private function getColumnWidth($column)
@@ -307,13 +307,13 @@ class TableHelper extends Helper
 
         return max($lengths) + 2;
     }
-    
+
     /**
      * Gets cell width.
-     * 
+     *
      * @param array $row
      * @param int   $column
-     * 
+     *
      * @return int
      */
     private function getCellWidth(array $row, $column)
@@ -325,7 +325,7 @@ class TableHelper extends Helper
         if (isset($row[$column])) {
             return mb_strlen($row[$column]);
         }
-        
+
         return $this->getCellWidth($row, $column - 1);
     }
 

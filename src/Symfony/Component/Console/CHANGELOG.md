@@ -4,6 +4,7 @@ CHANGELOG
 2.3.0
 -----
 
+ * added Table Helper for tabular data rendering
  * added support for events in `Application`
  * added a way to normalize EOLs in `ApplicationTester::getDisplay()` and `CommandTester::getDisplay()`
  * added a way to set the progress bar progress via the `setCurrent` method

@@ -118,12 +118,16 @@ class CompoundFormTest extends AbstractFormTest
     {
         $this->form->add($this->getBuilder()->getForm());
 
+        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
         $this->assertTrue($this->form->hasChildren());
+        restore_error_handler();
     }
 
     public function testHasNoChildren()
     {
+        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
         $this->assertFalse($this->form->hasChildren());
+        restore_error_handler();
     }
 
     public function testAdd()
@@ -151,7 +155,9 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->remove('foo');
 
         $this->assertNull($child->getParent());
+        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
         $this->assertFalse($this->form->hasChildren());
+        restore_error_handler();
     }
 
     /**
@@ -364,7 +370,7 @@ class CompoundFormTest extends AbstractFormTest
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
 
-        $form->bindRequest($request);
+        $form->bind($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -413,7 +419,7 @@ class CompoundFormTest extends AbstractFormTest
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
 
-        $form->bindRequest($request);
+        $form->bind($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -454,7 +460,7 @@ class CompoundFormTest extends AbstractFormTest
             ->addEventSubscriber(new BindRequestListener())
             ->getForm();
 
-        $form->bindRequest($request);
+        $form->bind($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -487,7 +493,7 @@ class CompoundFormTest extends AbstractFormTest
             ->addEventSubscriber(new BindRequestListener())
             ->getForm();
 
-        $form->bindRequest($request);
+        $form->bind($request);
 
         $this->assertEquals('Bernhard', $form->getData());
 
@@ -519,7 +525,7 @@ class CompoundFormTest extends AbstractFormTest
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());
 
-        $form->bindRequest($request);
+        $form->bind($request);
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());
@@ -549,7 +555,7 @@ class CompoundFormTest extends AbstractFormTest
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());
 
-        $form->bindRequest($request);
+        $form->bind($request);
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());

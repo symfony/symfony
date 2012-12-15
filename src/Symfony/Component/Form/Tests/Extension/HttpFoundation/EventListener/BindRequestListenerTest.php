@@ -14,9 +14,9 @@ namespace Symfony\Component\Form\Tests\Extension\HttpFoundation\EventListener;
 use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Form\Tests\DeprecationErrorHandler;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -98,7 +98,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $config = new FormConfigBuilder('author', null, $dispatcher);
         $form = new Form($config);
-        $event = new FormEvent($form, $request);
+        $event = DeprecationErrorHandler::getFormEvent($form, $request);
 
         $listener = new BindRequestListener();
         $listener->preBind($event);
@@ -125,7 +125,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $config = new FormConfigBuilder('', null, $dispatcher);
         $form = new Form($config);
-        $event = new FormEvent($form, $request);
+        $event = DeprecationErrorHandler::getFormEvent($form, $request);
 
         $listener = new BindRequestListener();
         $listener->preBind($event);
@@ -154,7 +154,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $config->setCompound(true);
         $config->setDataMapper($this->getMock('Symfony\Component\Form\DataMapperInterface'));
         $form = new Form($config);
-        $event = new FormEvent($form, $request);
+        $event = DeprecationErrorHandler::getFormEvent($form, $request);
 
         $listener = new BindRequestListener();
         $listener->preBind($event);
@@ -180,7 +180,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $config = new FormConfigBuilder('author', null, $dispatcher);
         $config->setCompound(false);
         $form = new Form($config);
-        $event = new FormEvent($form, $request);
+        $event = DeprecationErrorHandler::getFormEvent($form, $request);
 
         $listener = new BindRequestListener();
         $listener->preBind($event);
@@ -203,7 +203,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $config = new FormConfigBuilder('author', null, $dispatcher);
         $form = new Form($config);
-        $event = new FormEvent($form, $request);
+        $event = DeprecationErrorHandler::getFormEvent($form, $request);
 
         $listener = new BindRequestListener();
         $listener->preBind($event);
@@ -227,7 +227,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $config = new FormConfigBuilder('', null, $dispatcher);
         $form = new Form($config);
-        $event = new FormEvent($form, $request);
+        $event = DeprecationErrorHandler::getFormEvent($form, $request);
 
         $listener = new BindRequestListener();
         $listener->preBind($event);
@@ -253,7 +253,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $config->setCompound(true);
         $config->setDataMapper($this->getMock('Symfony\Component\Form\DataMapperInterface'));
         $form = new Form($config);
-        $event = new FormEvent($form, $request);
+        $event = DeprecationErrorHandler::getFormEvent($form, $request);
 
         $listener = new BindRequestListener();
         $listener->preBind($event);
@@ -275,7 +275,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $config = new FormConfigBuilder('author', null, $dispatcher);
         $config->setCompound(false);
         $form = new Form($config);
-        $event = new FormEvent($form, $request);
+        $event = DeprecationErrorHandler::getFormEvent($form, $request);
 
         $listener = new BindRequestListener();
         $listener->preBind($event);

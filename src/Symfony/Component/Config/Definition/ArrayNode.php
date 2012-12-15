@@ -29,6 +29,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $addIfNotSet;
     protected $performDeepMerging;
     protected $ignoreExtraKeys;
+    protected $normalizeKeys;
 
     /**
      * Constructor.
@@ -47,6 +48,41 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         $this->addIfNotSet = false;
         $this->allowNewKeys = true;
         $this->performDeepMerging = true;
+        $this->normalizeKeys = true;
+    }
+
+    public function setNormalizeKeys($normalizeKeys)
+    {
+        $this->normalizeKeys = (Boolean) $normalizeKeys;
+    }
+
+    /**
+     * Normalizes keys between the different configuration formats.
+     *
+     * Namely, you mostly have foo_bar in YAML while you have foo-bar in XML.
+     * After running this method, all keys are normalized to foo_bar.
+     *
+     * If you have a mixed key like foo-bar_moo, it will not be altered.
+     * The key will also not be altered if the target key already exists.
+     *
+     * @param mixed $value
+     *
+     * @return array The value with normalized keys
+     */
+    protected function preNormalize($value)
+    {
+        if (!$this->normalizeKeys || !is_array($value)) {
+            return $value;
+        }
+
+        foreach ($value as $k => $v) {
+            if (false !== strpos($k, '-') && false === strpos($k, '_') && !array_key_exists($normalizedKey = str_replace('-', '_', $k), $value)) {
+                $value[$normalizedKey] = $v;
+                unset($value[$k]);
+            }
+        }
+
+        return $value;
     }
 
     /**

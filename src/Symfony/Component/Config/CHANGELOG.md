@@ -4,6 +4,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * added a `keepKeys()` method for array nodes (to avoid key normalization)
  * added numerical type handling for config definitions
  * added convenience methods for optional configuration sections to ArrayNodeDefinition
  * added a utils class for XML manipulations

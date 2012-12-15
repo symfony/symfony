@@ -94,6 +94,8 @@ class TableHelper extends Helper
      * Sets background character, used for cell padding.
      *
      * @param string $backgroundChar
+     *
+     * @return TableHelper
      */
     public function setBackgroundChar($backgroundChar)
     {
@@ -106,6 +108,8 @@ class TableHelper extends Helper
      * Sets horizontal border character.
      *
      * @param string $horizontalBorderChar
+     *
+     * @return TableHelper
      */
     public function setHorizontalBorderChar($horizontalBorderChar)
     {
@@ -118,6 +122,8 @@ class TableHelper extends Helper
      * Sets vertical border character.
      *
      * @param string $verticalBorderChar
+     *
+     * @return TableHelper
      */
     public function setVerticalBorderChar($verticalBorderChar)
     {
@@ -130,6 +136,8 @@ class TableHelper extends Helper
      * Sets edge character.
      *
      * @param string $edgeChar
+     *
+     * @return TableHelper
      */
     public function setEdgeChar($edgeChar)
     {
@@ -142,6 +150,8 @@ class TableHelper extends Helper
      * Sets header cell format.
      *
      * @param string $cellHeaderFormat
+     *
+     * @return TableHelper
      */
     public function setCellHeaderFormat($cellHeaderFormat)
     {
@@ -154,6 +164,8 @@ class TableHelper extends Helper
      * Sets row cell format.
      *
      * @param string $cellRowFormat
+     *
+     * @return TableHelper
      */
     public function setCellRowFormat($cellRowFormat)
     {
@@ -166,6 +178,8 @@ class TableHelper extends Helper
      * Sets table border format.
      *
      * @param string $borderFormat
+     *
+     * @return TableHelper
      */
     public function setBorderFormat($borderFormat)
     {
@@ -178,6 +192,8 @@ class TableHelper extends Helper
      * Sets cell padding type.
      *
      * @param int $padType STR_PAD_*
+     *
+     * @return TableHelper
      */
     public function setPadType($padType)
     {

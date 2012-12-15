@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * SessionListenerTest.
@@ -26,7 +27,14 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  */
 class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var TestSessionListener
+     */
     private $listener;
+
+    /**
+     * @var SessionInterface
+     */
     private $session;
 
     protected function setUp()
@@ -58,6 +66,8 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testDoesNotDeleteCookieIfUsingSessionLifetime()
     {
+        $this->sessionHasBeenStarted();
+
         $params = session_get_cookie_params();
         session_set_cookie_params(0, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
 

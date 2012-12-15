@@ -68,7 +68,9 @@ class TestSessionListener implements EventSubscriberInterface
         }
 
         if ($session = $event->getRequest()->getSession()) {
-            $session->save();
+            if ($session->isStarted()) {
+                $session->save();
+            }
 
             $params = session_get_cookie_params();
 

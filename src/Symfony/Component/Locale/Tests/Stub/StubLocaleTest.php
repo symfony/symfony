@@ -67,7 +67,7 @@ class StubLocaleTest extends LocaleTestCase
 
     public function testGetCurrenciesData()
     {
-        $symbol = $this->isSameAsIcuVersion('4.8') ? 'BR$' : 'R$';
+        $symbol = $this->isGreaterOrEqualThanIcuVersion('4.8') ? 'BR$' : 'R$';
 
         $currencies = StubLocale::getCurrenciesData('en');
         $this->assertEquals($symbol, $currencies['BRL']['symbol']);

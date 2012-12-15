@@ -68,6 +68,8 @@ class FormRegistry implements FormRegistryInterface
      */
     public function addType(ResolvedFormTypeInterface $type)
     {
+        trigger_error('addType() is deprecated since version 2.1 and will be removed in 2.3. Use form extensions or type registration in the Dependency Injection Container instead.', E_USER_DEPRECATED);
+
         $this->types[$type->getName()] = $type;
     }
 
@@ -129,11 +131,13 @@ class FormRegistry implements FormRegistryInterface
             );
         }
 
+        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handleBC'));
         $this->addType($this->resolvedTypeFactory->createResolvedType(
             $type,
             $typeExtensions,
             $parentType ? $this->getType($parentType) : null
         ));
+        restore_error_handler();
     }
 
     /**

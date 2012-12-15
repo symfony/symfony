@@ -26,6 +26,13 @@ class MinLength extends Constraint
     public $limit;
     public $charset = 'UTF-8';
 
+    public function __construct($options = null)
+    {
+        trigger_error('MinLength is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+
+        parent::__construct($options);
+    }
+
     /**
      * {@inheritDoc}
      */

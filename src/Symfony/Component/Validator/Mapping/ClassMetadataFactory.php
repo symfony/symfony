@@ -118,6 +118,8 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface, MetadataFac
      */
     public function getClassMetadata($class)
     {
+        trigger_error('getClassMetadata() is deprecated since version 2.2 and will be removed in 2.3. Use getMetadataFor() instead.', E_USER_DEPRECATED);
+
         return $this->getMetadataFor($class);
     }
 }

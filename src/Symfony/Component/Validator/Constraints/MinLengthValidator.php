@@ -24,6 +24,11 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class MinLengthValidator extends ConstraintValidator
 {
+    public function __construct($options = null)
+    {
+        trigger_error('MinLengthValidator is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+    }
+
     /**
      * {@inheritDoc}
      */

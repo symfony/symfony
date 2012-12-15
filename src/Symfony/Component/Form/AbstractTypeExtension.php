@@ -44,8 +44,10 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handleBC'));
         $resolver->setDefaults($this->getDefaultOptions());
         $resolver->addAllowedValues($this->getAllowedOptionValues());
+        restore_error_handler();
     }
 
     /**
@@ -58,6 +60,8 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
      */
     public function getDefaultOptions()
     {
+        trigger_error('getDefaultOptions() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
+
         return array();
     }
 
@@ -71,6 +75,8 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
      */
     public function getAllowedOptionValues()
     {
+        trigger_error('getAllowedOptionValues() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
+
         return array();
     }
 }

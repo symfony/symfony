@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Csrf\EventListener;
 
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
+use Symfony\Component\Form\Tests\DeprecationErrorHandler;
 
 class CsrfValidationListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,7 +67,7 @@ class CsrfValidationListenerTest extends \PHPUnit_Framework_TestCase
     public function testStringFormData()
     {
         $data = "XP4HUzmHPi";
-        $event = new FormEvent($this->form, $data);
+        $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
 
         $validation = new CsrfValidationListener('csrf', $this->csrfProvider, 'unknown');
         $validation->preBind($event);

@@ -876,8 +876,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testDateTimeWithEmptyValueOnTime()
     {
-        $form = $this->factory->createNamed('name', 'datetime', '2011-02-03', array(
-            'input' => 'string',
+        $data = array('year' => '2011', 'month' => '2', 'day' => '3', 'hour' => '', 'minute' => '');
+
+        $form = $this->factory->createNamed('name', 'datetime', $data, array(
+            'input' => 'array',
             'empty_value' => array('hour' => 'Change&Me', 'minute' => 'Change&Me'),
             'required' => false,
         ));

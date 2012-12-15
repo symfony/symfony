@@ -36,14 +36,6 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      */
     public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
-        if (null === $start) {
-            $start = 0;
-        }
-
-        if (null === $end) {
-            $end = time();
-        }
-
         $cursor = $this->getMongo()->find($this->buildQuery($ip, $url, $method, $start, $end), array('_id', 'parent', 'ip', 'method', 'url', 'time'))->sort(array('time' => -1))->limit($limit);
 
         $tokens = array();
@@ -188,6 +180,18 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
         if (!empty($method)) {
             $query['method'] = $method;
+        }
+
+        if (!empty($start) || !empty($end)) {
+            $query['time'] = array();
+        }
+
+        if (!empty($start)) {
+            $query['time']['$gte'] = $start;
+        }
+
+        if (!empty($end)) {
+            $query['time']['$lte'] = $end;
         }
 
         return $query;

@@ -57,14 +57,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $file = fopen($file, 'r');
         fseek($file, 0, SEEK_END);
 
-        if (null === $start) {
-            $start = 0;
-        }
-
-        if (null === $end) {
-            $end = time();
-        }
-
         $result = array();
 
         while ($limit > 0) {
@@ -82,7 +74,15 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
             $csvTime = (int)$csvTime;
 
-            if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url) || $method && false === strpos($csvMethod, $method) || $start > $csvTime || $end < $csvTime) {
+            if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url) || $method && false === strpos($csvMethod, $method)) {
+                continue;
+            }
+
+            if (!empty($start) && $csvTime < $start) {
+               continue;
+            }
+
+            if (!empty($end) && $csvTime > $end) {
                 continue;
             }
 

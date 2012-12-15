@@ -174,21 +174,19 @@ class Profiler
             if (is_integer($start)) {
                 $start = '@' . $start;
             }
-        } else {
-            $start = '@0';
+
+            $start = new \DateTime($start);
+            $start = $start->getTimestamp();
         }
-        $start = new \DateTime($start);
-        $start = $start->getTimestamp();
 
         if ($end != '' && null !== $end) {
             if (is_integer($end)) {
                 $end = '@' . $end;
             }
-        } else {
-            $end = 'now';
+
+            $end = new \DateTime($end);
+            $end = $end->getTimestamp();
         }
-        $end = new \DateTime($end);
-        $end = $end->getTimestamp();
 
         return $this->storage->find($ip, $url, $limit, $method, $start, $end);
     }

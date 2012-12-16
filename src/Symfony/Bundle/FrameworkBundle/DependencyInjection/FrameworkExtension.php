@@ -150,6 +150,8 @@ class FrameworkExtension extends Extension
      * @param array            $config    A configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @throws \LogicException
      */
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -187,6 +189,8 @@ class FrameworkExtension extends Extension
      * @param array            $config    A profiler configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @throws \LogicException
      */
     private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {

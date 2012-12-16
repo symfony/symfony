@@ -291,6 +291,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @param mixed $value The value to normalize
      *
      * @return mixed The normalized value
+     *
+     * @throws InvalidConfigurationException
      */
     protected function normalizeValue($value)
     {

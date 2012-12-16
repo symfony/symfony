@@ -74,7 +74,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
      *
      * @return array
      *
-     * @throws \RuntimeException When the config is invalid
+     * @throws RuntimeException When the config is invalid
      */
     private function processArguments(array $arguments, $inMethodCall = false)
     {

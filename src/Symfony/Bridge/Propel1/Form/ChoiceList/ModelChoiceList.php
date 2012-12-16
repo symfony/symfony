@@ -348,6 +348,8 @@ class ModelChoiceList extends ObjectChoiceList
      *
      * @param object $model The model for which to get the identifier
      *
+     * @return array
+     *
      * @throws FormException If the model does not exist
      */
     private function getIdentifierValues($model)
@@ -367,7 +369,7 @@ class ModelChoiceList extends ObjectChoiceList
     /**
      * Whether this column in an integer
      *
-     * @param ColumnMap $column
+     * @param \ColumnMap $column
      *
      * @return Boolean
      */

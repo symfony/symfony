@@ -51,6 +51,8 @@ class HttpKernelExtension extends \Twig_Extension implements EventSubscriberInte
      * @param string            $uri  The URI to render
      *
      * @return string The Response content
+     *
+     * @throws \RuntimeException
      */
     public function render(\Twig_Environment $twig, $uri)
     {

@@ -251,7 +251,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
      *
      * @param string $token The profile token
      *
-     * @return Boolean
+     * @return string
      */
     protected function has($token)
     {

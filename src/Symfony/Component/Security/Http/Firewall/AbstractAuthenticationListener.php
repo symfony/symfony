@@ -75,6 +75,8 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      *                                                                      successful, or failed authentication attempt
      * @param LoggerInterface                        $logger                A LoggerInterface instance
      * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
@@ -110,6 +112,9 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * Handles form based authentication.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @throws \RuntimeException
+     * @throws SessionUnavailableException
      */
     final public function handle(GetResponseEvent $event)
     {

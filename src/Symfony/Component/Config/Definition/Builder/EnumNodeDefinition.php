@@ -31,6 +31,8 @@ class EnumNodeDefinition extends ScalarNodeDefinition
      * Instantiate a Node
      *
      * @return EnumNode The node
+     *
+     * @throws \RuntimeException
      */
     protected function instantiateNode()
     {

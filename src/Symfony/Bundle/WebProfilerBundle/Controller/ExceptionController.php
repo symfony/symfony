@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
-use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpKernel\Debug\ExceptionHandler;
 use Symfony\Component\HttpFoundation\Response;

@@ -107,6 +107,10 @@
         }
 
         window.setTimeout(function() {
+            if (document.getElementById('menu-profiler') == null) {
+                return;
+            }
+
             var menuItems = document.getElementById('menu-profiler').getElementsByTagName('LI'),
                 elem, value, child, displayState = Sfjs.getPreference('menu/displayState');
 

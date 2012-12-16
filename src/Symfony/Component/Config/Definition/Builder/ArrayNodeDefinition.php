@@ -284,13 +284,15 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Disables key normalization.
+     * Sets key normalization.
+     *
+     * @param Boolean $bool Whether to enable key normalization
      *
      * @return ArrayNodeDefinition
      */
-    public function keepKeys()
+    public function normalizeKeys($bool)
     {
-        $this->normalizeKeys = false;
+        $this->normalizeKeys = (Boolean) $bool;
 
         return $this;
     }

@@ -76,7 +76,7 @@ class Configuration implements ConfigurationInterface
             ->fixXmlConfig('global')
             ->children()
                 ->arrayNode('globals')
-                    ->keepKeys()
+                    ->normalizeKeys(false)
                     ->useAttributeAsKey('key')
                     ->example(array('foo' => '"@bar"', 'pi' => 3.14))
                     ->prototype('array')
@@ -127,7 +127,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('auto_reload')->end()
                 ->scalarNode('optimizations')->end()
                 ->arrayNode('paths')
-                    ->keepKeys()
+                    ->normalizeKeys(false)
                     ->beforeNormalization()
                         ->always()
                         ->then(function ($paths) {

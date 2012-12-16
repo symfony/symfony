@@ -170,6 +170,8 @@ class ExprBuilder
      * @param string $message
      *
      * @return ExprBuilder
+     *
+     * @throws \InvalidArgumentException
      */
     public function thenInvalid($message)
     {
@@ -182,6 +184,8 @@ class ExprBuilder
      * Sets a closure unsetting this key of the array at validation time.
      *
      * @return ExprBuilder
+     *
+     * @throws UnsetKeyException
      */
     public function thenUnset()
     {
@@ -194,6 +198,8 @@ class ExprBuilder
      * Returns the related node
      *
      * @return NodeDefinition
+     *
+     * @throws \RuntimeException
      */
     public function end()
     {

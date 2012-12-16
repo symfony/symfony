@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Security\Acl\Dbal\Schema;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\DBAL\Schema\SchemaException;
@@ -48,7 +47,7 @@ EOF
     }
 
     /**
-     * @see Command
+     * @see Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

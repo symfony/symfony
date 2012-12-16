@@ -57,6 +57,8 @@ abstract class ElementMetadata
      * Adds a constraint to this element.
      *
      * @param Constraint $constraint
+     *
+     * @return ElementMetadata
      */
     public function addConstraint(Constraint $constraint)
     {

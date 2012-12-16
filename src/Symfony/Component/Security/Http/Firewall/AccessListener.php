@@ -46,6 +46,9 @@ class AccessListener implements ListenerInterface
      * Handles access authorization.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @throws AccessDeniedException
+     * @throws AuthenticationCredentialsNotFoundException
      */
     public function handle(GetResponseEvent $event)
     {

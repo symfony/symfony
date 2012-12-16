@@ -59,6 +59,8 @@ class ProfilerController
      * @param string  $token   The profiler token
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function panelAction(Request $request, $token)
     {
@@ -93,6 +95,8 @@ class ProfilerController
      * @param string $token The profiler token
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function exportAction($token)
     {

@@ -500,6 +500,8 @@ class Request
      *
      * @param string $key   The header key
      * @param string $value The header name
+     *
+     * @throws \InvalidArgumentException
      */
     public static function setTrustedHeaderName($key, $value)
     {
@@ -1258,6 +1260,8 @@ class Request
      * @param Boolean $asResource If true, a resource will be returned
      *
      * @return string|resource The request body content or a resource to read the body stream.
+     *
+     * @throws \LogicException
      */
     public function getContent($asResource = false)
     {

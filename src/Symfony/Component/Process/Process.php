@@ -792,7 +792,7 @@ class Process
      *
      * @return self The current Process instance
      *
-     * @throws \InvalidArgumentException if the timeout is negative
+     * @throws InvalidArgumentException if the timeout is negative
      */
     public function setTimeout($timeout)
     {

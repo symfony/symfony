@@ -64,6 +64,8 @@ class PhpProcess extends Process
      *
      * @return integer The exit status code
      *
+     * @throws Exception\RuntimeException
+     *
      * @api
      */
     public function run($callback = null)

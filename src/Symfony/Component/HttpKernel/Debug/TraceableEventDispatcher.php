@@ -177,6 +177,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      *
      * @param string $method    The method name
      * @param array  $arguments The method arguments
+     *
+     * @return mixed
      */
     public function __call($method, $arguments)
     {

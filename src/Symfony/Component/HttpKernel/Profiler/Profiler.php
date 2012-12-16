@@ -163,12 +163,32 @@ class Profiler
      * @param string $url    The URL
      * @param string $limit  The maximum number of tokens to return
      * @param string $method The request method
+     * @param int    $start  The start period to search from
+     * @param int    $end    The end period to search to
      *
      * @return array An array of tokens
      */
-    public function find($ip, $url, $limit, $method)
+    public function find($ip, $url, $limit, $method, $start, $end)
     {
-        return $this->storage->find($ip, $url, $limit, $method);
+        if ($start != '' && null !== $start) {
+            if (is_integer($start)) {
+                $start = '@' . $start;
+            }
+
+            $start = new \DateTime($start);
+            $start = $start->getTimestamp();
+        }
+
+        if ($end != '' && null !== $end) {
+            if (is_integer($end)) {
+                $end = '@' . $end;
+            }
+
+            $end = new \DateTime($end);
+            $end = $end->getTimestamp();
+        }
+
+        return $this->storage->find($ip, $url, $limit, $method, $start, $end);
     }
 
     /**

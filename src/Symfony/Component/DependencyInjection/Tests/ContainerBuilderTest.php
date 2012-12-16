@@ -548,6 +548,28 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->compile();
         $container->setDefinition('a', new Definition());
     }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::getExtensionConfig
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::prependExtensionConfig
+     */
+    public function testExtensionConfig()
+    {
+        $container = new ContainerBuilder();
+
+        $configs = $container->getExtensionConfig('foo');
+        $this->assertEmpty($configs);
+
+        $first = array('foo' => 'bar');
+        $container->prependExtensionConfig('foo', $first);
+        $configs = $container->getExtensionConfig('foo');
+        $this->assertEquals(array($first), $configs);
+
+        $second = array('ding' => 'dong');
+        $container->prependExtensionConfig('foo', $second);
+        $configs = $container->getExtensionConfig('foo');
+        $this->assertEquals(array($second, $first), $configs);
+    }
 }
 
 class FooClass {}

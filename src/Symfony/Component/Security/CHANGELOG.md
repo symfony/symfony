@@ -4,6 +4,9 @@ CHANGELOG
 2.2.0
 -----
 
+ * `Symfony\Component\Security\Http\Firewall` and
+   `Symfony\Component\Security\Http\RememberMe\ResponseListener` now
+   implements EventSubscriberInterface
  * added secure random number generator
  * added PBKDF2 Password encoder
 

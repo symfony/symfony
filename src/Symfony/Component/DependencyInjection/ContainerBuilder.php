@@ -31,12 +31,36 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 class ContainerBuilder extends Container implements TaggedContainerInterface
 {
-    private $extensions       = array();
-    private $extensionsByNs   = array();
-    private $definitions      = array();
-    private $aliases          = array();
-    private $resources        = array();
+    /**
+     * @var ExtensionInterface[]
+     */
+    private $extensions = array();
+
+    /**
+     * @var ExtensionInterface[]
+     */
+    private $extensionsByNs = array();
+
+    /**
+     * @var Definition[]
+     */
+    private $definitions = array();
+
+    /**
+     * @var Alias[]
+     */
+    private $aliases = array();
+
+    /**
+     * @var ResourceInterface[]
+     */
+    private $resources = array();
+
     private $extensionConfigs = array();
+
+    /**
+     * @var Compiler
+     */
     private $compiler;
 
     /**
@@ -82,7 +106,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns all registered extensions.
      *
-     * @return array An array of ExtensionInterface
+     * @return ExtensionInterface[] An array of ExtensionInterface
      *
      * @api
      */
@@ -133,6 +157,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this;
     }
 
+    /**
+     * Sets the resources for this configuration.
+     *
+     * @param ResourceInterface[] $resources An array of resources
+     *
+     * @return ContainerBuilder The current instance
+     *
+     * @api
+     */
     public function setResources(array $resources)
     {
         $this->resources = $resources;
@@ -145,6 +178,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param object $object An object instance
      *
+     * @return ContainerBuilder The current instance
+     *
      * @api
      */
     public function addObjectResource($object)
@@ -153,6 +188,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         do {
             $this->addResource(new FileResource($parent->getFileName()));
         } while ($parent = $parent->getParentClass());
+
+        return $this;
     }
 
     /**
@@ -187,6 +224,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param CompilerPassInterface $pass A compiler pass
      * @param string                $type The type of compiler pass
      *
+     * @return ContainerBuilder The current instance
+     *
      * @api
      */
     public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
@@ -198,6 +237,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $this->compiler->addPass($pass, $type);
 
         $this->addObjectResource($pass);
+
+        return $this;
     }
 
     /**
@@ -425,6 +466,21 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Prepends a config array to the configs of the given extension.
+     *
+     * @param string $name    The name of the extension
+     * @param array  $config  The config to set
+     */
+    public function prependExtensionConfig($name, array $config)
+    {
+        if (!isset($this->extensionConfigs[$name])) {
+            $this->extensionConfigs[$name] = array();
+        }
+
+        array_unshift($this->extensionConfigs[$name], $config);
+    }
+
+    /**
      * Compiles the container.
      *
      * This method passes the container to compiler
@@ -484,7 +540,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the service aliases.
      *
-     * @param array $aliases An array of service definitions
+     * @param array $aliases An array of aliases
      *
      * @api
      */
@@ -619,7 +675,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the service definitions.
      *
-     * @param array $definitions An array of service definitions
+     * @param Definition[] $definitions An array of service definitions
      *
      * @api
      */
@@ -798,10 +854,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($callable = $definition->getConfigurator()) {
-            if (is_array($callable) && is_object($callable[0]) && $callable[0] instanceof Reference) {
-                $callable[0] = $this->get((string) $callable[0]);
-            } elseif (is_array($callable)) {
-                $callable[0] = $parameterBag->resolveValue($callable[0]);
+            if (is_array($callable)) {
+                $callable[0] = $callable[0] instanceof Reference ? $this->get((string) $callable[0]) : $parameterBag->resolveValue($callable[0]);
             }
 
             if (!is_callable($callable)) {
@@ -827,9 +881,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             foreach ($value as &$v) {
                 $v = $this->resolveServices($v);
             }
-        } elseif (is_object($value) && $value instanceof Reference) {
+        } elseif ($value instanceof Reference) {
             $value = $this->get((string) $value, $value->getInvalidBehavior());
-        } elseif (is_object($value) && $value instanceof Definition) {
+        } elseif ($value instanceof Definition) {
             $value = $this->createService($value, null);
         }
 
@@ -887,7 +941,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             foreach ($value as $v) {
                 $services = array_unique(array_merge($services, self::getServiceConditionals($v)));
             }
-        } elseif (is_object($value) && $value instanceof Reference && $value->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
+        } elseif ($value instanceof Reference && $value->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
             $services[] = (string) $value;
         }
 

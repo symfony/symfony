@@ -336,11 +336,30 @@ class Filesystem
      *                               Valid options are:
      *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
      *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
+     *                                 - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
      *
      * @throws IOException When file type is unknown
      */
     public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array())
     {
+        $targetDir = rtrim($targetDir, '/\\');
+        $originDir = rtrim($originDir, '/\\');
+
+        // Iterate in destination folder to remove obsolete entries
+        if ($this->exists($targetDir) && isset($options['delete']) && $options['delete']) {
+            $deleteIterator = $iterator;
+            if (null === $deleteIterator) {
+                $flags = \FilesystemIterator::SKIP_DOTS;
+                $deleteIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST);
+            }
+            foreach ($deleteIterator as $file) {
+                $origin = str_replace($targetDir, $originDir, $file->getPathname());
+                if (!$this->exists($origin)) {
+                    $this->remove($file);
+                }
+            }
+        }
+
         $copyOnWindows = false;
         if (isset($options['copy_on_windows']) && !function_exists('symlink')) {
             $copyOnWindows = $options['copy_on_windows'];
@@ -351,20 +370,27 @@ class Filesystem
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
         }
 
-        $targetDir = rtrim($targetDir, '/\\');
-        $originDir = rtrim($originDir, '/\\');
-
         foreach ($iterator as $file) {
             $target = str_replace($originDir, $targetDir, $file->getPathname());
 
-            if (is_dir($file)) {
-                $this->mkdir($target);
-            } elseif (!$copyOnWindows && is_link($file)) {
-                $this->symlink($file, $target);
-            } elseif (is_file($file) || ($copyOnWindows && is_link($file))) {
-                $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+            if ($copyOnWindows) {
+                if (is_link($file) || is_file($file)) {
+                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+                } elseif (is_dir($file)) {
+                    $this->mkdir($target);
+                } else {
+                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
+                }
             } else {
-                throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
+                if (is_link($file)) {
+                    $this->symlink($file, $target);
+                } elseif (is_dir($file)) {
+                    $this->mkdir($target);
+                } elseif (is_file($file)) {
+                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+                } else {
+                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file));
+                }
             }
         }
     }

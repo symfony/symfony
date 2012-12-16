@@ -8,6 +8,10 @@ CHANGELOG
  * replaced Symfony\Component\HttpKernel\Debug\ContainerAwareTraceableEventDispatcher by Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher
  * added Client::enableProfiler()
  * added posibility to load the serializer component in the service container
+ * A new parameter has been added to the DIC: `router.request_context.base_url`
+   You can customize it for your functional tests or for generating urls with
+   the right base url when your are in the cli context.
+>>>>>>> master
 
 2.1.0
 -----

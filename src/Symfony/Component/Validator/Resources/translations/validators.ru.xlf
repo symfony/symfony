@@ -64,7 +64,7 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>Файл слишком большой ({{ size }} {{ suffix }}). Максимальный допустимый размер {{ limit }} {{ suffix }}.</target>
+                <target>Файл слишком большой ({{ size }} {{ suffix }}). Максимально допустимый размер {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
@@ -108,7 +108,7 @@
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
-                <target>Значение URL недопустимо.</target>
+                <target>Значение не является допустимым URL.</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>Файл слишком большой. Максимальный допустимый размер {{ limit }} {{ suffix }}.</target>
+                <target>Файл слишком большой. Максимально допустимый размер {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
@@ -160,19 +160,19 @@
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target>Ширина изображения слишком большая ({{ width }}px). Максимальная допустимая ширина {{ max_width }}px.</target>
+                <target>Ширина изображения слишком велика ({{ width }}px). Максимально допустимая ширина {{ max_width }}px.</target>
             </trans-unit>
             <trans-unit id="44">
                 <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target>Ширина изображения слишком мала ({{ width }}px). Минимальная допустимая ширина {{ min_width }}px.</target>
+                <target>Ширина изображения слишком мала ({{ width }}px). Минимально допустимая ширина {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target>Высота изображения слишком большая ({{ height }}px). Максимальная допустимая высота {{ max_height }}px.</target>
+                <target>Высота изображения слишком велика ({{ height }}px). Максимально допустимая высота {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>Высота изображения слишком мала ({{ height }}px). Минимальная допустимая высота {{ min_height }}px.</target>
+                <target>Высота изображения слишком мала ({{ height }}px). Минимально допустимая высота {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user current password.</source>

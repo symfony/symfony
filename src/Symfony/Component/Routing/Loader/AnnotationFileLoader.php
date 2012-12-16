@@ -14,7 +14,7 @@ namespace Symfony\Component\Routing\Loader;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Loader\FileLoader;
-use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * AnnotationFileLoader loads routing information from annotations set
@@ -29,11 +29,11 @@ class AnnotationFileLoader extends FileLoader
     /**
      * Constructor.
      *
-     * @param FileLocator           $locator A FileLocator instance
+     * @param FileLocatorInterface  $locator A FileLocator instance
      * @param AnnotationClassLoader $loader  An AnnotationClassLoader instance
      * @param string|array          $paths   A path or an array of paths where to look for resources
      */
-    public function __construct(FileLocator $locator, AnnotationClassLoader $loader, $paths = array())
+    public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader, $paths = array())
     {
         if (!function_exists('token_get_all')) {
             throw new \RuntimeException('The Tokenizer extension is required for the routing annotation loaders.');
@@ -47,8 +47,8 @@ class AnnotationFileLoader extends FileLoader
     /**
      * Loads from annotations from a file.
      *
-     * @param string $file A PHP file path
-     * @param string $type The resource type
+     * @param string      $file A PHP file path
+     * @param string|null $type The resource type
      *
      * @return RouteCollection A RouteCollection instance
      *

@@ -65,9 +65,11 @@ class Finder implements \IteratorAggregate, \Countable
     {
         $this->ignore = static::IGNORE_VCS_FILES | static::IGNORE_DOT_FILES;
 
-        $this->addAdapter(new GnuFindAdapter());
-        $this->addAdapter(new BsdFindAdapter());
-        $this->addAdapter(new PhpAdapter(), -50);
+        $this
+            ->addAdapter(new GnuFindAdapter())
+            ->addAdapter(new BsdFindAdapter())
+            ->addAdapter(new PhpAdapter(), -50)
+        ;
     }
 
     /**
@@ -86,7 +88,7 @@ class Finder implements \IteratorAggregate, \Countable
      * Registers a finder engine implementation.
      *
      * @param AdapterInterface $adapter  An adapter instance
-     * @param int              $priority Highest is selected first
+     * @param integer          $priority Highest is selected first
      *
      * @return Finder The current Finder instance
      */
@@ -418,9 +420,20 @@ class Finder implements \IteratorAggregate, \Countable
         return $this;
     }
 
+    /**
+     * Adds VCS patterns.
+     *
+     * @see ignoreVCS
+     *
+     * @param string|string[] $pattern VCS patterns to ignore
+     */
     public static function addVCSPattern($pattern)
     {
-        self::$vcsPatterns[] = $pattern;
+        foreach ((array) $pattern as $p) {
+            self::$vcsPatterns[] = $p;
+        }
+
+        self::$vcsPatterns = array_unique(self::$vcsPatterns);
     }
 
     /**
@@ -615,8 +628,8 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function getIterator()
     {
-        if (0 === count($this->dirs)) {
-            throw new \LogicException('You must call the in() method before iterating over a Finder.');
+        if (0 === count($this->dirs) && 0 === count($this->iterators)) {
+            throw new \LogicException('You must call one of in() or append() methods before iterating over a Finder.');
         }
 
         if (1 === count($this->dirs) && 0 === count($this->iterators)) {
@@ -641,6 +654,10 @@ class Finder implements \IteratorAggregate, \Countable
      * The set can be another Finder, an Iterator, an IteratorAggregate, or even a plain array.
      *
      * @param mixed $iterator
+     *
+     * @return Finder The finder
+     *
+     * @throws \InvalidArgumentException When the given argument is not iterable.
      */
     public function append($iterator)
     {
@@ -657,6 +674,8 @@ class Finder implements \IteratorAggregate, \Countable
         } else {
             throw new \InvalidArgumentException('Finder::append() method wrong argument type.');
         }
+
+        return $this;
     }
 
     /**
@@ -685,6 +704,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @param $dir
      *
      * @return \Iterator
+     *
+     * @throws \RuntimeException When none of the adapters are supported
      */
     private function searchInDirectory($dir)
     {
@@ -697,16 +718,12 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         foreach ($this->adapters as $adapter) {
-            if (!$adapter['adapter']->isSupported()) {
-                continue;
-            }
-
-            try {
-                return $this
-                    ->buildAdapter($adapter['adapter'])
-                    ->searchInDirectory($dir);
-            } catch(ExceptionInterface $e) {
-                continue;
+            if ($adapter['adapter']->isSupported()) {
+                try {
+                    return $this
+                        ->buildAdapter($adapter['adapter'])
+                        ->searchInDirectory($dir);
+                } catch (ExceptionInterface $e) {}
             }
         }
 

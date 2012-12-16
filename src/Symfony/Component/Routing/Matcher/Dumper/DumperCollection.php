@@ -18,13 +18,25 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
  */
 class DumperCollection implements \IteratorAggregate
 {
+    /**
+     * @var DumperCollection|null
+     */
     private $parent;
+
+    /**
+     * @var (DumperCollection|DumperRoute)[]
+     */
     private $children = array();
+
+    /**
+     * @var array
+     */
+    private $attributes = array();
 
     /**
      * Returns the children routes and collections.
      *
-     * @return array Array of DumperCollection|DumperRoute
+     * @return (DumperCollection|DumperRoute)[] Array of DumperCollection|DumperRoute
      */
     public function all()
     {
@@ -45,7 +57,7 @@ class DumperCollection implements \IteratorAggregate
     }
 
     /**
-     * Sets children
+     * Sets children.
      *
      * @param array $children The children
      */
@@ -97,5 +109,51 @@ class DumperCollection implements \IteratorAggregate
     protected function setParent(DumperCollection $parent)
     {
         $this->parent = $parent;
+    }
+
+    /**
+     * Returns true if the attribute is defined.
+     *
+     * @param string $name The attribute name
+     *
+     * @return Boolean true if the attribute is defined, false otherwise
+     */
+    public function hasAttribute($name)
+    {
+        return array_key_exists($name, $this->attributes);
+    }
+
+    /**
+     * Returns an attribute by name.
+     *
+     * @param string $name    The attribute name
+     * @param mixed  $default Default value is the attribute doesn't exist
+     *
+     * @return mixed The attribute value
+     */
+    public function getAttribute($name, $default = null)
+    {
+        return $this->hasAttribute($name) ? $this->attributes[$name] : $default;
+    }
+
+    /**
+     * Sets an attribute by name.
+     *
+     * @param string $name  The attribute name
+     * @param mixed  $value The attribute value
+     */
+    public function setAttribute($name, $value)
+    {
+        $this->attributes[$name] = $value;
+    }
+
+    /**
+     * Sets multiple attributes.
+     *
+     * @param array $attributes The attributes
+     */
+    public function setAttributes($attributes)
+    {
+        $this->attributes = $attributes;
     }
 }

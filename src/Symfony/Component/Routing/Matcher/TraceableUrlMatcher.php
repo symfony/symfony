@@ -44,14 +44,6 @@ class TraceableUrlMatcher extends UrlMatcher
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
         foreach ($routes as $name => $route) {
-            if ($route instanceof RouteCollection) {
-                if (!$ret = $this->matchCollection($pathinfo, $route)) {
-                    continue;
-                }
-
-                return true;
-            }
-
             $compiledRoute = $route->compile();
 
             if (!preg_match($compiledRoute->getRegex(), $pathinfo, $matches)) {

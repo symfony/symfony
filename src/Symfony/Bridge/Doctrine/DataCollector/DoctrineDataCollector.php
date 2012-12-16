@@ -148,6 +148,7 @@ class DoctrineDataCollector extends DataCollector
      * value to explain the query).
      *
      * @param mixed $var
+     *
      * @return array
      */
     private function sanitizeParam($var)

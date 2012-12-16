@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Client;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Tests\Fixtures\TestClient;
@@ -84,6 +85,22 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $domResponse = $m->invoke($client, $response);
         $this->assertEquals($expected[0], $domResponse->getHeader('Set-Cookie'));
         $this->assertEquals($expected, $domResponse->getHeader('Set-Cookie', false));
+    }
+
+    public function testFilterResponseSupportsStreamedResponses()
+    {
+        $client = new Client(new TestHttpKernel());
+
+        $r = new \ReflectionObject($client);
+        $m = $r->getMethod('filterResponse');
+        $m->setAccessible(true);
+
+        $response = new StreamedResponse(function () {
+            echo 'foo';
+        });
+
+        $domResponse = $m->invoke($client, $response);
+        $this->assertEquals('foo', $domResponse->getContent());
     }
 
     public function testUploadedFile()

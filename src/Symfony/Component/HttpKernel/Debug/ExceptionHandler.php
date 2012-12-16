@@ -91,7 +91,6 @@ class ExceptionHandler
      */
     public function getContent(FlattenException $exception)
     {
-        $title = '';
         switch ($exception->getStatusCode()) {
             case 404:
                 $title = 'Sorry, the page you are looking for could not be found.';
@@ -103,13 +102,10 @@ class ExceptionHandler
         $content = '';
         if ($this->debug) {
             try {
-                $message = nl2br($exception->getMessage());
-                $class = $this->abbrClass($exception->getClass());
                 $count = count($exception->getAllPrevious());
-                $content = '';
+                $total = $count + 1;
                 foreach ($exception->toArray() as $position => $e) {
                     $ind = $count - $position + 1;
-                    $total = $count + 1;
                     $class = $this->abbrClass($e['class']);
                     $message = nl2br($e['message']);
                     $content .= sprintf(<<<EOF
@@ -121,7 +117,7 @@ class ExceptionHandler
 
 EOF
                         , $ind, $total, $class, $message);
-                    foreach ($e['trace'] as $i => $trace) {
+                    foreach ($e['trace'] as $trace) {
                         $content .= '       <li>';
                         if ($trace['function']) {
                             $content .= sprintf('at %s%s%s(%s)', $this->abbrClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
@@ -150,7 +146,7 @@ EOF
         }
 
         return <<<EOF
-            <div id="sf-exceptionresetcontent" class="sf-exceptionreset">
+            <div id="sf-resetcontent" class="sf-reset">
                 <h1>$title</h1>
                 $content
             </div>
@@ -167,24 +163,24 @@ EOF;
     public function getStylesheet(FlattenException $exception)
     {
         return <<<EOF
-            .sf-exceptionreset { font: 11px Verdana, Arial, sans-serif; color: #333 }
-            .sf-exceptionreset .clear { clear:both; height:0; font-size:0; line-height:0; }
-            .sf-exceptionreset .clear_fix:after { display:block; height:0; clear:both; visibility:hidden; }
-            .sf-exceptionreset .clear_fix { display:inline-block; }
-            .sf-exceptionreset * html .clear_fix { height:1%; }
-            .sf-exceptionreset .clear_fix { display:block; }
-            .sf-exceptionreset, .sf-exceptionreset .block { margin: auto }
-            .sf-exceptionreset abbr { border-bottom: 1px dotted #000; cursor: help; }
-            .sf-exceptionreset p { font-size:14px; line-height:20px; color:#868686; padding-bottom:20px }
-            .sf-exceptionreset strong { font-weight:bold; }
-            .sf-exceptionreset a { color:#6c6159; }
-            .sf-exceptionreset a img { border:none; }
-            .sf-exceptionreset a:hover { text-decoration:underline; }
-            .sf-exceptionreset em { font-style:italic; }
-            .sf-exceptionreset h1, .sf-exceptionreset h2 { font: 20px Georgia, "Times New Roman", Times, serif }
-            .sf-exceptionreset h2 span { background-color: #fff; color: #333; padding: 6px; float: left; margin-right: 10px; }
-            .sf-exceptionreset .traces li { font-size:12px; padding: 2px 4px; list-style-type:decimal; margin-left:20px; }
-            .sf-exceptionreset .block { background-color:#FFFFFF; padding:10px 28px; margin-bottom:20px;
+            .sf-reset { font: 11px Verdana, Arial, sans-serif; color: #333 }
+            .sf-reset .clear { clear:both; height:0; font-size:0; line-height:0; }
+            .sf-reset .clear_fix:after { display:block; height:0; clear:both; visibility:hidden; }
+            .sf-reset .clear_fix { display:inline-block; }
+            .sf-reset * html .clear_fix { height:1%; }
+            .sf-reset .clear_fix { display:block; }
+            .sf-reset, .sf-reset .block { margin: auto }
+            .sf-reset abbr { border-bottom: 1px dotted #000; cursor: help; }
+            .sf-reset p { font-size:14px; line-height:20px; color:#868686; padding-bottom:20px }
+            .sf-reset strong { font-weight:bold; }
+            .sf-reset a { color:#6c6159; }
+            .sf-reset a img { border:none; }
+            .sf-reset a:hover { text-decoration:underline; }
+            .sf-reset em { font-style:italic; }
+            .sf-reset h1, .sf-reset h2 { font: 20px Georgia, "Times New Roman", Times, serif }
+            .sf-reset h2 span { background-color: #fff; color: #333; padding: 6px; float: left; margin-right: 10px; }
+            .sf-reset .traces li { font-size:12px; padding: 2px 4px; list-style-type:decimal; margin-left:20px; }
+            .sf-reset .block { background-color:#FFFFFF; padding:10px 28px; margin-bottom:20px;
                 -webkit-border-bottom-right-radius: 16px;
                 -webkit-border-bottom-left-radius: 16px;
                 -moz-border-radius-bottomright: 16px;
@@ -195,7 +191,7 @@ EOF;
                 border-right:1px solid #ccc;
                 border-left:1px solid #ccc;
             }
-            .sf-exceptionreset .block_exception { background-color:#ddd; color: #333; padding:20px;
+            .sf-reset .block_exception { background-color:#ddd; color: #333; padding:20px;
                 -webkit-border-top-left-radius: 16px;
                 -webkit-border-top-right-radius: 16px;
                 -moz-border-radius-topleft: 16px;
@@ -206,10 +202,10 @@ EOF;
                 border-right:1px solid #ccc;
                 border-left:1px solid #ccc;
             }
-            .sf-exceptionreset li a { background:none; color:#868686; text-decoration:none; }
-            .sf-exceptionreset li a:hover { background:none; color:#313131; text-decoration:underline; }
-            .sf-exceptionreset ol { padding: 10px 0; }
-            .sf-exceptionreset h1 { background-color:#FFFFFF; padding: 15px 28px; margin-bottom: 20px;
+            .sf-reset li a { background:none; color:#868686; text-decoration:none; }
+            .sf-reset li a:hover { background:none; color:#313131; text-decoration:underline; }
+            .sf-reset ol { padding: 10px 0; }
+            .sf-reset h1 { background-color:#FFFFFF; padding: 15px 28px; margin-bottom: 20px;
                 -webkit-border-radius: 10px;
                 -moz-border-radius: 10px;
                 border-radius: 10px;
@@ -232,7 +228,7 @@ EOF;
 
             html { background: #eee; padding: 10px }
             img { border: 0; }
-            #sf-exceptionresetcontent { width:970px; margin:0 auto; }
+            #sf-resetcontent { width:970px; margin:0 auto; }
             $css
         </style>
     </head>

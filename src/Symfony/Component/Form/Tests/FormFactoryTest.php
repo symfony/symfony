@@ -348,6 +348,24 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FORM', $this->factory->createNamed('name', 'type', null, $options));
     }
 
+    public function testCreateBuilderForPropertyWithoutTypeGuesser()
+    {
+        $registry = $this->getMock('Symfony\Component\Form\FormRegistryInterface');
+        $factory = $this->getMockBuilder('Symfony\Component\Form\FormFactory')
+            ->setMethods(array('createNamedBuilder'))
+            ->setConstructorArgs(array($registry, $this->resolvedTypeFactory))
+            ->getMock();
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('firstName', 'text', null, array())
+            ->will($this->returnValue('builderInstance'));
+
+        $builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
+
+        $this->assertEquals('builderInstance', $builder);
+    }
+
     public function testCreateBuilderForPropertyCreatesFormWithHighestConfidence()
     {
         $this->guesser1->expects($this->once())

@@ -235,7 +235,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', array(), array('foo' => 'd+')));
         $this->getGenerator($routes)->generate('test', array('foo' => 'bar'), true);
     }
-    
+
     /**
      * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
      */
@@ -262,7 +262,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $routes = $this->getRoutes('test', new Route('/', array(), array('_scheme' => 'http')));
         $this->assertEquals('http://localhost/app.php/', $this->getGenerator($routes, array('scheme' => 'https'))->generate('test'));
     }
-    
+
     public function testPathWithTwoStartingSlashes()
     {
         $routes = $this->getRoutes('test', new Route('//path-and-not-domain'));
@@ -292,6 +292,13 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('/app.php/test?default=foo', $this->getGenerator($routes)->generate('test', array('default' => 'foo')));
         $this->assertSame('/app.php/test?default=value', $this->getGenerator($routes)->generate('test', array('default' => 'value')));
         $this->assertSame('/app.php/test', $this->getGenerator($routes)->generate('test'));
+    }
+
+    public function testGenerateWithSpecialRouteName()
+    {
+        $routes = $this->getRoutes('$péß^a|', new Route('/bar'));
+
+        $this->assertSame('/app.php/bar', $this->getGenerator($routes)->generate('$péß^a|'));
     }
 
     public function testUrlEncoding()
@@ -375,6 +382,62 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $routes = $this->getRoutes('test', new Route('/{page}.{_format}'));
         $this->getGenerator($routes)->generate('test', array('page' => 'do.t', '_format' => 'html'));
+    }
+
+    public function testWithHostnameDifferentFromContext()
+    {
+        $routes = $this->getRoutes('test', new Route('/{name}', array(), array(), array(), '{locale}.example.com'));
+
+        $this->assertEquals('http://fr.example.com/app.php/Fabien', $this->getGenerator($routes)->generate('test', array('name' =>'Fabien', 'locale' => 'fr')));
+    }
+
+    public function testWithHostnameSameAsContext()
+    {
+        $routes = $this->getRoutes('test', new Route('/{name}', array(), array(), array(), '{locale}.example.com'));
+
+        $this->assertEquals('/app.php/Fabien', $this->getGenerator($routes, array('host' => 'fr.example.com'))->generate('test', array('name' =>'Fabien', 'locale' => 'fr')));
+    }
+
+    public function testWithHostnameSameAsContextAndAbsolute()
+    {
+        $routes = $this->getRoutes('test', new Route('/{name}', array(), array(), array(), '{locale}.example.com'));
+
+        $this->assertEquals('http://fr.example.com/app.php/Fabien', $this->getGenerator($routes, array('host' => 'fr.example.com'))->generate('test', array('name' =>'Fabien', 'locale' => 'fr'), true));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
+     */
+    public function testUrlWithInvalidParameterInHostname()
+    {
+        $routes = $this->getRoutes('test', new Route('/', array(), array('foo' => 'bar'), array(), '{foo}.example.com'));
+        $this->getGenerator($routes)->generate('test', array('foo' => 'baz'), false);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
+     */
+    public function testUrlWithInvalidParameterInHostnameWhenParamHasADefaultValue()
+    {
+        $routes = $this->getRoutes('test', new Route('/', array('foo' => 'bar'), array('foo' => 'bar'), array(), '{foo}.example.com'));
+        $this->getGenerator($routes)->generate('test', array('foo' => 'baz'), false);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\InvalidParameterException
+     */
+    public function testUrlWithInvalidParameterEqualsDefaultValueInHostname()
+    {
+        $routes = $this->getRoutes('test', new Route('/', array('foo' => 'baz'), array('foo' => 'bar'), array(), '{foo}.example.com'));
+        $this->getGenerator($routes)->generate('test', array('foo' => 'baz'), false);
+    }
+
+    public function testUrlWithInvalidParameterInHostnameInNonStrictMode()
+    {
+        $routes = $this->getRoutes('test', new Route('/', array(), array('foo' => 'bar'), array(), '{foo}.example.com'));
+        $generator = $this->getGenerator($routes);
+        $generator->setStrictRequirements(false);
+        $this->assertNull($generator->generate('test', array('foo' => 'baz'), false));
     }
 
     protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)

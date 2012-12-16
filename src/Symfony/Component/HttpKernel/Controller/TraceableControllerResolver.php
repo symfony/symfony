@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Controller;
 
-use Symfony\Component\HttpKernel\Debug\Stopwatch;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

@@ -22,6 +22,9 @@
         "symfony/form": "2.2.*",
         "propel/propel1": "1.6.*"
     },
+    "require-dev": {
+        "symfony/stopwatch": "2.2.*"
+    },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Propel1\\": "" }
     },

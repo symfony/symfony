@@ -15,10 +15,10 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
-use Symfony\Component\HttpKernel\Debug\Stopwatch;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
 {
@@ -194,7 +194,7 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
 class EventSubscriber implements EventSubscriberInterface
 {
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array('foo' => 'call');
     }

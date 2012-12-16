@@ -227,7 +227,6 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
     {
         // The mapping must be deterministic! If a child has the property path "[street]",
         // "data[street]" should be mapped, but "data.street" should not!
-
         return array(
             // mapping target, child name, its property path, grand child name, its property path, violation path
             array(self::LEVEL_0, 'address', 'address', 'street', 'street', ''),
@@ -1260,7 +1259,6 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         // 1) the error actually maps to an existing child and
         // 2) the property path of that child (relative to the form providing
         //    the mapping) matches the left side of the mapping
-
         return array(
             // mapping target, map from, map to, child name, its property path, grand child name, its property path, violation path
             array(self::LEVEL_1, 'foo', 'address', 'foo', 'foo', 'address', 'address', 'street', 'street', 'children[foo].children[street].data'),

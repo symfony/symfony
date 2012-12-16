@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
 use Symfony\Component\Form\Extension\Core\EventListener\FixUrlProtocolListener;
-use Symfony\Component\Form\Tests\DeprecationErrorHandler;
+use Symfony\Component\Form\Test\DeprecationErrorHandler;
 
 class FixUrlProtocolListenerTest extends \PHPUnit_Framework_TestCase
 {

@@ -247,6 +247,8 @@ abstract class BaseNode implements NodeInterface
      */
     final public function normalize($value)
     {
+        $value = $this->preNormalize($value);
+
         // run custom normalization closures
         foreach ($this->normalizationClosures as $closure) {
             $value = $closure($value);
@@ -264,6 +266,18 @@ abstract class BaseNode implements NodeInterface
 
         // normalize value
         return $this->normalizeValue($value);
+    }
+
+    /**
+     * Normalizes the value before any other normalization is applied.
+     *
+     * @param $value
+     *
+     * @return $value The normalized array value
+     */
+    protected function preNormalize($value)
+    {
+        return $value;
     }
 
     /**

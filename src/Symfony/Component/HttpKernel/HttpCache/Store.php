@@ -422,7 +422,7 @@ class Store implements StoreInterface
      * @param array  $headers An array of HTTP headers for the Response
      * @param string $body    The Response body
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     private function restoreResponse($headers, $body = null)
     {

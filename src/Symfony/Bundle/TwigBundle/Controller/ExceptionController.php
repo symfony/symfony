@@ -66,7 +66,7 @@ class ExceptionController
     }
 
     /**
-     * @param int $startObLevel
+     * @param integer $startObLevel
      *
      * @return string
      */

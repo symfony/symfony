@@ -71,7 +71,7 @@ class BinaryFileResponse extends Response
      *
      * @return BinaryFileResponse
      *
-     * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
+     * @throws FileException
      */
     public function setFile($file, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {

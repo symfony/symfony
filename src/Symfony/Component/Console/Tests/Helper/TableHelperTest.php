@@ -74,7 +74,7 @@ class TableHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public static function testRenderProvider()
+    public function testRenderProvider()
     {
         return array(
             array(

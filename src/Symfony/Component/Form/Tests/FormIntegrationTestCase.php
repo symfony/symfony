@@ -33,7 +33,7 @@ abstract class FormIntegrationTestCase extends \PHPUnit_Framework_TestCase
             ->addExtensions($this->getExtensions())
             ->getFormFactory();
 
-        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
     }
 
     protected function tearDown()

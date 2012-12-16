@@ -85,7 +85,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('addType')
             ->with($resolvedType);
 
-        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
         $this->factory->addType($type);
         restore_error_handler();
     }
@@ -97,7 +97,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->with('name')
             ->will($this->returnValue('RESULT'));
 
-        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
         $this->assertSame('RESULT', $this->factory->hasType('name'));
         restore_error_handler();
     }
@@ -116,7 +116,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->with('name')
             ->will($this->returnValue($resolvedType));
 
-        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
         $this->assertEquals($type, $this->factory->getType('name'));
         restore_error_handler();
     }

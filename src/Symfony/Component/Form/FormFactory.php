@@ -99,7 +99,7 @@ class FormFactory implements FormFactoryInterface
         $typeGuess = $guesser->guessType($class, $property);
         $maxLengthGuess = $guesser->guessMaxLength($class, $property);
         // Keep $minLengthGuess for BC until Symfony 2.3
-        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handleBC'));
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
         $minLengthGuess = $guesser->guessMinLength($class, $property);
         restore_error_handler();
         $requiredGuess = $guesser->guessRequired($class, $property);

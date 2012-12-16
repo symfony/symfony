@@ -25,10 +25,12 @@ interface ProfilerStorageInterface
      * @param string $url    The URL
      * @param string $limit  The maximum number of tokens to return
      * @param string $method The request method
+     * @param int    $start  The start period to search from
+     * @param int    $end    The end period to search to
      *
      * @return array An array of tokens
      */
-    public function find($ip, $url, $limit, $method);
+    public function find($ip, $url, $limit, $method, $start = null, $end = null);
 
     /**
      * Reads data associated with the given token.

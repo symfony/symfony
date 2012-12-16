@@ -34,9 +34,9 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method)
+    public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
-        $cursor = $this->getMongo()->find($this->buildQuery($ip, $url, $method), array('_id', 'parent', 'ip', 'method', 'url', 'time'))->sort(array('time' => -1))->limit($limit);
+        $cursor = $this->getMongo()->find($this->buildQuery($ip, $url, $method, $start, $end), array('_id', 'parent', 'ip', 'method', 'url', 'time'))->sort(array('time' => -1))->limit($limit);
 
         $tokens = array();
         foreach ($cursor as $profile) {
@@ -161,10 +161,12 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * @param string $ip
      * @param string $url
      * @param string $method
+     * @param int    $start
+     * @param int    $end
      *
      * @return array
      */
-    private function buildQuery($ip, $url, $method)
+    private function buildQuery($ip, $url, $method, $start, $end)
     {
         $query = array();
 
@@ -178,6 +180,18 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
 
         if (!empty($method)) {
             $query['method'] = $method;
+        }
+
+        if (!empty($start) || !empty($end)) {
+            $query['time'] = array();
+        }
+
+        if (!empty($start)) {
+            $query['time']['$gte'] = $start;
+        }
+
+        if (!empty($end)) {
+            $query['time']['$lte'] = $end;
         }
 
         return $query;

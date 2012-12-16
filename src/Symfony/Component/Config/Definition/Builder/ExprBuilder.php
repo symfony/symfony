@@ -169,6 +169,7 @@ class ExprBuilder
      *
      * @param string $message
      *
+     * @throws \InvalidArgumentException
      * @return ExprBuilder
      */
     public function thenInvalid($message)
@@ -181,6 +182,7 @@ class ExprBuilder
     /**
      * Sets a closure unsetting this key of the array at validation time.
      *
+     * @throws UnsetKeyException
      * @return ExprBuilder
      */
     public function thenUnset()
@@ -193,6 +195,7 @@ class ExprBuilder
     /**
      * Returns the related node
      *
+     * @throws \RuntimeException
      * @return NodeDefinition
      */
     public function end()

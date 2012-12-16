@@ -36,6 +36,8 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
      * @param QueryBuilder|\Closure $queryBuilder
      * @param EntityManager         $manager
      * @param string                $class
+     *
+     * @throws UnexpectedTypeException
      */
     public function __construct($queryBuilder, $manager = null, $class = null)
     {

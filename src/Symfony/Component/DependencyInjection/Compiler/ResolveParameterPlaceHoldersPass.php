@@ -26,7 +26,7 @@ class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
      *
      * @param ContainerBuilder $container
      *
-     * @throws ParameterNotFoundException When an invalid parameter is referenced
+     * @throws \Exception|\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException
      */
     public function process(ContainerBuilder $container)
     {

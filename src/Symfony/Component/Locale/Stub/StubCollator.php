@@ -74,6 +74,7 @@ class StubCollator
      *
      * @param string $locale The locale code
      *
+     * @return \Symfony\Component\Locale\Stub\StubCollator
      * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
      */
     public static function create($locale)
@@ -84,8 +85,8 @@ class StubCollator
     /**
      * Sort array maintaining index association
      *
-     * @param  array  &$array    Input array
-     * @param array $sortFlag Flags for sorting, can be one of the following:
+     * @param array &$array    Input array
+     * @param int   $sortFlag  Flags for sorting, can be one of the following:
      *                           StubCollator::SORT_REGULAR - compare items normally (don't change types)
      *                           StubCollator::SORT_NUMERIC - compare items numerically
      *                           StubCollator::SORT_STRING - compare items as strings

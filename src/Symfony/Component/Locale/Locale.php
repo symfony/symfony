@@ -43,7 +43,7 @@ class Locale extends \Locale
      *
      * @return array              The country names with their codes as keys
      *
-     * @throws RuntimeException   When the resource bundles cannot be loaded
+     * @throws \RuntimeException  When the resource bundles cannot be loaded
      */
     public static function getDisplayCountries($locale)
     {
@@ -98,7 +98,7 @@ class Locale extends \Locale
      *
      * @return array              The language names with their codes as keys
      *
-     * @throws RuntimeException   When the resource bundles cannot be loaded
+     * @throws \RuntimeException  When the resource bundles cannot be loaded
      */
     public static function getDisplayLanguages($locale)
     {
@@ -149,7 +149,7 @@ class Locale extends \Locale
      *
      * @param string $locale The locale to use for the locale names
      * @return array              The locale names with their codes as keys
-     * @throws RuntimeException   When the resource bundles cannot be loaded
+     * @throws \RuntimeException  When the resource bundles cannot be loaded
      */
     public static function getDisplayLocales($locale)
     {

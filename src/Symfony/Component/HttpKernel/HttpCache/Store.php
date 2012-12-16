@@ -156,6 +156,7 @@ class Store implements StoreInterface
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
      *
+     * @throws \RuntimeException
      * @return string The key under which the response is stored
      */
     public function write(Request $request, Response $response)
@@ -219,6 +220,8 @@ class Store implements StoreInterface
      * Invalidates all cache entries that match the request.
      *
      * @param Request $request A Request instance
+     *
+     * @throws \RuntimeException
      */
     public function invalidate(Request $request)
     {
@@ -336,6 +339,8 @@ class Store implements StoreInterface
      *
      * @param string $key  The store key
      * @param string $data The data to store
+     *
+     * @return Boolean
      */
     private function save($key, $data)
     {
@@ -415,6 +420,8 @@ class Store implements StoreInterface
      *
      * @param array  $headers An array of HTTP headers for the Response
      * @param string $body    The Response body
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function restoreResponse($headers, $body = null)
     {

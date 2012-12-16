@@ -334,6 +334,7 @@ class Response
      *
      * @param mixed $content
      *
+     * @throws \UnexpectedValueException
      * @return Response
      *
      * @api
@@ -873,6 +874,7 @@ class Response
      *
      * @param array $options An array of cache options
      *
+     * @throws \InvalidArgumentException
      * @return Response
      *
      * @api

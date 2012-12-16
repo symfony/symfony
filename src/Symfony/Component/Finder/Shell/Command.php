@@ -175,6 +175,7 @@ class Command
      *
      * @param string $label
      *
+     * @throws \RuntimeException
      * @return Command The labeled command
      */
     public function get($label)
@@ -215,6 +216,7 @@ class Command
     /**
      * Executes current command.
      *
+     * @throws \RuntimeException
      * @return array The command result
      */
     public function execute()

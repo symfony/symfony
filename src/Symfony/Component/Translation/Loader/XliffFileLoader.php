@@ -60,6 +60,7 @@ class XliffFileLoader implements LoaderInterface
      *
      * @param string $file
      *
+     * @throws InvalidResourceException
      * @return \SimpleXMLElement
      */
     private function parseFile($file)
@@ -114,6 +115,8 @@ class XliffFileLoader implements LoaderInterface
 
     /**
      * Returns the XML errors of the internal XML parser
+     *
+     * @param Boolean $internalErrors
      *
      * @return array An array of errors
      */

@@ -47,6 +47,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param string          $providerKey
      * @param array           $options
      * @param LoggerInterface $logger
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(array $userProviders, $key, $providerKey, array $options = array(), LoggerInterface $logger = null)
     {
@@ -89,7 +91,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      *
      * @param Request $request
      *
-     * @return TokenInterface
+     * @throws \RuntimeException|\Symfony\Component\Security\Core\Exception\CookieTheftException
+     * @return TokenInterface|null
      */
     final public function autoLogin(Request $request)
     {

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Translation;
 
-use Symfony\Component\Config\Resource\ResourceInterface;
-
 /**
  * MetadataAwareInterface.
  *

@@ -62,6 +62,7 @@ class PhpProcess extends Process
      * @param Closure|string|array $callback A PHP callback to run whenever there is some
      *                                       output available on STDOUT or STDERR
      *
+     * @throws Exception\RuntimeException
      * @return integer The exit status code
      *
      * @api

@@ -323,6 +323,9 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Sets the default group sequence for this class.
      *
      * @param array $groups An array of group names
+     *
+     * @throws \Symfony\Component\Validator\Exception\GroupDefinitionException
+     * @return ClassMetadata
      */
     public function setGroupSequence(array $groups)
     {
@@ -381,6 +384,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Sets whether a group sequence provider should be used.
      *
      * @param Boolean $active
+     *
+     * @throws GroupDefinitionException
      */
     public function setGroupSequenceProvider($active)
     {

@@ -406,9 +406,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Validate the configuration of a concrete node.
      *
-     * @param NodeInterface $node The related node
+     * @param \Symfony\Component\Config\Definition\ArrayNode|\Symfony\Component\Config\Definition\NodeInterface $node The related node
      *
-     * @throws InvalidDefinitionException When an error is detected in the configuration
+     * @throws \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
      */
     protected function validateConcreteNode(ArrayNode $node)
     {
@@ -442,9 +442,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Validate the configuration of a prototype node.
      *
-     * @param NodeInterface $node The related node
+     * @param \Symfony\Component\Config\Definition\NodeInterface|\Symfony\Component\Config\Definition\PrototypedArrayNode $node The related node
      *
-     * @throws InvalidDefinitionException When an error is detected in the configuration
+     * @throws \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
      */
     protected function validatePrototypeNode(PrototypedArrayNode $node)
     {

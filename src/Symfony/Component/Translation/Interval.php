@@ -38,6 +38,9 @@ class Interval
      *
      * @param integer $number   A number
      * @param string  $interval An interval
+     *
+     * @throws \InvalidArgumentException
+     * @return Boolean
      */
     public static function test($number, $interval)
     {

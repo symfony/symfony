@@ -187,6 +187,7 @@ EOF;
      * @param Boolean     $supportsRedirections Whether redirections are supported by the base class
      * @param string|null $parentPrefix         The prefix of the parent collection used to optimize the code
      *
+     * @throws \LogicException
      * @return string PHP code
      */
     private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)

@@ -416,6 +416,7 @@ QUERY;
      * @param array $sids
      * @param array $oidLookup
      *
+     * @throws AclNotFoundException
      * @return \SplObjectStorage mapping object identities to ACL instances
      */
     private function lookupObjectIdentities(array $batch, array $sids, array $oidLookup)

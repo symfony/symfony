@@ -206,6 +206,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     /**
      * Internal convenience method that returns the instance of Redis.
      *
+     * @throws \RuntimeException
      * @return Redis
      */
     protected function getRedis()

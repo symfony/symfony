@@ -48,6 +48,7 @@ class JsonResponse extends Response
      *
      * @param string $callback
      *
+     * @throws \InvalidArgumentException
      * @return JsonResponse
      */
     public function setCallback($callback = null)

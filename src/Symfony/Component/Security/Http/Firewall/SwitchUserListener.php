@@ -71,6 +71,8 @@ class SwitchUserListener implements ListenerInterface
      * Handles digest authentication.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @throws \LogicException
      */
     public function handle(GetResponseEvent $event)
     {
@@ -101,6 +103,8 @@ class SwitchUserListener implements ListenerInterface
      *
      * @param Request $request A Request instance
      *
+     * @throws \LogicException
+     * @throws AccessDeniedException
      * @return TokenInterface|null The new TokenInterface if successfully switched, null otherwise
      */
     private function attemptSwitchUser(Request $request)
@@ -147,6 +151,7 @@ class SwitchUserListener implements ListenerInterface
      *
      * @param Request $request A Request instance
      *
+     * @throws AuthenticationCredentialsNotFoundException
      * @return TokenInterface The original TokenInterface instance
      */
     private function attemptExitUser(Request $request)

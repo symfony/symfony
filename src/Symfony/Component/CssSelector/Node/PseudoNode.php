@@ -142,9 +142,10 @@ class PseudoNode implements NodeInterface
     /**
      * Sets the XPath expression to be the first of type.
      *
-     * @param XPathExpr $xpath The XPath expression
+     * @param \Symfony\Component\CssSelector\XPathExpr $xpath The XPath expression
      *
-     * @return XPathExpr The modified expression
+     * @throws ParseException
+     * @return \Symfony\Component\CssSelector\XPathExpr The modified expression
      */
     protected function xpath_first_of_type($xpath)
     {

@@ -58,6 +58,7 @@ class FilesystemLoader implements LoaderInterface
      *
      * @param TemplateReferenceInterface $template The template name as an array
      * @param integer                    $time     The last modification time of the cached template (timestamp)
+     * @return Boolean
      */
     public function isFresh(TemplateReferenceInterface $template, $time)
     {

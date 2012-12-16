@@ -618,6 +618,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     /**
      * Builds the service container.
      *
+     * @throws \RuntimeException
      * @return ContainerBuilder The compiled service container
      */
     protected function buildContainer()

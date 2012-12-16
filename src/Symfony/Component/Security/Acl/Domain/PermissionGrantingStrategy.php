@@ -130,6 +130,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @param SecurityIdentityInterface[] $sids               An array of SecurityIdentityInterface implementations
      * @param Boolean                     $administrativeMode True turns off audit logging
      *
+     * @throws NoAceFoundException
      * @return Boolean true, or false; either granting, or denying access respectively.
      */
     private function hasSufficientPermissions(AclInterface $acl, array $aces, array $masks, array $sids, $administrativeMode)

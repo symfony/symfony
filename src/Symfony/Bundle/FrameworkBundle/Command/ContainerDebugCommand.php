@@ -279,6 +279,7 @@ EOF
     /**
      * Loads the ContainerBuilder from the cache.
      *
+     * @throws \LogicException
      * @return ContainerBuilder
      */
     protected function getContainerBuilder()

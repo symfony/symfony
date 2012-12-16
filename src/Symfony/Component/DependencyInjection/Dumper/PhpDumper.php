@@ -187,7 +187,7 @@ class PhpDumper extends Dumper
      *
      * @return string
      *
-     * @throws \RuntimeException When the factory definition is incomplete
+     * @throws RuntimeException When the factory definition is incomplete
      * @throws ServiceCircularReferenceException When a circular reference is detected
      */
     private function addServiceInlinedDefinitions($id, $definition)
@@ -815,6 +815,7 @@ EOF;
      * @param string  $path
      * @param integer $indent
      *
+     * @throws InvalidArgumentException
      * @return string
      */
     private function exportParameters($parameters, $path = '', $indent = 12)
@@ -986,6 +987,7 @@ EOF;
      * @param array   $value
      * @param Boolean $interpolate
      *
+     * @throws RuntimeException
      * @return string
      */
     private function dumpValue($value, $interpolate = true)

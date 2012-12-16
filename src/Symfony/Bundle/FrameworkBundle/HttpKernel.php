@@ -94,6 +94,8 @@ class HttpKernel extends BaseHttpKernel
      * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
      * @param array  $options    An array of options
      *
+     * @throws \RuntimeException
+     * @throws \Exception
      * @return string The Response content
      */
     public function render($controller, array $options = array())
@@ -105,7 +107,7 @@ class HttpKernel extends BaseHttpKernel
             'alt'           => array(),
             'standalone'    => false,
             'comment'       => '',
-            'default'		=> null,
+            'default'       => null,
         ), $options);
 
         if (!is_array($options['alt'])) {
@@ -237,6 +239,8 @@ class HttpKernel extends BaseHttpKernel
      *
      * @param string $uri            A URI
      * @param string $defaultContent Default content
+     *
+     * @return string
      */
     public function renderHIncludeTag($uri, $defaultContent = null)
     {

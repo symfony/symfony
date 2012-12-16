@@ -51,6 +51,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      * @param string $password the password to be used
      * @param string $salt     the salt to be used
      *
+     * @throws \InvalidArgumentException
      * @return string a merged password and salt
      */
     protected function mergePasswordAndSalt($password, $salt)

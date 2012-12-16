@@ -34,6 +34,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected $addDefaults;
     protected $addDefaultChildren;
     protected $nodeBuilder;
+    protected $normalizeKeys;
 
     /**
      * {@inheritDoc}
@@ -51,6 +52,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $this->performDeepMerging = true;
         $this->nullEquivalent = array();
         $this->trueEquivalent = array();
+        $this->normalizeKeys = true;
     }
 
     /**
@@ -282,6 +284,18 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
+     * Disables key normalization.
+     *
+     * @return ArrayNodeDefinition
+     */
+    public function keepKeys()
+    {
+        $this->normalizeKeys = false;
+
+        return $this;
+    }
+
+    /**
      * Appends a node definition.
      *
      *     $node = new ArrayNodeDefinition()
@@ -368,6 +382,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $node->setPerformDeepMerging($this->performDeepMerging);
         $node->setRequired($this->required);
         $node->setIgnoreExtraKeys($this->ignoreExtraKeys);
+        $node->setNormalizeKeys($this->normalizeKeys);
 
         if (null !== $this->normalization) {
             $node->setNormalizationClosures($this->normalization->before);

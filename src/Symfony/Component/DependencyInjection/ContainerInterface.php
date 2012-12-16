@@ -38,6 +38,8 @@ interface ContainerInterface
      * @param object $service The service instance
      * @param string $scope   The scope of the service
      *
+     * @return object The service set.
+     *
      * @api
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER);

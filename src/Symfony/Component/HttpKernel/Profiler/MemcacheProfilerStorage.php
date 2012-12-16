@@ -20,7 +20,6 @@ use Memcache;
  */
 class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
 {
-
     /**
      * @var Memcache
      */
@@ -106,5 +105,4 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
 
         return $memcache->set($key, $content . $value, false, $expiration);
     }
-
 }

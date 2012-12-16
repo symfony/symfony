@@ -8,6 +8,10 @@
         <default key="_controller">web_profiler.controller.profiler:searchAction</default>
     </route>
 
+    <route id="_profiler_search_bar" pattern="/search_bar">
+        <default key="_controller">web_profiler.controller.profiler:searchBarAction</default>
+    </route>
+
     <route id="_profiler_purge" pattern="/purge">
         <default key="_controller">web_profiler.controller.profiler:purgeAction</default>
     </route>
@@ -34,6 +38,18 @@
 
     <route id="_profiler" pattern="/{token}">
         <default key="_controller">web_profiler.controller.profiler:panelAction</default>
+    </route>
+
+    <route id="_profiler_router" pattern="/{token}/router">
+        <default key="_controller">web_profiler.controller.router:panelAction</default>
+    </route>
+
+    <route id="_profiler_exception" pattern="/{token}/exception">
+        <default key="_controller">web_profiler.controller.exception:showAction</default>
+    </route>
+
+    <route id="_profiler_exception_css" pattern="/{token}/exception.css">
+        <default key="_controller">web_profiler.controller.exception:cssAction</default>
     </route>
 
     <route id="_profiler_redirect" pattern="/">

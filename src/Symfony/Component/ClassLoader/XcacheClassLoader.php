@@ -53,6 +53,7 @@ class XcacheClassLoader
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
+     *
      * @api
      */
     public function __construct($prefix, $classFinder)

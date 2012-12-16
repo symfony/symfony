@@ -91,8 +91,9 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      *
      * @param Request $request
      *
-     * @throws \RuntimeException|\Symfony\Component\Security\Core\Exception\CookieTheftException
      * @return TokenInterface|null
+     *
+     * @throws CookieTheftException
      */
     final public function autoLogin(Request $request)
     {

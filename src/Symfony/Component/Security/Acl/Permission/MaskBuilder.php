@@ -90,8 +90,9 @@ class MaskBuilder
      *
      * @param mixed $mask
      *
-     * @throws \InvalidArgumentException
      * @return MaskBuilder
+     *
+     * @throws \InvalidArgumentException
      */
     public function add($mask)
     {
@@ -145,8 +146,9 @@ class MaskBuilder
      *
      * @param mixed $mask
      *
-     * @throws \InvalidArgumentException
      * @return MaskBuilder
+     *
+     * @throws \InvalidArgumentException
      */
     public function remove($mask)
     {

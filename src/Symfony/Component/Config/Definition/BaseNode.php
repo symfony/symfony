@@ -285,8 +285,9 @@ abstract class BaseNode implements NodeInterface
      *
      * @param mixed $value The value to finalize
      *
-     * @throws InvalidConfigurationException
      * @return mixed The finalized value
+     *
+     * @throws InvalidConfigurationException
      */
     final public function finalize($value)
     {

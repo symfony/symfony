@@ -187,10 +187,10 @@ class Esi
      * @param string    $alt          An alternative URI
      * @param Boolean   $ignoreErrors Whether to ignore errors or not
      *
+     * @return string
+     *
      * @throws \RuntimeException
      * @throws \Exception
-     *
-     * @return string
      */
     public function handle(HttpCache $cache, $uri, $alt, $ignoreErrors)
     {
@@ -220,8 +220,9 @@ class Esi
      *
      * @param array $attributes An array containing the attributes.
      *
-     * @throws \RuntimeException
      * @return string The response content for the include.
+     *
+     * @throws \RuntimeException
      */
     private function handleEsiIncludeTag($attributes)
     {

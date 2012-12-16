@@ -324,8 +324,9 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      *
      * @param array $groups An array of group names
      *
-     * @throws \Symfony\Component\Validator\Exception\GroupDefinitionException
      * @return ClassMetadata
+     *
+     * @throws GroupDefinitionException
      */
     public function setGroupSequence(array $groups)
     {

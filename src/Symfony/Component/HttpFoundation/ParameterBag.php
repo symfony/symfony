@@ -94,8 +94,9 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * @param mixed   $default The default value if the parameter key does not exist
      * @param boolean $deep    If true, a path like foo[bar] will find deeper items
      *
-     * @throws \InvalidArgumentException
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      *
      * @api
      */

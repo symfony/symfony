@@ -59,6 +59,7 @@ class ApcClassLoader
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
+     *
      * @api
      */
     public function __construct($prefix, $decorated)

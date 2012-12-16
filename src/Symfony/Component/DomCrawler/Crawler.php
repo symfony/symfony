@@ -374,8 +374,9 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns the previous sibling nodes of the current selection
      *
-     * @throws \InvalidArgumentException
      * @return Crawler A Crawler instance with the previous sibling nodes
+     *
+     * @throws \InvalidArgumentException
      *
      * @api
      */

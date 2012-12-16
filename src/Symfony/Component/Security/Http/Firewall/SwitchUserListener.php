@@ -103,9 +103,10 @@ class SwitchUserListener implements ListenerInterface
      *
      * @param Request $request A Request instance
      *
+     * @return TokenInterface|null The new TokenInterface if successfully switched, null otherwise
+     *
      * @throws \LogicException
      * @throws AccessDeniedException
-     * @return TokenInterface|null The new TokenInterface if successfully switched, null otherwise
      */
     private function attemptSwitchUser(Request $request)
     {
@@ -151,8 +152,9 @@ class SwitchUserListener implements ListenerInterface
      *
      * @param Request $request A Request instance
      *
-     * @throws AuthenticationCredentialsNotFoundException
      * @return TokenInterface The original TokenInterface instance
+     *
+     * @throws AuthenticationCredentialsNotFoundException
      */
     private function attemptExitUser(Request $request)
     {

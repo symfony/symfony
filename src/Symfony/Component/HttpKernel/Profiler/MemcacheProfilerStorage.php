@@ -28,8 +28,9 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
     /**
      * Internal convenience method that returns the instance of the Memcache
      *
-     * @throws \RuntimeException
      * @return Memcache
+     *
+     * @throws \RuntimeException
      */
     protected function getMemcache()
     {

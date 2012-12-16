@@ -815,8 +815,9 @@ EOF;
      * @param string  $path
      * @param integer $indent
      *
-     * @throws InvalidArgumentException
      * @return string
+     *
+     * @throws InvalidArgumentException
      */
     private function exportParameters($parameters, $path = '', $indent = 12)
     {
@@ -987,8 +988,9 @@ EOF;
      * @param array   $value
      * @param Boolean $interpolate
      *
-     * @throws RuntimeException
      * @return string
+     *
+     * @throws RuntimeException
      */
     private function dumpValue($value, $interpolate = true)
     {

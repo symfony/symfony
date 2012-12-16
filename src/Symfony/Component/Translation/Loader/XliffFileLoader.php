@@ -60,8 +60,9 @@ class XliffFileLoader implements LoaderInterface
      *
      * @param string $file
      *
-     * @throws InvalidResourceException
      * @return \SimpleXMLElement
+     *
+     * @throws InvalidResourceException
      */
     private function parseFile($file)
     {

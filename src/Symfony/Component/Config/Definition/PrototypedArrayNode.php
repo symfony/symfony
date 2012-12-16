@@ -232,10 +232,10 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @param mixed $value The value to normalize
      *
+     * @return mixed The normalized value
+     *
      * @throws InvalidConfigurationException
      * @throws DuplicateKeyException
-     *
-     * @return mixed The normalized value
      */
     protected function normalizeValue($value)
     {

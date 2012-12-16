@@ -249,8 +249,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Request $request A Request instance
      * @param Boolean $catch   Whether to process exceptions
      *
-     * @throws \Exception
      * @return Response A Response instance
+     *
+     * @throws \Exception
      *
      * @see RFC2616 13.10
      */
@@ -288,8 +289,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Request $request A Request instance
      * @param Boolean $catch   whether to process exceptions
      *
-     * @throws \Exception
      * @return Response A Response instance
+     *
+     * @throws \Exception
      */
     protected function lookup(Request $request, $catch = false)
     {

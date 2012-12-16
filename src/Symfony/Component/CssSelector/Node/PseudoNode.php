@@ -144,8 +144,9 @@ class PseudoNode implements NodeInterface
      *
      * @param \Symfony\Component\CssSelector\XPathExpr $xpath The XPath expression
      *
-     * @throws ParseException
      * @return \Symfony\Component\CssSelector\XPathExpr The modified expression
+     *
+     * @throws ParseException
      */
     protected function xpath_first_of_type($xpath)
     {

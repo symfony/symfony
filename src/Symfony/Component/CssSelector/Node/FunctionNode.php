@@ -165,8 +165,9 @@ class FunctionNode implements NodeInterface
      * @param XPathExpr $xpath
      * @param XPathExpr $expr
      *
-     * @throws \Symfony\Component\CssSelector\Exception\ParseException
      * @return XPathExpr
+     *
+     * @throws ParseException
      */
     protected function _xpath_nth_of_type($xpath, $expr)
     {

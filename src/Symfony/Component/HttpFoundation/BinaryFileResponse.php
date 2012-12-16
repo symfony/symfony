@@ -69,8 +69,9 @@ class BinaryFileResponse extends Response
      * @param Boolean            $autoEtag
      * @param Boolean            $autoLastModified
      *
-     * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      * @return BinaryFileResponse
+     *
+     * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
     public function setFile($file, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {

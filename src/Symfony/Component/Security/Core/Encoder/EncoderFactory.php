@@ -50,8 +50,9 @@ class EncoderFactory implements EncoderFactoryInterface
      *
      * @param array $config
      *
-     * @throws \InvalidArgumentException
      * @return PasswordEncoderInterface
+     *
+     * @throws \InvalidArgumentException
      */
     private function createEncoder(array $config)
     {

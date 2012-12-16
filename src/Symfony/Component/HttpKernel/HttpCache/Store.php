@@ -156,8 +156,9 @@ class Store implements StoreInterface
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
      *
-     * @throws \RuntimeException
      * @return string The key under which the response is stored
+     *
+     * @throws \RuntimeException
      */
     public function write(Request $request, Response $response)
     {

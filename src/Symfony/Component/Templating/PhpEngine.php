@@ -150,8 +150,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param Storage $template   The template to render
      * @param array   $parameters An array of parameters to pass to the template
      *
-     * @throws \InvalidArgumentException
      * @return string|false The evaluated template, or false if the engine is unable to render the template
+     *
+     * @throws \InvalidArgumentException
      */
     protected function evaluate(Storage $template, array $parameters = array())
     {
@@ -229,6 +230,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param string $name The helper name
      *
      * @throws \LogicException
+     *
      * @api
      */
     public function offsetUnset($name)
@@ -399,8 +401,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $context The context name
      *
-     * @throws \InvalidArgumentException
      * @return mixed  $escaper A PHP callable
+     *
+     * @throws \InvalidArgumentException
      *
      * @api
      */

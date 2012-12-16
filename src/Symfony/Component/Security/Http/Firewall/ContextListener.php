@@ -133,8 +133,9 @@ class ContextListener implements ListenerInterface
      *
      * @param TokenInterface $token
      *
-     * @throws \RuntimeException
      * @return TokenInterface|null
+     *
+     * @throws \RuntimeException
      */
     private function refreshUser(TokenInterface $token)
     {

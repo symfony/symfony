@@ -56,9 +56,10 @@ abstract class FileLoader extends Loader
      * @param Boolean $ignoreErrors   Whether to ignore import errors or not
      * @param string  $sourceResource The original resource importing the new resource
      *
+     * @return mixed
+     *
      * @throws FileLoaderLoadException
      * @throws FileLoaderImportCircularReferenceException
-     * @return mixed
      */
     public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
     {

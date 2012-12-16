@@ -148,7 +148,9 @@ class Locale extends \Locale
      * Returns the locale names for a locale
      *
      * @param string $locale The locale to use for the locale names
+     *
      * @return array              The locale names with their codes as keys
+     *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
      */
     public static function getDisplayLocales($locale)

@@ -43,8 +43,9 @@ class TreeBuilder implements NodeParentInterface
     /**
      * Builds the tree.
      *
-     * @throws \RuntimeException
      * @return NodeInterface
+     *
+     * @throws \RuntimeException
      */
     public function buildTree()
     {

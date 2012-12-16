@@ -200,8 +200,9 @@ class Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \Exception
      * @return integer The command exit code
+     *
+     * @throws \Exception
      *
      * @see setCode()
      * @see execute()
@@ -250,8 +251,9 @@ class Command
      *
      * @param callable $code A callable(InputInterface $input, OutputInterface $output)
      *
-     * @throws \InvalidArgumentException
      * @return Command The current instance
+     *
+     * @throws \InvalidArgumentException
      *
      * @see execute()
      *

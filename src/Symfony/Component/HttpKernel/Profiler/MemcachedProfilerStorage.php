@@ -20,7 +20,6 @@ use Memcached;
  */
 class MemcachedProfilerStorage extends BaseMemcacheProfilerStorage
 {
-
     /**
      * @var Memcached
      */
@@ -101,5 +100,4 @@ class MemcachedProfilerStorage extends BaseMemcacheProfilerStorage
 
         return $result;
     }
-
 }

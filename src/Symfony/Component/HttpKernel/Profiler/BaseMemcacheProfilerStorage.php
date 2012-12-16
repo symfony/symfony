@@ -64,7 +64,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
 
             list($itemToken, $itemIp, $itemMethod, $itemUrl, $itemTime, $itemParent) = explode("\t", $item, 6);
 
-            $itemTime = (int)$itemTime;
+            $itemTime = (int) $itemTime;
 
             if ($ip && false === strpos($itemIp, $ip) || $url && false === strpos($itemUrl, $url) || $method && false === strpos($itemMethod, $method)) {
                 continue;

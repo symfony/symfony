@@ -61,23 +61,122 @@ class DialogHelper extends Helper
     /**
      * Asks a question to the user.
      *
-     * @param OutputInterface $output   An Output instance
-     * @param string|array    $question The question to ask
-     * @param string          $default  The default answer if none is given by the user
+     * @param OutputInterface $output       An Output instance
+     * @param string|array    $question     The question to ask
+     * @param string          $default      The default answer if none is given by the user
+     * @param array           $autocomplete List of values to autocomplete
      *
      * @return string The user answer
      *
      * @throws \RuntimeException If there is no data to read in the input stream
      */
-    public function ask(OutputInterface $output, $question, $default = null)
+    public function ask(OutputInterface $output, $question, $default = null, $autocomplete = null)
     {
         $output->write($question);
 
-        $ret = fgets($this->inputStream ?: STDIN, 4096);
-        if (false === $ret) {
-            throw new \RuntimeException('Aborted');
+        $inputStream = $this->inputStream ?: STDIN;
+
+        if (null === $autocomplete || !$this->hasSttyAvailable()) {
+            $ret = fgets($inputStream, 4096);
+            if (false === $ret) {
+                throw new \RuntimeException('Aborted');
+            }
+            $ret = trim($ret);
+        } else {
+            $i = 0;
+            $currentMatched = false;
+            $ret = '';
+
+            // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
+            system("stty -icanon -echo");
+
+            // We read 3 characters instead of 1 to account for escape sequences
+            while ($c = fread($inputStream, 3)) {
+                // Did we read an escape character?
+                if (strlen($c) > 1 && $c[0] == "\033") {
+                    // Escape sequences for arrow keys
+                    if ($c[2] == 'A' || $c[2] == 'B' || $c[2] == 'C' || $c[2] == 'D') {
+                        continue;
+                    }
+                }
+
+                // Backspace Character
+                if (ord($c) === 127) {
+                    if ($i === 0) {
+                        continue;
+                    }
+
+                    if (!$currentMatched) {
+                        $i--;
+                        // Move cursor backwards
+                        $output->write("\033[1D");
+                    }
+
+                    // Erase characters from cursor to end of line
+                    $output->write("\033[K");
+                    $ret = substr($ret, 0, $i);
+
+                    $currentMatched = false;
+
+                    continue;
+                }
+
+                if ($c == "\t" | $c == "\n") {
+                    if (false !== $currentMatched) {
+                        // Echo out completed match
+                        $output->write(substr($autocomplete[$currentMatched], strlen($ret)));
+                        $ret = $autocomplete[$currentMatched];
+                        $i = strlen($ret);
+                    }
+
+                    if ($c == "\n") {
+                        $output->write($c);
+                        break;
+                    }
+
+                    continue;
+                }
+
+                $output->write($c);
+                $ret .= $c;
+                $i++;
+
+                // Erase characters from cursor to end of line
+                $output->write("\033[K");
+
+                for ($j = 0; $j < count($autocomplete); $j++) {
+                    // Get a substring of the current autocomplete item based on number of chars typed (e.g. AcmeDemoBundle = Acme)
+                    $matchTest = substr($autocomplete[$j], 0, strlen($ret));
+
+                    if ($ret == $matchTest) {
+                        if (strlen($ret) === strlen($autocomplete[$j])) {
+                            $currentMatched = false;
+                            break;
+                        }
+                        
+                        // Save cursor position
+                        $output->write("\0337");
+
+                        // Set fore/background colour to make text appear highlighted
+                        $output->write("\033[47;30m");
+                        $output->write(substr($autocomplete[$j], strlen($ret)));
+                        // Reset text colour
+                        $output->write("\033[0m");
+
+                        // Restore cursor position
+                        $output->write("\0338");
+
+                        $currentMatched = $j;
+                        break;
+                    }
+
+                    $currentMatched = false;
+                }
+            }
+
+            // Reset stty so it behaves normally again
+            system("stty icanon echo");
         }
-        $ret = trim($ret);
 
         return strlen($ret) > 0 ? $ret : $default;
     }
@@ -184,22 +283,23 @@ class DialogHelper extends Helper
      * validated data when the data is valid and throw an exception
      * otherwise.
      *
-     * @param OutputInterface $output    An Output instance
-     * @param string|array    $question  The question to ask
-     * @param callable        $validator A PHP callback
-     * @param integer         $attempts  Max number of times to ask before giving up (false by default, which means infinite)
-     * @param string          $default   The default answer if none is given by the user
+     * @param OutputInterface $output       An Output instance
+     * @param string|array    $question     The question to ask
+     * @param callable        $validator    A PHP callback
+     * @param integer         $attempts     Max number of times to ask before giving up (false by default, which means infinite)
+     * @param string          $default      The default answer if none is given by the user
+     * @param array           $autocomplete List of values to autocomplete
      *
      * @return mixed
      *
      * @throws \Exception When any of the validators return an error
      */
-    public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null)
+    public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null, $autocomplete = null)
     {
         $that = $this;
 
-        $interviewer = function() use ($output, $question, $default, $that) {
-            return $that->ask($output, $question, $default);
+        $interviewer = function() use ($output, $question, $default, $autocomplete, $that) {
+            return $that->ask($output, $question, $default, $autocomplete);
         };
 
         return $this->validateAttempts($interviewer, $output, $validator, $attempts);

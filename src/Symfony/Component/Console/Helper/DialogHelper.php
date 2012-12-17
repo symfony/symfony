@@ -97,7 +97,7 @@ class DialogHelper extends Helper
             // We read 3 characters instead of 1 to account for escape sequences
             while ($c = fread($inputStream, 3)) {
                 // Did we read an escape character?
-                if (strlen($c) > 1 && $c[0] == "\033") {
+                if (strlen($c) === 3 && $c[0] == "\033") {
                     // Escape sequences for arrow keys
                     if ($c[2] == 'A' || $c[2] == 'B' || $c[2] == 'C' || $c[2] == 'D') {
                         continue;

@@ -20,7 +20,7 @@ class ApplicationTest extends TestCase
 {
     public function testBundleInterfaceImplementation()
     {
-        $bundle = $this->getMock("Symfony\Component\HttpKernel\Bundle\BundleInterface");
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
 
         $kernel = $this->getKernel(array($bundle));
 
@@ -30,8 +30,27 @@ class ApplicationTest extends TestCase
 
     public function testBundleCommandsAreRegistered()
     {
-        $bundle = $this->getMock("Symfony\Component\HttpKernel\Bundle\Bundle");
+        $bundle = $this->getMock(
+            'Symfony\Component\HttpKernel\Bundle\Bundle',
+            array('autoRegisterCommands', 'registerCommands'));
+
+        $bundle->expects($this->once())->method('autoRegisterCommands')->will($this->returnValue(true));
         $bundle->expects($this->once())->method('registerCommands');
+
+        $kernel = $this->getKernel(array($bundle));
+
+        $application = new Application($kernel);
+        $application->doRun(new ArrayInput(array('list')), new NullOutput());
+    }
+
+    public function testBundleCommandsAreNotRegistered()
+    {
+        $bundle = $this->getMock(
+            'Symfony\Component\HttpKernel\Bundle\Bundle',
+            array('autoRegisterCommands', 'registerCommands'));
+        
+        $bundle->expects($this->once())->method('autoRegisterCommands')->will($this->returnValue(false));
+        $bundle->expects($this->never())->method('registerCommands');
 
         $kernel = $this->getKernel(array($bundle));
 
@@ -41,7 +60,7 @@ class ApplicationTest extends TestCase
 
     private function getKernel(array $bundles)
     {
-        $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
         $kernel
             ->expects($this->any())
             ->method('getBundles')

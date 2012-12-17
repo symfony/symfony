@@ -70,8 +70,7 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
             $this->assertEquals('AsseticBundleTest', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
             $this->assertEquals('FrameworkBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
-        }
-        else {
+        } else {
             $this->markTestSkipped();
             $this->markTestSkipped();
             $this->markTestSkipped();

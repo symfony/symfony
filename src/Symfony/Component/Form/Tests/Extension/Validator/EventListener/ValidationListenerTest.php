@@ -94,7 +94,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     private function getMockForm()
     {
-        return $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
     }
 
     // More specific mapping tests can be found in ViolationMapperTest

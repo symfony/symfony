@@ -26,7 +26,7 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
     public function testTrim()
     {
         $data = " Foo! ";
-        $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = DeprecationErrorHandler::getFormEvent($form, $data);
 
         $filter = new TrimListener();
@@ -38,7 +38,7 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
     public function testTrimSkipNonStrings()
     {
         $data = 1234;
-        $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = DeprecationErrorHandler::getFormEvent($form, $data);
 
         $filter = new TrimListener();
@@ -59,7 +59,7 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
         $data = mb_convert_encoding(pack('H*', implode('', $chars)), 'UTF-8', 'UCS-2BE');
         $data = $data."ab\ncd".$data;
 
-        $form  = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $form  = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = DeprecationErrorHandler::getFormEvent($form, $data);
 
         $filter = new TrimListener();

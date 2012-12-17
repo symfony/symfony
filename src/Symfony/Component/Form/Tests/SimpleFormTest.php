@@ -686,7 +686,7 @@ class SimpleFormTest extends AbstractFormTest
     {
         $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
         $view = $this->getMock('Symfony\Component\Form\FormView');
-        $parentForm = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $parentForm = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $parentView = $this->getMock('Symfony\Component\Form\FormView');
         $form = $this->getBuilder()->setType($type)->getForm();
         $form->setParent($parentForm);

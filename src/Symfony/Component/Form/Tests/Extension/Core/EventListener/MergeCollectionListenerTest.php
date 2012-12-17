@@ -49,7 +49,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockForm()
     {
-        return $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
     }
 
     public function getBooleanMatrix1()

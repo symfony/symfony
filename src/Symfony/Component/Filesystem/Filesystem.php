@@ -31,6 +31,8 @@ class Filesystem
      * @param string  $targetFile The target filename
      * @param boolean $override   Whether to override an existing file or not
      *
+     * @return Filesystem the current instance
+     *
      * @throws IOException When copy fails
      */
     public function copy($originFile, $targetFile, $override = false)
@@ -48,6 +50,8 @@ class Filesystem
                 throw new IOException(sprintf('Failed to copy %s to %s', $originFile, $targetFile));
             }
         }
+
+        return $this;
     }
 
     /**
@@ -55,6 +59,8 @@ class Filesystem
      *
      * @param string|array|\Traversable $dirs The directory path
      * @param integer                   $mode The directory mode
+     *
+     * @return Filesystem the current instance
      *
      * @throws IOException On any directory creation failure
      */
@@ -69,6 +75,8 @@ class Filesystem
                 throw new IOException(sprintf('Failed to create %s', $dir));
             }
         }
+
+        return $this;
     }
 
     /**
@@ -96,6 +104,8 @@ class Filesystem
      * @param integer                   $time  The touch time as a unix timestamp
      * @param integer                   $atime The access time as a unix timestamp
      *
+     * @return Filesystem the current instance
+     *
      * @throws IOException When touch fails
      */
     public function touch($files, $time = null, $atime = null)
@@ -109,12 +119,16 @@ class Filesystem
                 throw new IOException(sprintf('Failed to touch %s', $file));
             }
         }
+
+        return $this;
     }
 
     /**
      * Removes files or directories.
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
+     *
+     * @return Filesystem the current instance
      *
      * @throws IOException When removal fails
      */
@@ -146,6 +160,8 @@ class Filesystem
                 }
             }
         }
+
+        return $this;
     }
 
     /**
@@ -155,6 +171,8 @@ class Filesystem
      * @param integer                   $mode      The new mode (octal)
      * @param integer                   $umask     The mode mask (octal)
      * @param Boolean                   $recursive Whether change the mod recursively or not
+     *
+     * @return Filesystem the current instance
      *
      * @throws IOException When the change fail
      */
@@ -168,6 +186,8 @@ class Filesystem
                 throw new IOException(sprintf('Failed to chmod file %s', $file));
             }
         }
+
+        return $this;
     }
 
     /**
@@ -176,6 +196,8 @@ class Filesystem
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change owner
      * @param string                    $user      The new owner user name
      * @param Boolean                   $recursive Whether change the owner recursively or not
+     *
+     * @return Filesystem the current instance
      *
      * @throws IOException When the change fail
      */
@@ -195,6 +217,8 @@ class Filesystem
                 }
             }
         }
+
+        return $this;
     }
 
     /**
@@ -203,6 +227,8 @@ class Filesystem
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change group
      * @param string                    $group     The group name
      * @param Boolean                   $recursive Whether change the group recursively or not
+     *
+     * @return Filesystem the current instance
      *
      * @throws IOException When the change fail
      */
@@ -222,6 +248,8 @@ class Filesystem
                 }
             }
         }
+
+        return $this;
     }
 
     /**
@@ -229,6 +257,8 @@ class Filesystem
      *
      * @param string $origin The origin filename
      * @param string $target The new filename
+     *
+     * @return Filesystem the current instance
      *
      * @throws IOException When target file already exists
      * @throws IOException When origin cannot be renamed
@@ -243,6 +273,8 @@ class Filesystem
         if (true !== @rename($origin, $target)) {
             throw new IOException(sprintf('Cannot rename "%s" to "%s".', $origin, $target));
         }
+
+        return $this;
     }
 
     /**
@@ -252,6 +284,8 @@ class Filesystem
      * @param string  $targetDir     The symbolic link name
      * @param Boolean $copyOnWindows Whether to copy files if on Windows
      *
+     * @return Filesystem the current instance
+     *
      * @throws IOException When symlink fails
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
@@ -259,7 +293,7 @@ class Filesystem
         if (!function_exists('symlink') && $copyOnWindows) {
             $this->mirror($originDir, $targetDir);
 
-            return;
+            return $this;
         }
 
         $this->mkdir(dirname($targetDir));
@@ -284,6 +318,8 @@ class Filesystem
                 throw new IOException(sprintf('Failed to create symbolic link from %s to %s', $originDir, $targetDir));
             }
         }
+
+        return $this;
     }
 
     /**
@@ -337,6 +373,8 @@ class Filesystem
      *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
      *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
      *                                 - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
+     *
+     * @return Filesystem the current instance
      *
      * @throws IOException When file type is unknown
      */
@@ -393,6 +431,8 @@ class Filesystem
                 }
             }
         }
+
+        return $this;
     }
 
     /**

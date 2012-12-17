@@ -84,54 +84,40 @@ class HttpKernel extends BaseHttpKernel
      *
      * Available options:
      *
-     *  * attributes: An array of request attributes (only when the first argument is a controller)
-     *  * query: An array of request query parameters (only when the first argument is a controller)
      *  * ignore_errors: true to return an empty string in case of an error
-     *  * alt: an alternative controller to execute in case of an error (can be a controller, a URI, or an array with the controller, the attributes, and the query arguments)
+     *  * alt: an alternative URI to execute in case of an error
      *  * standalone: whether to generate an esi:include tag or not when ESI is supported
      *  * comment: a comment to add when returning an esi:include tag
      *
-     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
-     * @param array  $options    An array of options
+     * @param string $uri     A URI
+     * @param array  $options An array of options
      *
      * @return string The Response content
      *
      * @throws \RuntimeException
      * @throws \Exception
      */
-    public function render($controller, array $options = array())
+    public function render($uri, array $options = array())
     {
+        $request = $this->container->get('request');
+
         $options = array_merge(array(
-            'attributes'    => array(),
-            'query'         => array(),
             'ignore_errors' => !$this->container->getParameter('kernel.debug'),
-            'alt'           => array(),
+            'alt'           => null,
             'standalone'    => false,
             'comment'       => '',
             'default'       => null,
         ), $options);
 
-        if (!is_array($options['alt'])) {
-            $options['alt'] = array($options['alt']);
-        }
-
         if (null === $this->esiSupport) {
-            $this->esiSupport = $this->container->has('esi') && $this->container->get('esi')->hasSurrogateEsiCapability($this->container->get('request'));
+            $this->esiSupport = $this->container->has('esi') && $this->container->get('esi')->hasSurrogateEsiCapability($request);
         }
 
         if ($this->esiSupport && (true === $options['standalone'] || 'esi' === $options['standalone'])) {
-            $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query']);
-
-            $alt = '';
-            if ($options['alt']) {
-                $alt = $this->generateInternalUri($options['alt'][0], isset($options['alt'][1]) ? $options['alt'][1] : array(), isset($options['alt'][2]) ? $options['alt'][2] : array());
-            }
-
-            return $this->container->get('esi')->renderIncludeTag($uri, $alt, $options['ignore_errors'], $options['comment']);
+            return $this->container->get('esi')->renderIncludeTag($uri, $options['alt'], $options['ignore_errors'], $options['comment']);
         }
 
         if ('js' === $options['standalone']) {
-            $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query'], false);
             $defaultContent = null;
 
             $templating = $this->container->get('templating');
@@ -149,29 +135,9 @@ class HttpKernel extends BaseHttpKernel
             return $this->renderHIncludeTag($uri, $defaultContent);
         }
 
-        $request = $this->container->get('request');
-
-        // controller or URI or path?
-        if (0 === strpos($controller, 'http://') || 0 === strpos($controller, 'https://')) {
-            $subRequest = Request::create($controller, 'get', array(), $request->cookies->all(), array(), $request->server->all());
-            if ($session = $request->getSession()) {
-                $subRequest->setSession($session);
-            }
-        } elseif (0 === strpos($controller, '/')) {
-            $subRequest = Request::create($request->getUriForPath($controller), 'get', array(), $request->cookies->all(), array(), $request->server->all());
-            if ($session = $request->getSession()) {
-                $subRequest->setSession($session);
-            }
-        } else {
-            $options['attributes']['_controller'] = $controller;
-
-            if (!isset($options['attributes']['_format'])) {
-                $options['attributes']['_format'] = $request->getRequestFormat();
-            }
-
-            $options['attributes']['_route'] = '_internal';
-            $subRequest = $request->duplicate($options['query'], null, $options['attributes']);
-            $subRequest->setMethod('GET');
+        $subRequest = Request::create($uri, 'get', array(), $request->cookies->all(), array(), $request->server->all());
+        if ($session = $request->getSession()) {
+            $subRequest->setSession($session);
         }
 
         $level = ob_get_level();
@@ -191,10 +157,8 @@ class HttpKernel extends BaseHttpKernel
             if ($options['alt']) {
                 $alt = $options['alt'];
                 unset($options['alt']);
-                $options['attributes'] = isset($alt[1]) ? $alt[1] : array();
-                $options['query'] = isset($alt[2]) ? $alt[2] : array();
 
-                return $this->render($alt[0], $options);
+                return $this->render($alt, $options);
             }
 
             if (!$options['ignore_errors']) {
@@ -206,38 +170,6 @@ class HttpKernel extends BaseHttpKernel
                 ob_get_clean();
             }
         }
-    }
-
-    /**
-     * Generates an internal URI for a given controller.
-     *
-     * This method uses the "_internal" route, which should be available.
-     *
-     * @param string  $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
-     * @param array   $attributes An array of request attributes
-     * @param array   $query      An array of request query parameters
-     * @param boolean $secure
-     *
-     * @return string An internal URI
-     */
-    public function generateInternalUri($controller, array $attributes = array(), array $query = array(), $secure = true)
-    {
-        if (0 === strpos($controller, '/')) {
-            return $controller;
-        }
-
-        $path = http_build_query($attributes, '', '&');
-        $uri = $this->container->get('router')->generate($secure ? '_internal' : '_internal_public', array(
-            'controller' => $controller,
-            'path'       => $path ?: 'none',
-            '_format'    => $this->container->get('request')->getRequestFormat(),
-        ));
-
-        if ($queryString = http_build_query($query, '', '&')) {
-            $uri .= '?'.$queryString;
-        }
-
-        return $uri;
     }
 
     /**

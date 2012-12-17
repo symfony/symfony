@@ -4,6 +4,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * [BC BREAK] restricted the `render` tag to only accept URIs as reference (the signature changed)
  * added a render function to render a request
  * The `app` global variable is now injected even when using the twig service directly.
 

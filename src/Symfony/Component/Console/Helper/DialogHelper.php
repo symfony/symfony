@@ -71,7 +71,7 @@ class DialogHelper extends Helper
      *
      * @throws \RuntimeException If there is no data to read in the input stream
      */
-    public function ask(OutputInterface $output, $question, $default = null, $autocomplete = null)
+    public function ask(OutputInterface $output, $question, $default = null, array $autocomplete = null)
     {
         $output->write($question);
 
@@ -94,9 +94,9 @@ class DialogHelper extends Helper
             // Add highlighted text style
             $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
 
-            // We read 3 characters instead of 1 to account for escape sequences
+            // Read a keypress
             while ($c = fread($inputStream, 1)) {
-                // Did we read an escape character?
+                // Did we read an escape sequence?
                 if ("\033" === $c) {
                     $c .= fread($inputStream, 2);
 
@@ -304,7 +304,7 @@ class DialogHelper extends Helper
      *
      * @throws \Exception When any of the validators return an error
      */
-    public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null, $autocomplete = null)
+    public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null, array $autocomplete = null)
     {
         $that = $this;
 

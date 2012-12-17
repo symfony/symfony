@@ -107,7 +107,7 @@ class HttpUtils
     {
         if ('/' !== $path[0]) {
             try {
-                $parameters = $this->router->match($request->getPathInfo());
+                $parameters = $this->router->match(urlencode($request->getPathInfo()));
 
                 return $path === $parameters['_route'];
             } catch (MethodNotAllowedException $e) {
@@ -129,7 +129,7 @@ class HttpUtils
         }
 
         try {
-            $parameters = $this->router->match($request->getPathInfo());
+            $parameters = $this->router->match(urlencode($request->getPathInfo()));
 
             if (isset($parameters['_locale'])) {
                 $context->setParameter('_locale', $parameters['_locale']);

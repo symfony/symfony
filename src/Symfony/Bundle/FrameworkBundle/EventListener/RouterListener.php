@@ -70,7 +70,10 @@ class RouterListener
 
         // add attributes based on the path info (routing)
         try {
-            $parameters = $this->router->match($request->getPathInfo());
+            // The path is returned in decoded form from the request, so we need to
+            // encode it again as the router applies its own decoding. This prevents
+            // double-decoding.
+            $parameters = $this->router->match(urlencode($request->getPathInfo()));
 
             if (null !== $this->logger) {
                 $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], $this->parametersToString($parameters)));

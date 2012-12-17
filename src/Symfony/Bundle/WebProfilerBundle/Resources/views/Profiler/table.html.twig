@@ -9,7 +9,7 @@
         {% for key in data|keys|sort %}
             <tr>
                 <th>{{ key }}</th>
-                <td>{{ data[key]|yaml_dump }}</td>
+                <td>{{ data[key]|json_encode }}</td>
             </tr>
         {% endfor %}
     </tbody>

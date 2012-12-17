@@ -1,6 +1,6 @@
 README
 ======
-
+ 
 What is Symfony2?
 -----------------
 

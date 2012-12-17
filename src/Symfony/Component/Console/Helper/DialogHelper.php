@@ -104,10 +104,6 @@ class DialogHelper extends Helper
                     }
                 }
 
-                if (ord($c[0]) < 32) {
-                    continue;
-                }
-
                 // Backspace Character
                 if ($c == "\177") {
                     if ($i === 0) {
@@ -144,6 +140,10 @@ class DialogHelper extends Helper
 
                     $currentMatched = false;
 
+                    continue;
+                }
+
+                if (ord($c[0]) < 32) {
                     continue;
                 }
 

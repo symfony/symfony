@@ -117,8 +117,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
 
         // fix container files and classes
         $regex = '/' . preg_quote($this->getTempKernelSuffix(), '/') . '/';
-        $finder = new Finder();
-        foreach ($finder->files()->name(get_class($tempKernel->getContainer()) . '*')->in($tempCacheDir) as $file) {
+        foreach (Finder::create()->files()->name(get_class($tempKernel->getContainer()) . '*')->in($tempCacheDir) as $file) {
             $content = preg_replace($regex, '', $file->getContents());
 
             // fix absolute paths to the cache directory
@@ -133,7 +132,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         }
 
         // fix meta references to the Kernel
-        foreach ($finder->files()->name('*.meta')->in($tempCacheDir) as $file) {
+        foreach (Finder::create()->files()->name('*.meta')->in($tempCacheDir) as $file) {
             $content = preg_replace(
                 '/C\:\d+\:"' . preg_quote($class . $this->getTempKernelSuffix(), '"/').'"/',
                 sprintf('C:%s:"%s"', strlen($class), $class),

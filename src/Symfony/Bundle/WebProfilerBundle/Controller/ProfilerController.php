@@ -166,11 +166,10 @@ class ProfilerController
      *
      * @param Request $request  The current HTTP Request
      * @param string  $token    The profiler token
-     * @param string  $position The toolbar position (top, bottom, normal, or null -- use the configuration)
      *
      * @return Response A Response instance
      */
-    public function toolbarAction(Request $request, $token, $position = null)
+    public function toolbarAction(Request $request, $token)
     {
         $session = $request->getSession();
 
@@ -189,7 +188,8 @@ class ProfilerController
             return new Response();
         }
 
-        if (null === $position) {
+        // the toolbar position (top, bottom, normal, or null -- use the configuration)
+        if (null === $position = $request->query->get('position')) {
             $position = $this->toolbarPosition;
         }
 

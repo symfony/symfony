@@ -30,6 +30,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
      * Example : "file:/path/to/the/storage/folder"
      *
      * @param string $dsn The DSN
+     *
+     * @throws \RuntimeException When the dsn is not valid
      */
     public function __construct($dsn)
     {
@@ -129,7 +131,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
             return null;
         }
 
-        return $this->createProfileFromData($token, unserialize(file_get_contents($file)));
+        return $this->createProfileFromData($token, $this->getProfileFromFile($file));
     }
 
     /**
@@ -160,7 +162,10 @@ class FileProfilerStorage implements ProfilerStorageInterface
             'time'     => $profile->getTime(),
         );
 
-        if (false === file_put_contents($file, serialize($data))) {
+        if (false === ($handle = fopen($file, 'wb')) ||
+            false === ($data = gzcompress(serialize($data), 9)) ||
+            false === fwrite($handle, $data) ||
+            false === fclose($handle)) {
             return false;
         }
 
@@ -186,6 +191,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
     /**
      * Gets filename to store data, associated to the token.
+     *
+     * @param string $token The profile token
      *
      * @return string The profile filename
      */
@@ -229,7 +236,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         while (true) {
             $char = fgetc($file);
 
-            if ($char === "\n") {
+            if ("\n" === $char) {
                 // Leave the file with cursor before the line return
                 fseek($file, -1, SEEK_CUR);
                 break;
@@ -271,9 +278,22 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
-            $profile->addChild($this->createProfileFromData($token, unserialize(file_get_contents($file)), $profile));
+            $profile->addChild($this->createProfileFromData($token, $this->getProfileFromFile($file), $profile));
         }
 
         return $profile;
+    }
+
+    protected function getProfileFromFile($file)
+    {
+        if (!file_exists($file) ||
+            false === ($handle = fopen($file, 'rb')) ||
+            false === ($data = fread($handle, 10485760)) ||
+            false === ($data = gzuncompress($data)) ||
+            false === fclose($handle)) {
+            return null;
+        }
+
+        return unserialize($data);
     }
 }

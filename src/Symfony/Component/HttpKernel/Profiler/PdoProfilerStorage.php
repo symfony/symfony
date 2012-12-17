@@ -90,7 +90,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         $args = array(
             ':token'      => $profile->getToken(),
             ':parent'     => $profile->getParentToken(),
-            ':data'       => base64_encode(serialize($profile->getCollectors())),
+            ':data'       => base64_encode(gzcompress(serialize($profile->getCollectors()), 9)),
             ':ip'         => $profile->getIp(),
             ':method'     => $profile->getMethod(),
             ':url'        => $profile->getUrl(),
@@ -205,7 +205,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
         $profile->setMethod($data['method']);
         $profile->setUrl($data['url']);
         $profile->setTime($data['time']);
-        $profile->setCollectors(unserialize(base64_decode($data['data'])));
+        $profile->setCollectors(unserialize(gzuncompress(base64_decode($data['data']))));
 
         if (!$parent && !empty($data['parent'])) {
             $parent = $this->read($data['parent']);

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Helper;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 /**
  * The Dialog class provides helpers to interact with the user.
@@ -90,6 +91,9 @@ class DialogHelper extends Helper
             // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
             system("stty -icanon -echo");
 
+            // Add highlighted text style
+            $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
+
             // We read 3 characters instead of 1 to account for escape sequences
             while ($c = fread($inputStream, 3)) {
                 // Did we read an escape character?
@@ -157,11 +161,7 @@ class DialogHelper extends Helper
                         // Save cursor position
                         $output->write("\0337");
 
-                        // Set fore/background colour to make text appear highlighted
-                        $output->write("\033[47;30m");
-                        $output->write(substr($autocomplete[$j], strlen($ret)));
-                        // Reset text colour
-                        $output->write("\033[0m");
+                        $output->write('<hl>' . substr($autocomplete[$j], strlen($ret)) . '</hl>');
 
                         // Restore cursor position
                         $output->write("\0338");

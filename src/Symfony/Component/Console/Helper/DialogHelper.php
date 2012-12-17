@@ -138,6 +138,8 @@ class DialogHelper extends Helper
                         break;
                     }
 
+                    $currentMatched = false;
+
                     continue;
                 }
 

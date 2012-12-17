@@ -154,12 +154,12 @@ class DialogHelper extends Helper
                 // Erase characters from cursor to end of line
                 $output->write("\033[K");
 
-                for ($j = 0; $j < count($autocomplete); $j++) {
+                foreach ($autocomplete as $j => $value) {
                     // Get a substring of the current autocomplete item based on number of chars typed (e.g. AcmeDemoBundle = Acme)
-                    $matchTest = substr($autocomplete[$j], 0, strlen($ret));
+                    $matchTest = substr($value, 0, strlen($ret));
 
                     if ($ret == $matchTest) {
-                        if (strlen($ret) === strlen($autocomplete[$j])) {
+                        if (strlen($ret) === strlen($value)) {
                             $currentMatched = false;
                             break;
                         }
@@ -167,7 +167,7 @@ class DialogHelper extends Helper
                         // Save cursor position
                         $output->write("\0337");
 
-                        $output->write('<hl>' . substr($autocomplete[$j], strlen($ret)) . '</hl>');
+                        $output->write('<hl>' . substr($value, strlen($ret)) . '</hl>');
 
                         // Restore cursor position
                         $output->write("\0338");

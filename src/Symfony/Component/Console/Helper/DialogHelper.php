@@ -97,20 +97,20 @@ class DialogHelper extends Helper
             // We read 3 characters instead of 1 to account for escape sequences
             while ($c = fread($inputStream, 3)) {
                 // Did we read an escape character?
-                if (strlen($c) === 3 && $c[0] == "\033") {
+                if (3 === strlen($c) && "\033" === $c[0]) {
                     // Escape sequences for arrow keys
-                    if ($c[2] == 'A' || $c[2] == 'B' || $c[2] == 'C' || $c[2] == 'D') {
+                    if ('A' === $c[2] || 'B' === $c[2] || 'C' === $c[2] || 'D' === $c[2]) {
                         continue;
                     }
                 }
 
                 // Backspace Character
-                if ($c == "\177") {
+                if ("\177" === $c) {
                     if ($i === 0) {
                         continue;
                     }
 
-                    if (!$currentMatched) {
+                    if (false === $currentMatched) {
                         $i--;
                         // Move cursor backwards
                         $output->write("\033[1D");
@@ -125,7 +125,7 @@ class DialogHelper extends Helper
                     continue;
                 }
 
-                if ($c == "\t" | $c == "\n") {
+                if ("\t" === $c || "\n" === $c) {
                     if (false !== $currentMatched) {
                         // Echo out completed match
                         $output->write(substr($autocomplete[$currentMatched], strlen($ret)));
@@ -133,7 +133,7 @@ class DialogHelper extends Helper
                         $i = strlen($ret);
                     }
 
-                    if ($c == "\n") {
+                    if ("\n" === $c) {
                         $output->write($c);
                         break;
                     }
@@ -158,7 +158,7 @@ class DialogHelper extends Helper
                     // Get a substring of the current autocomplete item based on number of chars typed (e.g. AcmeDemoBundle = Acme)
                     $matchTest = substr($value, 0, strlen($ret));
 
-                    if ($ret == $matchTest) {
+                    if ($ret === $matchTest) {
                         if (strlen($ret) === strlen($value)) {
                             $currentMatched = false;
                             break;

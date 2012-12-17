@@ -57,13 +57,10 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
 
         $bundles = array('AcmeDemoBundle', 'AsseticBundle');
 
-        // Note: null-characters are because DialogHelper reads up to 3 bytes at a time to account for escape sequences
-        // We cannot emulate stty here, so this is the best we can do
-
         // Acm<NEWLINE>
         // Ac<BACKSPACE><BACKSPACE>s<TAB>Test<NEWLINE>
         // <NEWLINE>
-        $inputStream = $this->getInputStream("A\0\0c\0\0m\0\0\n\0\0A\0\0c\0\0\177\0\0\177\0\0s\0\0\t\0\0T\0\0e\0\0s\0\0t\0\0\n\0\0\n\0\0");
+        $inputStream = $this->getInputStream("Acm\nAc\177\177s\tTest\n\n");
         $dialog->setInputStream($inputStream);
 
         if ($this->hasSttyAvailable()) {

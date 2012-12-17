@@ -95,18 +95,18 @@ class DialogHelper extends Helper
             $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
 
             // We read 3 characters instead of 1 to account for escape sequences
-            while ($c = fread($inputStream, 3)) {
+            while ($c = fread($inputStream, 1)) {
                 // Did we read an escape character?
-                if (3 === strlen($c) && "\033" === $c[0]) {
+                if ("\033" === $c) {
+                    $c .= fread($inputStream, 2);
+
                     // Escape sequences for arrow keys
                     if ('A' === $c[2] || 'B' === $c[2] || 'C' === $c[2] || 'D' === $c[2]) {
-                        continue;
+                        // todo
                     }
 
                     continue;
                 }
-
-                $c = $c[0];
 
                 // Backspace Character
                 if ("\177" === $c) {
@@ -147,7 +147,7 @@ class DialogHelper extends Helper
                     continue;
                 }
 
-                if (ord($c[0]) < 32) {
+                if (ord($c) < 32) {
                     continue;
                 }
 

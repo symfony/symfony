@@ -61,22 +61,21 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         // We cannot emulate stty here, so this is the best we can do
 
         // Acm<NEWLINE>
-        $inputStream = $this->getInputStream("A\0\0c\0\0m\0\0\n\0\0");
-        $dialog->setInputStream($inputStream);
-
-        $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
-
         // Ac<BACKSPACE><BACKSPACE>s<TAB>Test<NEWLINE>
-        $inputStream = $this->getInputStream("A\0\0c\0\0\177\0\0\177\0\0s\0\0\t\0\0T\0\0e\0\0s\0\0t\0\0\n\0\0");
-        $dialog->setInputStream($inputStream);
-
-        $this->assertEquals('AsseticBundleTest', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
-
         // <NEWLINE>
-        $inputStream = $this->getInputStream("\n\0\0");
+        $inputStream = $this->getInputStream("A\0\0c\0\0m\0\0\n\0\0A\0\0c\0\0\177\0\0\177\0\0s\0\0\t\0\0T\0\0e\0\0s\0\0t\0\0\n\0\0\n\0\0");
         $dialog->setInputStream($inputStream);
 
-        $this->assertEquals('FrameworkBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+        if ($this->hasSttyAvailable()) {
+            $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+            $this->assertEquals('AsseticBundleTest', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+            $this->assertEquals('FrameworkBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+        }
+        else {
+            $this->markTestSkipped();
+            $this->markTestSkipped();
+            $this->markTestSkipped();
+        }
     }
 
     public function testAskHiddenResponse()
@@ -150,5 +149,12 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
     protected function getOutputStream()
     {
         return new StreamOutput(fopen('php://memory', 'r+', false));
+    }
+
+    private function hasSttyAvailable()
+    {
+        exec('/usr/bin/env stty', $output, $exitcode);
+
+        return $exitcode === 0;
     }
 }

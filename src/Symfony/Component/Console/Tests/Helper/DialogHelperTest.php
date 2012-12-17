@@ -54,6 +54,22 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
 
         rewind($output->getStream());
         $this->assertEquals('What time is it?', stream_get_contents($output->getStream()));
+
+        $bundles = array('AcmeDemoBundle', 'AsseticBundle');
+
+        // Acm<NEWLINE>
+        // Ac<BACKSPACE><BACKSPACE>s<TAB>Test<NEWLINE>
+        // <NEWLINE>
+        $inputStream = $this->getInputStream("Acm\nAc\177\177s\tTest\n\n");
+        $dialog->setInputStream($inputStream);
+
+        if ($this->hasSttyAvailable()) {
+            $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+            $this->assertEquals('AsseticBundleTest', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+            $this->assertEquals('FrameworkBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+        } else {
+            $this->markTestSkipped();
+        }
     }
 
     public function testAskHiddenResponse()
@@ -127,5 +143,12 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
     protected function getOutputStream()
     {
         return new StreamOutput(fopen('php://memory', 'r+', false));
+    }
+
+    private function hasSttyAvailable()
+    {
+        exec('stty 2>&1', $output, $exitcode);
+
+        return $exitcode === 0;
     }
 }

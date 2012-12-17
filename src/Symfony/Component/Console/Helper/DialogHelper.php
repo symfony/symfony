@@ -105,7 +105,7 @@ class DialogHelper extends Helper
                 }
 
                 // Backspace Character
-                if (ord($c) === 127) {
+                if ($c == "\177") {
                     if ($i === 0) {
                         continue;
                     }

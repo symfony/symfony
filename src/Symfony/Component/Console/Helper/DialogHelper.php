@@ -102,7 +102,11 @@ class DialogHelper extends Helper
                     if ('A' === $c[2] || 'B' === $c[2] || 'C' === $c[2] || 'D' === $c[2]) {
                         continue;
                     }
+
+                    continue;
                 }
+
+                $c = $c[0];
 
                 // Backspace Character
                 if ("\177" === $c) {

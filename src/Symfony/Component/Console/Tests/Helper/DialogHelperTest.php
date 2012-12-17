@@ -54,6 +54,29 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
 
         rewind($output->getStream());
         $this->assertEquals('What time is it?', stream_get_contents($output->getStream()));
+
+        $bundles = array('AcmeDemoBundle', 'AsseticBundle');
+
+        // Note: null-characters are because DialogHelper reads up to 3 bytes at a time to account for escape sequences
+        // We cannot emulate stty here, so this is the best we can do
+
+        // Acm<NEWLINE>
+        $inputStream = $this->getInputStream("A\0\0c\0\0m\0\0\n\0\0");
+        $dialog->setInputStream($inputStream);
+
+        $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+
+        // Ac<BACKSPACE><BACKSPACE>s<TAB>Test<NEWLINE>
+        $inputStream = $this->getInputStream("A\0\0c\0\0\177\0\0\177\0\0s\0\0\t\0\0T\0\0e\0\0s\0\0t\0\0\n\0\0");
+        $dialog->setInputStream($inputStream);
+
+        $this->assertEquals('AsseticBundleTest', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
+
+        // <NEWLINE>
+        $inputStream = $this->getInputStream("\n\0\0");
+        $dialog->setInputStream($inputStream);
+
+        $this->assertEquals('FrameworkBundle', $dialog->ask($this->getOutputStream(), 'Please select a bundle', 'FrameworkBundle', $bundles));
     }
 
     public function testAskHiddenResponse()

@@ -89,7 +89,7 @@ class DialogHelper extends Helper
             $ret = '';
 
             // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
-            system("stty -icanon -echo");
+            shell_exec('/usr/bin/env stty -icanon -echo');
 
             // Add highlighted text style
             $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
@@ -175,7 +175,7 @@ class DialogHelper extends Helper
             }
 
             // Reset stty so it behaves normally again
-            system("stty icanon echo");
+            shell_exec('/usr/bin/env stty icanon echo');
         }
 
         return strlen($ret) > 0 ? $ret : $default;

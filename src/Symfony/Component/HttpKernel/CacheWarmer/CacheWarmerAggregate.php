@@ -140,9 +140,11 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         }
 
         $oldCacheDir = rtrim($cacheDir, '/\\') . self::OLD_CACHE_FOLDER_SUFFIX;
-        $fs->rename($cacheDir, $oldCacheDir);
-        $fs->rename($tempCacheDir, $cacheDir);
-        $fs->remove($oldCacheDir);
+        $fs
+            ->rename($cacheDir, $oldCacheDir)
+            ->rename($tempCacheDir, $cacheDir)
+            ->remove($oldCacheDir)
+        ;
     }
 
     /**

@@ -17,6 +17,7 @@
         <parameter key="twig.extension.routing.class">Symfony\Bridge\Twig\Extension\RoutingExtension</parameter>
         <parameter key="twig.extension.yaml.class">Symfony\Bridge\Twig\Extension\YamlExtension</parameter>
         <parameter key="twig.extension.form.class">Symfony\Bridge\Twig\Extension\FormExtension</parameter>
+        <parameter key="twig.extension.httpkernel.class">Symfony\Bridge\Twig\Extension\HttpKernelExtension</parameter>
         <parameter key="twig.form.engine.class">Symfony\Bridge\Twig\Form\TwigRendererEngine</parameter>
         <parameter key="twig.form.renderer.class">Symfony\Bridge\Twig\Form\TwigRenderer</parameter>
         <parameter key="twig.translation.extractor.class">Symfony\Bridge\Twig\Translation\TwigExtractor</parameter>
@@ -85,6 +86,12 @@
 
         <service id="twig.extension.yaml" class="%twig.extension.yaml.class%" public="false">
             <tag name="twig.extension" />
+        </service>
+
+        <service id="twig.extension.httpkernel" class="%twig.extension.httpkernel.class%">
+            <tag name="twig.extension" />
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="http_kernel" />
         </service>
 
         <service id="twig.extension.form" class="%twig.extension.form.class%" public="false">

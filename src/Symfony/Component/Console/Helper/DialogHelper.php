@@ -85,8 +85,9 @@ class DialogHelper extends Helper
             $ret = trim($ret);
         } else {
             $i = 0;
-            $currentMatched = false;
+            $currentMatched = array();
             $ret = '';
+            $ofs = 0;
 
             // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
             shell_exec('stty -icanon -echo');
@@ -100,9 +101,45 @@ class DialogHelper extends Helper
                 if ("\033" === $c) {
                     $c .= fread($inputStream, 2);
 
-                    // Escape sequences for arrow keys
-                    if ('A' === $c[2] || 'B' === $c[2] || 'C' === $c[2] || 'D' === $c[2]) {
-                        // todo
+                    if ('A' === $c[2]) {
+                        if (0 === count($currentMatched)) {
+                            continue;
+                        }
+
+                        // Save cursor position
+                        $output->write("\0337");
+
+                        // Erase characters from cursor to end of line
+                        $output->write("\033[K");
+
+                        if ($ofs === 0) {
+                            $ofs = count($currentMatched);
+                        }
+
+                        $ofs--;
+
+                        $output->write('<hl>' . substr($currentMatched[$ofs], strlen($ret)) . '</hl>');
+
+                        // Restore cursor position
+                        $output->write("\0338");
+                    }
+                    else if ('B' === $c[2]) {
+                        if (0 === count($currentMatched)) {
+                            continue;
+                        }
+                        
+                        // Save cursor position
+                        $output->write("\0337");
+
+                        // Erase characters from cursor to end of line
+                        $output->write("\033[K");
+
+                        $ofs = ($ofs + 1) % count($currentMatched);
+
+                        $output->write('<hl>' . substr($currentMatched[$ofs], strlen($ret)) . '</hl>');
+
+                        // Restore cursor position
+                        $output->write("\0338");
                     }
 
                     continue;
@@ -114,7 +151,7 @@ class DialogHelper extends Helper
                         continue;
                     }
 
-                    if (false === $currentMatched) {
+                    if (0 === count($currentMatched)) {
                         $i--;
                         // Move cursor backwards
                         $output->write("\033[1D");
@@ -124,7 +161,7 @@ class DialogHelper extends Helper
                     $output->write("\033[K");
                     $ret = substr($ret, 0, $i);
 
-                    $currentMatched = false;
+                    $currentMatched = array();
 
                     continue;
                 }
@@ -132,8 +169,8 @@ class DialogHelper extends Helper
                 if ("\t" === $c || "\n" === $c) {
                     if (false !== $currentMatched) {
                         // Echo out completed match
-                        $output->write(substr($autocomplete[$currentMatched], strlen($ret)));
-                        $ret = $autocomplete[$currentMatched];
+                        $output->write(substr($currentMatched[$ofs], strlen($ret)));
+                        $ret = $currentMatched[$ofs];
                         $i = strlen($ret);
                     }
 
@@ -158,29 +195,31 @@ class DialogHelper extends Helper
                 // Erase characters from cursor to end of line
                 $output->write("\033[K");
 
-                foreach ($autocomplete as $j => $value) {
+                $currentMatched = array();
+                $ofs = 0;
+
+                foreach ($autocomplete as $value) {
                     // Get a substring of the current autocomplete item based on number of chars typed (e.g. AcmeDemoBundle = Acme)
                     $matchTest = substr($value, 0, strlen($ret));
 
                     if ($ret === $matchTest) {
                         if (strlen($ret) === strlen($value)) {
-                            $currentMatched = false;
-                            break;
+                            //$currentMatched = false;
+                            continue;
                         }
-                        
-                        // Save cursor position
-                        $output->write("\0337");
 
-                        $output->write('<hl>' . substr($value, strlen($ret)) . '</hl>');
-
-                        // Restore cursor position
-                        $output->write("\0338");
-
-                        $currentMatched = $j;
-                        break;
+                        $currentMatched[] = $value;
                     }
+                }
 
-                    $currentMatched = false;
+                if (count($currentMatched) > 0) {
+                    // Save cursor position
+                    $output->write("\0337");
+
+                    $output->write('<hl>' . substr($currentMatched[$ofs], strlen($ret)) . '</hl>');
+
+                    // Restore cursor position
+                    $output->write("\0338");
                 }
             }
 

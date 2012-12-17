@@ -6,6 +6,7 @@ CHANGELOG
 
  * added Finder::path() and Finder::notPath() methods
  * added finder adapters to improve performance on specific platforms
+ * added SplFileInfo::putContents()
 
 2.1.0
 -----

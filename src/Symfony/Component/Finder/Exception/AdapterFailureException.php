@@ -18,10 +18,10 @@ use Symfony\Component\Finder\Adapter\AdapterInterface;
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class AdapterFailureException extends \RuntimeException implements ExceptionInterface
+class AdapterFailureException extends RuntimeException
 {
     /**
-     * @var \Symfony\Component\Finder\Adapter\AdapterInterface
+     * @var AdapterInterface
      */
     private $adapter;
 

@@ -131,14 +131,12 @@ class CacheWarmerAggregate implements CacheWarmerInterface
             $fs->remove($file);
         }
 
-        // fix meta references to the Kernel
+        $from = '/C:\d+:"' . preg_quote($class . $this->getTempKernelSuffix(), '/').'"/';
+        $to = sprintf('C:%d:"%s"', strlen($class), $class);
+
         foreach (Finder::create()->files()->name('*.meta')->in($tempCacheDir) as $file) {
-            $content = preg_replace(
-                '/C\:\d+\:"' . preg_quote($class . $this->getTempKernelSuffix(), '"/').'"/',
-                sprintf('C:%s:"%s"', strlen($class), $class),
-                $file->getContents()
-            );
-            $file->putContents($content);
+            // Fix references to the kernel
+            $file->putContents(preg_replace($from, $to, $file->getContents()));
         }
 
         $oldCacheDir = rtrim($cacheDir, '/\\') . self::OLD_CACHE_FOLDER_SUFFIX;

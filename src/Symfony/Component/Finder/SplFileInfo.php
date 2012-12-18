@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Finder;
 
+use Symfony\Component\Finder\Exception\RuntimeException;
+
 /**
  * Extends \SplFileInfo to support relative paths
  *
@@ -22,7 +24,7 @@ class SplFileInfo extends \SplFileInfo
     private $relativePathname;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $file             The file name
      * @param string $relativePath     The relative path
@@ -36,7 +38,7 @@ class SplFileInfo extends \SplFileInfo
     }
 
     /**
-     * Returns the relative path
+     * Returns the relative path.
      *
      * @return string the relative path
      */
@@ -46,7 +48,7 @@ class SplFileInfo extends \SplFileInfo
     }
 
     /**
-     * Returns the relative path name
+     * Returns the relative path name.
      *
      * @return string the relative path name
      */
@@ -56,9 +58,13 @@ class SplFileInfo extends \SplFileInfo
     }
 
     /**
-     * Returns the contents of the file
+     * Returns the contents of the file.
      *
      * @return string the contents of the file
+     *
+     * @see file_get_contents()
+     *
+     * @throws RuntimeException When the content could not be read
      */
     public function getContents()
     {
@@ -67,9 +73,33 @@ class SplFileInfo extends \SplFileInfo
         error_reporting($level);
         if (false === $content) {
             $error = error_get_last();
-            throw new \RuntimeException($error['message']);
+            throw new RuntimeException($error['message']);
         }
 
         return $content;
+    }
+
+    /**
+     * Writes a string to the file.
+     *
+     * @param mixed    $data     The string
+     * @param integer  $flags    The flags
+     * @param mixed    $resource A context resource (@see stream_context_create())
+     *
+     * @return integer The number of bytes written
+     *
+     * @throws RuntimeException When the content could not be written
+     *
+     * @see file_put_contents()
+     */
+    public function putContents($data, $flags = 0, $resource = null)
+    {
+        $status = file_put_contents($this->getRealPath(), $data, $flags, $resource);
+
+        if (false === $status) {
+            throw new RuntimeException(sprintf("The file '%s' could not be written", $file->getRealPath()));
+        }
+
+        return $status;
     }
 }

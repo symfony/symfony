@@ -26,6 +26,7 @@
         "symfony/stopwatch": "2.2.*",
         "symfony/templating": "2.2.*",
         "symfony/translation": "2.2.*",
+        "symfony/finder": "2.2.*",
         "doctrine/common": ">=2.2,<2.4-dev"
     },
     "require-dev": {
@@ -33,7 +34,6 @@
     },
     "suggest": {
         "symfony/console": "2.2.*",
-        "symfony/finder": "2.2.*",
         "symfony/form": "2.2.*",
         "symfony/validator": "2.2.*"
     },

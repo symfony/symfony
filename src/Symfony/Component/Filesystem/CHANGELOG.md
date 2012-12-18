@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added a delete option for the mirror() method
+ * added a fluid interface
 
 2.1.0
 -----

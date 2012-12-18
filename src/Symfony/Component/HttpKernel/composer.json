@@ -37,7 +37,8 @@
         "symfony/config": "2.2.*",
         "symfony/console": "2.2.*",
         "symfony/dependency-injection": "2.2.*",
-        "symfony/finder": "2.2.*"
+        "symfony/finder": "2.2.*",
+        "symfony/filesystem": "2.2.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\HttpKernel\\": "" }

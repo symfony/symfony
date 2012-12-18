@@ -55,123 +55,27 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
-        $oldCacheDir  = $realCacheDir.'_old';
+        $container = $this->getContainer();
 
-        if (!is_writable($realCacheDir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
+        $cacheDir = $container->getParameter('kernel.cache_dir');
+
+        if (!is_writable($cacheDir)) {
+            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $cacheDir));
         }
 
-        $kernel = $this->getContainer()->get('kernel');
+        $kernel = $container->get('kernel');
         $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
 
-        $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
+        $container->get('cache_clearer')->clear($cacheDir);
 
         if ($input->getOption('no-warmup')) {
-            rename($realCacheDir, $oldCacheDir);
+            $oldCacheDir  = $cacheDir.'__old__';
+            rename($cacheDir, $oldCacheDir);
+            $container->get('filesystem')->remove($oldCacheDir);
         } else {
-            $warmupDir = $realCacheDir.'_new';
-
-            $this->warmup($warmupDir, !$input->getOption('no-optional-warmers'));
-
-            rename($realCacheDir, $oldCacheDir);
-            rename($warmupDir, $realCacheDir);
+            $optionalEnabled = !$input->getOption('no-optional-warmers');
+            $warmer = $container->get('cache_warmer');
+            $warmer->warmUpForEnv($kernel, $container->get('filesystem'), $cacheDir, $kernel->getEnvironment(), $kernel->isDebug(), $optionalEnabled);
         }
-
-        $this->getContainer()->get('filesystem')->remove($oldCacheDir);
-    }
-
-    protected function warmup($warmupDir, $enableOptionalWarmers = true)
-    {
-        $this->getContainer()->get('filesystem')->remove($warmupDir);
-
-        $parent = $this->getContainer()->get('kernel');
-        $class = get_class($parent);
-        $namespace = '';
-        if (false !== $pos = strrpos($class, '\\')) {
-            $namespace = substr($class, 0, $pos);
-            $class = substr($class, $pos + 1);
-        }
-
-        $kernel = $this->getTempKernel($parent, $namespace, $class, $warmupDir);
-        $kernel->boot();
-
-        $warmer = $kernel->getContainer()->get('cache_warmer');
-
-        if ($enableOptionalWarmers) {
-            $warmer->enableOptionalWarmers();
-        }
-
-        $warmer->warmUp($warmupDir);
-
-        // fix container files and classes
-        $regex = '/'.preg_quote($this->getTempKernelSuffix(), '/').'/';
-        $finder = new Finder();
-        foreach ($finder->files()->name(get_class($kernel->getContainer()).'*')->in($warmupDir) as $file) {
-            $content = file_get_contents($file);
-            $content = preg_replace($regex, '', $content);
-
-            // fix absolute paths to the cache directory
-            $content = preg_replace('/'.preg_quote($warmupDir, '/').'/', preg_replace('/_new$/', '', $warmupDir), $content);
-
-            file_put_contents(preg_replace($regex, '', $file), $content);
-            unlink($file);
-        }
-
-        // fix meta references to the Kernel
-        foreach ($finder->files()->name('*.meta')->in($warmupDir) as $file) {
-            $content = preg_replace(
-                '/C\:\d+\:"'.preg_quote($class.$this->getTempKernelSuffix(), '"/').'"/',
-                sprintf('C:%s:"%s"', strlen($class), $class),
-                file_get_contents($file)
-            );
-            file_put_contents($file, $content);
-        }
-    }
-
-    protected function getTempKernelSuffix()
-    {
-        if (null === $this->name) {
-            $this->name = '__'.uniqid().'__';
-        }
-
-        return $this->name;
-    }
-
-    protected function getTempKernel(KernelInterface $parent, $namespace, $class, $warmupDir)
-    {
-        $suffix = $this->getTempKernelSuffix();
-        $rootDir = $parent->getRootDir();
-        $code = <<<EOF
-<?php
-
-namespace $namespace
-{
-    class $class$suffix extends $class
-    {
-        public function getCacheDir()
-        {
-            return '$warmupDir';
-        }
-
-        public function getRootDir()
-        {
-            return '$rootDir';
-        }
-
-        protected function getContainerClass()
-        {
-            return parent::getContainerClass().'$suffix';
-        }
-    }
-}
-EOF;
-        $this->getContainer()->get('filesystem')->mkdir($warmupDir);
-        file_put_contents($file = $warmupDir.'/kernel.tmp', $code);
-        require_once $file;
-        @unlink($file);
-        $class = "$namespace\\$class$suffix";
-
-        return new $class($parent->getEnvironment(), $parent->isDebug());
     }
 }

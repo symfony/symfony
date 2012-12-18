@@ -12,10 +12,10 @@
 namespace Symfony\Component\Finder\Exception;
 
 /**
- * Base ExceptionInterface for the Finder component.
+ * Base RuntimeException for the Finder component.
  *
- * @author Jean-François Simon <contact@jfsimon.fr>
+ * @author Victor Berchet <victor@suumit.com>
  */
-interface ExceptionInterface
+class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }

@@ -91,7 +91,7 @@ class StubIntlDateFormatter
     private $pattern;
 
     /**
-     * @var DateTimeZone
+     * @var \DateTimeZone
      */
     private $dateTimeZone;
 
@@ -496,7 +496,7 @@ class StubIntlDateFormatter
      *
      * @param int $timestamp
      *
-     * @return DateTime
+     * @return \DateTime
      */
     protected function createDateTime($timestamp)
     {

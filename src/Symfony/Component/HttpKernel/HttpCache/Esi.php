@@ -141,7 +141,7 @@ class Esi
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function process(Request $request, Response $response)
     {

@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine;
 
 use Doctrine\Common\Persistence\ManagerRegistry as ManagerRegistryInterface;
+use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 
 /**
@@ -72,7 +73,7 @@ interface RegistryInterface extends ManagerRegistryInterface
      *
      * @return string The full namespace
      *
-     * @see Doctrine\ORM\Configuration::getEntityNamespace
+     * @see Configuration::getEntityNamespace
      */
     public function getEntityNamespace($alias);
 

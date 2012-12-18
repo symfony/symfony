@@ -47,7 +47,7 @@ EOF
     }
 
     /**
-     * @see Command
+     * @see Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\CssSelector\Node;
 
 use Symfony\Component\CssSelector\Exception\ParseException;
+use Symfony\Component\CssSelector\XPathExpr;
 
 /**
  * PseudoNode represents a "selector:ident" node.
@@ -142,9 +143,9 @@ class PseudoNode implements NodeInterface
     /**
      * Sets the XPath expression to be the first of type.
      *
-     * @param \Symfony\Component\CssSelector\XPathExpr $xpath The XPath expression
+     * @param XPathExpr $xpath The XPath expression
      *
-     * @return \Symfony\Component\CssSelector\XPathExpr The modified expression
+     * @return XPathExpr The modified expression
      *
      * @throws ParseException
      */

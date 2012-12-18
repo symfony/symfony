@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpCache\Esi;
 
 /**
  * Cache provides HTTP caching.
@@ -135,7 +136,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Gets the Request instance associated with the master request.
      *
-     * @return Symfony\Component\HttpFoundation\Request A Request instance
+     * @return Request A Request instance
      */
     public function getRequest()
     {
@@ -145,7 +146,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Gets the Kernel instance
      *
-     * @return Symfony\Component\HttpKernel\HttpKernelInterface An HttpKernelInterface instance
+     * @return HttpKernelInterface An HttpKernelInterface instance
      */
     public function getKernel()
     {
@@ -156,7 +157,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Gets the Esi instance
      *
-     * @return Symfony\Component\HttpKernel\HttpCache\Esi An Esi instance
+     * @return Esi An Esi instance
      */
     public function getEsi()
     {

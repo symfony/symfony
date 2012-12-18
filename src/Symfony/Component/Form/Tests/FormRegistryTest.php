@@ -76,7 +76,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue('foo'));
 
-        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
         $this->registry->addType($resolvedType);
         restore_error_handler();
 
@@ -225,7 +225,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->registry->hasType('foo'));
 
-        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
         $this->registry->addType($resolvedType);
         restore_error_handler();
 

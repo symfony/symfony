@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
-use Symfony\Component\Form\Tests\DeprecationErrorHandler;
+use Symfony\Component\Form\Test\DeprecationErrorHandler;
 
 abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,7 +49,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockForm()
     {
-        return $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
     }
 
     public function getBooleanMatrix1()

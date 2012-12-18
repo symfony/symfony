@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests;
+namespace Symfony\Component\Form\Test;
 
 interface FormInterface extends \Iterator, \Symfony\Component\Form\FormInterface
 {

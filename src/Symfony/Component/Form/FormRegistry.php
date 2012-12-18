@@ -131,7 +131,7 @@ class FormRegistry implements FormRegistryInterface
             );
         }
 
-        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handleBC'));
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
         $this->addType($this->resolvedTypeFactory->createResolvedType(
             $type,
             $typeExtensions,

@@ -22,8 +22,8 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class CacheWarmerAggregate implements CacheWarmerInterface
 {
-    const NEW_CACHE_FOLDER_SUFFIX = '__new__';
-    const OLD_CACHE_FOLDER_SUFFIX = '__old__';
+    const NEW_CACHE_FOLDER_SUFFIX = '_new';
+    const OLD_CACHE_FOLDER_SUFFIX = '_old';
 
     protected $warmers;
     protected $optionalsEnabled;

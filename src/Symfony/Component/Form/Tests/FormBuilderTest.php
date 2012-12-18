@@ -50,10 +50,10 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(method_exists($this->builder, 'setName'));
     }
 
-    public function testAddNameNoString()
+    public function testAddNameNoStringAndNoInteger()
     {
         $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
-        $this->builder->add(1234);
+        $this->builder->add(true);
     }
 
     public function testAddTypeNoString()
@@ -80,6 +80,13 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->builder->has('foo'));
         $this->builder->add('foo', 'text');
         $this->assertTrue($this->builder->has('foo'));
+    }
+
+    public function testAddIntegerName()
+    {
+        $this->assertFalse($this->builder->has(0));
+        $this->builder->add(0, 'text');
+        $this->assertTrue($this->builder->has(0));
     }
 
     public function testAll()

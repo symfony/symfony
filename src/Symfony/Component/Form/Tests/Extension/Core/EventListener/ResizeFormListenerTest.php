@@ -81,7 +81,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array(1 => 'string', 2 => 'string');
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array('max_length' => '10'), false, false);
+        $listener = new ResizeFormListener('text', array('max_length' => '10'), false, false);
         $listener->preSetData($event);
 
         $this->assertFalse($this->form->has('0'));
@@ -90,13 +90,13 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testPreSetDataRequiresArrayOrTraversable()
     {
         $data = 'no array or traversable';
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
+        $listener = new ResizeFormListener('text', array(), false, false);
         $listener->preSetData($event);
     }
 
@@ -106,7 +106,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = null;
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
+        $listener = new ResizeFormListener('text', array(), false, false);
         $listener->preSetData($event);
     }
 
@@ -121,7 +121,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array(0 => 'string', 1 => 'string');
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array('max_length' => 10), true, false);
+        $listener = new ResizeFormListener('text', array('max_length' => 10), true, false);
         $listener->preBind($event);
 
         $this->assertTrue($this->form->has('0'));
@@ -135,7 +135,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array(0 => 'string');
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, true);
+        $listener = new ResizeFormListener('text', array(), false, true);
         $listener->preBind($event);
 
         $this->assertTrue($this->form->has('0'));
@@ -149,7 +149,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array();
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, true);
+        $listener = new ResizeFormListener('text', array(), false, true);
         $listener->preBind($event);
 
         $this->assertFalse($this->form->has('0'));
@@ -162,7 +162,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array(0 => 'string', 2 => 'string');
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
+        $listener = new ResizeFormListener('text', array(), false, false);
         $listener->preBind($event);
 
         $this->assertTrue($this->form->has('0'));
@@ -171,13 +171,13 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testPreBindRequiresArrayOrTraversable()
     {
         $data = 'no array or traversable';
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
+        $listener = new ResizeFormListener('text', array(), false, false);
         $listener->preBind($event);
     }
 
@@ -187,7 +187,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = null;
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, true);
+        $listener = new ResizeFormListener('text', array(), false, true);
         $listener->preBind($event);
 
         $this->assertFalse($this->form->has('1'));
@@ -200,7 +200,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = '';
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, true);
+        $listener = new ResizeFormListener('text', array(), false, true);
         $listener->preBind($event);
 
         $this->assertFalse($this->form->has('1'));
@@ -212,7 +212,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array(0 => 'first', 1 => 'second', 2 => 'third');
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, true);
+        $listener = new ResizeFormListener('text', array(), false, true);
         $listener->onBind($event);
 
         $this->assertEquals(array(1 => 'second'), $event->getData());
@@ -224,20 +224,20 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = array(0 => 'first', 1 => 'second', 2 => 'third');
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
+        $listener = new ResizeFormListener('text', array(), false, false);
         $listener->onBind($event);
 
         $this->assertEquals($data, $event->getData());
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testOnBindNormDataRequiresArrayOrTraversable()
     {
         $data = 'no array or traversable';
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, false);
+        $listener = new ResizeFormListener('text', array(), false, false);
         $listener->onBind($event);
     }
 
@@ -247,7 +247,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = null;
         $event = DeprecationErrorHandler::getFormEvent($this->form, $data);
-        $listener = new ResizeFormListener($this->factory, 'text', array(), false, true);
+        $listener = new ResizeFormListener('text', array(), false, true);
         $listener->onBind($event);
 
         $this->assertEquals(array(), $event->getData());

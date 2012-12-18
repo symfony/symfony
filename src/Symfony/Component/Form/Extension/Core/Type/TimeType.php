@@ -21,9 +21,27 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransfo
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class TimeType extends AbstractType
 {
+    private static $allowedSingleWidgets = array(
+        'single_text',
+        'text',
+        'choice'
+    );
+
+    private static $allowedPartWidgets = array(
+        'text',
+        'choice',
+    );
+
+    private static $allowedParts = array(
+        'hour',
+        'minute',
+        'second',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -43,49 +61,57 @@ class TimeType extends AbstractType
                 'error_bubbling' => true,
             );
 
-            if ('choice' === $options['widget']) {
-                $hours = $minutes = array();
+            if ('choice' === $options['widget']['hour']) {
+                $hours = array();
 
                 foreach ($options['hours'] as $hour) {
                     $hours[$hour] = str_pad($hour, 2, '0', STR_PAD_LEFT);
                 }
+
+                $hourOptions = array_merge($options['hour_options'], $hourOptions);
+                $hourOptions['choices'] = $hours;
+                $hourOptions['empty_value'] = $options['empty_value']['hour'];
+            }
+
+            if ('choice' === $options['widget']['minute']) {
+                $minutes = array();
+
                 foreach ($options['minutes'] as $minute) {
                     $minutes[$minute] = str_pad($minute, 2, '0', STR_PAD_LEFT);
                 }
 
-                // Only pass a subset of the options to children
-                $hourOptions['choices'] = $hours;
-                $hourOptions['empty_value'] = $options['empty_value']['hour'];
+                $minuteOptions = array_merge($options['minute_options'], $minuteOptions);
                 $minuteOptions['choices'] = $minutes;
                 $minuteOptions['empty_value'] = $options['empty_value']['minute'];
+            }
 
-                if ($options['with_seconds']) {
-                    $seconds = array();
+            if ('choice' === $options['widget']['second'] && $options['with_seconds']) {
+                $seconds = array();
 
-                    foreach ($options['seconds'] as $second) {
-                        $seconds[$second] = str_pad($second, 2, '0', STR_PAD_LEFT);
-                    }
-
-                    $secondOptions['choices'] = $seconds;
-                    $secondOptions['empty_value'] = $options['empty_value']['second'];
+                foreach ($options['seconds'] as $second) {
+                    $seconds[$second] = str_pad($second, 2, '0', STR_PAD_LEFT);
                 }
 
-                // Append generic carry-along options
-                foreach (array('required', 'translation_domain') as $passOpt) {
-                    $hourOptions[$passOpt] = $minuteOptions[$passOpt] = $options[$passOpt];
-                    if ($options['with_seconds']) {
-                        $secondOptions[$passOpt] = $options[$passOpt];
-                    }
+                $secondOptions = array_merge($options['second_options'], $secondOptions);
+                $secondOptions['choices'] = $seconds;
+                $secondOptions['empty_value'] = $options['empty_value']['second'];
+            }
+
+            // Append generic carry-along options
+            foreach (array('required', 'translation_domain') as $passOpt) {
+                $hourOptions[$passOpt] = $minuteOptions[$passOpt] = $options[$passOpt];
+                if ($options['with_seconds']) {
+                    $secondOptions[$passOpt] = $options[$passOpt];
                 }
             }
 
             $builder
-                ->add('hour', $options['widget'], $hourOptions)
-                ->add('minute', $options['widget'], $minuteOptions)
+                ->add('hour', $options['widget']['hour'], $hourOptions)
+                ->add('minute', $options['widget']['minute'], $minuteOptions)
             ;
 
             if ($options['with_seconds']) {
-                $builder->add('second', $options['widget'], $secondOptions);
+                $builder->add('second', $options['widget']['second'], $secondOptions);
             }
 
             $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget']));
@@ -130,6 +156,53 @@ class TimeType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
+        $widgetNormalizer = function (Options $options, $widget) {
+            if ("single_text" === $widget) {
+                return $widget;
+            }
+
+            if (is_array($widget)) {
+                if (0 < count(array_diff(array_keys($widget), self::$allowedParts))) {
+                    throw new InvalidOptionsException(sprintf('The "widget" option can only be used to define the ' .
+                        'following time parts: "%s"', implode('", "', self::$allowedParts)));
+
+                }
+
+                if (0 < count(array_diff($widget, self::$allowedPartWidgets))) {
+                    throw new InvalidOptionsException(sprintf(
+                        'The "widget" option time part widgets can only be one of "%s"',
+                        implode('", "', self::$allowedPartWidgets)
+                    ));
+                }
+
+                if (isset($widget["second"]) && false === $options['with_seconds']) {
+                    throw new InvalidOptionsException(sprintf(
+                        'The "widget" option for time part "second" cannot be set because the option "with_seconds" is '
+                        . 'not enabled',
+                        implode('", "', self::$allowedPartWidgets)
+                    ));
+                }
+
+                return array_merge(array(
+                    'hour'   => 'choice',
+                    'minute' => 'choice',
+                    'second' => 'choice',
+                ), $widget);
+            }
+
+            if (!in_array($widget, self::$allowedSingleWidgets, true)) {
+                throw new InvalidOptionsException(sprintf('The "widget" option must be one of "%s" or individually'
+                    . ' defined for each time part ("%s")', implode('", "', self::$allowedSingleWidgets),
+                    implode('", "', self::$allowedParts)));
+            }
+
+            return array(
+                'hour'   => $widget,
+                'minute' => $widget,
+                'second' => $widget,
+            );
+        };
+
         $emptyValue = $emptyValueDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
@@ -145,7 +218,7 @@ class TimeType extends AbstractType
             }
 
             return array(
-                'hour' => $emptyValue,
+                'hour'   => $emptyValue,
                 'minute' => $emptyValue,
                 'second' => $emptyValue
             );
@@ -165,6 +238,9 @@ class TimeType extends AbstractType
             'hours'          => range(0, 23),
             'minutes'        => range(0, 59),
             'seconds'        => range(0, 59),
+            'hour_options'   => array(),
+            'minute_options' => array(),
+            'second_options' => array(),
             'widget'         => 'choice',
             'input'          => 'datetime',
             'with_seconds'   => false,
@@ -187,6 +263,7 @@ class TimeType extends AbstractType
         ));
 
         $resolver->setNormalizers(array(
+            'widget'      => $widgetNormalizer,
             'empty_value' => $emptyValueNormalizer,
         ));
 
@@ -196,12 +273,7 @@ class TimeType extends AbstractType
                 'string',
                 'timestamp',
                 'array',
-            ),
-            'widget' => array(
-                'single_text',
-                'text',
-                'choice',
-            ),
+            )
         ));
     }
 

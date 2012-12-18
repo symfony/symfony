@@ -16,7 +16,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Form\Tests\DeprecationErrorHandler;
+use Symfony\Component\Form\Test\DeprecationErrorHandler;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
 use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
-use Symfony\Component\Form\Tests\DeprecationErrorHandler;
+use Symfony\Component\Form\Test\DeprecationErrorHandler;
 
 class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,7 +41,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
     public function testFixRadio()
     {
         $data = '1';
-        $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = DeprecationErrorHandler::getFormEvent($form, $data);
 
         $this->listener->preBind($event);
@@ -52,7 +52,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
     public function testFixZero()
     {
         $data = '0';
-        $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = DeprecationErrorHandler::getFormEvent($form, $data);
 
         $this->listener->preBind($event);
@@ -63,7 +63,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
     public function testIgnoreEmptyString()
     {
         $data = '';
-        $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = DeprecationErrorHandler::getFormEvent($form, $data);
 
         $this->listener->preBind($event);

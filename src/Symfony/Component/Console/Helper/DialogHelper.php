@@ -101,43 +101,25 @@ class DialogHelper extends Helper
                 if ("\033" === $c) {
                     $c .= fread($inputStream, 2);
 
-                    if ('A' === $c[2]) {
+                    if ('A' === $c[2] || 'B' === $c[2]) {
                         if (0 === count($currentMatched)) {
                             continue;
                         }
 
-                        // Save cursor position
-                        $output->write("\0337");
+                        if ('A' === $c[2]) {
+                            $ofs = (count($currentMatched) + --$ofs) % count($currentMatched);
+                        }
+                        else {
+                            $ofs = ++$ofs % count($currentMatched);
+                        }
 
                         // Erase characters from cursor to end of line
                         $output->write("\033[K");
 
-                        if ($ofs === 0) {
-                            $ofs = count($currentMatched);
-                        }
-
-                        $ofs--;
-
-                        $output->write('<hl>' . substr($currentMatched[$ofs], strlen($ret)) . '</hl>');
-
-                        // Restore cursor position
-                        $output->write("\0338");
-                    }
-                    else if ('B' === $c[2]) {
-                        if (0 === count($currentMatched)) {
-                            continue;
-                        }
-                        
                         // Save cursor position
                         $output->write("\0337");
-
-                        // Erase characters from cursor to end of line
-                        $output->write("\033[K");
-
-                        $ofs = ($ofs + 1) % count($currentMatched);
-
+                        // Write highlighted text
                         $output->write('<hl>' . substr($currentMatched[$ofs], strlen($ret)) . '</hl>');
-
                         // Restore cursor position
                         $output->write("\0338");
                     }
@@ -146,11 +128,7 @@ class DialogHelper extends Helper
                 }
 
                 // Backspace Character
-                if ("\177" === $c) {
-                    if ($i === 0) {
-                        continue;
-                    }
-
+                if ("\177" === $c && 0 !== $i) {
                     if (0 === count($currentMatched)) {
                         $i--;
                         // Move cursor backwards
@@ -167,7 +145,7 @@ class DialogHelper extends Helper
                 }
 
                 if ("\t" === $c || "\n" === $c) {
-                    if (false !== $currentMatched) {
+                    if (count($currentMatched) > 0) {
                         // Echo out completed match
                         $output->write(substr($currentMatched[$ofs], strlen($ret)));
                         $ret = $currentMatched[$ofs];
@@ -179,7 +157,7 @@ class DialogHelper extends Helper
                         break;
                     }
 
-                    $currentMatched = false;
+                    $currentMatched = array();
 
                     continue;
                 }
@@ -203,21 +181,17 @@ class DialogHelper extends Helper
                     $matchTest = substr($value, 0, strlen($ret));
 
                     if ($ret === $matchTest) {
-                        if (strlen($ret) === strlen($value)) {
-                            //$currentMatched = false;
-                            continue;
+                        if (strlen($ret) !== strlen($value)) {
+                            $currentMatched[] = $value;
                         }
-
-                        $currentMatched[] = $value;
                     }
                 }
 
                 if (count($currentMatched) > 0) {
                     // Save cursor position
                     $output->write("\0337");
-
+                    // Write highlighted text
                     $output->write('<hl>' . substr($currentMatched[$ofs], strlen($ret)) . '</hl>');
-
                     // Restore cursor position
                     $output->write("\0338");
                 }

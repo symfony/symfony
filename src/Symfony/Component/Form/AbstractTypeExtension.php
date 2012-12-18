@@ -44,7 +44,7 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handleBC'));
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
         $resolver->setDefaults($this->getDefaultOptions());
         $resolver->addAllowedValues($this->getAllowedOptionValues());
         restore_error_handler();

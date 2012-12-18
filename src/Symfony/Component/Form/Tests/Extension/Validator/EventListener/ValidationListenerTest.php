@@ -18,7 +18,7 @@ use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Form\Tests\DeprecationErrorHandler;
+use Symfony\Component\Form\Test\DeprecationErrorHandler;
 
 class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -94,7 +94,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     private function getMockForm()
     {
-        return $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
     }
 
     // More specific mapping tests can be found in ViolationMapperTest

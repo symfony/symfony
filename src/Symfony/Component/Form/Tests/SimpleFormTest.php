@@ -644,7 +644,7 @@ class SimpleFormTest extends AbstractFormTest
     {
         $test = $this;
         $validator = $this->getFormValidator();
-        set_error_handler(array('Symfony\Component\Form\Tests\DeprecationErrorHandler', 'handle'));
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
         $form = $this->getBuilder()
             ->addValidator($validator)
             ->getForm();
@@ -686,7 +686,7 @@ class SimpleFormTest extends AbstractFormTest
     {
         $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
         $view = $this->getMock('Symfony\Component\Form\FormView');
-        $parentForm = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $parentForm = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $parentView = $this->getMock('Symfony\Component\Form\FormView');
         $form = $this->getBuilder()->setType($type)->getForm();
         $form->setParent($parentForm);

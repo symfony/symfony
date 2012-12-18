@@ -77,6 +77,16 @@ interface FormConfigInterface
     public function getCompound();
 
     /**
+     * Returns whether the form explicitly supports missing children
+     *
+     * When enabled, missing child data uses pre-existing model data
+     * rather than defaulting to `null`.
+     *
+     * @return null|Boolean Whether the form explicitly supports missing children
+     */
+    public function getIgnoreMissing();
+
+    /**
      * Returns the form types used to construct the form.
      *
      * @return ResolvedFormTypeInterface The form's type.

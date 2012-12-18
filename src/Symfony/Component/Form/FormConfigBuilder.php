@@ -67,6 +67,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $compound = false;
 
     /**
+     * @var Boolean
+     */
+    private $ignoreMissing;
+
+    /**
      * @var ResolvedFormTypeInterface
      */
     private $type;
@@ -465,6 +470,14 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function getIgnoreMissing()
+    {
+        return $this->ignoreMissing;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getType()
     {
         return $this->type;
@@ -814,6 +827,20 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         }
 
         $this->compound = $compound;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setIgnoreMissing($ignoreMissing)
+    {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
+        $this->ignoreMissing = $ignoreMissing;
 
         return $this;
     }

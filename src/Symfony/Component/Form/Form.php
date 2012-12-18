@@ -181,6 +181,15 @@ class Form implements \IteratorAggregate, FormInterface
         return $this->config->getName();
     }
 
+    public function getIgnoreMissing()
+    {
+        if ($this->parent && null === $this->config->getIgnoreMissing()) {
+            return $this->parent->getIgnoreMissing();
+        }
+
+        return $this->config->getIgnoreMissing();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -522,6 +531,8 @@ class Form implements \IteratorAggregate, FormInterface
         // and radio buttons with empty values.
         if (is_scalar($submittedData)) {
             $submittedData = (string) $submittedData;
+        } elseif ($this->getIgnoreMissing() && null === $submittedData) {
+            $submittedData = $this->getViewData();
         }
 
         // Initialize errors in the very beginning so that we don't lose any

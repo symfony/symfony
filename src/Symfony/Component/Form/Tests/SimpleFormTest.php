@@ -118,6 +118,63 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertTrue($form->isBound());
     }
 
+    public function testBindUsesViewDataIfNullAndIgnoreMissing()
+    {
+        $form = $this->getBuilder('name', new EventDispatcher())
+            ->setIgnoreMissing(true)
+            ->addViewTransformer(new FixedDataTransformer(array(
+                ''      => '',
+                'norm'  => 'client',
+            )))
+            ->addModelTransformer(new FixedDataTransformer(array(
+                ''      => '',
+                'app'   => 'norm',
+            )))
+            ->getForm()
+        ;
+
+        $form->setData('app');
+
+        $form->bind(null);
+
+        $this->assertEquals('app',      $form->getData());
+        $this->assertEquals('norm',     $form->getNormData());
+        $this->assertEquals('client',   $form->getClientData());
+    }
+
+    public function testIgnoreMissingUsesParentSettingByDefault()
+    {
+        $parent = $this->getBuilder()->setIgnoreMissing(true)->getForm();
+        $child = $this->getBuilder()->getForm();
+
+        $child->setParent($parent);
+
+        $this->assertTrue($child->getIgnoreMissing());
+    }
+
+    public function testIgnoreMissingDefaultsToNull()
+    {
+        $form = $this->getBuilder()->getForm();
+        $this->assertNull($form->getIgnoreMissing());
+    }
+
+    public function testIgnoreMissingUsesSetValue()
+    {
+        $parent = $this->getBuilder()->setIgnoreMissing(false)->getForm();
+        $child  = $this->getBuilder()->setIgnoreMissing(true)->getForm();
+
+        $child->setParent($parent);
+
+        $this->assertTrue($child->getIgnoreMissing());
+
+        $parent = $this->getBuilder()->setIgnoreMissing(true)->getForm();
+        $child  = $this->getBuilder()->setIgnoreMissing(false)->getForm();
+
+        $child->setParent($parent);
+
+        $this->assertFalse($child->getIgnoreMissing());
+    }
+
     public function testNeverRequiredIfParentNotRequired()
     {
         $parent = $this->getBuilder()->setRequired(false)->getForm();

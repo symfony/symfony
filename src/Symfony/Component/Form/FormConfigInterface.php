@@ -193,6 +193,13 @@ interface FormConfigInterface
     public function getDataLocked();
 
     /**
+     * Returns the form factory used for creating new forms.
+     *
+     * @return FormFactoryInterface The form factory.
+     */
+    public function getFormFactory();
+
+    /**
      * Returns all options passed during the construction of the form.
      *
      * @return array The passed options.

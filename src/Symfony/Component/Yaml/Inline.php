@@ -28,6 +28,8 @@ class Inline
      * @param string $value A YAML string
      *
      * @return array A PHP array representing the YAML string
+     *
+     * @throws ParseException
      */
     public static function parse($value)
     {

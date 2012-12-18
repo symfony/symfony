@@ -55,6 +55,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      * If not, override this method in your test classes.
      *
      * @return string The directory where phpunit.xml(.dist) is stored
+     *
+     * @throws \RuntimeException
      */
     protected static function getPhpUnitXmlDir()
     {
@@ -113,6 +115,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      * When the Kernel is located, the file is required.
      *
      * @return string The Kernel class name
+     *
+     * @throws \RuntimeException
      */
     protected static function getKernelClass()
     {

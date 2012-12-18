@@ -44,6 +44,7 @@ class JsonDecode implements DecoderInterface
      * Decodes a JSON string into PHP data
      *
      * @param string $data JSON
+     * @param string $format
      *
      * @return mixed
      */

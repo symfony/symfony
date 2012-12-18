@@ -59,6 +59,8 @@ class SplFileInfo extends \SplFileInfo
      * Returns the contents of the file
      *
      * @return string the contents of the file
+     *
+     * @throws \RuntimeException
      */
     public function getContents()
     {

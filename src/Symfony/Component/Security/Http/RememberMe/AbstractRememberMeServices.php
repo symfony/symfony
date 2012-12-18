@@ -47,6 +47,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param string          $providerKey
      * @param array           $options
      * @param LoggerInterface $logger
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(array $userProviders, $key, $providerKey, array $options = array(), LoggerInterface $logger = null)
     {
@@ -89,7 +91,9 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      *
      * @param Request $request
      *
-     * @return TokenInterface
+     * @return TokenInterface|null
+     *
+     * @throws CookieTheftException
      */
     final public function autoLogin(Request $request)
     {

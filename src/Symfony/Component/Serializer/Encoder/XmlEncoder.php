@@ -271,6 +271,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * @param array|object $data       data
      *
      * @return Boolean
+     *
+     * @throws UnexpectedValueException
      */
     private function buildXml($parentNode, $data)
     {

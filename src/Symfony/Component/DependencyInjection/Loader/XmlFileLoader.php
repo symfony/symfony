@@ -275,6 +275,8 @@ class XmlFileLoader extends FileLoader
      *
      * @param \DOMDocument $dom
      *
+     * @return Boolean
+     *
      * @throws RuntimeException When extension references a non-existent XSD file
      */
     public function validateSchema(\DOMDocument $dom)

@@ -336,6 +336,8 @@ class Response
      *
      * @return Response
      *
+     * @throws \UnexpectedValueException
+     *
      * @api
      */
     public function setContent($content)
@@ -874,6 +876,8 @@ class Response
      * @param array $options An array of cache options
      *
      * @return Response
+     *
+     * @throws \InvalidArgumentException
      *
      * @api
      */

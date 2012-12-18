@@ -29,6 +29,8 @@ class MemcachedProfilerStorage extends BaseMemcacheProfilerStorage
      * Internal convenience method that returns the instance of the Memcached
      *
      * @return Memcached
+     *
+     * @throws \RuntimeException
      */
     protected function getMemcached()
     {

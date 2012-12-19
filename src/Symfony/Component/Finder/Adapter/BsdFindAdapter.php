@@ -13,6 +13,8 @@ namespace Symfony\Component\Finder\Adapter;
 
 use Symfony\Component\Finder\Shell\Shell;
 use Symfony\Component\Finder\Shell\Command;
+use Symfony\Component\Finder\Iterator\SortableIterator;
+use Symfony\Component\Finder\Expression\Expression;
 
 /**
  * Shell engine implementation using BSD find command.
@@ -34,21 +36,65 @@ class BsdFindAdapter extends AbstractFindAdapter
      */
     protected function canBeUsed()
     {
-        // FIXME: this adapter does not work yet with Shell::TYPE_DARWIN
-        return in_array($this->shell->getType(), array(Shell::TYPE_BSD)) && parent::canBeUsed();
+        return in_array($this->shell->getType(), array(Shell::TYPE_BSD, Shell::TYPE_DARWIN)) && parent::canBeUsed();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function buildFormatSorting(Command $command, $format)
+    protected function buildFormatSorting(Command $command, $sort)
     {
+        switch ($sort) {
+            case SortableIterator::SORT_BY_NAME:
+                $command->ins('sort')->add('| sort');
+
+                return;
+            case SortableIterator::SORT_BY_TYPE:
+                $format = '%HT';
+                break;
+            case SortableIterator::SORT_BY_ACCESSED_TIME:
+                $format = '%a';
+                break;
+            case SortableIterator::SORT_BY_CHANGED_TIME:
+                $format = '%c';
+                break;
+            case SortableIterator::SORT_BY_MODIFIED_TIME:
+                $format = '%m';
+                break;
+            default:
+                throw new \InvalidArgumentException('Unknown sort options: '.$sort.'.');
+        }
+
         $command
-            ->get('find')
             ->add('-print0 | xargs -0 stat -f')
-            ->arg($format.' %h/%f\\n')
-            ->add('| sort | cut')
-            ->arg('-d ')
-            ->arg('-f2-');
+            ->arg($format.'%t%N')
+            ->add('| sort | cut -f 2');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildFindCommand(Command $command, $dir)
+    {
+        parent::buildFindCommand($command, $dir)->addAtIndex('-E', 1);
+        return $command;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildContentFiltering(Command $command, array $contains, $not = false)
+    {
+        foreach ($contains as $contain) {
+            $expr = Expression::create($contain);
+
+            // todo: avoid forking process for each $pattern by using multiple -e options
+            $command
+                ->add('| grep -v \'^$\'')
+                ->add('| xargs grep -I')
+                ->add($expr->isCaseSensitive() ? null : '-i')
+                ->add($not ? '-L' : '-l')
+                ->add('-Ee')->arg($expr->renderPattern());
+        }
     }
 }

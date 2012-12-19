@@ -42,6 +42,8 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * @param array            $objectManager A configured object manager.
      * @param ContainerBuilder $container     A ContainerBuilder instance
+     *
+     * @throws \InvalidArgumentException
      */
     protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
     {
@@ -119,6 +121,8 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array  $mappingConfig
      * @param string $mappingName
+     *
+     * @throws \InvalidArgumentException
      */
     protected function setMappingDriverConfig(array $mappingConfig, $mappingName)
     {
@@ -228,6 +232,8 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array  $mappingConfig
      * @param string $objectManagerName
+     *
+     * @throws \InvalidArgumentException
      */
     protected function assertValidMappingConfiguration(array $mappingConfig, $objectManagerName)
     {

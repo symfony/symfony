@@ -185,8 +185,6 @@ abstract class AbstractFindAdapter extends AbstractAdapter
      * @param string   $dir
      * @param string[] $paths
      * @param Boolean  $not
-     *
-     * @return void
      */
     private function buildPathsFiltering(Command $command, $dir, array $paths, $not = false)
     {

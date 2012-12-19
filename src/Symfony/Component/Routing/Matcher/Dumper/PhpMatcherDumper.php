@@ -188,6 +188,8 @@ EOF;
      * @param string|null $parentPrefix         The prefix of the parent collection used to optimize the code
      *
      * @return string PHP code
+     *
+     * @throws \LogicException
      */
     private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)
     {

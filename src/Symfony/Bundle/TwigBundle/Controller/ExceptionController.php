@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\TwigBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -67,6 +66,8 @@ class ExceptionController
     }
 
     /**
+     * @param integer $startObLevel
+     *
      * @return string
      */
     protected function getAndCleanOutputBuffering($startObLevel)

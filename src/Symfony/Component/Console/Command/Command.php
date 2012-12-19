@@ -202,6 +202,8 @@ class Command
      *
      * @return integer The command exit code
      *
+     * @throws \Exception
+     *
      * @see setCode()
      * @see execute()
      *
@@ -250,6 +252,8 @@ class Command
      * @param callable $code A callable(InputInterface $input, OutputInterface $output)
      *
      * @return Command The current instance
+     *
+     * @throws \InvalidArgumentException
      *
      * @see execute()
      *

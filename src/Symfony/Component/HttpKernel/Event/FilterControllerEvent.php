@@ -59,6 +59,8 @@ class FilterControllerEvent extends KernelEvent
      *
      * @param callable $controller
      *
+     * @throws \LogicException
+     *
      * @api
      */
     public function setController($controller)

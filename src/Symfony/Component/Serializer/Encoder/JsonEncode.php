@@ -41,7 +41,8 @@ class JsonEncode implements EncoderInterface
     /**
      * Encodes PHP data to a JSON string
      *
-     * @param mixed $data
+     * @param mixed  $data
+     * @param string $format
      *
      * @return string
      */

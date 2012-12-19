@@ -218,6 +218,8 @@ class ProgressHelper extends Helper
      *
      * @param integer $step   Number of steps to advance
      * @param Boolean $redraw Whether to redraw or not
+     *
+     * @throws \LogicException
      */
     public function advance($step = 1, $redraw = false)
     {
@@ -238,6 +240,8 @@ class ProgressHelper extends Helper
      * Outputs the current progress string.
      *
      * @param Boolean $finish Forces the end result
+     *
+     * @throws \LogicException
      */
     public function display($finish = false)
     {

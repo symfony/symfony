@@ -184,8 +184,8 @@ class Container implements IntrospectableContainerInterface
      * @param object $service The service instance
      * @param string $scope   The scope of the service
      *
-     * @throws \RuntimeException When trying to set a service in an inactive scope
-     * @throws \InvalidArgumentException When trying to set a service in the prototype scope
+     * @throws RuntimeException When trying to set a service in an inactive scope
+     * @throws InvalidArgumentException When trying to set a service in the prototype scope
      *
      * @api
      */
@@ -401,7 +401,7 @@ class Container implements IntrospectableContainerInterface
      *
      * @param ScopeInterface $scope
      *
-     * @throws \InvalidArgumentException When the scope is invalid
+     * @throws InvalidArgumentException
      *
      * @api
      */

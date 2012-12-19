@@ -25,20 +25,4 @@ class Magician
         return isset($this->$property) ? $this->$property : null;
     }
 
-    public function __call($methodName, $args)
-    {
-        $returnValue = null;
-        $property = lcfirst(substr($methodName, 3));
-
-        switch (substr($methodName, 0, 3)) {
-            case 'get':
-                $returnValue = $this->__get($property);
-                break;
-            case 'set':
-                $returnValue = $this->__set($property, $args);
-                break;
-        }
-
-        return $returnValue;
-    }
 }

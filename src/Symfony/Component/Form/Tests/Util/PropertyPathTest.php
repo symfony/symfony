@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Util;
 use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\Magician;
+use Symfony\Component\Form\Tests\Fixtures\MagicianCall;
 
 class PropertyPathTest extends \PHPUnit_Framework_TestCase
 {
@@ -322,9 +323,10 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
 
     public function testSetValueUpdateMagicCall()
     {
-        $object = new Magician();
+        $object = new MagicianCall();
 
-        $object->setMagicProperty('foobar');
+        $path = new PropertyPath('magicProperty');
+        $path->setValue($object, 'foobar');
 
         $this->assertEquals('foobar', $object->getMagicProperty());
     }

@@ -17,8 +17,10 @@ class MagicianCall
 
     public function __call($methodName, $args)
     {
+        
         $returnValue = null;
         $property = lcfirst(substr($methodName, 3));
+        $args = $this->getSimpleValue($args);
 
         switch (substr($methodName, 0, 3)) {
             case 'get':
@@ -40,6 +42,11 @@ class MagicianCall
     private function get($property)
     {
         return isset($this->$property) ? $this->$property : null;
+    }
+    
+    private function getSimpleValue($args)
+    {
+        return count($args)==1 ? current($args) : $args;
     }
 
 }

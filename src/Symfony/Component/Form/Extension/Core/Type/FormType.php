@@ -86,11 +86,6 @@ class FormType extends AbstractType
             $id = $name;
             $fullName = $name;
             $uniqueBlockPrefix = '_' . $blockName;
-
-            // Strip leading underscores and digits. These are allowed in
-            // form names, but not in HTML4 ID attributes.
-            // http://www.w3.org/TR/html401/struct/global.html#adef-id
-            $id = ltrim($id, '_0123456789');
         }
 
         $blockPrefixes = array();

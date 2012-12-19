@@ -112,16 +112,6 @@ class FormTypeTest extends TypeTestCase
         $this->assertEquals('name', $view->vars['full_name']);
     }
 
-    public function testStripLeadingUnderscoresAndDigitsFromId()
-    {
-        $form = $this->factory->createNamed('_09name', 'form');
-        $view = $form->createView();
-
-        $this->assertEquals('name', $view->vars['id']);
-        $this->assertEquals('_09name', $view->vars['name']);
-        $this->assertEquals('_09name', $view->vars['full_name']);
-    }
-
     public function testPassIdAndNameToViewWithParent()
     {
         $parent = $this->factory->createNamed('parent', 'form');

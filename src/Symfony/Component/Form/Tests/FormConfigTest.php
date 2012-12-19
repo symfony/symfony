@@ -20,42 +20,39 @@ use Symfony\Component\Form\FormConfigBuilder;
 
 class FormConfigTest extends \PHPUnit_Framework_TestCase
 {
-    public function getHtml4Ids()
+    public function getHtml5Ids()
     {
         return array(
             array('z0', true),
             array('A0', true),
             array('A9', true),
             array('Z0', true),
-            array('#', false),
-            array('a#', false),
-            array('a$', false),
-            array('a%', false),
+            array('#', true),
+            array('a#', true),
+            array('a$', true),
+            array('a%', true),
             array('a ', false),
             array("a\t", false),
+            array("a\r", false),
             array("a\n", false),
+            array("a\f", false),
             array('a-', true),
             array('a_', true),
             array('a:', true),
-            // Periods are allowed by the HTML4 spec, but disallowed by us
-            // because they break the generated property paths
-            array('a.', false),
-            // Contrary to the HTML4 spec, we allow names starting with a
-            // number, otherwise naming fields by collection indices is not
-            // possible.
-            // For root forms, leading digits will be stripped from the
-            // "id" attribute to produce valid HTML4.
             array('0', true),
             array('9', true),
-            // Contrary to the HTML4 spec, we allow names starting with an
-            // underscore, since this is already a widely used practice in
-            // Symfony2.
-            // For root forms, leading underscores will be stripped from the
-            // "id" attribute to produce valid HTML4.
             array('_', true),
+            // Brackets and periods are allowed by the HTML5 spec, but disallowed by us
+            // because they break the generated property paths
+            array('a[a]', false),
+            array('a[', false),
+            array('a]', false),
+            array('a.', false),
             // Integers are allowed
             array(0, true),
             array(123, true),
+            array(-1, true),
+            array(-123, true),
             // NULL is allowed
             array(null, true),
             // Other types are not
@@ -67,9 +64,9 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getHtml4Ids
+     * @dataProvider getHtml5Ids
      */
-    public function testNameAcceptsOnlyNamesValidAsIdsInHtml4($name, $accepted)
+    public function testNameAcceptsOnlyNamesValidAsIdsInHtml5($name, $accepted)
     {
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 

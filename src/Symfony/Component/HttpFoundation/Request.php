@@ -487,6 +487,16 @@ class Request
     }
 
     /**
+     * Gets the list of trusted proxies.
+     *
+     * @return array An array of trusted proxies.
+     */
+    public static function getTrustedProxies()
+    {
+        return self::$trustedProxies;
+    }
+
+    /**
      * Sets the name for trusted headers.
      *
      * The following header keys are supported:

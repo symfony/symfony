@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\HttpContentRenderer;
 
 class HttpKernelExtensionTest extends TestCase
 {
@@ -31,7 +31,7 @@ class HttpKernelExtensionTest extends TestCase
 
     public function testRenderWithoutMasterRequest()
     {
-        $kernel = $this->getKernel($this->returnValue(new Response('foo')));
+        $kernel = $this->getHttpContentRenderer($this->returnValue('foo'));
 
         $this->assertEquals('foo', $this->renderTemplate($kernel));
     }
@@ -41,7 +41,7 @@ class HttpKernelExtensionTest extends TestCase
      */
     public function testRenderWithError()
     {
-        $kernel = $this->getKernel($this->throwException(new \Exception('foo')));
+        $kernel = $this->getHttpContentRenderer($this->throwException(new \Exception('foo')));
 
         $loader = new \Twig_Loader_Array(array('index' => '{{ render("foo") }}'));
         $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
@@ -50,23 +50,20 @@ class HttpKernelExtensionTest extends TestCase
         $this->renderTemplate($kernel);
     }
 
-    protected function getKernel($return)
+    protected function getHttpContentRenderer($return)
     {
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-        $kernel
-            ->expects($this->once())
-            ->method('handle')
-            ->will($return)
-        ;
+        $strategy = $this->getMock('Symfony\\Component\\HttpKernel\\RenderingStrategy\\RenderingStrategyInterface');
+        $strategy->expects($this->once())->method('getName')->will($this->returnValue('default'));
+        $strategy->expects($this->once())->method('render')->will($return);
 
-        return $kernel;
+        return new HttpContentRenderer(array($strategy));
     }
 
-    protected function renderTemplate(HttpKernelInterface $kernel, $template = '{{ render("foo") }}')
+    protected function renderTemplate(HttpContentRenderer $renderer, $template = '{{ render("foo") }}')
     {
         $loader = new \Twig_Loader_Array(array('index' => $template));
         $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
-        $twig->addExtension(new HttpKernelExtension($kernel));
+        $twig->addExtension(new HttpKernelExtension($renderer));
 
         return $twig->render('index');
     }

@@ -81,7 +81,7 @@
 
         <service id="templating.helper.actions" class="%templating.helper.actions.class%">
             <tag name="templating.helper" alias="actions" />
-            <argument type="service" id="http_kernel" />
+            <argument type="service" id="http_content_renderer" />
         </service>
 
         <service id="templating.helper.code" class="%templating.helper.code.class%">

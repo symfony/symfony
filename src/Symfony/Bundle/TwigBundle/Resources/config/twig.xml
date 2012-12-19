@@ -90,8 +90,7 @@
 
         <service id="twig.extension.httpkernel" class="%twig.extension.httpkernel.class%">
             <tag name="twig.extension" />
-            <tag name="kernel.event_subscriber" />
-            <argument type="service" id="http_kernel" />
+            <argument type="service" id="http_content_renderer" />
         </service>
 
         <service id="twig.extension.form" class="%twig.extension.form.class%" public="false">

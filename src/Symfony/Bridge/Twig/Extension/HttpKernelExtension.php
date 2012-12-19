@@ -11,83 +11,54 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\HttpContentRenderer;
+use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
  * Provides integration with the HttpKernel component.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HttpKernelExtension extends \Twig_Extension implements EventSubscriberInterface
+class HttpKernelExtension extends \Twig_Extension
 {
-    private $kernel;
-    private $request;
+    private $renderer;
 
     /**
      * Constructor.
      *
-     * @param HttpKernelInterface $kernel A HttpKernelInterface install
+     * @param HttpContentRenderer $kernel A HttpContentRenderer instance
      */
-    public function __construct(HttpKernelInterface $kernel)
+    public function __construct(HttpContentRenderer $renderer)
     {
-        $this->kernel = $kernel;
+        $this->renderer = $renderer;
     }
 
     public function getFunctions()
     {
         return array(
-            'render' => new \Twig_Function_Method($this, 'render', array('needs_environment' => true, 'is_safe' => array('html'))),
+            'render' => new \Twig_Function_Method($this, 'render', array('is_safe' => array('html'))),
+            'controller' => new \Twig_Function_Method($this, 'controller'),
         );
     }
 
     /**
      * Renders a URI.
      *
-     * @param \Twig_Environment $twig A \Twig_Environment instance
-     * @param string            $uri  The URI to render
+     * @param string $uri     A URI
+     * @param array  $options An array of options
      *
      * @return string The Response content
      *
-     * @throws \RuntimeException
+     * @see Symfony\Component\HttpKernel\HttpContentRenderer::render()
      */
-    public function render(\Twig_Environment $twig, $uri)
+    public function render($uri, $options = array())
     {
-        if (null !== $this->request) {
-            $cookies = $this->request->cookies->all();
-            $server = $this->request->server->all();
-        } else {
-            $cookies = array();
-            $server = array();
-        }
-
-        $subRequest = Request::create($uri, 'get', array(), $cookies, array(), $server);
-        if (null !== $this->request && $this->request->getSession()) {
-            $subRequest->setSession($this->request->getSession());
-        }
-
-        $response = $this->kernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST, false);
-
-        if (!$response->isSuccessful()) {
-            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $subRequest->getUri(), $response->getStatusCode()));
-        }
-
-        return $response->getContent();
+        return $this->renderer->render($uri, $options);
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function controller($controller, $attributes = array(), $query = array())
     {
-        $this->request = $event->getRequest();
-    }
-
-    public static function getSubscribedEvents()
-    {
-        return array(
-            KernelEvents::REQUEST => array('onKernelRequest'),
-        );
+        return new ControllerReference($controller, $attributes, $query);
     }
 
     public function getName()

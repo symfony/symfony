@@ -18,11 +18,28 @@ namespace Symfony\Component\HttpKernel\Profiler;
 class FileProfilerStorage implements ProfilerStorageInterface
 {
     /**
-     * Folder where profiler data are stored.
+     * File where profiler data are stored.
      *
      * @var string
      */
-    private $folder;
+    private $storageFile;
+
+    /**
+     * Storage index file.
+     *
+     * @var string
+     */
+    private $indexFile;
+
+    /**
+     * @var \PharData
+     */
+    private $storage;
+
+    /**
+     * @var integer
+     */
+    private $storageFormat;
 
     /**
      * Constructs the file storage using a "dsn-like" path.
@@ -32,6 +49,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
      * @param string $dsn The DSN
      *
      * @throws \RuntimeException When the dsn is not valid
+     * @throws \RuntimeException When the storage folder could not be created
      */
     public function __construct($dsn)
     {
@@ -41,8 +59,14 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $this->folder = substr($dsn, 5);
 
         if (!is_dir($this->folder)) {
-            mkdir($this->folder);
+            if (false == mkdir($this->folder)) {
+                throw new \RuntimeException(sprintf('Could not create the profiler storage folder "%s".', $this->folder));
+            }
         }
+
+        $this->indexFile = realpath($this->folder).'/index.csv';
+        $this->storageFile = realpath($this->folder).'/profile';
+        $this->attachStorage();
     }
 
     /**
@@ -50,19 +74,17 @@ class FileProfilerStorage implements ProfilerStorageInterface
      */
     public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
-        $file = $this->getIndexFilename();
-
-        if (!file_exists($file)) {
+        if (!file_exists($this->indexFile)) {
             return array();
         }
 
-        $file = fopen($file, 'r');
+        $file = fopen($this->indexFile, 'r');
         fseek($file, 0, SEEK_END);
 
         $result = array();
 
         for (;$limit > 0; $limit--) {
-            $line = $this->readLineFromFile($file);
+            $line = $this->readLineFromIndexFile($file);
 
             if (null === $line) {
                 break;
@@ -104,16 +126,19 @@ class FileProfilerStorage implements ProfilerStorageInterface
      */
     public function purge()
     {
-        $flags = \FilesystemIterator::SKIP_DOTS;
-        $iterator = new \RecursiveDirectoryIterator($this->folder, $flags);
-        $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::CHILD_FIRST);
 
-        foreach ($iterator as $file) {
-            if (is_file($file)) {
-                unlink($file);
-            } else {
-                rmdir($file);
+        $storageFile = $this->getStorageFileName();
+        if (is_file($storageFile)) {
+            $iterator = new \RecursiveIteratorIterator($this->storage, \RecursiveIteratorIterator::CHILD_FIRST);
+            foreach ($iterator as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                } else {
+                    rmdir($file);
+                }
             }
+            \PharData::unlinkArchive($storageFile);
+            $this->attachStorage();
         }
     }
 
@@ -122,11 +147,11 @@ class FileProfilerStorage implements ProfilerStorageInterface
      */
     public function read($token)
     {
-        if (!$token || !file_exists($file = $this->getFilename($token))) {
+        if (!$token || null === ($profile = $this->getProfileFromToken($token))) {
             return null;
         }
 
-        return $this->createProfileFromData($token, $this->getProfileFromFile($file));
+        return $this->createProfileFromData($token, $profile);
     }
 
     /**
@@ -134,17 +159,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
      */
     public function write(Profile $profile)
     {
-        $file = $this->getFilename($profile->getToken());
-
-        $profileIndexed = is_file($file);
-        if (!$profileIndexed) {
-            // Create directory
-            $dir = dirname($file);
-            if (!is_dir($dir)) {
-                mkdir($dir, 0777, true);
-            }
-        }
-
         // Store profile
         $data = array(
             'token'    => $profile->getToken(),
@@ -157,16 +171,21 @@ class FileProfilerStorage implements ProfilerStorageInterface
             'time'     => $profile->getTime(),
         );
 
-        if (false === ($handle = fopen($file, 'wb')) ||
-            false === ($data = gzcompress(serialize($data), 9)) ||
-            false === fwrite($handle, $data) ||
-            false === fclose($handle)) {
+        $file = $this->getFilename($profile->getToken());
+        $profileIndexed = isset($this->storage[$file]);
+
+        try {
+            $this->storage[$file] = serialize($data);
+            if (\Phar::ZIP == $this->storageFormat) {
+                $this->storage[$file]->compress(\Phar::GZ);
+            }
+        } catch (\PharException $e) {
             return false;
         }
 
         if (!$profileIndexed) {
             // Add to index
-            if (false === $file = fopen($this->getIndexFilename(), 'a')) {
+            if (false === $file = fopen($this->indexFile, 'a')) {
                 return false;
             }
 
@@ -193,21 +212,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
      */
     protected function getFilename($token)
     {
-        // Uses 4 last characters, because first are mostly the same.
-        $folderA = substr($token, -2, 2);
-        $folderB = substr($token, -4, 2);
-
-        return $this->folder.'/'.$folderA.'/'.$folderB.'/'.$token;
-    }
-
-    /**
-     * Gets the index filename.
-     *
-     * @return string The index filename
-     */
-    protected function getIndexFilename()
-    {
-        return $this->folder.'/index.csv';
+        return substr($token, -2, 2).''.substr($token, -4, 2).'/'.$token;
     }
 
     /**
@@ -219,7 +224,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
      *
      * @return mixed A string representing the line or null if beginning of file is reached
      */
-    protected function readLineFromFile($file)
+    protected function readLineFromIndexFile($file)
     {
         $line = '';
         $position = ftell($file);
@@ -275,26 +280,48 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
 
         foreach ($data['children'] as $token) {
-            if (!$token || !file_exists($file = $this->getFilename($token))) {
+            if (!$token || null === ($childProfile = $this->getProfileFromToken($token))) {
                 continue;
             }
 
-            $profile->addChild($this->createProfileFromData($token, $this->getProfileFromFile($file), $profile));
+            $profile->addChild($this->createProfileFromData($token, $childProfile, $profile));
         }
 
         return $profile;
     }
 
-    protected function getProfileFromFile($file)
+    /**
+     * Return the Profile associated with the given token if any.
+     *
+     * @param string $token
+     *
+     * @return Profile|null
+     */
+    protected function getProfileFromToken($token)
     {
-        if (!file_exists($file) ||
-            false === ($handle = fopen($file, 'rb')) ||
-            false === ($data = fread($handle, 10485760)) ||
-            false === ($data = gzuncompress($data)) ||
-            false === fclose($handle)) {
-            return null;
-        }
+        $file = $this->getFilename($token);
+        return isset($this->storage[$file]) ? unserialize(file_get_contents($this->storage[$file])) : null;
+    }
 
-        return unserialize($data);
+    /**
+     * Attach to the PharData storage
+     */
+    protected function attachStorage()
+    {
+        $this->storageFormat = \PharData::canCompress(\Phar::GZ) ? \Phar::ZIP : \Phar::TAR;
+        $this->storage = new \PharData(
+            $this->getStorageFileName(),
+            \PharData::CURRENT_AS_FILEINFO | \PharData::KEY_AS_FILENAME,
+            'profile',
+            $this->storageFormat
+        );
+    }
+
+    /**
+     * @return string The name of the storage file
+     */
+    protected function getStorageFileName()
+    {
+        return $this->storageFile.(\Phar::ZIP === $this->storageFormat ? '.zip' : '.tar');
     }
 }

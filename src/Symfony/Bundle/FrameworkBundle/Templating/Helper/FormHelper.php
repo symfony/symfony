@@ -84,7 +84,7 @@ class FormHelper extends Helper
      *
      *     <?php echo view['form']->widget(array('attr' => array('class' => 'foo'))) ?>
      *
-     *     <?php echo view['form']->widget(array('separator' => '+++++)) ?>
+     *     <?php echo view['form']->widget(array('separator' => '+++++')) ?>
      *
      * @param FormView $view      The view for which to render the widget
      * @param array    $variables Additional variables passed to the template

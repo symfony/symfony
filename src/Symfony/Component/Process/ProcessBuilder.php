@@ -31,17 +31,26 @@ class ProcessBuilder
 
     public function __construct(array $arguments = array())
     {
-        $this->arguments = $arguments;
-
-        $this->timeout = 60;
-        $this->options = array();
-        $this->env = array();
-        $this->inheritEnv = true;
+        $this->startNewProcess($arguments);
     }
 
     public static function create(array $arguments = array())
     {
         return new static($arguments);
+    }
+
+    /**
+     * Resets the ProcessBuilder's state in order to start the creation of a new Process.
+     */
+    public function startNewProcess($arguments)
+    {
+        $this->arguments = $arguments;
+        $this->timeout = 60;
+        $this->options = array();
+        $this->env = array();
+        $this->inheritEnv = true;
+        $this->stdin = null;
+        $this->cwd = null;
     }
 
     /**

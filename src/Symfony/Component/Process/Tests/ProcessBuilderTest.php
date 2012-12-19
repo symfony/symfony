@@ -115,4 +115,28 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertContains("second", $proc->getCommandLine());
     }
+
+    /**
+     * @test
+     */
+    public function shouldStartNewProcess()
+    {
+        $pb = new ProcessBuilder(array('initial'));
+        $pb->setEnv('foo', 'bar');
+        $pb->setInput('test');
+        $pb->setOption('bar', 'foo');
+        $pb->setTimeout(30);
+        $pb->setWorkingDirectory('/tmp');
+        $pb->inheritEnvironmentVariables(true);
+
+        $pb->startNewProcess(array('second'));
+        $process = $pb->getProcess();
+
+        $this->assertContains('second', $process->getCommandLine());
+        $this->assertNotEquals(array('foo' => 'bar'), $process->getEnv());
+        $this->assertNotEquals('test', $process->getStdin());
+        $this->assertArrayNotHasKey('bar', $process->getOptions());
+        $this->assertNotEquals(30, $process->getTimeout());
+        $this->assertNotEquals('/tmp', $process->getWorkingDirectory());
+    }
 }

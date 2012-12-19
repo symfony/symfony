@@ -222,6 +222,9 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
      *
      * @return array|scalar
+     *
+     * @throws LogicException
+     * @throws UnexpectedValueException
      */
     private function normalizeObject($object, $format = null)
     {
@@ -253,6 +256,9 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
      *
      * @return object
+     *
+     * @throws LogicException
+     * @throws UnexpectedValueException
      */
     private function denormalizeObject($data, $class, $format = null)
     {

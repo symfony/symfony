@@ -94,6 +94,8 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * Internal convenience method that returns the instance of the MongoDB Collection
      *
      * @return \MongoCollection
+     *
+     * @throws \RuntimeException
      */
     protected function getMongo()
     {

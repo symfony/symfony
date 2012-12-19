@@ -31,6 +31,8 @@ class Route
      * Constructor.
      *
      * @param array $data An array of key/value parameters.
+     *
+     * @throws \BadMethodCallException
      */
     public function __construct(array $data)
     {

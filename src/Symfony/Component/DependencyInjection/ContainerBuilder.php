@@ -86,7 +86,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return ExtensionInterface An extension instance
      *
-     * @throws \LogicException if the extension is not registered
+     * @throws LogicException if the extension is not registered
      *
      * @api
      */
@@ -556,8 +556,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string        $alias The alias to create
      * @param string|Alias  $id    The service to alias
      *
-     * @throws \InvalidArgumentException if the id is not a string or an Alias
-     * @throws \InvalidArgumentException if the alias is for itself
+     * @throws InvalidArgumentException if the id is not a string or an Alias
+     * @throws InvalidArgumentException if the alias is for itself
      *
      * @api
      */

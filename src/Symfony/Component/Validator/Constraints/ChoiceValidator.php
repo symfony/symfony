@@ -25,9 +25,8 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class ChoiceValidator extends OneOfValidator
 {
-    public function __construct($options = null)
+    public function __construct()
     {
         trigger_error('ChoiceValidator is deprecated since version 2.2 and will be removed in 2.3. Use OneOfValidator instead', E_USER_DEPRECATED);
-        parent::__construct($options);
     }
 }

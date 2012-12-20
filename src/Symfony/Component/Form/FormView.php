@@ -65,6 +65,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     public function getName()
     {
         trigger_error('getName() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'vars\' instead which contains an entry named "name".', E_USER_DEPRECATED);
+
         return $this->vars['name'];
     }
 

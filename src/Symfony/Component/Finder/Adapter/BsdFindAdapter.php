@@ -77,6 +77,7 @@ class BsdFindAdapter extends AbstractFindAdapter
     protected function buildFindCommand(Command $command, $dir)
     {
         parent::buildFindCommand($command, $dir)->addAtIndex('-E', 1);
+
         return $command;
     }
 

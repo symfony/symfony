@@ -121,7 +121,7 @@ class HttpKernel extends BaseHttpKernel
 
             $alt = '';
             if ($options['alt']) {
-                if (is_string($options['alt']) && (0 === strpos($controller, 'http://') || 0 === strpos($controller, 'https://'))) {
+                if (is_string($options['alt']) && (0 === strpos($options['alt'], 'http://') || 0 === strpos($options['alt'], 'https://'))) {
                     $alt = $options['alt'];
                 } else {
                     $alt = $this->generateInternalUri($options['alt'][0], isset($options['alt'][1]) ? $options['alt'][1] : array(), isset($options['alt'][2]) ? $options['alt'][2] : array());

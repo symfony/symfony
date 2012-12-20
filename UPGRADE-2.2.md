@@ -362,3 +362,24 @@
    protected $gender;
    ```
 
+### FrameworkBundle
+
+#### Configuration
+
+ * The 2.2 version introduces a new parameter ```trusted_proxies``` that replaces ```trust_proxy_headers``` in the framework configuration.
+
+   Before:
+
+   ```
+   # app/config/config.yml
+   framework:
+       trust_proxy_headers: false
+   ```
+
+   After:
+
+   ```
+   # app/config/config.yml
+   framework:
+      trusted_proxies: []
+   ```

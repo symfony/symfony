@@ -7,6 +7,18 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.20 (2012-12-20)
+
+ * 532cc9a: [FrameworkBundle] added support for URIs as an argument to HttpKernel::render()
+ * 1f8c501: [FrameworkBundle] restricted the type of controllers that can be executed by InternalController
+ * 8b2c17f: fix double-decoding in the routing system
+ * 773d818: [FrameworkBundle] Added a check on file mime type for CodeHelper::fileExcerpt()
+ * a0e2391: [FrameworkBundle] used the new method for trusted proxies
+ * 8bb3208: [Config] Loader::import must return imported data
+ * 447ff91: [HttpFoundation] changed UploadedFile::move() to use move_uploaded_file() when possible
+ * 0489799: [HttpFoundation] added a check for the host header value
+ * ae3d531: [TwigBundle] Moved the registration of the app global to the environment
+
 * 2.0.19 (2012-11-29)
 
  * e5536f0: replaced magic strings by proper constants

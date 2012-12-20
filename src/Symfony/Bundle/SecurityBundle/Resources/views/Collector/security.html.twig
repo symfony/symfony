@@ -18,6 +18,12 @@
                 <b>Authenticated</b>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ authentication_color_code }}">{{ authentication_color_text }}</span>
             </div>
+            {% if collector.tokenClass != null %}
+            <div class="sf-toolbar-info-piece">
+                <b>Token class</b>
+                {{ collector.tokenClass|abbr_class }}
+            </div>
+            {% endif %}
         {% elseif collector.enabled %}
             You are not authenticated.
         {% else %}
@@ -61,6 +67,12 @@
                 <th>Roles</th>
                 <td>{{ collector.roles|yaml_encode }}</td>
             </tr>
+            {% if collector.tokenClass != null %}
+            <tr>
+                <th>Token class</th>
+                <td>{{ collector.tokenClass }}</td>
+            </tr>
+            {% endif %}
         </table>
     {% elseif collector.enabled %}
         <p>

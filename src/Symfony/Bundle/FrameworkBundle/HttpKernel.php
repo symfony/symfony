@@ -116,7 +116,11 @@ class HttpKernel extends BaseHttpKernel
         }
 
         if ($this->esiSupport && (true === $options['standalone'] || 'esi' === $options['standalone'])) {
-            $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query']);
+            if (0 === strpos($controller, 'http://') || 0 === strpos($controller, 'https://')) {
+                $uri = $controller;
+            } else {
+                $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query']);
+            }
 
             $alt = '';
             if ($options['alt']) {
@@ -127,7 +131,11 @@ class HttpKernel extends BaseHttpKernel
         }
 
         if ('js' === $options['standalone']) {
-            $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query'], false);
+            if (0 === strpos($controller, 'http://') || 0 === strpos($controller, 'https://')) {
+                $uri = $controller;
+            } else {
+                $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query'], false);
+            }
             $defaultContent = null;
 
             if ($template = $this->container->getParameter('templating.hinclude.default_template')) {

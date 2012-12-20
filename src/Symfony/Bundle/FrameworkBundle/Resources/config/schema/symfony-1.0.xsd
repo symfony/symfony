@@ -24,6 +24,7 @@
         <!-- charset is deprecated and will be removed in 2.2 -->
         <xsd:attribute name="charset" type="xsd:string" />
         <xsd:attribute name="trust-proxy-headers" type="xsd:string" />
+        <xsd:attribute name="trusted-proxies" type="xsd:string" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
         <xsd:attribute name="default-locale" type="xsd:string" />

@@ -8,6 +8,7 @@ CHANGELOG
    * `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` method signature changed and the first argument
      must now be a URI (the `generateInternalUri()` method was removed)
    * The internal routes have been removed (`Resources/config/routing/internal.xml`)
+   * The `render` method of the `actions` templating helper signature and arguments changed:
  * replaced Symfony\Bundle\FrameworkBundle\Controller\TraceableControllerResolver by Symfony\Component\HttpKernel\Controller\TraceableControllerResolver
  * replaced Symfony\Component\HttpKernel\Debug\ContainerAwareTraceableEventDispatcher by Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher
  * added Client::enableProfiler()

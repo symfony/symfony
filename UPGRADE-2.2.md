@@ -364,6 +364,22 @@
 
 ### FrameworkBundle
 
+ * The `render` method of the `actions` templating helper signature and arguments changed:
+
+   Before:
+
+   ```
+   <?php echo $view['actions']->render('BlogBundle:Post:list', array('limit' => 2), array('alt' => 'BlogBundle:Post:error')) ?>
+   ```
+
+   After:
+
+   ```
+   <?php echo $view['actions']->render($view['router']->generate('post_list', array('limit' => 2)), array('alt' => 'BlogBundle:Post:error')) ?>
+   ```
+
+   where `post_list` is the route name for the `BlogBundle:Post:list` controller.
+
 #### Configuration
 
  * The 2.2 version introduces a new parameter `trusted_proxies` that replaces

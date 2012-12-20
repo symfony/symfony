@@ -23,7 +23,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         parent::setUpBeforeClass();
 
-        self::$tmpDir = sys_get_temp_dir().'/symfony2_finder';
+        self::$tmpDir = realpath(sys_get_temp_dir().'/symfony2_finder');
     }
 
     public function testCreate()

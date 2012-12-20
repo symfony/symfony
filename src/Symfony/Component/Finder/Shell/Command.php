@@ -246,4 +246,17 @@ class Command
             function($bit) { return null !== $bit; }
         ));
     }
+
+    /**
+     * Insert a string or a Command instance before the bit at given position $index (index starts from 0).
+     *
+     * @param string|Command $bit
+     *
+     * @return Command The current Command instance
+     */
+    public function addAtIndex($bit, $index)
+    {
+        array_splice($this->bits, $index, 0, $bit);
+        return $this;
+    }
 }

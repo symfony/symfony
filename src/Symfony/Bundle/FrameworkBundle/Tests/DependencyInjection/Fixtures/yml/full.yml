@@ -2,6 +2,8 @@ framework:
     secret: s3cr3t
     default_locale: fr
     form: ~
+    trust_proxy_headers: true
+    trusted_proxies: ['127.0.0.1', '10.0.0.1']
     csrf_protection:
         enabled:    true
         field_name: _csrf

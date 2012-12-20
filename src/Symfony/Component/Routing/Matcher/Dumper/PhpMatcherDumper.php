@@ -335,18 +335,27 @@ EOF;
     {
         $groups = new DumperCollection();
 
-        $currentGroup = new DumperCollection();
-        $currentGroup->setAttribute('hostname_regex', null);
-        $groups->add($currentGroup);
+        $hostnameRegexEmptyGroup = new DumperCollection();
+        $hostnameRegexEmptyGroup->setAttribute('hostname_regex', null);
+        $groups->add($hostnameRegexEmptyGroup);
 
+        $hostnameGrouppedArray = array();
         foreach ($routes as $name => $route) {
             $hostnameRegex = $route->compile()->getHostnameRegex();
-            if ($currentGroup->getAttribute('hostname_regex') !== $hostnameRegex) {
-                $currentGroup = new DumperCollection();
-                $currentGroup->setAttribute('hostname_regex', $hostnameRegex);
-                $groups->add($currentGroup);
+            $dumper = new DumperRoute($name, $route);
+            if ($hostnameRegex) {
+                $hostnameGrouppedArray[$hostnameRegex][] = $dumper;
+            } else {
+                $hostnameRegexEmptyGroup->add($dumper);
             }
-            $currentGroup->add(new DumperRoute($name, $route));
+        }
+
+        foreach ($hostnameGrouppedArray as $hostnameRegex => $dumpers) {
+            $group = new DumperCollection();
+            $group->setAttribute('hostname_regex', $hostnameRegex);
+            $group->setAll($dumpers);
+
+            $groups->add($group);
         }
 
         return $groups;

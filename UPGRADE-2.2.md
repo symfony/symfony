@@ -366,7 +366,8 @@
 
 #### Configuration
 
- * The 2.2 version introduces a new parameter ```trusted_proxies``` that replaces ```trust_proxy_headers``` in the framework configuration.
+ * The 2.2 version introduces a new parameter `trusted_proxies` that replaces
+   `trust_proxy_headers` in the framework configuration.
 
    Before:
 
@@ -381,5 +382,5 @@
    ```
    # app/config/config.yml
    framework:
-      trusted_proxies: []
+      trusted_proxies: ['127.0.0.1', '10.0.0.1'] # a list of proxy IPs you trust
    ```

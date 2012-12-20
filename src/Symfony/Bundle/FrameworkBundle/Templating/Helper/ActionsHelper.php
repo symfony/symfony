@@ -34,21 +34,18 @@ class ActionsHelper extends Helper
     }
 
     /**
-     * Returns the Response content for a given controller or URI.
+     * Returns the Response content for a given URI.
      *
-     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
-     * @param array  $attributes An array of request attributes
-     * @param array  $options    An array of options
+     * @param string $uri     A URI
+     * @param array  $options An array of options
      *
      * @return string
      *
      * @see Symfony\Bundle\FrameworkBundle\HttpKernel::render()
      */
-    public function render($controller, array $attributes = array(), array $options = array())
+    public function render($uri, array $options = array())
     {
-        $options['attributes'] = $attributes;
-
-        return $this->kernel->render($controller, $options);
+        return $this->kernel->render($uri, $options);
     }
 
     /**

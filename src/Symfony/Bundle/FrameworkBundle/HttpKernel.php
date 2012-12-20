@@ -113,11 +113,19 @@ class HttpKernel extends BaseHttpKernel
         }
 
         if ($this->esiSupport && $options['standalone']) {
-            $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query']);
+            if (0 === strpos($controller, 'http://') || 0 === strpos($controller, 'https://')) {
+                $uri = $controller;
+            } else {
+                $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query']);
+            }
 
             $alt = '';
             if ($options['alt']) {
-                $alt = $this->generateInternalUri($options['alt'][0], isset($options['alt'][1]) ? $options['alt'][1] : array(), isset($options['alt'][2]) ? $options['alt'][2] : array());
+                if (is_string($options['alt']) && (0 === strpos($controller, 'http://') || 0 === strpos($controller, 'https://'))) {
+                    $alt = $options['alt'];
+                } else {
+                    $alt = $this->generateInternalUri($options['alt'][0], isset($options['alt'][1]) ? $options['alt'][1] : array(), isset($options['alt'][2]) ? $options['alt'][2] : array());
+                }
             }
 
             return $this->container->get('esi')->renderIncludeTag($uri, $alt, $options['ignore_errors'], $options['comment']);

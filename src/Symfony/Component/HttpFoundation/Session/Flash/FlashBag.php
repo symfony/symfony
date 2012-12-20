@@ -181,6 +181,8 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate, \Countable
      */
     public function count()
     {
+        trigger_error(sprintf('%s() is deprecated since 2.2 and will be removed in 2.3', __METHOD__), E_USER_DEPRECATED);
+
         return count($this->flashes);
     }
 }

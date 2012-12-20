@@ -36,6 +36,8 @@ class RenderTokenParser extends \Twig_TokenParser
             $this->parser->getStream()->next();
 
             $options = $this->parser->getExpressionParser()->parseExpression();
+        } else {
+            $options = new \Twig_Node_Expression_Array(array(), $token->getLine());
         }
 
         $this->parser->getStream()->expect(\Twig_Token::BLOCK_END_TYPE);

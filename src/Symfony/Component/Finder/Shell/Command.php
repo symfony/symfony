@@ -257,6 +257,7 @@ class Command
     public function addAtIndex($bit, $index)
     {
         array_splice($this->bits, $index, 0, $bit);
+
         return $this;
     }
 }

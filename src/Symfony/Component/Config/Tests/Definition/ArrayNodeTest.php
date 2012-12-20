@@ -12,7 +12,6 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use Symfony\Component\Config\Definition\ArrayNode;
-use Symfony\Component\Config\Definition\PrototypedArrayNode;
 
 class ArrayNodeTest extends \PHPUnit_Framework_TestCase
 {

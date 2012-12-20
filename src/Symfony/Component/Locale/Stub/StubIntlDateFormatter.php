@@ -13,7 +13,6 @@ namespace Symfony\Component\Locale\Stub;
 
 use Symfony\Component\Locale\Stub\StubLocale;
 use Symfony\Component\Locale\Stub\DateFormat\FullTransformer;
-use Symfony\Component\Locale\Exception\NotImplementedException;
 use Symfony\Component\Locale\Exception\MethodNotImplementedException;
 use Symfony\Component\Locale\Exception\MethodArgumentNotImplementedException;
 use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;

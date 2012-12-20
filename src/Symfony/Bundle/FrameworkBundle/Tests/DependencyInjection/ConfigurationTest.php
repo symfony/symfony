@@ -53,11 +53,14 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             array(array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1')), array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1'), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => '%kernel.debug%'), 'default_locale' => 'en', 'charset' => null)),
             array(array('secret' => 's3cr3t', 'trusted_proxies' => array('::1')), array('secret' => 's3cr3t', 'trusted_proxies' => array('::1'), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => '%kernel.debug%'), 'default_locale' => 'en', 'charset' => null)),
             array(array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1', '::1')), array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1', '::1'), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => '%kernel.debug%'), 'default_locale' => 'en', 'charset' => null)),
+            array(array('secret' => 's3cr3t', 'trusted_proxies' => null), array('secret' => 's3cr3t', 'trusted_proxies' => array(), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => '%kernel.debug%'), 'default_locale' => 'en', 'charset' => null)),
+            array(array('secret' => 's3cr3t', 'trusted_proxies' => false), array('secret' => 's3cr3t', 'trusted_proxies' => array(), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => '%kernel.debug%'), 'default_locale' => 'en', 'charset' => null)),
+            array(array('secret' => 's3cr3t', 'trusted_proxies' => array()), array('secret' => 's3cr3t', 'trusted_proxies' => array(), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => '%kernel.debug%'), 'default_locale' => 'en', 'charset' => null)),
         );
     }
 
     /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidTypeException
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testInvalidTypeTrustedProxies()
     {

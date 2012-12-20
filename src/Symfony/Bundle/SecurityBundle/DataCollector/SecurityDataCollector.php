@@ -52,12 +52,10 @@ class SecurityDataCollector extends DataCollector
                 'roles'         => array(),
             );
         } else {
-            $class = explode('\\', get_class($token)); 
-
             $this->data = array(
                 'enabled'       => true,
                 'authenticated' => $token->isAuthenticated(),
-                'token_class'   => end($class),
+                'token_class'   => get_class($token),
                 'user'          => $token->getUsername(),
                 'roles'         => array_map(function ($role){ return $role->getRole();}, $token->getRoles()),
             );
@@ -105,7 +103,7 @@ class SecurityDataCollector extends DataCollector
     }
 
     /**
-     * Get the class name of the security token (without namespace).
+     * Get the class name of the security token.
      *
      * @return String The token
      */

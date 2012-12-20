@@ -21,7 +21,7 @@
             {% if collector.tokenClass != null %}
             <div class="sf-toolbar-info-piece">
                 <b>Token class</b>
-                {{ collector.tokenClass }}
+                {{ collector.tokenClass|abbr_class }}
             </div>
             {% endif %}
         {% elseif collector.enabled %}

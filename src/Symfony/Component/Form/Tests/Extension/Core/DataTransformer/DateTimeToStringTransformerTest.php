@@ -17,7 +17,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 {
     public function dataProvider()
     {
-        return array(
+        $data = array(
             array('Y-m-d H:i:s', '2010-02-03 16:05:06', '2010-02-03 16:05:06 UTC'),
             array('Y-m-d H:i:00', '2010-02-03 16:05:00', '2010-02-03 16:05:00 UTC'),
             array('Y-m-d H:i', '2010-02-03 16:05', '2010-02-03 16:05:00 UTC'),
@@ -33,10 +33,12 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
             // different day representations
             array('Y-m-j', '2010-02-3', '2010-02-03 00:00:00 UTC'),
-            array('Y-z', '2010-33', '2010-02-03 00:00:00 UTC'),
             array('z', '33', '1970-02-03 00:00:00 UTC'),
 
             // not bijective
+            // this will not work as php will use actual date to replace missing info
+            // and after change of date will lookup for closest Wednesday
+            // i.e. value: 2010-02, php value: 2010-02-(today i.e. 20), parsed date: 2010-02-24
             //array('Y-m-D', '2010-02-Wed', '2010-02-03 00:00:00 UTC'),
             //array('Y-m-l', '2010-02-Wednesday', '2010-02-03 00:00:00 UTC'),
 
@@ -56,6 +58,13 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
             // seconds since unix
             array('U', '1265213106', '2010-02-03 16:05:06 UTC'),
         );
+
+        // This test will fail < 5.3.9 - see https://bugs.php.net/51994
+        if (version_compare(phpversion(), '5.3.9', '>=')) {
+            $data[] = array('Y-z', '2010-33', '2010-02-03 00:00:00 UTC');
+        }
+
+        return $data;
     }
 
     /**
@@ -100,8 +109,12 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testReverseTransformBeforePhp538($format, $input, $output)
+    public function testReverseTransformUsingPipe($format, $input, $output)
     {
+        if (version_compare(phpversion(), '5.3.7', '>=')) {
+            $this->markTestSkipped('Pipe usage requires PHP 5.3.7 or newer.');
+        }
+
         $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format, false);
 
         $output = new \DateTime($output);
@@ -112,13 +125,9 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testReverseTransformAsOfPhp538($format, $input, $output)
+    public function testReverseTransformWithoutUsingPipe($format, $input, $output)
     {
-        if (version_compare(phpversion(), '5.3.8', '<')) {
-            $this->markTestSkipped('Requires PHP 5.3.8 or newer');
-        }
-
-        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);
+        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format, false);
 
         $output = new \DateTime($output);
 

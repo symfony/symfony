@@ -191,7 +191,7 @@ class TableHelper extends Helper
     /**
      * Sets cell padding type.
      *
-     * @param int $padType STR_PAD_*
+     * @param integer $padType STR_PAD_*
      *
      * @return TableHelper
      */
@@ -287,9 +287,9 @@ class TableHelper extends Helper
     /**
      * Renders table cell with padding.
      *
-     * @param array  $row
-     * @param int    $column
-     * @param string $cellFormat
+     * @param array   $row
+     * @param integer $column
+     * @param string  $cellFormat
      */
     private function renderCell(array $row, $column, $cellFormat)
     {
@@ -325,7 +325,7 @@ class TableHelper extends Helper
     /**
      * Gets column width.
      *
-     * @param int $column
+     * @param integer $column
      *
      * @return int
      */
@@ -343,8 +343,8 @@ class TableHelper extends Helper
     /**
      * Gets cell width.
      *
-     * @param array $row
-     * @param int   $column
+     * @param array   $row
+     * @param integer $column
      *
      * @return int
      */

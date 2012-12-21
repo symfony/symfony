@@ -24,7 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * @author William Durand <william.durand1@gmail.com>
  * @author Toni Uebernickel <tuebernickel@gmail.com>
  *
- * Example using the preferred_query option.
+ * Example using the preferred_choices option.
  *
  * <code>
  *  public function buildForm(FormBuilderInterface $builder, array $options)
@@ -38,7 +38,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  *                      ->orderByName()
  *                  ->endUse()
  *              ,
- *              'preferred_query' => ProductQuery::create()
+ *              'preferred_choices' => ProductQuery::create()
  *                  ->filterByIsTopProduct(true)
  *              ,
  *          ))
@@ -64,7 +64,7 @@ class ModelType extends AbstractType
                 $options['choices'],
                 $options['query'],
                 $options['group_by'],
-                $options['preferred_query']
+                $options['preferred_choices']
             );
         };
 
@@ -79,7 +79,6 @@ class ModelType extends AbstractType
             'choice_list'       => $choiceList,
             'group_by'          => null,
             'by_reference'      => false,
-            'preferred_query'   => null,
         ));
     }
 

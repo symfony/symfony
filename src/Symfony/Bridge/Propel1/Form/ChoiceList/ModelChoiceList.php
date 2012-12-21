@@ -340,7 +340,11 @@ class ModelChoiceList extends ObjectChoiceList
     private function load()
     {
         $models = (array) $this->query->find();
-        $preferred = (array) $this->preferredQuery->find();
+
+        $preferred = array();
+        if ($this->preferredQuery instanceof ModelCriteria) {
+            $preferred = (array) $this->preferredQuery->find();
+        }
 
         try {
             // The second parameter $labels is ignored by ObjectChoiceList

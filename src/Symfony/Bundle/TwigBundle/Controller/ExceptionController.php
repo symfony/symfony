@@ -132,7 +132,7 @@ class ExceptionController
             $loader->getSource($template);
 
             return true;
-        } catch (Twig_Error_Loader $e) {
+        } catch (\Twig_Error_Loader $e) {
         }
 
         return false;

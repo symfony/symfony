@@ -165,6 +165,11 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3600, $response->getMaxAge(), '->getMaxAge() falls back to Expires when no max-age or s-maxage directive present');
 
         $response = new Response();
+        $response->headers->set('Cache-Control', 'must-revalidate');
+        $response->headers->set('Expires', -1);
+        $this->assertEquals('Sat, 01 Jan 00 00:00:00 +0000', $response->getExpires()->format(DATE_RFC822));
+
+        $response = new Response();
         $this->assertNull($response->getMaxAge(), '->getMaxAge() returns null if no freshness information available');
     }
 
@@ -214,6 +219,11 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $response->expire();
         $this->assertFalse($response->headers->has('Age'), '->expire() does nothing when the response does not include freshness information');
+
+        $response = new Response();
+        $response->headers->set('Expires', -1);
+        $response->expire();
+        $this->assertEquals(0, $response->headers->get('Age'), '->expire() does not set the Age to 0');
     }
 
     public function testGetTtl()

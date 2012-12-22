@@ -1,24 +1,6 @@
 ﻿UPGRADE FROM 2.1 to 2.2
 =======================
 
-### TwigBridge
-
- * The `render` tag signature and arguments changed.
-
-   Before:
-
-   ```
-   {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
-   ```
-
-   After:
-
-   ```
-   {% render url('post_list', { 'limit': 2 }), { 'alt': 'BlogBundle:Post:error' } %}
-   ```
-
-   where `post_list` is the route name for the `BlogBundle:Post:list` controller.
-
 ### HttpFoundation
 
  * The MongoDbSessionHandler default field names and timestamp type have changed.

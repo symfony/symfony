@@ -18,9 +18,9 @@ namespace Symfony\Bundle\TwigBundle\Node;
  */
 class RenderNode extends \Twig_Node
 {
-    public function __construct(\Twig_Node_Expression $expr, \Twig_Node_Expression $options, $lineno, $tag = null)
+    public function __construct(\Twig_Node_Expression $expr, \Twig_Node_Expression $attributes, \Twig_Node_Expression $options, $lineno, $tag = null)
     {
-        parent::__construct(array('expr' => $expr, 'options' => $options), array(), $lineno, $tag);
+        parent::__construct(array('expr' => $expr, 'attributes' => $attributes, 'options' => $options), array(), $lineno, $tag);
     }
 
     /**
@@ -32,8 +32,10 @@ class RenderNode extends \Twig_Node
     {
         $compiler
             ->addDebugInfo($this)
-            ->write("echo \$this->env->getExtension('actions')->renderUri(")
+            ->write("echo \$this->env->getExtension('actions')->renderAction(")
             ->subcompile($this->getNode('expr'))
+            ->raw(', ')
+            ->subcompile($this->getNode('attributes'))
             ->raw(', ')
             ->subcompile($this->getNode('options'))
             ->raw(");\n")

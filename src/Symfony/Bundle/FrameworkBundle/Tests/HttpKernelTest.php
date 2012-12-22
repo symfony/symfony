@@ -120,6 +120,10 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
+        $urlSigner = $this->getMockBuilder('Symfony\\Bundle\\FrameworkBundle\\Routing\\UrlSigner')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $router = $this->getMock('Symfony\\Component\\Routing\\RouterInterface');
         $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
         $container
@@ -133,6 +137,12 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with($this->equalTo('request'))
             ->will($this->returnValue($request))
+        ;
+        $container
+            ->expects($this->at(2))
+            ->method('get')
+            ->with($this->equalTo('routing.url_signer'))
+            ->will($this->returnValue($urlSigner))
         ;
 
         $controller = 'AController';
@@ -149,12 +159,19 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('GENERATED_URI'))
         ;
 
+        $urlSigner
+            ->expects($this->once())
+            ->method('sign')
+            ->with($this->equalTo('GENERATED_URI'))
+            ->will($this->returnValue('SIGNED_GENERATED_URI'))
+        ;
+
         $dispatcher = new EventDispatcher();
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
         $kernel = new HttpKernel($dispatcher, $container, $resolver);
 
         $uri = $kernel->generateInternalUri($controller, $attributes, $query);
-        $this->assertEquals('GENERATED_URI', $uri);
+        $this->assertEquals('SIGNED_GENERATED_URI', $uri);
     }
 
     public function getProviderTypes()

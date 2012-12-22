@@ -61,6 +61,11 @@ class InternalController extends ContainerAware
         }
 
         $request = $this->container->get('request');
+
+        if (!$this->container->get('routing.url_signer')->verify($request->getUri())) {
+            throw new \RuntimeException('Invalid url signature.');
+        }
+
         $attributes = $request->attributes;
 
         $attributes->remove('path');

@@ -235,6 +235,10 @@ class HeaderBag implements \IteratorAggregate, \Countable
             return $default;
         }
 
+        if (-1 === $value) {
+            return -1;
+        }
+
         if (false === $date = \DateTime::createFromFormat(DATE_RFC2822, $value)) {
             throw new \RuntimeException(sprintf('The %s HTTP header is not parseable (%s).', $key, $value));
         }

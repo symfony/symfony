@@ -45,6 +45,20 @@ class TableHelper extends Helper
     private $padType = STR_PAD_RIGHT;
 
     /**
+     * Column widths cache.
+     *
+     * @var array
+     */
+    private $columnWidths = array();
+
+    /**
+     * Number of columns cache.
+     *
+     * @var array
+     */
+    private $numberOfColumns;
+
+    /**
      * @var OutputInterface
      */
     private $output;
@@ -231,6 +245,8 @@ class TableHelper extends Helper
         if (!empty($this->rows)) {
             $this->renderRowSeparator();
         }
+
+        $this->afterRender();
     }
 
     /**
@@ -313,13 +329,17 @@ class TableHelper extends Helper
      */
     private function getNumberOfColumns()
     {
+        if (null !== $this->numberOfColumns) {
+            return $this->numberOfColumns;
+        }
+
         $columns = array(0);
         $columns[] = count($this->headers);
         foreach ($this->rows as $row) {
             $columns[] = count($row);
         }
 
-        return max($columns);
+        return $this->numberOfColumns = max($columns);
     }
 
     /**
@@ -331,13 +351,17 @@ class TableHelper extends Helper
      */
     private function getColumnWidth($column)
     {
+        if (isset($this->columnWidths[$column])) {
+            return $this->columnWidths[$column];
+        }
+
         $lengths = array(0);
         $lengths[] = $this->getCellWidth($this->headers, $column);
         foreach ($this->rows as $row) {
             $lengths[] = $this->getCellWidth($row, $column);
         }
 
-        return max($lengths) + 2;
+        return $this->columnWidths[$column] = max($lengths) + 2;
     }
 
     /**
@@ -359,6 +383,15 @@ class TableHelper extends Helper
         }
 
         return $this->getCellWidth($row, $column - 1);
+    }
+
+    /**
+     * Called after rendering to cleanup cache data.
+     */
+    private function afterRender()
+    {
+        $this->columnWidths = array();
+        $this->numberOfColumns = null;
     }
 
     /**

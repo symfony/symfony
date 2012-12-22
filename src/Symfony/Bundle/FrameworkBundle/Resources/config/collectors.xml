@@ -18,7 +18,7 @@
     <services>
         <service id="data_collector.config" class="%data_collector.config.class%" public="false">
             <tag name="data_collector" template="WebProfilerBundle:Collector:config" id="config" priority="255" />
-            <call method="setKernel"><argument type="service" id="kernel" /></call>
+            <call method="setKernel"><argument type="service" id="kernel" on-invalid="ignore" /></call>
         </service>
 
         <service id="data_collector.request" class="%data_collector.request.class%">
@@ -42,7 +42,7 @@
 
         <service id="data_collector.time" class="%data_collector.time.class%" public="false">
             <tag name="data_collector" template="WebProfilerBundle:Collector:time" id="time" priority="255" />
-            <argument type="service" id="kernel" />
+            <argument type="service" id="kernel" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.memory" class="%data_collector.memory.class%" public="false">

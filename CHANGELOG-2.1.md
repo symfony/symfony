@@ -7,6 +7,11 @@ in 2.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.1.0...v2.1.1
 
+* 2.1.6 (2012-12-21)
+
+ * b8e5689: [FrameworkBundle] fixed ESI calls
+ * ce536cd: [FrameworkBundle] fixed ESI calls
+
 * 2.1.5 (2012-12-20)
 
  * 532cc9a: [FrameworkBundle] added support for URIs as an argument to HttpKernel::render()

@@ -14,6 +14,18 @@ namespace Symfony\Component\HttpKernel\Tests\Exception;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\GoneHttpException;
+use Symfony\Component\HttpKernel\Exception\LengthRequiredHttpException;
+use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
+use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
 class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,12 +39,66 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $flattened = FlattenException::create(new NotFoundHttpException());
         $this->assertEquals('404', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new UnauthorizedHttpException('Basic realm="My Realm"'));
+        $this->assertEquals('401', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new BadRequestHttpException());
+        $this->assertEquals('400', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new NotAcceptableHttpException());
+        $this->assertEquals('406', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new ConflictHttpException());
+        $this->assertEquals('409', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new MethodNotAllowedHttpException(array('POST')));
+        $this->assertEquals('405', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new AccessDeniedHttpException());
+        $this->assertEquals('403', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new GoneHttpException());
+        $this->assertEquals('410', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new LengthRequiredHttpException());
+        $this->assertEquals('411', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new PreconditionFailedHttpException());
+        $this->assertEquals('412', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new PreconditionRequiredHttpException());
+        $this->assertEquals('428', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new ServiceUnavailableHttpException());
+        $this->assertEquals('503', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new TooManyRequestsHttpException());
+        $this->assertEquals('429', $flattened->getStatusCode());
+
+        $flattened = FlattenException::create(new UnsupportedMediaTypeHttpException());
+        $this->assertEquals('415', $flattened->getStatusCode());
     }
 
     public function testHeadersForHttpException()
     {
         $flattened = FlattenException::create(new MethodNotAllowedHttpException(array('POST')));
         $this->assertEquals(array('Allow' => 'POST'), $flattened->getHeaders());
+
+        $flattened = FlattenException::create(new UnauthorizedHttpException('Basic realm="My Realm"'));
+        $this->assertEquals(array('WWW-Authenticate' => 'Basic realm="My Realm"'), $flattened->getHeaders());
+
+        $flattened = FlattenException::create(new ServiceUnavailableHttpException('Fri, 31 Dec 1999 23:59:59 GMT'));
+        $this->assertEquals(array('Retry-After' => 'Fri, 31 Dec 1999 23:59:59 GMT'), $flattened->getHeaders());
+
+        $flattened = FlattenException::create(new ServiceUnavailableHttpException(120));
+        $this->assertEquals(array('Retry-After' => 120), $flattened->getHeaders());
+
+        $flattened = FlattenException::create(new TooManyRequestsHttpException('Fri, 31 Dec 1999 23:59:59 GMT'));
+        $this->assertEquals(array('Retry-After' => 'Fri, 31 Dec 1999 23:59:59 GMT'), $flattened->getHeaders());
+
+        $flattened = FlattenException::create(new TooManyRequestsHttpException(120));
+        $this->assertEquals(array('Retry-After' => 120), $flattened->getHeaders());
     }
 
     /**
@@ -90,18 +156,18 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     public function testToArray(\Exception $exception, $statusCode)
     {
         $flattened = FlattenException::create($exception);
-        $flattened->setTrace(array(),'foo.php',123);
+        $flattened->setTrace(array(), 'foo.php', 123);
 
         $this->assertEquals(array(
             array(
                 'message'=> 'test',
                 'class'=>'Exception',
                 'trace'=>array(array(
-                    'namespace'   => '', 'short_class' => '', 'class' => '','type' => '','function' => '', 'file' => 'foo.php','line' => 123,
+                    'namespace'   => '', 'short_class' => '', 'class' => '','type' => '','function' => '', 'file' => 'foo.php', 'line' => 123,
                     'args'        => array()
                 )),
             )
-        ),$flattened->toArray());
+        ), $flattened->toArray());
     }
 
     public function flattenDataProvider()
@@ -124,5 +190,46 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     private function createException($foo)
     {
         return new \Exception();
+    }
+
+    public function testSetTraceIncompleteClass()
+    {
+        $flattened = FlattenException::create(new \Exception('test', 123));
+        $flattened->setTrace(
+            array(
+                array(
+                    'file' => __FILE__,
+                    'line' => 123,
+                    'function' => 'test',
+                    'args' => array(
+                        unserialize('O:14:"BogusTestClass":0:{}')
+                    ),
+                ),
+            ),
+            'foo.php', 123
+        );
+
+        $this->assertEquals(array(
+            array(
+                'message'=> 'test',
+                'class'=>'Exception',
+                'trace'=>array(
+                    array(
+                        'namespace'   => '', 'short_class' => '', 'class' => '','type' => '','function' => '',
+                        'file'        => 'foo.php', 'line' => 123,
+                        'args'        => array(),
+                    ),
+                    array(
+                        'namespace'   => '', 'short_class' => '', 'class' => '','type' => '','function' => 'test',
+                        'file'        => __FILE__, 'line' => 123,
+                        'args'        => array(
+                            array(
+                                'incomplete-object', 'BogusTestClass'
+                            ),
+                        ),
+                    )
+                ),
+            )
+        ), $flattened->toArray());
     }
 }

@@ -526,6 +526,23 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testLabelIsNotRenderedWhenSetToFalse()
+    {
+        $form = $this->factory->createNamed('name', 'text', null, array(
+            'label' => false
+        ));
+        $html = $this->renderRow($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
+        ./input[@id="name"]
+    ]
+    [count(//label)=0]
+'
+        );
+    }
+
     /**
      * @dataProvider themeBlockInheritanceProvider
      */

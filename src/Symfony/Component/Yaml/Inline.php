@@ -28,6 +28,8 @@ class Inline
      * @param string $value A YAML string
      *
      * @return array A PHP array representing the YAML string
+     *
+     * @throws ParseException
      */
     public static function parse($value)
     {
@@ -400,9 +402,11 @@ class Inline
     }
 
     /**
-     * Gets a regex that matches an unix timestamp
+     * Gets a regex that matches a YAML date.
      *
      * @return string The regular expression
+     *
+     * @see http://www.yaml.org/spec/1.2/spec.html#id2761573
      */
     private static function getTimestampRegex()
     {

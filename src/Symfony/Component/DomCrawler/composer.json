@@ -25,7 +25,7 @@
         "symfony/css-selector": "2.2.*"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\DomCrawler": "" }
+        "psr-0": { "Symfony\\Component\\DomCrawler\\": "" }
     },
     "target-dir": "Symfony/Component/DomCrawler",
     "minimum-stability": "dev",

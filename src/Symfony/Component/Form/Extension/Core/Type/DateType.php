@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Exception\CreationException;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
@@ -181,6 +180,10 @@ class DateType extends AbstractType
             );
         };
 
+        $format = function (Options $options) {
+            return $options['widget'] === 'single_text' ? DateType::HTML5_FORMAT : DateType::DEFAULT_FORMAT;
+        };
+
         // BC until Symfony 2.3
         $modelTimezone = function (Options $options) {
             return $options['data_timezone'];
@@ -197,7 +200,7 @@ class DateType extends AbstractType
             'days'           => range(1, 31),
             'widget'         => 'choice',
             'input'          => 'datetime',
-            'format'         => self::HTML5_FORMAT,
+            'format'         => $format,
             'model_timezone' => $modelTimezone,
             'view_timezone'  => $viewTimezone,
             // Deprecated timezone options

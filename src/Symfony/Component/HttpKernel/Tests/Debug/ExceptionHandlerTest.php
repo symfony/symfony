@@ -45,11 +45,11 @@ class ExceptionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $response = $handler->createResponse(new \RuntimeException('Foo'));
         $this->assertEquals('500', $response->getStatusCode());
-        $this->assertContains('<title>Whoops, looks like something went wrong.</title>', $response->getContent());
+        $this->assertContains('Whoops, looks like something went wrong.', $response->getContent());
 
         $response = $handler->createResponse(new NotFoundHttpException('Foo'));
         $this->assertEquals('404', $response->getStatusCode());
-        $this->assertContains('<title>Sorry, the page you are looking for could not be found.</title>', $response->getContent());
+        $this->assertContains('Sorry, the page you are looking for could not be found.', $response->getContent());
     }
 
     public function testHeaders()

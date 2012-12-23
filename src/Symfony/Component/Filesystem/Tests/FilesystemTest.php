@@ -28,6 +28,23 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
      */
     private $filesystem = null;
 
+    private static $symlinkOnWindows = null;
+
+    public static function setUpBeforeClass()
+    {
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            self::$symlinkOnWindows = true;
+            $originDir = tempnam(sys_get_temp_dir(), 'sl');
+            $targetDir = tempnam(sys_get_temp_dir(), 'sl');
+            if (true !== @symlink($originDir, $targetDir)) {
+                $report = error_get_last();
+                if (is_array($report) && false !== strpos($report['message'], 'error code(1314)')) {
+                    self::$symlinkOnWindows = false;
+                }
+            }
+        }
+    }
+
     public function setUp()
     {
         $this->filesystem = new Filesystem();
@@ -781,6 +798,24 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_dir($targetPath.'directory'));
         $this->assertFileEquals($file1, $targetPath.'directory'.DIRECTORY_SEPARATOR.'file1');
         $this->assertFileEquals($file2, $targetPath.'file2');
+
+        $this->filesystem->remove($file1);
+
+        $this->filesystem->mirror($sourcePath, $targetPath, null, array('delete' => false));
+        $this->assertTrue($this->filesystem->exists($targetPath.'directory'.DIRECTORY_SEPARATOR.'file1'));
+
+        $this->filesystem->mirror($sourcePath, $targetPath, null, array('delete' => true));
+        $this->assertFalse($this->filesystem->exists($targetPath.'directory'.DIRECTORY_SEPARATOR.'file1'));
+
+        file_put_contents($file1, 'FILE1');
+
+        $this->filesystem->mirror($sourcePath, $targetPath, null, array('delete' => true));
+        $this->assertTrue($this->filesystem->exists($targetPath.'directory'.DIRECTORY_SEPARATOR.'file1'));
+
+        $this->filesystem->remove($directory);
+        $this->filesystem->mirror($sourcePath, $targetPath, null, array('delete' => true));
+        $this->assertFalse($this->filesystem->exists($targetPath.'directory'));
+        $this->assertFalse($this->filesystem->exists($targetPath.'directory'.DIRECTORY_SEPARATOR.'file1'));
     }
 
     public function testMirrorCopiesLinks()
@@ -799,6 +834,26 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(is_dir($targetPath));
         $this->assertFileEquals($sourcePath.'file1', $targetPath.DIRECTORY_SEPARATOR.'link1');
+        $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
+    }
+
+    public function testMirrorCopiesLinkedDirectoryContents()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
+
+        mkdir($sourcePath . 'nested/', 0777, true);
+        file_put_contents($sourcePath.'/nested/file1.txt', 'FILE1');
+        // Note: We symlink directory, not file
+        symlink($sourcePath.'nested', $sourcePath.'link1');
+
+        $targetPath = $this->workspace.DIRECTORY_SEPARATOR.'target'.DIRECTORY_SEPARATOR;
+
+        $this->filesystem->mirror($sourcePath, $targetPath);
+
+        $this->assertTrue(is_dir($targetPath));
+        $this->assertFileEquals($sourcePath.'/nested/file1.txt', $targetPath.DIRECTORY_SEPARATOR.'link1/file1.txt');
         $this->assertTrue(is_link($targetPath.DIRECTORY_SEPARATOR.'link1'));
     }
 
@@ -831,6 +886,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     /**
      * Returns file permissions as three digits (i.e. 755)
      *
+     * @param string $filePath
+     *
      * @return integer
      */
     private function getFilePermissions($filePath)
@@ -862,6 +919,10 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     {
         if (!function_exists('symlink')) {
             $this->markTestSkipped('symlink is not supported');
+        }
+
+        if (defined('PHP_WINDOWS_VERSION_MAJOR') && false === self::$symlinkOnWindows) {
+            $this->markTestSkipped('symlink requires "Create symbolic links" privilege on windows');
         }
     }
 

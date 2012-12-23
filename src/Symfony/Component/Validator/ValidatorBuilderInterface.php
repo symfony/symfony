@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Doctrine\Common\Annotations\Reader;
 
@@ -113,11 +112,14 @@ interface ValidatorBuilderInterface
     /**
      * Sets the class metadata factory used by the validator.
      *
-     * @param ClassMetadataFactoryInterface $metadataFactory The metadata factory.
+     * As of Symfony 2.3, the first parameter of this method will be typed
+     * against {@link MetadataFactoryInterface}.
+     *
+     * @param MetadataFactoryInterface|Mapping\ClassMetadataFactoryInterface $metadataFactory The metadata factory.
      *
      * @return ValidatorBuilderInterface The builder object.
      */
-    public function setMetadataFactory(ClassMetadataFactoryInterface $metadataFactory);
+    public function setMetadataFactory($metadataFactory);
 
     /**
      * Sets the cache for caching class metadata.

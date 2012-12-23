@@ -38,7 +38,8 @@ class ReferenceDumper
     }
 
     /**
-     * @param int $depth
+     * @param NodeInterface $node
+     * @param integer       $depth
      */
     private function writeNode(NodeInterface $node, $depth = 0)
     {
@@ -91,6 +92,12 @@ class ReferenceDumper
                     $default = 'false';
                 } elseif (null === $default) {
                     $default = '~';
+                } elseif (is_array($default)) {
+                    if ($node->hasDefaultValue() && count($defaultArray = $node->getDefaultValue())) {
+                        $default = '';
+                    } elseif (!is_array($example)) {
+                        $default = '[]';
+                    }
                 }
             }
         }

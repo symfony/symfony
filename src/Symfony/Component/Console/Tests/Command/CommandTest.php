@@ -221,6 +221,13 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testRunReturnsAlwaysInteger()
+    {
+        $command = new \TestCommand();
+
+        $this->assertSame(0, $command->run(new StringInput(''), new NullOutput()));
+    }
+
     public function testSetCode()
     {
         $command = new \TestCommand();
@@ -231,6 +238,31 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $tester = new CommandTester($command);
         $tester->execute(array());
         $this->assertEquals('interact called'.PHP_EOL.'from the code...'.PHP_EOL, $tester->getDisplay());
+    }
+
+    public function testSetCodeWithNonClosureCallable()
+    {
+        $command = new \TestCommand();
+        $ret = $command->setCode(array($this, 'callableMethodCommand'));
+        $this->assertEquals($command, $ret, '->setCode() implements a fluent interface');
+        $tester = new CommandTester($command);
+        $tester->execute(array());
+        $this->assertEquals('interact called'.PHP_EOL.'from the code...'.PHP_EOL, $tester->getDisplay());
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Invalid callable provided to Command::setCode.
+     */
+    public function testSetCodeWithNonCallable()
+    {
+        $command = new \TestCommand();
+        $command->setCode(array($this, 'nonExistentMethod'));
+    }
+
+    public function callableMethodCommand(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln('from the code...');
     }
 
     public function testAsText()

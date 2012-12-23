@@ -4,7 +4,18 @@ CHANGELOG
 2.2.0
 -----
 
+ * [BC BREAK] restricted the `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` method to only accept URIs as reference
+   * `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` method signature changed and the first argument
+     must now be a URI (the `generateInternalUri()` method was removed)
+   * The internal routes have been removed (`Resources/config/routing/internal.xml`)
+   * The `render` method of the `actions` templating helper signature and arguments changed:
+ * replaced Symfony\Bundle\FrameworkBundle\Controller\TraceableControllerResolver by Symfony\Component\HttpKernel\Controller\TraceableControllerResolver
+ * replaced Symfony\Component\HttpKernel\Debug\ContainerAwareTraceableEventDispatcher by Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher
  * added Client::enableProfiler()
+ * A new parameter has been added to the DIC: `router.request_context.base_url`
+   You can customize it for your functional tests or for generating urls with
+   the right base url when your are in the cli context.
+ * Added support for default templates per render tag
 
 2.1.0
 -----

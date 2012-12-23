@@ -294,7 +294,7 @@ class OptionsResolver implements OptionsResolverInterface
     private function validateOptionValues(array $options)
     {
         foreach ($this->allowedValues as $option => $allowedValues) {
-            if (!in_array($options[$option], $allowedValues, true)) {
+            if (isset($options[$option]) && !in_array($options[$option], $allowedValues, true)) {
                 throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $allowedValues)));
             }
         }

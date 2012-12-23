@@ -27,7 +27,7 @@
         "symfony/process": "2.2.*"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\BrowserKit": "" }
+        "psr-0": { "Symfony\\Component\\BrowserKit\\": "" }
     },
     "target-dir": "Symfony/Component/BrowserKit",
     "minimum-stability": "dev",

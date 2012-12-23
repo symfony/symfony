@@ -160,6 +160,7 @@ class StubNumberFormatterTest extends LocaleTestCase
      */
     public function testFormatCurrencyWithCurrencyStyleCostaRicanColonsRoundingStub($value, $currency, $symbol, $expected)
     {
+        $this->skipIfICUDataVersionNotDefined();
         $formatter = $this->getStubFormatterWithCurrencyStyle();
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
@@ -191,6 +192,7 @@ class StubNumberFormatterTest extends LocaleTestCase
      */
     public function testFormatCurrencyWithCurrencyStyleBrazilianRealRoundingStub($value, $currency, $symbol, $expected)
     {
+        $this->skipIfICUDataVersionNotDefined();
         $formatter = $this->getStubFormatterWithCurrencyStyle();
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
@@ -208,7 +210,7 @@ class StubNumberFormatterTest extends LocaleTestCase
 
     public function formatCurrencyWithCurrencyStyleBrazilianRealRoundingProvider()
     {
-        $brl = $this->isIntlExtensionLoaded() && $this->isSameAsIcuVersion('4.8') ? 'BR' : 'R';
+        $brl = $this->isIntlExtensionLoaded() && $this->isGreaterOrEqualThanIcuVersion('4.8') ? 'BR' : 'R';
 
         return array(
             array(100, 'BRL', $brl, '%s$100.00'),
@@ -231,6 +233,7 @@ class StubNumberFormatterTest extends LocaleTestCase
      */
     public function testFormatCurrencyWithCurrencyStyleSwissRoundingStub($value, $currency, $symbol, $expected)
     {
+        $this->skipIfICUDataVersionNotDefined();
         $formatter = $this->getStubFormatterWithCurrencyStyle();
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
     }
@@ -1191,5 +1194,12 @@ class StubNumberFormatterTest extends LocaleTestCase
         $formatter->setSymbol(\NumberFormatter::CURRENCY_SYMBOL, 'SFD');
 
         return $formatter;
+    }
+
+    protected function skipIfICUDataVersionNotDefined()
+    {
+        if (!getenv('USE_INTL_ICU_DATA_VERSION')) {
+            $this->markTestSkipped('Please set environment variable USE_INTL_ICU_DATA_VERSION.');
+        }
     }
 }

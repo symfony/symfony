@@ -151,18 +151,18 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
         ));
         $this->assertNull($constraint->getHtmlPattern());
 
-        // Automaticaly converted
+        // Automatically converted
         $constraint = new Regex(array(
             'pattern' => '/^[a-z]+$/',
         ));
         $this->assertEquals('[a-z]+', $constraint->getHtmlPattern());
 
-        // Automaticaly converted, adds .*
+        // Automatically converted, adds .*
         $constraint = new Regex(array(
             'pattern' => '/[a-z]+/',
         ));
         $this->assertEquals('.*[a-z]+.*', $constraint->getHtmlPattern());
-        
+
         // Dropped because of match=false
         $constraint = new Regex(array(
             'pattern' => '/[a-z]+/',
@@ -170,5 +170,4 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
         ));
         $this->assertNull($constraint->getHtmlPattern());
     }
-
 }

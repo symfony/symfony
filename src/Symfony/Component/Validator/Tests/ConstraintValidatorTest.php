@@ -25,9 +25,20 @@ class ConstraintValidatorTest_Validator extends ConstraintValidator
         $this->params = $params;
     }
 
+    public function deprecationErrorHandler($errorNumber, $message, $file, $line, $context)
+    {
+        if ($errorNumber & E_USER_DEPRECATED) {
+            return true;
+        }
+
+        return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
+    }
+
     public function validate($value, Constraint $constraint)
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->setMessage($this->message, $this->params);
+        restore_error_handler();
     }
 }
 

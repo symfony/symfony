@@ -13,7 +13,6 @@ namespace Symfony\Component\Locale\Stub;
 
 use Symfony\Component\Locale\Stub\StubLocale;
 use Symfony\Component\Locale\Stub\DateFormat\FullTransformer;
-use Symfony\Component\Locale\Exception\NotImplementedException;
 use Symfony\Component\Locale\Exception\MethodNotImplementedException;
 use Symfony\Component\Locale\Exception\MethodArgumentNotImplementedException;
 use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;
@@ -91,7 +90,7 @@ class StubIntlDateFormatter
     private $pattern;
 
     /**
-     * @var DateTimeZone
+     * @var \DateTimeZone
      */
     private $dateTimeZone;
 
@@ -150,6 +149,8 @@ class StubIntlDateFormatter
      *                           One of the calendar constants.
      * @param string $pattern Optional pattern to use when formatting
      *
+     * @return StubIntlDateFormatter
+     *
      * @see    http://www.php.net/manual/en/intldateformatter.create.php
      * @see    http://userguide.icu-project.org/formatparse/datetime
      *
@@ -169,7 +170,7 @@ class StubIntlDateFormatter
      *
      * @see    http://www.php.net/manual/en/intldateformatter.format.php
      *
-     * @throws NotImplementedException    If one of the formatting characters is not implemented
+     * @throws MethodArgumentValueNotImplementedException If one of the formatting characters is not implemented
      */
     public function format($timestamp)
     {
@@ -186,7 +187,7 @@ class StubIntlDateFormatter
         $argumentError = null;
         if (version_compare(\PHP_VERSION, '5.3.4', '<') && !is_int($timestamp)) {
             $argumentError = 'datefmt_format: takes either an array  or an integer timestamp value ';
-        } elseif (version_compare(\PHP_VERSION, '5.3.4', '>=') && !is_int($timestamp) && !$timestamp instanceOf \DateTime) {
+        } elseif (version_compare(\PHP_VERSION, '5.3.4', '>=') && !is_int($timestamp) && !$timestamp instanceof \DateTime) {
             $argumentError = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object';
         }
 
@@ -199,7 +200,7 @@ class StubIntlDateFormatter
         }
 
         // As of PHP 5.3.4, IntlDateFormatter::format() accepts DateTime instances
-        if (version_compare(\PHP_VERSION, '5.3.4', '>=') && $timestamp instanceOf \DateTime) {
+        if (version_compare(\PHP_VERSION, '5.3.4', '>=') && $timestamp instanceof \DateTime) {
             $timestamp = $timestamp->getTimestamp();
         }
 
@@ -319,7 +320,7 @@ class StubIntlDateFormatter
     /**
      * Returns whether the formatter is lenient
      *
-     * @return string   The timezone identifier used by the formatter
+     * @return Boolean
      *
      * @see    http://www.php.net/manual/en/intldateformatter.islenient.php
      *
@@ -327,7 +328,7 @@ class StubIntlDateFormatter
      */
     public function isLenient()
     {
-        throw new MethodNotImplementedException(__METHOD__);
+        return false;
     }
 
     /**
@@ -494,7 +495,7 @@ class StubIntlDateFormatter
      *
      * @param int $timestamp
      *
-     * @return DateTime
+     * @return \DateTime
      */
     protected function createDateTime($timestamp)
     {

@@ -35,16 +35,16 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
 
         try {
             $argument = new InputArgument('foo', 'ANOTHER_ONE');
-            $this->fail('__construct() throws an Exception if the mode is not valid');
+            $this->fail('__construct() throws an \InvalidArgumentException if the mode is not valid');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '__construct() throws an Exception if the mode is not valid');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the mode is not valid');
             $this->assertEquals('Argument mode "ANOTHER_ONE" is not valid.', $e->getMessage());
         }
         try {
             $argument = new InputArgument('foo', -1);
-            $this->fail('__construct() throws an Exception if the mode is not valid');
+            $this->fail('__construct() throws an \InvalidArgumentException if the mode is not valid');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '__construct() throws an Exception if the mode is not valid');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the mode is not valid');
             $this->assertEquals('Argument mode "-1" is not valid.', $e->getMessage());
         }
     }
@@ -86,18 +86,18 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
         try {
             $argument = new InputArgument('foo', InputArgument::REQUIRED);
             $argument->setDefault('default');
-            $this->fail('->setDefault() throws an Exception if you give a default value for a required argument');
+            $this->fail('->setDefault() throws a \LogicException if you give a default value for a required argument');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->parse() throws an \InvalidArgumentException exception if an invalid option is passed');
-            $this->assertEquals('Cannot set a default value except for Parameter::OPTIONAL mode.', $e->getMessage());
+            $this->assertInstanceOf('\LogicException', $e, '->setDefault() throws a \LogicException exception if an invalid option is passed');
+            $this->assertEquals('Cannot set a default value except for InputArgument::OPTIONAL mode.', $e->getMessage());
         }
 
         try {
             $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
             $argument->setDefault('default');
-            $this->fail('->setDefault() throws an Exception if you give a default value which is not an array for a IS_ARRAY option');
+            $this->fail('->setDefault() throws a \LogicException if you give a default value which is not an array for a IS_ARRAY option');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->setDefault() throws an Exception if you give a default value which is not an array for a IS_ARRAY option');
+            $this->assertInstanceOf('\LogicException', $e, '->setDefault() throws a \LogicException if you give a default value which is not an array for a IS_ARRAY option');
             $this->assertEquals('A default value for an array argument must be an array.', $e->getMessage());
         }
     }

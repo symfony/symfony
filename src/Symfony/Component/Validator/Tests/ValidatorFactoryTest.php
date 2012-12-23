@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Symfony\Component\Validator\Mapping\ClassMetadataFactoryAdapter;
 use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\ValidatorContext;
 use Symfony\Component\Validator\ValidatorFactory;
@@ -77,7 +78,7 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
         $validator = $this->factory->getValidator();
 
-        $this->assertEquals(new Validator($metadataFactory, $validatorFactory), $validator);
+        $this->assertEquals(new Validator(new ClassMetadataFactoryAdapter($metadataFactory), $validatorFactory), $validator);
     }
 
     public function testBuildDefaultFromAnnotationsWithCustomNamespaces()

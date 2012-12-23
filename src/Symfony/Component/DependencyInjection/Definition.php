@@ -241,7 +241,7 @@ class Definition
      *
      * @return Definition The current instance
      *
-     * @throws \OutOfBoundsException When the replaced argument does not exist
+     * @throws OutOfBoundsException When the replaced argument does not exist
      *
      * @api
      */
@@ -275,7 +275,7 @@ class Definition
      *
      * @return mixed The argument value
      *
-     * @throws \OutOfBoundsException When the argument does not exist
+     * @throws OutOfBoundsException When the argument does not exist
      *
      * @api
      */
@@ -373,7 +373,7 @@ class Definition
     /**
      * Gets the methods to call after service initialization.
      *
-     * @return  array An array of method calls
+     * @return array An array of method calls
      *
      * @api
      */

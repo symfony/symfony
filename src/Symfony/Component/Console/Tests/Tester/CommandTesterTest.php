@@ -17,7 +17,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CommandTesterTest extends \PHPUnit_Framework_TestCase
 {
-    protected $application;
+    protected $command;
     protected $tester;
 
     protected function setUp()

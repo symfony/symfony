@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Component\Form\Exception\FormException;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
@@ -76,16 +77,16 @@ abstract class DoctrineType extends AbstractType
                 // A second parameter ($key) is passed, so we cannot use
                 // spl_object_hash() directly (which strictly requires
                 // one parameter)
-                array_walk_recursive($choiceHashes, function ($value) {
-                    return spl_object_hash($value);
+                array_walk_recursive($choiceHashes, function (&$value) {
+                    $value = spl_object_hash($value);
                 });
             }
 
             $preferredChoiceHashes = $options['preferred_choices'];
 
             if (is_array($preferredChoiceHashes)) {
-                array_walk_recursive($preferredChoiceHashes, function ($value) {
-                    return spl_object_hash($value);
+                array_walk_recursive($preferredChoiceHashes, function (&$value) {
+                    $value = spl_object_hash($value);
                 });
             }
 
@@ -130,12 +131,21 @@ abstract class DoctrineType extends AbstractType
                 return $registry->getManager($em);
             }
 
-            return $registry->getManagerForClass($options['class']);
+            $em = $registry->getManagerForClass($options['class']);
+
+            if (null === $em) {
+                throw new FormException(sprintf(
+                    'Class "%s" seems not to be a managed Doctrine entity. ' .
+                    'Did you forget to map it?',
+                    $options['class']
+                ));
+            }
+
+            return $em;
         };
 
         $resolver->setDefaults(array(
             'em'                => null,
-            'class'             => null,
             'property'          => null,
             'query_builder'     => null,
             'loader'            => $loader,
@@ -144,8 +154,14 @@ abstract class DoctrineType extends AbstractType
             'group_by'          => null,
         ));
 
+        $resolver->setRequired(array('class'));
+
         $resolver->setNormalizers(array(
             'em' => $emNormalizer,
+        ));
+
+        $resolver->setAllowedTypes(array(
+            'loader' => array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'),
         ));
     }
 

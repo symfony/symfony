@@ -231,13 +231,24 @@ class Response
             $headers->remove('Content-Length');
         }
 
-        if ('HEAD' === $request->getMethod()) {
+        if ($request->isMethod('HEAD')) {
             // cf. RFC2616 14.13
             $length = $headers->get('Content-Length');
             $this->setContent(null);
             if ($length) {
                 $headers->set('Content-Length', $length);
             }
+        }
+
+        // Fix protocol
+        if ('HTTP/1.0' != $request->server->get('SERVER_PROTOCOL')) {
+            $this->setProtocolVersion('1.1');
+        }
+
+        // Check if we need to send extra expire info headers
+        if ('1.0' == $this->getProtocolVersion() && 'no-cache' == $this->headers->get('Cache-Control')) {
+            $this->headers->set('pragma', 'no-cache');
+            $this->headers->set('expires', -1);
         }
 
         return $this;
@@ -259,7 +270,7 @@ class Response
         header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
 
         // headers
-        foreach ($this->headers->all() as $name => $values) {
+        foreach ($this->headers->allPreserveCase() as $name => $values) {
             foreach ($values as $value) {
                 header($name.': '.$value, false);
             }
@@ -324,6 +335,8 @@ class Response
      * @param mixed $content
      *
      * @return Response
+     *
+     * @throws \UnexpectedValueException
      *
      * @api
      */
@@ -574,7 +587,7 @@ class Response
      */
     public function getDate()
     {
-        return $this->headers->getDate('Date');
+        return $this->headers->getDate('Date', new \DateTime());
     }
 
     /**
@@ -864,6 +877,8 @@ class Response
      *
      * @return Response
      *
+     * @throws \InvalidArgumentException
+     *
      * @api
      */
     public function setCache(array $options)
@@ -1097,7 +1112,7 @@ class Response
     }
 
     /**
-     * Is the reponse forbidden?
+     * Is the response forbidden?
      *
      * @return Boolean
      *

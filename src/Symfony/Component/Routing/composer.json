@@ -30,7 +30,7 @@
         "doctrine/common": ">=2.2,<2.4-dev"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Routing": "" }
+        "psr-0": { "Symfony\\Component\\Routing\\": "" }
     },
     "target-dir": "Symfony/Component/Routing",
     "minimum-stability": "dev",

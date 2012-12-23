@@ -61,7 +61,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class Container implements IntrospectableContainerInterface
 {
+    /**
+     * @var ParameterBagInterface
+     */
     protected $parameterBag;
+
     protected $services;
     protected $scopes;
     protected $scopeChildren;
@@ -180,8 +184,8 @@ class Container implements IntrospectableContainerInterface
      * @param object $service The service instance
      * @param string $scope   The scope of the service
      *
-     * @throws \RuntimeException When trying to set a service in an inactive scope
-     * @throws \InvalidArgumentException When trying to set a service in the prototype scope
+     * @throws RuntimeException When trying to set a service in an inactive scope
+     * @throws InvalidArgumentException When trying to set a service in the prototype scope
      *
      * @api
      */
@@ -258,6 +262,11 @@ class Container implements IntrospectableContainerInterface
                 $service = $this->$method();
             } catch (\Exception $e) {
                 unset($this->loading[$id]);
+
+                if (isset($this->services[$id])) {
+                    unset($this->services[$id]);
+                }
+
                 throw $e;
             }
 
@@ -392,7 +401,7 @@ class Container implements IntrospectableContainerInterface
      *
      * @param ScopeInterface $scope
      *
-     * @throws \InvalidArgumentException When the scope is invalid
+     * @throws InvalidArgumentException
      *
      * @api
      */

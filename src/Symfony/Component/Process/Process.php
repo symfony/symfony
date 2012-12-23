@@ -51,6 +51,8 @@ class Process
     private $pipes;
     private $process;
     private $status = self::STATUS_READY;
+    private $incrementalOutputOffset;
+    private $incrementalErrorOutputOffset;
 
     private $fileHandles;
     private $readBytes;
@@ -150,6 +152,20 @@ class Process
         $this->stop();
     }
 
+    public function __clone()
+    {
+        $this->exitcode = null;
+        $this->fallbackExitcode = null;
+        $this->processInformation = null;
+        $this->stdout = null;
+        $this->stderr = null;
+        $this->pipes = null;
+        $this->process = null;
+        $this->status = self::STATUS_READY;
+        $this->fileHandles = null;
+        $this->readBytes = null;
+    }
+
     /**
      * Runs the process.
      *
@@ -205,6 +221,8 @@ class Process
 
         $this->stdout = '';
         $this->stderr = '';
+        $this->incrementalOutputOffset = 0;
+        $this->incrementalErrorOutputOffset = 0;
         $callback = $this->buildCallback($callback);
 
         //Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
@@ -230,8 +248,6 @@ class Process
                 $descriptors = array_merge($descriptors, array(array('pipe', 'w')));
 
                 $this->commandline = '('.$this->commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
-            } else {
-                $this->commandline = 'exec ' . $this->commandline;
             }
         }
 
@@ -312,6 +328,33 @@ class Process
         }
 
         $this->updateStatus();
+    }
+
+    /**
+     * Restarts the process.
+     *
+     * Be warned that the process is cloned before being started.
+     *
+     * @param callable $callback A PHP callback to run whenever there is some
+     *                           output available on STDOUT or STDERR
+     *
+     * @return Process The new process
+     *
+     * @throws \RuntimeException When process can't be launch or is stopped
+     * @throws \RuntimeException When process is already running
+     *
+     * @see start()
+     */
+    public function restart($callback = null)
+    {
+        if ($this->isRunning()) {
+            throw new \RuntimeException('Process is already running');
+        }
+
+        $process = clone $this;
+        $process->start($callback);
+
+        return $process;
     }
 
     /**
@@ -414,6 +457,24 @@ class Process
     }
 
     /**
+     * Returns the output incrementally.
+     *
+     * In comparison with the getOutput method which always return the whole
+     * output, this one returns the new output since the last call.
+     *
+     * @return string The process output since the last call
+     */
+    public function getIncrementalOutput()
+    {
+        $data = $this->getOutput();
+
+        $latest = substr($data, $this->incrementalOutputOffset);
+        $this->incrementalOutputOffset = strlen($data);
+
+        return $latest;
+    }
+
+    /**
      * Returns the current error output of the process (STDERR).
      *
      * @return string The process error output
@@ -425,6 +486,25 @@ class Process
         $this->updateErrorOutput();
 
         return $this->stderr;
+    }
+
+    /**
+     * Returns the errorOutput incrementally.
+     *
+     * In comparison with the getErrorOutput method which always return the
+     * whole error output, this one returns the new error output since the last
+     * call.
+     *
+     * @return string The process error output since the last call
+     */
+    public function getIncrementalErrorOutput()
+    {
+        $data = $this->getErrorOutput();
+
+        $latest = substr($data, $this->incrementalErrorOutputOffset);
+        $this->incrementalErrorOutputOffset = strlen($data);
+
+        return $latest;
     }
 
     /**
@@ -542,7 +622,7 @@ class Process
     }
 
     /**
-     * Returns the number of the signal that caused the child process to stop its execution
+     * Returns the number of the signal that caused the child process to stop its execution.
      *
      * It is only meaningful if hasBeenStopped() returns true.
      *
@@ -574,15 +654,51 @@ class Process
     }
 
     /**
+     * Checks if the process has been started with no regard to the current state.
+     *
+     * @return Boolean true if status is ready, false otherwise
+     */
+    public function isStarted()
+    {
+        return $this->status != self::STATUS_READY;
+    }
+
+    /**
+     * Checks if the process is terminated.
+     *
+     * @return Boolean true if process is terminated, false otherwise
+     */
+    public function isTerminated()
+    {
+        $this->updateStatus();
+
+        return $this->status == self::STATUS_TERMINATED;
+    }
+
+    /**
+     * Gets the process status.
+     *
+     * The status is one of: ready, started, terminated.
+     *
+     * @return string The current process status
+     */
+    public function getStatus()
+    {
+        $this->updateStatus();
+
+        return $this->status;
+    }
+
+    /**
      * Stops the process.
      *
-     * @param float $timeout The timeout in seconds
+     * @param integer $timeout The timeout in seconds
      *
-     * @return integer The exitcode of the process
+     * @return integer The exit-code of the process
      *
      * @throws RuntimeException if the process got signaled
      */
-    public function stop($timeout=10)
+    public function stop($timeout = 10)
     {
         $timeoutMicro = (int) $timeout*10E6;
         if ($this->isRunning()) {
@@ -613,26 +729,55 @@ class Process
         return $this->exitcode;
     }
 
+    /**
+     * Adds a line to the STDOUT stream.
+     *
+     * @param string $line The line to append
+     */
     public function addOutput($line)
     {
         $this->stdout .= $line;
     }
 
+    /**
+     * Adds a line to the STDERR stream.
+     *
+     * @param string $line The line to append
+     */
     public function addErrorOutput($line)
     {
         $this->stderr .= $line;
     }
 
+    /**
+     * Gets the command line to be executed.
+     *
+     * @return string The command to execute
+     */
     public function getCommandLine()
     {
         return $this->commandline;
     }
 
+    /**
+     * Sets the command line to be executed.
+     *
+     * @param string $commandline The command to execute
+     *
+     * @return self The current Process instance
+     */
     public function setCommandLine($commandline)
     {
         $this->commandline = $commandline;
+
+        return $this;
     }
 
+    /**
+     * Gets the process timeout.
+     *
+     * @return integer|null The timeout in seconds or null if it's disabled
+     */
     public function getTimeout()
     {
         return $this->timeout;
@@ -643,14 +788,18 @@ class Process
      *
      * To disable the timeout, set this value to null.
      *
-     * @param integer|null
+     * @param integer|null $timeout The timeout in seconds
+     *
+     * @return self The current Process instance
+     *
+     * @throws InvalidArgumentException if the timeout is negative
      */
     public function setTimeout($timeout)
     {
         if (null === $timeout) {
             $this->timeout = null;
 
-            return;
+            return $this;
         }
 
         $timeout = (integer) $timeout;
@@ -660,56 +809,130 @@ class Process
         }
 
         $this->timeout = $timeout;
+
+        return $this;
     }
 
+    /**
+     * Gets the working directory.
+     *
+     * @return string The current working directory
+     */
     public function getWorkingDirectory()
     {
         return $this->cwd;
     }
 
+    /**
+     * Sets the current working directory.
+     *
+     * @param string $cwd The new working directory
+     *
+     * @return self The current Process instance
+     */
     public function setWorkingDirectory($cwd)
     {
         $this->cwd = $cwd;
+
+        return $this;
     }
 
+    /**
+     * Gets the environment variables.
+     *
+     * @return array The current environment variables
+     */
     public function getEnv()
     {
         return $this->env;
     }
 
+    /**
+     * Sets the environment variables.
+     *
+     * @param array $env The new environment variables
+     *
+     * @return self The current Process instance
+     */
     public function setEnv(array $env)
     {
         $this->env = $env;
+
+        return $this;
     }
 
+    /**
+     * Gets the contents of STDIN.
+     *
+     * @return string The current contents
+     */
     public function getStdin()
     {
         return $this->stdin;
     }
 
+    /**
+     * Sets the contents of STDIN.
+     *
+     * @param string $stdin The new contents
+     *
+     * @return self The current Process instance
+     */
     public function setStdin($stdin)
     {
         $this->stdin = $stdin;
+
+        return $this;
     }
 
+    /**
+     * Gets the options for proc_open.
+     *
+     * @return array The current options
+     */
     public function getOptions()
     {
         return $this->options;
     }
 
+    /**
+     * Sets the options for proc_open.
+     *
+     * @param array $options The new options
+     *
+     * @return self The current Process instance
+     */
     public function setOptions(array $options)
     {
         $this->options = $options;
+
+        return $this;
     }
 
+    /**
+     * Gets whether or not Windows compatibility is enabled
+     *
+     * This is true by default.
+     *
+     * @return Boolean
+     */
     public function getEnhanceWindowsCompatibility()
     {
         return $this->enhanceWindowsCompatibility;
     }
 
+    /**
+     * Sets whether or not Windows compatibility is enabled
+     *
+     * @param Boolean $enhance
+     *
+     * @return self The current Process instance
+     */
     public function setEnhanceWindowsCompatibility($enhance)
     {
         $this->enhanceWindowsCompatibility = (Boolean) $enhance;
+
+        return $this;
     }
 
     /**
@@ -730,10 +953,14 @@ class Process
      * the --enable-sigchild option
      *
      * @param Boolean $enhance
+     *
+     * @return self The current Process instance
      */
     public function setEnhanceSigchildCompatibility($enhance)
     {
         $this->enhanceSigchildCompatibility = (Boolean) $enhance;
+
+        return $this;
     }
 
     /**

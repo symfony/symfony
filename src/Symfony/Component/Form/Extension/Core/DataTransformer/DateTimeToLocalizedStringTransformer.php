@@ -32,12 +32,12 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @see BaseDateTimeTransformer::formats for available format options
      *
-     * @param string             $inputTimezone  The name of the input timezone
-     * @param string             $outputTimezone The name of the output timezone
-     * @param integer            $dateFormat     The date format
-     * @param integer            $timeFormat     The time format
-     * @param \IntlDateFormatter $calendar       An \IntlDateFormatter instance
-     * @param string             $pattern        A pattern to pass to \IntlDateFormatter
+     * @param string  $inputTimezone  The name of the input timezone
+     * @param string  $outputTimezone The name of the output timezone
+     * @param integer $dateFormat     The date format
+     * @param integer $timeFormat     The time format
+     * @param integer $calendar       One of the \IntlDateFormatter calendar constants
+     * @param string  $pattern        A pattern to pass to \IntlDateFormatter
      *
      * @throws UnexpectedTypeException If a format is not supported
      * @throws UnexpectedTypeException if a timezone is not a string
@@ -71,7 +71,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a normalized date into a localized date string/array.
      *
-     * @param DateTime $dateTime Normalized date.
+     * @param \DateTime $dateTime Normalized date.
      *
      * @return string|array        Localized date string/array.
      *
@@ -108,7 +108,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @param string|array $value Localized date string/array
      *
-     * @return DateTime Normalized date
+     * @return \DateTime Normalized date
      *
      * @throws UnexpectedTypeException if the given value is not a string
      * @throws TransformationFailedException if the date could not be parsed

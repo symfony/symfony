@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.1.5
+-----
+
+ * fixed caching of choice lists when EntityType is used with the "query_builder" option
+
 2.1.0
 -----
 

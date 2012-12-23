@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Propel1\Logger;
 
-use Symfony\Component\HttpKernel\Debug\Stopwatch;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 
 /**
@@ -33,7 +33,7 @@ class PropelLogger
     protected $queries;
 
     /**
-     * @var \Symfony\Component\HttpKernel\Debug\Stopwatch
+     * @var Stopwatch
      */
     protected $stopwatch;
 
@@ -161,7 +161,7 @@ class PropelLogger
     /**
      * Returns queries.
      *
-     * @return array    Queries
+     * @return array Queries
      */
     public function getQueries()
     {

@@ -13,12 +13,37 @@ namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
 use Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class DummyMongoDbProfilerStorage extends MongoDbProfilerStorage
 {
     public function getMongo()
     {
         return parent::getMongo();
+    }
+}
+
+class MongoDbProfilerStorageTestDataCollector extends DataCollector
+{
+    public function setData($data)
+    {
+        $this->data = $data;
+    }
+
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    public function collect(Request $request, Response $response, \Exception $exception = null)
+    {
+    }
+
+    public function getName()
+    {
+        return 'test_data_collector';
     }
 }
 
@@ -60,6 +85,28 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
         $this->assertCount(1, $records, '->find() returns only one record');
         $this->assertEquals($records[0]['token'], 'time_2', '->find() returns the latest added record');
         self::$storage->purge();
+    }
+
+    public function testUtf8()
+    {
+        $profile = new Profile('utf8_test_profile');
+
+        $data = 'HЁʃʃϿ, ϢorЃd!';
+        $nonUtf8Data = mb_convert_encoding($data, 'UCS-2');
+
+        $collector = new MongoDbProfilerStorageTestDataCollector();
+        $collector->setData($nonUtf8Data);
+
+        $profile->setCollectors(array($collector));
+
+        self::$storage->write($profile);
+
+        $readProfile = self::$storage->read('utf8_test_profile');
+        $collectors = $readProfile->getCollectors();
+
+        $this->assertCount(1, $collectors);
+        $this->assertArrayHasKey('test_data_collector', $collectors);
+        $this->assertEquals($nonUtf8Data, $collectors['test_data_collector']->getData(), 'Non-UTF8 data is properly encoded/decoded');
     }
 
     /**

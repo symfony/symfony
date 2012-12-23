@@ -24,9 +24,9 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
 
         try {
             $option = new InputOption('foo', 'f', InputOption::VALUE_IS_ARRAY);
-            $this->fail('->setDefault() throws an Exception if VALUE_IS_ARRAY option is used when an option does not accept a value');
+            $this->fail('__construct() throws an \InvalidArgumentException if VALUE_IS_ARRAY option is used when an option does not accept a value');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->setDefault() throws an Exception if VALUE_IS_ARRAY option is used when an option does not accept a value');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if VALUE_IS_ARRAY option is used when an option does not accept a value');
             $this->assertEquals('Impossible to have an option mode VALUE_IS_ARRAY if the option does not accept a value.', $e->getMessage());
         }
 
@@ -66,16 +66,16 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
 
         try {
             $option = new InputOption('foo', 'f', 'ANOTHER_ONE');
-            $this->fail('__construct() throws an Exception if the mode is not valid');
+            $this->fail('__construct() throws an \InvalidArgumentException if the mode is not valid');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '__construct() throws an Exception if the mode is not valid');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the mode is not valid');
             $this->assertEquals('Option mode "ANOTHER_ONE" is not valid.', $e->getMessage());
         }
         try {
             $option = new InputOption('foo', 'f', -1);
-            $this->fail('__construct() throws an Exception if the mode is not valid');
+            $this->fail('__construct() throws an \InvalidArgumentException if the mode is not valid');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '__construct() throws an Exception if the mode is not valid');
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the mode is not valid');
             $this->assertEquals('Option mode "-1" is not valid.', $e->getMessage());
         }
     }
@@ -151,18 +151,18 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
         try {
             $option->setDefault('default');
-            $this->fail('->setDefault() throws an Exception if you give a default value for a VALUE_NONE option');
+            $this->fail('->setDefault() throws a \LogicException if you give a default value for a VALUE_NONE option');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->setDefault() throws an Exception if you give a default value for a VALUE_NONE option');
-            $this->assertEquals('Cannot set a default value when using Option::VALUE_NONE mode.', $e->getMessage());
+            $this->assertInstanceOf('\LogicException', $e, '->setDefault() throws a \LogicException if you give a default value for a VALUE_NONE option');
+            $this->assertEquals('Cannot set a default value when using InputOption::VALUE_NONE mode.', $e->getMessage());
         }
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
         try {
             $option->setDefault('default');
-            $this->fail('->setDefault() throws an Exception if you give a default value which is not an array for a VALUE_IS_ARRAY option');
+            $this->fail('->setDefault() throws a \LogicException if you give a default value which is not an array for a VALUE_IS_ARRAY option');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e, '->setDefault() throws an Exception if you give a default value which is not an array for a VALUE_IS_ARRAY option');
+            $this->assertInstanceOf('\LogicException', $e, '->setDefault() throws a \LogicException if you give a default value which is not an array for a VALUE_IS_ARRAY option');
             $this->assertEquals('A default value for an array option must be an array.', $e->getMessage());
         }
     }

@@ -17,7 +17,6 @@ use Symfony\Component\Config\Definition\ScalarNode;
 
 class PrototypedArrayNodeTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testGetDefaultValueReturnsAnEmptyArrayForPrototypes()
     {
         $node = new PrototypedArrayNode('root');
@@ -31,8 +30,8 @@ class PrototypedArrayNodeTest extends \PHPUnit_Framework_TestCase
         $node = new PrototypedArrayNode('root');
         $prototype = new ArrayNode(null, $node);
         $node->setPrototype($prototype);
-        $node->setDefaultValue(array ('test'));
-        $this->assertEquals(array ('test'), $node->getDefaultValue());
+        $node->setDefaultValue(array('test'));
+        $this->assertEquals(array('test'), $node->getDefaultValue());
     }
 
     // a remapped key (e.g. "mapping" -> "mappings") should be unset after being used

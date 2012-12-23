@@ -1,0 +1,9 @@
+Resources/data/4.0/
+Resources/data/4.2/
+Resources/data/4.4/
+Resources/data/4.6/
+Resources/data/4.8/
+Resources/data/50/
+vendor/
+composer.lock
+phpunit.xml

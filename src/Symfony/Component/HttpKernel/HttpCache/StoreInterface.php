@@ -66,8 +66,19 @@ interface StoreInterface
      * Releases the lock for the given Request.
      *
      * @param Request $request A Request instance
+     *
+     * @return Boolean False if the lock file does not exist or cannot be unlocked, true otherwise
      */
     public function unlock(Request $request);
+
+    /**
+     * Returns whether or not a lock exists.
+     *
+     * @param Request $request A Request instance
+     *
+     * @return Boolean true if lock exists, false otherwise
+     */
+    public function isLocked(Request $request);
 
     /**
      * Purges data for the given URL.

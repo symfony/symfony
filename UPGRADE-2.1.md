@@ -29,6 +29,7 @@
     Therefore you should change the namespace of this bundle in your AppKernel.php:
 
     Before: `new Symfony\Bundle\DoctrineBundle\DoctrineBundle()`
+
     After: `new Doctrine\Bundle\DoctrineBundle\DoctrineBundle()`
 
 ### HttpFoundation
@@ -52,11 +53,6 @@
         default_locale: fr
     ```
 
-  * The methods `getPathInfo()`, `getBaseUrl()` and `getBasePath()` of
-    a `Request` now all return a raw value (vs a urldecoded value before). Any call
-    to one of these methods must be checked and wrapped in a `rawurldecode()` if
-    needed.
-
     ##### Retrieving the locale from a Twig template
 
     Before: `{{ app.request.session.locale }}` or `{{ app.session.locale }}`
@@ -75,13 +71,11 @@
 
     After: `$request->getLocale()`
 
-### HttpFoundation
+    ##### Simulate old behavior
 
- * The current locale for the user is not stored anymore in the session
-
-   You can simulate the old behavior by registering a listener that looks like
-   the following if the parameter which handles the locale value in the
-   request is `_locale`:
+    You can simulate that the locale for the user is still stored in the session by
+    registering a listener that looks like the following if the parameter which 
+    handles the locale value in the request is `_locale`:
 
    ```
    namespace XXX;
@@ -122,6 +116,11 @@
        }
    }
    ```
+
+  * The methods `getPathInfo()`, `getBaseUrl()` and `getBasePath()` of
+    a `Request` now all return a raw value (vs a urldecoded value before). Any call
+    to one of these methods must be checked and wrapped in a `rawurldecode()` if
+    needed.
 
 ### Security
 
@@ -423,22 +422,13 @@
   * In the collection type's template, the default name of the prototype field
     has changed from `$$name$$` to `__name__`.
 
-    For custom names, dollar signs are no longer prepended and appended. You are
-    advised to prepend and append two underscores wherever you specify a value
-    for the field's "prototype_name" option.
-
-    Before:
-
-    ```
-    $builder->add('tags', 'collection', array('prototype' => 'proto'));
-
-    // results in the name "$$proto$$" in the template
-    ```
-
-    After:
+    You can now customize the name of the prototype field by changin the
+    "prototype_name" option. You are advised to prepend and append two
+    underscores wherever you specify a value for the field's "prototype_name"
+    option.
 
     ```
-    $builder->add('tags', 'collection', array('prototype' => '__proto__'));
+    $builder->add('tags', 'collection', array('prototype_name' => '__proto__'));
 
     // results in the name "__proto__" in the template
     ```
@@ -536,25 +526,43 @@
 
   * In the choice field type's template, the `_form_is_choice_selected` method
     used to identify a selected choice has been replaced with the `selectedchoice`
-    filter.
+    filter. Similarly, the `_form_is_choice_group` method used to check if a 
+    choice is grouped has been removed and can be checked with the `iterable` 
+    test.
 
     Before:
 
     ```
     {% for choice, label in choices %}
-        <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
-            {{ label }}
-        </option>
+        {% if _form_is_choice_group(label) %}
+            <optgroup label="{{ choice|trans }}">
+                {% for nestedChoice, nestedLabel in label %}
+                    ... options tags ...
+                {% endfor %}
+            </optgroup>
+        {% else %}
+            <option value="{{ choice }}"{% if _form_is_choice_selected(form, choice) %} selected="selected"{% endif %}>
+                {{ label }}
+            </option>
+        {% endif %}
     {% endfor %}
     ```
 
     After:
 
     ```
-    {% for choice, label in choices %}
-        <option value="{{ choice.value }}"{% if choice is selectedchoice(choice.value) %} selected="selected"{% endif %}>
-            {{ label }}
-        </option>
+    {% for label, choice in choices %}
+        {% if choice is iterable %}
+            <optgroup label="{{ label|trans({}, translation_domain) }}">
+                {% for nestedChoice, nestedLabel in choice %}
+                    ... options tags ...
+                {% endfor %}
+            </optgroup>
+        {% else %}
+            <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>
+                {{ label }}
+            </option>
+        {% endif %}
     {% endfor %}
     ```
 
@@ -576,7 +584,7 @@
 
   * Custom styling of individual rows of a collection form has been removed for
     performance reasons. Instead, all rows now have the same block name, where
-    the word "entry" replaces the previous occurence of the row index.
+    the word "entry" replaces the previous occurrence of the row index.
 
     Before:
 
@@ -1331,6 +1339,9 @@
     ```
 
 ### Session
+
+  * The namespace of the Session class changed from `Symfony\Component\HttpFoundation\Session`
+    to `Symfony\Component\HttpFoundation\Session\Session`.
 
   * Using `get` to retrieve flash messages now returns an array.
 

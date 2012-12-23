@@ -12,7 +12,7 @@
     <li>
         <strong>Route parameters:&nbsp;</strong>
         {% if request.routeParams|length %}
-            {% include 'WebProfilerBundle:Profiler:table.html.twig' with { 'data': request.routeParams, 'class': 'inline' } only %}
+            {% include '@WebProfiler/Profiler/table.html.twig' with { 'data': request.routeParams, 'class': 'inline' } only %}
         {% else %}
             <em>No parameters</em>
         {% endif %}

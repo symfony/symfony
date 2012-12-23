@@ -132,6 +132,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $dataLocked;
 
     /**
+     * @var FormFactoryInterface
+     */
+    private $formFactory;
+
+    /**
      * @var array
      */
     private $options;
@@ -139,7 +144,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Creates an empty form configuration.
      *
-     * @param string                   $name       The form name
+     * @param string|integer           $name       The form name
      * @param string                   $dataClass  The class of the form's data
      * @param EventDispatcherInterface $dispatcher The event dispatcher
      * @param array                    $options    The form options
@@ -149,15 +154,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
     {
-        $name = (string) $name;
-
         self::validateName($name);
 
         if (null !== $dataClass && !class_exists($dataClass)) {
             throw new \InvalidArgumentException(sprintf('The data class "%s" is not a valid class.', $dataClass));
         }
 
-        $this->name = $name;
+        $this->name = (string) $name;
         $this->dataClass = $dataClass;
         $this->dispatcher = $dispatcher;
         $this->options = $options;
@@ -196,6 +199,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function addValidator(FormValidatorInterface $validator)
     {
+        trigger_error('addValidator() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -251,6 +256,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function appendClientTransformer(DataTransformerInterface $viewTransformer)
     {
+        trigger_error('appendClientTransformer() is deprecated since version 2.1 and will be removed in 2.3. Use addViewTransformer() instead.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -271,6 +278,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function prependClientTransformer(DataTransformerInterface $viewTransformer)
     {
+        trigger_error('prependClientTransformer() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -290,6 +299,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function resetClientTransformers()
     {
+        trigger_error('resetClientTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use resetViewTransformers() instead.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -342,6 +353,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function appendNormTransformer(DataTransformerInterface $modelTransformer)
     {
+        trigger_error('appendNormTransformer() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -363,6 +376,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function prependNormTransformer(DataTransformerInterface $modelTransformer)
     {
+        trigger_error('prependNormTransformer() is deprecated since version 2.1 and will be removed in 2.3. Use addModelTransformer() instead.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -382,6 +397,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function resetNormTransformers()
     {
+        trigger_error('resetNormTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use resetModelTransformers() instead.', E_USER_DEPRECATED);
+
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
         }
@@ -471,6 +488,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getClientTransformers()
     {
+        trigger_error('getClientTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use getViewTransformers() instead.', E_USER_DEPRECATED);
+
         return $this->getViewTransformers();
     }
 
@@ -492,6 +511,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getNormTransformers()
     {
+        trigger_error('getNormTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use getModelTransformers() instead.', E_USER_DEPRECATED);
+
         return $this->getModelTransformers();
     }
 
@@ -508,6 +529,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getValidators()
     {
+        trigger_error('getValidators() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         return $this->validators;
     }
 
@@ -589,6 +612,14 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     public function getDataLocked()
     {
         return $this->dataLocked;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormFactory()
+    {
+        return $this->formFactory;
     }
 
     /**
@@ -832,6 +863,20 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setFormFactory(FormFactoryInterface $formFactory)
+    {
+        if ($this->locked) {
+            throw new FormException('The config builder cannot be modified anymore.');
+        }
+
+        $this->formFactory = $formFactory;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getFormConfig()
     {
         // This method should be idempotent, so clone the builder
@@ -848,15 +893,15 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Validates whether the given variable is a valid form name.
      *
-     * @param string $name The tested form name.
+     * @param string|integer $name The tested form name.
      *
-     * @throws UnexpectedTypeException   If the name is not a string.
+     * @throws UnexpectedTypeException   If the name is not a string or an integer.
      * @throws \InvalidArgumentException If the name contains invalid characters.
      */
     public static function validateName($name)
     {
-        if (!is_string($name)) {
-            throw new UnexpectedTypeException($name, 'string');
+        if (null !== $name && !is_string($name) && !is_int($name)) {
+            throw new UnexpectedTypeException($name, 'string, integer or null');
         }
 
         if (!self::isValidName($name)) {
@@ -883,6 +928,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public static function isValidName($name)
     {
-        return '' === $name || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
+        return '' === $name || null === $name || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
     }
 }

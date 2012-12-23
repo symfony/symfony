@@ -121,17 +121,18 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * permission/identity combination.
      *
      * This process is repeated until either a granting ACE is found, or no
-     * permission/identity combinations are left. In the latter case, we will
-     * call this method on the parent ACL if it exists, and isEntriesInheriting
-     * is true. Otherwise, we will either throw an NoAceFoundException, or deny
-     * access finally.
+     * permission/identity combinations are left. Finally, we will either throw
+     * an NoAceFoundException, or deny access.
      *
-     * @param AclInterface $acl
-     * @param array        $aces               An array of ACE to check against
-     * @param array        $masks              An array of permission masks
-     * @param array        $sids               An array of SecurityIdentityInterface implementations
-     * @param Boolean      $administrativeMode True turns off audit logging
+     * @param AclInterface                $acl
+     * @param EntryInterface[]            $aces               An array of ACE to check against
+     * @param array                       $masks              An array of permission masks
+     * @param SecurityIdentityInterface[] $sids               An array of SecurityIdentityInterface implementations
+     * @param Boolean                     $administrativeMode True turns off audit logging
+     *
      * @return Boolean true, or false; either granting, or denying access respectively.
+     *
+     * @throws NoAceFoundException
      */
     private function hasSufficientPermissions(AclInterface $acl, array $aces, array $masks, array $sids, $administrativeMode)
     {
@@ -189,7 +190,10 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      *
      * @param integer        $requiredMask
      * @param EntryInterface $ace
+     *
      * @return Boolean
+     *
+     * @throws \RuntimeException if the ACE strategy is not supported
      */
     private function isAceApplicable($requiredMask, EntryInterface $ace)
     {

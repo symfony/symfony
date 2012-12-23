@@ -214,6 +214,14 @@
                 <source>This collection should contain exactly {{ limit }} elements.</source>
                 <target>Ez a gyűjetemény pontosan {{ limit }} elemet tartalmazzon.</target>
             </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>Érvénytelen kártyaszám.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>Nem támogatott kártyatípus vagy érvénytelen kártyaszám.</target>
+            </trans-unit>            
         </body>
     </file>
 </xliff>

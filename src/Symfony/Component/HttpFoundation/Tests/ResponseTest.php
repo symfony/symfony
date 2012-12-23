@@ -143,6 +143,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $now = $this->createDateTimeNow();
         $response->headers->set('Date', $now->format(DATE_RFC2822));
         $this->assertEquals(0, $now->diff($response->getDate())->format('%s'), '->getDate() returns the date when the header has been modified');
+
+        $response = new Response('', 200);
+        $response->headers->remove('Date');
+        $this->assertInstanceOf('\DateTime', $response->getDate());
     }
 
     public function testGetMaxAge()
@@ -345,6 +349,23 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response->prepare($request);
 
         $this->assertEquals('', $response->getContent());
+    }
+
+    public function testPrepareSetsPragmaOnHttp10Only()
+    {
+        $request = Request::create('/', 'GET');
+        $request->server->set('SERVER_PROTOCOL', 'HTTP/1.0');
+
+        $response = new Response('foo');
+        $response->prepare($request);
+        $this->assertEquals('no-cache', $response->headers->get('pragma'));
+        $this->assertEquals('-1', $response->headers->get('expires'));
+
+        $request->server->set('SERVER_PROTOCOL', 'HTTP/1.1');
+        $response = new Response('foo');
+        $response->prepare($request);
+        $this->assertFalse($response->headers->has('pragma'));
+        $this->assertFalse($response->headers->has('expires'));
     }
 
     public function testSetCache()

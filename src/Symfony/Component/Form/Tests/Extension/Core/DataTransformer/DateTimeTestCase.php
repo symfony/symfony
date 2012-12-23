@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-class DateTimeTestCase extends LocalizedTestCase
+abstract class DateTimeTestCase extends LocalizedTestCase
 {
     public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
     {

@@ -78,7 +78,7 @@ class Controller extends ContainerAware
      * @param string $view       The view name
      * @param array  $parameters An array of parameters to pass to the view
      *
-     * @return string The renderer view
+     * @return string The rendered view
      */
     public function renderView($view, array $parameters = array())
     {
@@ -133,7 +133,7 @@ class Controller extends ContainerAware
      *     throw $this->createNotFoundException('Page not found!');
      *
      * @param string    $message  A message
-     * @param Exception $previous The previous exception
+     * @param \Exception $previous The previous exception
      *
      * @return NotFoundHttpException
      */

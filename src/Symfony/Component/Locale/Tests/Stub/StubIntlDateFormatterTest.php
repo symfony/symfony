@@ -472,7 +472,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->skipIfIntlExtensionIsNotLoaded();
         $this->skipIfICUVersionIsTooOld();
 
-        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC');
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
         $this->assertEquals(
@@ -629,13 +629,10 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         $this->assertEquals(StubIntlDateFormatter::FULL, $formatter->getTimeType());
     }
 
-    /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
-     */
     public function testIsLenient()
     {
         $formatter = $this->createStubFormatter();
-        $formatter->isLenient();
+        $this->assertFalse($formatter->isLenient());
     }
 
     /**
@@ -869,7 +866,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function parseErrorProvider()
     {
-        return array(
+        $data = array(
             // 1 char month
             array('y-MMMMM-d', '1970-J-1'),
             array('y-MMMMM-d', '1970-S-1'),
@@ -878,6 +875,13 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array('y-LLLLL-d', '1970-J-1'),
             array('y-LLLLL-d', '1970-S-1'),
         );
+
+        if (!$this->isIntlExtensionLoaded() || $this->isLowerThanIcuVersion('4.8')) {
+            $data[] = array('y-M-d', '1970/1/1');
+            $data[] = array('yy-M-d', '70/1/1');
+        }
+
+        return $data;
     }
 
     /*

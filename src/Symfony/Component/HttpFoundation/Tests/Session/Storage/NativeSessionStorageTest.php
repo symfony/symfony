@@ -29,6 +29,8 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @param array $options
+     *
      * @return NativeSessionStorage
      */
     protected function getStorage(array $options = array())

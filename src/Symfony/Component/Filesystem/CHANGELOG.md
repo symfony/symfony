@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added a delete option for the mirror() method
+
 2.1.0
 -----
 

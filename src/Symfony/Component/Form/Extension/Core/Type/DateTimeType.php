@@ -114,6 +114,7 @@ class DateTimeType extends AbstractType
                 'years',
                 'months',
                 'days',
+                'placeholder',
                 'empty_value',
                 'required',
                 'translation_domain',
@@ -125,6 +126,7 @@ class DateTimeType extends AbstractType
                 'seconds',
                 'with_minutes',
                 'with_seconds',
+                'placeholder',
                 'empty_value',
                 'required',
                 'translation_domain',
@@ -246,6 +248,7 @@ class DateTimeType extends AbstractType
         // Don't add some defaults in order to preserve the defaults
         // set in DateType and TimeType
         $resolver->setOptional(array(
+            'placeholder',
             'empty_value',
             'years',
             'months',

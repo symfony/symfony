@@ -82,11 +82,11 @@ class DateType extends AbstractType
             if ('choice' === $options['widget']) {
                 // Only pass a subset of the options to children
                 $yearOptions['choices'] = $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years']));
-                $yearOptions['empty_value'] = $options['empty_value']['year'];
+                $yearOptions['placeholder'] = $options['placeholder']['year'];
                 $monthOptions['choices'] = $this->formatTimestamps($formatter, '/[M|L]+/', $this->listMonths($options['months']));
-                $monthOptions['empty_value'] = $options['empty_value']['month'];
+                $monthOptions['placeholder'] = $options['placeholder']['month'];
                 $dayOptions['choices'] = $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days']));
-                $dayOptions['empty_value'] = $options['empty_value']['day'];
+                $dayOptions['placeholder'] = $options['placeholder']['day'];
             }
 
             // Append generic carry-along options
@@ -164,24 +164,29 @@ class DateType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
-        $emptyValue = $emptyValueDefault = function (Options $options) {
+        $placeholderValue = $placeholderValueDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
-        $emptyValueNormalizer = function (Options $options, $emptyValue) use ($emptyValueDefault) {
-            if (is_array($emptyValue)) {
-                $default = $emptyValueDefault($options);
+        $placeholderValueNormalizer = function (Options $options, $placeholderValue) use ($placeholderValueDefault) {
+            // BC until Symfony 2.3
+            if ($options['empty_value'] && !$placeholderValue) {
+                $placeholderValue  = $options['empty_value'];
+            }
+
+            if (is_array($placeholderValue)) {
+                $default = $placeholderValueDefault($options);
 
                 return array_merge(
                     array('year' => $default, 'month' => $default, 'day' => $default),
-                    $emptyValue
+                    $placeholderValue
                 );
             }
 
             return array(
-                'year' => $emptyValue,
-                'month' => $emptyValue,
-                'day' => $emptyValue
+                'year' => $placeholderValue,
+                'month' => $placeholderValue,
+                'day' => $placeholderValue
             );
         };
 
@@ -211,7 +216,9 @@ class DateType extends AbstractType
             // Deprecated timezone options
             'data_timezone'  => null,
             'user_timezone'  => null,
-            'empty_value'    => $emptyValue,
+            'placeholder'    => $placeholderValue,
+            // Deprecated empty_value option
+            'empty_value'    => null,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'   => false,
@@ -225,7 +232,7 @@ class DateType extends AbstractType
         ));
 
         $resolver->setNormalizers(array(
-            'empty_value' => $emptyValueNormalizer,
+            'placeholder' => $placeholderValueNormalizer,
         ));
 
         $resolver->setAllowedValues(array(

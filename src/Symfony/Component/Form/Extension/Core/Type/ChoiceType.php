@@ -105,7 +105,7 @@ class ChoiceType extends AbstractType
         // Check if the choices already contain the empty value
         // Only add the empty value option if this is not the case
         if (0 === count($options['choice_list']->getIndicesForValues(array('')))) {
-            $view->vars['empty_value'] = $options['empty_value'];
+            $view->vars['empty_value'] = $options['placeholder'];
         }
 
         if ($options['multiple'] && !$options['expanded']) {
@@ -165,21 +165,26 @@ class ChoiceType extends AbstractType
             return '';
         };
 
-        $emptyValue = function (Options $options) {
+        $placeholderValue = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
-        $emptyValueNormalizer = function (Options $options, $emptyValue) {
+        $placeholderValueNormalizer = function (Options $options, $placeholderValue) {
+            // BC until Symfony 2.3
+            if ($options['empty_value'] && !$placeholderValue) {
+                $placeholderValue = $options['empty_value'];
+            }
+
             if ($options['multiple'] || $options['expanded']) {
                 // never use an empty value for these cases
                 return null;
-            } elseif (false === $emptyValue) {
+            } elseif (false === $placeholderValue) {
                 // an empty value should be added but the user decided otherwise
                 return null;
             }
 
             // empty value has been set explicitly
-            return $emptyValue;
+            return $placeholderValue;
         };
 
         $compound = function (Options $options) {
@@ -193,7 +198,9 @@ class ChoiceType extends AbstractType
             'choices'           => array(),
             'preferred_choices' => array(),
             'empty_data'        => $emptyData,
-            'empty_value'       => $emptyValue,
+            'placeholder'       => $placeholderValue,
+            // Deprecated empty_value option
+            'empty_value'       => null,
             'error_bubbling'    => false,
             'compound'          => $compound,
             // The view data is always a string, even if the "data" option
@@ -203,7 +210,7 @@ class ChoiceType extends AbstractType
         ));
 
         $resolver->setNormalizers(array(
-            'empty_value' => $emptyValueNormalizer,
+            'placeholder' => $placeholderValueNormalizer,
         ));
 
         $resolver->setAllowedTypes(array(

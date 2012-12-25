@@ -277,7 +277,7 @@ class Crawler extends \SplObjectStorage
      *
      *     $crawler->filter('h1')->each(function ($node, $i)
      *     {
-     *       return $node->nodeValue;
+     *       return $node->text();
      *     });
      *
      * @param \Closure $closure An anonymous function
@@ -290,6 +290,7 @@ class Crawler extends \SplObjectStorage
     {
         $data = array();
         foreach ($this as $i => $node) {
+            $node = new static($node, $this->uri);
             $data[] = $closure($node, $i);
         }
 

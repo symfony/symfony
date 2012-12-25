@@ -337,7 +337,6 @@ EOF;
 
         $hostnameRegexEmptyGroup = new DumperCollection();
         $hostnameRegexEmptyGroup->setAttribute('hostname_regex', null);
-        $groups->add($hostnameRegexEmptyGroup);
 
         $hostnameGrouppedArray = array();
         foreach ($routes as $name => $route) {
@@ -357,6 +356,8 @@ EOF;
 
             $groups->add($group);
         }
+
+        $groups->add($hostnameRegexEmptyGroup);
 
         return $groups;
     }

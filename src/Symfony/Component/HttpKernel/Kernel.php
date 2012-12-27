@@ -85,6 +85,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $this->rootDir = $this->getRootDir();
         $this->name = $this->getName();
         $this->classes = array();
+        $this->bundles = array();
 
         if ($this->debug) {
             $this->startTime = microtime(true);

@@ -50,8 +50,6 @@ class Route implements \Serializable
      */
     private $compiled;
 
-    private static $compilers = array();
-
     /**
      * Constructor.
      *
@@ -421,6 +419,9 @@ class Route implements \Serializable
      *
      * @return CompiledRoute A CompiledRoute instance
      *
+     * @throws \LogicException If the Route cannot be compiled because the
+     *                         path or hostname pattern is invalid
+     *
      * @see RouteCompiler which is responsible for the compilation process
      */
     public function compile()
@@ -431,11 +432,7 @@ class Route implements \Serializable
 
         $class = $this->getOption('compiler_class');
 
-        if (!isset(self::$compilers[$class])) {
-            self::$compilers[$class] = new $class;
-        }
-
-        return $this->compiled = self::$compilers[$class]->compile($this);
+        return $this->compiled = $class::compile($this);
     }
 
     private function sanitizeRequirement($key, $regex)

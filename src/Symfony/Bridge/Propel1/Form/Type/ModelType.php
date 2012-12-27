@@ -22,6 +22,29 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * ModelType class.
  *
  * @author William Durand <william.durand1@gmail.com>
+ * @author Toni Uebernickel <tuebernickel@gmail.com>
+ *
+ * Example using the preferred_choices option.
+ *
+ * <code>
+ *  public function buildForm(FormBuilderInterface $builder, array $options)
+ *  {
+ *      $builder
+ *          ->add('product', 'model', array(
+ *              'class' => 'Model\Product',
+ *              'query' => ProductQuery::create()
+ *                  ->filterIsActive(true)
+ *                  ->useI18nQuery($options['locale'])
+ *                      ->orderByName()
+ *                  ->endUse()
+ *              ,
+ *              'preferred_choices' => ProductQuery::create()
+ *                  ->filterByIsTopProduct(true)
+ *              ,
+ *          ))
+ *      ;
+ *   }
+ * </code>
  */
 class ModelType extends AbstractType
 {
@@ -40,7 +63,8 @@ class ModelType extends AbstractType
                 $options['property'],
                 $options['choices'],
                 $options['query'],
-                $options['group_by']
+                $options['group_by'],
+                $options['preferred_choices']
             );
         };
 

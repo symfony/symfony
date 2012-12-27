@@ -419,6 +419,9 @@ class Route implements \Serializable
      *
      * @return CompiledRoute A CompiledRoute instance
      *
+     * @throws \LogicException If the Route cannot be compiled because the
+     *                         path or hostname pattern is invalid
+     *
      * @see RouteCompiler which is responsible for the compilation process
      */
     public function compile()

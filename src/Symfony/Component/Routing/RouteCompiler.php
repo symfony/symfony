@@ -23,7 +23,7 @@ class RouteCompiler implements RouteCompilerInterface
 
     /**
      * This string defines the characters that are automatically considered separators in front of
-     * optional placeholders (with default and no static text following). Such a single separator
+     * implicit optional placeholders (with default and no static text following). Such a single separator
      * can be left out together with the optional placeholder from matching and generating URLs.
      */
     const SEPARATORS = '/,;.:-_~+*=@|';
@@ -171,6 +171,192 @@ class RouteCompiler implements RouteCompilerInterface
             'tokens' => array_reverse($tokens),
             'variables' => $variables,
         );
+    }
+
+    /**
+     * Performs lexical and syntactic analysis of the pattern and returns the parse tree
+     * consisting of tokens.
+     *
+     * The array is a tree when optional parts enclosed with parentheses are used
+     * that can potentially be nested at any deepth.
+     *
+     * @param string  $pattern     The route pattern or subpattern for an optional part
+     * @param Boolean $isHostname  Whether it is the pattern for the hostname or path
+     * @param string  $fullPattern The full pattern used for better exception messages
+     * @param integer $parentPos   The parsing position of the parent call
+     *
+     * @return array The parse tree of tokens
+     *
+     * @throws \LogicException If the pattern is invalid
+     */
+    public static function parsePattern($pattern, $isHostname = false, $fullPattern = '', $parentPos = 0)
+    {
+        $tokens = array();
+        $matches = array();
+        $pos = 0;
+
+        if ('' === $fullPattern) {
+            $fullPattern = $pattern;
+        }
+
+        // '#\{.*?\}|\((?:[^()]++|(?R))*\)#'
+        // '#(?<!\\\\)\{.*?(?<!\\\\)\}|(?<!\\\\)\((?:[^()]++|((?<=\\\\)[()])++|(?R))*(?<!\\\\)\)#'
+        preg_match_all('#(?<!\\\\)\{.*?(?<!\\\\)\}|(?<!\\\\)\((?:[^()]++|((?<=\\\\)[()])++|(?R))*(?<!\\\\)\)#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        foreach ($matches as $match) {
+            // get all static text preceding the current variable or optional part
+            $precedingText = substr($pattern, $pos, $match[0][1] - $pos);
+            if (strlen($precedingText) > 0) {
+                self::addTextToken($tokens, $precedingText, $fullPattern, $parentPos + $pos);
+            }
+
+            $content = substr($match[0][0], 1, -1);
+            if ('{' === $match[0][0][0]) {
+                if ('' === $content || preg_match('#[^\w]#', $content)) {
+                    throw new \LogicException(sprintf('Variable name "%s" cannot be empty and must only contain letters, digits and underscores in route pattern "%s" at position %s.', $content, $fullPattern, $parentPos + $match[0][1]));
+                }
+                if (is_numeric($content)) {
+                    throw new \DomainException(sprintf('Variable name "%s" cannot be numeric in route pattern "%s" at position %s. Please use a different name.', $content, $fullPattern, $parentPos + $match[0][1]));
+                }
+                // add variable name as token
+                $tokens[] = array(CompiledRoute::VARIABLE_TOKEN, $content);
+            } else {
+                // recursively tokenize an optional part that can itself have text/variable/optional tokens
+                $subTokens = self::parsePattern($content, $isHostname, $fullPattern, $parentPos + $match[0][1] + 1);
+                if (!self::containsVariableToken($subTokens)) {
+                    // TODO explain why
+                    throw new \LogicException(sprintf('The optional part "%s" must contain at least one variable placeholder in route pattern "%s" at position %s.', $match[0][0], $fullPattern, $parentPos + $match[0][1]));
+                }
+                $tokens[] = array(CompiledRoute::OPTIONAL_TOKEN, $subTokens);
+            }
+
+            $pos = $match[0][1] + strlen($match[0][0]);
+        }
+
+        if ($pos < strlen($pattern)) {
+            // add all text behind the last variable or optional part
+            self::addTextToken($tokens, substr($pattern, $pos), $fullPattern, $parentPos + $pos);
+        }
+
+        return $tokens;
+    }
+
+    /**
+     * Adds a text token to the tokens array.
+     *
+     * @param array   $tokens  The tokens
+     * @param string  $text    The static text
+     * @param string  $pattern The pattern used for a proper exception message
+     * @param integer $pos     The position of the text in the pattern
+     *
+     * @throws \LogicException If there is an unescaped parentheses or curly brace in the text
+     */
+    private static function addTextToken(array &$tokens, $text, $pattern, $pos)
+    {
+        $matches = array();
+        if (preg_match('#(?<!\\\\)[{}()]#', $text, $matches, PREG_OFFSET_CAPTURE)) {
+            throw new \LogicException(sprintf('There is an unescaped "%s" in route pattern "%s" at position %s.', $matches[0][0], $pattern, $pos + $matches[0][1]));
+        }
+
+        $tokens[] = array(CompiledRoute::TEXT_TOKEN, $text);
+    }
+
+    /**
+     * Transforms the token array so that implicit optional variables are
+     * correctly represented in the parse tree.
+     *
+     * Variables are optional if they have a default value and are at the end
+     * of the pattern. A single separating character in front of the optional variable
+     * can also be left out from matching and generating URLs. See self::SEPARATORS.
+     *
+     * @param array $tokens   The array of tokens
+     * @param array $defaults The array of defaults for the variables
+     *
+     * @return array The corrected array of tokens
+     */
+    public static function convertImplicitOptionals(array $tokens, array $defaults)
+    {
+        for($i = count($tokens)-1; $i >= 0; $i--) {
+            if (CompiledRoute::VARIABLE_TOKEN !== $tokens[$i][0] || !array_key_exists($tokens[$i][1], $defaults)) {
+                return $tokens;
+            }
+
+            $tokens[$i] = array(CompiledRoute::OPTIONAL_TOKEN, array($tokens[$i]), array('implicit' => true));
+
+            if (isset($tokens[$i+1])) {
+                $tokens[$i][1][] = $tokens[$i+1];
+                unset($tokens[$i+1]);
+            }
+
+            // if there is a preceeding separating char, move it into the optional token (except the starting slash which is required)
+            if (isset($tokens[$i-1]) && CompiledRoute::TEXT_TOKEN === $tokens[$i-1][0] && !(1 === $i && '/' === $tokens[$i-1][1])) {
+                $separator = substr($tokens[$i-1][1], -1);
+                if (false !== strpos(static::SEPARATORS, $separator)) {
+                    if (1 === strlen($tokens[$i-1][1])) {
+                        array_unshift($tokens[$i][1], $tokens[$i-1]);
+                        $tokens[$i-1] = $tokens[$i];
+                        unset($tokens[$i]);
+                        $i--;
+                    } else {
+                        $tokens[$i-1][1] = substr($tokens[$i-1][1], 0, -1);
+                        array_unshift($tokens[$i][1], array(CompiledRoute::TEXT_TOKEN, $separator));
+                    }
+                }
+            }
+        }
+
+        return $tokens;
+    }
+
+    /**
+     * Checks whether there is a variable token in the tokens array as direct child.
+     *
+     * @param array $tokens The tokens
+     *
+     * @return Boolean
+     */
+    private static function containsVariableToken(array $tokens)
+    {
+        foreach ($tokens as $token) {
+            if (CompiledRoute::VARIABLE_TOKEN !== $token[0]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Computes the default requirement for each variable placeholder or uses the
+     * given custom regex from the requirements array.
+     *
+     * @param array  $tokens       The tree of tokens
+     * @param array  $requirements The custom requirements
+     * @param string $pattern      The pattern used for a proper exception message
+     * @param array  $variables    The variables and requirements computed so far
+     *
+     * @return array An array indexed by the variable names and the requirement regex as value
+     *
+     * @throws \LogicException If a variable is referenced more than once
+     */
+    private static function computeRequirements(array $tokens, array $requirements, $pattern, array &$variables = array())
+    {
+        foreach ($tokens as $token) {
+            if (CompiledRoute::VARIABLE_TOKEN === $token[0]) {
+                if (isset($variables[$token[1]])) {
+                    throw new \LogicException(sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $pattern, $token[1]));
+                }
+
+                if (array_key_exists($token[1], $requirements)) {
+                    $variables[$token[1]] = $requirements[$token[1]];
+                } else {
+                    $variables[$token[1]] = 'TODO';
+                }
+            } elseif (CompiledRoute::OPTIONAL_TOKEN === $token[0]) {
+                self::computeRequirements($token[1], $requirements, $pattern, $variables);
+            }
+        }
+
+        return $variables;
     }
 
     /**

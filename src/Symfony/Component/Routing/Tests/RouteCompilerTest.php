@@ -181,6 +181,15 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Variable name "spéßial" cannot be empty and must only contain letters, digits and underscores in route pattern "/prefix/{spéßial}" at position 8.
+     */
+    public function testInvalidVariableName()
+    {
+        \Symfony\Component\Routing\RouteCompiler::parsePattern('/prefix/{spéßial}');
+    }
+
+    /**
      * @dataProvider provideCompileWithHostnameData
      */
     public function testCompileWithHostname($name, $arguments, $prefix, $regex, $variables, $pathVariables, $tokens, $hostnameRegex, $hostnameVariables, $hostnameTokens)

@@ -23,6 +23,46 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => '\d+'), $route->getRequirements(), '__construct() takes requirements as its third argument');
         $this->assertEquals('bar', $route->getOption('foo'), '__construct() takes options as its fourth argument');
         $this->assertEquals('{locale}.example.com', $route->getHostnamePattern(), '__construct() takes a hostname pattern as its fifth argument');
+
+        var_dump($t = \Symfony\Component\Routing\RouteCompiler::parsePattern('/prefix/{test}{product}-{bla}'));
+        var_dump(\Symfony\Component\Routing\RouteCompiler::convertImplicitOptionals($t, array('bla' => 'b', 'product' => 'p', 'test' => 't')));
+
+        var_dump($t = \Symfony\Component\Routing\RouteCompiler::parsePattern('/{test}'));
+        var_dump(\Symfony\Component\Routing\RouteCompiler::convertImplicitOptionals($t, array('test' => 't')));
+
+        var_dump(\Symfony\Component\Routing\RouteCompiler::parsePattern('/prefix/{tèst}{prod}uct}{a(b{var}uct})c}{a(b)c}(wrong)-{foo}()((-by-){criterion}).{_format}(.{ext}))'));
+
+        preg_match_all('#(?<!\\\\)\{.*?(?<!\\\\)\}|(?<!\\\\)\((?:[^()]++|((?<=\\\\)[()])++|(?R))*(?<!\\\\)\)#', '/prefix/{}{prod\}uct}(sad\)(f)((-by-{criterion}).{_format}(:{method}))', $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        var_dump($matches);
+
+        preg_match_all('#\{\w+\}#', '/prefix/{product}((-by-{criterion}).{_format})', $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        //var_dump($matches);
+
+        preg_match_all('#(.*?)\{(\w+)\}#', '/prefix/{product}((-by-{criterion}).{_format})', $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        //var_dump($matches);
+
+        preg_match_all('#(.*?)(\{(\w+)\}|\(((?>[^()]+)|(?R))*\))#', '/prefix/{product}((-by-{criterion}).{_format})', $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        //var_dump($matches);
+
+        preg_match_all('#\((?R)\)|\{(\w+)\}#', '/prefix/{product}((-by-{criterion}).{_format})', $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        //var_dump($matches);
+
+        preg_match_all('#\((.*)\)|\{(\w+)\}#', '/prefix/{product}(wrong)-{foo}()((-by-{criterion}).{_format})', $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        //var_dump($matches);
+
+        /*
+        var_dump(preg_match('#^/(?P<product>[^/\-\.]++)(?:(?:\-by\-(?P<criterion>[^/\.]++))?\.(?P<_format>[^/]++))?a$#s', '/prod-by-prize.htmla', $matches));
+        var_dump($matches);
+
+        var_dump(preg_match('#^/(?P<product>[^/\-\.]++)(?:(?:\-by\-(?P<criterion>[^/\.]++))?\.(?P<_format>[^/]++))?$#s', '/prod-by-prize', $matches));
+        var_dump($matches);
+
+        var_dump(preg_match('#^/(?P<product>[^/\-\.]++)(?:(?:\-by\-(?P<criterion>[^/\.]++))?\.(?P<_format>[^/]++))?$#s', '/prod.html', $matches));
+        var_dump($matches);
+
+        var_dump(preg_match('#^/(?P<product>[^/\-\.]++)(?:(?:\-by\-(?P<criterion>[^/\.]++))?\.(?P<_format>[^/]++))?$#s', '/prod', $matches));
+        var_dump($matches);
+        */
     }
 
     public function testPattern()

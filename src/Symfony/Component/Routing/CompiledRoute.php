@@ -18,6 +18,21 @@ namespace Symfony\Component\Routing;
  */
 class CompiledRoute
 {
+    /**
+     * A token representing static text in the pattern
+     */
+    const TEXT_TOKEN = 'text';
+
+    /**
+     * A token representing a variable placeholder in the pattern
+     */
+    const VARIABLE_TOKEN = 'variable';
+
+    /**
+     * An token representing an optional part that can itself have text/variable/optional tokens
+     */
+    const OPTIONAL_TOKEN = 'optional';
+
     private $variables;
     private $tokens;
     private $staticPrefix;

@@ -79,6 +79,8 @@ CHANGELOG
    pass the requirements (otherwise it would break your link anyway).
  * There is no restriction on the route name anymore. So non-alphanumeric characters
    are now also allowed.
+ * [BC BREAK] `RouteCompilerInterface::compile(Route $route)` was made static
+   (only relevant if you implemented your own RouteCompiler).
 
 2.1.0
 -----

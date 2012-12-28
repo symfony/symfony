@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormEvent;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -33,7 +34,9 @@ class DataEvent extends Event
      */
     public function __construct(FormInterface $form, $data)
     {
-        trigger_error('DataEvent is deprecated since version 2.1 and will be removed in 2.3. Code against \Symfony\Component\Form\FormEvent instead.', E_USER_DEPRECATED);
+        if (!$this instanceof FormEvent) {
+            trigger_error(sprintf('%s is deprecated since version 2.1 and will be removed in 2.3. Code against \Symfony\Component\Form\FormEvent instead.', get_class($this)), E_USER_DEPRECATED);
+        }
 
         $this->form = $form;
         $this->data = $data;

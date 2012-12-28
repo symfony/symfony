@@ -531,8 +531,38 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         }
 
         $container = new ContainerBuilder();
+        $container->setDefinition('a', new Definition('stdClass'));
         $container->compile();
         $container->set('a', new \stdClass());
+    }
+
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testThrowsExceptionWhenAddServiceOnAFrozenContainer()
+    {
+        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
+            $this->markTestSkipped('The "Config" component is not available');
+        }
+
+        $container = new ContainerBuilder();
+        $container->compile();
+        $container->set('a', new \stdClass());
+    }
+
+    public function testNoExceptionWhenSetSyntheticServiceOnAFrozenContainer()
+    {
+        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
+            $this->markTestSkipped('The "Config" component is not available');
+        }
+
+        $container = new ContainerBuilder();
+        $def = new Definition('stdClass');
+        $def->setSynthetic(true);
+        $container->setDefinition('a', $def);
+        $container->compile();
+        $container->set('a', $a = new \stdClass());
+        $this->assertEquals($a, $container->get('a'));
     }
 
     /**

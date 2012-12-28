@@ -63,6 +63,31 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private $compiler;
 
+    private $trackResources = true;
+
+    /**
+     * Sets the track resources flag.
+     *
+     * If you are not using the loaders and therefore don't want
+     * to depend on the Config component, set this flag to false.
+     *
+     * @param Boolean $track true if you want to track resources, false otherwise
+     */
+    public function setResourceTracking($track)
+    {
+        $this->trackResources = (Boolean) $track;
+    }
+
+    /**
+     * Checks if resources are tracked.
+     *
+     * @return Boolean true if resources are tracked, false otherwise
+     */
+    public function isTrackingResources()
+    {
+        return $this->trackResources;
+    }
+
     /**
      * Registers an extension.
      *
@@ -152,6 +177,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function addResource(ResourceInterface $resource)
     {
+        if (!$this->trackResources) {
+            return $this;
+        }
+
         $this->resources[] = $resource;
 
         return $this;
@@ -168,6 +197,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function setResources(array $resources)
     {
+        if (!$this->trackResources) {
+            return $this;
+        }
+
         $this->resources = $resources;
 
         return $this;
@@ -184,6 +217,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function addObjectResource($object)
     {
+        if (!$this->trackResources) {
+            return $this;
+        }
+
         $parent = new \ReflectionObject($object);
         do {
             $this->addResource(new FileResource($parent->getFileName()));
@@ -434,8 +471,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $this->addAliases($container->getAliases());
         $this->getParameterBag()->add($container->getParameterBag()->all());
 
-        foreach ($container->getResources() as $resource) {
-            $this->addResource($resource);
+        if ($this->trackResources) {
+            foreach ($container->getResources() as $resource) {
+                $this->addResource($resource);
+            }
         }
 
         foreach ($this->extensions as $name => $extension) {
@@ -502,8 +541,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $this->compiler = new Compiler();
         }
 
-        foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
-            $this->addObjectResource($pass);
+        if ($this->trackResources) {
+            foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
+                $this->addObjectResource($pass);
+            }
         }
 
         $this->compiler->compile($this);

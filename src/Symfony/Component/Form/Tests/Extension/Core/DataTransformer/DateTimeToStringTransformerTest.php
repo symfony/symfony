@@ -111,11 +111,11 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
      */
     public function testReverseTransformUsingPipe($format, $input, $output)
     {
-        if (version_compare(phpversion(), '5.3.7', '>=')) {
+        if (version_compare(phpversion(), '5.3.7', '<')) {
             $this->markTestSkipped('Pipe usage requires PHP 5.3.7 or newer.');
         }
 
-        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format, false);
+        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format, true);
 
         $output = new \DateTime($output);
 

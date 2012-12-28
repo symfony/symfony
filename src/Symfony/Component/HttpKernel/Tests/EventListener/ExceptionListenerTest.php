@@ -111,7 +111,6 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
             array($event, $event2)
         );
     }
-
 }
 
 class TestLogger extends Logger implements DebugLoggerInterface

@@ -906,7 +906,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
         if (!self::isValidName($name)) {
             throw new \InvalidArgumentException(sprintf(
-                'The name "%s" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
+                'The name "%s" contains illegal characters. Names should not contain spaces, brackets and periods.',
                 $name
             ));
         }
@@ -918,9 +918,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * A name is accepted if it
      *
      *   * is empty
-     *   * starts with a letter, digit or underscore
-     *   * contains only letters, digits, numbers, underscores ("_"),
-     *     hyphens ("-") and colons (":")
+     *   * is null
+     *   * does not contain spaces, brackets and periods
      *
      * @param string $name The tested form name.
      *
@@ -928,6 +927,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public static function isValidName($name)
     {
-        return '' === $name || null === $name || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
+        return '' === $name || null === $name || preg_match('/^[^\s\[\]\.]*$/D', $name);
     }
 }

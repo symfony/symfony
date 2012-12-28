@@ -98,6 +98,10 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadImports()
     {
+        if (!class_exists('Symfony\Component\Yaml\Yaml')) {
+            $this->markTestSkipped('The "Yaml" component is not available');
+        }
+
         $container = new ContainerBuilder();
         $resolver = new LoaderResolver(array(
             new IniFileLoader($container, new FileLocator(self::$fixturesPath.'/xml')),

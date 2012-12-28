@@ -76,7 +76,7 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseNode(RouteCollection $collection, \DOMElement $node, $path, $file)
     {
-        if (static::NAMESPACE_URI !== $node->namespaceURI) {
+        if (self::NAMESPACE_URI !== $node->namespaceURI) {
             return;
         }
 
@@ -192,7 +192,7 @@ class XmlFileLoader extends FileLoader
         $requirements = array();
         $options = array();
 
-        foreach ($node->getElementsByTagNameNS(static::NAMESPACE_URI, '*') as $n) {
+        foreach ($node->getElementsByTagNameNS(self::NAMESPACE_URI, '*') as $n) {
             switch ($n->localName) {
                 case 'default':
                     $defaults[$n->getAttribute('key')] = trim($n->textContent);

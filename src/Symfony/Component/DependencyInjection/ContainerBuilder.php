@@ -311,7 +311,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
         if ($this->isFrozen()) {
-            throw new BadMethodCallException('Setting service on a frozen container is not allowed');
+            // setting a synthetic service on a frozen container is alright
+            if (!isset($this->definitions[$id]) || !$this->definitions[$id]->isSynthetic()) {
+                throw new BadMethodCallException('Setting service on a frozen container is not allowed');
+            }
         }
 
         $id = strtolower($id);

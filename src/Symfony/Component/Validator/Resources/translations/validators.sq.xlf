@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37">
                 <source>This is not a valid IP address.</source>
-                <target>Kjo vlerë nuk është IP adresë e vlefshme.</ësh>
+                <target>Kjo vlerë nuk është IP adresë e vlefshme.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>

@@ -28,22 +28,33 @@ class StringUtils
      *
      * This method implements a constant-time algorithm to compare strings.
      *
-     * @param string $str1 The first string
-     * @param string $str2 The second string
+     * @param string $knownString The string of known length to compare against
+     * @param string $userInput   The string that the user can control
      *
      * @return Boolean true if the two strings are the same, false otherwise
      */
-    public static function equals($str1, $str2)
+    public static function equals($knownString, $userInput)
     {
-        if (strlen($str1) !== $c = strlen($str2)) {
-            return false;
+        // Prevent issues if string length is 0
+        $knownString .= chr(0);
+        $userInput .= chr(0);
+
+        $knownLen = strlen($knownString);
+        $userLen = strlen($userInput);
+
+        // Set the result to the difference between the lengths
+        $result = $knownLen - $userLen;
+
+        // Note that we ALWAYS iterate over the user-supplied length
+        // This is to prevent leaking length information
+        for ($i = 0; $i < $userLen; $i++) {
+            // Using % here is a trick to prevent notices
+            // It's safe, since if the lengths are different
+            // $result is already non-0
+            $result |= (ord($knownString[$i % $knownLen]) ^ ord($userInput[$i]));
         }
 
-        $result = 0;
-        for ($i = 0; $i < $c; $i++) {
-            $result |= ord($str1[$i]) ^ ord($str2[$i]);
-        }
-
-        return 0 === $result;
+        // They are only identical strings if $result is exactly 0...
+        return $result === 0;
     }
 }

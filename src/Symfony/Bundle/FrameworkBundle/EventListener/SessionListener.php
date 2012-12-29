@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
- * Sets the session on the request.
+ * Sets the session in the request.
  *
  * This will also start the session if it was already started during a previous
  * request.

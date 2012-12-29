@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+
 /**
  * ChoiceValidator validates that the value is one of the expected values.
  *
@@ -19,15 +24,60 @@ namespace Symfony\Component\Validator\Constraints;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
- *
- * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
- *             {@link OneOfValidator} instead.
  */
-class ChoiceValidator extends OneOfValidator
+class ChoiceValidator extends ConstraintValidator
 {
-    public function __construct($options = null)
+    /**
+     * {@inheritDoc}
+     */
+    public function validate($value, Constraint $constraint)
     {
-        trigger_error('ChoiceValidator is deprecated since version 2.2 and will be removed in 2.3. Use OneOfValidator instead', E_USER_DEPRECATED);
-        parent::__construct($options);
+        if (!$constraint->choices && !$constraint->callback) {
+            throw new ConstraintDefinitionException('Either "choices" or "callback" must be specified on constraint Choice');
+        }
+
+        if (null === $value) {
+            return;
+        }
+
+        if ($constraint->multiple && !is_array($value)) {
+            throw new UnexpectedTypeException($value, 'array');
+        }
+
+        if ($constraint->callback) {
+            if (is_callable(array($this->context->getCurrentClass(), $constraint->callback))) {
+                $choices = call_user_func(array($this->context->getCurrentClass(), $constraint->callback));
+            } elseif (is_callable($constraint->callback)) {
+                $choices = call_user_func($constraint->callback);
+            } else {
+                throw new ConstraintDefinitionException('The Choice constraint expects a valid callback');
+            }
+        } else {
+            $choices = $constraint->choices;
+        }
+
+        if ($constraint->multiple) {
+            foreach ($value as $_value) {
+                if (!in_array($_value, $choices, $constraint->strict)) {
+                    $this->context->addViolation($constraint->multipleMessage, array('{{ value }}' => $_value));
+                }
+            }
+
+            $count = count($value);
+
+            if ($constraint->min !== null && $count < $constraint->min) {
+                $this->context->addViolation($constraint->minMessage, array('{{ limit }}' => $constraint->min), null, (int) $constraint->min);
+
+                return;
+            }
+
+            if ($constraint->max !== null && $count > $constraint->max) {
+                $this->context->addViolation($constraint->maxMessage, array('{{ limit }}' => $constraint->max), null, (int) $constraint->max);
+
+                return;
+            }
+        } elseif (!in_array($value, $choices, $constraint->strict)) {
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+        }
     }
 }

@@ -12,15 +12,15 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\ExecutionContext;
-use Symfony\Component\Validator\Constraints\OneOf;
-use Symfony\Component\Validator\Constraints\OneOfValidator;
+use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\ChoiceValidator;
 
-function oneof_callback()
+function choice_callback()
 {
     return array('foo', 'bar');
 }
 
-class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
+class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $context;
     protected $validator;
@@ -33,7 +33,7 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new OneOfValidator();
+        $this->validator = new ChoiceValidator();
         $this->validator->initialize($this->context);
 
         $this->context->expects($this->any())
@@ -52,7 +52,7 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testExpectArrayIfMultipleIsTrue()
     {
-        $constraint = new OneOf(array(
+        $constraint = new Choice(array(
             'choices' => array('foo', 'bar'),
             'multiple' => true,
         ));
@@ -65,7 +65,7 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $this->validator->validate(null, new OneOf(array('choices' => array('foo', 'bar'))));
+        $this->validator->validate(null, new Choice(array('choices' => array('foo', 'bar'))));
     }
 
     /**
@@ -73,7 +73,7 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testChoicesOrCallbackExpected()
     {
-        $this->validator->validate('foobar', new OneOf());
+        $this->validator->validate('foobar', new Choice());
     }
 
     /**
@@ -81,12 +81,12 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidCallbackExpected()
     {
-        $this->validator->validate('foobar', new OneOf(array('callback' => 'abcd')));
+        $this->validator->validate('foobar', new Choice(array('callback' => 'abcd')));
     }
 
-    public function testValidOneOfChoicesArray()
+    public function testValidChoiceArray()
     {
-        $constraint = new OneOf(array('choices' => array('foo', 'bar')));
+        $constraint = new Choice(array('choices' => array('foo', 'bar')));
 
         $this->context->expects($this->never())
             ->method('addViolation');
@@ -94,9 +94,9 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate('bar', $constraint);
     }
 
-    public function testValidOneOfCallbackFunction()
+    public function testValidChoiceCallbackFunction()
     {
-        $constraint = new OneOf(array('callback' => __NAMESPACE__.'\oneof_callback'));
+        $constraint = new Choice(array('callback' => __NAMESPACE__.'\choice_callback'));
 
         $this->context->expects($this->never())
             ->method('addViolation');
@@ -104,9 +104,9 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate('bar', $constraint);
     }
 
-    public function testValidOneOfCallbackClosure()
+    public function testValidChoiceCallbackClosure()
     {
-        $constraint = new OneOf(array('callback' => function() {
+        $constraint = new Choice(array('callback' => function() {
             return array('foo', 'bar');
         }));
 
@@ -116,9 +116,9 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate('bar', $constraint);
     }
 
-    public function testValidOneOfCallbackStaticMethod()
+    public function testValidChoiceCallbackStaticMethod()
     {
-        $constraint = new OneOf(array('callback' => array(__CLASS__, 'staticCallback')));
+        $constraint = new Choice(array('callback' => array(__CLASS__, 'staticCallback')));
 
         $this->context->expects($this->never())
             ->method('addViolation');
@@ -126,9 +126,9 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate('bar', $constraint);
     }
 
-    public function testValidOneOfCallbackContextMethod()
+    public function testValidChoiceCallbackContextMethod()
     {
-        $constraint = new OneOf(array('callback' => 'staticCallback'));
+        $constraint = new Choice(array('callback' => 'staticCallback'));
 
         $this->context->expects($this->never())
             ->method('addViolation');
@@ -136,9 +136,9 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate('bar', $constraint);
     }
 
-    public function testMultipleOneOfChoices()
+    public function testMultipleChoices()
     {
-        $constraint = new OneOf(array(
+        $constraint = new Choice(array(
             'choices' => array('foo', 'bar', 'baz'),
             'multiple' => true,
         ));
@@ -149,9 +149,9 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate(array('baz', 'bar'), $constraint);
     }
 
-    public function testInvalidOneOf()
+    public function testInvalidChoice()
     {
-        $constraint = new OneOf(array(
+        $constraint = new Choice(array(
             'choices' => array('foo', 'bar'),
             'message' => 'myMessage',
         ));
@@ -165,9 +165,9 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate('baz', $constraint);
     }
 
-    public function testInvalidOneOfMultiple()
+    public function testInvalidChoiceMultiple()
     {
-        $constraint = new OneOf(array(
+        $constraint = new Choice(array(
             'choices' => array('foo', 'bar'),
             'multipleMessage' => 'myMessage',
             'multiple' => true,
@@ -182,9 +182,9 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate(array('foo', 'baz'), $constraint);
     }
 
-    public function testTooFewOneOfChoices()
+    public function testTooFewChoices()
     {
-        $constraint = new OneOf(array(
+        $constraint = new Choice(array(
             'choices' => array('foo', 'bar', 'moo', 'maa'),
             'multiple' => true,
             'min' => 2,
@@ -200,9 +200,9 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate(array('foo'), $constraint);
     }
 
-    public function testTooManyOneOfChoices()
+    public function testTooManyChoices()
     {
-        $constraint = new OneOf(array(
+        $constraint = new Choice(array(
             'choices' => array('foo', 'bar', 'moo', 'maa'),
             'multiple' => true,
             'max' => 2,
@@ -220,7 +220,7 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testNonStrict()
     {
-        $constraint = new OneOf(array(
+        $constraint = new Choice(array(
             'choices' => array(1, 2),
             'strict' => false,
         ));
@@ -234,7 +234,7 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testStrictAllowsExactValue()
     {
-        $constraint = new OneOf(array(
+        $constraint = new Choice(array(
             'choices' => array(1, 2),
             'strict' => true,
         ));
@@ -247,7 +247,7 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testStrictDisallowsDifferentType()
     {
-        $constraint = new OneOf(array(
+        $constraint = new Choice(array(
             'choices' => array(1, 2),
             'strict' => true,
             'message' => 'myMessage'
@@ -262,9 +262,9 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate('2', $constraint);
     }
 
-    public function testNonStrictOneOfWithMultipleChoices()
+    public function testNonStrictWithMultipleChoices()
     {
-        $constraint = new OneOf(array(
+        $constraint = new Choice(array(
             'choices' => array(1, 2, 3),
             'multiple' => true,
             'strict' => false
@@ -276,9 +276,9 @@ class OneOfValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate(array('2', 3), $constraint);
     }
 
-    public function testStrictOneOfWithMultipleChoices()
+    public function testStrictWithMultipleChoices()
     {
-        $constraint = new OneOf(array(
+        $constraint = new Choice(array(
             'choices' => array(1, 2, 3),
             'multiple' => true,
             'strict' => true,

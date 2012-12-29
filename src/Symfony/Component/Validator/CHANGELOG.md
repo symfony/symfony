@@ -28,7 +28,6 @@ CHANGELOG
    As of Symfony 2.3, this method will be typed against `MetadataFactoryInterface` instead.
  * [BC BREAK] the switches `traverse` and `deep` in the `Valid` constraint and in `GraphWalker::walkReference`
    are ignored for arrays now. Arrays are always traversed recursively.
- * deprecated `Choice` constraint in favor of the new `OneOf` constraint.
 
 2.1.0
 -----

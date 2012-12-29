@@ -30,10 +30,10 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class Request
 {
-    const HEADER_CLIENT_IP = 'client_ip';
-    const HEADER_CLIENT_HOST = 'client_host';
+    const HEADER_CLIENT_IP    = 'client_ip';
+    const HEADER_CLIENT_HOST  = 'client_host';
     const HEADER_CLIENT_PROTO = 'client_proto';
-    const HEADER_CLIENT_PORT = 'client_port';
+    const HEADER_CLIENT_PORT  = 'client_port';
 
     protected static $trustProxy = false;
 

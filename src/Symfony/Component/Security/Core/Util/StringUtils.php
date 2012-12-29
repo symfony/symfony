@@ -55,6 +55,6 @@ class StringUtils
         }
 
         // They are only identical strings if $result is exactly 0...
-        return $result === 0;
+        return 0 === $result;
     }
 }

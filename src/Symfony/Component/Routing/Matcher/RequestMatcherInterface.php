@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface RequestMatcherInterface
+interface RequestMatcherInterface extends MatcherInterface
 {
     /**
      * Tries to match a request with a set of routes.

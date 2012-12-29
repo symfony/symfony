@@ -34,6 +34,15 @@ class ProfilerController
     private $templates;
     private $toolbarPosition;
 
+    /**
+     * Constructor.
+     *
+     * @param UrlGeneratorInterface $generator       The Url Generator
+     * @param Profiler              $profiler        The profiler
+     * @param \Twig_Environment     $twig            The twig environment
+     * @param array                 $templates       The templates
+     * @param string                $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
+     */
     public function __construct(UrlGeneratorInterface $generator, Profiler $profiler, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal')
     {
         $this->generator = $generator;
@@ -46,10 +55,12 @@ class ProfilerController
     /**
      * Renders a profiler panel for the given token.
      *
-     * @param Request $request The HTTP request
+     * @param Request $request The current HTTP request
      * @param string  $token   The profiler token
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function panelAction(Request $request, $token)
     {
@@ -75,8 +86,6 @@ class ProfilerController
             'request'   => $request,
             'templates' => $this->getTemplateManager()->getTemplates($profile),
             'is_ajax'   => $request->isXmlHttpRequest(),
-            // for BC compatibility
-            'app'       => array('request' => $request),
         )));
     }
 
@@ -86,6 +95,8 @@ class ProfilerController
      * @param string $token The profiler token
      *
      * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
      */
     public function exportAction($token)
     {
@@ -117,6 +128,8 @@ class ProfilerController
     /**
      * Imports token data.
      *
+     * @param Request $request The current HTTP Request
+     *
      * @return Response A Response instance
      */
     public function importAction(Request $request)
@@ -126,7 +139,7 @@ class ProfilerController
         $file = $request->files->get('file');
 
         if (empty($file) || !$file->isValid()) {
-            return new RedirectResponse($router->generate('_profiler_info', array('about' => 'upload_error')));
+            return new RedirectResponse($this->generator->generate('_profiler_info', array('about' => 'upload_error')));
         }
 
         if (!$profile = $this->profiler->import(file_get_contents($file->getPathname()))) {
@@ -139,7 +152,7 @@ class ProfilerController
     /**
      * Displays information page.
      *
-     * @param string $about
+     * @param string $about The about message
      *
      * @return Response A Response instance
      */
@@ -155,13 +168,12 @@ class ProfilerController
     /**
      * Renders the Web Debug Toolbar.
      *
-     * @param Request $request  The current Request
+     * @param Request $request  The current HTTP Request
      * @param string  $token    The profiler token
-     * @param string  $position The toolbar position (top, bottom, normal, or null -- use the configuration)
      *
      * @return Response A Response instance
      */
-    public function toolbarAction(Request $request, $token, $position = null)
+    public function toolbarAction(Request $request, $token)
     {
         $session = $request->getSession();
 
@@ -180,7 +192,8 @@ class ProfilerController
             return new Response();
         }
 
-        if (null === $position) {
+        // the toolbar position (top, bottom, normal, or null -- use the configuration)
+        if (null === $position = $request->query->get('position')) {
             $position = $this->toolbarPosition;
         }
 
@@ -203,7 +216,7 @@ class ProfilerController
     /**
      * Renders the profiler search bar.
      *
-     * @param Request $request  The current Request
+     * @param Request $request The current HTTP Request
      *
      * @return Response A Response instance
      */
@@ -215,12 +228,16 @@ class ProfilerController
             $ip     =
             $method =
             $url    =
+            $start  =
+            $end    =
             $limit  =
             $token  = null;
         } else {
             $ip     = $session->get('_profiler_search_ip');
             $method = $session->get('_profiler_search_method');
             $url    = $session->get('_profiler_search_url');
+            $start  = $session->get('_profiler_search_start');
+            $end    = $session->get('_profiler_search_end');
             $limit  = $session->get('_profiler_search_limit');
             $token  = $session->get('_profiler_search_token');
         }
@@ -230,6 +247,8 @@ class ProfilerController
             'ip'     => $ip,
             'method' => $method,
             'url'    => $url,
+            'start'  => $start,
+            'end'    => $end,
             'limit'  => $limit,
         )));
     }
@@ -237,8 +256,8 @@ class ProfilerController
     /**
      * Search results.
      *
-     * @param Request $request  The current Request
-     * @param string  $token    The token
+     * @param Request $request The current HTTP Request
+     * @param string  $token   The token
      *
      * @return Response A Response instance
      */
@@ -251,24 +270,28 @@ class ProfilerController
         $ip     = $request->query->get('ip');
         $method = $request->query->get('method');
         $url    = $request->query->get('url');
+        $start  = $request->query->get('start', null);
+        $end    = $request->query->get('end', null);
         $limit  = $request->query->get('limit');
 
         return new Response($this->twig->render('@WebProfiler/Profiler/results.html.twig', array(
-            'token'    => $token,
-            'profile'  => $profile,
-            'tokens'   => $this->profiler->find($ip, $url, $limit, $method),
-            'ip'       => $ip,
-            'method'   => $method,
-            'url'      => $url,
-            'limit'    => $limit,
-            'panel'    => null,
+            'token'     => $token,
+            'profile'   => $profile,
+            'tokens'    => $this->profiler->find($ip, $url, $limit, $method, $start, $end),
+            'ip'        => $ip,
+            'method'    => $method,
+            'url'       => $url,
+            'start'     => $start,
+            'end'       => $end,
+            'limit'     => $limit,
+            'panel'     => null,
         )));
     }
 
     /**
      * Narrow the search bar.
      *
-     * @param Request $request  The current Request
+     * @param Request $request The current HTTP Request
      *
      * @return Response A Response instance
      */
@@ -279,6 +302,8 @@ class ProfilerController
         $ip     = preg_replace('/[^:\d\.]/', '', $request->query->get('ip'));
         $method = $request->query->get('method');
         $url    = $request->query->get('url');
+        $start  = $request->query->get('start', null);
+        $end    = $request->query->get('end', null);
         $limit  = $request->query->get('limit');
         $token  = $request->query->get('token');
 
@@ -286,6 +311,8 @@ class ProfilerController
             $session->set('_profiler_search_ip', $ip);
             $session->set('_profiler_search_method', $method);
             $session->set('_profiler_search_url', $url);
+            $session->set('_profiler_search_start', $start);
+            $session->set('_profiler_search_end', $end);
             $session->set('_profiler_search_limit', $limit);
             $session->set('_profiler_search_token', $token);
         }
@@ -294,13 +321,15 @@ class ProfilerController
             return new RedirectResponse($this->generator->generate('_profiler', array('token' => $token)));
         }
 
-        $tokens = $this->profiler->find($ip, $url, $limit, $method);
+        $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end);
 
         return new RedirectResponse($this->generator->generate('_profiler_search_results', array(
             'token'  => $tokens ? $tokens[0]['token'] : 'empty',
             'ip'     => $ip,
             'method' => $method,
             'url'    => $url,
+            'start'  => $start,
+            'end'    => $end,
             'limit'  => $limit,
         )));
     }
@@ -321,6 +350,11 @@ class ProfilerController
         return new Response($phpinfo);
     }
 
+    /**
+     * Gets the Template Manager.
+     *
+     * @return TemplateManager The Template Manager
+     */
     protected function getTemplateManager()
     {
         if (null === $this->templateManager) {

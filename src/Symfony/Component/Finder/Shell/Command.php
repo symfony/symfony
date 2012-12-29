@@ -176,6 +176,8 @@ class Command
      * @param string $label
      *
      * @return Command The labeled command
+     *
+     * @throws \RuntimeException
      */
     public function get($label)
     {
@@ -216,6 +218,8 @@ class Command
      * Executes current command.
      *
      * @return array The command result
+     *
+     * @throws \RuntimeException
      */
     public function execute()
     {
@@ -241,5 +245,19 @@ class Command
             }, $this->bits),
             function($bit) { return null !== $bit; }
         ));
+    }
+
+    /**
+     * Insert a string or a Command instance before the bit at given position $index (index starts from 0).
+     *
+     * @param string|Command $bit
+     *
+     * @return Command The current Command instance
+     */
+    public function addAtIndex($bit, $index)
+    {
+        array_splice($this->bits, $index, 0, $bit);
+
+        return $this;
     }
 }

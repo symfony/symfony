@@ -31,6 +31,7 @@ class Cookie
         'D, d-M-y H:i:s T',
         'D, d-M-Y H:i:s T',
         'D M j G:i:s Y',
+        'D M d H:i:s Y T',
     );
 
     protected $name;
@@ -114,6 +115,8 @@ class Cookie
      * @param string $url    The base URL
      *
      * @return Cookie A Cookie instance
+     *
+     * @throws \InvalidArgumentException
      *
      * @api
      */

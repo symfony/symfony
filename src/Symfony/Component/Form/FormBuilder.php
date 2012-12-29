@@ -23,13 +23,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormBuilderInterface
 {
     /**
-     * The form factory.
-     *
-     * @var FormFactoryInterface
-     */
-    private $factory;
-
-    /**
      * The children of the form builder.
      *
      * @var array
@@ -63,15 +56,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     {
         parent::__construct($name, $dataClass, $dispatcher, $options);
 
-        $this->factory = $factory;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormFactory()
-    {
-        return $this->factory;
+        $this->setFormFactory($factory);
     }
 
     /**
@@ -93,8 +78,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             return $this;
         }
 
-        if (!is_string($child)) {
-            throw new UnexpectedTypeException($child, 'string or Symfony\Component\Form\FormBuilder');
+        if (!is_string($child) && !is_int($child)) {
+            throw new UnexpectedTypeException($child, 'string, integer or Symfony\Component\Form\FormBuilder');
         }
 
         if (null !== $type && !is_string($type) && !$type instanceof FormTypeInterface) {
@@ -125,10 +110,10 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         }
 
         if (null !== $type) {
-            return $this->factory->createNamedBuilder($name, $type, null, $options, $this);
+            return $this->getFormFactory()->createNamedBuilder($name, $type, null, $options, $this);
         }
 
-        return $this->factory->createBuilderForProperty($this->getDataClass(), $name, null, $options, $this);
+        return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, null, $options, $this);
     }
 
     /**
@@ -288,13 +273,15 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * Returns the types used by this builder.
      *
-     * @return array An array of FormTypeInterface
+     * @return FormTypeInterface[] An array of FormTypeInterface
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link FormConfigInterface::getType()} instead.
      */
     public function getTypes()
     {
+        trigger_error('getTypes() is deprecated since version 2.1 and will be removed in 2.3. Use getConfig() and FormConfigInterface::getType() instead.', E_USER_DEPRECATED);
+
         $types = array();
 
         for ($type = $this->getType(); null !== $type; $type = $type->getParent()) {

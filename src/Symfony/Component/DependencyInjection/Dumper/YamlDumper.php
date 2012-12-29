@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\Yaml\Dumper as YmlDumper;
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -121,7 +120,7 @@ class YamlDumper extends Dumper
 
         if ($callable = $definition->getConfigurator()) {
             if (is_array($callable)) {
-                if (is_object($callable[0]) && $callable[0] instanceof Reference) {
+                if ($callable[0] instanceof Reference) {
                     $callable = array($this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]);
                 } else {
                     $callable = array($callable[0], $callable[1]);
@@ -212,9 +211,9 @@ class YamlDumper extends Dumper
             }
 
             return $code;
-        } elseif (is_object($value) && $value instanceof Reference) {
+        } elseif ($value instanceof Reference) {
             return $this->getServiceCall((string) $value, $value);
-        } elseif (is_object($value) && $value instanceof Parameter) {
+        } elseif ($value instanceof Parameter) {
             return $this->getParameterCall((string) $value);
         } elseif (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');

@@ -21,13 +21,6 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 {
     protected static $fixturesPath;
 
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\Loader\Loader')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
-
     public static function setUpBeforeClass()
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
@@ -47,6 +40,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     public function testDumpFrozenContainerWithNoParameter()
     {
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
         $container->register('foo', 'stdClass');
 
         $container->compile();
@@ -76,6 +70,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         ));
 
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
         $container->setDefinition('test', $definition);
         $container->setParameter('empty_value', '');
         $container->setParameter('some_string', '-');

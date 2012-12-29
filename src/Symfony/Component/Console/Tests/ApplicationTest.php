@@ -33,6 +33,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/Foo1Command.php';
         require_once self::$fixturesPath.'/Foo2Command.php';
         require_once self::$fixturesPath.'/Foo3Command.php';
+        require_once self::$fixturesPath.'/Foo4Command.php';
     }
 
     protected function normalizeLineBreaks($text)
@@ -241,7 +242,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             $this->assertRegExp('/Did you mean this/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
         }
 
-
         $application->add(new \Foo1Command());
         $application->add(new \Foo2Command());
 
@@ -261,6 +261,19 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
             $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with alternatives');
+        }
+
+        $application->add(new \Foo3Command());
+        $application->add(new \Foo4Command());
+
+        // Subnamespace + plural
+        try {
+            $a = $application->find('foo3:');
+            $this->fail('->find() should throw an \InvalidArgumentException if a command is ambiguous because of a subnamespace, with alternatives');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e);
+            $this->assertRegExp('/foo3:bar/', $e->getMessage());
+            $this->assertRegExp('/foo3:bar:toh/', $e->getMessage());
         }
     }
 
@@ -584,7 +597,31 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $inputDefinition = $application->getDefinition();
 
-        // check wether the default arguments and options are not returned any more
+        // check whether the default arguments and options are not returned any more
+        $this->assertFalse($inputDefinition->hasArgument('command'));
+
+        $this->assertFalse($inputDefinition->hasOption('help'));
+        $this->assertFalse($inputDefinition->hasOption('quiet'));
+        $this->assertFalse($inputDefinition->hasOption('verbose'));
+        $this->assertFalse($inputDefinition->hasOption('version'));
+        $this->assertFalse($inputDefinition->hasOption('ansi'));
+        $this->assertFalse($inputDefinition->hasOption('no-ansi'));
+        $this->assertFalse($inputDefinition->hasOption('no-interaction'));
+
+        $this->assertTrue($inputDefinition->hasOption('custom'));
+    }
+
+    public function testSettingCustomInputDefinitionOverwritesDefaultValues()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        $application->setDefinition(new InputDefinition(array(new InputOption('--custom', '-c', InputOption::VALUE_NONE, 'Set the custom input definition.'))));
+
+        $inputDefinition = $application->getDefinition();
+
+        // check whether the default arguments and options are not returned any more
         $this->assertFalse($inputDefinition->hasArgument('command'));
 
         $this->assertFalse($inputDefinition->hasOption('help'));

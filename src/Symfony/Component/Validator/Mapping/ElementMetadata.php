@@ -15,7 +15,14 @@ use Symfony\Component\Validator\Constraint;
 
 abstract class ElementMetadata
 {
+    /**
+     * @var Constraint[]
+     */
     public $constraints = array();
+
+    /**
+     * @var array
+     */
     public $constraintsByGroup = array();
 
     /**
@@ -50,6 +57,8 @@ abstract class ElementMetadata
      * Adds a constraint to this element.
      *
      * @param Constraint $constraint
+     *
+     * @return ElementMetadata
      */
     public function addConstraint(Constraint $constraint)
     {
@@ -65,7 +74,7 @@ abstract class ElementMetadata
     /**
      * Returns all constraints of this element.
      *
-     * @return array  An array of Constraint instances
+     * @return Constraint[] An array of Constraint instances
      */
     public function getConstraints()
     {

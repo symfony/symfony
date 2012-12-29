@@ -31,6 +31,24 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $dates       = array();
     protected $filters     = array();
     protected $sort        = false;
+    protected $paths       = array();
+    protected $notPaths    = array();
+
+    private static $areSupported = array();
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isSupported()
+    {
+        $name = $this->getName();
+
+        if (!array_key_exists($name, self::$areSupported)) {
+            self::$areSupported[$name] = $this->canBeUsed();
+        }
+
+        return self::$areSupported[$name];
+    }
 
     /**
      * {@inheritdoc}
@@ -40,7 +58,7 @@ abstract class AbstractAdapter implements AdapterInterface
         $this->followLinks = $followLinks;
 
         return $this;
-     }
+    }
 
     /**
      * {@inheritdoc}
@@ -50,7 +68,7 @@ abstract class AbstractAdapter implements AdapterInterface
         $this->mode = $mode;
 
         return $this;
-     }
+    }
 
     /**
      * {@inheritdoc}
@@ -80,7 +98,7 @@ abstract class AbstractAdapter implements AdapterInterface
         }
 
         return $this;
-     }
+    }
 
     /**
      * {@inheritdoc}
@@ -90,7 +108,7 @@ abstract class AbstractAdapter implements AdapterInterface
         $this->exclude = $exclude;
 
         return $this;
-     }
+    }
 
     /**
      * {@inheritdoc}
@@ -100,7 +118,7 @@ abstract class AbstractAdapter implements AdapterInterface
         $this->names = $names;
 
         return $this;
-     }
+    }
 
     /**
      * {@inheritdoc}
@@ -110,7 +128,7 @@ abstract class AbstractAdapter implements AdapterInterface
         $this->notNames = $notNames;
 
         return $this;
-     }
+    }
 
     /**
      * {@inheritdoc}
@@ -120,7 +138,7 @@ abstract class AbstractAdapter implements AdapterInterface
         $this->contains = $contains;
 
         return $this;
-     }
+    }
 
     /**
      * {@inheritdoc}
@@ -130,7 +148,7 @@ abstract class AbstractAdapter implements AdapterInterface
         $this->notContains = $notContains;
 
         return $this;
-     }
+    }
 
     /**
      * {@inheritdoc}
@@ -140,7 +158,7 @@ abstract class AbstractAdapter implements AdapterInterface
         $this->sizes = $sizes;
 
         return $this;
-     }
+    }
 
     /**
      * {@inheritdoc}
@@ -150,7 +168,7 @@ abstract class AbstractAdapter implements AdapterInterface
         $this->dates = $dates;
 
         return $this;
-     }
+    }
 
     /**
      * {@inheritdoc}
@@ -160,7 +178,7 @@ abstract class AbstractAdapter implements AdapterInterface
         $this->filters = $filters;
 
         return $this;
-     }
+    }
 
     /**
      * {@inheritdoc}
@@ -170,5 +188,38 @@ abstract class AbstractAdapter implements AdapterInterface
         $this->sort = $sort;
 
         return $this;
-     }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPath(array $paths)
+    {
+        $this->paths = $paths;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setNotPath(array $notPaths)
+    {
+        $this->notPaths = $notPaths;
+
+        return $this;
+    }
+
+    /**
+     * Returns whether the adapter is supported in the current environment.
+     *
+     * This method should be implemented in all adapters. Do not implement
+     * isSupported in the adapters as the generic implementation provides a cache
+     * layer.
+     *
+     * @see isSupported
+     *
+     * @return Boolean Whether the adapter is supported
+     */
+    abstract protected function canBeUsed();
 }

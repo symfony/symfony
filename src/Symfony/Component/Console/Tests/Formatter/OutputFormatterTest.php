@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Symfony\Component\Console\Tests\Formatter;
 
 use Symfony\Component\Console\Formatter\OutputFormatter;

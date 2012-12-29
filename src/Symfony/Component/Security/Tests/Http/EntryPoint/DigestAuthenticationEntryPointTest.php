@@ -34,7 +34,6 @@ class DigestAuthenticationEntryPointTest extends \PHPUnit_Framework_TestCase
         $response = $entryPoint->start($request, $authenticationException);
 
         $this->assertEquals(401, $response->getStatusCode());
-        $this->assertAttributeEquals('TheAuthenticationExceptionMessage', 'statusText', $response);
         $this->assertRegExp('/^Digest realm="TheRealmName", qop="auth", nonce="[a-zA-Z0-9\/+]+={0,2}"$/', $response->headers->get('WWW-Authenticate'));
     }
 
@@ -46,7 +45,6 @@ class DigestAuthenticationEntryPointTest extends \PHPUnit_Framework_TestCase
         $response = $entryPoint->start($request);
 
         $this->assertEquals(401, $response->getStatusCode());
-        $this->assertAttributeEquals('Unauthorized', 'statusText', $response);
         $this->assertRegExp('/^Digest realm="TheRealmName", qop="auth", nonce="[a-zA-Z0-9\/+]+={0,2}"$/', $response->headers->get('WWW-Authenticate'));
     }
 
@@ -60,7 +58,6 @@ class DigestAuthenticationEntryPointTest extends \PHPUnit_Framework_TestCase
         $response = $entryPoint->start($request, $nonceExpiredException);
 
         $this->assertEquals(401, $response->getStatusCode());
-        $this->assertAttributeEquals('TheNonceExpiredExceptionMessage', 'statusText', $response);
         $this->assertRegExp('/^Digest realm="TheRealmName", qop="auth", nonce="[a-zA-Z0-9\/+]+={0,2}", stale="true"$/', $response->headers->get('WWW-Authenticate'));
     }
 }

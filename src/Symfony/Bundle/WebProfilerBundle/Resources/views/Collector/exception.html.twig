@@ -1,7 +1,11 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block head %}
-    <link rel="stylesheet" href="{{ asset('bundles/framework/css/exception.css') }}" />
+    {% if collector.hasexception %}
+        <style type="text/css">
+            {{ render(path('_profiler_exception_css', { 'token': token })) }}
+        </style>
+    {% endif %}
     {{ parent() }}
 {% endblock %}
 
@@ -25,6 +29,8 @@
             <em>No exception was thrown and uncaught during the request.</em>
         </p>
     {% else %}
-        {% render 'WebProfilerBundle:Exception:show' with { 'exception': collector.exception, 'format': 'html' } %}
+        <div class="sf-reset">
+            {{ render(path('_profiler_exception', { 'token': token })) }}
+        </div>
     {% endif %}
 {% endblock %}

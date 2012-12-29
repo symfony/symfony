@@ -71,6 +71,8 @@ class Client extends BaseClient
      * Returns the script to execute when the request must be insulated.
      *
      * @param Request $request A Request instance
+     *
+     * @return string
      */
     protected function getScript($request)
     {
@@ -179,6 +181,11 @@ EOF;
             $headers['Set-Cookie'] = $cookies;
         }
 
-        return new DomResponse($response->getContent(), $response->getStatusCode(), $headers);
+        // this is needed to support StreamedResponse
+        ob_start();
+        $response->sendContent();
+        $content = ob_get_clean();
+
+        return new DomResponse($content, $response->getStatusCode(), $headers);
     }
 }

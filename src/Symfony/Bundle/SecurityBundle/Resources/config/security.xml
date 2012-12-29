@@ -106,7 +106,7 @@
 
         <!-- Firewall related services -->
         <service id="security.firewall" class="%security.firewall.class%">
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="8" />
+            <tag name="kernel.event_subscriber" />
             <argument type="service" id="security.firewall.map" />
             <argument type="service" id="event_dispatcher" />
         </service>
@@ -137,6 +137,13 @@
             <tag name="validator.constraint_validator" alias="security.validator.user_password" />
             <argument type="service" id="security.context" />
             <argument type="service" id="security.encoder_factory" />
+        </service>
+
+        <!-- Pseudorandom Number Generator -->
+        <service id="security.secure_random" class="Symfony\Component\Security\Core\Util\SecureRandom">
+            <tag name="monolog.logger" channel="security" />
+            <argument>%kernel.cache_dir%/secure_random.seed</argument>
+            <argument type="service" id="logger" on-invalid="ignore" />
         </service>
     </services>
 </container>

@@ -51,6 +51,8 @@ class Process
     private $pipes;
     private $process;
     private $status = self::STATUS_READY;
+    private $incrementalOutputOffset;
+    private $incrementalErrorOutputOffset;
 
     private $fileHandles;
     private $readBytes;
@@ -219,6 +221,8 @@ class Process
 
         $this->stdout = '';
         $this->stderr = '';
+        $this->incrementalOutputOffset = 0;
+        $this->incrementalErrorOutputOffset = 0;
         $callback = $this->buildCallback($callback);
 
         //Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
@@ -453,6 +457,24 @@ class Process
     }
 
     /**
+     * Returns the output incrementally.
+     *
+     * In comparison with the getOutput method which always return the whole
+     * output, this one returns the new output since the last call.
+     *
+     * @return string The process output since the last call
+     */
+    public function getIncrementalOutput()
+    {
+        $data = $this->getOutput();
+
+        $latest = substr($data, $this->incrementalOutputOffset);
+        $this->incrementalOutputOffset = strlen($data);
+
+        return $latest;
+    }
+
+    /**
      * Returns the current error output of the process (STDERR).
      *
      * @return string The process error output
@@ -464,6 +486,25 @@ class Process
         $this->updateErrorOutput();
 
         return $this->stderr;
+    }
+
+    /**
+     * Returns the errorOutput incrementally.
+     *
+     * In comparison with the getErrorOutput method which always return the
+     * whole error output, this one returns the new error output since the last
+     * call.
+     *
+     * @return string The process error output since the last call
+     */
+    public function getIncrementalErrorOutput()
+    {
+        $data = $this->getErrorOutput();
+
+        $latest = substr($data, $this->incrementalErrorOutputOffset);
+        $this->incrementalErrorOutputOffset = strlen($data);
+
+        return $latest;
     }
 
     /**
@@ -613,15 +654,51 @@ class Process
     }
 
     /**
+     * Checks if the process has been started with no regard to the current state.
+     *
+     * @return Boolean true if status is ready, false otherwise
+     */
+    public function isStarted()
+    {
+        return $this->status != self::STATUS_READY;
+    }
+
+    /**
+     * Checks if the process is terminated.
+     *
+     * @return Boolean true if process is terminated, false otherwise
+     */
+    public function isTerminated()
+    {
+        $this->updateStatus();
+
+        return $this->status == self::STATUS_TERMINATED;
+    }
+
+    /**
+     * Gets the process status.
+     *
+     * The status is one of: ready, started, terminated.
+     *
+     * @return string The current process status
+     */
+    public function getStatus()
+    {
+        $this->updateStatus();
+
+        return $this->status;
+    }
+
+    /**
      * Stops the process.
      *
-     * @param float $timeout The timeout in seconds
+     * @param integer $timeout The timeout in seconds
      *
-     * @return integer The exitcode of the process
+     * @return integer The exit-code of the process
      *
      * @throws RuntimeException if the process got signaled
      */
-    public function stop($timeout=10)
+    public function stop($timeout = 10)
     {
         $timeoutMicro = (int) $timeout*10E6;
         if ($this->isRunning()) {
@@ -715,7 +792,7 @@ class Process
      *
      * @return self The current Process instance
      *
-     * @throws \InvalidArgumentException if the timeout is negative
+     * @throws InvalidArgumentException if the timeout is negative
      */
     public function setTimeout($timeout)
     {

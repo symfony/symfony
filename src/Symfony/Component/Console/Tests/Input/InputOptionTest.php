@@ -154,7 +154,7 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
             $this->fail('->setDefault() throws a \LogicException if you give a default value for a VALUE_NONE option');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\LogicException', $e, '->setDefault() throws a \LogicException if you give a default value for a VALUE_NONE option');
-            $this->assertEquals('Cannot set a default value when using Option::VALUE_NONE mode.', $e->getMessage());
+            $this->assertEquals('Cannot set a default value when using InputOption::VALUE_NONE mode.', $e->getMessage());
         }
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);

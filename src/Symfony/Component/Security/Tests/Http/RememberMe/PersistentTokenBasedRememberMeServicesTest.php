@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices;
 use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
+use Symfony\Component\Security\Core\Util\SecureRandom;
 
 class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
 {
@@ -318,7 +319,7 @@ class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_Test
             $userProvider = $this->getProvider();
         }
 
-        return new PersistentTokenBasedRememberMeServices(array($userProvider), 'fookey', 'fookey', $options, $logger);
+        return new PersistentTokenBasedRememberMeServices(array($userProvider), 'fookey', 'fookey', $options, $logger, new SecureRandom(sys_get_temp_dir().'/_sf2.seed'));
     }
 
     protected function getProvider()

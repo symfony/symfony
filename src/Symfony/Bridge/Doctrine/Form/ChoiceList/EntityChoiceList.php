@@ -392,7 +392,10 @@ class EntityChoiceList extends ObjectChoiceList
     private function getIdentifierValues($entity)
     {
         if (!$this->em->contains($entity)) {
-            throw new FormException('Entities passed to the choice field must be managed');
+            throw new FormException(
+                'Entities passed to the choice field must be managed. Maybe ' .
+                'persist them in the entity manager?'
+            );
         }
 
         $this->em->initializeObject($entity);

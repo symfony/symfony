@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation;
 
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 /**
  * Translator.
@@ -22,11 +23,34 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
  */
 class Translator implements TranslatorInterface
 {
-    protected $catalogues;
+    /**
+     * @var MessageCatalogueInterface[]
+     */
+    protected $catalogues = array();
+
+    /**
+     * @var string
+     */
     protected $locale;
-    private $fallbackLocales;
-    private $loaders;
-    private $resources;
+
+    /**
+     * @var array
+     */
+    private $fallbackLocales = array();
+
+    /**
+     * @var LoaderInterface[]
+     */
+    private $loaders = array();
+
+    /**
+     * @var array
+     */
+    private $resources = array();
+
+    /**
+     * @var MessageSelector
+     */
     private $selector;
 
     /**
@@ -41,10 +65,6 @@ class Translator implements TranslatorInterface
     {
         $this->locale = $locale;
         $this->selector = null === $selector ? new MessageSelector() : $selector;
-        $this->loaders = array();
-        $this->resources = array();
-        $this->catalogues = array();
-        $this->fallbackLocales = array();
     }
 
     /**
@@ -157,12 +177,18 @@ class Translator implements TranslatorInterface
             }
         }
 
-        return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
+        return strtr($this->selector->choose($catalogue->get($id, $domain), (float) $number, $locale), $parameters);
     }
 
     protected function loadCatalogue($locale)
     {
-        $this->doLoadCatalogue($locale);
+        try {
+            $this->doLoadCatalogue($locale);
+        } catch (NotFoundResourceException $e) {
+            if (!$this->computeFallbackLocales($locale)) {
+                throw $e;
+            }
+        }
         $this->loadFallbackCatalogues($locale);
     }
 

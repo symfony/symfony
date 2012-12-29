@@ -23,7 +23,8 @@ class FormRegistry implements FormRegistryInterface
 {
     /**
      * Extensions
-     * @var array An array of FormExtensionInterface
+     *
+     * @var FormExtensionInterface[] An array of FormExtensionInterface
      */
     private $extensions = array();
 
@@ -33,9 +34,9 @@ class FormRegistry implements FormRegistryInterface
     private $types = array();
 
     /**
-     * @var FormTypeGuesserInterface
+     * @var FormTypeGuesserInterface|false|null
      */
-    private $guesser;
+    private $guesser = false;
 
     /**
      * @var ResolvedFormTypeFactoryInterface
@@ -45,7 +46,7 @@ class FormRegistry implements FormRegistryInterface
     /**
      * Constructor.
      *
-     * @param array                            $extensions          An array of FormExtensionInterface
+     * @param FormExtensionInterface[]         $extensions          An array of FormExtensionInterface
      * @param ResolvedFormTypeFactoryInterface $resolvedTypeFactory The factory for resolved form types.
      *
      * @throws UnexpectedTypeException if any extension does not implement FormExtensionInterface
@@ -67,6 +68,8 @@ class FormRegistry implements FormRegistryInterface
      */
     public function addType(ResolvedFormTypeInterface $type)
     {
+        trigger_error('addType() is deprecated since version 2.1 and will be removed in 2.3. Use form extensions or type registration in the Dependency Injection Container instead.', E_USER_DEPRECATED);
+
         $this->types[$type->getName()] = $type;
     }
 
@@ -128,11 +131,13 @@ class FormRegistry implements FormRegistryInterface
             );
         }
 
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
         $this->addType($this->resolvedTypeFactory->createResolvedType(
             $type,
             $typeExtensions,
             $parentType ? $this->getType($parentType) : null
         ));
+        restore_error_handler();
     }
 
     /**
@@ -158,7 +163,7 @@ class FormRegistry implements FormRegistryInterface
      */
     public function getTypeGuesser()
     {
-        if (null === $this->guesser) {
+        if (false === $this->guesser) {
             $guessers = array();
 
             foreach ($this->extensions as $extension) {
@@ -170,7 +175,7 @@ class FormRegistry implements FormRegistryInterface
                 }
             }
 
-            $this->guesser = new FormTypeGuesserChain($guessers);
+            $this->guesser = !empty($guessers) ? new FormTypeGuesserChain($guessers) : null;
         }
 
         return $this->guesser;

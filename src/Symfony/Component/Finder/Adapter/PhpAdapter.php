@@ -73,15 +73,11 @@ class PhpAdapter extends AbstractAdapter
             $iterator = $iteratorAggregate->getIterator();
         }
 
-        return $iterator;
-    }
+        if ($this->paths || $this->notPaths) {
+            $iterator = new Iterator\PathFilterIterator($iterator, $this->paths, $this->notPaths);
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isSupported()
-    {
-        return true;
+        return $iterator;
     }
 
     /**
@@ -90,5 +86,13 @@ class PhpAdapter extends AbstractAdapter
     public function getName()
     {
         return 'php';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function canBeUsed()
+    {
+        return true;
     }
 }

@@ -12,12 +12,11 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\Extension\Core\CoreExtension;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormIntegrationTestCase extends \PHPUnit_Framework_TestCase
+abstract class FormIntegrationTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \Symfony\Component\Form\FormFactoryInterface
@@ -33,6 +32,13 @@ class FormIntegrationTestCase extends \PHPUnit_Framework_TestCase
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions($this->getExtensions())
             ->getFormFactory();
+
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
+    }
+
+    protected function tearDown()
+    {
+        restore_error_handler();
     }
 
     protected function getExtensions()

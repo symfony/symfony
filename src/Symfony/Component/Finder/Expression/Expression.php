@@ -41,7 +41,7 @@ class Expression implements ValueInterface
     {
         try {
             $this->value = Regex::create($expr);
-        } catch(\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->value = new Glob($expr);
         }
     }
@@ -84,6 +84,26 @@ class Expression implements ValueInterface
     public function getType()
     {
         return $this->value->getType();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend($expr)
+    {
+        $this->value->prepend($expr);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function append($expr)
+    {
+        $this->value->append($expr);
+
+        return $this;
     }
 
     /**

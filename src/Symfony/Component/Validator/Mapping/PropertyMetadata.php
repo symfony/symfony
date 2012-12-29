@@ -20,6 +20,8 @@ class PropertyMetadata extends MemberMetadata
      *
      * @param string $class The class this property is defined on
      * @param string $name  The name of this property
+     *
+     * @throws ValidatorException
      */
     public function __construct($class, $name)
     {
@@ -33,7 +35,7 @@ class PropertyMetadata extends MemberMetadata
     /**
      * {@inheritDoc}
      */
-    public function getValue($object)
+    public function getPropertyValue($object)
     {
         return $this->getReflectionMember()->getValue($object);
     }

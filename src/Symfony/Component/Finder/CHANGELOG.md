@@ -4,6 +4,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * added Finder::path() and Finder::notPath() methods
  * added finder adapters to improve performance on specific platforms
 
 2.1.0

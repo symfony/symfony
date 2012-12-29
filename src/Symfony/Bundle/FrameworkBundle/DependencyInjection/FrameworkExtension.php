@@ -65,6 +65,9 @@ class FrameworkExtension extends Extension
             $container->setParameter('kernel.secret', $config['secret']);
         }
 
+        $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
+
+        // @deprecated, to be removed in 2.3
         $container->setParameter('kernel.trust_proxy_headers', $config['trust_proxy_headers']);
 
         $container->setParameter('kernel.default_locale', $config['default_locale']);
@@ -141,17 +144,14 @@ class FrameworkExtension extends Extension
         ));
     }
 
-    public function getConfiguration(array $config, ContainerBuilder $container)
-    {
-        return new Configuration($container->getParameter('kernel.debug'));
-    }
-
     /**
      * Loads Form configuration.
      *
      * @param array            $config    A configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @throws \LogicException
      */
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -189,6 +189,8 @@ class FrameworkExtension extends Extension
      * @param array            $config    A profiler configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @throws \LogicException
      */
     private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {

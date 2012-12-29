@@ -51,18 +51,12 @@ class FormValidator extends ConstraintValidator
 
         if ($form->isSynchronized()) {
             // Validate the form data only if transformation succeeded
-            $path = $this->context->getPropertyPath();
-            $graphWalker = $this->context->getGraphWalker();
             $groups = self::getValidationGroups($form);
-
-            if (!empty($path)) {
-                $path .= '.';
-            }
 
             // Validate the data against its own constraints
             if (self::allowDataWalking($form)) {
                 foreach ($groups as $group) {
-                    $graphWalker->walkReference($form->getData(), $group, $path . 'data', true);
+                    $this->context->validate($form->getData(), 'data', $group, true);
                 }
             }
 
@@ -72,7 +66,7 @@ class FormValidator extends ConstraintValidator
             foreach ($constraints as $constraint) {
                 foreach ($groups as $group) {
                     if (in_array($group, $constraint->groups)) {
-                        $graphWalker->walkConstraint($constraint, $form->getData(), $group, $path . 'data');
+                        $this->context->validateValue($form->getData(), $constraint, 'data', $group);
 
                         // Prevent duplicate validation
                         continue 2;
@@ -80,18 +74,35 @@ class FormValidator extends ConstraintValidator
                 }
             }
         } else {
-            $clientDataAsString = is_scalar($form->getViewData())
-                ? (string) $form->getViewData()
-                : gettype($form->getViewData());
+            $childrenSynchronized = true;
 
-            // Mark the form with an error if it is not synchronized
-            $this->context->addViolation(
-                $config->getOption('invalid_message'),
-                array_replace(array('{{ value }}' => $clientDataAsString), $config->getOption('invalid_message_parameters')),
-                $form->getViewData(),
-                null,
-                Form::ERR_INVALID
-            );
+            foreach ($form as $child) {
+                if (!$child->isSynchronized()) {
+                    $childrenSynchronized = false;
+                    break;
+                }
+            }
+
+            // Mark the form with an error if it is not synchronized BUT all
+            // of its children are synchronized. If any child is not
+            // synchronized, an error is displayed there already and showing
+            // a second error in its parent form is pointless, or worse, may
+            // lead to duplicate errors if error bubbling is enabled on the
+            // child.
+            // See also https://github.com/symfony/symfony/issues/4359
+            if ($childrenSynchronized) {
+                $clientDataAsString = is_scalar($form->getViewData())
+                    ? (string) $form->getViewData()
+                    : gettype($form->getViewData());
+
+                $this->context->addViolation(
+                    $config->getOption('invalid_message'),
+                    array_replace(array('{{ value }}' => $clientDataAsString), $config->getOption('invalid_message_parameters')),
+                    $form->getViewData(),
+                    null,
+                    Form::ERR_INVALID
+                );
+            }
         }
 
         // Mark the form with an error if it contains extra fields

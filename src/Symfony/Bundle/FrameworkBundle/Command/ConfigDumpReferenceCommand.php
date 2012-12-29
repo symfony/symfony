@@ -15,9 +15,6 @@ use Symfony\Component\Config\Definition\ReferenceDumper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Config\Definition\NodeInterface;
-use Symfony\Component\Config\Definition\ArrayNode;
-use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**

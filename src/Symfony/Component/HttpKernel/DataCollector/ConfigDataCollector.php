@@ -31,7 +31,7 @@ class ConfigDataCollector extends DataCollector
      *
      * @param KernelInterface $kernel A KernelInterface instance
      */
-    public function setKernel(KernelInterface $kernel)
+    public function setKernel(KernelInterface $kernel = null)
     {
         $this->kernel = $kernel;
     }

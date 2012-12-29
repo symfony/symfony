@@ -20,6 +20,7 @@ class ClassCollectionLoader
 {
     private static $loaded;
     private static $seen;
+    private static $useTokenizer = true;
 
     /**
      * Loads a list of classes and caches them in one big file.
@@ -103,13 +104,13 @@ class ClassCollectionLoader
 
             $c = preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($class->getFileName()));
 
-            // add namespace declaration for global code
+            // fakes namespace declaration for global code
             if (!$class->inNamespace()) {
-                $c = "\nnamespace\n{\n".self::stripComments($c)."\n}\n";
-            } else {
-                $c = self::fixNamespaceDeclarations('<?php '.$c);
-                $c = preg_replace('/^\s*<\?php/', '', $c);
+                $c = "\nnamespace\n{\n".$c."\n}\n";
             }
+
+            $c = self::fixNamespaceDeclarations('<?php '.$c);
+            $c = preg_replace('/^\s*<\?php/', '', $c);
 
             $content .= $c;
         }
@@ -135,7 +136,11 @@ class ClassCollectionLoader
      */
     public static function fixNamespaceDeclarations($source)
     {
-        if (!function_exists('token_get_all')) {
+        if (!function_exists('token_get_all') || !self::$useTokenizer) {
+            if (preg_match('/namespace(.*?)\s*;/', $source)) {
+                $source = preg_replace('/namespace(.*?)\s*;/', "namespace$1\n{", $source)."}\n";
+            }
+
             return $source;
         }
 
@@ -201,42 +206,11 @@ class ClassCollectionLoader
     }
 
     /**
-     * Removes comments from a PHP source string.
-     *
-     * We don't use the PHP php_strip_whitespace() function
-     * as we want the content to be readable and well-formatted.
-     *
-     * @param string $source A PHP string
-     *
-     * @return string The PHP string with the comments removed
-     */
-    private static function stripComments($source)
-    {
-        if (!function_exists('token_get_all')) {
-            return $source;
-        }
-
-        $output = '';
-        foreach (token_get_all($source) as $token) {
-            if (is_string($token)) {
-                $output .= $token;
-            } elseif (!in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
-                $output .= $token[1];
-            }
-        }
-
-        // replace multiple new lines with a single newline
-        $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
-
-        return $output;
-    }
-
-    /**
      * Gets an ordered array of passed classes including all their dependencies.
      *
      * @param array $classes
      *
-     * @return array An array of sorted \ReflectionClass instances (dependencies added if needed)
+     * @return \ReflectionClass[] An array of sorted \ReflectionClass instances (dependencies added if needed)
      *
      * @throws \InvalidArgumentException When a class can't be loaded
      */
@@ -316,5 +290,13 @@ class ClassCollectionLoader
         }
 
         return $classes;
+    }
+
+    /**
+     * This method is only useful for testing.
+     */
+    public static function enableTokenizer($bool)
+    {
+        self::$useTokenizer = (Boolean) $bool;
     }
 }

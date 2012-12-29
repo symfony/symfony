@@ -91,6 +91,8 @@ class ControllerResolver implements ControllerResolverInterface
      * @param Request $request    A Request instance
      * @param mixed   $controller A PHP callable
      *
+     * @return array
+     *
      * @throws \RuntimeException When value for argument given is not provided
      *
      * @api
@@ -142,6 +144,8 @@ class ControllerResolver implements ControllerResolverInterface
      * @param string $controller A Controller string
      *
      * @return mixed A PHP callable
+     *
+     * @throws \InvalidArgumentException
      */
     protected function createController($controller)
     {

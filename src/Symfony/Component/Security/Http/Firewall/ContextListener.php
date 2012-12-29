@@ -75,6 +75,7 @@ class ContextListener implements ListenerInterface
 
         if (null === $session || null === $token = $session->get('_security_'.$this->contextKey)) {
             $this->context->setToken(null);
+
             return;
         }
 
@@ -133,6 +134,8 @@ class ContextListener implements ListenerInterface
      * @param TokenInterface $token
      *
      * @return TokenInterface|null
+     *
+     * @throws \RuntimeException
      */
     private function refreshUser(TokenInterface $token)
     {

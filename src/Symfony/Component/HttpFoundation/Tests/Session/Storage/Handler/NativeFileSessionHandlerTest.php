@@ -54,6 +54,7 @@ class NativeFileSessionHandlerTest extends \PHPUnit_Framework_TestCase
     public function savePathDataProvider()
     {
         $base = sys_get_temp_dir();
+
         return array(
             array("$base/foo", "$base/foo", "$base/foo"),
             array("5;$base/foo", "5;$base/foo", "$base/foo"),

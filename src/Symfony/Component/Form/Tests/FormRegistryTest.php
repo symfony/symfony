@@ -9,8 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form;
+namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\Tests\Fixtures\TestExtension;
 use Symfony\Component\Form\Tests\Fixtures\FooSubTypeWithParentInstance;
 use Symfony\Component\Form\Tests\Fixtures\FooSubType;
@@ -74,7 +76,9 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue('foo'));
 
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
         $this->registry->addType($resolvedType);
+        restore_error_handler();
 
         $this->assertSame($resolvedType, $this->registry->getType('foo'));
     }
@@ -221,7 +225,9 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->registry->hasType('foo'));
 
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
         $this->registry->addType($resolvedType);
+        restore_error_handler();
 
         $this->assertTrue($this->registry->hasType('foo'));
     }
@@ -252,6 +258,12 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
         $expectedGuesser = new FormTypeGuesserChain(array($this->guesser1, $this->guesser2));
 
         $this->assertEquals($expectedGuesser, $this->registry->getTypeGuesser());
+
+        $registry = new FormRegistry(
+            array($this->getMock('Symfony\Component\Form\FormExtensionInterface')),
+            $this->resolvedTypeFactory);
+
+        $this->assertNull($registry->getTypeGuesser());
     }
 
     public function testGetExtensions()

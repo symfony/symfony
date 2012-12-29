@@ -6,8 +6,9 @@ $collection = new RouteCollection();
 $collection->add('blog_show', new Route(
     '/blog/{slug}',
     array('_controller' => 'MyBlogBundle:Blog:show'),
-    array(),
-    array('compiler_class' => 'RouteCompiler')
+    array('_method' => 'GET', 'locale' => '\w+'),
+    array('compiler_class' => 'RouteCompiler'),
+    '{locale}.example.com'
 ));
 
 return $collection;

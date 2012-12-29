@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Routing\Generator;
 
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
@@ -29,8 +28,24 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  */
 class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
 {
+    /**
+     * @var RouteCollection
+     */
+    protected $routes;
+
+    /**
+     * @var RequestContext
+     */
     protected $context;
+
+    /**
+     * @var Boolean|null
+     */
     protected $strictRequirements = true;
+
+    /**
+     * @var LoggerInterface|null
+     */
     protected $logger;
 
     /**
@@ -61,14 +76,12 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%7C' => '|',
     );
 
-    protected $routes;
-
     /**
      * Constructor.
      *
-     * @param RouteCollection $routes  A RouteCollection instance
-     * @param RequestContext  $context The context
-     * @param LoggerInterface $logger  A logger instance
+     * @param RouteCollection      $routes  A RouteCollection instance
+     * @param RequestContext       $context The context
+     * @param LoggerInterface|null $logger  A logger instance
      *
      * @api
      */
@@ -123,14 +136,14 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // the Route has a cache of its own and is not recompiled as long as it does not get modified
         $compiledRoute = $route->compile();
 
-        return $this->doGenerate($compiledRoute->getVariables(), $route->getDefaults(), $route->getRequirements(), $compiledRoute->getTokens(), $parameters, $name, $absolute);
+        return $this->doGenerate($compiledRoute->getVariables(), $route->getDefaults(), $route->getRequirements(), $compiledRoute->getTokens(), $parameters, $name, $absolute, $compiledRoute->getHostnameTokens());
     }
 
     /**
      * @throws MissingMandatoryParametersException When route has some missing mandatory parameters
      * @throws InvalidParameterException When a parameter value is not correct
      */
-    protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute)
+    protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $absolute, $hostnameTokens)
     {
         $variables = array_flip($variables);
         $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
@@ -192,11 +205,41 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             $url .= '?'.$query;
         }
 
-        if ($this->context->getHost()) {
+        if ($host = $this->context->getHost()) {
             $scheme = $this->context->getScheme();
             if (isset($requirements['_scheme']) && ($req = strtolower($requirements['_scheme'])) && $scheme != $req) {
                 $absolute = true;
                 $scheme = $req;
+            }
+
+            if ($hostnameTokens) {
+                $routeHost = '';
+                foreach ($hostnameTokens as $token) {
+                    if ('variable' === $token[0]) {
+                        if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
+                            $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given).', $token[3], $name, $token[2], $mergedParams[$token[3]]);
+
+                            if ($this->strictRequirements) {
+                                throw new InvalidParameterException($message);
+                            }
+
+                            if ($this->logger) {
+                                $this->logger->err($message);
+                            }
+
+                            return null;
+                        }
+
+                        $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;
+                    } elseif ('text' === $token[0]) {
+                        $routeHost = $token[1].$routeHost;
+                    }
+                }
+
+                if ($routeHost != $host) {
+                    $host = $routeHost;
+                    $absolute = true;
+                }
             }
 
             if ($absolute) {
@@ -207,7 +250,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                     $port = ':'.$this->context->getHttpsPort();
                 }
 
-                $url = $scheme.'://'.$this->context->getHost().$port.$url;
+                $url = $scheme.'://'.$host.$port.$url;
             }
         }
 

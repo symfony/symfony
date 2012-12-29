@@ -34,9 +34,6 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/FooClass.php');
     }
 
-    /**
-     * @covers Symfony\Component\Routing\Loader\AnnotationFileLoader::supports
-     */
     public function testSupports()
     {
         $fixture = __DIR__.'/../Fixtures/annotated.php';

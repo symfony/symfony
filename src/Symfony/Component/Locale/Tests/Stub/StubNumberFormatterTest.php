@@ -210,7 +210,7 @@ class StubNumberFormatterTest extends LocaleTestCase
 
     public function formatCurrencyWithCurrencyStyleBrazilianRealRoundingProvider()
     {
-        $brl = $this->isIntlExtensionLoaded() && $this->isSameAsIcuVersion('4.8') ? 'BR' : 'R';
+        $brl = $this->isIntlExtensionLoaded() && $this->isGreaterOrEqualThanIcuVersion('4.8') ? 'BR' : 'R';
 
         return array(
             array(100, 'BRL', $brl, '%s$100.00'),

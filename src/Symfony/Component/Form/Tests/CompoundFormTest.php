@@ -12,12 +12,10 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 
 class CompoundFormTest extends AbstractFormTest
@@ -35,7 +33,7 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertTrue($this->form->isValid());
     }
 
-    public function testInvalidIfChildrenIsInvalid()
+    public function testInvalidIfChildIsInvalid()
     {
         $this->form->add($this->getValidForm('firstName'));
         $this->form->add($this->getInvalidForm('lastName'));
@@ -120,12 +118,16 @@ class CompoundFormTest extends AbstractFormTest
     {
         $this->form->add($this->getBuilder()->getForm());
 
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
         $this->assertTrue($this->form->hasChildren());
+        restore_error_handler();
     }
 
     public function testHasNoChildren()
     {
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
         $this->assertFalse($this->form->hasChildren());
+        restore_error_handler();
     }
 
     public function testAdd()
@@ -133,12 +135,88 @@ class CompoundFormTest extends AbstractFormTest
         $child = $this->getBuilder('foo')->getForm();
         $this->form->add($child);
 
+        $this->assertTrue($this->form->has('foo'));
+        $this->assertSame($this->form, $child->getParent());
+        $this->assertSame(array('foo' => $child), $this->form->all());
+    }
+
+    public function testAddUsingNameAndType()
+    {
+        $child = $this->getBuilder('foo')->getForm();
+
+        $this->factory->expects($this->once())
+            ->method('createNamed')
+            ->with('foo', 'text', null, array('bar' => 'baz'))
+            ->will($this->returnValue($child));
+
+        $this->form->add('foo', 'text', array('bar' => 'baz'));
+
+        $this->assertTrue($this->form->has('foo'));
+        $this->assertSame($this->form, $child->getParent());
+        $this->assertSame(array('foo' => $child), $this->form->all());
+    }
+
+    public function testAddUsingIntegerNameAndType()
+    {
+        $child = $this->getBuilder(0)->getForm();
+
+        $this->factory->expects($this->once())
+            ->method('createNamed')
+            ->with('0', 'text', null, array('bar' => 'baz'))
+            ->will($this->returnValue($child));
+
+        // in order to make casting unnecessary
+        $this->form->add(0, 'text', array('bar' => 'baz'));
+
+        $this->assertTrue($this->form->has(0));
+        $this->assertSame($this->form, $child->getParent());
+        $this->assertSame(array(0 => $child), $this->form->all());
+    }
+
+    public function testAddUsingNameButNoType()
+    {
+        $this->form = $this->getBuilder('name', null, '\stdClass')
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
+
+        $child = $this->getBuilder('foo')->getForm();
+
+        $this->factory->expects($this->once())
+            ->method('createForProperty')
+            ->with('\stdClass', 'foo')
+            ->will($this->returnValue($child));
+
+        $this->form->add('foo');
+
+        $this->assertTrue($this->form->has('foo'));
+        $this->assertSame($this->form, $child->getParent());
+        $this->assertSame(array('foo' => $child), $this->form->all());
+    }
+
+    public function testAddUsingNameButNoTypeAndOptions()
+    {
+        $this->form = $this->getBuilder('name', null, '\stdClass')
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
+
+        $child = $this->getBuilder('foo')->getForm();
+
+        $this->factory->expects($this->once())
+            ->method('createForProperty')
+            ->with('\stdClass', 'foo', null, array('bar' => 'baz'))
+            ->will($this->returnValue($child));
+
+        $this->form->add('foo', null, array('bar' => 'baz'));
+
+        $this->assertTrue($this->form->has('foo'));
         $this->assertSame($this->form, $child->getParent());
         $this->assertSame(array('foo' => $child), $this->form->all());
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\AlreadyBoundException
+     * @expectedException \Symfony\Component\Form\Exception\AlreadyBoundException
      */
     public function testAddThrowsExceptionIfAlreadyBound()
     {
@@ -153,11 +231,13 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->remove('foo');
 
         $this->assertNull($child->getParent());
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
         $this->assertFalse($this->form->hasChildren());
+        restore_error_handler();
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\AlreadyBoundException
+     * @expectedException \Symfony\Component\Form\Exception\AlreadyBoundException
      */
     public function testRemoveThrowsExceptionIfAlreadyBound()
     {
@@ -366,7 +446,7 @@ class CompoundFormTest extends AbstractFormTest
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
 
-        $form->bindRequest($request);
+        $form->bind($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -415,7 +495,7 @@ class CompoundFormTest extends AbstractFormTest
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
 
-        $form->bindRequest($request);
+        $form->bind($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -456,7 +536,7 @@ class CompoundFormTest extends AbstractFormTest
             ->addEventSubscriber(new BindRequestListener())
             ->getForm();
 
-        $form->bindRequest($request);
+        $form->bind($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -489,7 +569,7 @@ class CompoundFormTest extends AbstractFormTest
             ->addEventSubscriber(new BindRequestListener())
             ->getForm();
 
-        $form->bindRequest($request);
+        $form->bind($request);
 
         $this->assertEquals('Bernhard', $form->getData());
 
@@ -521,7 +601,7 @@ class CompoundFormTest extends AbstractFormTest
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());
 
-        $form->bindRequest($request);
+        $form->bind($request);
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());
@@ -551,7 +631,7 @@ class CompoundFormTest extends AbstractFormTest
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());
 
-        $form->bindRequest($request);
+        $form->bind($request);
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());

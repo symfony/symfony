@@ -33,15 +33,60 @@ class RouteCompiler implements RouteCompilerInterface
      *
      * @throws \LogicException  If a variable is referenced more than once
      * @throws \DomainException If a variable name is numeric because PHP raises an error for such
-     *                          subpatterns in PCRE and thus would break matching, e.g. "(?<123>.+)".
+     *                          subpatterns in PCRE and thus would break matching, e.g. "(?P<123>.+)".
      */
     public function compile(Route $route)
     {
+        $staticPrefix = null;
+        $hostnameVariables = array();
+        $pathVariables = array();
+        $variables = array();
+        $tokens = array();
+        $regex = null;
+        $hostnameRegex = null;
+        $hostnameTokens = array();
+
+        if ('' !== $hostnamePattern = $route->getHostnamePattern()) {
+            $result = $this->compilePattern($route, $hostnamePattern, true);
+
+            $hostnameVariables = $result['variables'];
+            $variables = array_merge($variables, $hostnameVariables);
+
+            $hostnameTokens = $result['tokens'];
+            $hostnameRegex = $result['regex'];
+        }
+
         $pattern = $route->getPattern();
+
+        $result = $this->compilePattern($route, $pattern, false);
+
+        $staticPrefix = $result['staticPrefix'];
+
+        $pathVariables = $result['variables'];
+        $variables = array_merge($variables, $pathVariables);
+
+        $tokens = $result['tokens'];
+        $regex = $result['regex'];
+
+        return new CompiledRoute(
+            $staticPrefix,
+            $regex,
+            $tokens,
+            $pathVariables,
+            $hostnameRegex,
+            $hostnameTokens,
+            $hostnameVariables,
+            array_unique($variables)
+        );
+    }
+
+    private function compilePattern(Route $route, $pattern, $isHostname)
+    {
         $tokens = array();
         $variables = array();
         $matches = array();
         $pos = 0;
+        $defaultSeparator = $isHostname ? '.' : '/';
 
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
@@ -78,11 +123,15 @@ class RouteCompiler implements RouteCompilerInterface
                 // Also even if {_format} was not optional the requirement prevents that {page} matches something that was originally
                 // part of {_format} when generating the URL, e.g. _format = 'mobile.html'.
                 $nextSeparator = $this->findNextSeparator($followingPattern);
-                $regexp = sprintf('[^/%s]+', '/' !== $nextSeparator && '' !== $nextSeparator ? preg_quote($nextSeparator, self::REGEX_DELIMITER) : '');
+                $regexp = sprintf(
+                    '[^%s%s]+',
+                    preg_quote($defaultSeparator, self::REGEX_DELIMITER),
+                    $defaultSeparator !== $nextSeparator && '' !== $nextSeparator ? preg_quote($nextSeparator, self::REGEX_DELIMITER) : ''
+                );
                 if (('' !== $nextSeparator && !preg_match('#^\{\w+\}#', $followingPattern)) || '' === $followingPattern) {
                     // When we have a separator, which is disallowed for the variable, we can optimize the regex with a possessive
                     // quantifier. This prevents useless backtracking of PCRE and improves performance by 20% for matching those patterns.
-                    // Given the above example, there is no point in backtracking into {page} (that forbids the dot) when a dot must follow 
+                    // Given the above example, there is no point in backtracking into {page} (that forbids the dot) when a dot must follow
                     // after it. This optimization cannot be applied when the next char is no real separator or when the next variable is
                     // directly adjacent, e.g. '/{x}{y}'.
                     $regexp .= '+';
@@ -99,12 +148,14 @@ class RouteCompiler implements RouteCompilerInterface
 
         // find the first optional token
         $firstOptional = INF;
-        for ($i = count($tokens) - 1; $i >= 0; $i--) {
-            $token = $tokens[$i];
-            if ('variable' === $token[0] && $route->hasDefault($token[3])) {
-                $firstOptional = $i;
-            } else {
-                break;
+        if (!$isHostname) {
+            for ($i = count($tokens) - 1; $i >= 0; $i--) {
+                $token = $tokens[$i];
+                if ('variable' === $token[0] && $route->hasDefault($token[3])) {
+                    $firstOptional = $i;
+                } else {
+                    break;
+                }
             }
         }
 
@@ -114,11 +165,11 @@ class RouteCompiler implements RouteCompilerInterface
             $regexp .= $this->computeRegexp($tokens, $i, $firstOptional);
         }
 
-        return new CompiledRoute(
-            'text' === $tokens[0][0] ? $tokens[0][1] : '',
-            self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s',
-            array_reverse($tokens),
-            $variables
+        return array(
+            'staticPrefix' => 'text' === $tokens[0][0] ? $tokens[0][1] : '',
+            'regex' => self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s',
+            'tokens' => array_reverse($tokens),
+            'variables' => $variables,
         );
     }
 
@@ -160,9 +211,9 @@ class RouteCompiler implements RouteCompilerInterface
             // Variable tokens
             if (0 === $index && 0 === $firstOptional) {
                 // When the only token is an optional variable token, the separator is required
-                return sprintf('%s(?<%s>%s)?', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
+                return sprintf('%s(?P<%s>%s)?', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
             } else {
-                $regexp = sprintf('%s(?<%s>%s)', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
+                $regexp = sprintf('%s(?P<%s>%s)', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
                 if ($index >= $firstOptional) {
                     // Enclose each optional token in a subpattern to make it optional.
                     // "?:" means it is non-capturing, i.e. the portion of the subject string that

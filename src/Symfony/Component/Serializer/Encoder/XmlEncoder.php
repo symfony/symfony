@@ -96,6 +96,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
       * Checks whether the serializer can encode to given format
       *
       * @param string $format format name
+      *
       * @return Boolean
       */
      public function supportsEncoding($format)
@@ -107,6 +108,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
       * Checks whether the serializer can decode from given format
       *
       * @param string $format format name
+      *
       * @return Boolean
       */
      public function supportsDecoding($format)
@@ -116,6 +118,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
     /**
      * Sets the root node name
+     *
      * @param string $name root node name
      */
     public function setRootNodeName($name)
@@ -240,11 +243,15 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
             if ($key === 'item') {
                 if (isset($value['@key'])) {
-                    $data[(string) $value['@key']] = $value['#'];
+                    if (isset($value['#'])) {
+                        $data[(string) $value['@key']] = $value['#'];
+                    } else {
+                        $data[(string) $value['@key']] = $value;
+                    }
                 } else {
                     $data['item'][] = $value;
                 }
-            } elseif (array_key_exists($key, $data)) {
+            } elseif (array_key_exists($key, $data) || $key == "entry") {
                 if ((false === is_array($data[$key]))  || (false === isset($data[$key][0]))) {
                     $data[$key] = array($data[$key]);
                 }
@@ -264,6 +271,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * @param array|object $data       data
      *
      * @return Boolean
+     *
+     * @throws UnexpectedValueException
      */
     private function buildXml($parentNode, $data)
     {

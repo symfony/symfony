@@ -21,7 +21,7 @@ use Symfony\Component\Templating\TemplateNameParserInterface;
 /**
  * Proxy engine resolves template references to subsequest engine.
  *
- * @author Rafa≥ Wrzeszcz <rafal.wrzeszcz@wrzasq.pl>
+ * @author Rafa≈Ç Wrzeszcz <rafal.wrzeszcz@wrzasq.pl>
  */
 class ProxyEngine implements EngineInterface
 {

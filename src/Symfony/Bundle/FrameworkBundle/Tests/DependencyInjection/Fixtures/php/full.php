@@ -40,7 +40,8 @@ $container->loadFromExtension('framework', array(
         'assets_version'   => 'SomeVersionScheme',
         'assets_base_urls' => 'http://cdn.example.com',
         'cache'            => '/path/to/cache',
-        'engines'          => array('php', 'twig'),
+        'engines'          => array('php', 'twig', 'default'),
+        'default_engine'   => 'php',
         'loader'           => array('loader.foo', 'loader.bar'),
         'packages'         => array(
             'images' => array(

@@ -437,7 +437,14 @@ class FrameworkExtension extends Extension
             ));
         }
 
+        if (in_array('default', $config['engines'], true)) {
+            $this->addClassesToCompile(array(
+                'Symfony\\Bundle\\FrameworkBundle\\Templating\\ProxyEngine',
+            ));
+        }
+
         $container->setParameter('templating.engines', $config['engines']);
+        $container->setParameter('templating.default_engine', $config['default_engine']);
         $engines = array_map(function($engine) { return new Reference('templating.engine.'.$engine); }, $config['engines']);
 
         // Use a delegation unless only a single engine was registered

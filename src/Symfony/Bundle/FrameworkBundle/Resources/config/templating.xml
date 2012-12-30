@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="templating.engine.delegating.class">Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine</parameter>
+        <parameter key="templating.engine.default.class">Symfony\Bundle\FrameworkBundle\Templating\ProxyEngine</parameter>
         <parameter key="templating.name_parser.class">Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser</parameter>
         <parameter key="templating.filename_parser.class">Symfony\Bundle\FrameworkBundle\Templating\TemplateFilenameParser</parameter>
         <parameter key="templating.cache_warmer.template_paths.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplatePathsCacheWarmer</parameter>
@@ -60,5 +61,12 @@
         </service>
 
         <service id="templating.loader" alias="templating.loader.filesystem" />
+
+        <service id="templating.engine.default" class="%templating.engine.default.class%" public="false">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="templating.name_parser" />
+            <argument>default</argument>
+            <argument>%templating.default_engine%</argument>
+        </service>
     </services>
 </container>

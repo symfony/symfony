@@ -188,11 +188,14 @@ class Controller extends ContainerAware
      */
     public function getDoctrine()
     {
-        if (!$this->container->has('doctrine')) {
-            throw new \LogicException('The DoctrineBundle is not registered in your application.');
+        if ($this->container->has('doctrine')) {
+            return $this->container->get('doctrine');
+        else if ($this->container->has('doctrine_mongodb')){
+            return $this->container->get('doctrine_mongodb');
         }
-
-        return $this->container->get('doctrine');
+        
+        throw new \LogicException('The DoctrineBundle is not registered in your application.');
+        
     }
 
     /**

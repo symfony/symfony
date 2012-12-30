@@ -87,17 +87,29 @@ class FormRenderer implements FormRendererInterface
      */
     public function renderBlock(FormView $view, $blockName, array $variables = array())
     {
-        if (0 == count($this->variableStack)) {
-            throw new Exception('This method should only be called while rendering a form element.');
-        }
-
-        $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
-        $scopeVariables = end($this->variableStack[$viewCacheKey]);
-
         $resource = $this->engine->getResourceForBlockName($view, $blockName);
 
         if (!$resource) {
             throw new Exception(sprintf('No block "%s" found while rendering the form.', $blockName));
+        }
+
+        $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
+
+        // The variables are cached globally for a view (instead of for the
+        // current suffix)
+        if (!isset($this->variableStack[$viewCacheKey])) {
+            $this->variableStack[$viewCacheKey] = array();
+
+            // The default variable scope contains all view variables, merged with
+            // the variables passed explicitly to the helper
+            $scopeVariables = $view->vars;
+
+            $varInit = true;
+        } else {
+            // Reuse the current scope and merge it with the explicitly passed variables
+            $scopeVariables = end($this->variableStack[$viewCacheKey]);
+
+            $varInit = false;
         }
 
         // Merge the passed with the existing attributes
@@ -121,6 +133,10 @@ class FormRenderer implements FormRendererInterface
 
         // Clear the stack
         array_pop($this->variableStack[$viewCacheKey]);
+
+        if ($varInit) {
+            unset($this->variableStack[$viewCacheKey]);
+        }
 
         return $html;
     }
@@ -191,6 +207,8 @@ class FormRenderer implements FormRendererInterface
         // The variables are cached globally for a view (instead of for the
         // current suffix)
         if (!isset($this->variableStack[$viewCacheKey])) {
+            $this->variableStack[$viewCacheKey] = array();
+
             // The default variable scope contains all view variables, merged with
             // the variables passed explicitly to the helper
             $scopeVariables = $view->vars;

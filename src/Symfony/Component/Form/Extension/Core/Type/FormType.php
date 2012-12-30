@@ -53,6 +53,8 @@ class FormType extends BaseType
             ->setData(isset($options['data']) ? $options['data'] : null)
             ->setDataLocked(isset($options['data']))
             ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
+            ->setMethod($options['method'])
+            ->setAction($options['action'])
         ;
 
         if ($options['trim']) {
@@ -93,6 +95,8 @@ class FormType extends BaseType
             'size'       => null,
             'label_attr' => $options['label_attr'],
             'compound'   => $form->getConfig()->getCompound(),
+            'method'              => $form->getConfig()->getMethod(),
+            'action'              => $form->getConfig()->getAction(),
         ));
     }
 
@@ -167,6 +171,10 @@ class FormType extends BaseType
             'label_attr'         => array(),
             'virtual'            => false,
             'compound'           => true,
+            'method'             => 'POST',
+            // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
+            // section 4.2., empty URIs are considered same-document references
+            'action'             => '',
         ));
 
         $resolver->setAllowedTypes(array(

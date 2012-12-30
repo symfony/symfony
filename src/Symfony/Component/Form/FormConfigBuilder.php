@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
-use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -27,6 +27,26 @@ use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
  */
 class FormConfigBuilder implements FormConfigBuilderInterface
 {
+    /**
+     * Caches a globally unique {@link NativeFormProcessor} instance.
+     *
+     * @var NativeFormProcessor
+     */
+    private static $nativeFormProcessor;
+
+    /**
+     * The accepted request methods.
+     *
+     * @var array
+     */
+    private static $allowedMethods = array(
+        'GET',
+        'PUT',
+        'POST',
+        'DELETE',
+        'PATCH'
+    );
+
     /**
      * @var Boolean
      */
@@ -136,6 +156,21 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @var FormFactoryInterface
      */
     private $formFactory;
+
+    /**
+     * @var string
+     */
+    private $action;
+
+    /**
+     * @var string
+     */
+    private $method = 'POST';
+
+    /**
+     * @var FormProcessorInterface
+     */
+    private $formProcessor;
 
     /**
      * @var array
@@ -264,6 +299,10 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getEventDispatcher()
     {
+        if ($this->locked && !$this->dispatcher instanceof ImmutableEventDispatcher) {
+            $this->dispatcher = new ImmutableEventDispatcher($this->dispatcher);
+        }
+
         return $this->dispatcher;
     }
 
@@ -433,6 +472,37 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     public function getFormFactory()
     {
         return $this->formFactory;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormProcessor()
+    {
+        if (null === $this->formProcessor) {
+            if (null === self::$nativeFormProcessor) {
+                self::$nativeFormProcessor = new NativeFormProcessor();
+            }
+            $this->formProcessor = self::$nativeFormProcessor;
+        }
+
+        return $this->formProcessor;
     }
 
     /**
@@ -690,6 +760,58 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setAction($action)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+        }
+
+        $this->action = $action;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMethod($method)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+        }
+
+        $upperCaseMethod = strtoupper($method);
+
+        if (!in_array($upperCaseMethod, self::$allowedMethods)) {
+            throw new InvalidArgumentException(sprintf(
+                'The form method is "%s", but should be one of "%s".',
+                $method,
+                implode('", "', self::$allowedMethods)
+            ));
+        }
+
+        $this->method = $upperCaseMethod;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setFormProcessor(FormProcessorInterface $formProcessor)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+        }
+
+        $this->formProcessor = $formProcessor;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getFormConfig()
     {
         if ($this->locked) {
@@ -699,10 +821,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         // This method should be idempotent, so clone the builder
         $config = clone $this;
         $config->locked = true;
-
-        if (!$config->dispatcher instanceof ImmutableEventDispatcher) {
-            $config->dispatcher = new ImmutableEventDispatcher($config->dispatcher);
-        }
 
         return $config;
     }

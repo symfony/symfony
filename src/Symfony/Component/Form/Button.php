@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\AlreadyBoundException;
+use Symfony\Component\Form\Exception\BadMethodCallException;
 
 /**
  * A form button.
@@ -340,6 +341,18 @@ class Button implements \IteratorAggregate, FormInterface
     public function isSynchronized()
     {
         return true;
+    }
+
+    /**
+     * Unsupported method.
+     *
+     * @param mixed $request
+     *
+     * @throws BadMethodCallException
+     */
+    public function process($request = null)
+    {
+        throw new BadMethodCallException('Buttons cannot be processed. Call process() on the root form instead.');
     }
 
     /**

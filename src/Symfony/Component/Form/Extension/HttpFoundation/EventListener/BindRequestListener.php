@@ -19,6 +19,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.3, to be removed in 3.0. Pass the
+ *             Request instance to {@link Form::process()} instead.
  */
 class BindRequestListener implements EventSubscriberInterface
 {
@@ -39,6 +42,8 @@ class BindRequestListener implements EventSubscriberInterface
         if (!$request instanceof Request) {
             return;
         }
+
+        trigger_error('Passing a Request instance to Form::bind() is deprecated since version 2.3 and will be disabled in 3.0. Call Form::process($request) instead.', E_USER_DEPRECATED);
 
         $name = $form->getConfig()->getName();
         $default = $form->getConfig()->getCompound() ? array() : null;

@@ -75,6 +75,11 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
         $this->extension = null;
     }
 
+    protected function renderForm(FormView $view, array $vars = array())
+    {
+        return (string) $this->extension->renderer->renderBlock($view, 'form', $vars);
+    }
+
     protected function renderEnctype(FormView $view)
     {
         return (string) $this->extension->renderer->searchAndRenderBlock($view, 'enctype');
@@ -107,6 +112,16 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
     protected function renderRest(FormView $view, array $vars = array())
     {
         return (string) $this->extension->renderer->searchAndRenderBlock($view, 'rest', $vars);
+    }
+
+    protected function renderStart(FormView $view, array $vars = array())
+    {
+        return (string) $this->extension->renderer->renderBlock($view, 'form_start', $vars);
+    }
+
+    protected function renderEnd(FormView $view, array $vars = array())
+    {
+        return (string) $this->extension->renderer->renderBlock($view, 'form_end', $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)

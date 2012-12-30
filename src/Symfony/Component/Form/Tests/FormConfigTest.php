@@ -12,12 +12,11 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\FormConfigBuilder;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-use Symfony\Component\Form\FormConfigBuilder;
-
 class FormConfigTest extends \PHPUnit_Framework_TestCase
 {
     public function getHtml4Ids()
@@ -89,5 +88,60 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
                 throw $e;
             }
         }
+    }
+
+    public function testGetFormProcessorCreatesNativeFormProcessorIfNotSet()
+    {
+        $config = $this->getConfigBuilder()->getFormConfig();
+
+        $this->assertInstanceOf('Symfony\Component\Form\NativeFormProcessor', $config->getFormProcessor());
+    }
+
+    public function testGetFormProcessorReusesNativeFormProcessorInstance()
+    {
+        $config1 = $this->getConfigBuilder()->getFormConfig();
+        $config2 = $this->getConfigBuilder()->getFormConfig();
+
+        $this->assertSame($config1->getFormProcessor(), $config2->getFormProcessor());
+    }
+
+    public function testSetMethodAllowsGet()
+    {
+        $this->getConfigBuilder()->setMethod('GET');
+    }
+
+    public function testSetMethodAllowsPost()
+    {
+        $this->getConfigBuilder()->setMethod('POST');
+    }
+
+    public function testSetMethodAllowsPut()
+    {
+        $this->getConfigBuilder()->setMethod('PUT');
+    }
+
+    public function testSetMethodAllowsDelete()
+    {
+        $this->getConfigBuilder()->setMethod('DELETE');
+    }
+
+    public function testSetMethodAllowsPatch()
+    {
+        $this->getConfigBuilder()->setMethod('PATCH');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\FormException
+     */
+    public function testSetMethodDoesNotAllowOtherValues()
+    {
+        $this->getConfigBuilder()->setMethod('foo');
+    }
+
+    private function getConfigBuilder($name = 'name')
+    {
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        return new FormConfigBuilder($name, null, $dispatcher);
     }
 }

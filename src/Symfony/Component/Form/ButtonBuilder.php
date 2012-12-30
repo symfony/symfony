@@ -457,6 +457,42 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     }
 
     /**
+     * Unsupported method.
+     *
+     * @param string $action
+     *
+     * @throws \BadMethodCallException
+     */
+    public function setAction($action)
+    {
+        throw new \BadMethodCallException('Buttons do not support actions.');
+    }
+
+    /**
+     * Unsupported method.
+     *
+     * @param string $method
+     *
+     * @throws \BadMethodCallException
+     */
+    public function setMethod($method)
+    {
+        throw new \BadMethodCallException('Buttons do not support methods.');
+    }
+
+    /**
+     * Unsupported method.
+     *
+     * @param FormProcessorInterface $formProcessor
+     *
+     * @throws \BadMethodCallException
+     */
+    public function setFormProcessor(FormProcessorInterface $formProcessor)
+    {
+        throw new \BadMethodCallException('Buttons do not support form processors.');
+    }
+
+    /**
      * Builds and returns the button configuration.
      *
      * @return FormConfigInterface
@@ -689,6 +725,36 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * @return null Always returns null.
      */
     public function getFormFactory()
+    {
+        return null;
+    }
+
+    /**
+     * Unsupported method.
+     *
+     * @return null Always returns null.
+     */
+    public function getAction()
+    {
+        return null;
+    }
+
+    /**
+     * Unsupported method.
+     *
+     * @return null Always returns null.
+     */
+    public function getMethod()
+    {
+        return null;
+    }
+
+    /**
+     * Unsupported method.
+     *
+     * @return null Always returns null.
+     */
+    public function getFormProcessor()
     {
         return null;
     }

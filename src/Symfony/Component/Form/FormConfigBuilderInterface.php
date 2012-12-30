@@ -238,6 +238,31 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setFormFactory(FormFactoryInterface $formFactory);
 
     /**
+     * Sets the target URL of the form.
+     *
+     * @param string $action The target URL of the form.
+     *
+     * @return self The configuration object.
+     */
+    public function setAction($action);
+
+    /**
+     * Sets the HTTP method used by the form.
+     *
+     * @param string $method The HTTP method of the form.
+     *
+     * @return self The configuration object.
+     */
+    public function setMethod($method);
+
+    /**
+     * @param FormProcessorInterface $formProcessor
+     *
+     * @return self The configuration object.
+     */
+    public function setFormProcessor(FormProcessorInterface $formProcessor);
+
+    /**
      * Builds and returns the form configuration.
      *
      * @return FormConfigInterface

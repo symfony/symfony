@@ -166,15 +166,13 @@ class ChoiceType extends AbstractType
         };
 
         $placeholderValue = function (Options $options) {
-            return $options['required'] ? null : '';
+            // BC until Symfony 2.3
+            return null !== $options['empty_value']
+                ? $options['empty_value']
+                : ($options['required'] ? null : '');
         };
 
         $placeholderValueNormalizer = function (Options $options, $placeholderValue) {
-            // BC until Symfony 2.3
-            if ($options['empty_value'] && !$placeholderValue) {
-                $placeholderValue = $options['empty_value'];
-            }
-
             if ($options['multiple'] || $options['expanded']) {
                 // never use an empty value for these cases
                 return null;

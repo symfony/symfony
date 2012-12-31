@@ -219,7 +219,15 @@ class DateTimeType extends AbstractType
             return $options['user_timezone'];
         };
 
+        $placeholderValue = function (Options $options) {
+            // BC until Symfony 2.3
+            return isset($options['empty_value'])
+                ? $options['empty_value']
+                : ($options['required'] ? null : '');
+        };
+
         $resolver->setDefaults(array(
+            'placeholder'    => $placeholderValue,
             'input'          => 'datetime',
             'model_timezone' => $modelTimezone,
             'view_timezone'  => $viewTimezone,
@@ -248,7 +256,7 @@ class DateTimeType extends AbstractType
         // Don't add some defaults in order to preserve the defaults
         // set in DateType and TimeType
         $resolver->setOptional(array(
-            'placeholder',
+            // Deprecated empty_value option
             'empty_value',
             'years',
             'months',

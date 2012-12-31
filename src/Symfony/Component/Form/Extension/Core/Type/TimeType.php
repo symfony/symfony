@@ -152,16 +152,18 @@ class TimeType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
-        $placeholderValue = $placeholderValueDefault = function (Options $options) {
+        $placeholderValue = function (Options $options) {
+            // BC until Symfony 2.3
+            return $options['empty_value'] !== null
+                ? $options['empty_value']
+                : ($options['required'] ? null : '');
+        };
+
+        $placeholderValueDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
         $placeholderValueNormalizer = function (Options $options, $placeholderValue) use ($placeholderValueDefault) {
-            // BC until Symfony 2.3
-            if ($options['empty_value'] && !$placeholderValue) {
-                $placeholderValue  = $options['empty_value'];
-            }
-
             if (is_array($placeholderValue)) {
                 $default = $placeholderValueDefault($options);
 

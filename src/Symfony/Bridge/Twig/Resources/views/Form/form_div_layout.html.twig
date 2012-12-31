@@ -218,6 +218,36 @@
 {% endspaceless %}
 {% endblock email_widget %}
 
+{% block button_widget %}
+{% spaceless %}
+    {% if type is not defined or type is empty %}
+        {% set type = "button" %}
+    {% endif %}
+    {% if label is empty %}
+        {% set label = name|humanize %}
+    {% endif %}
+    <button type="{{ type }}" {{ block('button_attributes') }}>{{ label|trans({}, translation_domain) }}</button>
+{% endspaceless %}
+{% endblock button_widget %}
+
+{% block submit_widget %}
+{% spaceless %}
+    {% if type is not defined %}
+        {% set type = "submit" %}
+    {% endif %}
+    {{ block('button_widget') }}
+{% endspaceless %}
+{% endblock submit_widget %}
+
+{% block reset_widget %}
+{% spaceless %}
+    {% if type is not defined %}
+        {% set type = "reset" %}
+    {% endif %}
+    {{ block('button_widget') }}
+{% endspaceless %}
+{% endblock reset_widget %}
+
 {# Labels #}
 
 {% block form_label %}
@@ -236,6 +266,8 @@
     {% endif %}
 {% endspaceless %}
 {% endblock form_label %}
+
+{% block button_label %}{% endblock %}
 
 {# Rows #}
 
@@ -258,6 +290,14 @@
     </div>
 {% endspaceless %}
 {% endblock form_row %}
+
+{% block button_row %}
+{% spaceless %}
+    <div>
+        {{ form_widget(form) }}
+    </div>
+{% endspaceless %}
+{% endblock button_row %}
 
 {% block hidden_row %}
     {{ form_widget(form) }}
@@ -316,6 +356,13 @@
     {% for attrname, attrvalue in attr %}{{ attrname }}="{{ attrvalue }}" {% endfor %}
 {% endspaceless %}
 {% endblock widget_container_attributes %}
+
+{% block button_attributes %}
+{% spaceless %}
+    id="{{ id }}" name="{{ full_name }}"{% if disabled %} disabled="disabled"{% endif %}
+    {% for attrname, attrvalue in attr %}{{ attrname }}="{{ attrvalue }}" {% endfor %}
+{% endspaceless %}
+{% endblock button_attributes %}
 
 {# Deprecated in Symfony 2.1, to be removed in 2.3 #}
 

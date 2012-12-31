@@ -111,7 +111,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         // Should be decoupled from the specific option at some point
         $dataClass = isset($options['data_class']) ? $options['data_class'] : null;
 
-        $builder = new FormBuilder($name, $dataClass, new EventDispatcher(), $factory, $options);
+        $builder = $this->newBuilder($name, $dataClass, $factory, $options);
         $builder->setType($this);
         $builder->setParent($parent);
 
@@ -127,7 +127,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     {
         $options = $form->getConfig()->getOptions();
 
-        $view = new FormView($parent);
+        $view = $this->newView($parent);
 
         $this->buildView($view, $form, $options);
 
@@ -242,5 +242,44 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         }
 
         return $this->optionsResolver;
+    }
+
+    /**
+     * Creates a new builder instance.
+     *
+     * Override this method if you want to customize the builder class.
+     *
+     * @param string               $name      The name of the builder.
+     * @param string               $dataClass The data class.
+     * @param FormFactoryInterface $factory   The current form factory.
+     * @param array                $options   The builder options.
+     *
+     * @return FormBuilderInterface The new builder instance.
+     */
+    protected function newBuilder($name, $dataClass, FormFactoryInterface $factory, array $options)
+    {
+        if ($this->innerType instanceof ButtonTypeInterface) {
+            return new ButtonBuilder($name, $options);
+        }
+
+        if ($this->innerType instanceof SubmitButtonTypeInterface) {
+            return new SubmitButtonBuilder($name, $options);
+        }
+
+        return new FormBuilder($name, $dataClass, new EventDispatcher(), $factory, $options);
+    }
+
+    /**
+     * Creates a new view instance.
+     *
+     * Override this method if you want to customize the view class.
+     *
+     * @param FormView|null $parent The parent view, if available.
+     *
+     * @return FormView A new view instance.
+     */
+    protected function newView(FormView $parent = null)
+    {
+        return new FormView($parent);
     }
 }

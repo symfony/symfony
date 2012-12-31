@@ -50,6 +50,9 @@ class CoreExtension extends AbstractExtension
             new Type\TimezoneType(),
             new Type\UrlType(),
             new Type\FileType(),
+            new Type\ButtonType(),
+            new Type\SubmitType(),
+            new Type\ResetType(),
         );
     }
 }

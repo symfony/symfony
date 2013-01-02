@@ -84,7 +84,7 @@
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} characters or more.</source>
-                <target>O valor é muito curto. Deveria de ter {{ limit }} caracteres ou mais.</target>
+                <target>O valor é muito curto. Deveria de ter {{ limit }} caractere ou mais.|O valor é muito curto. Deveria de ter {{ limit }} caracteres ou mais.</target>
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank.</source>

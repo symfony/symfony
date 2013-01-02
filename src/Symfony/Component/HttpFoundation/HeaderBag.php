@@ -235,6 +235,14 @@ class HeaderBag implements \IteratorAggregate, \Countable
             return $default;
         }
 
+        if (-1 === $value) {
+            /**
+             * Since we need to return a valid date time a older date has been chosen
+             * https://github.com/symfony/symfony/pull/6471#discussion_r2527156
+             */
+            $value = 'Sat, 01 Jan 00 00:00:00 +0000';
+        }
+
         if (false === $date = \DateTime::createFromFormat(DATE_RFC2822, $value)) {
             throw new \RuntimeException(sprintf('The %s HTTP header is not parseable (%s).', $key, $value));
         }

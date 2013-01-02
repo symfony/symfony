@@ -40,8 +40,6 @@ abstract class BaseType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        /* @var \Symfony\Component\Form\ClickableInterface $form */
-
         $name = $form->getName();
         $blockName = $options['block_name'] ?: $form->getName();
         $translationDomain = $options['translation_domain'];

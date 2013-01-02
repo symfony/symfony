@@ -163,5 +163,8 @@
         <service id="form.type_extension.repeated.validator" class="Symfony\Component\Form\Extension\Validator\Type\RepeatedTypeValidatorExtension">
             <tag name="form.type_extension" alias="repeated" />
         </service>
+        <service id="form.type_extension.submit.validator" class="Symfony\Component\Form\Extension\Validator\Type\SubmitTypeValidatorExtension">
+            <tag name="form.type_extension" alias="submit" />
+        </service>
     </services>
 </container>

@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormTypeValidatorExtension extends AbstractTypeExtension
+class FormTypeValidatorExtension extends BaseValidatorExtension
 {
     /**
      * @var ValidatorInterface
@@ -53,6 +53,8 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        parent::setDefaultOptions($resolver);
+
         // BC clause
         $constraints = function (Options $options) {
             return $options['validation_constraint'];

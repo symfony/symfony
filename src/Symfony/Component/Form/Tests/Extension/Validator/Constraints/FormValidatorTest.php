@@ -17,6 +17,7 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\Constraints\FormValidator;
+use Symfony\Component\Form\SubmitButtonBuilder;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -313,6 +314,62 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($form, new Form());
     }
 
+    public function testUseValidationGroupOfClickedButton()
+    {
+        $context = $this->getMockExecutionContext();
+        $object = $this->getMock('\stdClass');
+
+        $parent = $this->getBuilder('parent', null, array('cascade_validation' => true))
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
+        $form = $this->getForm('name', '\stdClass', array(
+            'validation_groups' => 'form_group',
+        ));
+
+        $parent->add($form);
+        $parent->add($this->getClickedSubmitButton('submit', array(
+            'validation_groups' => 'button_group',
+        )));
+
+        $form->setData($object);
+
+        $context->expects($this->once())
+            ->method('validate')
+            ->with($object, 'data', 'button_group', true);
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
+    public function testDontUseValidationGroupOfUnclickedButton()
+    {
+        $context = $this->getMockExecutionContext();
+        $object = $this->getMock('\stdClass');
+
+        $parent = $this->getBuilder('parent', null, array('cascade_validation' => true))
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
+        $form = $this->getForm('name', '\stdClass', array(
+            'validation_groups' => 'form_group',
+        ));
+
+        $parent->add($form);
+        $parent->add($this->getSubmitButton('submit', array(
+            'validation_groups' => 'button_group',
+        )));
+
+        $form->setData($object);
+
+        $context->expects($this->once())
+            ->method('validate')
+            ->with($object, 'data', 'form_group', true);
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
     public function testUseInheritedValidationGroup()
     {
         $context = $this->getMockExecutionContext();
@@ -561,9 +618,21 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         return new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory, $options);
     }
 
-    private function getForm($name = 'name', $dataClass = null)
+    private function getForm($name = 'name', $dataClass = null, array $options = array())
     {
-        return $this->getBuilder($name, $dataClass)->getForm();
+        return $this->getBuilder($name, $dataClass, $options)->getForm();
+    }
+
+    private function getSubmitButton($name = 'name', array $options = array())
+    {
+        $builder = new SubmitButtonBuilder($name, $options);
+
+        return $builder->getForm();
+    }
+
+    private function getClickedSubmitButton($name = 'name', array $options = array())
+    {
+        return $this->getSubmitButton($name, $options)->bind('');
     }
 
     /**

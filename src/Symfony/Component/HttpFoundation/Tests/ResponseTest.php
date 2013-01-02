@@ -223,7 +223,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $response->headers->set('Expires', -1);
         $response->expire();
-        $this->assertEquals(0, $response->headers->get('Age'), '->expire() does not set the Age to 0');
+        $this->assertNull($response->headers->get('Age'), '->expire() does not set the Age when the response is expired');
     }
 
     public function testGetTtl()
@@ -237,7 +237,12 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
         $response = new Response();
         $response->headers->set('Expires', $this->createDateTimeOneHourAgo()->format(DATE_RFC2822));
-        $this->assertLessThan(0, $response->getTtl(), '->getTtl() returns negative values when Expires is in part');
+        $this->assertLessThan(0, $response->getTtl(), '->getTtl() returns negative values when Expires is in past');
+
+        $response = new Response();
+        $response->headers->set('Expires', $response->getDate()->format(DATE_RFC2822));
+        $response->headers->set('Age', 0);
+        $this->assertSame(0, $response->getTtl(), '->getTtl() correctly handles zero');
 
         $response = new Response();
         $response->headers->set('Cache-Control', 'max-age=60');

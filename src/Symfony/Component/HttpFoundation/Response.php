@@ -693,6 +693,10 @@ class Response
         }
 
         if (null !== $this->getExpires()) {
+            if (!$this->getExpires() instanceof \DateTime) {
+                return 0;
+            }
+
             return $this->getExpires()->format('U') - $this->getDate()->format('U');
         }
 

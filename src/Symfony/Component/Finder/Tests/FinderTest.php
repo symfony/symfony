@@ -281,6 +281,29 @@ class FinderTest extends Iterator\RealIteratorTestCase
     /**
      * @dataProvider getAdaptersTestData
      */
+    public function testFilterSupportsCallables($adapter)
+    {
+        $finder = $this->buildFinder($adapter);
+        $filterStub = new Stubs\FilterStub();
+        $finder->filter(array($filterStub, 'filter'));
+
+        $this->assertIterator($this->toAbsolute(array('test.php', 'test.py')), $finder->in(self::$tmpDir)->getIterator());
+    }
+
+    /**
+     * @dataProvider getAdaptersTestData
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The filter must be a PHP callable
+     */
+    public function testFilterThrowExceptionIfNoCallable($adapter)
+    {
+        $finder = $this->buildFinder($adapter);
+        $finder->filter('foo');
+    }
+
+    /**
+     * @dataProvider getAdaptersTestData
+     */
     public function testFollowLinks($adapter)
     {
         if ('\\' == DIRECTORY_SEPARATOR) {

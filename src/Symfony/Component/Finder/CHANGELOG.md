@@ -6,6 +6,7 @@ CHANGELOG
 
  * added Finder::path() and Finder::notPath() methods
  * added finder adapters to improve performance on specific platforms
+ * The Finder::filter() method accepts all PHP callables now
 
 2.1.0
 -----

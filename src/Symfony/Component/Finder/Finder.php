@@ -562,16 +562,21 @@ class Finder implements \IteratorAggregate, \Countable
      * The anonymous function receives a \SplFileInfo and must return false
      * to remove files.
      *
-     * @param \Closure $closure An anonymous function
+     * @param callable $closure A PHP callable
      *
      * @return Finder The current Finder instance
+     *
+     * @throws \InvalidArgumentException if the closure is not a PHP callable
      *
      * @see Symfony\Component\Finder\Iterator\CustomFilterIterator
      *
      * @api
      */
-    public function filter(\Closure $closure)
+    public function filter($closure)
     {
+        if (!is_callable($closure)) {
+            throw new \InvalidArgumentException('The filter must be a PHP callable');
+        }
         $this->filters[] = $closure;
 
         return $this;

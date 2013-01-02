@@ -79,6 +79,12 @@ CHANGELOG
    pass the requirements (otherwise it would break your link anyway).
  * There is no restriction on the route name anymore. So non-alphanumeric characters
    are now also allowed.
+ * Added possibility to generate relative paths and network paths in the UrlGenerator, e.g.
+   "../parent-file" and "//example.com/dir/file". The third parameter in
+   `UrlGeneratorInterface::generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)`
+   now accepts more values and you should use the constants defined in `UrlGeneratorInterface` for
+   claritiy. The old method calls with a Boolean parameter will continue to work because they
+   equal the signature using the constants.
 
 2.1.0
 -----

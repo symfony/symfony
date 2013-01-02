@@ -614,8 +614,8 @@ class Response
      */
     public function getAge()
     {
-        if ($age = $this->headers->get('Age')) {
-            return $age;
+        if (null !== $age = $this->headers->get('Age')) {
+            return (int) $age;
         }
 
         return max(time() - $this->getDate()->format('U'), 0);
@@ -691,12 +691,12 @@ class Response
      */
     public function getMaxAge()
     {
-        if ($age = $this->headers->getCacheControlDirective('s-maxage')) {
-            return $age;
+        if ($this->headers->hasCacheControlDirective('s-maxage')) {
+            return (int) $this->headers->getCacheControlDirective('s-maxage');
         }
 
-        if ($age = $this->headers->getCacheControlDirective('max-age')) {
-            return $age;
+        if ($this->headers->hasCacheControlDirective('max-age')) {
+            return (int) $this->headers->getCacheControlDirective('max-age');
         }
 
         if (null !== $this->getExpires()) {
@@ -757,7 +757,7 @@ class Response
      */
     public function getTtl()
     {
-        if ($maxAge = $this->getMaxAge()) {
+        if (null !== $maxAge = $this->getMaxAge()) {
             return $maxAge - $this->getAge();
         }
 
@@ -961,7 +961,7 @@ class Response
      */
     public function hasVary()
     {
-        return (Boolean) $this->headers->get('Vary');
+        return null !== $this->headers->get('Vary');
     }
 
     /**

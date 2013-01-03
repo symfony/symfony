@@ -36,12 +36,15 @@
         <service id="http_content_renderer.strategy.hinclude" class="%http_content_renderer.strategy.hinclude.class%">
             <tag name="kernel.content_renderer_strategy" />
             <argument type="service" id="templating" />
+            <argument type="service" id="uri_signer" />
             <argument>%http_content_renderer.strategy.hinclude.global_template%</argument>
+            <call method="setUrlGenerator"><argument type="service" id="router" /></call>
         </service>
 
 <!-- FIXME: make the listener registration optional via a configuration setting? -->
         <service id="http_content_renderer.listener.router_proxy" class="%http_content_renderer.listener.router_proxy.class%">
             <tag name="kernel.event_subscriber" />
+            <argument type="service" id="uri_signer" />
         </service>
 
     </services>

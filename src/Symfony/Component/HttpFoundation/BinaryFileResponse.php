@@ -210,6 +210,8 @@ class BinaryFileResponse extends Response
                 $this->headers->set('Content-Range', sprintf('bytes %s-%s/%s', $start, $end, $this->file->getSize()));
             }
         }
+
+        return $this;
     }
 
     /**

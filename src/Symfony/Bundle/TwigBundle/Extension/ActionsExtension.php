@@ -34,16 +34,17 @@ class ActionsExtension extends \Twig_Extension
     }
 
     /**
-     * Returns the Response content for a given URI.
+     * Returns the Response content for a given controller or URI.
      *
-     * @param string $uri     A URI
-     * @param array  $options An array of options
+     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
+     * @param array  $attributes An array of request attributes
+     * @param array  $options    An array of options
      *
      * @see Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver::render()
      */
-    public function renderUri($uri, array $options = array())
+    public function renderAction($controller, array $attributes = array(), array $options = array())
     {
-        return $this->container->get('templating.helper.actions')->render($uri, $options);
+        return $this->container->get('templating.helper.actions')->render($controller, $attributes, $options);
     }
 
     /**
@@ -54,7 +55,7 @@ class ActionsExtension extends \Twig_Extension
     public function getTokenParsers()
     {
         return array(
-            // {% render url('post_list', { 'limit': 2 }), { 'alt': 'BlogBundle:Post:error' } %}
+            // {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
             new RenderTokenParser(),
         );
     }

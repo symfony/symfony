@@ -598,21 +598,25 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @throws \InvalidArgumentException if one of the directory does not exist
+     * @throws \InvalidArgumentException if one of the directories does not exist
      *
      * @api
      */
     public function in($dirs)
     {
-        $dirs = (array) $dirs;
+        $resolvedDirs = array();
 
-        foreach ($dirs as $dir) {
-            if (!is_dir($dir)) {
+        foreach ((array) $dirs as $dir) {
+            if (is_dir($dir)) {
+                $resolvedDirs[] = $dir;
+            } elseif ($glob = glob($dir, GLOB_ONLYDIR)) {
+                $resolvedDirs = array_merge($resolvedDirs, $glob);
+            } else {
                 throw new \InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));
             }
         }
 
-        $this->dirs = array_merge($this->dirs, $dirs);
+        $this->dirs = array_merge($this->dirs, $resolvedDirs);
 
         return $this;
     }

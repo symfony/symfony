@@ -37,6 +37,7 @@ class HttpKernelExtension extends \Twig_Extension
     {
         return array(
             'render' => new \Twig_Function_Method($this, 'render', array('is_safe' => array('html'))),
+            'render_*' => new \Twig_Function_Method($this, 'renderStrategy', array('is_safe' => array('html'))),
             'controller' => new \Twig_Function_Method($this, 'controller'),
         );
     }
@@ -53,6 +54,13 @@ class HttpKernelExtension extends \Twig_Extension
      */
     public function render($uri, $options = array())
     {
+        return $this->renderer->render($uri, $options);
+    }
+
+    public function renderStrategy($strategy, $uri, $options = array())
+    {
+        $options['strategy'] = $strategy;
+
         return $this->renderer->render($uri, $options);
     }
 

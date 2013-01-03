@@ -83,7 +83,7 @@ class DateType extends AbstractType
                 // Only pass a subset of the options to children
                 $yearOptions['choices'] = $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years']));
                 $yearOptions['empty_value'] = $options['empty_value']['year'];
-                $monthOptions['choices'] = $this->formatTimestamps($formatter, '/M+/', $this->listMonths($options['months']));
+                $monthOptions['choices'] = $this->formatTimestamps($formatter, '/[M|L]+/', $this->listMonths($options['months']));
                 $monthOptions['empty_value'] = $options['empty_value']['month'];
                 $dayOptions['choices'] = $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days']));
                 $dayOptions['empty_value'] = $options['empty_value']['day'];

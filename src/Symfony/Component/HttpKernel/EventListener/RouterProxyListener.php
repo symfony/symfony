@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\UriSigner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -28,6 +29,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class RouterProxyListener implements EventSubscriberInterface
 {
+    private $signer;
+
+    public function __construct(UriSigner $signer)
+    {
+        $this->signer = $signer;
+    }
+
     /**
      * Fixes request attributes when the route is '_proxy'.
      *
@@ -43,7 +51,7 @@ class RouterProxyListener implements EventSubscriberInterface
             return;
         }
 
-        $this->checkRequest($request);
+        $this->validateRequest($request);
 
         parse_str($request->query->get('path', ''), $attributes);
         $request->attributes->add($attributes);
@@ -51,14 +59,25 @@ class RouterProxyListener implements EventSubscriberInterface
         $request->query->remove('path');
     }
 
-    protected function checkRequest(Request $request)
+    protected function validateRequest(Request $request)
     {
+        // is the Request safe?
+        if (!$request->isMethodSafe()) {
+            throw new AccessDeniedHttpException();
+        }
+
+        // does the Request come from a trusted IP?
         $trustedIps = array_merge($this->getLocalIpAddresses(), $request->getTrustedProxies());
         $remoteAddress = $request->server->get('REMOTE_ADDR');
         foreach ($trustedIps as $ip) {
             if (IpUtils::checkIp($remoteAddress, $ip)) {
                 return;
             }
+        }
+
+        // is the Request signed?
+        if ($this->signer->check($request->getUri())) {
+            return;
         }
 
         throw new AccessDeniedHttpException();

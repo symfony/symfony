@@ -14,17 +14,19 @@ namespace Symfony\Component\HttpKernel\RenderingStrategy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpKernel\UriSigner;
 
 /**
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HIncludeRenderingStrategy implements RenderingStrategyInterface
+class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
 {
     private $templating;
     private $globalDefaultTemplate;
+    private $signer;
 
-    public function __construct($templating, $globalDefaultTemplate = null)
+    public function __construct($templating, UriSigner $signer = null, $globalDefaultTemplate = null)
     {
         if (!$templating instanceof EngineInterface && !$templating instanceof \Twig_Environment) {
             throw new \InvalidArgumentException('The hinclude rendering strategy needs an instance of \Twig_Environment or Symfony\Component\Templating\EngineInterface');
@@ -32,16 +34,20 @@ class HIncludeRenderingStrategy implements RenderingStrategyInterface
 
         $this->templating = $templating;
         $this->globalDefaultTemplate = $globalDefaultTemplate;
+        $this->signer = $signer;
     }
 
     public function render($uri, Request $request = null, array $options = array())
     {
         if ($uri instanceof ControllerReference) {
-            // FIXME: can we sign the proxy URL instead?
-            throw new \LogicException('You must use a proper URI when using the Hinclude rendering strategy.');
+            if (null === $this->signer) {
+                throw new \LogicException('You must use a proper URI when using the Hinclude rendering strategy or set a URL signer.');
+            }
+
+            $uri = $this->signer->sign($this->generateProxyUri($uri, $request));
         }
 
-        $defaultTemplate = $options['default'] ?: null;
+        $defaultTemplate = isset($options['default']) ? $options['default'] : null;
         $defaultContent = null;
 
         if (null !== $defaultTemplate) {

@@ -87,7 +87,7 @@ class DialogHelper extends Helper
             $ret = trim($ret);
         } else {
             $i = 0;
-            $currentMatched = false;
+            $currentMatched = array_search($default, $autocomplete);
             $ret = '';
 
             // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
@@ -96,6 +96,15 @@ class DialogHelper extends Helper
             // Add highlighted text style
             $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
 
+            // Show default value (if present in the autocomplete list)
+            if (false !== $currentMatched) {
+                // Save cursor position
+                $output->write("\0337");
+                $output->write('<hl>' . $autocomplete[$currentMatched] . '</hl>');
+                // Restore cursor position
+                $output->write("\0338");
+            }
+
             // Read a keypress
             while ($c = fread($inputStream, 1)) {
                 // Did we read an escape sequence?
@@ -103,16 +112,21 @@ class DialogHelper extends Helper
                     $c .= fread($inputStream, 2);
 
                     // Escape sequences for arrow keys
-                    if ('A' === $c[2] || 'B' === $c[2] || 'C' === $c[2] || 'D' === $c[2]) {
+                    if ('C' === $c[2] || 'D' === $c[2]) {
                         // todo
                     }
 
-                    continue;
+                    // Continue unless it's an upper or down arrow
+                    if ('A' !== $c[2] && 'B' !== $c[2]) {
+                        continue;
+                    }
                 }
 
                 // Backspace Character
                 if ("\177" === $c) {
                     if ($i === 0) {
+                        // Erase characters from cursor to end of line
+                        $output->write("\033[K");
                         continue;
                     }
 
@@ -149,40 +163,61 @@ class DialogHelper extends Helper
                     continue;
                 }
 
-                if (ord($c) < 32) {
-                    continue;
-                }
+                // Skip writing if it's an upper or down arrow
+                if ("\033[A" !== $c && "\033[B" !== $c) {
+                    if (ord($c) < 32) {
+                        continue;
+                    }
 
-                $output->write($c);
-                $ret .= $c;
-                $i++;
+                    $output->write($c);
+                    $ret .= $c;
+                    $i++;
+                }
 
                 // Erase characters from cursor to end of line
                 $output->write("\033[K");
 
-                foreach ($autocomplete as $j => $value) {
-                    // Get a substring of the current autocomplete item based on number of chars typed (e.g. AcmeDemoBundle = Acme)
-                    $matchTest = substr($value, 0, $i);
+                if (in_array($ret, $autocomplete)) {
+                    $currentMatched = false;
+                } else {
+                    if (empty($ret)) {
+                        $matches = $autocomplete;
+                    } else {
+                        $matches = array_filter($autocomplete, function($value) use ($ret) {
+                            return 0 === strpos($value, $ret);
+                        });
+                    }
 
-                    if ($ret === $matchTest) {
-                        if ($i === strlen($value)) {
-                            $currentMatched = false;
-                            break;
+                    if (empty($matches)) {
+                        $currentMatched = false;
+                    } else {
+                        if (1 < count($matches) && false !== $currentMatched) {
+                            // if the previously matched is still in the matched set
+                            if (isset($matches[$currentMatched])) {
+                                // Sets current key at the right position
+                                while (key($matches) !== $currentMatched) {
+                                    next($matches);
+                                }
+
+                                // If upper or down arrow, browse to the next or previous entry
+                                if ("\033[A" === $c && false === prev($matches)) {
+                                    reset($matches);
+                                } elseif ("\033[B" === $c && false === next($matches)) {
+                                    end($matches);
+                                }
+                            }                            
                         }
-                        
+
+                        $currentMatched = key($matches);
+
                         // Save cursor position
                         $output->write("\0337");
 
-                        $output->write('<hl>' . substr($value, $i) . '</hl>');
+                        $output->write('<hl>' . substr($matches[$currentMatched], strlen($ret)) . '</hl>');
 
                         // Restore cursor position
                         $output->write("\0338");
-
-                        $currentMatched = $j;
-                        break;
                     }
-
-                    $currentMatched = false;
                 }
             }
 

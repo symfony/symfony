@@ -188,6 +188,9 @@ class StubIntlDateFormatter
             $argumentError = 'datefmt_format: takes either an array  or an integer timestamp value ';
         } elseif (version_compare(\PHP_VERSION, '5.3.4', '>=') && !is_int($timestamp) && !$timestamp instanceof \DateTime) {
             $argumentError = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object';
+            if (version_compare(\PHP_VERSION, '5.5.0alpha1', '>=') && !is_int($timestamp)) {
+                $argumentError = sprintf('datefmt_format: string \'%s\' is not numeric, which would be required for it to be a valid date', $timestamp);
+            }
         }
 
         if (null !== $argumentError) {
@@ -313,7 +316,28 @@ class StubIntlDateFormatter
             return $this->timeZoneId;
         }
 
+        // In PHP 5.5 default timezone depends on `date_default_timezone_get()` method
+        if (version_compare(\PHP_VERSION, '5.5.0alpha1', '>=')) {
+            return date_default_timezone_get();
+        }
+
         return null;
+    }
+
+    /**
+     * Returns the formatter's timezone
+     *
+     * @return \DateTimeZone The timezone identifier used by the formatter
+     *
+     * @see    http://www.php.net/manual/en/intldateformatter.gettimezone.php
+     */
+    public function getTimeZone()
+    {
+        if (!$this->unitializedTimeZoneId) {
+            return new \DateTimeZone($this->timeZoneId);
+        }
+
+        return new \DateTimeZone(date_default_timezone_get());
     }
 
     /**
@@ -490,13 +514,18 @@ class StubIntlDateFormatter
         return true;
     }
 
+    public function setTimeZone($timeZoneId)
+    {
+        return $this->setTimeZoneId($timeZoneId);
+    }
+
     /**
      * Create and returns a DateTime object with the specified timestamp and with the
      * current time zone
      *
      * @param int $timestamp
      *
-     * @return DateTime
+     * @return \DateTime
      */
     protected function createDateTime($timestamp)
     {

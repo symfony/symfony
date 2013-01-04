@@ -338,10 +338,13 @@ class Process
                 $w = null;
                 $e = null;
 
-                $n = @stream_select($r, $w, $e, $this->timeout);
+                if (false === $n = @stream_select($r, $w, $e, $this->timeout)) {
+                    $lastError = error_get_last();
 
-                if (false === $n) {
-                    $this->pipes = array();
+                    // stream_select returns false when the `select` system call is interrupted by an incoming signal
+                    if (isset($lastError['message']) && false === stripos($lastError['message'], 'interrupted system call')) {
+                        $this->pipes = array();
+                    }
 
                     continue;
                 }

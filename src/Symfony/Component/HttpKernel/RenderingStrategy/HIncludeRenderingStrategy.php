@@ -32,7 +32,7 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
      *
      * @param EngineInterface|\Twig_Environment $templating            An EngineInterface or a \Twig_Environment instance
      * @param UriSigner                         $signer                A UriSigner instance
-     * @param string                            $globalDefaultTemplate The content of the global default template
+     * @param string                            $globalDefaultTemplate The global default content (it can be a template name or the content)
      */
     public function __construct($templating, UriSigner $signer = null, $globalDefaultTemplate = null)
     {
@@ -47,6 +47,10 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
 
     /**
      * {@inheritdoc}
+     *
+     * Additional available options:
+     *
+     *  * default: The default content (it can be a template name or the content)
      */
     public function render($uri, Request $request = null, array $options = array())
     {
@@ -58,31 +62,14 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
             $uri = $this->signer->sign($this->generateProxyUri($uri, $request));
         }
 
-        $defaultTemplate = isset($options['default']) ? $options['default'] : null;
-        $defaultContent = null;
-
-        if (null !== $defaultTemplate) {
-            if ($this->templateExists($defaultTemplate)) {
-                $defaultContent = $this->templating->render($defaultContent);
-            } else {
-                $defaultContent = $defaultTemplate;
-            }
-        } elseif ($this->globalDefaultTemplate) {
-            $defaultContent = $this->templating->render($this->globalDefaultTemplate);
+        $template = isset($options['default']) ? $options['default'] : $this->globalDefaultTemplate;
+        if ($this->templateExists($template)) {
+            $content = $this->templating->render($template);
+        } else {
+            $content = $template;
         }
 
-        return $this->renderHIncludeTag($uri, $defaultContent);
-    }
-
-    /**
-     * Renders an HInclude tag.
-     *
-     * @param string $uri            A URI
-     * @param string $defaultContent Default content
-     */
-    protected function renderHIncludeTag($uri, $defaultContent = null)
-    {
-        return sprintf('<hx:include src="%s">%s</hx:include>', $uri, $defaultContent);
+        return sprintf('<hx:include src="%s">%s</hx:include>', $uri, $content);
     }
 
     private function templateExists($template)

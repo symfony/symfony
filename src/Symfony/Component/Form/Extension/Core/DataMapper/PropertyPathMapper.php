@@ -56,7 +56,7 @@ class PropertyPathMapper implements DataMapperInterface
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $form) {
-            /* @var FormInterface $form */
+            /* @var \Symfony\Component\Form\FormInterface $form */
             $propertyPath = $form->getPropertyPath();
             $config = $form->getConfig();
 
@@ -83,7 +83,7 @@ class PropertyPathMapper implements DataMapperInterface
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $form) {
-            /* @var FormInterface $form */
+            /* @var \Symfony\Component\Form\FormInterface $form */
             $propertyPath = $form->getPropertyPath();
             $config = $form->getConfig();
 

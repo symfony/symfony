@@ -12,10 +12,11 @@
 namespace Symfony\Component\Form\Util;
 
 /**
- * Iterator that traverses fields of a field group
+ * Iterator that returns only forms from a form tree that do not inherit their
+ * parent data.
  *
- * If the iterator encounters a virtual field group, it enters the field
- * group and traverses its children as well.
+ * If the iterator encounters a form that inherits its parent data, it enters
+ * the form and traverses its children as well.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -28,6 +29,6 @@ class VirtualFormAwareIterator extends \ArrayIterator implements \RecursiveItera
 
     public function hasChildren()
     {
-        return $this->current()->getConfig()->getVirtual();
+        return $this->current()->getConfig()->getInheritData();
     }
 }

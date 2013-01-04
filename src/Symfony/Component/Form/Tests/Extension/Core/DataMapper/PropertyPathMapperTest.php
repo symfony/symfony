@@ -182,7 +182,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($form->getData());
     }
 
-    public function testMapDataToFormsSkipsVirtualForms()
+    public function testMapDataToFormsSkipsFormsInheritingParentData()
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -195,7 +195,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
 
         $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
         $config->setByReference(true);
-        $config->setVirtual(true);
+        $config->setInheritData(true);
         $config->setCompound(true);
         $config->setDataMapper($this->getDataMapper());
         $form = $this->getForm($config);
@@ -348,7 +348,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $this->mapper->mapFormsToData(array($form), $car);
     }
 
-    public function testMapFormsToDataSkipsVirtualForms()
+    public function testMapFormsToDataSkipsFormsInheritingParentData()
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -366,7 +366,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
 
         $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
         $config->setPropertyPath($parentPath);
-        $config->setVirtual(true);
+        $config->setInheritData(true);
         $config->setCompound(true);
         $config->setDataMapper($this->getDataMapper());
         $form = $this->getForm($config);

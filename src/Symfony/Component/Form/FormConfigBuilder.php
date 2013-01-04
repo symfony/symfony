@@ -80,7 +80,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @var Boolean
      */
-    private $virtual = false;
+    private $inheritData = false;
 
     /**
      * @var Boolean
@@ -341,9 +341,24 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function getInheritData()
+    {
+        return $this->inheritData;
+    }
+
+    /**
+     * Alias of {@link getInheritData()}.
+     *
+     * @return FormConfigBuilder The configuration object.
+     *
+     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
+     *             {@link getInheritData()} instead.
+     */
     public function getVirtual()
     {
-        return $this->virtual;
+        trigger_error('getVirtual() is deprecated since version 2.2 and will be removed in 2.3. Use getInheritData() instead.', E_USER_DEPRECATED);
+
+        return $this->getInheritData();
     }
 
     /**
@@ -676,15 +691,32 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setVirtual($virtual)
+    public function setInheritData($inheritData)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->virtual = $virtual;
+        $this->inheritData = $inheritData;
 
         return $this;
+    }
+
+    /**
+     * Alias of {@link setInheritData()}.
+     *
+     * @param Boolean $inheritData Whether the form should inherit its parent's data.
+     *
+     * @return FormConfigBuilder The configuration object.
+     *
+     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
+     *             {@link setInheritData()} instead.
+     */
+    public function setVirtual($inheritData)
+    {
+        trigger_error('setVirtual() is deprecated since version 2.2 and will be removed in 2.3. Use setInheritData() instead.', E_USER_DEPRECATED);
+
+        $this->setInheritData($inheritData);
     }
 
     /**

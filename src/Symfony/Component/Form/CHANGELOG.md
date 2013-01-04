@@ -9,6 +9,7 @@ CHANGELOG
  * added FormProcessorInterface and FormInterface::process()
  * deprecated passing a Request instance to FormInterface::bind()
  * added options "method" and "action" to FormType
+ * deprecated option "virtual", renamed it to "inherit_data"
 
 2.2.0
 -----

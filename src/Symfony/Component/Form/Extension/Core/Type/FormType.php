@@ -48,7 +48,7 @@ class FormType extends BaseType
             ->setPropertyPath($options['property_path'])
             ->setMapped($options['mapped'])
             ->setByReference($options['by_reference'])
-            ->setVirtual($options['virtual'])
+            ->setInheritData($options['inherit_data'])
             ->setCompound($options['compound'])
             ->setData(isset($options['data']) ? $options['data'] : null)
             ->setDataLocked(isset($options['data']))
@@ -95,8 +95,8 @@ class FormType extends BaseType
             'size'       => null,
             'label_attr' => $options['label_attr'],
             'compound'   => $form->getConfig()->getCompound(),
-            'method'              => $form->getConfig()->getMethod(),
-            'action'              => $form->getConfig()->getAction(),
+            'method'     => $form->getConfig()->getMethod(),
+            'action'     => $form->getConfig()->getAction(),
         ));
     }
 
@@ -169,7 +169,7 @@ class FormType extends BaseType
             'by_reference'       => true,
             'error_bubbling'     => $errorBubbling,
             'label_attr'         => array(),
-            'virtual'            => false,
+            'inherit_data'       => false,
             'compound'           => true,
             'method'             => 'POST',
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)

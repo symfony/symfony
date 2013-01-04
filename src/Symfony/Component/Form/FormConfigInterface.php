@@ -55,15 +55,11 @@ interface FormConfigInterface
     public function getByReference();
 
     /**
-     * Returns whether the form should be virtual.
+     * Returns whether the form should read and write the data of its parent.
      *
-     * When mapping data to the children of a form, the data mapper
-     * should ignore virtual forms and map to the children of the
-     * virtual form instead.
-     *
-     * @return Boolean Whether the form is virtual.
+     * @return Boolean Whether the form should inherit its parent's data.
      */
-    public function getVirtual();
+    public function getInheritData();
 
     /**
      * Returns whether the form is compound.

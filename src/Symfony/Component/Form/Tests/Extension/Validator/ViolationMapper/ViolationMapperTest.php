@@ -71,13 +71,13 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->params = array('foo' => 'bar');
     }
 
-    protected function getForm($name = 'name', $propertyPath = null, $dataClass = null, $errorMapping = array(), $virtual = false, $synchronized = true)
+    protected function getForm($name = 'name', $propertyPath = null, $dataClass = null, $errorMapping = array(), $inheritData = false, $synchronized = true)
     {
         $config = new FormConfigBuilder($name, $dataClass, $this->dispatcher, array(
             'error_mapping' => $errorMapping,
         ));
         $config->setMapped(true);
-        $config->setVirtual($virtual);
+        $config->setInheritData($inheritData);
         $config->setPropertyPath($propertyPath);
         $config->setCompound(true);
         $config->setDataMapper($this->getDataMapper());
@@ -118,7 +118,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         return new FormError($this->message, $this->messageTemplate, $this->params);
     }
 
-    public function testMapToVirtualFormIfDataDoesNotMatch()
+    public function testMapToFormInheritingParentDataIfDataDoesNotMatch()
     {
         $violation = $this->getConstraintViolation('children[address].data.foo');
         $parent = $this->getForm('parent');
@@ -183,7 +183,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
     }
 
-    public function testAbortVirtualFormMappingIfNotSynchronized()
+    public function testAbortFormInheritingParentDataMappingIfNotSynchronized()
     {
         $violation = $this->getConstraintViolation('children[address].children[street].data.foo');
         $parent = $this->getForm('parent');
@@ -1446,7 +1446,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function provideVirtualFormErrorTests()
+    public function provideFormInheritingParentDataErrorTests()
     {
         return array(
             // mapping target, child name, its property path, grand child name, its property path, violation path
@@ -1472,9 +1472,9 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provideVirtualFormErrorTests
+     * @dataProvider provideFormInheritingParentDataErrorTests
      */
-    public function testVirtualFormErrorMapping($target, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath)
+    public function testFormInheritingParentDataErrorMapping($target, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath)
     {
         $violation = $this->getConstraintViolation($violationPath);
         $parent = $this->getForm('parent');

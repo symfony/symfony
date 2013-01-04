@@ -46,22 +46,14 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
     public static function isSupported()
     {
         if (!defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $disableFunctions = ini_get('disable_functions');
-            if (!$disableFunctions) {
-                return true;
-            }
-
-            $required = array('passthru', 'escapeshellarg');
-            $disabled = array_map(
-                function($item) { 
-                    return strtolower(trim($item)); 
-                },
-                explode(',', $disableFunctions)
-            );
-
-            return !array_intersect($required, $disabled);
+			$required = array('passthru', 'escapeshellarg');
+            foreach ($required as $function) {
+                if (!function_exists($function)) {
+                    return false;	
+                }
+			}			
+            return true;
         }
-
         return false;
     }
 

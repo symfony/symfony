@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\RenderingStrategy\RenderingStrategyInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
+ * Renders a URI using different strategies.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -28,6 +29,12 @@ class HttpContentRenderer implements EventSubscriberInterface
     private $strategies;
     private $requests;
 
+    /**
+     * Constructor.
+     *
+     * @param RenderingStrategyInterface[] $strategies An array of RenderingStrategyInterface instances
+     * @param Boolean                      $debug      Whether the debug mode is enabled or not
+     */
     public function __construct(array $strategies = array(), $debug = false)
     {
         $this->strategies = array();
@@ -38,6 +45,11 @@ class HttpContentRenderer implements EventSubscriberInterface
         $this->requests = array();
     }
 
+    /**
+     * Adds a rendering strategy.
+     *
+     * @param RenderingStrategyInterface $strategy A RenderingStrategyInterface instance
+     */
     public function addStrategy(RenderingStrategyInterface $strategy)
     {
         $this->strategies[$strategy->getName()] = $strategy;
@@ -66,13 +78,16 @@ class HttpContentRenderer implements EventSubscriberInterface
     /**
      * Renders a URI and returns the Response content.
      *
+     * When the Response is a StreamedResponse, the content is streamed immediately
+     * instead of being returned.
+     *
      *  * ignore_errors: true to return an empty string in case of an error
      *  * strategy:      the strategy to use for rendering
      *
      * @param string|ControllerReference $uri     A URI as a string or a ControllerReference instance
      * @param array                      $options An array of options
      *
-     * @return string The Response content
+     * @return string|null The Response content or null when the Response is streamed
      */
     public function render($uri, array $options = array())
     {
@@ -99,6 +114,7 @@ class HttpContentRenderer implements EventSubscriberInterface
         );
     }
 
+    // to be removed in 2.3
     private function fixOptions($options)
     {
         // support for the standalone option is @deprecated in 2.2 and replaced with the strategy option

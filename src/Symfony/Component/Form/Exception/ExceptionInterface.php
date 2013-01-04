@@ -12,10 +12,10 @@
 namespace Symfony\Component\Form\Exception;
 
 /**
- * Indicates a value transformation error.
+ * Base ExceptionInterface for Form component.
  *
- * @author     Bernhard Schussek <bschussek@gmail.com>
+ * @author Julien Galenski <julien.galenski@gmail.com>
  */
-class TransformationFailedException extends \RuntimeException implements ExceptionInterface
+interface ExceptionInterface
 {
 }

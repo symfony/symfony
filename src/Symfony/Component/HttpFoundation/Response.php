@@ -679,7 +679,7 @@ class Response
     }
 
     /**
-     * Gets the number of seconds after the time specified in the response's Date
+     * Returns the number of seconds after the time specified in the response's Date
      * header when the the response should no longer be considered fresh.
      *
      * First, it checks for a s-maxage directive, then a max-age directive, and then it falls

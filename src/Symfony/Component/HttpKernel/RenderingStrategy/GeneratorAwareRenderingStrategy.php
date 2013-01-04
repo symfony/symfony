@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
+ * Adds the possibility to generate a proxy URI for a given Controller.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -24,6 +25,11 @@ abstract class GeneratorAwareRenderingStrategy implements RenderingStrategyInter
 {
     protected $generator;
 
+    /**
+     * Sets a URL generator to use for proxy URIs generation.
+     *
+     * @param UrlGeneratorInterface $generator An UrlGeneratorInterface instance
+     */
     public function setUrlGenerator(UrlGeneratorInterface $generator)
     {
         $this->generator = $generator;

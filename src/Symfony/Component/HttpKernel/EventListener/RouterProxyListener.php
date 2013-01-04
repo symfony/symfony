@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Proxies URIs when the current route name is "_proxy".
  *
- * If the request does not come from a trusted, it throws an
+ * If the request does not come from a trusted IP, it throws an
  * AccessDeniedHttpException exception.
  *
  * @author Fabien Potencier <fabien@symfony.com>

@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel;
 
 /**
- * UriSigner.
+ * Signs URIs.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

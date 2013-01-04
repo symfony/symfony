@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\UriSigner;
 
 /**
+ * Implements the Hinclude rendering strategy.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -26,6 +27,13 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
     private $globalDefaultTemplate;
     private $signer;
 
+    /**
+     * Constructor.
+     *
+     * @param EngineInterface|\Twig_Environment $templating            An EngineInterface or a \Twig_Environment instance
+     * @param UriSigner                         $signer                A UriSigner instance
+     * @param string                            $globalDefaultTemplate The content of the global default template
+     */
     public function __construct($templating, UriSigner $signer = null, $globalDefaultTemplate = null)
     {
         if (!$templating instanceof EngineInterface && !$templating instanceof \Twig_Environment) {
@@ -37,6 +45,9 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
         $this->signer = $signer;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function render($uri, Request $request = null, array $options = array())
     {
         if ($uri instanceof ControllerReference) {
@@ -95,6 +106,9 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
         return false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'hinclude';

@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
+ * Implements the default rendering strategy where the Request is rendered by the current HTTP kernel.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -23,11 +24,19 @@ class DefaultRenderingStrategy extends GeneratorAwareRenderingStrategy
 {
     private $kernel;
 
+    /**
+     * Constructor.
+     *
+     * @param HttpKernelInterface $kernel A HttpKernelInterface instance
+     */
     public function __construct(HttpKernelInterface $kernel)
     {
         $this->kernel = $kernel;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function render($uri, Request $request = null, array $options = array())
     {
         if ($uri instanceof ControllerReference) {
@@ -94,6 +103,9 @@ class DefaultRenderingStrategy extends GeneratorAwareRenderingStrategy
         return $subRequest;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'default';

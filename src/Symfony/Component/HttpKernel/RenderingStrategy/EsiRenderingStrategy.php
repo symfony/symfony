@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 
 /**
+ * Implements the ESI rendering strategy.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -24,6 +25,16 @@ class EsiRenderingStrategy extends GeneratorAwareRenderingStrategy
     private $esi;
     private $defaultStrategy;
 
+    /**
+     * Constructor.
+     *
+     * The "fallback" strategy when ESI is not available should always be an
+     * instance of DefaultRenderingStrategy (or a class you are using for the
+     * default strategy).
+     *
+     * @param Esi                        $esi             An Esi instance
+     * @param RenderingStrategyInterface $defaultStrategy The default strategy to use when ESI is not supported
+     */
     public function __construct(Esi $esi, RenderingStrategyInterface $defaultStrategy)
     {
         $this->esi = $esi;
@@ -31,15 +42,17 @@ class EsiRenderingStrategy extends GeneratorAwareRenderingStrategy
     }
 
     /**
+     * {@inheritdoc}
      *
-     * Note that this method generates an esi:include tag only when both the standalone
-     * option is set to true and the request has ESI capability (@see Symfony\Component\HttpKernel\HttpCache\ESI).
+     * Note that if the current Request has no ESI capability, this method
+     * falls back to use the default rendering strategy.
      *
-     * Available options:
+     * Additional available options:
      *
-     *  * ignore_errors: true to return an empty string in case of an error
-     *  * alt: an alternative URI to execute in case of an error
+     *  * alt: an alternative URI to render in case of an error
      *  * comment: a comment to add when returning an esi:include tag
+     *
+     * @see Symfony\Component\HttpKernel\HttpCache\ESI
      */
     public function render($uri, Request $request = null, array $options = array())
     {
@@ -59,6 +72,9 @@ class EsiRenderingStrategy extends GeneratorAwareRenderingStrategy
         return $this->esi->renderIncludeTag($uri, $alt, $options['ignore_errors'], isset($options['comment']) ? $options['comment'] : '');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'esi';

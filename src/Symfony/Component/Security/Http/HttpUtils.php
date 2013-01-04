@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
+use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -33,12 +34,15 @@ class HttpUtils
     /**
      * Constructor.
      *
-     * @param UrlGeneratorInterface $urlGenerator A UrlGeneratorInterface instance
-     * @param UrlMatcherInterface   $urlMatcher   A UrlMatcherInterface instance
+     * @param UrlGeneratorInterface                       $urlGenerator A UrlGeneratorInterface instance
+     * @param UrlMatcherInterface|RequestMatcherInterface $matcher      The Url or Request matcher
      */
-    public function __construct(UrlGeneratorInterface $urlGenerator = null, UrlMatcherInterface $urlMatcher = null)
+    public function __construct(UrlGeneratorInterface $urlGenerator = null, $urlMatcher = null)
     {
         $this->urlGenerator = $urlGenerator;
+        if ($urlMatcher !== null && !$urlMatcher instanceof UrlMatcherInterface && !$urlMatcher instanceof RequestMatcherInterface) {
+            throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
+        }
         $this->urlMatcher = $urlMatcher;
     }
 
@@ -96,7 +100,12 @@ class HttpUtils
     {
         if ('/' !== $path[0]) {
             try {
-                $parameters = $this->urlMatcher->match($request->getPathInfo());
+                // matching a request is more powerful than matching a URL path + context, so try that first
+                if ($this->urlMatcher instanceof RequestMatcherInterface) {
+                    $parameters = $this->urlMatcher->matchRequest($request);
+                } else {
+                    $parameters = $this->urlMatcher->match($request->getPathInfo());
+                }
 
                 return $path === $parameters['_route'];
             } catch (MethodNotAllowedException $e) {

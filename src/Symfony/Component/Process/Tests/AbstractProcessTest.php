@@ -282,10 +282,14 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Windows does not support POSIX signals');
         }
 
+        // SIGTERM is only defined if pcntl extension is present
+        $termSignal = defined('SIGTERM') ? SIGTERM : 15;
+
         $process = $this->getProcess('php -r "while (true) {}"');
         $process->start();
         $process->stop();
-        $this->assertEquals(SIGTERM, $process->getTermSignal());
+
+        $this->assertEquals($termSignal, $process->getTermSignal());
     }
 
     public function testRestart()

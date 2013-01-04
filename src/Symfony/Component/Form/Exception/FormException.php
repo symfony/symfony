@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Form\Exception;
 
-class FormException extends \Exception
+class FormException extends \Exception implements ExceptionInterface
 {
 }

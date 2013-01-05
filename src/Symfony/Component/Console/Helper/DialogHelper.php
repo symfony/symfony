@@ -87,7 +87,7 @@ class DialogHelper extends Helper
             $ret = '';
 
             $i = 0;
-            $currentMatched = array();
+            $matches = array();
             $numMatches = 0;
             $ofs = 0;
 
@@ -111,7 +111,7 @@ class DialogHelper extends Helper
                     $output->write("\033[K");
                     $ret = substr($ret, 0, $i);
 
-                    $currentMatched = array();
+                    $matches = array();
                     $numMatches = 0;
 
                     continue;
@@ -123,8 +123,8 @@ class DialogHelper extends Helper
 
                     if ('A' === $c[2] || 'B' === $c[2]) {
                         if (0 === $i) {
-                            $currentMatched = $autocomplete;
-                            $numMatches = count($currentMatched);
+                            $matches = $autocomplete;
+                            $numMatches = count($matches);
                         }
 
                         if (0 === $numMatches) {
@@ -134,11 +134,10 @@ class DialogHelper extends Helper
                         $ofs += ('A' === $c[2]) ? -1 : 1;
                         $ofs = ($numMatches + $ofs) % $numMatches;
                     }
-                }
-                else if (ord($c) < 32) {
+                } else if (ord($c) < 32) {
                     if ("\t" === $c || "\n" === $c) {
                         if ($numMatches > 0) {
-                            $ret = $currentMatched[$ofs];
+                            $ret = $matches[$ofs];
                             // Echo out completed match
                             $output->write(substr($ret, $i));
                             $i = strlen($ret);
@@ -149,18 +148,17 @@ class DialogHelper extends Helper
                             break;
                         }
 
-                        $currentMatched = array();
+                        $matches = array();
                         $numMatches = 0;
                     }
 
                     continue;
-                }
-                else {
+                } else {
                     $output->write($c);
                     $ret .= $c;
                     $i++;
 
-                    $currentMatched = array();
+                    $matches = array();
                     $numMatches = 0;
                     $ofs = 0;
 
@@ -169,7 +167,7 @@ class DialogHelper extends Helper
                         $matchTest = substr($value, 0, $i);
 
                         if ($ret === $matchTest && $i !== strlen($value)) {
-                            $currentMatched[$numMatches++] = $value;
+                            $matches[$numMatches++] = $value;
                         }
                     }
                 }
@@ -181,7 +179,7 @@ class DialogHelper extends Helper
                     // Save cursor position
                     $output->write("\0337");
                     // Write highlighted text
-                    $output->write('<hl>' . substr($currentMatched[$ofs], $i) . '</hl>');
+                    $output->write('<hl>' . substr($matches[$ofs], $i) . '</hl>');
                     // Restore cursor position
                     $output->write("\0338");
                 }

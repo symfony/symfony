@@ -797,7 +797,7 @@ class Application
             $len = $strlen($title);
             $width = $this->getTerminalWidth() ? $this->getTerminalWidth() - 1 : PHP_INT_MAX;
             $lines = array();
-            foreach (preg_split("{\r?\n}", $e->getMessage()) as $line) {
+            foreach (preg_split('/\r?\n/', $e->getMessage()) as $line) {
                 foreach (str_split($line, $width - 4) as $line) {
                     $lines[] = sprintf('  %s  ', $line);
                     $len = max($strlen($line) + 4, $len);
@@ -859,21 +859,11 @@ class Application
      *
      * @return int|null
      */
-    public function getTerminalWidth()
+    protected function getTerminalWidth()
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            if ($ansicon = getenv('ANSICON')) {
-                return preg_replace('{^(\d+)x.*$}', '$1', $ansicon);
-            }
+        $dimensions = $this->getTerminalDimensions();
 
-            if (preg_match('{^(\d+)x\d+$}i', $this->getConsoleMode(), $matches)) {
-                return $matches[1];
-            }
-        }
-
-        if (preg_match("{rows.(\d+);.columns.(\d+);}i", $this->getSttyColumns(), $match)) {
-            return $match[2];
-        }
+        return $dimensions[0];
     }
 
     /**
@@ -881,21 +871,43 @@ class Application
      *
      * @return int|null
      */
-    public function getTerminalHeight()
+    protected function getTerminalHeight()
+    {
+        $dimensions = $this->getTerminalDimensions();
+
+        return $dimensions[1];
+    }
+
+    /**
+     * Tries to figure out the terminal dimensions based on the current environment
+     *
+     * @return array Array containing width and height
+     */
+    public function getTerminalDimensions()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            if ($ansicon = getenv('ANSICON')) {
-                return preg_replace('{^\d+x\d+ \(\d+x(\d+)\)$}', '$1', trim($ansicon));
+            // extract [w, H] from "wxh (WxH)"
+            if (preg_match('/^(\d+)x\d+ \(\d+x(\d+)\)$/', trim(getenv('ANSICON')), $matches)) {
+                return array((int) $matches[1], (int) $matches[2]);
             }
-
-            if (preg_match('{^\d+x(\d+)$}i', $this->getConsoleMode(), $matches)) {
-                return $matches[1];
+            // extract [w, h] from "wxh"
+            if (preg_match('/^(\d+)x(\d+)$/', $this->getConsoleMode(), $matches)) {
+                return array((int) $matches[1], (int) $matches[2]);
             }
         }
 
-        if (preg_match("{rows.(\d+);.columns.(\d+);}i", $this->getSttyColumns(), $match)) {
-            return $match[1];
+        if ($sttyString = $this->getSttyColumns()) {
+            // extract [w, h] from "rows h; columns w;"
+            if (preg_match('/rows.(\d+);.columns.(\d+);/i', $sttyString, $matches)) {
+                return array((int) $matches[2], (int) $matches[1]);
+            }
+            // extract [w, h] from "; h rows; w columns"
+            if (preg_match('/;.(\d+).rows;.(\d+).columns/i', $sttyString, $matches)) {
+                return array((int) $matches[2], (int) $matches[1]);
+            }
         }
+
+        return array(null, null);
     }
 
     /**
@@ -996,7 +1008,7 @@ class Application
             fclose($pipes[2]);
             proc_close($process);
 
-            if (preg_match('{--------+\r?\n.+?(\d+)\r?\n.+?(\d+)\r?\n}', $info, $matches)) {
+            if (preg_match('/--------+\r?\n.+?(\d+)\r?\n.+?(\d+)\r?\n/', $info, $matches)) {
                 return $matches[2].'x'.$matches[1];
             }
         }

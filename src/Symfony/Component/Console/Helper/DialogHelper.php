@@ -84,9 +84,11 @@ class DialogHelper extends Helper
             }
             $ret = trim($ret);
         } else {
+            $ret = '';
+
             $i = 0;
             $currentMatched = array();
-            $ret = '';
+            $numMatches = 0;
             $ofs = 0;
 
             // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
@@ -104,17 +106,18 @@ class DialogHelper extends Helper
                     if ('A' === $c[2] || 'B' === $c[2]) {
                         if (0 === $i) {
                             $currentMatched = $autocomplete;
+                            $numMatches = count($currentMatched);
                         }
 
-                        if (0 === count($currentMatched)) {
+                        if (0 === $numMatches) {
                             continue;
                         }
 
                         if ('A' === $c[2]) {
-                            $ofs = (count($currentMatched) + --$ofs) % count($currentMatched);
+                            $ofs = ($numMatches + --$ofs) % $numMatches;
                         }
                         else {
-                            $ofs = ++$ofs % count($currentMatched);
+                            $ofs = ++$ofs % $numMatches;
                         }
 
                         // Erase characters from cursor to end of line
@@ -133,7 +136,7 @@ class DialogHelper extends Helper
 
                 // Backspace Character
                 if ("\177" === $c) {
-                    if (0 === count($currentMatched) && 0 !== $i) {
+                    if (0 === $numMatches && 0 !== $i) {
                         $i--;
                         // Move cursor backwards
                         $output->write("\033[1D");
@@ -144,29 +147,29 @@ class DialogHelper extends Helper
                     $ret = substr($ret, 0, $i);
 
                     $currentMatched = array();
-
-                    continue;
-                }
-
-                if ("\t" === $c || "\n" === $c) {
-                    if (count($currentMatched) > 0) {
-                        // Echo out completed match
-                        $output->write(substr($currentMatched[$ofs], $i));
-                        $ret = $currentMatched[$ofs];
-                        $i = strlen($ret);
-                    }
-
-                    if ("\n" === $c) {
-                        $output->write($c);
-                        break;
-                    }
-
-                    $currentMatched = array();
+                    $numMatches = 0;
 
                     continue;
                 }
 
                 if (ord($c) < 32) {
+                    if ("\t" === $c || "\n" === $c) {
+                        if ($numMatches > 0) {
+                            $ret = $currentMatched[$ofs];
+                            // Echo out completed match
+                            $output->write(substr($ret, $i));
+                            $i = strlen($ret);
+                        }
+
+                        if ("\n" === $c) {
+                            $output->write($c);
+                            break;
+                        }
+
+                        $currentMatched = array();
+                        $numMatches = 0;
+                    }
+
                     continue;
                 }
 
@@ -178,6 +181,7 @@ class DialogHelper extends Helper
                 $output->write("\033[K");
 
                 $currentMatched = array();
+                $numMatches = 0;
                 $ofs = 0;
 
                 foreach ($autocomplete as $value) {
@@ -185,11 +189,11 @@ class DialogHelper extends Helper
                     $matchTest = substr($value, 0, $i);
 
                     if ($ret === $matchTest && $i !== strlen($value)) {
-                        $currentMatched[] = $value;
+                        $currentMatched[$numMatches++] = $value;
                     }
                 }
 
-                if (count($currentMatched) > 0) {
+                if ($numMatches > 0) {
                     // Save cursor position
                     $output->write("\0337");
                     // Write highlighted text

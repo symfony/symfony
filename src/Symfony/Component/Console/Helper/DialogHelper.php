@@ -86,9 +86,12 @@ class DialogHelper extends Helper
             }
             $ret = trim($ret);
         } else {
-            $i = 0;
-            $currentMatched = false;
             $ret = '';
+
+            $i = 0;
+            $matches = array();
+            $numMatches = 0;
+            $ofs = 0;
 
             // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
             shell_exec('stty -icanon -echo');
@@ -98,25 +101,9 @@ class DialogHelper extends Helper
 
             // Read a keypress
             while ($c = fread($inputStream, 1)) {
-                // Did we read an escape sequence?
-                if ("\033" === $c) {
-                    $c .= fread($inputStream, 2);
-
-                    // Escape sequences for arrow keys
-                    if ('A' === $c[2] || 'B' === $c[2] || 'C' === $c[2] || 'D' === $c[2]) {
-                        // todo
-                    }
-
-                    continue;
-                }
-
                 // Backspace Character
                 if ("\177" === $c) {
-                    if ($i === 0) {
-                        continue;
-                    }
-
-                    if (false === $currentMatched) {
+                    if (0 === $numMatches && 0 !== $i) {
                         $i--;
                         // Move cursor backwards
                         $output->write("\033[1D");
@@ -126,63 +113,77 @@ class DialogHelper extends Helper
                     $output->write("\033[K");
                     $ret = substr($ret, 0, $i);
 
-                    $currentMatched = false;
+                    $matches = array();
+                    $numMatches = 0;
 
                     continue;
                 }
 
-                if ("\t" === $c || "\n" === $c) {
-                    if (false !== $currentMatched) {
-                        // Echo out completed match
-                        $output->write(substr($autocomplete[$currentMatched], strlen($ret)));
-                        $ret = $autocomplete[$currentMatched];
-                        $i = strlen($ret);
+                // Did we read an escape sequence?
+                if ("\033" === $c) {
+                    $c .= fread($inputStream, 2);
+
+                    if ('A' === $c[2] || 'B' === $c[2]) {
+                        if (0 === $i) {
+                            $matches = $autocomplete;
+                            $numMatches = count($matches);
+                        }
+
+                        if (0 === $numMatches) {
+                            continue;
+                        }
+
+                        $ofs += ('A' === $c[2]) ? -1 : 1;
+                        $ofs = ($numMatches + $ofs) % $numMatches;
+                    }
+                } else if (ord($c) < 32) {
+                    if ("\t" === $c || "\n" === $c) {
+                        if ($numMatches > 0) {
+                            $ret = $matches[$ofs];
+                            // Echo out completed match
+                            $output->write(substr($ret, $i));
+                            $i = strlen($ret);
+                        }
+
+                        if ("\n" === $c) {
+                            $output->write($c);
+                            break;
+                        }
+
+                        $matches = array();
+                        $numMatches = 0;
                     }
 
-                    if ("\n" === $c) {
-                        $output->write($c);
-                        break;
+                    continue;
+                } else {
+                    $output->write($c);
+                    $ret .= $c;
+                    $i++;
+
+                    $matches = array();
+                    $numMatches = 0;
+                    $ofs = 0;
+
+                    foreach ($autocomplete as $value) {
+                        // Get a substring of the current autocomplete item based on number of chars typed (e.g. AcmeDemoBundle = Acme)
+                        $matchTest = substr($value, 0, $i);
+
+                        if ($ret === $matchTest && $i !== strlen($value)) {
+                            $matches[$numMatches++] = $value;
+                        }
                     }
-
-                    $currentMatched = false;
-
-                    continue;
                 }
-
-                if (ord($c) < 32) {
-                    continue;
-                }
-
-                $output->write($c);
-                $ret .= $c;
-                $i++;
 
                 // Erase characters from cursor to end of line
                 $output->write("\033[K");
 
-                foreach ($autocomplete as $j => $value) {
-                    // Get a substring of the current autocomplete item based on number of chars typed (e.g. AcmeDemoBundle = Acme)
-                    $matchTest = substr($value, 0, $i);
-
-                    if ($ret === $matchTest) {
-                        if ($i === strlen($value)) {
-                            $currentMatched = false;
-                            break;
-                        }
-                        
-                        // Save cursor position
-                        $output->write("\0337");
-
-                        $output->write('<hl>' . substr($value, $i) . '</hl>');
-
-                        // Restore cursor position
-                        $output->write("\0338");
-
-                        $currentMatched = $j;
-                        break;
-                    }
-
-                    $currentMatched = false;
+                if ($numMatches > 0) {
+                    // Save cursor position
+                    $output->write("\0337");
+                    // Write highlighted text
+                    $output->write('<hl>' . substr($matches[$ofs], $i) . '</hl>');
+                    // Restore cursor position
+                    $output->write("\0338");
                 }
             }
 

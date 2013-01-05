@@ -57,6 +57,13 @@
 
  * The PasswordType is now not trimmed by default.
 
+ * The class FormException is now an interface. The old class is still available
+   under the name Symfony\Component\Form\Exception\Exception, but will probably
+   be removed before 2.2. If you created FormException instances manually,
+   you are now advised to create any of the other exceptions in the
+   Symfony\Component\Form\Exception namespace or to create custom exception
+   classes for your purpose.
+
 #### Deprecations
 
  * The methods `getParent()`, `setParent()` and `hasParent()` in

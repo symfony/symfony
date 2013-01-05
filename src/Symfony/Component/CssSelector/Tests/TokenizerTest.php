@@ -37,7 +37,7 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\CssSelector\Exception\ParseException
+     * @expectedException \Symfony\Component\CssSelector\Exception\ParseException
      */
     public function testTokenizeInvalidString()
     {

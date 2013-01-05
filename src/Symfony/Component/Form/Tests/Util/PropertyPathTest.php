@@ -27,7 +27,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyException
      */
     public function testGetValueThrowsExceptionIfIndexNotationExpected()
     {
@@ -126,7 +126,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\PropertyAccessDeniedException
+     * @expectedException \Symfony\Component\Form\Exception\PropertyAccessDeniedException
      */
     public function testGetValueThrowsExceptionIfPropertyIsNotPublic()
     {
@@ -156,7 +156,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\PropertyAccessDeniedException
+     * @expectedException \Symfony\Component\Form\Exception\PropertyAccessDeniedException
      */
     public function testGetValueThrowsExceptionIfGetterIsNotPublic()
     {
@@ -208,7 +208,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\PropertyAccessDeniedException
+     * @expectedException \Symfony\Component\Form\Exception\PropertyAccessDeniedException
      */
     public function testGetValueThrowsExceptionIfIsserIsNotPublic()
     {
@@ -218,7 +218,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyException
      */
     public function testGetValueThrowsExceptionIfPropertyDoesNotExist()
     {
@@ -228,7 +228,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testGetValueThrowsExceptionIfNotObjectOrArray()
     {
@@ -238,7 +238,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testGetValueThrowsExceptionIfNull()
     {
@@ -248,7 +248,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testGetValueThrowsExceptionIfEmpty()
     {
@@ -268,7 +268,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyException
      */
     public function testSetValueThrowsExceptionIfIndexNotationExpected()
     {
@@ -341,7 +341,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\PropertyAccessDeniedException
+     * @expectedException \Symfony\Component\Form\Exception\PropertyAccessDeniedException
      */
     public function testSetValueThrowsExceptionIfGetterIsNotPublic()
     {
@@ -351,7 +351,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testSetValueThrowsExceptionIfNotObjectOrArray()
     {
@@ -362,7 +362,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testSetValueThrowsExceptionIfNull()
     {
@@ -373,7 +373,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testSetValueThrowsExceptionIfEmpty()
     {
@@ -391,7 +391,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyPathException
      */
     public function testInvalidPropertyPath_noDotBeforeProperty()
     {
@@ -399,7 +399,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyPathException
      */
     public function testInvalidPropertyPath_dotAtTheBeginning()
     {
@@ -407,7 +407,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyPathException
      */
     public function testInvalidPropertyPath_unexpectedCharacters()
     {
@@ -415,7 +415,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyPathException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyPathException
      */
     public function testInvalidPropertyPath_empty()
     {
@@ -423,7 +423,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testInvalidPropertyPath_null()
     {
@@ -431,7 +431,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testInvalidPropertyPath_false()
     {

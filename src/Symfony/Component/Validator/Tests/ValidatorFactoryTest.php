@@ -160,7 +160,7 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\MappingException
+     * @expectedException \Symfony\Component\Validator\Exception\MappingException
      */
     public function testBuildDefaultThrowsExceptionIfNoLoaderIsFound()
     {
@@ -168,7 +168,7 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\MappingException
+     * @expectedException \Symfony\Component\Validator\Exception\MappingException
      */
     public function testBuildDefaultThrowsExceptionIfUnknownExtension()
     {

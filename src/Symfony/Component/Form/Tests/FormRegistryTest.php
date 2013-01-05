@@ -188,7 +188,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\FormException
      */
     public function testGetTypeThrowsExceptionIfParentNotFound()
     {
@@ -200,7 +200,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\FormException
      */
     public function testGetTypeThrowsExceptionIfTypeNotFound()
     {
@@ -208,7 +208,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testGetTypeThrowsExceptionIfNoString()
     {

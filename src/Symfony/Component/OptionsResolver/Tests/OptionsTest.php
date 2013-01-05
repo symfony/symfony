@@ -60,7 +60,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testSetNotSupportedAfterGet()
     {
@@ -70,7 +70,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testRemoveNotSupportedAfterGet()
     {
@@ -80,7 +80,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testSetNormalizerNotSupportedAfterGet()
     {
@@ -270,7 +270,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testFailForCyclicDependencies()
     {
@@ -286,7 +286,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testFailForCyclicDependenciesBetweenNormalizers()
     {
@@ -305,7 +305,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testFailForCyclicDependenciesBetweenNormalizerAndLazyOption()
     {
@@ -394,7 +394,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\OptionsResolver\Options::replace
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testCannotReplaceAfterOptionWasRead()
     {
@@ -408,7 +408,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\OptionsResolver\Options::overload
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testCannotOverloadAfterOptionWasRead()
     {
@@ -420,7 +420,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\OptionsResolver\Options::clear
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testCannotClearAfterOptionWasRead()
     {

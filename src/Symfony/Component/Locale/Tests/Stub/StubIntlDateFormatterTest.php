@@ -19,7 +19,7 @@ use Symfony\Component\Locale\Tests\TestCase as LocaleTestCase;
 class StubIntlDateFormatterTest extends LocaleTestCase
 {
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException
      */
     public function testConstructorWithUnsupportedLocale()
     {
@@ -422,7 +422,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\NotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\NotImplementedException
      */
     public function testFormatWithTimezoneFormatOptionAndDifferentThanUtcStub()
     {
@@ -530,7 +530,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\NotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\NotImplementedException
      */
     public function testFormatWithUnimplementedCharsStub()
     {
@@ -540,7 +540,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\NotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\NotImplementedException
      */
     public function testFormatWithNonIntegerTimestamp()
     {
@@ -636,7 +636,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\MethodNotImplementedException
      */
     public function testLocaltime()
     {
@@ -979,7 +979,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodArgumentNotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\MethodArgumentNotImplementedException
      */
     public function testParseWithNotNullPositionValueStub()
     {
@@ -989,7 +989,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\MethodNotImplementedException
      */
     public function testSetCalendar()
     {
@@ -998,7 +998,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException
      */
     public function testSetLenient()
     {
@@ -1052,7 +1052,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\NotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\NotImplementedException
      */
     public function testSetTimeZoneIdWithGmtTimeZoneWithMinutesOffsetStub()
     {

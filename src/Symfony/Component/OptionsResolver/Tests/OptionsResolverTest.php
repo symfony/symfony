@@ -173,7 +173,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testResolveFailsIfNonExistingOption()
     {
@@ -195,7 +195,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      */
     public function testResolveFailsIfMissingRequiredOption()
     {
@@ -283,7 +283,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testResolveFailsIfOptionValueNotAllowed()
     {
@@ -427,7 +427,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testResolveFailsIfOptionTypeNotAllowed()
     {
@@ -445,7 +445,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testResolveFailsIfOptionTypeNotAllowedMultipleOptions()
     {
@@ -466,7 +466,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testResolveFailsIfOptionTypeNotAllowedAddTypes()
     {
@@ -487,7 +487,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testSetRequiredFailsIfDefaultIsPassed()
     {
@@ -497,7 +497,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testSetOptionalFailsIfDefaultIsPassed()
     {

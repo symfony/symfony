@@ -24,7 +24,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testInvalidWidgetOption()
     {
@@ -34,7 +34,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testInvalidInputOption()
     {
@@ -271,7 +271,7 @@ class DateTypeTest extends LocalizedTestCase
      * This test is to check that the strings '0', '1', '2', '3' are no accepted
      * as valid IntlDateFormatter constants for FULL, LONG, MEDIUM or SHORT respectively.
      *
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testThrowExceptionIfFormatIsNoPattern()
     {
@@ -283,7 +283,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testThrowExceptionIfFormatDoesNotContainYearMonthAndDay()
     {
@@ -294,7 +294,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testThrowExceptionIfFormatIsNoConstant()
     {
@@ -304,7 +304,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testThrowExceptionIfFormatIsInvalid()
     {

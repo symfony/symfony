@@ -20,19 +20,20 @@
             <argument>%kernel.debug%</argument>
         </service>
 
-        <service id="http_content_renderer.strategy.default" class="%http_content_renderer.strategy.default.class%">
+        <service id="http_content_renderer.strategy.default" class="%http_content_renderer.strategy.default.class%" public="false">
             <tag name="kernel.content_renderer_strategy" />
             <argument type="service" id="http_kernel" />
             <call method="setUrlGenerator"><argument type="service" id="router" /></call>
         </service>
 
-        <service id="http_content_renderer.strategy.esi" class="%http_content_renderer.strategy.esi.class%">
+        <service id="http_content_renderer.strategy.esi" class="%http_content_renderer.strategy.esi.class%" public="false">
             <tag name="kernel.content_renderer_strategy" />
             <argument type="service" id="esi" />
             <argument type="service" id="http_content_renderer.strategy.default" />
             <call method="setUrlGenerator"><argument type="service" id="router" /></call>
         </service>
 
+<!-- FIXME: this service should be private but it cannot due to a bug in PhpDumper -->
         <service id="http_content_renderer.strategy.hinclude" class="%http_content_renderer.strategy.hinclude.class%">
             <tag name="kernel.content_renderer_strategy" />
             <argument type="service" id="templating" />

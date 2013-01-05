@@ -131,12 +131,8 @@ class DialogHelper extends Helper
                             continue;
                         }
 
-                        if ('A' === $c[2]) {
-                            $ofs = ($numMatches + --$ofs) % $numMatches;
-                        }
-                        else {
-                            $ofs = ++$ofs % $numMatches;
-                        }
+                        $ofs += ('A' === $c[2]) ? -1 : 1;
+                        $ofs = ($numMatches + $ofs) % $numMatches;
                     }
                 }
                 else if (ord($c) < 32) {
@@ -180,7 +176,6 @@ class DialogHelper extends Helper
 
                 // Erase characters from cursor to end of line
                 $output->write("\033[K");
-
 
                 if ($numMatches > 0) {
                     // Save cursor position

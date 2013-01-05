@@ -57,4 +57,15 @@ $container->
     setFactoryMethod('getInstance')
 ;
 
+$container
+    ->register('foo_with_inline', 'Foo')
+    ->addMethodCall('setBar', array(new Reference('inlined')))
+;
+$container
+    ->register('inlined', 'Bar')
+    ->setProperty('pub', 'pub')
+    ->addMethodCall('setFoo', array(new Reference('foo_with_inline')))
+    ->setPublic(false)
+;
+
 return $container;

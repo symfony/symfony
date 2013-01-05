@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
  * ProjectServiceContainer
@@ -23,7 +23,16 @@ class ProjectServiceContainer extends Container
      */
     public function __construct()
     {
-        parent::__construct(new ParameterBag($this->getDefaultParameters()));
+        $this->parameters = $this->getDefaultParameters();
+
+        $this->services =
+        $this->scopedServices =
+        $this->scopeStacks = array();
+
+        $this->set('service_container', $this);
+
+        $this->scopes = array();
+        $this->scopeChildren = array();
     }
 
     /**
@@ -85,7 +94,7 @@ class ProjectServiceContainer extends Container
     {
         $a = $this->get('foo.baz');
 
-        $this->services['foo'] = $instance = call_user_func(array('FooClass', 'getInstance'), 'foo', $a, array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo'), 'foobar' => $this->getParameter('foo')), true, $this);
+        $this->services['foo'] = $instance = call_user_func(array('FooClass', 'getInstance'), 'foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
 
         $instance->setBar($this->get('bar'));
         $instance->initialize();
@@ -102,13 +111,13 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return Object A %baz_class% instance.
+     * @return BazClass A BazClass instance.
      */
     protected function getFoo_BazService()
     {
-        $this->services['foo.baz'] = $instance = call_user_func(array($this->getParameter('baz_class'), 'getInstance'));
+        $this->services['foo.baz'] = $instance = call_user_func(array('BazClass', 'getInstance'));
 
-        call_user_func(array($this->getParameter('baz_class'), 'configureStatic1'), $instance);
+        call_user_func(array('BazClass', 'configureStatic1'), $instance);
 
         return $instance;
     }
@@ -116,13 +125,11 @@ class ProjectServiceContainer extends Container
     /**
      * Gets the 'foo_bar' service.
      *
-     * @return Object A %foo_class% instance.
+     * @return FooClass A FooClass instance.
      */
     protected function getFooBarService()
     {
-        $class = $this->getParameter('foo_class');
-
-        return new $class();
+        return new \FooClass();
     }
 
     /**
@@ -135,9 +142,14 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooWithInlineService()
     {
+        $a = new \Bar();
+
         $this->services['foo_with_inline'] = $instance = new \Foo();
 
-        $instance->setBar($this->get('inlined'));
+        $a->setBaz($this->get('baz'));
+        $a->pub = 'pub';
+
+        $instance->setBar($a);
 
         return $instance;
     }
@@ -157,13 +169,7 @@ class ProjectServiceContainer extends Container
         $this->services['method_call1'] = $instance = new \FooClass();
 
         $instance->setBar($this->get('foo'));
-        $instance->setBar($this->get('foo2', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-        if ($this->has('foo3')) {
-            $instance->setBar($this->get('foo3', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-        }
-        if ($this->has('foobaz')) {
-            $instance->setBar($this->get('foobaz', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-        }
+        $instance->setBar(NULL);
 
         return $instance;
     }
@@ -179,27 +185,46 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'inlined' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * This service is private.
-     * If you want to be able to request this service from the container directly,
-     * make it public, otherwise you might end up with broken code.
-     *
-     * @return Bar A Bar instance.
+     * {@inheritdoc}
      */
-    protected function getInlinedService()
+    public function getParameter($name)
     {
-        $this->services['inlined'] = $instance = new \Bar();
+        $name = strtolower($name);
 
-        $instance->setBaz($this->get('baz'));
-        $instance->pub = 'pub';
+        if (!array_key_exists($name, $this->parameters)) {
+            throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+        }
 
-        return $instance;
+        return $this->parameters[$name];
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function hasParameter($name)
+    {
+        return array_key_exists(strtolower($name), $this->parameters);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setParameter($name, $value)
+    {
+        throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getParameterBag()
+    {
+        if (null === $this->parameterBag) {
+            $this->parameterBag = new FrozenParameterBag($this->parameters);
+        }
+
+        return $this->parameterBag;
+    }
     /**
      * Gets the default parameters.
      *

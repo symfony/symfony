@@ -4,6 +4,11 @@ php:
   - 5.3.3
   - 5.3
   - 5.4
+  - 5.5
+
+matrix:
+  allow_failures:
+    - php: 5.5
 
 before_script:
     - COMPOSER_ROOT_VERSION=2.1.x-dev composer --prefer-source --dev install

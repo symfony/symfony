@@ -188,6 +188,9 @@ class StubIntlDateFormatter
             $argumentError = 'datefmt_format: takes either an array  or an integer timestamp value ';
         } elseif (version_compare(\PHP_VERSION, '5.3.4', '>=') && !is_int($timestamp) && !$timestamp instanceof \DateTime) {
             $argumentError = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object';
+            if (version_compare(\PHP_VERSION, '5.5.0alpha1', '>=') && !is_int($timestamp)) {
+                $argumentError = sprintf('datefmt_format: string \'%s\' is not numeric, which would be required for it to be a valid date', $timestamp);
+            }
         }
 
         if (null !== $argumentError) {
@@ -215,6 +218,24 @@ class StubIntlDateFormatter
     }
 
     /**
+     * Formats an object
+     *
+     * @param object $object
+     * @param mixed  $format
+     * @param string $locale
+     *
+     * @return string   The formatted value
+     *
+     * @see    http://www.php.net/manual/en/intldateformatter.formatobject.php
+     *
+     * @throws MethodNotImplementedException
+     */
+    public function formatObject($object, $format = null, $locale = null)
+    {
+        throw new MethodNotImplementedException(__METHOD__);
+    }
+
+    /**
      * Returns the formatter's calendar
      *
      * @return int   The calendar being used by the formatter
@@ -224,6 +245,20 @@ class StubIntlDateFormatter
     public function getCalendar()
     {
         return self::GREGORIAN;
+    }
+
+    /**
+     * Returns the formatter's calendar object
+     *
+     * @return object The calendar's object being used by the formatter
+     *
+     * @see    http://www.php.net/manual/en/intldateformatter.getcalendarobject.php
+     *
+     * @throws MethodNotImplementedException
+     */
+    public function getCalendarObject()
+    {
+        throw new MethodNotImplementedException(__METHOD__);
     }
 
     /**
@@ -313,7 +348,26 @@ class StubIntlDateFormatter
             return $this->timeZoneId;
         }
 
+        // In PHP 5.5 default timezone depends on `date_default_timezone_get()` method
+        if (version_compare(\PHP_VERSION, '5.5.0alpha1', '>=')) {
+            return date_default_timezone_get();
+        }
+
         return null;
+    }
+
+    /**
+     * Returns the formatter's timezone
+     *
+     * @return mixed    The timezone used by the formatter
+     *
+     * @see    http://www.php.net/manual/en/intldateformatter.gettimezone.php
+     *
+     * @throws MethodNotImplementedException
+     */
+    public function getTimeZone()
+    {
+        throw new MethodNotImplementedException(__METHOD__);
     }
 
     /**
@@ -456,11 +510,16 @@ class StubIntlDateFormatter
     public function setTimeZoneId($timeZoneId)
     {
         if (null === $timeZoneId) {
-            // TODO: changes were made to ext/intl in PHP 5.4.4 release that need to be investigated since it will
-            // use ini's date.timezone when the time zone is not provided. As a not well tested workaround, uses UTC.
-            // See the first two items of the commit message for more information:
-            // https://github.com/php/php-src/commit/eb346ef0f419b90739aadfb6cc7b7436c5b521d9
-            $timeZoneId = getenv('TZ') ?: 'UTC';
+            // In PHP 5.5 if $timeZoneId is null it fallbacks to `date_default_timezone_get()` method
+            if (version_compare(\PHP_VERSION, '5.5.0alpha1', '>=')) {
+                $timeZoneId = date_default_timezone_get();
+            } else {
+                // TODO: changes were made to ext/intl in PHP 5.4.4 release that need to be investigated since it will
+                // use ini's date.timezone when the time zone is not provided. As a not well tested workaround, uses UTC.
+                // See the first two items of the commit message for more information:
+                // https://github.com/php/php-src/commit/eb346ef0f419b90739aadfb6cc7b7436c5b521d9
+                $timeZoneId = getenv('TZ') ?: 'UTC';
+            }
 
             $this->unitializedTimeZoneId = true;
         }
@@ -489,12 +548,26 @@ class StubIntlDateFormatter
     }
 
     /**
+     * This method was added in PHP 5.5 as replacement for `setTimeZoneId()`
+     *
+     * @param  mixed $timeZone
+     *
+     * @return Boolean true on success or false on failure
+     *
+     * @see    http://www.php.net/manual/en/intldateformatter.settimezone.php
+     */
+    public function setTimeZone($timeZone)
+    {
+        return $this->setTimeZoneId($timeZone);
+    }
+
+    /**
      * Create and returns a DateTime object with the specified timestamp and with the
      * current time zone
      *
      * @param int $timestamp
      *
-     * @return DateTime
+     * @return \DateTime
      */
     protected function createDateTime($timestamp)
     {

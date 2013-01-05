@@ -203,7 +203,7 @@ class PhpDumper extends Dumper
                 $nbOccurrences->offsetSet($definition, 1);
             } else {
                 $i = $nbOccurrences->offsetGet($definition);
-                $nbOccurrences->offsetSet($definition, $i+1);
+                $nbOccurrences->offsetSet($definition, $i + 1);
             }
         }
 
@@ -214,7 +214,7 @@ class PhpDumper extends Dumper
             $processed->offsetSet($sDefinition);
 
             $class = $this->dumpValue($sDefinition->getClass());
-            if ($nbOccurrences->offsetGet($sDefinition) > 1 || count($sDefinition->getMethodCalls()) > 0 || $sDefinition->getProperties() || null !== $sDefinition->getConfigurator() || false !== strpos($class, '$')) {
+            if ($nbOccurrences->offsetGet($sDefinition) > 1 || $sDefinition->getMethodCalls() || $sDefinition->getProperties() || null !== $sDefinition->getConfigurator() || false !== strpos($class, '$')) {
                 $name = $this->getNextVariableName();
                 $variableMap->offsetSet($sDefinition, new Variable($name));
 
@@ -248,7 +248,7 @@ class PhpDumper extends Dumper
                     $code .= sprintf("        \$%s = new \\%s(%s);\n", $name, substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
                 }
 
-                if (!$this->hasReference($id, $sDefinition->getMethodCalls()) && !$this->hasReference($id, $sDefinition->getProperties())) {
+                if (!$this->hasReference($id, $sDefinition->getMethodCalls(), true) && !$this->hasReference($id, $sDefinition->getProperties(), true)) {
                     $code .= $this->addServiceMethodCalls(null, $sDefinition, $name);
                     $code .= $this->addServiceProperties(null, $sDefinition, $name);
                     $code .= $this->addServiceConfigurator(null, $sDefinition, $name);
@@ -417,16 +417,14 @@ class PhpDumper extends Dumper
             }
             $processed->offsetSet($iDefinition);
 
-            if (!$this->hasReference($id, $iDefinition->getMethodCalls())) {
+            if (!$this->hasReference($id, $iDefinition->getMethodCalls(), true) && !$this->hasReference($id, $iDefinition->getProperties(), true)) {
                 continue;
             }
 
-            if ($iDefinition->getMethodCalls()) {
-                $code .= $this->addServiceMethodCalls(null, $iDefinition, (string) $this->definitionVariables->offsetGet($iDefinition));
-            }
-            if ($iDefinition->getConfigurator()) {
-                $code .= $this->addServiceConfigurator(null, $iDefinition, (string) $this->definitionVariables->offsetGet($iDefinition));
-            }
+            $name = (string) $this->definitionVariables->offsetGet($iDefinition);
+            $code .= $this->addServiceMethodCalls(null, $iDefinition, $name);
+            $code .= $this->addServiceProperties(null, $iDefinition, $name);
+            $code .= $this->addServiceConfigurator(null, $iDefinition, $name);
         }
 
         if ('' !== $code) {
@@ -963,16 +961,25 @@ EOF;
      *
      * @return Boolean
      */
-    private function hasReference($id, array $arguments)
+    private function hasReference($id, array $arguments, $deep = false)
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
-                if ($this->hasReference($id, $argument)) {
+                if ($this->hasReference($id, $argument, $deep)) {
                     return true;
                 }
             } elseif ($argument instanceof Reference) {
                 if ($id === (string) $argument) {
                     return true;
+                }
+
+                if ($deep) {
+                    $service = $this->container->getDefinition((string) $argument);
+                    $arguments = array_merge($service->getMethodCalls(), $service->getArguments(), $service->getProperties());
+
+                    if ($this->hasReference($id, $arguments, $deep)) {
+                        return true;
+                    }
                 }
             }
         }

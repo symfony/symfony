@@ -846,7 +846,7 @@ class Application
      *
      * @return int|null
      */
-    protected function getTerminalWidth()
+    public function getTerminalWidth()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             if ($ansicon = getenv('ANSICON')) {
@@ -868,7 +868,7 @@ class Application
      *
      * @return int|null
      */
-    protected function getTerminalHeight()
+    public function getTerminalHeight()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             if ($ansicon = getenv('ANSICON')) {

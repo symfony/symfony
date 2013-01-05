@@ -794,7 +794,7 @@ class Application
      *
      * @return int|null
      */
-    protected function getTerminalWidth()
+    public function getTerminalWidth()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD') && $ansicon = getenv('ANSICON')) {
             return preg_replace('{^(\d+)x.*$}', '$1', $ansicon);
@@ -810,7 +810,7 @@ class Application
      *
      * @return int|null
      */
-    protected function getTerminalHeight()
+    public function getTerminalHeight()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD') && $ansicon = getenv('ANSICON')) {
             return preg_replace('{^\d+x\d+ \(\d+x(\d+)\)$}', '$1', trim($ansicon));

@@ -102,6 +102,10 @@ class DialogHelper extends Helper
                     $c .= fread($inputStream, 2);
 
                     if ('A' === $c[2] || 'B' === $c[2]) {
+                        if (0 === $i) {
+                            $currentMatched = $autocomplete;
+                        }
+
                         if (0 === count($currentMatched)) {
                             continue;
                         }
@@ -119,7 +123,7 @@ class DialogHelper extends Helper
                         // Save cursor position
                         $output->write("\0337");
                         // Write highlighted text
-                        $output->write('<hl>' . substr($currentMatched[$ofs], strlen($ret)) . '</hl>');
+                        $output->write('<hl>' . substr($currentMatched[$ofs], $i) . '</hl>');
                         // Restore cursor position
                         $output->write("\0338");
                     }
@@ -128,8 +132,8 @@ class DialogHelper extends Helper
                 }
 
                 // Backspace Character
-                if ("\177" === $c && 0 !== $i) {
-                    if (0 === count($currentMatched)) {
+                if ("\177" === $c) {
+                    if (0 === count($currentMatched) && 0 !== $i) {
                         $i--;
                         // Move cursor backwards
                         $output->write("\033[1D");
@@ -147,7 +151,7 @@ class DialogHelper extends Helper
                 if ("\t" === $c || "\n" === $c) {
                     if (count($currentMatched) > 0) {
                         // Echo out completed match
-                        $output->write(substr($currentMatched[$ofs], strlen($ret)));
+                        $output->write(substr($currentMatched[$ofs], $i));
                         $ret = $currentMatched[$ofs];
                         $i = strlen($ret);
                     }
@@ -178,12 +182,10 @@ class DialogHelper extends Helper
 
                 foreach ($autocomplete as $value) {
                     // Get a substring of the current autocomplete item based on number of chars typed (e.g. AcmeDemoBundle = Acme)
-                    $matchTest = substr($value, 0, strlen($ret));
+                    $matchTest = substr($value, 0, $i);
 
-                    if ($ret === $matchTest) {
-                        if (strlen($ret) !== strlen($value)) {
-                            $currentMatched[] = $value;
-                        }
+                    if ($ret === $matchTest && $i !== strlen($value)) {
+                        $currentMatched[] = $value;
                     }
                 }
 
@@ -191,7 +193,7 @@ class DialogHelper extends Helper
                     // Save cursor position
                     $output->write("\0337");
                     // Write highlighted text
-                    $output->write('<hl>' . substr($currentMatched[$ofs], strlen($ret)) . '</hl>');
+                    $output->write('<hl>' . substr($currentMatched[$ofs], $i) . '</hl>');
                     // Restore cursor position
                     $output->write("\0338");
                 }

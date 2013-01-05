@@ -41,6 +41,23 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the 'baz' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return Baz A Baz instance.
+     */
+    protected function getBazService()
+    {
+        $this->services['baz'] = $instance = new \Baz();
+
+        $instance->setFoo($this->get('foo_with_inline'));
+
+        return $instance;
+    }
+
+    /**
      * Gets the 'factory_service' service.
      *
      * This service is shared.
@@ -173,7 +190,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['inlined'] = $instance = new \Bar();
 
-        $instance->setFoo($this->get('foo_with_inline'));
+        $instance->setBaz($this->get('baz'));
         $instance->pub = 'pub';
 
         return $instance;

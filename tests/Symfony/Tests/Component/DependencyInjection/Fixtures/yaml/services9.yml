@@ -50,6 +50,11 @@ services:
     class: Bar
     properties: { pub: pub }
     calls:
+      - [setBaz, ['@baz']]
+      
+  baz:
+    class: Baz
+    calls:
       - [setFoo, ['@foo_with_inline']]
       
   alias_for_foo: @foo

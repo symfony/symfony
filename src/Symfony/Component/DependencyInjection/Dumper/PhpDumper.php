@@ -246,7 +246,7 @@ class PhpDumper extends Dumper
                     $code .= sprintf("        \$%s = new \\%s(%s);\n", $name, substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
                 }
 
-                if (!$this->hasReference($id, $sDefinition->getMethodCalls()) && !$this->hasReference($id, $sDefinition->getProperties())) {
+                if (!$this->hasReference($id, $sDefinition->getMethodCalls(), true) && !$this->hasReference($id, $sDefinition->getProperties(), true)) {
                     $code .= $this->addServiceMethodCalls(null, $sDefinition, $name);
                     $code .= $this->addServiceProperties(null, $sDefinition, $name);
                     $code .= $this->addServiceConfigurator(null, $sDefinition, $name);
@@ -415,7 +415,7 @@ class PhpDumper extends Dumper
             }
             $processed->offsetSet($iDefinition);
 
-            if (!$this->hasReference($id, $iDefinition->getMethodCalls()) && !$this->hasReference($id, $iDefinition->getProperties())) {
+            if (!$this->hasReference($id, $iDefinition->getMethodCalls(), true) && !$this->hasReference($id, $iDefinition->getProperties(), true)) {
                 continue;
             }
 
@@ -958,16 +958,25 @@ EOF;
      *
      * @return Boolean
      */
-    private function hasReference($id, array $arguments)
+    private function hasReference($id, array $arguments, $deep = false)
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
-                if ($this->hasReference($id, $argument)) {
+                if ($this->hasReference($id, $argument, $deep)) {
                     return true;
                 }
             } elseif ($argument instanceof Reference) {
                 if ($id === (string) $argument) {
                     return true;
+                }
+
+                if ($deep) {
+                    $service = $this->container->getDefinition((string) $argument);
+                    $arguments = array_merge($service->getMethodCalls(), $service->getArguments(), $service->getProperties());
+
+                    if ($this->hasReference($id, $arguments, $deep)) {
+                        return true;
+                    }
                 }
             }
         }

@@ -64,8 +64,12 @@ $container
 $container
     ->register('inlined', 'Bar')
     ->setProperty('pub', 'pub')
-    ->addMethodCall('setFoo', array(new Reference('foo_with_inline')))
+    ->addMethodCall('setBaz', array(new Reference('baz')))
     ->setPublic(false)
+;
+$container
+    ->register('baz', 'Baz')
+    ->addMethodCall('setFoo', array(new Reference('foo_with_inline')))
 ;
 
 return $container;

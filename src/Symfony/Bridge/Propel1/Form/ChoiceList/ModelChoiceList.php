@@ -104,7 +104,7 @@ class ModelChoiceList extends ObjectChoiceList
             $this->identifierAsIndex = true;
         }
 
-        parent::__construct($choices, $labelPath, array(), $groupPath);
+        parent::__construct($choices, $labelPath, $preferred, $groupPath);
     }
 
     /**

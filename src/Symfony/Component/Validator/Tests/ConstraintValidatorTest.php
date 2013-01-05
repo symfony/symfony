@@ -59,7 +59,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ValidatorException
+     * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
      */
     public function testSetMessageFailsIfNoContextSet()
     {

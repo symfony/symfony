@@ -73,7 +73,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Acl\Exception\NoAceFoundException
+     * @expectedException \Symfony\Component\Security\Acl\Exception\NoAceFoundException
      */
     public function testIsGrantedReturnsExceptionIfNoAceIsFound()
     {

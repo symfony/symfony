@@ -124,7 +124,7 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyException
      */
     public function testGetValueThrowsExceptionIfArrayAccessExpected()
     {
@@ -154,7 +154,7 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyException
      */
     public function testSetValueThrowsExceptionIfArrayAccessExpected()
     {
@@ -240,7 +240,7 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyException
      */
     public function testMapFormToDataFailsIfOnlyAdderFound()
     {
@@ -258,7 +258,7 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidPropertyException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyException
      */
     public function testMapFormToDataFailsIfOnlyRemoverFound()
     {

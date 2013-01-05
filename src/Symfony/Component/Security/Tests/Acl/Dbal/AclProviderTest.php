@@ -27,7 +27,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
     protected $insertSidStmt;
 
     /**
-     * @expectedException Symfony\Component\Security\Acl\Exception\AclNotFoundException
+     * @expectedException \Symfony\Component\Security\Acl\Exception\AclNotFoundException
      * @expectedMessage There is no ACL for the given object identity.
      */
     public function testFindAclThrowsExceptionWhenNoAclExists()

@@ -169,7 +169,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage The attribute "id" must be set for path "root.thing".
      */
     public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet()

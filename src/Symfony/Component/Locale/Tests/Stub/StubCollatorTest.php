@@ -19,7 +19,7 @@ use Symfony\Component\Locale\Tests\TestCase as LocaleTestCase;
 class StubCollatorTest extends LocaleTestCase
 {
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException
      */
     public function testConstructorWithUnsupportedLocale()
     {
@@ -70,7 +70,7 @@ class StubCollatorTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\MethodNotImplementedException
      */
     public function testCompare()
     {
@@ -79,7 +79,7 @@ class StubCollatorTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\MethodNotImplementedException
      */
     public function testGetAttribute()
     {
@@ -106,7 +106,7 @@ class StubCollatorTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\MethodNotImplementedException
      */
     public function testGetSortKey()
     {
@@ -115,7 +115,7 @@ class StubCollatorTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\MethodNotImplementedException
      */
     public function testGetStrength()
     {
@@ -124,7 +124,7 @@ class StubCollatorTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\MethodNotImplementedException
      */
     public function testSetAttribute()
     {
@@ -133,7 +133,7 @@ class StubCollatorTest extends LocaleTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Locale\Exception\MethodNotImplementedException
+     * @expectedException \Symfony\Component\Locale\Exception\MethodNotImplementedException
      */
     public function testSetStrength()
     {

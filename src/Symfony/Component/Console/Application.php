@@ -870,7 +870,7 @@ class Application
      *
      * @return array Array containing width and height
      */
-    protected function getTerminalDimensions()
+    public function getTerminalDimensions()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             // extract [w, H] from "wxh (WxH)"

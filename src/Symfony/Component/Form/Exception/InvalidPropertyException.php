@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Form\Exception;
 
-class InvalidPropertyException extends FormException
+class InvalidPropertyException extends Exception
 {
 }

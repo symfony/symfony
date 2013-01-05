@@ -9,6 +9,7 @@ CHANGELOG
  * FormInterface::add() now accepts a FormInterface instance OR a field's name, type and options
  * removed special characters between the choice or text fields of DateType unless
    the option "format" is set to a custom value
+ * deprecated FormException and introduced ExceptionInterface instead
 
 2.1.0
 -----

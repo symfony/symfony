@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\Exception;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
@@ -134,7 +134,7 @@ abstract class DoctrineType extends AbstractType
             $em = $registry->getManagerForClass($options['class']);
 
             if (null === $em) {
-                throw new FormException(sprintf(
+                throw new Exception(sprintf(
                     'Class "%s" seems not to be a managed Doctrine entity. ' .
                     'Did you forget to map it?',
                     $options['class']

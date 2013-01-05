@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\Exception;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -387,12 +387,12 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * @return array          The identifier values
      *
-     * @throws FormException  If the entity does not exist in Doctrine's identity map
+     * @throws Exception If the entity does not exist in Doctrine's identity map
      */
     private function getIdentifierValues($entity)
     {
         if (!$this->em->contains($entity)) {
-            throw new FormException(
+            throw new Exception(
                 'Entities passed to the choice field must be managed. Maybe ' .
                 'persist them in the entity manager?'
             );

@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Extension\HttpFoundation\EventListener;
 
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\Exception;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -74,7 +74,7 @@ class BindRequestListener implements EventSubscriberInterface
                 break;
 
             default:
-                throw new FormException(sprintf(
+                throw new Exception(sprintf(
                     'The request method "%s" is not supported',
                     $request->getMethod()
                 ));

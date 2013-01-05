@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Exception;
 
-class UnexpectedTypeException extends FormException
+class UnexpectedTypeException extends Exception
 {
     public function __construct($value, $expectedType)
     {

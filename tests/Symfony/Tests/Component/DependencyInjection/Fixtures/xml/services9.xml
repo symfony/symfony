@@ -51,6 +51,17 @@
       </call>
     </service>
     <service id="factory_service" class="Bar" factory-method="getInstance" factory-service="foo.baz"/>
+    <service id="foo_with_inline" class="Foo">
+      <call method="setBar">
+        <argument type="service" id="inlined"/>
+      </call>
+    </service>
+    <service id="inlined" class="Bar" public="false">
+      <property name="pub">pub</property>
+      <call method="setFoo">
+        <argument type="service" id="foo_with_inline"/>
+      </call>
+    </service>
     <service id="alias_for_foo" alias="foo"/>
   </services>
 </container>

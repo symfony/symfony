@@ -41,4 +41,15 @@ services:
     class: Bar
     factory_method: getInstance
     factory_service: foo.baz
+  foo_with_inline:
+    class: Foo
+    calls:
+      - [setBar, ['@inlined']]
+      
+  inlined:
+    class: Bar
+    properties: { pub: pub }
+    calls:
+      - [setFoo, ['@foo_with_inline']]
+      
   alias_for_foo: @foo

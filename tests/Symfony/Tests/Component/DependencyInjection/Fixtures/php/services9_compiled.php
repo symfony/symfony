@@ -113,6 +113,28 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the 'foo_with_inline' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return Foo A Foo instance.
+     */
+    protected function getFooWithInlineService()
+    {
+        $a = new \Bar();
+
+        $this->services['foo_with_inline'] = $instance = new \Foo();
+
+        $a->setFoo($instance);
+        $a->pub = 'pub';
+
+        $instance->setBar($a);
+
+        return $instance;
+    }
+
+    /**
      * Gets the 'method_call1' service.
      *
      * This service is shared.

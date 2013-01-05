@@ -105,6 +105,23 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the 'foo_with_inline' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return Foo A Foo instance.
+     */
+    protected function getFooWithInlineService()
+    {
+        $this->services['foo_with_inline'] = $instance = new \Foo();
+
+        $instance->setBar($this->get('inlined'));
+
+        return $instance;
+    }
+
+    /**
      * Gets the 'method_call1' service.
      *
      * This service is shared.
@@ -138,6 +155,28 @@ class ProjectServiceContainer extends Container
     protected function getAliasForFooService()
     {
         return $this->get('foo');
+    }
+
+    /**
+     * Gets the 'inlined' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * This service is private.
+     * If you want to be able to request this service from the container directly,
+     * make it public, otherwise you might end up with broken code.
+     *
+     * @return Bar A Bar instance.
+     */
+    protected function getInlinedService()
+    {
+        $this->services['inlined'] = $instance = new \Bar();
+
+        $instance->setFoo($this->get('foo_with_inline'));
+        $instance->pub = 'pub';
+
+        return $instance;
     }
 
     /**

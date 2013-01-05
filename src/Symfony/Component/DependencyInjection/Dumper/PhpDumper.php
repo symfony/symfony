@@ -415,16 +415,14 @@ class PhpDumper extends Dumper
             }
             $processed->offsetSet($iDefinition);
 
-            if (!$this->hasReference($id, $iDefinition->getMethodCalls())) {
+            if (!$this->hasReference($id, $iDefinition->getMethodCalls()) && !$this->hasReference($id, $iDefinition->getProperties())) {
                 continue;
             }
 
-            if ($iDefinition->getMethodCalls()) {
-                $code .= $this->addServiceMethodCalls(null, $iDefinition, (string) $this->definitionVariables->offsetGet($iDefinition));
-            }
-            if ($iDefinition->getConfigurator()) {
-                $code .= $this->addServiceConfigurator(null, $iDefinition, (string) $this->definitionVariables->offsetGet($iDefinition));
-            }
+            $name = (string) $this->definitionVariables->offsetGet($iDefinition);
+            $code .= $this->addServiceMethodCalls(null, $iDefinition, $name);
+            $code .= $this->addServiceProperties(null, $iDefinition, $name);
+            $code .= $this->addServiceConfigurator(null, $iDefinition, $name);
         }
 
         if ('' !== $code) {

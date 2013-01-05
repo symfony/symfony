@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\Exception;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -65,7 +65,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     public function add($child, $type = null, array $options = array())
     {
         if ($this->locked) {
-            throw new FormException('The form builder cannot be modified anymore.');
+            throw new Exception('The form builder cannot be modified anymore.');
         }
 
         if ($child instanceof self) {
@@ -102,7 +102,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     public function create($name, $type = null, array $options = array())
     {
         if ($this->locked) {
-            throw new FormException('The form builder cannot be modified anymore.');
+            throw new Exception('The form builder cannot be modified anymore.');
         }
 
         if (null === $type && null === $this->getDataClass()) {
@@ -129,7 +129,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             return $this->children[$name];
         }
 
-        throw new FormException(sprintf('The child with the name "%s" does not exist.', $name));
+        throw new Exception(sprintf('The child with the name "%s" does not exist.', $name));
     }
 
     /**
@@ -138,7 +138,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     public function remove($name)
     {
         if ($this->locked) {
-            throw new FormException('The form builder cannot be modified anymore.');
+            throw new Exception('The form builder cannot be modified anymore.');
         }
 
         unset($this->unresolvedChildren[$name]);
@@ -217,7 +217,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     public function setParent(FormBuilderInterface $parent = null)
     {
         if ($this->locked) {
-            throw new FormException('The form builder cannot be modified anymore.');
+            throw new Exception('The form builder cannot be modified anymore.');
         }
 
         $this->parent = $parent;

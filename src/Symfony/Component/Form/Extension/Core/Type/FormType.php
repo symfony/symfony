@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\Exception;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -61,7 +61,7 @@ class FormType extends AbstractType
 
         if ($view->parent) {
             if ('' === $name) {
-                throw new FormException('Form node with empty name can be used only as root form node.');
+                throw new Exception('Form node with empty name can be used only as root form node.');
             }
 
             if ('' !== ($parentFullName = $view->parent->vars['full_name'])) {

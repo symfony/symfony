@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\Exception;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -152,7 +152,7 @@ class Form implements \IteratorAggregate, FormInterface
         // `setData` and `add` will not lead to the correct population of
         // the child forms.
         if ($config->getCompound() && !$config->getDataMapper()) {
-            throw new FormException('Compound forms need a data mapper');
+            throw new Exception('Compound forms need a data mapper');
         }
 
         $this->config = $config;
@@ -256,7 +256,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (null !== $parent && '' === $this->config->getName()) {
-            throw new FormException('A form with an empty name cannot have a parent form.');
+            throw new Exception('A form with an empty name cannot have a parent form.');
         }
 
         $this->parent = $parent;
@@ -359,7 +359,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if ($this->lockSetData) {
-            throw new FormException('A cycle was detected. Listeners to the PRE_SET_DATA event must not call setData(). You should call setData() on the FormEvent object instead.');
+            throw new Exception('A cycle was detected. Listeners to the PRE_SET_DATA event must not call setData(). You should call setData() on the FormEvent object instead.');
         }
 
         $this->lockSetData = true;
@@ -394,7 +394,7 @@ class Form implements \IteratorAggregate, FormInterface
             if (null === $dataClass && is_object($viewData) && !$viewData instanceof \ArrayAccess) {
                 $expectedType = 'scalar, array or an instance of \ArrayAccess';
 
-                throw new FormException(
+                throw new Exception(
                     'The form\'s view data is expected to be of type ' . $expectedType . ', ' .
                     'but is ' . $actualType . '. You ' .
                     'can avoid this error by setting the "data_class" option to ' .
@@ -404,7 +404,7 @@ class Form implements \IteratorAggregate, FormInterface
             }
 
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
-                throw new FormException(
+                throw new Exception(
                     'The form\'s view data is expected to be an instance of class ' .
                     $dataClass . ', but is '. $actualType . '. You can avoid this error ' .
                     'by setting the "data_class" option to null or by adding a view ' .
@@ -867,7 +867,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (!$this->config->getCompound()) {
-            throw new FormException('You cannot add children to a simple form. Maybe you should set the option "compound" to true?');
+            throw new Exception('You cannot add children to a simple form. Maybe you should set the option "compound" to true?');
         }
 
         // Obtain the view data

@@ -846,7 +846,7 @@ class Application
      *
      * @return int|null
      */
-    public function getTerminalWidth()
+    protected function getTerminalWidth()
     {
         $dimensions = $this->getTerminalDimensions();
 
@@ -858,7 +858,7 @@ class Application
      *
      * @return int|null
      */
-    public function getTerminalHeight()
+    protected function getTerminalHeight()
     {
         $dimensions = $this->getTerminalDimensions();
 

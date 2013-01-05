@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Util\VirtualFormAwareIterator;
+use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\PropertyAccess\PropertyPathIterator;
 use Symfony\Component\PropertyAccess\PropertyPathBuilder;
 use Symfony\Component\PropertyAccess\PropertyPathIteratorInterface;
@@ -100,6 +100,9 @@ class ViolationMapper implements ViolationMapperInterface
             $scope = $form;
             $it = new ViolationPathIterator($violationPath);
 
+            // Note: acceptsErrors() will always return true for forms inheriting
+            // their parent data, because these forms can never be non-synchronized
+            // (they don't do any data transformation on their own)
             while ($this->acceptsErrors($scope) && $it->valid() && $it->mapsForm()) {
                 if (!$scope->has($it->current())) {
                     // Break if we find a reference to a non-existing child
@@ -164,7 +167,7 @@ class ViolationMapper implements ViolationMapperInterface
 
         // Skip forms inheriting their parent data when iterating the children
         $childIterator = new \RecursiveIteratorIterator(
-            new VirtualFormAwareIterator($form->all())
+            new InheritDataAwareIterator($form->all())
         );
 
         // Make the path longer until we find a matching child

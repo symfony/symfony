@@ -183,28 +183,6 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
     }
 
-    public function testAbortFormInheritingParentDataMappingIfNotSynchronized()
-    {
-        $violation = $this->getConstraintViolation('children[address].children[street].data.foo');
-        $parent = $this->getForm('parent');
-        $child = $this->getForm('address', 'address', null, array(), true, false);
-        // even though "street" is synchronized, it should not have any errors
-        // due to its parent not being synchronized
-        $grandChild = $this->getForm('street' , 'street', null, array(), true);
-
-        $parent->add($child);
-        $child->add($grandChild);
-
-        // bind to invoke the transformer and mark the form unsynchronized
-        $parent->bind(array());
-
-        $this->mapper->mapViolation($violation, $parent);
-
-        $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
-        $this->assertCount(0, $child->getErrors(), $child->getName().' should not have an error, but has one');
-        $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
-    }
-
     public function testAbortDotRuleMappingIfNotSynchronized()
     {
         $violation = $this->getConstraintViolation('data.address');
@@ -1446,7 +1424,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function provideFormInheritingParentDataErrorTests()
+    public function provideErrorTestsForFormInheritingParentData()
     {
         return array(
             // mapping target, child name, its property path, grand child name, its property path, violation path
@@ -1472,9 +1450,9 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provideFormInheritingParentDataErrorTests
+     * @dataProvider provideErrorTestsForFormInheritingParentData
      */
-    public function testFormInheritingParentDataErrorMapping($target, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath)
+    public function testErrorMappingForFormInheritingParentData($target, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath)
     {
         $violation = $this->getConstraintViolation($violationPath);
         $parent = $this->getForm('parent');

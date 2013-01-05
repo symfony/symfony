@@ -34,7 +34,7 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
      * @dataProvider providePrototypeNodeSpecificCalls
      */
     public function testPrototypeNodeSpecificOption($method, $args)
@@ -57,7 +57,7 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
      */
     public function testConcreteNodeSpecificOption()
     {
@@ -67,7 +67,7 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
      */
     public function testPrototypeNodesCantHaveADefaultValueWhenUsingDefaultChildren()
     {

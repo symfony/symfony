@@ -196,7 +196,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getBooleanMatrix2
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testRequireArrayOrTraversable($allowAdd, $allowDelete)
     {

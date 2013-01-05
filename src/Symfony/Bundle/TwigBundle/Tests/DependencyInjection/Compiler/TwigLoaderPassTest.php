@@ -69,7 +69,7 @@ class TwigLoaderPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\DependencyInjection\Exception\LogicException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
      */
     public function testMapperPassWithZeroTaggedLoaders()
     {

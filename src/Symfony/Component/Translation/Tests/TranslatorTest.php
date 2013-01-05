@@ -69,7 +69,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider      getTransFileTests
-     * @expectedException Symfony\Component\Translation\Exception\NotFoundResourceException
+     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
      */
     public function testTransWithoutFallbackLocaleFile($format, $loader)
     {

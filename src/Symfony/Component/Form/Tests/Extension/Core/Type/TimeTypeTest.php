@@ -629,7 +629,7 @@ class TimeTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\InvalidConfigurationException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidConfigurationException
      */
     public function testInitializeWithSecondsAndWithoutMinutes()
     {

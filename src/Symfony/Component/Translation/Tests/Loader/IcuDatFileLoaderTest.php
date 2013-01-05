@@ -28,7 +28,7 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Translation\Exception\InvalidResourceException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
      */
     public function testLoadInvalidResource()
     {
@@ -62,7 +62,7 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Translation\Exception\NotFoundResourceException
+     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
      */
     public function testLoadNonExistingResource()
     {

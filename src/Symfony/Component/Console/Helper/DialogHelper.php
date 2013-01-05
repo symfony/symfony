@@ -99,6 +99,24 @@ class DialogHelper extends Helper
 
             // Read a keypress
             while ($c = fread($inputStream, 1)) {
+                // Backspace Character
+                if ("\177" === $c) {
+                    if (0 === $numMatches && 0 !== $i) {
+                        $i--;
+                        // Move cursor backwards
+                        $output->write("\033[1D");
+                    }
+
+                    // Erase characters from cursor to end of line
+                    $output->write("\033[K");
+                    $ret = substr($ret, 0, $i);
+
+                    $currentMatched = array();
+                    $numMatches = 0;
+
+                    continue;
+                }
+
                 // Did we read an escape sequence?
                 if ("\033" === $c) {
                     $c .= fread($inputStream, 2);
@@ -119,40 +137,9 @@ class DialogHelper extends Helper
                         else {
                             $ofs = ++$ofs % $numMatches;
                         }
-
-                        // Erase characters from cursor to end of line
-                        $output->write("\033[K");
-
-                        // Save cursor position
-                        $output->write("\0337");
-                        // Write highlighted text
-                        $output->write('<hl>' . substr($currentMatched[$ofs], $i) . '</hl>');
-                        // Restore cursor position
-                        $output->write("\0338");
                     }
-
-                    continue;
                 }
-
-                // Backspace Character
-                if ("\177" === $c) {
-                    if (0 === $numMatches && 0 !== $i) {
-                        $i--;
-                        // Move cursor backwards
-                        $output->write("\033[1D");
-                    }
-
-                    // Erase characters from cursor to end of line
-                    $output->write("\033[K");
-                    $ret = substr($ret, 0, $i);
-
-                    $currentMatched = array();
-                    $numMatches = 0;
-
-                    continue;
-                }
-
-                if (ord($c) < 32) {
+                else if (ord($c) < 32) {
                     if ("\t" === $c || "\n" === $c) {
                         if ($numMatches > 0) {
                             $ret = $currentMatched[$ofs];
@@ -172,26 +159,28 @@ class DialogHelper extends Helper
 
                     continue;
                 }
+                else {
+                    $output->write($c);
+                    $ret .= $c;
+                    $i++;
 
-                $output->write($c);
-                $ret .= $c;
-                $i++;
+                    $currentMatched = array();
+                    $numMatches = 0;
+                    $ofs = 0;
+
+                    foreach ($autocomplete as $value) {
+                        // Get a substring of the current autocomplete item based on number of chars typed (e.g. AcmeDemoBundle = Acme)
+                        $matchTest = substr($value, 0, $i);
+
+                        if ($ret === $matchTest && $i !== strlen($value)) {
+                            $currentMatched[$numMatches++] = $value;
+                        }
+                    }
+                }
 
                 // Erase characters from cursor to end of line
                 $output->write("\033[K");
 
-                $currentMatched = array();
-                $numMatches = 0;
-                $ofs = 0;
-
-                foreach ($autocomplete as $value) {
-                    // Get a substring of the current autocomplete item based on number of chars typed (e.g. AcmeDemoBundle = Acme)
-                    $matchTest = substr($value, 0, $i);
-
-                    if ($ret === $matchTest && $i !== strlen($value)) {
-                        $currentMatched[$numMatches++] = $value;
-                    }
-                }
 
                 if ($numMatches > 0) {
                     // Save cursor position

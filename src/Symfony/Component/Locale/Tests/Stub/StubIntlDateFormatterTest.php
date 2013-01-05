@@ -41,14 +41,26 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testConstructorDefaultTimeZoneStub()
     {
         $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
-        $this->assertNull($formatter->getTimeZoneId());
+
+        // In PHP 5.5 default timezone depends on `date_default_timezone_get()` method
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $this->assertEquals(date_default_timezone_get(), $formatter->getTimeZoneId());
+        } else {
+            $this->assertNull($formatter->getTimeZoneId());
+        }
     }
 
     public function testConstructorDefaultTimeZoneIntl()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
-        $this->assertNull($formatter->getTimeZoneId());
+
+        // In PHP 5.5 default timezone depends on `date_default_timezone_get()` method
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $this->assertEquals(date_default_timezone_get(), $formatter->getTimeZoneId());
+        } else {
+            $this->assertNull($formatter->getTimeZoneId());
+        }
     }
 
     public function testFormatWithUnsupportedTimestampArgument()
@@ -354,6 +366,13 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function formatErrorProvider()
     {
+        // With PHP 5.5 IntlDateFormatter accepts empty values ('0')
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            return array(
+                array('y-M-d', 'foobar', 'datefmt_format: string \'foobar\' is not numeric, which would be required for it to be a valid date: U_ILLEGAL_ARGUMENT_ERROR')
+            );
+        }
+
         $message = 'datefmt_format: takes either an array  or an integer timestamp value : U_ILLEGAL_ARGUMENT_ERROR';
 
         if ($this->isGreaterOrEqualThanPhpVersion('5.3.4')) {
@@ -389,7 +408,7 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function formatWithTimezoneProvider()
     {
-        return array(
+        $data = array(
             array(0, 'UTC', '1970-01-01 00:00:00'),
             array(0, 'GMT', '1970-01-01 00:00:00'),
             array(0, 'GMT-03:00', '1969-12-31 21:00:00'),
@@ -413,12 +432,17 @@ class StubIntlDateFormatterTest extends LocaleTestCase
             array(0, 'Europe/Dublin', '1970-01-01 01:00:00'),
             array(0, 'Europe/Warsaw', '1970-01-01 01:00:00'),
             array(0, 'Pacific/Fiji', '1970-01-01 12:00:00'),
-
-            // When time zone not exists, uses UTC by default
-            array(0, 'Foo/Bar', '1970-01-01 00:00:00'),
-            array(0, 'UTC+04:30', '1970-01-01 00:00:00'),
-            array(0, 'UTC+04:AA', '1970-01-01 00:00:00'),
         );
+
+        // As of PHP 5.5, intl ext no longer fallbacks invalid time zones to UTC
+        if (!$this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            // When time zone not exists, uses UTC by default
+            $data[] = array(0, 'Foo/Bar', '1970-01-01 00:00:00');
+            $data[] = array(0, 'UTC+04:30', '1970-01-01 00:00:00');
+            $data[] = array(0, 'UTC+04:AA', '1970-01-01 00:00:00');
+        }
+
+        return $data;
     }
 
     /**
@@ -427,7 +451,13 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testFormatWithTimezoneFormatOptionAndDifferentThanUtcStub()
     {
         $formatter = $this->createStubFormatter('zzzz');
-        $formatter->setTimeZoneId('Pacific/Fiji');
+
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $formatter->setTimeZone('Pacific/Fiji');
+        } else {
+            $formatter->setTimeZoneId('Pacific/Fiji');
+        }
+
         $formatter->format(0);
     }
 
@@ -435,7 +465,12 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->createIntlFormatter('zzzz');
-        $formatter->setTimeZoneId('Pacific/Fiji');
+
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $formatter->setTimeZone('Pacific/Fiji');
+        } else {
+            $formatter->setTimeZoneId('Pacific/Fiji');
+        }
 
         $expected = $this->isGreaterOrEqualThanIcuVersion('49') ? 'Fiji Standard Time' : 'Fiji Time';
         $this->assertEquals($expected, $formatter->format(0));
@@ -444,7 +479,13 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testFormatWithGmtTimezoneStub()
     {
         $formatter = $this->createStubFormatter('zzzz');
-        $formatter->setTimeZoneId('GMT+03:00');
+
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $formatter->setTimeZone('GMT+03:00');
+        } else {
+            $formatter->setTimeZoneId('GMT+03:00');
+        }
+
         $this->assertEquals('GMT+03:00', $formatter->format(0));
     }
 
@@ -452,7 +493,13 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->createIntlFormatter('zzzz');
-        $formatter->setTimeZoneId('GMT+03:00');
+
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $formatter->setTimeZone('GMT+03:00');
+        } else {
+            $formatter->setTimeZoneId('GMT+03:00');
+        }
+
         $this->assertEquals('GMT+03:00', $formatter->format(0));
     }
 
@@ -483,6 +530,10 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     public function testFormatWithDefaultTimezoneStubShouldUseTheTzEnvironmentVariableWhenAvailable()
     {
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $this->markTestSkipped('StubIntlDateFormatter in PHP 5.5 no longer depends on TZ environment.');
+        }
+
         $tz = getenv('TZ');
         putenv('TZ=Europe/London');
 
@@ -500,6 +551,29 @@ class StubIntlDateFormatterTest extends LocaleTestCase
         putenv('TZ='.$tz);
     }
 
+    public function testFormatWithDefaultTimezoneStubShouldUseDefaultDateTimeZoneVariable()
+    {
+        if (!$this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $this->markTestSkipped('Only in PHP 5.5 StubIntlDateFormatter depends on default timezone (`date_default_timezone_get()`).');
+        }
+
+        $tz = date_default_timezone_get();
+        date_default_timezone_set('Europe/London');
+
+        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
+
+        $this->assertEquals(
+            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $formatter->format(0)
+        );
+
+        $this->assertEquals('Europe/London', date_default_timezone_get());
+
+        // Restores TZ.
+        date_default_timezone_set($tz);
+    }
+
     /**
      * It seems IntlDateFormatter caches the timezone id when not explicitly set via constructor or by the
      * setTimeZoneId() method. Since testFormatWithDefaultTimezoneIntl() runs using the default environment
@@ -509,6 +583,10 @@ class StubIntlDateFormatterTest extends LocaleTestCase
      */
     public function testFormatWithDefaultTimezoneIntlShouldUseTheTzEnvironmentVariableWhenAvailable()
     {
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $this->markTestSkipped('IntlDateFormatter in PHP 5.5 no longer depends on TZ environment.');
+        }
+
         $this->skipIfIntlExtensionIsNotLoaded();
         $this->skipIfICUVersionIsTooOld();
 
@@ -527,6 +605,35 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
         // Restores TZ.
         putenv('TZ='.$tz);
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testFormatWithDefaultTimezoneIntlShouldUseDefaultDateTimeZoneVariable()
+    {
+        if (!$this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $this->markTestSkipped('Only in PHP 5.5 IntlDateFormatter depends on default timezone (`date_default_timezone_get()`).');
+        }
+
+        $this->skipIfIntlExtensionIsNotLoaded();
+        $this->skipIfICUVersionIsTooOld();
+
+        $tz = date_default_timezone_get();
+        date_default_timezone_set('Europe/Paris');
+
+        $formatter = new \IntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
+
+        $this->assertEquals('Europe/Paris', date_default_timezone_get());
+
+        $this->assertEquals(
+            $this->createDateTime(0)->format('Y-m-d H:i:s'),
+            $formatter->format(0)
+        );
+
+        // Restores TZ.
+        date_default_timezone_set($tz);
     }
 
     /**
@@ -1020,38 +1127,59 @@ class StubIntlDateFormatterTest extends LocaleTestCase
      * @covers Symfony\Component\Locale\Stub\StubIntlDateFormatter::getTimeZoneId
      * @dataProvider setTimeZoneIdProvider()
      */
-    public function testSetTimeZoneIdStub($timeZoneId)
+    public function testSetTimeZoneIdStub($timeZoneId, $expectedTimeZoneId)
     {
         $formatter = $this->createStubFormatter();
-        $formatter->setTimeZoneId($timeZoneId);
+
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $formatter->setTimeZone($timeZoneId);
+        } else {
+            $formatter->setTimeZoneId($timeZoneId);
+        }
+
         $this->assertEquals($timeZoneId, $formatter->getTimeZoneId());
     }
 
     /**
      * @dataProvider setTimeZoneIdProvider()
      */
-    public function testSetTimeZoneIdIntl($timeZoneId)
+    public function testSetTimeZoneIdIntl($timeZoneId, $expectedTimeZoneId)
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->createIntlFormatter();
-        $formatter->setTimeZoneId($timeZoneId);
-        $this->assertEquals($timeZoneId, $formatter->getTimeZoneId());
+
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $formatter->setTimeZone($timeZoneId);
+        } else {
+            $formatter->setTimeZoneId($timeZoneId);
+        }
+
+        $this->assertEquals($expectedTimeZoneId, $formatter->getTimeZoneId());
     }
 
     public function setTimeZoneIdProvider()
     {
-        return array(
-            array('UTC'),
-            array('GMT'),
-            array('GMT-03:00'),
-            array('GMT-0300'),
-            array('Europe/Zurich'),
-
-            // When time zone not exists, uses UTC by default
-            array('Foo/Bar'),
-            array('GMT+00:AA'),
-            array('GMT+00AA'),
+        $data = array(
+            array('UTC', 'UTC'),
+            array('GMT', 'GMT'),
+            array('GMT-03:00', 'GMT-03:00'),
+            array('Europe/Zurich', 'Europe/Zurich'),
         );
+
+        // When time zone not exists, uses UTC by default
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $data[] = array('GMT-0300', 'UTC');
+            $data[] = array('Foo/Bar', 'UTC');
+            $data[] = array('GMT+00:AA', 'UTC');
+            $data[] = array('GMT+00AA', 'UTC');
+        } else {
+            $data[] = array('GMT-0300', 'GMT-0300');
+            $data[] = array('Foo/Bar', 'Foo/Bar');
+            $data[] = array('GMT+00:AA', 'GMT+00:AA');
+            $data[] = array('GMT+00AA', 'GMT+00AA');
+        }
+
+        return $data;
     }
 
     /**
@@ -1060,14 +1188,25 @@ class StubIntlDateFormatterTest extends LocaleTestCase
     public function testSetTimeZoneIdWithGmtTimeZoneWithMinutesOffsetStub()
     {
         $formatter = $this->createStubFormatter();
-        $formatter->setTimeZoneId('GMT+00:30');
+
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $formatter->setTimeZone('GMT+00:30');
+        } else {
+            $formatter->setTimeZoneId('GMT+00:30');
+        }
     }
 
     public function testSetTimeZoneIdWithGmtTimeZoneWithMinutesOffsetIntl()
     {
         $this->skipIfIntlExtensionIsNotLoaded();
         $formatter = $this->createIntlFormatter();
-        $formatter->setTimeZoneId('GMT+00:30');
+
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $formatter->setTimeZone('GMT+00:30');
+        } else {
+            $formatter->setTimeZoneId('GMT+00:30');
+        }
+
         $this->assertEquals('GMT+00:30', $formatter->getTimeZoneId());
     }
 
@@ -1089,7 +1228,11 @@ class StubIntlDateFormatterTest extends LocaleTestCase
 
     protected function createDateTime($timestamp = null)
     {
-        $timeZone = getenv('TZ') ?: 'UTC';
+        if ($this->isGreaterOrEqualThanPhpVersion('5.5.0alpha1')) {
+            $timeZone = date_default_timezone_get();
+        } else {
+            $timeZone = getenv('TZ') ?: 'UTC';
+        }
 
         $dateTime = new \DateTime();
         $dateTime->setTimestamp(null === $timestamp ? time() : $timestamp);

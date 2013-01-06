@@ -54,14 +54,15 @@ class HttpKernelExtension extends \Twig_Extension
      */
     public function render($uri, $options = array())
     {
-        return $this->renderer->render($uri, $options);
+        $strategy = isset($options['strategy']) ? $options['strategy'] : 'default';
+        unset($options['strategy']);
+
+        return $this->renderer->render($uri, $strategy, $options);
     }
 
     public function renderStrategy($strategy, $uri, $options = array())
     {
-        $options['strategy'] = $strategy;
-
-        return $this->renderer->render($uri, $options);
+        return $this->renderer->render($uri, $strategy, $options);
     }
 
     public function controller($controller, $attributes = array(), $query = array())

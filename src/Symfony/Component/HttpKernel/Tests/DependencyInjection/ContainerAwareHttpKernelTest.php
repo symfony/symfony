@@ -9,16 +9,31 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests;
+namespace Symfony\Component\HttpKernel\Tests;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\HttpKernel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class HttpKernelTest extends \PHPUnit_Framework_TestCase
+class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        if (!class_exists('Symfony\Component\DependencyInjection\Container')) {
+            $this->markTestSkipped('The "DependencyInjection" component is not available');
+        }
+
+        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
+            $this->markTestSkipped('The "EventDispatcher" component is not available');
+        }
+
+        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
+            $this->markTestSkipped('The "HttpFoundation" component is not available');
+        }
+    }
+
     /**
      * @dataProvider getProviderTypes
      */
@@ -46,7 +61,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = new EventDispatcher();
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $kernel = new HttpKernel($dispatcher, $container, $resolver);
+        $kernel = new ContainerAwareHttpKernel($dispatcher, $container, $resolver);
 
         $controller = function() use ($expected) {
             return $expected;
@@ -93,7 +108,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = new EventDispatcher();
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $kernel = new HttpKernel($dispatcher, $container, $resolver);
+        $kernel = new ContainerAwareHttpKernel($dispatcher, $container, $resolver);
 
         $controller = function() use ($expected) {
             throw $expected;
@@ -122,54 +137,5 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
             array(HttpKernelInterface::MASTER_REQUEST),
             array(HttpKernelInterface::SUB_REQUEST),
         );
-    }
-
-    public function testExceptionInSubRequestsDoesNotMangleOutputBuffers()
-    {
-        $request = new Request();
-
-        $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
-        $container
-            ->expects($this->at(0))
-            ->method('get')
-            ->with($this->equalTo('request'))
-            ->will($this->returnValue($request))
-        ;
-        $container
-            ->expects($this->at(1))
-            ->method('getParameter')
-            ->with($this->equalTo('kernel.debug'))
-            ->will($this->returnValue(false))
-        ;
-        $container
-            ->expects($this->at(2))
-            ->method('has')
-            ->with($this->equalTo('esi'))
-            ->will($this->returnValue(false))
-        ;
-
-        $dispatcher = new EventDispatcher();
-        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $resolver->expects($this->once())
-            ->method('getController')
-            ->will($this->returnValue(function () {
-                ob_start();
-                echo 'bar';
-                throw new \RuntimeException();
-            }));
-        $resolver->expects($this->once())
-            ->method('getArguments')
-            ->will($this->returnValue(array()));
-
-        $kernel = new HttpKernel($dispatcher, $container, $resolver);
-
-        // simulate a main request with output buffering
-        ob_start();
-        echo 'Foo';
-
-        // simulate a sub-request with output buffering and an exception
-        $kernel->render('/');
-
-        $this->assertEquals('Foo', ob_get_clean());
     }
 }

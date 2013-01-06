@@ -101,6 +101,9 @@ class HttpKernel extends BaseHttpKernel
     {
         trigger_error('render() is deprecated since version 2.2 and will be removed in 2.3. Use Symfony\Component\HttpKernel\HttpContentRenderer::render() instead.', E_USER_DEPRECATED);
 
-        $this->container->get('http_content_renderer')->render($uri, $options);
+        $strategy = isset($options['strategy']) ? $options['strategy'] : 'default';
+        unset($options['strategy']);
+
+        $this->container->get('http_content_renderer')->render($uri, $strategy, $options);
     }
 }

@@ -46,7 +46,10 @@ class ActionsHelper extends Helper
      */
     public function render($uri, array $options = array())
     {
-        return $this->renderer->render($uri, $options);
+        $strategy = isset($options['strategy']) ? $options['strategy'] : 'default';
+        unset($options['strategy']);
+
+        return $this->renderer->render($uri, $strategy, $options);
     }
 
     public function controller($controller, $attributes = array(), $query = array())

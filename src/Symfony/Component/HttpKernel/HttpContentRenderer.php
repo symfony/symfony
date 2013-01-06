@@ -81,23 +81,26 @@ class HttpContentRenderer implements EventSubscriberInterface
      * When the Response is a StreamedResponse, the content is streamed immediately
      * instead of being returned.
      *
-     *  * ignore_errors: true to return an empty string in case of an error
-     *  * strategy:      the strategy to use for rendering
+     * Available options:
      *
-     * @param string|ControllerReference $uri     A URI as a string or a ControllerReference instance
-     * @param array                      $options An array of options
+     *  * ignore_errors: true to return an empty string in case of an error
+     *
+     * @param string|ControllerReference $uri      A URI as a string or a ControllerReference instance
+     * @param string                     $strategy The strategy to use for the rendering
+     * @param array                      $options  An array of options
      *
      * @return string|null The Response content or null when the Response is streamed
      */
-    public function render($uri, array $options = array())
+    public function render($uri, $strategy = 'default', array $options = array())
     {
         if (!isset($options['ignore_errors'])) {
             $options['ignore_errors'] = !$this->debug;
         }
 
         $options = $this->fixOptions($options);
-
-        $strategy = isset($options['strategy']) ? $options['strategy'] : 'default';
+        if (isset($options['strategy'])) {
+            $strategy = $options['strategy'];
+        }
 
         if (!isset($this->strategies[$strategy])) {
             throw new \InvalidArgumentException(sprintf('The "%s" rendering strategy does not exist.', $strategy));

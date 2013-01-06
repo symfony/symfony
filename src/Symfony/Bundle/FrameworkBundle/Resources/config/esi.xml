@@ -7,6 +7,7 @@
     <parameters>
         <parameter key="esi.class">Symfony\Component\HttpKernel\HttpCache\Esi</parameter>
         <parameter key="esi_listener.class">Symfony\Component\HttpKernel\EventListener\EsiListener</parameter>
+        <parameter key="http_content_renderer.strategy.esi.class">Symfony\Component\HttpKernel\RenderingStrategy\EsiRenderingStrategy</parameter>
     </parameters>
 
     <services>
@@ -15,6 +16,13 @@
         <service id="esi_listener" class="%esi_listener.class%">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="esi" on-invalid="ignore" />
+        </service>
+
+        <service id="http_content_renderer.strategy.esi" class="%http_content_renderer.strategy.esi.class%" public="false">
+            <tag name="kernel.content_renderer_strategy" />
+            <argument type="service" id="esi" />
+            <argument type="service" id="http_content_renderer.strategy.default" />
+            <call method="setUrlGenerator"><argument type="service" id="router" /></call>
         </service>
     </services>
 </container>

@@ -34,9 +34,9 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
      * @param UriSigner                         $signer                A UriSigner instance
      * @param string                            $globalDefaultTemplate The global default content (it can be a template name or the content)
      */
-    public function __construct($templating, UriSigner $signer = null, $globalDefaultTemplate = null)
+    public function __construct($templating = null, UriSigner $signer = null, $globalDefaultTemplate = null)
     {
-        if (!$templating instanceof EngineInterface && !$templating instanceof \Twig_Environment) {
+        if (null !== $templating && !$templating instanceof EngineInterface && !$templating instanceof \Twig_Environment) {
             throw new \InvalidArgumentException('The hinclude rendering strategy needs an instance of \Twig_Environment or Symfony\Component\Templating\EngineInterface');
         }
 
@@ -63,7 +63,7 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
         }
 
         $template = isset($options['default']) ? $options['default'] : $this->globalDefaultTemplate;
-        if ($this->templateExists($template)) {
+        if (null !== $this->templating && $this->templateExists($template)) {
             $content = $this->templating->render($template);
         } else {
             $content = $template;

@@ -7,7 +7,6 @@
     <parameters>
         <parameter key="http_content_renderer.class">Symfony\Component\HttpKernel\HttpContentRenderer</parameter>
         <parameter key="http_content_renderer.strategy.default.class">Symfony\Component\HttpKernel\RenderingStrategy\DefaultRenderingStrategy</parameter>
-        <parameter key="http_content_renderer.strategy.esi.class">Symfony\Component\HttpKernel\RenderingStrategy\EsiRenderingStrategy</parameter>
         <parameter key="http_content_renderer.strategy.hinclude.class">Symfony\Component\HttpKernel\RenderingStrategy\HIncludeRenderingStrategy</parameter>
         <parameter key="http_content_renderer.strategy.hinclude.global_template"></parameter>
         <parameter key="http_content_renderer.listener.router_proxy.class">Symfony\Component\HttpKernel\EventListener\RouterProxyListener</parameter>
@@ -26,17 +25,10 @@
             <call method="setUrlGenerator"><argument type="service" id="router" /></call>
         </service>
 
-        <service id="http_content_renderer.strategy.esi" class="%http_content_renderer.strategy.esi.class%" public="false">
-            <tag name="kernel.content_renderer_strategy" />
-            <argument type="service" id="esi" />
-            <argument type="service" id="http_content_renderer.strategy.default" />
-            <call method="setUrlGenerator"><argument type="service" id="router" /></call>
-        </service>
-
 <!-- FIXME: this service should be private but it cannot due to a bug in PhpDumper -->
         <service id="http_content_renderer.strategy.hinclude" class="%http_content_renderer.strategy.hinclude.class%">
             <tag name="kernel.content_renderer_strategy" />
-            <argument type="service" id="templating" />
+            <argument type="service" id="templating" on-invalid="null" />
             <argument type="service" id="uri_signer" />
             <argument>%http_content_renderer.strategy.hinclude.global_template%</argument>
             <call method="setUrlGenerator"><argument type="service" id="router" /></call>

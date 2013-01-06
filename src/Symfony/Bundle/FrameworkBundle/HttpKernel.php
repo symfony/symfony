@@ -65,9 +65,13 @@ class HttpKernel extends BaseHttpKernel
      * @param array  $query      An array of request query parameters
      *
      * @return Response A Response instance
+     *
+     * @deprecated in 2.2, will be removed in 2.3
      */
     public function forward($controller, array $attributes = array(), array $query = array())
     {
+        trigger_error('forward() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         $attributes['_controller'] = $controller;
         $subRequest = $this->container->get('request')->duplicate($query, null, $attributes);
 

@@ -91,7 +91,7 @@ class DialogHelper extends Helper
             $i = 0;
             $matches = array();
             $numMatches = 0;
-            $ofs = 0;
+            $ofs = -1;
 
             // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
             shell_exec('stty -icanon -echo');
@@ -107,6 +107,10 @@ class DialogHelper extends Helper
                         $i--;
                         // Move cursor backwards
                         $output->write("\033[1D");
+                    }
+
+                    if ($i === 0) {
+                        $ofs = -1;
                     }
 
                     // Erase characters from cursor to end of line
@@ -126,6 +130,10 @@ class DialogHelper extends Helper
                         if (0 === $i) {
                             $matches = $autocomplete;
                             $numMatches = count($matches);
+
+                            if ('A' === $c[2] && -1 === $ofs) {
+                                $ofs = 0;
+                            }
                         }
 
                         if (0 === $numMatches) {

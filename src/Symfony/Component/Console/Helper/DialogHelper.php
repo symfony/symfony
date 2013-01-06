@@ -113,7 +113,6 @@ class DialogHelper extends Helper
                     $output->write("\033[K");
                     $ret = substr($ret, 0, $i);
 
-                    $matches = array();
                     $numMatches = 0;
 
                     continue;
@@ -150,7 +149,6 @@ class DialogHelper extends Helper
                             break;
                         }
 
-                        $matches = array();
                         $numMatches = 0;
                     }
 
@@ -160,7 +158,6 @@ class DialogHelper extends Helper
                     $ret .= $c;
                     $i++;
 
-                    $matches = array();
                     $numMatches = 0;
                     $ofs = 0;
 

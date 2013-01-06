@@ -97,11 +97,6 @@ class HttpContentRenderer implements EventSubscriberInterface
             $options['ignore_errors'] = !$this->debug;
         }
 
-        $options = $this->fixOptions($options);
-        if (isset($options['strategy'])) {
-            $strategy = $options['strategy'];
-        }
-
         if (!isset($this->strategies[$strategy])) {
             throw new \InvalidArgumentException(sprintf('The "%s" rendering strategy does not exist.', $strategy));
         }
@@ -118,7 +113,7 @@ class HttpContentRenderer implements EventSubscriberInterface
     }
 
     // to be removed in 2.3
-    private function fixOptions($options)
+    public function fixOptions(array $options)
     {
         // support for the standalone option is @deprecated in 2.2 and replaced with the strategy option
         if (isset($options['standalone'])) {
@@ -136,6 +131,7 @@ class HttpContentRenderer implements EventSubscriberInterface
             }
 
             $options['strategy'] = $options['standalone'];
+            unset($options['standalone']);
         }
 
         return $options;

@@ -118,6 +118,7 @@ class ProjectServiceContainer extends Container
     protected function getFooBarService()
     {
         $class = $this->getParameter('foo_class');
+
         return new $class();
     }
 

@@ -46,6 +46,8 @@ class ActionsHelper extends Helper
      */
     public function render($uri, array $options = array())
     {
+        $options = $this->renderer->fixOptions($options);
+
         $strategy = isset($options['strategy']) ? $options['strategy'] : 'default';
         unset($options['strategy']);
 

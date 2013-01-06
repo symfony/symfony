@@ -54,6 +54,8 @@ class HttpKernelExtension extends \Twig_Extension
      */
     public function render($uri, $options = array())
     {
+        $options = $this->renderer->fixOptions($options);
+
         $strategy = isset($options['strategy']) ? $options['strategy'] : 'default';
         unset($options['strategy']);
 

@@ -162,10 +162,8 @@ class DialogHelper extends Helper
                     $ofs = 0;
 
                     foreach ($autocomplete as $value) {
-                        // Get a substring of the current autocomplete item based on number of chars typed (e.g. AcmeDemoBundle = Acme)
-                        $matchTest = substr($value, 0, $i);
-
-                        if ($ret === $matchTest && $i !== strlen($value)) {
+                        // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
+                        if (0 === strpos($value, $ret) && $i !== strlen($value)) {
                             $matches[$numMatches++] = $value;
                         }
                     }

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\Exception;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 
 /**
@@ -88,7 +88,7 @@ class FormRenderer implements FormRendererInterface
     public function renderBlock(FormView $view, $blockName, array $variables = array())
     {
         if (0 == count($this->variableStack)) {
-            throw new FormException('This method should only be called while rendering a form element.');
+            throw new Exception('This method should only be called while rendering a form element.');
         }
 
         $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
@@ -97,7 +97,7 @@ class FormRenderer implements FormRendererInterface
         $resource = $this->engine->getResourceForBlockName($view, $blockName);
 
         if (!$resource) {
-            throw new FormException(sprintf('No block "%s" found while rendering the form.', $blockName));
+            throw new Exception(sprintf('No block "%s" found while rendering the form.', $blockName));
         }
 
         // Merge the passed with the existing attributes
@@ -217,7 +217,7 @@ class FormRenderer implements FormRendererInterface
 
         // Escape if no resource exists for this block
         if (!$resource) {
-            throw new FormException(sprintf(
+            throw new Exception(sprintf(
                 'Unable to render the form as none of the following blocks exist: "%s".',
                 implode('", "', array_reverse($blockNameHierarchy))
             ));

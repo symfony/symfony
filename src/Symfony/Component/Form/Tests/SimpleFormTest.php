@@ -741,7 +741,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\Exception
      * @expectedExceptionMessage A form with an empty name cannot have a parent form.
      */
     public function testFormCannotHaveEmptyNameNotInRootLevel()
@@ -787,7 +787,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\Exception
      */
     public function testViewDataMustNotBeObjectIfDataClassIsNull()
     {
@@ -817,7 +817,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\Exception
      */
     public function testViewDataMustBeObjectIfDataClassIsSet()
     {
@@ -832,7 +832,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\Exception
      */
     public function testSetDataCannotInvokeItself()
     {

@@ -162,7 +162,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUnknown()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\FormException', 'The child with the name "foo" does not exist.');
+        $this->setExpectedException('Symfony\Component\Form\Exception\Exception', 'The child with the name "foo" does not exist.');
         $this->builder->get('foo');
     }
 

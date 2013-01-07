@@ -89,9 +89,9 @@ class DialogHelper extends Helper
             $ret = '';
 
             $i = 0;
-            $matches = array();
-            $numMatches = 0;
             $ofs = -1;
+            $matches = $autocomplete;
+            $numMatches = count($matches);
 
             // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
             shell_exec('stty -icanon -echo');
@@ -111,29 +111,21 @@ class DialogHelper extends Helper
 
                     if ($i === 0) {
                         $ofs = -1;
+                        $matches = $autocomplete;
+                        $numMatches = count($matches);
                     }
 
-                    // Erase characters from cursor to end of line
-                    $output->write("\033[K");
+                    // Pop the last character off the end of our string
                     $ret = substr($ret, 0, $i);
 
                     $numMatches = 0;
-
-                    continue;
-                }
-
-                // Did we read an escape sequence?
-                if ("\033" === $c) {
+                } elseif ("\033" === $c) { // Did we read an escape sequence?
                     $c .= fread($inputStream, 2);
 
+                    // A = Up Arrow. B = Down Arrow
                     if ('A' === $c[2] || 'B' === $c[2]) {
-                        if (0 === $i) {
-                            $matches = $autocomplete;
-                            $numMatches = count($matches);
-
-                            if ('A' === $c[2] && -1 === $ofs) {
-                                $ofs = 0;
-                            }
+                        if ('A' === $c[2] && -1 === $ofs) {
+                            $ofs = 0;
                         }
 
                         if (0 === $numMatches) {
@@ -143,11 +135,11 @@ class DialogHelper extends Helper
                         $ofs += ('A' === $c[2]) ? -1 : 1;
                         $ofs = ($numMatches + $ofs) % $numMatches;
                     }
-                } else if (ord($c) < 32) {
+                } elseif (ord($c) < 32) {
                     if ("\t" === $c || "\n" === $c) {
                         if ($numMatches > 0) {
                             $ret = $matches[$ofs];
-                            // Echo out completed match
+                            // Echo out remaining chars for current match
                             $output->write(substr($ret, $i));
                             $i = strlen($ret);
                         }

@@ -93,6 +93,8 @@ class DialogHelper extends Helper
             $matches = $autocomplete;
             $numMatches = count($matches);
 
+            $sttyMode = shell_exec('stty -g');
+
             // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
             shell_exec('stty -icanon -echo');
 
@@ -183,7 +185,7 @@ class DialogHelper extends Helper
             }
 
             // Reset stty so it behaves normally again
-            shell_exec('stty icanon echo');
+            shell_exec(sprintf('stty %s', $sttyMode));
         }
 
         return strlen($ret) > 0 ? $ret : $default;
@@ -251,11 +253,11 @@ class DialogHelper extends Helper
         if ($this->hasSttyAvailable()) {
             $output->write($question);
 
-            $sttyMode = shell_exec('/usr/bin/env stty -g');
+            $sttyMode = shell_exec('stty -g');
 
-            shell_exec('/usr/bin/env stty -echo');
+            shell_exec('stty -echo');
             $value = fgets($this->inputStream ?: STDIN, 4096);
-            shell_exec(sprintf('/usr/bin/env stty %s', $sttyMode));
+            shell_exec(sprintf('stty %s', $sttyMode));
 
             if (false === $value) {
                 throw new \RuntimeException('Aborted');
@@ -376,7 +378,7 @@ class DialogHelper extends Helper
     /**
      * Return a valid unix shell
      *
-     * @return string|false  The valid shell name, false in case no valid shell is found
+     * @return string|Boolean  The valid shell name, false in case no valid shell is found
      */
     private function getShell()
     {

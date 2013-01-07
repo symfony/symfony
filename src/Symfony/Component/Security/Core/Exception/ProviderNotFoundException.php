@@ -25,6 +25,6 @@ class ProviderNotFoundException extends AuthenticationException
      */
     public function getMessageKey()
     {
-        return 'security.exception.provider_not_found_exception';
+        return 'No authentication provider found to support the authentication token.';
     }
 }

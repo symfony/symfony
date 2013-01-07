@@ -24,6 +24,6 @@ class DisabledException extends AccountStatusException
      */
     public function getMessageKey()
     {
-        return 'security.exception.disabled_exception';
+        return 'Account is disabled.';
     }
 }

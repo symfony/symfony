@@ -24,6 +24,6 @@ class LockedException extends AccountStatusException
      */
     public function getMessageKey()
     {
-        return 'security.exception.locked_exception';
+        return 'Account is locked.';
     }
 }

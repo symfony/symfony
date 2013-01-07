@@ -30,6 +30,6 @@ class SessionUnavailableException extends AuthenticationException
      */
     public function getMessageKey()
     {
-        return 'security.exception.session_unavailable_exception';
+        return 'No session available, it either timed out or cookies are not enabled.';
     }
 }

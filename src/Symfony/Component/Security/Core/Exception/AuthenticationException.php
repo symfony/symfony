@@ -72,7 +72,7 @@ class AuthenticationException extends \RuntimeException implements \Serializable
      */
     public function getMessageKey()
     {
-        return 'security.exception.authentication_exception';
+        return 'An authentication exception occurred.';
     }
 
     /**

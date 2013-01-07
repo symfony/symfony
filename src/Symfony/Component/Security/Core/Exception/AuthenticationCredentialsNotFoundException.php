@@ -25,6 +25,6 @@ class AuthenticationCredentialsNotFoundException extends AuthenticationException
      */
     public function getMessageKey()
     {
-        return 'security.exception.authentication_credentials_not_found_exception';
+        return 'Authentication credentials could not be found.';
     }
 }

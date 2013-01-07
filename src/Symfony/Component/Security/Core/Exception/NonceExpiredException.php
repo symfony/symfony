@@ -27,6 +27,6 @@ class NonceExpiredException extends AuthenticationException
      */
     public function getMessageKey()
     {
-        return 'security.exception.nonce_expired_exception';
+        return 'Digest nonce has expired.';
     }
 }

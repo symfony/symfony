@@ -257,47 +257,43 @@ SELECTCLAUSE;
             INNER JOIN {$this->options['oid_ancestors_table_name']} a ON a.object_identity_id = o.id
                WHERE (
 SELECTCLAUSE;
-                
-		$types = array();
-        for ($i=0,$c=count($batch); $i<$c; $i++) {
-        	if(!isset($types[$batch[$i]->getType()])) {
-        		$types[$batch[$i]->getType()] = true;
-        		if(count($batch) > 1) {
-        			break;
-        		}
-        	}  	
+
+        $types = array();
+        $count = count($batch);
+        for ($i = 0; $i < $count; $i++) {
+            if (!isset($types[$batch[$i]->getType()])) {
+                $types[$batch[$i]->getType()] = true;
+                if ($count > 1) {
+                    break;
+                }
+            }
         }
-        
-        if(count($types) === 1) {
-        	
-        	$where = '(o.object_identifier IN (%s) AND c.class_type = %s)'; 
-        	$ids = array();
-        	for ($i=0,$c=count($batch); $i<$c; $i++) {
-				$ids[] = $this->connection->quote($batch[$i]->getIdentifier());   
-        	}
-        	
-        	$sql .= sprintf(
-        			$where,
-        			implode(',', $ids), 
-        			$this->connection->quote($batch[0]->getType())
-        	);
-        	
+
+        if (1 === count($types)) {
+            $ids = array();
+            for ($i = 0; $i < $count; $i++) {
+                $ids[] = $this->connection->quote($batch[$i]->getIdentifier());
+            }
+
+            $sql .= sprintf(
+                '(o.object_identifier IN (%s) AND c.class_type = %s)',
+                implode(',', $ids),
+                $this->connection->quote($batch[0]->getType())
+            );
         } else {
-        	
-        	$where = '(o.object_identifier = %s AND c.class_type = %s)';
-        	for ($i=0,$c=count($batch); $i<$c; $i++) {
-        		$sql .= sprintf(
-        				$where,
-        				$this->connection->quote($batch[$i]->getIdentifier()),
-        				$this->connection->quote($batch[$i]->getType())
-        		);
-        		 
-        		if ($i+1 < $c) {
-        			$sql .= ' OR ';
-        		}
-        	}
+            $where = '(o.object_identifier = %s AND c.class_type = %s)';
+            for ($i = 0; $i < $count; $i++) {
+                $sql .= sprintf(
+                    $where,
+                    $this->connection->quote($batch[$i]->getIdentifier()),
+                    $this->connection->quote($batch[$i]->getType())
+                );
+
+                if ($i+1 < $count) {
+                    $sql .= ' OR ';
+                }
+            }
         }
-        
 
         $sql .= ')';
 
@@ -445,7 +441,7 @@ QUERY;
      * @param array $oidLookup
      *
      * @return \SplObjectStorage mapping object identities to ACL instances
-     * 
+     *
      * @throws AclNotFoundException
      */
     private function lookupObjectIdentities(array $batch, array $sids, array $oidLookup)

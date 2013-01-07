@@ -74,9 +74,11 @@ class CardSchemeValidator extends ConstraintValidator
 
         if (!is_numeric($value)) {
             $this->context->addViolation($constraint->message);
+
+            return;
         }
 
-        $schemes = array_flip($constraint->schemes);
+        $schemes = array_flip((array) $constraint->schemes);
         $schemeRegexes = array_intersect_key($this->schemes, $schemes);
 
         foreach ($schemeRegexes as $regexes) {

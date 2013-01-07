@@ -250,6 +250,14 @@ class TableHelper extends Helper
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function getName()
+    {
+        return 'table';
+    }
+
+    /**
      * Renders horizontal header separator.
      *
      * Example: +-----+-----------+-------+
@@ -392,13 +400,5 @@ class TableHelper extends Helper
     {
         $this->columnWidths = array();
         $this->numberOfColumns = null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getName()
-    {
-        return 'table';
     }
 }

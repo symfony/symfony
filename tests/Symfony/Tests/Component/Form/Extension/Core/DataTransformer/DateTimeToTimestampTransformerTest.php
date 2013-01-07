@@ -31,7 +31,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToTimestampTransformer();
 
-        $this->assertSame(null, $transformer->transform(null));
+        $this->assertSame('', $transformer->transform(null));
     }
 
     public function testTransform_differentTimezones()

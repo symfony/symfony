@@ -34,6 +34,7 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('foo[class=foo bar  ]', $this->tokensToString($this->tokenizer->tokenize('foo[class="foo bar"]')), '->tokenize() lexes an input string and returns an array of tokens');
         $this->assertEquals("foo[class=foo Abar     ]", $this->tokensToString($this->tokenizer->tokenize('foo[class="foo \\65 bar"]')), '->tokenize() lexes an input string and returns an array of tokens');
+        $this->assertEquals("img[alt=  ]", $this->tokensToString($this->tokenizer->tokenize('img[alt=""]')), '->tokenize() lexes an input string and returns an array of tokens');
     }
 
     /**

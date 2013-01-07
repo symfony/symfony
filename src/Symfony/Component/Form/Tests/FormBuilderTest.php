@@ -232,6 +232,30 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->create('bar', 'text');
     }
 
+    public function testGetFormConfigErasesReferences()
+    {
+        $builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
+        $builder->setParent(new FormBuilder('parent', null, $this->dispatcher, $this->factory));
+        $builder->add(new FormBuilder('child', null, $this->dispatcher, $this->factory));
+
+        $config = $builder->getFormConfig();
+        $reflClass = new \ReflectionClass($config);
+        $factory = $reflClass->getProperty('factory');
+        $parent = $reflClass->getProperty('parent');
+        $children = $reflClass->getProperty('children');
+        $unresolvedChildren = $reflClass->getProperty('unresolvedChildren');
+
+        $factory->setAccessible(true);
+        $parent->setAccessible(true);
+        $children->setAccessible(true);
+        $unresolvedChildren->setAccessible(true);
+
+        $this->assertNull($factory->getValue($config));
+        $this->assertNull($parent->getValue($config));
+        $this->assertEmpty($children->getValue($config));
+        $this->assertEmpty($unresolvedChildren->getValue($config));
+    }
+
     private function getFormBuilder($name = 'name')
     {
         $mock = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')

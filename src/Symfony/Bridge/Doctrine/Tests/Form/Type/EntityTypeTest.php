@@ -90,6 +90,7 @@ class EntityTypeTest extends TypeTestCase
         parent::tearDown();
 
         $this->em = null;
+        $this->emRegistry = null;
     }
 
     protected function getExtensions()

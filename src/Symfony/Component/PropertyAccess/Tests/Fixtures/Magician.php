@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Fixtures;
+namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
 class Magician
 {

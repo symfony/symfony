@@ -14,9 +14,31 @@ namespace Symfony\Component\Form\Extension\Core\DataMapper;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Util\VirtualFormAwareIterator;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * A data mapper using property paths to read/write data.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 class PropertyPathMapper implements DataMapperInterface
 {
+    /**
+     * @var PropertyAccessorInterface
+     */
+    private $propertyAccessor;
+
+    /**
+     * Creates a new property path mapper.
+     *
+     * @param PropertyAccessorInterface $propertyAccessor
+     */
+    public function __construct(PropertyAccessorInterface $propertyAccessor = null)
+    {
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -39,7 +61,7 @@ class PropertyPathMapper implements DataMapperInterface
             $config = $form->getConfig();
 
             if (null !== $propertyPath && $config->getMapped()) {
-                $form->setData($propertyPath->getValue($data));
+                $form->setData($this->propertyAccessor->getValue($data, $propertyPath));
             }
         }
     }
@@ -70,8 +92,8 @@ class PropertyPathMapper implements DataMapperInterface
             if (null !== $propertyPath && $config->getMapped() && $form->isSynchronized() && !$form->isDisabled()) {
                 // If the data is identical to the value in $data, we are
                 // dealing with a reference
-                if (!is_object($data) || !$config->getByReference() || $form->getData() !== $propertyPath->getValue($data)) {
-                    $propertyPath->setValue($data, $form->getData());
+                if (!is_object($data) || !$config->getByReference() || $form->getData() !== $this->propertyAccessor->getValue($data, $propertyPath)) {
+                    $this->propertyAccessor->setValue($data, $propertyPath, $form->getData());
                 }
             }
         }

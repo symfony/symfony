@@ -51,7 +51,12 @@ class Configuration implements ConfigurationInterface
                         })
                     ->end()
                 ->end()
-                ->scalarNode('secret')->end()
+                ->scalarNode('secret')
+                    ->validate()
+                        ->ifTrue(function($v) { return 'ThisTokenIsNotSoSecretChangeIt' === $v; })
+                        ->thenInvalid('The "secret" parameter is currently set to the default. It is really important that you change it to something unique.')
+                    ->end()
+                ->end()
                 ->scalarNode('trust_proxy_headers')->defaultFalse()->end() // @deprecated, to be removed in 2.3
                 ->arrayNode('trusted_proxies')
                     ->beforeNormalization()

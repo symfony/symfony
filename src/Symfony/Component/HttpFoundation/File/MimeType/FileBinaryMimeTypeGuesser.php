@@ -28,8 +28,9 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
      */
     public static function isSupported()
     {
-        return !strstr(PHP_OS, 'WIN');
+        return !defined('PHP_WINDOWS_VERSION_BUILD') && function_exists('passthru') && function_exists('escapeshellarg');
     }
+
     /**
      * Guesses the mime type of the file with the given path
      *

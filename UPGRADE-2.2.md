@@ -344,6 +344,8 @@
        // ...
    }
    ```
+   
+ * Constraints `Max`, `Min`, `MaxLength` and `MinLength` are deprecated and will be removed in 2.3. You can use `Range` and `Length` instead.
 
 ### FrameworkBundle
 

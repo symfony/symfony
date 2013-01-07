@@ -66,7 +66,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(array());
-        $processor->processConfiguration($configuration, array(array('secret' => 's3cr3t', 'trusted_proxies' => 'Not an IP address')));
+        $config = $processor->processConfiguration($configuration, array(array('secret' => 's3cr3t', 'trusted_proxies' => 'Not an IP address')));
     }
 
     /**
@@ -76,16 +76,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(array());
-        $processor->processConfiguration($configuration, array(array('secret' => 's3cr3t', 'trusted_proxies' => array('Not an IP address'))));
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
-    public function testDefaultSecretIsUsed()
-    {
-        $processor = new Processor();
-        $configuration = new Configuration(array());
-        $processor->processConfiguration($configuration, array(array('secret' => 'ThisTokenIsNotSoSecretChangeIt')));
+        $config = $processor->processConfiguration($configuration, array(array('secret' => 's3cr3t', 'trusted_proxies' => array('Not an IP address'))));
     }
 }

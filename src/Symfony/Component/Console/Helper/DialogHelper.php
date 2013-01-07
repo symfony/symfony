@@ -119,8 +119,7 @@ class DialogHelper extends Helper
                     $ret = substr($ret, 0, $i);
 
                     $numMatches = 0;
-                }
-                else if ("\033" === $c) { // Did we read an escape sequence?
+                } elseif ("\033" === $c) { // Did we read an escape sequence?
                     $c .= fread($inputStream, 2);
 
                     // A = Up Arrow. B = Down Arrow
@@ -136,7 +135,7 @@ class DialogHelper extends Helper
                         $ofs += ('A' === $c[2]) ? -1 : 1;
                         $ofs = ($numMatches + $ofs) % $numMatches;
                     }
-                } else if (ord($c) < 32) {
+                } elseif (ord($c) < 32) {
                     if ("\t" === $c || "\n" === $c) {
                         if ($numMatches > 0) {
                             $ret = $matches[$ofs];

@@ -35,7 +35,7 @@ class RouteCompiler implements RouteCompilerInterface
      * @throws \DomainException If a variable name is numeric because PHP raises an error for such
      *                          subpatterns in PCRE and thus would break matching, e.g. "(?P<123>.+)".
      */
-    public function compile(Route $route)
+    public static function compile(Route $route)
     {
         $staticPrefix = null;
         $hostnameVariables = array();
@@ -47,7 +47,7 @@ class RouteCompiler implements RouteCompilerInterface
         $hostnameTokens = array();
 
         if ('' !== $hostnamePattern = $route->getHostnamePattern()) {
-            $result = $this->compilePattern($route, $hostnamePattern, true);
+            $result = self::compilePattern($route, $hostnamePattern, true);
 
             $hostnameVariables = $result['variables'];
             $variables = array_merge($variables, $hostnameVariables);
@@ -58,7 +58,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         $pattern = $route->getPattern();
 
-        $result = $this->compilePattern($route, $pattern, false);
+        $result = self::compilePattern($route, $pattern, false);
 
         $staticPrefix = $result['staticPrefix'];
 
@@ -80,7 +80,7 @@ class RouteCompiler implements RouteCompilerInterface
         );
     }
 
-    private function compilePattern(Route $route, $pattern, $isHostname)
+    private static function compilePattern(Route $route, $pattern, $isHostname)
     {
         $tokens = array();
         $variables = array();
@@ -122,7 +122,7 @@ class RouteCompiler implements RouteCompilerInterface
                 // If {page} would also match the separating dot, {_format} would never match as {page} will eagerly consume everything.
                 // Also even if {_format} was not optional the requirement prevents that {page} matches something that was originally
                 // part of {_format} when generating the URL, e.g. _format = 'mobile.html'.
-                $nextSeparator = $this->findNextSeparator($followingPattern);
+                $nextSeparator = self::findNextSeparator($followingPattern);
                 $regexp = sprintf(
                     '[^%s%s]+',
                     preg_quote($defaultSeparator, self::REGEX_DELIMITER),
@@ -162,7 +162,7 @@ class RouteCompiler implements RouteCompilerInterface
         // compute the matching regexp
         $regexp = '';
         for ($i = 0, $nbToken = count($tokens); $i < $nbToken; $i++) {
-            $regexp .= $this->computeRegexp($tokens, $i, $firstOptional);
+            $regexp .= self::computeRegexp($tokens, $i, $firstOptional);
         }
 
         return array(
@@ -180,7 +180,7 @@ class RouteCompiler implements RouteCompilerInterface
      *
      * @return string The next static character that functions as separator (or empty string when none available)
      */
-    private function findNextSeparator($pattern)
+    private static function findNextSeparator($pattern)
     {
         if ('' == $pattern) {
             // return empty string if pattern is empty or false (false which can be returned by substr)
@@ -201,7 +201,7 @@ class RouteCompiler implements RouteCompilerInterface
      *
      * @return string The regexp pattern for a single token
      */
-    private function computeRegexp(array $tokens, $index, $firstOptional)
+    private static function computeRegexp(array $tokens, $index, $firstOptional)
     {
         $token = $tokens[$index];
         if ('text' === $token[0]) {

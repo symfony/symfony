@@ -285,7 +285,7 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
         try {
             $path->setValue($car, $axes);
             $this->fail('An expected exception was not thrown!');
-        } catch (\Symfony\Component\Form\Exception\FormException $e) {
+        } catch (\Symfony\Component\Form\Exception\Exception $e) {
             $this->assertEquals($message, $e->getMessage());
         }
     }

@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Form\Exception;
 
-class PropertyAccessDeniedException extends FormException
+class PropertyAccessDeniedException extends Exception
 {
 }

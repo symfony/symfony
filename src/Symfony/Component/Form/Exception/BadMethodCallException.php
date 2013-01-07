@@ -12,10 +12,10 @@
 namespace Symfony\Component\Form\Exception;
 
 /**
- * Thrown when a form type is configured incorrectly
+ * Base BadMethodCallException for the Form component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class TypeDefinitionException extends Exception
+class BadMethodCallException extends \BadMethodCallException implements ExceptionInterface
 {
 }

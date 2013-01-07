@@ -11,24 +11,17 @@
 
 namespace Symfony\Component\Form\Util;
 
-/**
- * @author Bernhard Schussek <bschussek@gmail.com>
- */
-interface PropertyPathIteratorInterface extends \Iterator, \SeekableIterator
-{
-    /**
-     * Returns whether the current element in the property path is an array
-     * index.
-     *
-     * @return Boolean
-     */
-    public function isIndex();
+use Symfony\Component\PropertyAccess\PropertyPathIteratorInterface as BasePropertyPathIteratorInterface;
 
-    /**
-     * Returns whether the current element in the property path is a property
-     * name.
-     *
-     * @return Boolean
-     */
-    public function isProperty();
+/**
+ * Alias for {@link \Symfony\Component\PropertyAccess\PropertyPathIteratorInterface}.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated deprecated since version 2.2, to be removed in 2.3. Use
+ *             {@link \Symfony\Component\PropertyAccess\PropertyPathIterator}
+ *             instead.
+ */
+interface PropertyPathIteratorInterface extends BasePropertyPathIteratorInterface
+{
 }

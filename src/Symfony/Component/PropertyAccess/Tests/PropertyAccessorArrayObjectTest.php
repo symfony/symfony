@@ -9,14 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Util;
+namespace Symfony\Component\PropertyAccess\Tests;
 
-use Symfony\Component\Form\Tests\Fixtures\CustomArrayObject;
-
-class PropertyPathCustomArrayObjectTest extends PropertyPathCollectionTest
+class PropertyAccessorArrayObjectTest extends PropertyAccessorCollectionTest
 {
     protected function getCollection(array $array)
     {
-        return new CustomArrayObject($array);
+        return new \ArrayObject($array);
     }
 }

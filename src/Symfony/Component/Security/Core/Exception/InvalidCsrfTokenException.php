@@ -24,6 +24,6 @@ class InvalidCsrfTokenException extends AuthenticationException
      */
     public function getMessageKey()
     {
-        return 'security.exception.invalid_csrf_token_exception';
+        return 'Invalid CSRF token.';
     }
 }

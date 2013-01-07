@@ -24,6 +24,6 @@ class AuthenticationServiceException extends AuthenticationException
      */
     public function getMessageKey()
     {
-        return 'security.exception.authentication_service_exception';
+        return 'Authentication request could not be processed due to a system problem.';
     }
 }

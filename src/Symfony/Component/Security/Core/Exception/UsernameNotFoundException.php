@@ -26,7 +26,7 @@ class UsernameNotFoundException extends AuthenticationException
      */
     public function getMessageKey()
     {
-        return 'security.exception.username_not_found_exception';
+        return 'Username could not be found.';
     }
 
     /**

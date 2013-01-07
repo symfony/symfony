@@ -24,6 +24,6 @@ class CredentialsExpiredException extends AccountStatusException
      */
     public function getMessageKey()
     {
-        return 'security.exception.credentials_expired_exception';
+        return 'Credentials have expired.';
     }
 }

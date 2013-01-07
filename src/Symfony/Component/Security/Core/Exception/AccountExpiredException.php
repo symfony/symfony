@@ -24,6 +24,6 @@ class AccountExpiredException extends AccountStatusException
      */
     public function getMessageKey()
     {
-        return 'security.exception.account_expired_exception';
+        return 'Account has expired.';
     }
 }

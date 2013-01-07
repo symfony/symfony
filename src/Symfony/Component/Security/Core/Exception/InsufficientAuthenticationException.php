@@ -26,6 +26,6 @@ class InsufficientAuthenticationException extends AuthenticationException
      */
     public function getMessageKey()
     {
-        return 'security.exception.insufficient_authentication_exception';
+        return 'Not privileged to request the resource.';
     }
 }

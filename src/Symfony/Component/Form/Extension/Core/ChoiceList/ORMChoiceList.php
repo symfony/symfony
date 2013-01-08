@@ -171,18 +171,18 @@ abstract class ORMChoiceList extends ObjectChoiceList
     abstract protected function load();
 
     /**
-     * Returns the values of the identifier fields of an entity.
+     * Returns the values of the identifier fields of an object.
      *
-     * Doctrine must know about this entity, that is, the entity must already
+     * The ORM must know about this object, that is, the object must already
      * be persisted or added to the identity map before. Otherwise an
      * exception is thrown.
      *
-     * @param object $entity The entity for which to get the identifier
+     * @param object $object The object for which to get the identifier
      *
      * @return array          The identifier values
      *
-     * @throws Exception If the entity does not exist in Doctrine's identity map
+     * @throws Exception If the object does not exist in ORM's identity map
      */
-    abstract protected function getIdentifierValues($entity);
+    abstract protected function getIdentifierValues($object);
 }
 

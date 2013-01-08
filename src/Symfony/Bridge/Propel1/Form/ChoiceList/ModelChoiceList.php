@@ -17,7 +17,7 @@ use \Persistent;
 
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\StringCastException;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ORMChoiceList;
 
 /**
  * Widely inspired by the EntityChoiceList.
@@ -25,7 +25,7 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
  * @author William Durand <william.durand1@gmail.com>
  * @author Toni Uebernickel <tuebernickel@gmail.com>
  */
-class ModelChoiceList extends ObjectChoiceList
+class ModelChoiceList extends ORMChoiceList
 {
     /**
      * The fields of which the identifier of the underlying class consists
@@ -49,13 +49,6 @@ class ModelChoiceList extends ObjectChoiceList
      * @var ModelCriteria
      */
     protected $preferredQuery;
-
-    /**
-     * Whether the model objects have already been loaded.
-     *
-     * @var Boolean
-     */
-    protected $loaded = false;
 
     /**
      * Whether to use the identifier for index generation
@@ -118,72 +111,6 @@ class ModelChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Returns the list of model objects
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getChoices()
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        return parent::getChoices();
-    }
-
-    /**
-     * Returns the values for the model objects
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getValues()
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        return parent::getValues();
-    }
-
-    /**
-     * Returns the choice views of the preferred choices as nested array with
-     * the choice groups as top-level keys.
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getPreferredViews()
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        return parent::getPreferredViews();
-    }
-
-    /**
-     * Returns the choice views of the choices that are not preferred as nested
-     * array with the choice groups as top-level keys.
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getRemainingViews()
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        return parent::getRemainingViews();
-    }
-
-    /**
      * Returns the model objects corresponding to the given values.
      *
      * @param array $values
@@ -207,75 +134,6 @@ class ModelChoiceList extends ObjectChoiceList
         }
 
         return parent::getChoicesForValues($values);
-    }
-
-    /**
-     * Returns the values corresponding to the given model objects.
-     *
-     * @param array $models
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getValuesForChoices(array $models)
-    {
-        if (!$this->loaded) {
-            // Optimize performance for single-field identifiers. We already
-            // know that the IDs are used as values
-
-            // Attention: This optimization does not check choices for existence
-            if (1 === count($this->identifier)) {
-                $values = array();
-                foreach ($models as $model) {
-                    if ($model instanceof $this->class) {
-                        // Make sure to convert to the right format
-                        $values[] = $this->fixValue(current($this->getIdentifierValues($model)));
-                    }
-                }
-
-                return $values;
-            }
-
-            $this->load();
-        }
-
-        return parent::getValuesForChoices($models);
-    }
-
-    /**
-     * Returns the indices corresponding to the given models.
-     *
-     * @param array $models
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getIndicesForChoices(array $models)
-    {
-        if (!$this->loaded) {
-            // Optimize performance for single-field identifiers. We already
-            // know that the IDs are used as indices
-
-            // Attention: This optimization does not check choices for existence
-            if ($this->identifierAsIndex) {
-                $indices = array();
-
-                foreach ($models as $model) {
-                    if ($model instanceof $this->class) {
-                        // Make sure to convert to the right format
-                        $indices[] = $this->fixIndex(current($this->getIdentifierValues($model)));
-                    }
-                }
-
-                return $indices;
-            }
-
-            $this->load();
-        }
-
-        return parent::getIndicesForChoices($models);
     }
 
     /**
@@ -326,29 +184,17 @@ class ModelChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Creates a new unique value for this model.
-     *
-     * If the model has a single-field identifier, this identifier is used.
-     *
-     * Otherwise a new integer is generated.
-     *
-     * @param mixed $model The choice to create a value for
-     *
-     * @return integer|string A unique value without character limitations.
+     * {@inheritdoc}
      */
-    protected function createValue($model)
+    protected function optimizedIdentifierCheck()
     {
-        if (1 === count($this->identifier)) {
-            return (string) current($this->getIdentifierValues($model));
-        }
-
-        return parent::createValue($model);
+        return 1 === count($this->identifier);
     }
 
     /**
-     * Loads the list with model objects.
+     * {@inheritdoc}
      */
-    private function load()
+    protected function load()
     {
         $models = (array) $this->query->find();
 
@@ -368,19 +214,9 @@ class ModelChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Returns the values of the identifier fields of an model
-     *
-     * Propel must know about this model, that is, the model must already
-     * be persisted or added to the idmodel map before. Otherwise an
-     * exception is thrown.
-     *
-     * @param object $model The model for which to get the identifier
-     *
-     * @return array
-     *
-     * @throws FormException If the model does not exist
+     * {@inheritdoc}
      */
-    private function getIdentifierValues($model)
+    protected function getIdentifierValues($model)
     {
         if ($model instanceof Persistent) {
             return array($model->getPrimaryKey());
@@ -406,3 +242,4 @@ class ModelChoiceList extends ObjectChoiceList
         return $column->getPdoType() === \PDO::PARAM_INT;
     }
 }
+

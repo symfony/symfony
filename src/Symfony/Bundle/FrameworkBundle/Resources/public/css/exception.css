@@ -1,3 +1,7 @@
+.sf-reset pre {
+    white-space: pre;
+    font-size: 12px;
+}
 .sf-reset .traces {
     padding-bottom: 14px;
 }

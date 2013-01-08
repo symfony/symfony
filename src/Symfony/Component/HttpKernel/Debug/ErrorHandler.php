@@ -95,7 +95,7 @@ class ErrorHandler
                         : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10)
                 );
 
-                self::$logger->warn($message, $deprecation);
+                self::$logger->warning($message, $deprecation);
             }
 
             return true;

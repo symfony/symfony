@@ -110,7 +110,7 @@ class Profiler
     public function saveProfile(Profile $profile)
     {
         if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {
-            $this->logger->warn('Unable to store the profiler information.');
+            $this->logger->warning('Unable to store the profiler information.');
         }
 
         return $ret;

@@ -73,7 +73,7 @@ class PropelLogger
     public function crit($message)
     {
         if (null !== $this->logger) {
-            $this->logger->crit($message);
+            $this->logger->critical($message);
         }
     }
 
@@ -85,7 +85,7 @@ class PropelLogger
     public function err($message)
     {
         if (null !== $this->logger) {
-            $this->logger->err($message);
+            $this->logger->error($message);
         }
     }
 
@@ -97,7 +97,7 @@ class PropelLogger
     public function warning($message)
     {
         if (null !== $this->logger) {
-            $this->logger->warn($message);
+            $this->logger->warning($message);
         }
     }
 

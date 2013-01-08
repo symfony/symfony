@@ -229,24 +229,7 @@ class PhpDumper extends Dumper
                     throw new ServiceCircularReferenceException($id, array($id));
                 }
 
-                $arguments = array();
-                foreach ($sDefinition->getArguments() as $argument) {
-                    $arguments[] = $this->dumpValue($argument);
-                }
-
-                if (null !== $sDefinition->getFactoryMethod()) {
-                    if (null !== $sDefinition->getFactoryClass()) {
-                        $code .= sprintf("        \$%s = call_user_func(array(%s, '%s')%s);\n", $name, $this->dumpValue($sDefinition->getFactoryClass()), $sDefinition->getFactoryMethod(), count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
-                    } elseif (null !== $sDefinition->getFactoryService()) {
-                        $code .= sprintf("        \$%s = %s->%s(%s);\n", $name, $this->getServiceCall($sDefinition->getFactoryService()), $sDefinition->getFactoryMethod(), implode(', ', $arguments));
-                    } else {
-                        throw new RuntimeException('Factory service or factory class must be defined in service definition for '.$id);
-                    }
-                } elseif (false !== strpos($class, '$')) {
-                    $code .= sprintf("        \$class = %s;\n        \$%s = new \$class(%s);\n", $class, $name, implode(', ', $arguments));
-                } else {
-                    $code .= sprintf("        \$%s = new \\%s(%s);\n", $name, substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
-                }
+                $code .= $this->addNewInstance($id, $sDefinition, '$'.$name, ' = ');
 
                 if (!$this->hasReference($id, $sDefinition->getMethodCalls(), true) && !$this->hasReference($id, $sDefinition->getProperties(), true)) {
                     $code .= $this->addServiceMethodCalls(null, $sDefinition, $name);
@@ -297,11 +280,6 @@ class PhpDumper extends Dumper
             throw new InvalidArgumentException(sprintf('"%s" is not a valid class name for the "%s" service.', $class, $id));
         }
 
-        $arguments = array();
-        foreach ($definition->getArguments() as $value) {
-            $arguments[] = $this->dumpValue($value);
-        }
-
         $simple = $this->isSimpleInstance($id, $definition);
 
         $instantiation = '';
@@ -320,19 +298,7 @@ class PhpDumper extends Dumper
             $instantiation .= ' = ';
         }
 
-        if (null !== $definition->getFactoryMethod()) {
-            if (null !== $definition->getFactoryClass()) {
-                $code = sprintf("        $return{$instantiation}call_user_func(array(%s, '%s')%s);\n", $this->dumpValue($definition->getFactoryClass()), $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
-            } elseif (null !== $definition->getFactoryService()) {
-                $code = sprintf("        $return{$instantiation}%s->%s(%s);\n", $this->getServiceCall($definition->getFactoryService()), $definition->getFactoryMethod(), implode(', ', $arguments));
-            } else {
-                throw new RuntimeException('Factory method requires a factory service or factory class in service definition for '.$id);
-            }
-        } elseif (false !== strpos($class, '$')) {
-            $code = sprintf("        \$class = %s;\n\n        $return{$instantiation}new \$class(%s);\n", $class, implode(', ', $arguments));
-        } else {
-            $code = sprintf("        $return{$instantiation}new \\%s(%s);\n", substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
-        }
+        $code = $this->addNewInstance($id, $definition, $return, $instantiation);
 
         if (!$simple) {
             $code .= "\n";
@@ -609,6 +575,34 @@ EOF;
         }
 
         return $publicServices.$aliasServices.$privateServices;
+    }
+
+    private function addNewInstance($id, Definition $definition, $return, $instantiation)
+    {
+        $class = $this->dumpValue($definition->getClass());
+
+        $arguments = array();
+        foreach ($definition->getArguments() as $value) {
+            $arguments[] = $this->dumpValue($value);
+        }
+
+        if (null !== $definition->getFactoryMethod()) {
+            if (null !== $definition->getFactoryClass()) {
+                return sprintf("        $return{$instantiation}call_user_func(array(%s, '%s')%s);\n", $this->dumpValue($definition->getFactoryClass()), $definition->getFactoryMethod(), $arguments ? ', '.implode(', ', $arguments) : '');
+            }
+
+            if (null !== $definition->getFactoryService()) {
+                return sprintf("        $return{$instantiation}%s->%s(%s);\n", $this->getServiceCall($definition->getFactoryService()), $definition->getFactoryMethod(), implode(', ', $arguments));
+            }
+
+            throw new RuntimeException('Factory method requires a factory service or factory class in service definition for '.$id);
+        }
+
+        if (false !== strpos($class, '$')) {
+            return sprintf("        \$class = %s;\n\n        $return{$instantiation}new \$class(%s);\n", $class, implode(', ', $arguments));
+        }
+
+        return sprintf("        $return{$instantiation}new \\%s(%s);\n", substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
     }
 
     /**

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
@@ -87,6 +88,43 @@ class ProfilerController
             'templates' => $this->getTemplateManager()->getTemplates($profile),
             'is_ajax'   => $request->isXmlHttpRequest(),
         )));
+    }
+
+    public function panelsAction(Request $request, $token)
+    {
+        $this->profiler->disable();
+
+        $page = $request->query->get('page', 'home');
+
+        if (!$profile = $this->profiler->loadProfile($token)) {
+            return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array('about' => 'no_token', 'token' => $token)));
+        }
+
+        $renderedBlocks = array();
+        $templates = $this->getTemplateManager()->getTemplates($profile);
+
+        foreach ($templates as $panel => $template) {
+            if (!$profile->hasCollector($panel)) {
+                throw new NotFoundHttpException(sprintf('Panel "%s" is not available for token "%s".', $panel, $token));
+            }
+
+            if (!$template->hasBlock('panel')) {
+                continue;
+            }
+
+            $renderedBlocks[$panel] = $template->renderBlock('panel', array(
+                'token'     => $token,
+                'profile'   => $profile,
+                'collector' => $profile->getCollector($panel),
+                'panel'     => $panel,
+                'page'      => $page,
+                'request'   => $request,
+                'templates' => $templates,
+                'is_ajax'   => $request->isXmlHttpRequest(),
+            ));
+        }
+
+        return new JsonResponse($renderedBlocks);
     }
 
     /**

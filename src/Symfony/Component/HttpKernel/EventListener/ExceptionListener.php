@@ -89,7 +89,7 @@ class ExceptionListener implements EventSubscriberInterface
             // set handling to false otherwise it wont be able to handle further more
             $handling = false;
 
-            // re-throw the exception as this is a catch-all
+            // re-throw the exception from within HttpKernel as this is a catch-all
             return;
         }
 

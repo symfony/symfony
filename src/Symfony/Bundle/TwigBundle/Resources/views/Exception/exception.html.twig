@@ -88,6 +88,8 @@
     </div>
 {% endif %}
 
+{% include 'TwigBundle:Exception:traces_text.html.twig' with { 'exception': exception } only %}
+
 <script type="text/javascript">//<![CDATA[
     function toggle(id, clazz) {
         var el = document.getElementById(id),

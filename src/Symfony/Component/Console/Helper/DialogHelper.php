@@ -115,12 +115,12 @@ class DialogHelper extends Helper
                         $ofs = -1;
                         $matches = $autocomplete;
                         $numMatches = count($matches);
+                    } else {
+                        $numMatches = 0;
                     }
 
                     // Pop the last character off the end of our string
                     $ret = substr($ret, 0, $i);
-
-                    $numMatches = 0;
                 } elseif ("\033" === $c) { // Did we read an escape sequence?
                     $c .= fread($inputStream, 2);
 

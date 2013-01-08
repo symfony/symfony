@@ -156,12 +156,12 @@ class DefaultTranslator implements TranslatorInterface
     }
 
     /**
-     * Not supported.
+     * Returns the locale of the translator.
      *
-     * @throws BadMethodCallException
+     * @return string Always returns 'en'
      */
     public function getLocale()
     {
-        throw new BadMethodCallException('Unsupported method.');
+        return 'en';
     }
 }

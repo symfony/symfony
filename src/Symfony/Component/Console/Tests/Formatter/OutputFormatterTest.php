@@ -73,6 +73,16 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testStyleMatchingNotGreedy()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertEquals(
+            "(\033[32m>=2.0,<2.3\033[0m)",
+            $formatter->format('(<info>>=2.0,<2.3</info>)')
+        );
+    }
+
     public function testDeepNestedStyles()
     {
         $formatter = new OutputFormatter(true);

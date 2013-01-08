@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Validator\Exception\BadMethodCallException;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -43,7 +45,7 @@ class DefaultTranslator implements TranslatorInterface
         }
 
         if (!isset($ids[1])) {
-            throw new \InvalidArgumentException(sprintf('The message "%s" cannot be pluralized, because it is missing a plural (e.g. "There is one apple|There are %%count%% apples").', $id));
+            throw new InvalidArgumentException(sprintf('The message "%s" cannot be pluralized, because it is missing a plural (e.g. "There is one apple|There are %%count%% apples").', $id));
         }
 
         return strtr($ids[1], $parameters);
@@ -54,7 +56,7 @@ class DefaultTranslator implements TranslatorInterface
      */
     public function setLocale($locale)
     {
-        throw new \BadMethodCallException('Unsupported method.');
+        throw new BadMethodCallException('Unsupported method.');
     }
 
     /**
@@ -62,6 +64,6 @@ class DefaultTranslator implements TranslatorInterface
      */
     public function getLocale()
     {
-        throw new \BadMethodCallException('Unsupported method.');
+        throw new BadMethodCallException('Unsupported method.');
     }
 }

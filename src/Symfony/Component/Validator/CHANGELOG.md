@@ -38,6 +38,7 @@ CHANGELOG
  * [BC BREAK] added `setTranslator()` and `setTranslationDomain()` to `ValidatorBuilderInterface`
  * improved the Validator to support pluralized messages by default
  * [BC BREAK] changed the source of all pluralized messages in the translation files to the pluralized version
+ * added ExceptionInterface, BadMethodCallException and InvalidArgumentException
 
 2.1.0
 -----

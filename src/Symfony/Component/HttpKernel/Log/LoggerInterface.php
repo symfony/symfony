@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Log;
 
+use Psr\Log\LoggerInterface as PsrLogger;
+
 /**
  * LoggerInterface.
  *
@@ -18,17 +20,12 @@ namespace Symfony\Component\HttpKernel\Log;
  *
  * @api
  */
-interface LoggerInterface
+interface LoggerInterface extends PsrLogger
 {
     /**
      * @api
      */
     public function emerg($message, array $context = array());
-
-    /**
-     * @api
-     */
-    public function alert($message, array $context = array());
 
     /**
      * @api
@@ -44,19 +41,4 @@ interface LoggerInterface
      * @api
      */
     public function warn($message, array $context = array());
-
-    /**
-     * @api
-     */
-    public function notice($message, array $context = array());
-
-    /**
-     * @api
-     */
-    public function info($message, array $context = array());
-
-    /**
-     * @api
-     */
-    public function debug($message, array $context = array());
 }

@@ -83,6 +83,16 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testStyleEscaping()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertEquals(
+            "(\033[32mz>=2.0,<a2.3\033[0m)",
+            $formatter->format('(<info>'.$formatter->escape('z>=2.0,<a2.3').'</info>)')
+        );
+    }
+
     public function testDeepNestedStyles()
     {
         $formatter = new OutputFormatter(true);

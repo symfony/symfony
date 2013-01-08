@@ -542,7 +542,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         // Check whether the form is compound.
-        // This check is preferrable over checking the number of children,
+        // This check is preferable over checking the number of children,
         // since forms without children may also be compound.
         // (think of empty collection forms)
         if ($this->config->getCompound()) {
@@ -837,7 +837,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getChildren()
     {
-        trigger_error('getChilren() is deprecated since version 2.1 and will be removed in 2.3. Use all() instead.', E_USER_DEPRECATED);
+        trigger_error('getChildren() is deprecated since version 2.1 and will be removed in 2.3. Use all() instead.', E_USER_DEPRECATED);
 
         return $this->all();
     }

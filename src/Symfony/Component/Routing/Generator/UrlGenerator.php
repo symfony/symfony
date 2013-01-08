@@ -166,7 +166,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                         }
 
                         if ($this->logger) {
-                            $this->logger->err($message);
+                            $this->logger->error($message);
                         }
 
                         return null;
@@ -224,7 +224,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                             }
 
                             if ($this->logger) {
-                                $this->logger->err($message);
+                                $this->logger->error($message);
                             }
 
                             return null;

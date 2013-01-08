@@ -89,7 +89,7 @@ class ContextListener implements ListenerInterface
             $token = $this->refreshUser($token);
         } elseif (null !== $token) {
             if (null !== $this->logger) {
-                $this->logger->warn(sprintf('Session includes a "%s" where a security token is expected', is_object($token) ? get_class($token) : gettype($token)));
+                $this->logger->warning(sprintf('Session includes a "%s" where a security token is expected', is_object($token) ? get_class($token) : gettype($token)));
             }
 
             $token = null;
@@ -161,7 +161,7 @@ class ContextListener implements ListenerInterface
                 // let's try the next user provider
             } catch (UsernameNotFoundException $notFound) {
                 if (null !== $this->logger) {
-                    $this->logger->warn(sprintf('Username "%s" could not be found.', $user->getUsername()));
+                    $this->logger->warning(sprintf('Username "%s" could not be found.', $user->getUsername()));
                 }
 
                 return null;

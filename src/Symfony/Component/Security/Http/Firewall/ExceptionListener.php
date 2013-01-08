@@ -134,7 +134,7 @@ class ExceptionListener
                     }
                 } catch (\Exception $e) {
                     if (null !== $this->logger) {
-                        $this->logger->err(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
+                        $this->logger->error(sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()));
                     }
 
                     $event->setException(new \RuntimeException('Exception thrown when handling an exception.', 0, $e));

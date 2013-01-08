@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
 /**
- * Abstract class for ORM implemetations of ChoiceListInterface
+ * Abstract class for ORM implementations of ChoiceListInterface
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

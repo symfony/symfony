@@ -44,8 +44,6 @@ class MessageSelector
      *
      * @return string
      *
-     * @throws \InvalidArgumentException
-     *
      * @api
      */
     public function choose($message, $number, $locale)

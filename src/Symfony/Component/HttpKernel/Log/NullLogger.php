@@ -25,7 +25,21 @@ class NullLogger implements LoggerInterface
     /**
      * @api
      */
+    public function log($level, $message, array $context = array())
+    {
+    }
+
+    /**
+     * @api
+     */
     public function emerg($message, array $context = array())
+    {
+    }
+
+    /**
+     * @api
+     */
+    public function emergency($message, array $context = array())
     {
     }
 
@@ -46,6 +60,13 @@ class NullLogger implements LoggerInterface
     /**
      * @api
      */
+    public function critical($message, array $context = array())
+    {
+    }
+
+    /**
+     * @api
+     */
     public function err($message, array $context = array())
     {
     }
@@ -53,7 +74,21 @@ class NullLogger implements LoggerInterface
     /**
      * @api
      */
+    public function error($message, array $context = array())
+    {
+    }
+
+    /**
+     * @api
+     */
     public function warn($message, array $context = array())
+    {
+    }
+
+    /**
+     * @api
+     */
+    public function warning($message, array $context = array())
     {
     }
 

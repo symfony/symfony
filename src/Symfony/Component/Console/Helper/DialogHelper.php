@@ -139,7 +139,7 @@ class DialogHelper extends Helper
                     }
                 } elseif (ord($c) < 32) {
                     if ("\t" === $c || "\n" === $c) {
-                        if ($numMatches > 0) {
+                        if ($numMatches > 0 && -1 !== $ofs) {
                             $ret = $matches[$ofs];
                             // Echo out remaining chars for current match
                             $output->write(substr($ret, $i));
@@ -174,7 +174,7 @@ class DialogHelper extends Helper
                 // Erase characters from cursor to end of line
                 $output->write("\033[K");
 
-                if ($numMatches > 0) {
+                if ($numMatches > 0 && -1 !== $ofs) {
                     // Save cursor position
                     $output->write("\0337");
                     // Write highlighted text

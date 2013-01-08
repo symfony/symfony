@@ -25,16 +25,6 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $selector->choose($id, $number, 'en'));
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testChooseWhenNoEnoughChoices()
-    {
-        $selector = new MessageSelector();
-
-        $selector->choose('foo', 10, 'en');
-    }
-
     public function getChooseTests()
     {
         return array(
@@ -75,6 +65,9 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
             array('There is no apples', '{0} There is no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0),
             array('There is no apples', '{0} There is no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0.0),
             array('There is no apples', '{0.0} There is no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0),
+
+            // #4228
+            array('There are %count% apples', 'There are %count% apples', 10),
         );
     }
 }

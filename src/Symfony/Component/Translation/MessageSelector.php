@@ -74,7 +74,7 @@ class MessageSelector
 
         $position = PluralizationRules::get($number, $locale);
         if (!isset($standardRules[$position])) {
-            throw new \InvalidArgumentException(sprintf('Unable to choose a translation for "%s" with locale "%s". Double check that this translation has the correct plural options (e.g. "There is one apple|There are %%count%% apples").', $message, $locale));
+            return current($standardRules);
         }
 
         return $standardRules[$position];

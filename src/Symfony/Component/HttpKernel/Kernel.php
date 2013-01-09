@@ -74,15 +74,16 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @param string  $environment The environment
      * @param Boolean $debug       Whether to enable debugging or not
+     * @param string  $rootDir     Root directory
      *
      * @api
      */
-    public function __construct($environment, $debug)
+    public function __construct($environment, $debug, $rootDir = null)
     {
         $this->environment = $environment;
         $this->debug = (Boolean) $debug;
         $this->booted = false;
-        $this->rootDir = $this->getRootDir();
+        $this->rootDir = $rootDir ?: $this->getRootDir();
         $this->name = $this->getName();
         $this->classes = array();
         $this->bundles = array();

@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
 use Symfony\Component\Form\Exception\Exception;
 use Symfony\Component\Form\Exception\StringCastException;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ORMChoiceList;
 use Doctrine\Common\Persistence\ObjectManager;
 
 /**
@@ -21,17 +21,12 @@ use Doctrine\Common\Persistence\ObjectManager;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class EntityChoiceList extends ObjectChoiceList
+class EntityChoiceList extends ORMChoiceList
 {
     /**
      * @var ObjectManager
      */
     private $em;
-
-    /**
-     * @var string
-     */
-    private $class;
 
     /**
      * @var \Doctrine\Common\Persistence\Mapping\ClassMetadata
@@ -68,13 +63,6 @@ class EntityChoiceList extends ObjectChoiceList
      * @var Boolean
      */
     private $idAsValue = false;
-
-    /**
-     * Whether the entities have already been loaded.
-     *
-     * @var Boolean
-     */
-    private $loaded = false;
 
     /**
      * The preferred entities.
@@ -126,72 +114,6 @@ class EntityChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Returns the list of entities
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getChoices()
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        return parent::getChoices();
-    }
-
-    /**
-     * Returns the values for the entities
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getValues()
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        return parent::getValues();
-    }
-
-    /**
-     * Returns the choice views of the preferred choices as nested array with
-     * the choice groups as top-level keys.
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getPreferredViews()
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        return parent::getPreferredViews();
-    }
-
-    /**
-     * Returns the choice views of the choices that are not preferred as nested
-     * array with the choice groups as top-level keys.
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getRemainingViews()
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        return parent::getRemainingViews();
-    }
-
-    /**
      * Returns the entities corresponding to the given values.
      *
      * @param array $values
@@ -217,76 +139,6 @@ class EntityChoiceList extends ObjectChoiceList
         }
 
         return parent::getChoicesForValues($values);
-    }
-
-    /**
-     * Returns the values corresponding to the given entities.
-     *
-     * @param array $entities
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getValuesForChoices(array $entities)
-    {
-        if (!$this->loaded) {
-            // Optimize performance for single-field identifiers. We already
-            // know that the IDs are used as values
-
-            // Attention: This optimization does not check choices for existence
-            if ($this->idAsValue) {
-                $values = array();
-
-                foreach ($entities as $entity) {
-                    if ($entity instanceof $this->class) {
-                        // Make sure to convert to the right format
-                        $values[] = $this->fixValue(current($this->getIdentifierValues($entity)));
-                    }
-                }
-
-                return $values;
-            }
-
-            $this->load();
-        }
-
-        return parent::getValuesForChoices($entities);
-    }
-
-    /**
-     * Returns the indices corresponding to the given entities.
-     *
-     * @param array $entities
-     *
-     * @return array
-     *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
-     */
-    public function getIndicesForChoices(array $entities)
-    {
-        if (!$this->loaded) {
-            // Optimize performance for single-field identifiers. We already
-            // know that the IDs are used as indices
-
-            // Attention: This optimization does not check choices for existence
-            if ($this->idAsIndex) {
-                $indices = array();
-
-                foreach ($entities as $entity) {
-                    if ($entity instanceof $this->class) {
-                        // Make sure to convert to the right format
-                        $indices[] = $this->fixIndex(current($this->getIdentifierValues($entity)));
-                    }
-                }
-
-                return $indices;
-            }
-
-            $this->load();
-        }
-
-        return parent::getIndicesForChoices($entities);
     }
 
     /**
@@ -336,26 +188,6 @@ class EntityChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Creates a new unique value for this entity.
-     *
-     * If the entity has a single-field identifier, this identifier is used.
-     *
-     * Otherwise a new integer is generated.
-     *
-     * @param mixed $entity The choice to create a value for
-     *
-     * @return integer|string A unique value without character limitations.
-     */
-    protected function createValue($entity)
-    {
-        if ($this->idAsValue) {
-            return (string) current($this->getIdentifierValues($entity));
-        }
-
-        return parent::createValue($entity);
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function fixIndex($index)
@@ -373,9 +205,17 @@ class EntityChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Loads the list with entities.
+     * {@inheritdoc}
      */
-    private function load()
+    protected function canOptimizeIdentifier()
+    {
+        return $this->idAsValue;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function load()
     {
         if ($this->entityLoader) {
             $entities = $this->entityLoader->getEntities();
@@ -394,19 +234,9 @@ class EntityChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Returns the values of the identifier fields of an entity.
-     *
-     * Doctrine must know about this entity, that is, the entity must already
-     * be persisted or added to the identity map before. Otherwise an
-     * exception is thrown.
-     *
-     * @param object $entity The entity for which to get the identifier
-     *
-     * @return array          The identifier values
-     *
-     * @throws Exception If the entity does not exist in Doctrine's identity map
+     * {@inheritdoc}
      */
-    private function getIdentifierValues($entity)
+    protected function getIdentifierValues($entity)
     {
         if (!$this->em->contains($entity)) {
             throw new Exception(
@@ -420,3 +250,4 @@ class EntityChoiceList extends ObjectChoiceList
         return $this->classMetadata->getIdentifierValues($entity);
     }
 }
+

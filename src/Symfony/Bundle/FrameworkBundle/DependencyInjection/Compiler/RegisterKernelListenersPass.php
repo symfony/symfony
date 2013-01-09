@@ -14,17 +14,47 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
+/**
+ * Compiler pass to register tagged services for an event dispatcher.
+ */
 class RegisterKernelListenersPass implements CompilerPassInterface
 {
+    /**
+     * @var string
+     */
+    protected $dispatcherService;
+
+    /**
+     * @var string
+     */
+    protected $listenerTag;
+
+    /**
+     * @var string
+     */
+    protected $subscriberTag;
+
+    /**
+     * @param string $dispatcherService Service name of the event dispatcher in processed container
+     * @param string $listenerTag Tag name used for listener
+     * @param string $listenerTag Tag name used for subscribers
+     */
+    public function __construct($dispatcherService = 'event_dispatcher', $listenerTag = 'kernel.event_listener', $subscriberTag = 'kernel.event_subscriber')
+    {
+        $this->dispatcherService = $dispatcherService;
+        $this->listenerTag = $listenerTag;
+        $this->subscriberTag = $subscriberTag;
+    }
+
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('event_dispatcher')) {
+        if (!$container->hasDefinition($this->dispatcherService)) {
             return;
         }
 
-        $definition = $container->getDefinition('event_dispatcher');
+        $definition = $container->getDefinition($this->dispatcherService);
 
-        foreach ($container->findTaggedServiceIds('kernel.event_listener') as $id => $events) {
+        foreach ($container->findTaggedServiceIds($this->listenerTag) as $id => $events) {
             foreach ($events as $event) {
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
 
@@ -44,7 +74,7 @@ class RegisterKernelListenersPass implements CompilerPassInterface
             }
         }
 
-        foreach ($container->findTaggedServiceIds('kernel.event_subscriber') as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds($this->subscriberTag) as $id => $attributes) {
             // We must assume that the class value has been correctly filled, even if the service is created by a factory
             $class = $container->getDefinition($id)->getClass();
 

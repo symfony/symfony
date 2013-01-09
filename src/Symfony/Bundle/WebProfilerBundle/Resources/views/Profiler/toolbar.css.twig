@@ -80,6 +80,8 @@
 
 .sf-toolbar-block .sf-toolbar-info-piece {
     padding-bottom: 5px;
+    padding-left: 9px;
+    padding-right: 9px;
 }
 
 .sf-toolbar-block .sf-toolbar-info-piece:last-child {
@@ -112,11 +114,12 @@
     position: absolute;
     background-color: #fff;
     border: 1px solid #bbb;
-    padding: 10px 8px;
+    padding: 10px 0;
     margin-left: -1px;
 
     bottom: 38px;
     border-bottom-width: 0;
+    border-bottom: 1px solid #bbb;
 }
 
 .sf-toolbar-block .sf-toolbar-info:empty {
@@ -233,13 +236,21 @@
     box-shadow: rgba(0, 0, 0, 0.35) 0 0 5px;
     border-right: none;
     margin-right: 1px;
+    position: relative;
 }
 
 .sf-toolbar-block:hover .sf-toolbar-icon {
     background-color: #fff;
+    border-top: 1px dotted #DDD;
+    position: relative;
+    margin-top: -1px;
+    z-index: 1000;
 }
+
 .sf-toolbar-block:hover .sf-toolbar-info {
     display: block;
+    bottom: 38px;
+    min-width: 100%;
 }
 
 /***** Override the setting when the toolbar is on the top *****/

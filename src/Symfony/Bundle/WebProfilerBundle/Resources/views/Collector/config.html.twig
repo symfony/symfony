@@ -35,6 +35,10 @@
                 <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasxdebug ? 'green' : 'red' }}">xdebug</span>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasaccelerator ? 'green' : 'red' }}">accel</span>
             </div>
+            <div class="sf-toolbar-info-piece">
+                <b>PHP SAPI</b>
+                <span>{{ collector.sapiName }}</span>
+            </div>
         {% endspaceless %}
     {% endset %}
     {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': false } %}

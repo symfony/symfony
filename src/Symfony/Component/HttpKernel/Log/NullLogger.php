@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Log;
 
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\NullLogger as PsrNullLogger;
 
 /**
  * NullLogger.
@@ -20,17 +21,11 @@ use Symfony\Component\HttpKernel\Log\LoggerInterface;
  *
  * @api
  */
-class NullLogger implements LoggerInterface
+class NullLogger extends PsrNullLogger
 {
     /**
      * @api
-     */
-    public function log($level, $message, array $context = array())
-    {
-    }
-
-    /**
-     * @api
+     * @deprecated since 2.2, to be removed in 3.0. Use emergency() which is PSR-3 compatible.
      */
     public function emerg($message, array $context = array())
     {
@@ -38,20 +33,7 @@ class NullLogger implements LoggerInterface
 
     /**
      * @api
-     */
-    public function emergency($message, array $context = array())
-    {
-    }
-
-    /**
-     * @api
-     */
-    public function alert($message, array $context = array())
-    {
-    }
-
-    /**
-     * @api
+     * @deprecated since 2.2, to be removed in 3.0. Use critical() which is PSR-3 compatible.
      */
     public function crit($message, array $context = array())
     {
@@ -59,13 +41,7 @@ class NullLogger implements LoggerInterface
 
     /**
      * @api
-     */
-    public function critical($message, array $context = array())
-    {
-    }
-
-    /**
-     * @api
+     * @deprecated since 2.2, to be removed in 3.0. Use error() which is PSR-3 compatible.
      */
     public function err($message, array $context = array())
     {
@@ -73,43 +49,9 @@ class NullLogger implements LoggerInterface
 
     /**
      * @api
-     */
-    public function error($message, array $context = array())
-    {
-    }
-
-    /**
-     * @api
+     * @deprecated since 2.2, to be removed in 3.0. Use warning() which is PSR-3 compatible.
      */
     public function warn($message, array $context = array())
-    {
-    }
-
-    /**
-     * @api
-     */
-    public function warning($message, array $context = array())
-    {
-    }
-
-    /**
-     * @api
-     */
-    public function notice($message, array $context = array())
-    {
-    }
-
-    /**
-     * @api
-     */
-    public function info($message, array $context = array())
-    {
-    }
-
-    /**
-     * @api
-     */
-    public function debug($message, array $context = array())
     {
     }
 }

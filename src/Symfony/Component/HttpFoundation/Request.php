@@ -572,7 +572,7 @@ class Request
      * Be warned that enabling this feature might lead to CSRF issues in your code.
      * Check that you are using CSRF tokens when required.
      *
-     * The HTTP method can only be overriden when the real HTTP method is POST.
+     * The HTTP method can only be overridden when the real HTTP method is POST.
      */
     public static function enableHttpMethodParameterOverride()
     {
@@ -722,7 +722,7 @@ class Request
      *
      *  * http://localhost/mysite              returns an empty string
      *  * http://localhost/mysite/about        returns '/about'
-     *  * htpp://localhost/mysite/enco%20ded   returns '/enco%20ded'
+     *  * http://localhost/mysite/enco%20ded   returns '/enco%20ded'
      *  * http://localhost/mysite/about?var=1  returns '/about'
      *
      * @return string The raw path (i.e. not urldecoded)

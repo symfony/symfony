@@ -198,7 +198,7 @@ class Command
     public function end()
     {
         if (null === $this->parent) {
-            throw new \RuntimeException('Calling end on root command dont makes sense.');
+            throw new \RuntimeException('Calling end on root command doesn\'t make sense.');
         }
 
         return $this->parent;

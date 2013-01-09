@@ -211,7 +211,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     {
         $config = parent::getFormConfig();
 
-        $config->factory = null;
         $config->parent = null;
         $config->children = array();
         $config->unresolvedChildren = array();

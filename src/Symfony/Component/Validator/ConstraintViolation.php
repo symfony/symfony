@@ -21,6 +21,11 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * @var string
      */
+    private $message;
+
+    /**
+     * @var string
+     */
     private $messageTemplate;
 
     /**
@@ -56,6 +61,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * Creates a new constraint violation.
      *
+     * @param string       $message               The violation message.
      * @param string       $messageTemplate       The raw violation message.
      * @param array        $messageParameters     The parameters to substitute
      *                                            in the raw message.
@@ -70,8 +76,9 @@ class ConstraintViolation implements ConstraintViolationInterface
      * @param mixed        $code                  The error code of the
      *                                            violation, if any.
      */
-    public function __construct($messageTemplate, array $messageParameters, $root, $propertyPath, $invalidValue, $messagePluralization = null, $code = null)
+    public function __construct($message, $messageTemplate, array $messageParameters, $root, $propertyPath, $invalidValue, $messagePluralization = null, $code = null)
     {
+        $this->message = $message;
         $this->messageTemplate = $messageTemplate;
         $this->messageParameters = $messageParameters;
         $this->messagePluralization = $messagePluralization;
@@ -132,15 +139,7 @@ class ConstraintViolation implements ConstraintViolationInterface
      */
     public function getMessage()
     {
-        $parameters = $this->messageParameters;
-
-        foreach ($parameters as $i => $parameter) {
-            if (is_array($parameter)) {
-                $parameters[$i] = 'Array';
-            }
-        }
-
-        return strtr($this->messageTemplate, $parameters);
+        return $this->message;
     }
 
     /**

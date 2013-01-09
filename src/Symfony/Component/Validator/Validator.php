@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Default implementation of {@link ValidatorInterface}.
@@ -33,6 +34,16 @@ class Validator implements ValidatorInterface
     private $validatorFactory;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var null|string
+     */
+    private $translationDomain;
+
+    /**
      * @var array
      */
     private $objectInitializers;
@@ -40,11 +51,15 @@ class Validator implements ValidatorInterface
     public function __construct(
         MetadataFactoryInterface $metadataFactory,
         ConstraintValidatorFactoryInterface $validatorFactory,
+        TranslatorInterface $translator,
+        $translationDomain = null,
         array $objectInitializers = array()
     )
     {
         $this->metadataFactory = $metadataFactory;
         $this->validatorFactory = $validatorFactory;
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
         $this->objectInitializers = $objectInitializers;
     }
 
@@ -137,7 +152,7 @@ class Validator implements ValidatorInterface
      */
     public function validateValue($value, $constraints, $groups = null)
     {
-        $context = new ExecutionContext($this->createVisitor(null));
+        $context = new ExecutionContext($this->createVisitor(null), $this->translator, $this->translationDomain);
 
         $constraints = is_array($constraints) ? $constraints : array($constraints);
 
@@ -176,7 +191,14 @@ class Validator implements ValidatorInterface
      */
     private function createVisitor($root)
     {
-        return new ValidationVisitor($root, $this->metadataFactory, $this->validatorFactory, $this->objectInitializers);
+        return new ValidationVisitor(
+            $root,
+            $this->metadataFactory,
+            $this->validatorFactory,
+            $this->translator,
+            $this->translationDomain,
+            $this->objectInitializers
+        );
     }
 
     /**

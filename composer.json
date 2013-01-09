@@ -17,8 +17,8 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "doctrine/common": ">2.2,<2.4-dev",
-        "twig/twig": ">=1.11.0,<2.0-dev",
+        "doctrine/common": "~2.2",
+        "twig/twig": "~1.11",
         "psr/log": "~1.0"
     },
     "replace": {
@@ -58,10 +58,10 @@
     },
     "require-dev": {
         "doctrine/data-fixtures": "1.0.*",
-        "doctrine/dbal": ">=2.2,<2.4-dev",
-        "doctrine/orm": ">=2.2.3,<2.4-dev",
+        "doctrine/dbal": "~2.2",
+        "doctrine/orm": "~2.2,>=2.2.3",
         "monolog/monolog": "~1.3",
-        "propel/propel1": "dev-master"
+        "propel/propel1": "1.6.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\": "src/" },

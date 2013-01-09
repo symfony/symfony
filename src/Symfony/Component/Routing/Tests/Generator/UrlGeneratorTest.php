@@ -206,14 +206,14 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateForRouteWithInvalidOptionalParameterNonStrictWithLogger()
     {
-        if (!interface_exists('Symfony\Component\HttpKernel\Log\LoggerInterface')) {
-            $this->markTestSkipped('The "HttpKernel" component is not available');
+        if (!interface_exists('Psr\Log\LoggerInterface')) {
+            $this->markTestSkipped('The "psr/log" package is not available');
         }
 
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', array('foo' => '1'), array('foo' => 'd+')));
-        $logger = $this->getMock('Symfony\Component\HttpKernel\Log\LoggerInterface');
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
         $logger->expects($this->once())
-            ->method('err');
+            ->method('error');
         $generator = $this->getGenerator($routes, array(), $logger);
         $generator->setStrictRequirements(false);
         $this->assertNull($generator->generate('test', array('foo' => 'bar'), true));

@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\HttpKernel\Exception\FatalErrorException;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * ErrorHandler.

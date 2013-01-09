@@ -207,7 +207,7 @@ class EntityChoiceList extends ORMChoiceList
     /**
      * {@inheritdoc}
      */
-    protected function optimizedIdentifierCheck()
+    protected function canOptimizeIdentifier()
     {
         return $this->idAsValue;
     }

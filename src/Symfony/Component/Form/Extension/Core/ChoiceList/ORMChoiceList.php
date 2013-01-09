@@ -88,7 +88,7 @@ abstract class ORMChoiceList extends ObjectChoiceList
             // know that the IDs are used as values
 
             // Attention: This optimization does not check choices for existence
-            if ($this->optimizedIdentifierCheck()) {
+            if ($this->canOptimizeIdentifier()) {
                 $values = array();
 
                 foreach ($objects as $object) {
@@ -117,7 +117,7 @@ abstract class ORMChoiceList extends ObjectChoiceList
             // know that the IDs are used as indices
 
             // Attention: This optimization does not check choices for existence
-            if ($this->optimizedIdentifierCheck()) {
+            if ($this->canOptimizeIdentifier()) {
                 $indices = array();
 
                 foreach ($objects as $object) {
@@ -149,7 +149,7 @@ abstract class ORMChoiceList extends ObjectChoiceList
      */
     protected function createValue($object)
     {
-        if ($this->optimizedIdentifierCheck()) {
+        if ($this->canOptimizeIdentifier()) {
             return (string) current($this->getIdentifierValues($object));
         }
 
@@ -163,7 +163,7 @@ abstract class ORMChoiceList extends ObjectChoiceList
      *
      * @return Boolean
      */
-    abstract protected function optimizedIdentifierCheck();
+    abstract protected function canOptimizeIdentifier();
 
     /**
      * Loads the list with ORM objects.

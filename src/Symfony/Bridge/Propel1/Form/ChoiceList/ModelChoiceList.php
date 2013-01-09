@@ -186,7 +186,7 @@ class ModelChoiceList extends ORMChoiceList
     /**
      * {@inheritdoc}
      */
-    protected function optimizedIdentifierCheck()
+    protected function canOptimizeIdentifier()
     {
         return 1 === count($this->identifier);
     }

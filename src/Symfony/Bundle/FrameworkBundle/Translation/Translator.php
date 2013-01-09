@@ -67,6 +67,10 @@ class Translator extends BaseTranslator
      */
     public function getLocale()
     {
+        if (null === $this->locale && $this->container->has('session') && $this->container->get('session')->has('_locale')) {
+            $this->locale = $this->container->get('session')->get('_locale');
+        }
+
         if (null === $this->locale && $this->container->isScopeActive('request') && $this->container->has('request')) {
             $this->locale = $this->container->get('request')->getLocale();
         }

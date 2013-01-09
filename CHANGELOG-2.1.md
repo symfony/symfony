@@ -9,7 +9,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 * 2.1.7
 
- * 7b13811: [FrameworkBundle] added session _locale
+ * 9e1d960: [FrameworkBundle] added session _locale
 
 * 2.1.6 (2012-12-21)
 

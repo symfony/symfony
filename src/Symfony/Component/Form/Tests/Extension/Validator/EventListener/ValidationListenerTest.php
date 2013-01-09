@@ -49,6 +49,8 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     private $message;
 
+    private $messageTemplate;
+
     private $params;
 
     protected function setUp()
@@ -63,17 +65,13 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
         $this->violationMapper = $this->getMock('Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface');
         $this->listener = new ValidationListener($this->validator, $this->violationMapper);
         $this->message = 'Message';
+        $this->messageTemplate = 'Message template';
         $this->params = array('foo' => 'bar');
     }
 
     private function getConstraintViolation($code = null)
     {
-        return new ConstraintViolation($this->message, $this->params, null, 'prop.path', null, null, $code);
-    }
-
-    private function getFormError()
-    {
-        return new FormError($this->message, $this->params);
+        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code);
     }
 
     private function getBuilder($name = 'name', $propertyPath = null, $dataClass = null)

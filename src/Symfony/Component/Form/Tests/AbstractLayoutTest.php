@@ -283,8 +283,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testErrors()
     {
         $form = $this->factory->createNamed('name', 'text');
-        $form->addError(new FormError('Error 1'));
-        $form->addError(new FormError('Error 2'));
+        $form->addError(new FormError('[trans]Error 1[/trans]'));
+        $form->addError(new FormError('[trans]Error 2[/trans]'));
         $view = $form->createView();
         $html = $this->renderErrors($view);
 
@@ -1151,7 +1151,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $child = $this->factory->createNamed('date', 'date');
         $form = $this->factory->createNamed('form', 'form')->add($child);
-        $child->addError(new FormError('Error!'));
+        $child->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
         $this->assertEmpty($this->renderErrors($view));
@@ -1676,7 +1676,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $child = $this->factory->createNamed('time', 'time');
         $form = $this->factory->createNamed('form', 'form')->add($child);
-        $child->addError(new FormError('Error!'));
+        $child->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
         $this->assertEmpty($this->renderErrors($view));

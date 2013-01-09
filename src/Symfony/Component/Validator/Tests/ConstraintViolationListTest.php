@@ -129,6 +129,6 @@ EOF;
 
     protected function getViolation($message, $root = null, $propertyPath = null)
     {
-        return new ConstraintViolation($message, array(), $root, $propertyPath, null);
+        return new ConstraintViolation($message, $message, array(), $root, $propertyPath, null);
     }
 }

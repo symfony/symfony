@@ -64,6 +64,26 @@
    Symfony\Component\Form\Exception namespace or to create custom exception
    classes for your purpose.
 
+ * Translating validation errors is now optional. You can still do so
+   manually if you like, or you can simplify your templates to simply output
+   the already translated message.
+
+   Before:
+
+   ```
+   {{
+       error.messagePluralization is null
+           ? error.messageTemplate|trans(error.messageParameters, 'validators')
+           : error.messageTemplate|transchoice(error.messagePluralization, error.messageParameters, 'validators')
+   }}
+   ```
+
+   After:
+
+   ```
+   {{ error.message }}
+   ```
+
 #### Deprecations
 
  * The methods `getParent()`, `setParent()` and `hasParent()` in
@@ -185,6 +205,27 @@
        }
    }
    ```
+
+ * The sources of the pluralized messages in translation files have changed
+   from the singular to the pluralized version. If you created custom
+   translation files for validator errors, you should adapt them.
+
+   Before:
+
+   <trans-unit id="6">
+       <source>You must select at least {{ limit }} choices.</source>
+       <target>Sie müssen mindestens {{ limit }} Möglichkeit wählen.|Sie müssen mindestens {{ limit }} Möglichkeiten wählen.</target>
+   </trans-unit>
+
+   After:
+
+   <trans-unit id="6">
+       <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+       <target>Sie müssen mindestens {{ limit }} Möglichkeit wählen.|Sie müssen mindestens {{ limit }} Möglichkeiten wählen.</target>
+   </trans-unit>
+
+   Check the file src/Symfony/Component/Validator/Resources/translations/validators.en.xlf
+   for the new message sources.
 
 #### Deprecations
 

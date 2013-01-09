@@ -123,6 +123,7 @@ class ViolationMapper implements ViolationMapperInterface
         // Only add the error if the form is synchronized
         if ($this->acceptsErrors($scope)) {
             $scope->addError(new FormError(
+                $violation->getMessage(),
                 $violation->getMessageTemplate(),
                 $violation->getMessageParameters(),
                 $violation->getMessagePluralization()

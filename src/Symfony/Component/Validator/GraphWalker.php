@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
@@ -40,6 +41,16 @@ class GraphWalker
     private $metadataFactory;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var null|string
+     */
+    private $translationDomain;
+
+    /**
      * @var array
      */
     private $validatedObjects;
@@ -49,16 +60,20 @@ class GraphWalker
      *
      * @param ValidationVisitor        $visitor
      * @param MetadataFactoryInterface $metadataFactory
+     * @param TranslatorInterface      $translator
+     * @param null|string              $translationDomain
      * @param array                    $validatedObjects
      *
      * @deprecated Deprecated since version 2.2, to be removed in 2.3.
      */
-    public function __construct(ValidationVisitor $visitor, MetadataFactoryInterface $metadataFactory, array &$validatedObjects = array())
+    public function __construct(ValidationVisitor $visitor, MetadataFactoryInterface $metadataFactory, TranslatorInterface $translator, $translationDomain = null, array &$validatedObjects = array())
     {
         trigger_error('GraphWalker is deprecated since version 2.2 and will be removed in 2.3. This class has been replaced by ValidationVisitorInterface and MetadataInterface.', E_USER_DEPRECATED);
 
         $this->visitor = $visitor;
         $this->metadataFactory = $metadataFactory;
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
         $this->validatedObjects = &$validatedObjects;
     }
 
@@ -208,6 +223,8 @@ class GraphWalker
 
         $context = new ExecutionContext(
             $this->visitor,
+            $this->translator,
+            $this->translationDomain,
             $metadata,
             $value,
             $group,

@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.3",
+        "symfony/translation": "2.2.*"
     },
     "require-dev": {
         "symfony/http-foundation": "2.2.*",

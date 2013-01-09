@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class MaxLength extends Constraint
 {
-    public $message = 'This value is too long. It should have {{ limit }} characters or less.';
+    public $message = 'This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.';
     public $limit;
     public $charset = 'UTF-8';
 

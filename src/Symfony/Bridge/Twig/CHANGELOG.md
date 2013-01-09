@@ -7,6 +7,8 @@ CHANGELOG
  * [BC BREAK] restricted the `render` tag to only accept URIs as reference (the signature changed)
  * added a render function to render a request
  * The `app` global variable is now injected even when using the twig service directly.
+ * Added an optional parameter to the `path` and `url` function which allows to generate
+   relative paths (e.g. "../parent-file") and scheme-relative URLs (e.g. "//example.com/dir/file").
 
 2.1.0
 -----

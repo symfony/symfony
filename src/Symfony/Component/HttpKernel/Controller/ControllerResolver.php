@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Controller;
 
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

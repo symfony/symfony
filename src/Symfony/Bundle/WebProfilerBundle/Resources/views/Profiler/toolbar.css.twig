@@ -259,7 +259,6 @@
 
 .sf-toolbar-block:hover .sf-toolbar-info {
     display: block;
-    bottom: 38px;
     min-width: 100%;
 }
 
@@ -297,7 +296,14 @@
         top: 39px;
         bottom: auto;
         border-top-width: 0;
-        border-bottom: 1px solid #bbb;
+        border-radius: 0 0 4px 4px;
+    }
+
+    .sf-toolbar-block:hover .sf-toolbar-icon {
+        border-top: none;
+        border-bottom: 1px dotted #DDD;
+        margin-top: 0;
+        margin-bottom: -1px;
     }
 {% endif %}
 

@@ -112,6 +112,10 @@ class ProfilerController
                 continue;
             }
 
+            if ($template->hasBlock('head') || $template->hasBlock('body')) {
+                continue;
+            }
+
             $renderedBlocks[$panel] = $template->renderBlock('panel', array(
                 'token'     => $token,
                 'profile'   => $profile,

@@ -247,17 +247,14 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
         $config = $builder->getFormConfig();
         $reflClass = new \ReflectionClass($config);
-        $factory = $reflClass->getProperty('factory');
         $parent = $reflClass->getProperty('parent');
         $children = $reflClass->getProperty('children');
         $unresolvedChildren = $reflClass->getProperty('unresolvedChildren');
 
-        $factory->setAccessible(true);
         $parent->setAccessible(true);
         $children->setAccessible(true);
         $unresolvedChildren->setAccessible(true);
 
-        $this->assertNull($factory->getValue($config));
         $this->assertNull($parent->getValue($config));
         $this->assertEmpty($children->getValue($config));
         $this->assertEmpty($unresolvedChildren->getValue($config));

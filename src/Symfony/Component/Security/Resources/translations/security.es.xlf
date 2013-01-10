@@ -56,7 +56,7 @@
             </trans-unit>
             <trans-unit id="14">
                 <source>Credentials have expired.</source>
-                <target>Los credenciales han expirado.</target>
+                <target>Las credenciales han expirado.</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>Account is disabled.</source>

@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Util;
+namespace Symfony\Component\PropertyAccess\Tests;
 
-use Symfony\Component\Form\Util\FormUtil;
+use Symfony\Component\PropertyAccess\StringUtil;
 
-class FormUtilTest extends \PHPUnit_Framework_TestCase
+class StringUtilTest extends \PHPUnit_Framework_TestCase
 {
     public function singularifyProvider()
     {
@@ -130,6 +130,6 @@ class FormUtilTest extends \PHPUnit_Framework_TestCase
      */
     public function testSingularify($plural, $singular)
     {
-        $this->assertEquals($singular, FormUtil::singularify($plural));
+        $this->assertEquals($singular, StringUtil::singularify($plural));
     }
 }

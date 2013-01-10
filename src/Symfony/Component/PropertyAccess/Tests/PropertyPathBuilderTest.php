@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Util;
+namespace Symfony\Component\PropertyAccess\Tests;
 
-use Symfony\Component\Form\Util\PropertyPath;
-use Symfony\Component\Form\Util\PropertyPathBuilder;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathBuilder;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

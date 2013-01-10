@@ -9,8 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Exception;
+namespace Symfony\Component\PropertyAccess\Tests;
 
-class InvalidPropertyException extends Exception
+class PropertyAccessorArrayTest extends PropertyAccessorCollectionTest
 {
+    protected function getCollection(array $array)
+    {
+        return $array;
+    }
 }

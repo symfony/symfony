@@ -9,8 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Exception;
+namespace Symfony\Component\PropertyAccess\Exception;
 
-class InvalidPropertyPathException extends Exception
+/**
+ * Marker interface for the PropertyAccess component.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+interface ExceptionInterface
 {
 }

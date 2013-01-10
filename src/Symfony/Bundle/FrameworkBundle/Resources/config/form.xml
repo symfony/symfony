@@ -10,6 +10,7 @@
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
         <parameter key="form.extension.class">Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
         <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
+        <parameter key="property_accessor.class">Symfony\Component\PropertyAccess\PropertyAccessor</parameter>
     </parameters>
 
     <services>
@@ -53,11 +54,15 @@
             <argument type="service" id="validator.mapping.class_metadata_factory" />
         </service>
 
+        <!-- PropertyAccessor -->
+        <service id="property_accessor" class="%property_accessor.class%" />
+
         <!-- CoreExtension -->
         <service id="form.type.field" class="Symfony\Component\Form\Extension\Core\Type\FieldType">
             <tag name="form.type" alias="field" />
         </service>
         <service id="form.type.form" class="Symfony\Component\Form\Extension\Core\Type\FormType">
+            <argument type="service" id="property_accessor"/>
             <tag name="form.type" alias="form" />
         </service>
         <service id="form.type.birthday" class="Symfony\Component\Form\Extension\Core\Type\BirthdayType">

@@ -20,9 +20,21 @@ use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Exception\Exception;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class FormType extends AbstractType
 {
+    /**
+     * @var PropertyAccessorInterface
+     */
+    private $propertyAccessor;
+
+    public function __construct(PropertyAccessorInterface $propertyAccessor = null)
+    {
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -41,7 +53,7 @@ class FormType extends AbstractType
             ->setCompound($options['compound'])
             ->setData(isset($options['data']) ? $options['data'] : null)
             ->setDataLocked(isset($options['data']))
-            ->setDataMapper($options['compound'] ? new PropertyPathMapper() : null)
+            ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
         ;
 
         if ($options['trim']) {

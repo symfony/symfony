@@ -9,12 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Util;
+namespace Symfony\Component\PropertyAccess\Exception;
 
-class PropertyPathArrayTest extends PropertyPathCollectionTest
+/**
+ * Thrown when a property cannot be found.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class NoSuchPropertyException extends RuntimeException
 {
-    protected function getCollection(array $array)
-    {
-        return $array;
-    }
 }

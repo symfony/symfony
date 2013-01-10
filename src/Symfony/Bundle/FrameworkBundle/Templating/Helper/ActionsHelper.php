@@ -12,7 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Bundle\FrameworkBundle\HttpKernel;
+use Symfony\Component\HttpKernel\HttpContentRenderer;
+use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
  * ActionsHelper manages action inclusions.
@@ -21,16 +22,16 @@ use Symfony\Bundle\FrameworkBundle\HttpKernel;
  */
 class ActionsHelper extends Helper
 {
-    protected $kernel;
+    private $renderer;
 
     /**
      * Constructor.
      *
-     * @param HttpKernel $kernel A HttpKernel instance
+     * @param HttpContentRenderer $kernel A HttpContentRenderer instance
      */
-    public function __construct(HttpKernel $kernel)
+    public function __construct(HttpContentRenderer $renderer)
     {
-        $this->kernel = $kernel;
+        $this->renderer = $renderer;
     }
 
     /**
@@ -41,11 +42,21 @@ class ActionsHelper extends Helper
      *
      * @return string
      *
-     * @see Symfony\Bundle\FrameworkBundle\HttpKernel::render()
+     * @see Symfony\Component\HttpKernel\HttpContentRenderer::render()
      */
     public function render($uri, array $options = array())
     {
-        return $this->kernel->render($uri, $options);
+        $options = $this->renderer->fixOptions($options);
+
+        $strategy = isset($options['strategy']) ? $options['strategy'] : 'default';
+        unset($options['strategy']);
+
+        return $this->renderer->render($uri, $strategy, $options);
+    }
+
+    public function controller($controller, $attributes = array(), $query = array())
+    {
+        return new ControllerReference($controller, $attributes, $query);
     }
 
     /**

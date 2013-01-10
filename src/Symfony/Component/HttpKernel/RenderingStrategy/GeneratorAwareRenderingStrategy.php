@@ -46,6 +46,9 @@ abstract class GeneratorAwareRenderingStrategy implements RenderingStrategyInter
      * @param Request              $request    A Request instance
      *
      * @return string A proxy URI
+     *
+     * @throws \LogicException when the _proxy route is not available
+     * @throws \LogicException when there is no registered route generator
      */
     protected function generateProxyUri(ControllerReference $reference, Request $request = null)
     {
@@ -63,7 +66,7 @@ abstract class GeneratorAwareRenderingStrategy implements RenderingStrategyInter
         }
 
         try {
-            $uri = $this->generator->generate('_proxy', array('_controller' => $reference->controller, '_format' => $format), true);
+            $uri = $this->generator->generate('_proxy', array('_controller' => $reference->controller, '_format' => $format), UrlGeneratorInterface::ABSOLUTE_URL);
         } catch (RouteNotFoundException $e) {
             throw new \LogicException('Unable to generate a proxy URL as the "_proxy" route is not registered.', 0, $e);
         }

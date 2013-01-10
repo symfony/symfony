@@ -66,7 +66,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddCacheClearerPass());
         $container->addCompilerPass(new TranslationExtractorPass());
         $container->addCompilerPass(new TranslationDumperPass());
-        $container->addCompilerPass(new HttpRenderingStrategyPass());
+        $container->addCompilerPass(new HttpRenderingStrategyPass(), PassConfig::TYPE_AFTER_REMOVING);
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);

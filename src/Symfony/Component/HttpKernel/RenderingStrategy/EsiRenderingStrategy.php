@@ -56,7 +56,7 @@ class EsiRenderingStrategy extends GeneratorAwareRenderingStrategy
      */
     public function render($uri, Request $request = null, array $options = array())
     {
-        if (!$this->esi->hasSurrogateEsiCapability($request)) {
+        if (null === $request || !$this->esi->hasSurrogateEsiCapability($request)) {
             return $this->defaultStrategy->render($uri, $request, $options);
         }
 
@@ -69,7 +69,7 @@ class EsiRenderingStrategy extends GeneratorAwareRenderingStrategy
             $alt = $this->generateProxyUri($alt, $request);
         }
 
-        return $this->esi->renderIncludeTag($uri, $alt, $options['ignore_errors'], isset($options['comment']) ? $options['comment'] : '');
+        return $this->esi->renderIncludeTag($uri, $alt, isset($options['ignore_errors']) ? $options['ignore_errors'] : false, isset($options['comment']) ? $options['comment'] : '');
     }
 
     /**

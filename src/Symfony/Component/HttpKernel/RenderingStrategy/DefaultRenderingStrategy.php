@@ -36,6 +36,10 @@ class DefaultRenderingStrategy extends GeneratorAwareRenderingStrategy
 
     /**
      * {@inheritdoc}
+     *
+     * Additional available options:
+     *
+     *  * alt: an alternative URI to render in case of an error
      */
     public function render($uri, Request $request = null, array $options = array())
     {

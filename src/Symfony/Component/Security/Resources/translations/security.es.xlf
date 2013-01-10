@@ -60,11 +60,11 @@
             </trans-unit>
             <trans-unit id="15">
                 <source>Account is disabled.</source>
-                <target>La cuenta esta deshabilitada.</target>
+                <target>La cuenta está deshabilitada.</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>Account is locked.</source>
-                <target>La cuenta esta bloqueada.</target>
+                <target>La cuenta está bloqueada.</target>
             </trans-unit>
         </body>
     </file>

@@ -14,10 +14,8 @@
    After:
 
    ```
-   {% render url('post_list', { 'limit': 2 }), { 'alt': 'BlogBundle:Post:error' } %}
+   {% render controller('BlogBundle:Post:list', { 'limit': 2 }), { 'alt': 'BlogBundle:Post:error' } %}
    ```
-
-   where `post_list` is the route name for the `BlogBundle:Post:list` controller.
 
 ### HttpFoundation
 
@@ -409,7 +407,12 @@
    <?php echo $view['actions']->render($view['router']->generate('post_list', array('limit' => 2)), array('alt' => 'BlogBundle:Post:error')) ?>
    ```
 
-   where `post_list` is the route name for the `BlogBundle:Post:list` controller.
+   where `post_list` is the route name for the `BlogBundle:Post:list`
+   controller, or if you don't want to create a route:
+
+   ```
+   <?php echo $view['actions']->render(new ControllerReference('BlogBundle:Post:list', array('limit' => 2)), array('alt' => 'BlogBundle:Post:error')) ?>
+   ```
 
 #### Configuration
 

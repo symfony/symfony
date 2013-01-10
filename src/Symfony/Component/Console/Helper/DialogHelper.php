@@ -86,6 +86,7 @@ class DialogHelper extends Helper
             }
             $ret = trim($ret);
         } else {
+            sort($autocomplete);
             $ret = '';
 
             $i = 0;

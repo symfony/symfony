@@ -527,6 +527,11 @@ class FrameworkExtension extends Extension
 
                 $dirs[] = dirname($r->getFilename()).'/Resources/translations';
             }
+            if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
+                $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
+
+                $dirs[] = dirname($r->getFilename()).'/../../Resources/translations';
+            }
             $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
             foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
                 $reflection = new \ReflectionClass($class);

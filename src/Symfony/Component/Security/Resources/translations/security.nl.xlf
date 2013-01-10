@@ -24,7 +24,7 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
-                <target>Onvoldoende rechten om deze aanvraag te verwerken</target>
+                <target>Onvoldoende rechten om deze aanvraag te verwerken.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>Invalid CSRF token.</source>

@@ -48,19 +48,22 @@ class UriSigner
     /**
      * Checks that a URI contains the correct hash.
      *
+     * The _hash query string parameter must be the last one
+     * (as it is generated that way by the sign() method, it should
+     * never be a problem).
+     *
      * @param string $uri A signed URI
      *
      * @return Boolean True if the URI is signed correctly, false otherwise
      */
     public function check($uri)
     {
-        if (!preg_match('/(\?|&)_hash=(.+?)(&|$)/', $uri, $matches, PREG_OFFSET_CAPTURE)) {
+        if (!preg_match('/(\?|&)_hash=(.+?)$/', $uri, $matches, PREG_OFFSET_CAPTURE)) {
             return false;
         }
 
         // the naked URI is the URI without the _hash parameter (we need to keep the ? if there is some other parameters after)
-        $offset = ('?' == $matches[1][0] && '&' != $matches[3][0]) ? 0 : 1;
-        $nakedUri = substr($uri, 0, $matches[0][1] + $offset).substr($uri, $matches[0][1] + strlen($matches[0][0]));
+        $nakedUri = substr($uri, 0, $matches[0][1]).substr($uri, $matches[0][1] + strlen($matches[0][0]));
 
         return $this->computeHash($nakedUri) === $matches[2][0];
     }

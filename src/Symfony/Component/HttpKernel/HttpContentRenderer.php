@@ -90,6 +90,8 @@ class HttpContentRenderer implements EventSubscriberInterface
      * @param array                      $options  An array of options
      *
      * @return string|null The Response content or null when the Response is streamed
+     *
+     * @throws \InvalidArgumentException when the strategy does not exist
      */
     public function render($uri, $strategy = 'default', array $options = array())
     {

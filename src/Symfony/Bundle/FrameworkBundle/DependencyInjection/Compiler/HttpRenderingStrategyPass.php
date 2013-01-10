@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
  * Adds services tagged kernel.content_renderer_strategy as HTTP content rendering strategies.
@@ -31,6 +30,15 @@ class HttpRenderingStrategyPass implements CompilerPassInterface
 
         $definition = $container->getDefinition('http_content_renderer');
         foreach (array_keys($container->findTaggedServiceIds('kernel.content_renderer_strategy')) as $id) {
+            // We must assume that the class value has been correctly filled, even if the service is created by a factory
+            $class = $container->getDefinition($id)->getClass();
+
+            $refClass = new \ReflectionClass($class);
+            $interface = 'Symfony\Component\HttpKernel\RenderingStrategy\RenderingStrategyInterface';
+            if (!$refClass->implementsInterface($interface)) {
+                throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
+            }
+
             $definition->addMethodCall('addStrategy', array(new Reference($id)));
         }
     }

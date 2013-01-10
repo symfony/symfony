@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
- namespace Symfony\Component\HttpKernel\Tests\RenderingStrategy;
+namespace Symfony\Component\HttpKernel\Tests\RenderingStrategy;
 
-use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\RenderingStrategy\DefaultRenderingStrategy;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class DefaultRenderingStrategyTest extends \PHPUnit_Framework_TestCase
+class DefaultRenderingStrategyTest extends AbstractRenderingStrategyTest
 {
     protected function setUp()
     {
@@ -29,6 +29,60 @@ class DefaultRenderingStrategyTest extends \PHPUnit_Framework_TestCase
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
         }
+    }
+
+    public function testRender()
+    {
+        $strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
+
+        $this->assertEquals('foo', $strategy->render('/'));
+    }
+
+    public function testRenderWithControllerReference()
+    {
+        $strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
+        $strategy->setUrlGenerator($this->getUrlGenerator());
+
+        $this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', array(), array())));
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testRenderExceptionNoIgnoreErrors()
+    {
+        $strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
+
+        $this->assertEquals('foo', $strategy->render('/'));
+    }
+
+    public function testRenderExceptionIgnoreErrors()
+    {
+        $strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
+
+        $this->assertNull($strategy->render('/', null, array('ignore_errors' => true)));
+    }
+
+    public function testRenderExceptionIgnoreErrorsWithAlt()
+    {
+        $strategy = new DefaultRenderingStrategy($this->getKernel($this->onConsecutiveCalls(
+            $this->throwException(new \RuntimeException('foo')),
+            $this->returnValue(new Response('bar'))
+        )));
+
+        $this->assertEquals('bar', $strategy->render('/', null, array('ignore_errors' => true, 'alt' => '/foo')));
+    }
+
+    private function getKernel($returnValue)
+    {
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel
+            ->expects($this->any())
+            ->method('handle')
+            ->will($returnValue)
+        ;
+
+        return $kernel;
     }
 
     public function testExceptionInSubRequestsDoesNotMangleOutputBuffers()

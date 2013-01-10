@@ -55,7 +55,7 @@ class RouterProxyListener implements EventSubscriberInterface
 
         parse_str($request->query->get('path', ''), $attributes);
         $request->attributes->add($attributes);
-        $request->attributes->set('_route_params', array_replace($request->attributes->get('_route_params'), $attributes));
+        $request->attributes->set('_route_params', array_replace($request->attributes->get('_route_params', array()), $attributes));
         $request->query->remove('path');
     }
 
@@ -76,7 +76,8 @@ class RouterProxyListener implements EventSubscriberInterface
         }
 
         // is the Request signed?
-        if ($this->signer->check($request->getUri())) {
+        // we cannot use $request->getUri() here as we want to work with the original URI (no query string reordering)
+        if ($this->signer->check($request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo().(null !== ($qs = $request->server->get('QUERY_STRING')) ? '?'.$qs : ''))) {
             return;
         }
 

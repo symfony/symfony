@@ -420,6 +420,10 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 }
 
                 $result[self::VALUE] = $objectOrArray->$hasser();
+            } elseif ($reflClass->hasMethod('__call')) {
+                // needed to support magic method __call
+                $callMethod = 'get' . ucfirst($property);
+                $result[self::VALUE] = $objectOrArray->$callMethod();
             } elseif ($reflClass->hasMethod('__get')) {
                 // needed to support magic method __get
                 $result[self::VALUE] = $objectOrArray->$property;
@@ -536,6 +540,10 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 }
 
                 $objectOrArray->$setter($value);
+            } elseif ($reflClass->hasMethod('__call')) {
+                // needed to support magic method __call
+                $callMethod = 'set' . ucfirst($property);
+                $objectOrArray->$callMethod($value);
             } elseif ($reflClass->hasMethod('__set')) {
                 // needed to support magic method __set
                 $objectOrArray->$property = $value;

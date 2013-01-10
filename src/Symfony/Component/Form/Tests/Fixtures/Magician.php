@@ -24,4 +24,5 @@ class Magician
     {
         return isset($this->$property) ? $this->$property : null;
     }
+
 }

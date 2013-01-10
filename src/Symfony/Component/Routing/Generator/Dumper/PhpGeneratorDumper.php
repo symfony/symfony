@@ -47,7 +47,7 @@ class PhpGeneratorDumper extends GeneratorDumper
 
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * {$options['class']}

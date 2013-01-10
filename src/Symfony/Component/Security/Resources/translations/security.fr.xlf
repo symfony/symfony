@@ -40,7 +40,7 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>No session available, it either timed out or cookies are not enabled.</source>
-                <target>Pas de session disponible, celle-ci à expiré ou les cookies ne sont pas activés.</target>
+                <target>Pas de session disponible, celle-ci a expiré ou les cookies ne sont pas activés.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>No token could be found.</source>
@@ -52,7 +52,7 @@
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>
-                <target>Le compte à expiré.</target>
+                <target>Le compte a expiré.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>Credentials have expired.</source>

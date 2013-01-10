@@ -4,7 +4,7 @@
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
-                <target>Es ist ein Fehler bei der Authorisierung aufgetreten.</target>
+                <target>Es ist ein Fehler bei der Authentifikation aufgetreten.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
@@ -12,7 +12,7 @@
             </trans-unit>
             <trans-unit id="3">
                 <source>Authentication request could not be processed due to a system problem.</source>
-                <target>Die Authorisierung konnte wegen eines Systemproblems nicht bearbeitet werden.</target>
+                <target>Die Authentifikation konnte wegen eines Systemproblems nicht bearbeitet werden.</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>Invalid credentials.</source>
@@ -20,15 +20,15 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>Cookie has already been used by someone else.</source>
-                <target>Cookie wurde bereits von jemand Anderem verwendet.</target>
+                <target>Cookie wurde bereits von jemand anderem verwendet.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
-                <target>Keine Rechte, um die Resource anzufragen.</target>
+                <target>Keine Rechte, um die Ressource anzufragen.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>Invalid CSRF token.</source>
-                <target>Ungültiges CSRF Token.</target>
+                <target>Ungültiges CSRF-Token.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>Digest nonce has expired.</source>
@@ -48,7 +48,7 @@
             </trans-unit>
             <trans-unit id="12">
                 <source>Username could not be found.</source>
-                <target>Der Username wurde nicht gefunden.</target>
+                <target>Der Benutzername wurde nicht gefunden.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>Account has expired.</source>

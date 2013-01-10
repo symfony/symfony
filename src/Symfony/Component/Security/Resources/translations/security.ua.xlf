@@ -4,11 +4,11 @@
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
-                <target>Помилка аутентифікації</target>
+                <target>Помилка аутентифікації.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
-                <target>Перевірка справжності облікових данних не знайдена</target>
+                <target>Перевірка справжності облікових данних не знайдена.</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>Authentication request could not be processed due to a system problem.</source>

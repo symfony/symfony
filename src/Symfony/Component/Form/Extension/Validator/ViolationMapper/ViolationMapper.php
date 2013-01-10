@@ -13,9 +13,9 @@ namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Util\VirtualFormAwareIterator;
-use Symfony\Component\Form\Util\PropertyPathIterator;
-use Symfony\Component\Form\Util\PropertyPathBuilder;
-use Symfony\Component\Form\Util\PropertyPathIteratorInterface;
+use Symfony\Component\PropertyAccess\PropertyPathIterator;
+use Symfony\Component\PropertyAccess\PropertyPathBuilder;
+use Symfony\Component\PropertyAccess\PropertyPathIteratorInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationPathIterator;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -265,7 +265,7 @@ class ViolationMapper implements ViolationMapperInterface
                 $propertyPathBuilder->remove(0, $i + 1);
                 $i = 0;
             } else {
-                /* @var \Symfony\Component\Form\Util\PropertyPathInterface $propertyPath */
+                /* @var \Symfony\Component\PropertyAccess\PropertyPathInterface $propertyPath */
                 $propertyPath = $scope->getPropertyPath();
 
                 if (null === $propertyPath) {

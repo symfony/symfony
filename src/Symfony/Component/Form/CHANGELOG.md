@@ -13,6 +13,15 @@ CHANGELOG
  * [BC BREAK] FormException is now an interface
  * protected FormBuilder methods from being called when it is turned into a FormConfigInterface with getFormConfig()
  * [BC BREAK] inserted argument `$message` in the constructor of `FormError`
+ * the PropertyPath class and related classes were moved to a dedicated
+   PropertyAccess component. During the move, InvalidPropertyException was
+   renamed to NoSuchPropertyException. FormUtil was split: FormUtil::singularify()
+   can now be found in Symfony\Component\PropertyAccess\StringUtil. The methods
+   getValue() and setValue() from PropertyPath were extracted into a new class
+   PropertyAccessor.
+ * added an optional PropertyAccessorInterface parameter to FormType,
+   ObjectChoiceList and PropertyPathMapper
+ * [BC BREAK] PropertyPathMapper and FormType now have a constructor
 
 2.1.0
 -----

@@ -9,12 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form\Tests\Util;
+namespace Symfony\Component\PropertyAccess\Tests;
 
-use Symfony\Component\Form\Util\PropertyPath;
-use Symfony\Component\Form\Util\FormUtil;
+use Symfony\Component\PropertyAccess\Exception\ExceptionInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\StringUtil;
 
-class PropertyPathCollectionTest_Car
+class PropertyAccessorCollectionTest_Car
 {
     private $axes;
 
@@ -23,7 +24,7 @@ class PropertyPathCollectionTest_Car
         $this->axes = $axes;
     }
 
-    // In the test, use a name that FormUtil can't uniquely singularify
+    // In the test, use a name that StringUtil can't uniquely singularify
     public function addAxis($axis)
     {
         $this->axes[] = $axis;
@@ -46,7 +47,7 @@ class PropertyPathCollectionTest_Car
     }
 }
 
-class PropertyPathCollectionTest_CarCustomSingular
+class PropertyAccessorCollectionTest_CarCustomSingular
 {
     public function addFoo($axis) {}
 
@@ -55,44 +56,44 @@ class PropertyPathCollectionTest_CarCustomSingular
     public function getAxes() {}
 }
 
-class PropertyPathCollectionTest_Engine
+class PropertyAccessorCollectionTest_Engine
 {
 }
 
-class PropertyPathCollectionTest_CarOnlyAdder
+class PropertyAccessorCollectionTest_CarOnlyAdder
 {
     public function addAxis($axis) {}
 
     public function getAxes() {}
 }
 
-class PropertyPathCollectionTest_CarOnlyRemover
+class PropertyAccessorCollectionTest_CarOnlyRemover
 {
     public function removeAxis($axis) {}
 
     public function getAxes() {}
 }
 
-class PropertyPathCollectionTest_CarNoAdderAndRemover
+class PropertyAccessorCollectionTest_CarNoAdderAndRemover
 {
     public function getAxes() {}
 }
 
-class PropertyPathCollectionTest_CarNoAdderAndRemoverWithProperty
+class PropertyAccessorCollectionTest_CarNoAdderAndRemoverWithProperty
 {
     protected $axes = array();
 
     public function getAxes() {}
 }
 
-class PropertyPathCollectionTest_CompositeCar
+class PropertyAccessorCollectionTest_CompositeCar
 {
     public function getStructure() {}
 
     public function setStructure($structure) {}
 }
 
-class PropertyPathCollectionTest_CarStructure
+class PropertyAccessorCollectionTest_CarStructure
 {
     public function addAxis($axis) {}
 
@@ -101,44 +102,47 @@ class PropertyPathCollectionTest_CarStructure
     public function getAxes() {}
 }
 
-abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
+abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var PropertyAccessor
+     */
+    private $propertyAccessor;
+
+    protected function setUp()
+    {
+        $this->propertyAccessor = new PropertyAccessor();
+    }
+
     abstract protected function getCollection(array $array);
 
     public function testGetValueReadsArrayAccess()
     {
         $object = $this->getCollection(array('firstName' => 'Bernhard'));
 
-        $path = new PropertyPath('[firstName]');
-
-        $this->assertEquals('Bernhard', $path->getValue($object));
+        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($object, '[firstName]'));
     }
 
     public function testGetValueReadsNestedArrayAccess()
     {
         $object = $this->getCollection(array('person' => array('firstName' => 'Bernhard')));
 
-        $path = new PropertyPath('[person][firstName]');
-
-        $this->assertEquals('Bernhard', $path->getValue($object));
+        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($object, '[person][firstName]'));
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfArrayAccessExpected()
     {
-        $path = new PropertyPath('[firstName]');
-
-        $path->getValue(new \stdClass());
+        $this->propertyAccessor->getValue(new \stdClass(), '[firstName]');
     }
 
     public function testSetValueUpdatesArrayAccess()
     {
         $object = $this->getCollection(array());
 
-        $path = new PropertyPath('[firstName]');
-        $path->setValue($object, 'Bernhard');
+        $this->propertyAccessor->setValue($object, '[firstName]', 'Bernhard');
 
         $this->assertEquals('Bernhard', $object['firstName']);
     }
@@ -147,20 +151,17 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
     {
         $object = $this->getCollection(array());
 
-        $path = new PropertyPath('[person][firstName]');
-        $path->setValue($object, 'Bernhard');
+        $this->propertyAccessor->setValue($object, '[person][firstName]', 'Bernhard');
 
         $this->assertEquals('Bernhard', $object['person']['firstName']);
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testSetValueThrowsExceptionIfArrayAccessExpected()
     {
-        $path = new PropertyPath('[firstName]');
-
-        $path->setValue(new \stdClass(), 'Bernhard');
+        $this->propertyAccessor->setValue(new \stdClass(), '[firstName]', 'Bernhard');
     }
 
     public function testSetValueCallsAdderAndRemoverForCollections()
@@ -172,11 +173,9 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
 
         // Don't use a mock in order to test whether the collections are
         // modified while iterating them
-        $car = new PropertyPathCollectionTest_Car($axesBefore);
+        $car = new PropertyAccessorCollectionTest_Car($axesBefore);
 
-        $path = new PropertyPath('axes');
-
-        $path->setValue($car, $axesMerged);
+        $this->propertyAccessor->setValue($car, 'axes', $axesMerged);
 
         $this->assertEquals($axesAfter, $car->getAxes());
 
@@ -190,8 +189,6 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
         $structure = $this->getMock(__CLASS__ . '_CarStructure');
         $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
         $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
-
-        $path = new PropertyPath('structure.axes');
 
         $car->expects($this->any())
             ->method('getStructure')
@@ -210,7 +207,7 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
             ->method('addAxis')
             ->with('third');
 
-        $path->setValue($car, $axesAfter);
+        $this->propertyAccessor->setValue($car, 'structure.axes', $axesAfter);
     }
 
     public function testSetValueCallsCustomAdderAndRemover()
@@ -220,8 +217,6 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
         $car = $this->getMock(__CLASS__ . '_CarCustomSingular');
         $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
         $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
-
-        $path = new PropertyPath('axes|foo');
 
         $car->expects($this->at(0))
             ->method('getAxes')
@@ -236,43 +231,39 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
             ->method('addFoo')
             ->with('third');
 
-        $path->setValue($car, $axesAfter);
+        $this->propertyAccessor->setValue($car, 'axes|foo', $axesAfter);
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
-    public function testMapFormToDataFailsIfOnlyAdderFound()
+    public function testSetValueFailsIfOnlyAdderFound()
     {
         $car = $this->getMock(__CLASS__ . '_CarOnlyAdder');
         $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
         $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
-        $path = new PropertyPath('axes');
-
         $car->expects($this->any())
             ->method('getAxes')
             ->will($this->returnValue($axesBefore));
 
-        $path->setValue($car, $axesAfter);
+        $this->propertyAccessor->setValue($car, 'axes', $axesAfter);
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
-    public function testMapFormToDataFailsIfOnlyRemoverFound()
+    public function testSetValueFailsIfOnlyRemoverFound()
     {
         $car = $this->getMock(__CLASS__ . '_CarOnlyRemover');
         $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
         $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
-        $path = new PropertyPath('axes');
-
         $car->expects($this->any())
             ->method('getAxes')
             ->will($this->returnValue($axesBefore));
 
-        $path->setValue($car, $axesAfter);
+        $this->propertyAccessor->setValue($car, 'axes', $axesAfter);
     }
 
     /**
@@ -283,9 +274,9 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
         $axes = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
         try {
-            $path->setValue($car, $axes);
+            $this->propertyAccessor->setValue($car, $path, $axes);
             $this->fail('An expected exception was not thrown!');
-        } catch (\Symfony\Component\Form\Exception\Exception $e) {
+        } catch (ExceptionInterface $e) {
             $this->assertEquals($message, $e->getMessage());
         }
     }
@@ -295,7 +286,7 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
         $data = array();
 
         $car = $this->getMock(__CLASS__ . '_CarNoAdderAndRemover');
-        $propertyPath = new PropertyPath('axes');
+        $propertyPath = 'axes';
         $expectedMessage = sprintf(
             'Neither element "axes" nor method "setAxes()" exists in class '
                 .'"%s", nor could adders and removers be found based on the '
@@ -304,7 +295,7 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
 //                .'property path with "|{singular}" to override the guesser)'
                 ,
             get_class($car),
-            implode(', ', (array) $singulars = FormUtil::singularify('Axes'))
+            implode(', ', (array) $singulars = StringUtil::singularify('Axes'))
         );
         $data[] = array($car, $propertyPath, $expectedMessage);
 
@@ -323,7 +314,7 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
          */
 
         $car = $this->getMock(__CLASS__ . '_CarNoAdderAndRemoverWithProperty');
-        $propertyPath = new PropertyPath('axes');
+        $propertyPath = 'axes';
         $expectedMessage = sprintf(
             'Property "axes" is not public in class "%s", nor could adders and '
                 .'removers be found based on the guessed singulars: %s'
@@ -332,7 +323,7 @@ abstract class PropertyPathCollectionTest extends \PHPUnit_Framework_TestCase
                 . '. Maybe you should '
                 .'create the method "setAxes()"?',
             get_class($car),
-            implode(', ', (array) $singulars = FormUtil::singularify('Axes'))
+            implode(', ', (array) $singulars = StringUtil::singularify('Axes'))
         );
         $data[] = array($car, $propertyPath, $expectedMessage);
 

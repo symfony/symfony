@@ -92,7 +92,7 @@ class Crawler extends \SplObjectStorage
     public function addContent($content, $type = null)
     {
         if (empty($type)) {
-            $type = 'text/html';
+            $type = 0 === strpos($content, '<?xml') ? 'application/xml' : 'text/html';
         }
 
         // DOM only for HTML/XML content
@@ -580,6 +580,15 @@ class Crawler extends \SplObjectStorage
         }
 
         $domxpath = new \DOMXPath($document);
+        if (preg_match_all('/(?P<prefix>[a-zA-Z_][a-zA-Z_0-9\-\.]+):[^:]/', $xpath, $matches)) {
+            foreach ($matches['prefix'] as $prefix) {
+                // ask for one namespace, otherwise we'd get a collection with an item for each node
+                $namespaces = $domxpath->query(sprintf('(//namespace::*[name()="%s"])[last()]', $prefix));
+                foreach ($namespaces as $node) {
+                    $domxpath->registerNamespace($node->prefix, $node->nodeValue);
+                }
+            }
+        }
 
         return new static($domxpath->query($xpath), $this->uri);
     }

@@ -370,11 +370,31 @@ EOF
         $this->assertCount(6, $crawler->filterXPath('//li'), '->filterXPath() filters the node list with the XPath expression');
     }
 
+    public function testFilterXPathWithDefaultNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler()->filterXPath('//entry/id');
+        $this->assertCount(1, $crawler, '->filterXPath() automatically registers a namespace');
+    }
+
+    public function testFilterXPathWithNamespace()
+    {
+        $crawler = $this->createTestXmlCrawler()->filterXPath('//yt:accessControl');
+        $this->assertCount(2, $crawler, '->filterXPath() automatically registers a namespace');
+    }
+
+    public function testFilterXPathWithMultipleNamespaces()
+    {
+        $crawler = $this->createTestXmlCrawler()->filterXPath('//media:group/yt:aspectRatio');
+        $this->assertCount(1, $crawler, '->filterXPath() automatically registers multiple namespaces');
+    }
+
     /**
      * @covers Symfony\Component\DomCrawler\Crawler::filter
      */
     public function testFilter()
     {
+        $this->markSkippedIfCssSelectorNotPresent();
+
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->filter('li'), '->filter() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->filter() returns a new instance of a crawler');
@@ -382,6 +402,14 @@ EOF
         $crawler = $this->createTestCrawler()->filter('ul');
 
         $this->assertCount(6, $crawler->filter('li'), '->filter() filters the node list with the CSS selector');
+    }
+
+    public function testFilterWithNamespace()
+    {
+        $this->markSkippedIfCssSelectorNotPresent();
+
+        $crawler = $this->createTestXmlCrawler()->filter('yt|accessControl');
+        $this->assertCount(2, $crawler, '->filter() automatically registers namespaces');
     }
 
     public function testSelectLink()
@@ -656,6 +684,22 @@ EOF
         return new Crawler($dom, $uri);
     }
 
+    protected function createTestXmlCrawler($uri = null)
+    {
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>
+            <entry xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:yt="http://gdata.youtube.com/schemas/2007">
+                <id>tag:youtube.com,2008:video:kgZRZmEc9j4</id>
+                <yt:accessControl action="comment" permission="allowed"/>
+                <yt:accessControl action="videoRespond" permission="moderated"/>
+                <media:group>
+                    <media:title type="plain">Chordates - CrashCourse Biology #24</media:title>
+                    <yt:aspectRatio>widescreen</yt:aspectRatio>
+                </media:group>
+            </entry>';
+
+        return new Crawler($xml, $uri);
+    }
+
     protected function createDomDocument()
     {
         $dom = new \DOMDocument();
@@ -671,5 +715,12 @@ EOF
         $domxpath = new \DOMXPath($dom);
 
         return $domxpath->query('//div');
+    }
+
+    protected function markSkippedIfCssSelectorNotPresent()
+    {
+        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
+            $this->markTestSkipped('The "CssSelector" component is not available');
+        }
     }
 }

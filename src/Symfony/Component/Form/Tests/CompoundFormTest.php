@@ -231,9 +231,7 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->remove('foo');
 
         $this->assertNull($child->getParent());
-        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
-        $this->assertFalse($this->form->hasChildren());
-        restore_error_handler();
+        $this->assertCount(0, $this->form);
     }
 
     /**

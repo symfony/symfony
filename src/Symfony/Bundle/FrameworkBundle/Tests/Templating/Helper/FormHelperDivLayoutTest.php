@@ -68,6 +68,8 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
     protected function tearDown()
     {
         $this->engine = null;
+
+        parent::tearDown();
     }
 
     protected function renderEnctype(FormView $view)

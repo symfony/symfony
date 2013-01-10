@@ -12,72 +12,33 @@
 namespace Symfony\Bundle\TwigBundle\Tests\Controller;
 
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
-
 use Symfony\Bundle\TwigBundle\Controller\ExceptionController;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\HttpFoundation\Request;
 
 class ExceptionControllerTest extends TestCase
 {
-    protected $controller;
-    protected $container;
-    protected $flatten;
-    protected $templating;
-    protected $kernel;
-
-    protected function setUp()
+    public function testOnlyClearOwnOutputBuffers()
     {
-        parent::setUp();
-
-        $this->flatten = $this->getMock('Symfony\Component\HttpKernel\Exception\FlattenException');
-        $this->flatten
+        $flatten = $this->getMock('Symfony\Component\HttpKernel\Exception\FlattenException');
+        $flatten
             ->expects($this->once())
             ->method('getStatusCode')
             ->will($this->returnValue(404));
-        $this->controller = new ExceptionController();
-        $this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
-        $this->templating = $this->getMockBuilder('Symfony\\Bundle\\TwigBundle\\TwigEngine')
+        $twig = $this->getMockBuilder('\Twig_Environment')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->templating
+        $twig
             ->expects($this->any())
-            ->method('renderResponse')
+            ->method('render')
             ->will($this->returnValue($this->getMock('Symfony\Component\HttpFoundation\Response')));
-        $this->request = Request::create('/');
-        $this->container = $this->getContainer();
-    }
+        $twig
+            ->expects($this->any())
+            ->method('getLoader')
+            ->will($this->returnValue($this->getMock('\Twig_LoaderInterface')));
+        $request = Request::create('/');
+        $request->headers->set('X-Php-Ob-Level', 1);
 
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->controller = null;
-        $this->container = null;
-        $this->flatten = null;
-        $this->templating = null;
-        $this->kernel = null;
-    }
-
-    public function testOnlyClearOwnOutputBuffers()
-    {
-        $this->request->headers->set('X-Php-Ob-Level', 1);
-
-        $this->controller->setContainer($this->container);
-        $this->controller->showAction($this->flatten);
-    }
-
-    private function getContainer()
-    {
-        $container = new ContainerBuilder();
-        $container->addScope(new Scope('request'));
-        $container->set('request', $this->request);
-        $container->set('templating', $this->templating);
-        $container->setParameter('kernel.bundles', array());
-        $container->setParameter('kernel.cache_dir', __DIR__);
-        $container->setParameter('kernel.root_dir', __DIR__);
-        $container->set('kernel', $this->kernel);
-
-        return $container;
+        $controller = new ExceptionController($twig, false);
+        $controller->showAction($request, $flatten);
     }
 }

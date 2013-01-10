@@ -22,9 +22,16 @@ use Symfony\Component\Validator\Constraint;
  */
 class MaxLength extends Constraint
 {
-    public $message = 'This value is too long. It should have {{ limit }} characters or less.';
+    public $message = 'This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.';
     public $limit;
     public $charset = 'UTF-8';
+
+    public function __construct($options = null)
+    {
+        trigger_error('MaxLength is deprecated since version 2.1 and will be removed in 2.3. Use Length instead.', E_USER_DEPRECATED);
+
+        parent::__construct($options);
+    }
 
     /**
      * {@inheritDoc}

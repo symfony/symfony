@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\ExceptionInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\Exception;
 
 /**
  * The central registry of the Form component.
@@ -68,6 +69,8 @@ class FormRegistry implements FormRegistryInterface
      */
     public function addType(ResolvedFormTypeInterface $type)
     {
+        trigger_error('addType() is deprecated since version 2.1 and will be removed in 2.3. Use form extensions or type registration in the Dependency Injection Container instead.', E_USER_DEPRECATED);
+
         $this->types[$type->getName()] = $type;
     }
 
@@ -93,7 +96,7 @@ class FormRegistry implements FormRegistryInterface
             }
 
             if (!$type) {
-                throw new FormException(sprintf('Could not load type "%s"', $name));
+                throw new Exception(sprintf('Could not load type "%s"', $name));
             }
 
             $this->resolveAndAddType($type);
@@ -129,11 +132,13 @@ class FormRegistry implements FormRegistryInterface
             );
         }
 
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
         $this->addType($this->resolvedTypeFactory->createResolvedType(
             $type,
             $typeExtensions,
             $parentType ? $this->getType($parentType) : null
         ));
+        restore_error_handler();
     }
 
     /**
@@ -147,7 +152,7 @@ class FormRegistry implements FormRegistryInterface
 
         try {
             $this->getType($name);
-        } catch (FormException $e) {
+        } catch (ExceptionInterface $e) {
             return false;
         }
 

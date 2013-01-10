@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Base class implementing the RememberMeServicesInterface
@@ -47,6 +47,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * @param string          $providerKey
      * @param array           $options
      * @param LoggerInterface $logger
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(array $userProviders, $key, $providerKey, array $options = array(), LoggerInterface $logger = null)
     {
@@ -89,7 +91,9 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      *
      * @param Request $request
      *
-     * @return TokenInterface
+     * @return TokenInterface|null
+     *
+     * @throws CookieTheftException
      */
     final public function autoLogin(Request $request)
     {
@@ -125,7 +129,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             }
         } catch (UnsupportedUserException $unSupported) {
             if (null !== $this->logger) {
-                $this->logger->warn('User class for remember-me cookie not supported.');
+                $this->logger->warning('User class for remember-me cookie not supported.');
             }
         } catch (AuthenticationException $invalid) {
             if (null !== $this->logger) {

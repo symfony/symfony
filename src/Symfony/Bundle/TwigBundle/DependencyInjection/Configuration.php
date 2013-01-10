@@ -34,7 +34,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\TwigBundle\\Controller\\ExceptionController::showAction')->end()
+                ->scalarNode('exception_controller')->defaultValue('twig.controller.exception:showAction')->end()
             ->end()
         ;
 
@@ -76,6 +76,7 @@ class Configuration implements ConfigurationInterface
             ->fixXmlConfig('global')
             ->children()
                 ->arrayNode('globals')
+                    ->normalizeKeys(false)
                     ->useAttributeAsKey('key')
                     ->example(array('foo' => '"@bar"', 'pi' => 3.14))
                     ->prototype('array')
@@ -126,6 +127,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('auto_reload')->end()
                 ->scalarNode('optimizations')->end()
                 ->arrayNode('paths')
+                    ->normalizeKeys(false)
                     ->beforeNormalization()
                         ->always()
                         ->then(function ($paths) {

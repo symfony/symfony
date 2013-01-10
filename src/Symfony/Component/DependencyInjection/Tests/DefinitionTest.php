@@ -96,7 +96,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage Method name cannot be empty.
      */
     public function testExceptionOnEmptyMethodCall()

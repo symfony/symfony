@@ -103,7 +103,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\HttpFoundation\File\Exception\FileException
+     * @expectedException \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
     public function testMoveLocalFileIsNotAllowed()
     {

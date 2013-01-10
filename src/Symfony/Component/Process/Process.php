@@ -384,10 +384,13 @@ class Process
                 $w = null;
                 $e = null;
 
-                $n = @stream_select($r, $w, $e, $this->timeout);
+                if (false === $n = @stream_select($r, $w, $e, $this->timeout)) {
+                    $lastError = error_get_last();
 
-                if (false === $n) {
-                    $this->pipes = array();
+                    // stream_select returns false when the `select` system call is interrupted by an incoming signal
+                    if (isset($lastError['message']) && false === stripos($lastError['message'], 'interrupted system call')) {
+                        $this->pipes = array();
+                    }
 
                     continue;
                 }
@@ -692,13 +695,13 @@ class Process
     /**
      * Stops the process.
      *
-     * @param float $timeout The timeout in seconds
+     * @param integer $timeout The timeout in seconds
      *
      * @return integer The exit-code of the process
      *
      * @throws RuntimeException if the process got signaled
      */
-    public function stop($timeout=10)
+    public function stop($timeout = 10)
     {
         $timeoutMicro = (int) $timeout*10E6;
         if ($this->isRunning()) {
@@ -792,7 +795,7 @@ class Process
      *
      * @return self The current Process instance
      *
-     * @throws \InvalidArgumentException if the timeout is negative
+     * @throws InvalidArgumentException if the timeout is negative
      */
     public function setTimeout($timeout)
     {

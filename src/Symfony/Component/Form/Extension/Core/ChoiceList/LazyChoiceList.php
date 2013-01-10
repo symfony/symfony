@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\Exception;
 
 /**
  * A choice list that is loaded lazily
@@ -141,7 +141,7 @@ abstract class LazyChoiceList implements ChoiceListInterface
         $choiceList = $this->loadChoiceList();
 
         if (!$choiceList instanceof ChoiceListInterface) {
-            throw new FormException('loadChoiceList() should return a ChoiceListInterface instance. Got ' . gettype($choiceList));
+            throw new Exception('loadChoiceList() should return a ChoiceListInterface instance. Got ' . gettype($choiceList));
         }
 
         $this->choiceList = $choiceList;

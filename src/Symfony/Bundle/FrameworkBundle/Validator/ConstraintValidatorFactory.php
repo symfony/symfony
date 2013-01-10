@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Validator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
+use Symfony\Component\Validator\ConstraintValidator;
 
 /**
  * Uses a service container to create constraint validators.
@@ -57,7 +58,7 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
      *
      * @param Constraint $constraint A constraint
      *
-     * @return Symfony\Component\Validator\ConstraintValidator A validator for the supplied constraint
+     * @return ConstraintValidator A validator for the supplied constraint
      */
     public function getInstance(Constraint $constraint)
     {

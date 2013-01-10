@@ -20,6 +20,8 @@ class PropertyMetadata extends MemberMetadata
      *
      * @param string $class The class this property is defined on
      * @param string $name  The name of this property
+     *
+     * @throws ValidatorException
      */
     public function __construct($class, $name)
     {

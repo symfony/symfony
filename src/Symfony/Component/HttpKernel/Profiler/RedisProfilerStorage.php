@@ -52,7 +52,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method)
+    public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
         $indexName = $this->getIndexName();
 
@@ -74,7 +74,17 @@ class RedisProfilerStorage implements ProfilerStorageInterface
 
             list($itemToken, $itemIp, $itemMethod, $itemUrl, $itemTime, $itemParent) = explode("\t", $item, 6);
 
+            $itemTime = (int) $itemTime;
+
             if ($ip && false === strpos($itemIp, $ip) || $url && false === strpos($itemUrl, $url) || $method && false === strpos($itemMethod, $method)) {
+                continue;
+            }
+
+            if (!empty($start) && $itemTime < $start) {
+                continue;
+            }
+
+            if (!empty($end) && $itemTime > $end) {
                 continue;
             }
 
@@ -197,6 +207,8 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      * Internal convenience method that returns the instance of Redis.
      *
      * @return Redis
+     *
+     * @throws \RuntimeException
      */
     protected function getRedis()
     {

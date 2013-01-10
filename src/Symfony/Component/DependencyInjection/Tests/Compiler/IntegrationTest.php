@@ -20,13 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class IntegrationTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
-
     /**
      * This tests that the following dependencies are correctly processed:
      *
@@ -37,6 +30,7 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
     public function testProcessRemovesAndInlinesRecursively()
     {
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
 
         $a = $container
             ->register('a', '\stdClass')
@@ -66,6 +60,7 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
     public function testProcessInlinesReferencesToAliases()
     {
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
 
         $a = $container
             ->register('a', '\stdClass')
@@ -91,6 +86,7 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
     public function testProcessInlinesWhenThereAreMultipleReferencesButFromTheSameDefinition()
     {
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
 
         $container
             ->register('a', '\stdClass')

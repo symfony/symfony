@@ -83,7 +83,7 @@ class DateType extends AbstractType
                 // Only pass a subset of the options to children
                 $yearOptions['choices'] = $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years']));
                 $yearOptions['empty_value'] = $options['empty_value']['year'];
-                $monthOptions['choices'] = $this->formatTimestamps($formatter, '/M+/', $this->listMonths($options['months']));
+                $monthOptions['choices'] = $this->formatTimestamps($formatter, '/[M|L]+/', $this->listMonths($options['months']));
                 $monthOptions['empty_value'] = $options['empty_value']['month'];
                 $dayOptions['choices'] = $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days']));
                 $dayOptions['empty_value'] = $options['empty_value']['day'];
@@ -137,13 +137,18 @@ class DateType extends AbstractType
         if ($form->getConfig()->hasAttribute('formatter')) {
             $pattern = $form->getConfig()->getAttribute('formatter')->getPattern();
 
+            // remove special characters unless the format was explicitly specified
+            if (!is_string($options['format'])) {
+                $pattern = preg_replace('/[^yMd]+/', '', $pattern);
+            }
+
             // set right order with respect to locale (e.g.: de_DE=dd.MM.yy; en_US=M/d/yy)
             // lookup various formats at http://userguide.icu-project.org/formatparse/datetime
             if (preg_match('/^([yMd]+).+([yMd]+).+([yMd]+)$/', $pattern)) {
                 $pattern = preg_replace(array('/y+/', '/M+/', '/d+/'), array('{{ year }}', '{{ month }}', '{{ day }}'), $pattern);
             } else {
                 // default fallback
-                $pattern = '{{ year }}-{{ month }}-{{ day }}';
+                $pattern = '{{ year }}{{ month }}{{ day }}';
             }
 
             $view->vars['date_pattern'] = $pattern;

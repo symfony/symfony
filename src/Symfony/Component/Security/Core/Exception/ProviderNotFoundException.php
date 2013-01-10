@@ -16,7 +16,15 @@ namespace Symfony\Component\Security\Core\Exception;
  * supports an authentication Token.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexander <iam.asm89@gmail.com>
  */
 class ProviderNotFoundException extends AuthenticationException
 {
+    /**
+     * {@inheritDoc}
+     */
+    public function getMessageKey()
+    {
+        return 'No authentication provider found to support the authentication token.';
+    }
 }

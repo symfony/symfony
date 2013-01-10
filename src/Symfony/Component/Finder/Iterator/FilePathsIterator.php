@@ -103,11 +103,6 @@ class FilePathsIterator extends \ArrayIterator
         return $this->subPathname;
     }
 
-    /**
-     * @param string $absolutePath
-     *
-     * @return null|string
-     */
     private function buildSubPath()
     {
         $absolutePath = parent::current();

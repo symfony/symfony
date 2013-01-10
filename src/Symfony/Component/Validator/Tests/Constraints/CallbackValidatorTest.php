@@ -118,7 +118,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
     public function testExpectCallbackArray()
     {
@@ -128,7 +128,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testExpectValidMethods()
     {
@@ -138,7 +138,7 @@ class CallbackValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testExpectValidCallbacks()
     {

@@ -251,6 +251,39 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
+    public function testDecodeWithoutItemHash()
+    {
+        $obj = new ScalarDummy;
+        $obj->xmlFoo = array(
+            'foo-bar' => array(
+                '@key' => "value",
+                'item' => array("@key" => 'key', "key-val" => 'val')
+            ),
+            'Foo' => array(
+                'Bar' => "Test",
+                '@Type' => 'test'
+            ),
+            'föo_bär' => 'a',
+            "Bar" => array(1,2,3),
+            'a' => 'b',
+        );
+        $expected = array(
+            'foo-bar' => array(
+                '@key' => "value",
+                'key' => array('@key' => 'key', "key-val" => 'val')
+            ),
+            'Foo' => array(
+                'Bar' => "Test",
+                '@Type' => 'test'
+            ),
+            'föo_bär' => 'a',
+            "Bar" => array(1,2,3),
+            'a' => 'b',
+        );
+        $xml = $this->encoder->encode($obj, 'xml');
+        $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
+    }
+
     public function testPreventsComplexExternalEntities()
     {
         $oldCwd = getcwd();

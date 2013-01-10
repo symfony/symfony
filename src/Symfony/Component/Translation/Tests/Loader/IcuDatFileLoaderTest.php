@@ -25,12 +25,20 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
         if (!extension_loaded('intl')) {
             $this->markTestSkipped('This test requires intl extension to work.');
         }
+    }
 
+    /**
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
+     */
+    public function testLoadInvalidResource()
+    {
+        $loader = new IcuDatFileLoader();
+        $loader->load(__DIR__.'/../fixtures/resourcebundle/corrupted/resources', 'es', 'domain2');
     }
 
     public function testDatEnglishLoad()
     {
-        // bundled resource is build using pkgdata command which at leas in ICU 4.2 comes in extremely! buggy form
+        // bundled resource is build using pkgdata command which at least in ICU 4.2 comes in extremely! buggy form
         // you must specify an temporary build directory which is not the same as current directory and
         // MUST reside on the same partition. pkgdata -p resources -T /srv -d . packagelist.txt
         $loader = new IcuDatFileLoader();
@@ -54,11 +62,11 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
      */
-    public function testLoadInvalidResource()
+    public function testLoadNonExistingResource()
     {
         $loader = new IcuDatFileLoader();
-        $catalogue = $loader->load(__DIR__.'/../fixtures/resourcebundle/res/en.txt', 'en', 'domain1');
+        $loader->load(__DIR__.'/../fixtures/non-existing.txt', 'en', 'domain1');
     }
 }

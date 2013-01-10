@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
-use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
@@ -34,6 +33,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected $addDefaults;
     protected $addDefaultChildren;
     protected $nodeBuilder;
+    protected $normalizeKeys;
 
     /**
      * {@inheritDoc}
@@ -51,6 +51,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $this->performDeepMerging = true;
         $this->nullEquivalent = array();
         $this->trueEquivalent = array();
+        $this->normalizeKeys = true;
     }
 
     /**
@@ -282,6 +283,20 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
+     * Sets key normalization.
+     *
+     * @param Boolean $bool Whether to enable key normalization
+     *
+     * @return ArrayNodeDefinition
+     */
+    public function normalizeKeys($bool)
+    {
+        $this->normalizeKeys = (Boolean) $bool;
+
+        return $this;
+    }
+
+    /**
      * Appends a node definition.
      *
      *     $node = new ArrayNodeDefinition()
@@ -368,6 +383,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $node->setPerformDeepMerging($this->performDeepMerging);
         $node->setRequired($this->required);
         $node->setIgnoreExtraKeys($this->ignoreExtraKeys);
+        $node->setNormalizeKeys($this->normalizeKeys);
 
         if (null !== $this->normalization) {
             $node->setNormalizationClosures($this->normalization->before);
@@ -389,9 +405,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Validate the configuration of a concrete node.
      *
-     * @param NodeInterface $node The related node
+     * @param ArrayNode $node The related node
      *
-     * @throws InvalidDefinitionException When an error is detected in the configuration
+     * @throws InvalidDefinitionException
      */
     protected function validateConcreteNode(ArrayNode $node)
     {
@@ -425,9 +441,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Validate the configuration of a prototype node.
      *
-     * @param NodeInterface $node The related node
+     * @param PrototypedArrayNode $node The related node
      *
-     * @throws InvalidDefinitionException When an error is detected in the configuration
+     * @throws InvalidDefinitionException
      */
     protected function validatePrototypeNode(PrototypedArrayNode $node)
     {

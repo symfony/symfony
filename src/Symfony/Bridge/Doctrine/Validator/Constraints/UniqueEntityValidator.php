@@ -40,6 +40,9 @@ class UniqueEntityValidator extends ConstraintValidator
     /**
      * @param object     $entity
      * @param Constraint $constraint
+     *
+     * @throws UnexpectedTypeException
+     * @throws ConstraintDefinitionException
      */
     public function validate($entity, Constraint $constraint)
     {
@@ -63,7 +66,7 @@ class UniqueEntityValidator extends ConstraintValidator
             $em = $this->registry->getManagerForClass(get_class($entity));
         }
 
-        $className = $this->context->getCurrentClass();
+        $className = $this->context->getClassName();
         $class = $em->getClassMetadata($className);
         /* @var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata */
 
@@ -120,6 +123,6 @@ class UniqueEntityValidator extends ConstraintValidator
 
         $errorPath = null !== $constraint->errorPath ? $constraint->errorPath : $fields[0];
 
-        $this->context->addViolationAtSubPath($errorPath, $constraint->message, array(), $criteria[$fields[0]]);
+        $this->context->addViolationAt($errorPath, $constraint->message, array(), $criteria[$fields[0]]);
     }
 }

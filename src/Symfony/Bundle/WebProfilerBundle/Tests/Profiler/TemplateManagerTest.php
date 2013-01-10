@@ -57,7 +57,7 @@ class TemplateManagerTest extends TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function testGetNameOfInvalidTemplate()
     {
@@ -80,7 +80,7 @@ class TemplateManagerTest extends TestCase
             ->method('hasCollector')
             ->will($this->returnCallback(array($this, 'profileHasCollectorCallback')));
 
-       $this->assertEquals('FooBundle:Collector:foo.html.twig', $this->templateManager->getName($profile, 'foo'));
+        $this->assertEquals('FooBundle:Collector:foo.html.twig', $this->templateManager->getName($profile, 'foo'));
     }
 
     /**
@@ -89,7 +89,6 @@ class TemplateManagerTest extends TestCase
      */
     public function testGetTemplates()
     {
-
         $profile = $this->mockProfile();
         $profile->expects($this->any())
             ->method('hasCollector')
@@ -144,6 +143,10 @@ class TemplateManagerTest extends TestCase
         $this->twigEnvironment->expects($this->any())
             ->method('loadTemplate')
             ->will($this->returnValue('loadedTemplate'));
+
+        $this->twigEnvironment->expects($this->any())
+            ->method('getLoader')
+            ->will($this->returnValue($this->getMock('\Twig_LoaderInterface')));
 
         return $this->twigEnvironment;
     }

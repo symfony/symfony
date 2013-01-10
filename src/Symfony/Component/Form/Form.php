@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Util\FormUtil;
-use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
  * Form represents a form.
@@ -151,7 +152,7 @@ class Form implements \IteratorAggregate, FormInterface
         // `setData` and `add` will not lead to the correct population of
         // the child forms.
         if ($config->getCompound() && !$config->getDataMapper()) {
-            throw new FormException('Compound forms need a data mapper');
+            throw new Exception('Compound forms need a data mapper');
         }
 
         $this->config = $config;
@@ -210,6 +211,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getTypes()
     {
+        trigger_error('getTypes() is deprecated since version 2.1 and will be removed in 2.3. Use getConfig() and FormConfigInterface::getType() instead.', E_USER_DEPRECATED);
+
         $types = array();
 
         for ($type = $this->config->getType(); null !== $type; $type = $type->getParent()) {
@@ -253,7 +256,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (null !== $parent && '' === $this->config->getName()) {
-            throw new FormException('A form with an empty name cannot have a parent form.');
+            throw new Exception('A form with an empty name cannot have a parent form.');
         }
 
         $this->parent = $parent;
@@ -279,6 +282,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function hasParent()
     {
+        trigger_error('hasParent() is deprecated since version 2.1 and will be removed in 2.3. Use getParent() or inverse isRoot() instead.', E_USER_DEPRECATED);
+
         return null !== $this->parent;
     }
 
@@ -310,6 +315,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function hasAttribute($name)
     {
+        trigger_error('hasAttribute() is deprecated since version 2.1 and will be removed in 2.3. Use getConfig() and FormConfigInterface::hasAttribute() instead.', E_USER_DEPRECATED);
+
         return $this->config->hasAttribute($name);
     }
 
@@ -325,6 +332,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getAttribute($name)
     {
+        trigger_error('getAttribute() is deprecated since version 2.1 and will be removed in 2.3. Use getConfig() and FormConfigInterface::getAttribute() instead.', E_USER_DEPRECATED);
+
         return $this->config->getAttribute($name);
     }
 
@@ -350,7 +359,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if ($this->lockSetData) {
-            throw new FormException('A cycle was detected. Listeners to the PRE_SET_DATA event must not call setData(). You should call setData() on the FormEvent object instead.');
+            throw new Exception('A cycle was detected. Listeners to the PRE_SET_DATA event must not call setData(). You should call setData() on the FormEvent object instead.');
         }
 
         $this->lockSetData = true;
@@ -361,6 +370,9 @@ class Form implements \IteratorAggregate, FormInterface
             $event = new FormEvent($this, $modelData);
             $dispatcher->dispatch(FormEvents::PRE_SET_DATA, $event);
             // BC until 2.3
+            if ($dispatcher->hasListeners(FormEvents::SET_DATA)) {
+                trigger_error('The FormEvents::SET_DATA event is deprecated since 2.1 and will be removed in 2.3. Use the FormEvents::PRE_SET_DATA event instead.', E_USER_DEPRECATED);
+            }
             $dispatcher->dispatch(FormEvents::SET_DATA, $event);
             $modelData = $event->getData();
         }
@@ -383,7 +395,7 @@ class Form implements \IteratorAggregate, FormInterface
             if (null === $dataClass && is_object($viewData) && !$viewData instanceof \ArrayAccess) {
                 $expectedType = 'scalar, array or an instance of \ArrayAccess';
 
-                throw new FormException(
+                throw new Exception(
                     'The form\'s view data is expected to be of type ' . $expectedType . ', ' .
                     'but is ' . $actualType . '. You ' .
                     'can avoid this error by setting the "data_class" option to ' .
@@ -393,7 +405,7 @@ class Form implements \IteratorAggregate, FormInterface
             }
 
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
-                throw new FormException(
+                throw new Exception(
                     'The form\'s view data is expected to be an instance of class ' .
                     $dataClass . ', but is '. $actualType . '. You can avoid this error ' .
                     'by setting the "data_class" option to null or by adding a view ' .
@@ -470,6 +482,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getClientData()
     {
+        trigger_error('getClientData() is deprecated since version 2.1 and will be removed in 2.3. Use getViewData() instead.', E_USER_DEPRECATED);
+
         return $this->getViewData();
     }
 
@@ -522,12 +536,15 @@ class Form implements \IteratorAggregate, FormInterface
             $event = new FormEvent($this, $submittedData);
             $dispatcher->dispatch(FormEvents::PRE_BIND, $event);
             // BC until 2.3
+            if ($dispatcher->hasListeners(FormEvents::BIND_CLIENT_DATA)) {
+                trigger_error('The FormEvents::BIND_CLIENT_DATA event is deprecated since 2.1 and will be removed in 2.3. Use the FormEvents::PRE_BIND event instead.', E_USER_DEPRECATED);
+            }
             $dispatcher->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
             $submittedData = $event->getData();
         }
 
         // Check whether the form is compound.
-        // This check is preferrable over checking the number of children,
+        // This check is preferable over checking the number of children,
         // since forms without children may also be compound.
         // (think of empty collection forms)
         if ($this->config->getCompound()) {
@@ -582,6 +599,9 @@ class Form implements \IteratorAggregate, FormInterface
                 $event = new FormEvent($this, $normData);
                 $dispatcher->dispatch(FormEvents::BIND, $event);
                 // BC until 2.3
+                if ($dispatcher->hasListeners(FormEvents::BIND_NORM_DATA)) {
+                    trigger_error('The FormEvents::BIND_NORM_DATA event is deprecated since 2.1 and will be removed in 2.3. Use the FormEvents::BIND event instead.', E_USER_DEPRECATED);
+                }
                 $dispatcher->dispatch(FormEvents::BIND_NORM_DATA, $event);
                 $normData = $event->getData();
             }
@@ -603,7 +623,13 @@ class Form implements \IteratorAggregate, FormInterface
             $dispatcher->dispatch(FormEvents::POST_BIND, $event);
         }
 
-        foreach ($this->config->getValidators() as $validator) {
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
+        $validators = $this->config->getValidators();
+        restore_error_handler();
+
+        foreach ($validators as $validator) {
+            trigger_error(sprintf('FormConfigInterface::getValidators() is deprecated since 2.1 and will be removed in 2.3. Convert your %s class to a listener on the FormEvents::POST_BIND event.', get_class($validator)), E_USER_DEPRECATED);
+
             $validator->validate($this);
         }
 
@@ -627,6 +653,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function bindRequest(Request $request)
     {
+        trigger_error('bindRequest() is deprecated since version 2.1 and will be removed in 2.3. Use FormConfigInterface::bind() instead.', E_USER_DEPRECATED);
+
         return $this->bind($request);
     }
 
@@ -635,7 +663,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function addError(FormError $error)
     {
-        if ($this->parent && $this->getErrorBubbling()) {
+        if ($this->parent && $this->config->getErrorBubbling()) {
             $this->parent->addError($error);
         } else {
             $this->errors[] = $error;
@@ -654,6 +682,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getErrorBubbling()
     {
+        trigger_error('getErrorBubbling() is deprecated since version 2.1 and will be removed in 2.3. Use getConfig() and FormConfigInterface::getErrorBubbling() instead.', E_USER_DEPRECATED);
+
         return $this->config->getErrorBubbling();
     }
 
@@ -684,7 +714,11 @@ class Form implements \IteratorAggregate, FormInterface
             }
         }
 
-        return FormUtil::isEmpty($this->modelData) || array() === $this->modelData;
+        return FormUtil::isEmpty($this->modelData) ||
+            // arrays, countables
+            0 === count($this->modelData) ||
+            // traversables that are not countable
+            ($this->modelData instanceof \Traversable && 0 === iterator_count($this->modelData));
     }
 
     /**
@@ -721,6 +755,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function hasErrors()
     {
+        trigger_error('hasErrors() is deprecated since version 2.1 and will be removed in 2.3. Count getErrors() instead.', E_USER_DEPRECATED);
+
         return count($this->errors) > 0;
     }
 
@@ -770,6 +806,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getNormTransformers()
     {
+        trigger_error('getNormTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use getConfig() and FormConfigInterface::getModelTransformers() instead.', E_USER_DEPRECATED);
+
         return $this->config->getModelTransformers();
     }
 
@@ -783,6 +821,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getClientTransformers()
     {
+        trigger_error('getClientTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use getConfig() and FormConfigInterface::getViewTransformers() instead.', E_USER_DEPRECATED);
+
         return $this->config->getViewTransformers();
     }
 
@@ -804,6 +844,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getChildren()
     {
+        trigger_error('getChildren() is deprecated since version 2.1 and will be removed in 2.3. Use all() instead.', E_USER_DEPRECATED);
+
         return $this->all();
     }
 
@@ -817,20 +859,22 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function hasChildren()
     {
+        trigger_error('hasChildren() is deprecated since version 2.1 and will be removed in 2.3. Use count() instead.', E_USER_DEPRECATED);
+
         return count($this->children) > 0;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function add(FormInterface $child)
+    public function add($child, $type = null, array $options = array())
     {
         if ($this->bound) {
             throw new AlreadyBoundException('You cannot add children to a bound form');
         }
 
         if (!$this->config->getCompound()) {
-            throw new FormException('You cannot add children to a simple form. Maybe you should set the option "compound" to true?');
+            throw new Exception('You cannot add children to a simple form. Maybe you should set the option "compound" to true?');
         }
 
         // Obtain the view data
@@ -850,6 +894,22 @@ class Form implements \IteratorAggregate, FormInterface
         //  * ... endless recursion ...
         if (!$this->lockSetData) {
             $viewData = $this->getViewData();
+        }
+
+        if (!$child instanceof FormInterface) {
+            if (!is_string($child) && !is_int($child)) {
+                throw new UnexpectedTypeException($child, 'string, integer or Symfony\Component\Form\FormInterface');
+            }
+
+            if (null !== $type && !is_string($type) && !$type instanceof FormTypeInterface) {
+                throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
+            }
+
+            if (null === $type) {
+                $child = $this->config->getFormFactory()->createForProperty($this->config->getDataClass(), $child, null, $options);
+            } else {
+                $child = $this->config->getFormFactory()->createNamed($child, $type, null, $options);
+            }
         }
 
         $this->children[$child->getName()] = $child;

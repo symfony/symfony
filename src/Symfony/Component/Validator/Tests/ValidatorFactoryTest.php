@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryAdapter;
 use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\ValidatorContext;
 use Symfony\Component\Validator\ValidatorFactory;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
@@ -78,7 +79,7 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
         $validator = $this->factory->getValidator();
 
-        $this->assertEquals(new Validator(new ClassMetadataFactoryAdapter($metadataFactory), $validatorFactory), $validator);
+        $this->assertEquals(new Validator(new ClassMetadataFactoryAdapter($metadataFactory), $validatorFactory, new DefaultTranslator()), $validator);
     }
 
     public function testBuildDefaultFromAnnotationsWithCustomNamespaces()
@@ -160,7 +161,7 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\MappingException
+     * @expectedException \Symfony\Component\Validator\Exception\MappingException
      */
     public function testBuildDefaultThrowsExceptionIfNoLoaderIsFound()
     {
@@ -168,7 +169,7 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\MappingException
+     * @expectedException \Symfony\Component\Validator\Exception\MappingException
      */
     public function testBuildDefaultThrowsExceptionIfUnknownExtension()
     {

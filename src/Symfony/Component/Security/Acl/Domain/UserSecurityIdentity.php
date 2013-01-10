@@ -31,6 +31,8 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
      *
      * @param string $username the username representation
      * @param string $class    the user's fully qualified class name
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($username, $class)
     {

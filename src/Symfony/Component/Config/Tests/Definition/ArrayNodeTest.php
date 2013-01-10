@@ -16,7 +16,7 @@ use Symfony\Component\Config\Definition\ArrayNode;
 class ArrayNodeTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidTypeException
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
      */
     public function testNormalizeThrowsExceptionWhenFalseIsNotAllowed()
     {
@@ -53,5 +53,36 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
 
         $node->normalize(array('foo' => 'bar'));
         $this->assertTrue(true, 'No exception was thrown when setIgnoreExtraKeys is true');
+    }
+
+    /**
+     * @dataProvider getPreNormalizationTests
+     */
+    public function testPreNormalize($denormalized, $normalized)
+    {
+        $node = new ArrayNode('foo');
+
+        $r = new \ReflectionMethod($node, 'preNormalize');
+        $r->setAccessible(true);
+
+        $this->assertSame($normalized, $r->invoke($node, $denormalized));
+    }
+
+    public function getPreNormalizationTests()
+    {
+        return array(
+            array(
+                array('foo-bar' => 'foo'),
+                array('foo_bar' => 'foo'),
+            ),
+            array(
+                array('foo-bar_moo' => 'foo'),
+                array('foo-bar_moo' => 'foo'),
+            ),
+            array(
+                array('foo-bar' => null, 'foo_bar' => 'foo'),
+                array('foo-bar' => null, 'foo_bar' => 'foo'),
+            )
+        );
     }
 }

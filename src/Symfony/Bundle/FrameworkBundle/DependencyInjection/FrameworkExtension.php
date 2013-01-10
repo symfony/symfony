@@ -65,6 +65,9 @@ class FrameworkExtension extends Extension
             $container->setParameter('kernel.secret', $config['secret']);
         }
 
+        $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
+
+        // @deprecated, to be removed in 2.3
         $container->setParameter('kernel.trust_proxy_headers', $config['trust_proxy_headers']);
 
         $container->setParameter('kernel.default_locale', $config['default_locale']);
@@ -147,6 +150,8 @@ class FrameworkExtension extends Extension
      * @param array            $config    A configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @throws \LogicException
      */
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -184,6 +189,8 @@ class FrameworkExtension extends Extension
      * @param array            $config    A profiler configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     *
+     * @throws \LogicException
      */
     private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -520,6 +527,11 @@ class FrameworkExtension extends Extension
 
                 $dirs[] = dirname($r->getFilename()).'/Resources/translations';
             }
+            if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
+                $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
+
+                $dirs[] = dirname($r->getFilename()).'/../../Resources/translations';
+            }
             $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
             foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
                 $reflection = new \ReflectionClass($class);
@@ -567,6 +579,7 @@ class FrameworkExtension extends Extension
     {
         $loader->load('validator.xml');
 
+        $container->setParameter('validator.translation_domain', $config['translation_domain']);
         $container->setParameter('validator.mapping.loader.xml_files_loader.mapping_files', $this->getValidatorXmlMappingFiles($container));
         $container->setParameter('validator.mapping.loader.yaml_files_loader.mapping_files', $this->getValidatorYamlMappingFiles($container));
 

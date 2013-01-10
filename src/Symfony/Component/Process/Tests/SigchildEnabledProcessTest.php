@@ -23,7 +23,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testProcessIsSignaledIfStopped()
     {
@@ -31,7 +31,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testProcessWithTermSignal()
     {
@@ -39,7 +39,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testProcessIsNotSignaled()
     {
@@ -47,7 +47,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testProcessWithoutTermSignal()
     {

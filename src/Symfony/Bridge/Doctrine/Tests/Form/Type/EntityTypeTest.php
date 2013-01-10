@@ -90,6 +90,7 @@ class EntityTypeTest extends TypeTestCase
         parent::tearDown();
 
         $this->em = null;
+        $this->emRegistry = null;
     }
 
     protected function getExtensions()
@@ -111,7 +112,7 @@ class EntityTypeTest extends TypeTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      */
     public function testClassOptionIsRequired()
     {
@@ -171,7 +172,7 @@ class EntityTypeTest extends TypeTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure()
     {
@@ -183,7 +184,7 @@ class EntityTypeTest extends TypeTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
     {

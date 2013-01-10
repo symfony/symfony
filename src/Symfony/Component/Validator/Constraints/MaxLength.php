@@ -28,7 +28,7 @@ class MaxLength extends Constraint
 
     public function __construct($options = null)
     {
-        trigger_error('MaxLength is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+        trigger_error('MaxLength is deprecated since version 2.1 and will be removed in 2.3. Use Length instead.', E_USER_DEPRECATED);
 
         parent::__construct($options);
     }

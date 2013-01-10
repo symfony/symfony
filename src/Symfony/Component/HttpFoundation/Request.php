@@ -676,8 +676,6 @@ class Request
      *
      * @see http://en.wikipedia.org/wiki/X-Forwarded-For
      *
-     * @deprecated The proxy argument is deprecated since version 2.0 and will be removed in 2.3. Use setTrustedProxies instead.
-     *
      * @api
      */
     public function getClientIp()

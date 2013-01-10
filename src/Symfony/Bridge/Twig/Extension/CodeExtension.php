@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
+use Symfony\Component\HttpFoundation\Response;
+
 if (!defined('ENT_SUBSTITUTE')) {
     define('ENT_SUBSTITUTE', 8);
 }
@@ -54,6 +56,7 @@ class CodeExtension extends \Twig_Extension
             'format_file'           => new \Twig_Filter_Method($this, 'formatFile', array('is_safe' => array('html'))),
             'format_file_from_text' => new \Twig_Filter_Method($this, 'formatFileFromText', array('is_safe' => array('html'))),
             'file_link'             => new \Twig_Filter_Method($this, 'getFileLink', array('is_safe' => array('html'))),
+            'http_status_text'      => new \Twig_Filter_Method($this, 'httpStatusText'),
         );
     }
 
@@ -195,6 +198,18 @@ class CodeExtension extends \Twig_Extension
         }
 
         return false;
+    }
+
+    /**
+     * Returns a string from the status codes translation table.
+     *
+     * @param int $code The HTTP Status Code
+     *
+     * @return string
+     */
+    public function httpStatusText($code)
+    {
+        return Response::$statusTexts[$code];
     }
 
     public function formatFileFromText($text)

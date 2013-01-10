@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * SessionListenerTest.
@@ -26,7 +27,14 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  */
 class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var TestSessionListener
+     */
     private $listener;
+
+    /**
+     * @var SessionInterface
+     */
     private $session;
 
     protected function setUp()
@@ -43,6 +51,7 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSaveMasterRequestSession()
     {
+        $this->sessionHasBeenStarted();
         $this->sessionMustBeSaved();
 
         $this->filterResponse(new Request());
@@ -57,6 +66,8 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testDoesNotDeleteCookieIfUsingSessionLifetime()
     {
+        $this->sessionHasBeenStarted();
+
         $params = session_get_cookie_params();
         session_set_cookie_params(0, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
 
@@ -64,6 +75,14 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
         $cookies = $response->headers->getCookies();
 
         $this->assertEquals(0, reset($cookies)->getExpiresTime());
+    }
+
+    public function testUnstartedSessionIsNotSave()
+    {
+        $this->sessionHasNotBeenStarted();
+        $this->sessionMustNotBeSaved();
+
+        $this->filterResponse(new Request());
     }
 
     private function filterResponse(Request $request, $type = HttpKernelInterface::MASTER_REQUEST)
@@ -90,6 +109,20 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->session->expects($this->once())
             ->method('save');
+    }
+
+    private function sessionHasBeenStarted()
+    {
+        $this->session->expects($this->once())
+            ->method('isStarted')
+            ->will($this->returnValue(true));
+    }
+
+    private function sessionHasNotBeenStarted()
+    {
+        $this->session->expects($this->once())
+            ->method('isStarted')
+            ->will($this->returnValue(false));
     }
 
     private function getSession()

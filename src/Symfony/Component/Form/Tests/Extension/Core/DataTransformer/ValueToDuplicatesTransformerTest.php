@@ -83,7 +83,7 @@ class ValueToDuplicatesTransformerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransform_partiallyNull()
     {
@@ -97,7 +97,7 @@ class ValueToDuplicatesTransformerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransform_differences()
     {
@@ -111,7 +111,7 @@ class ValueToDuplicatesTransformerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testReverseTransformRequiresArray()
     {

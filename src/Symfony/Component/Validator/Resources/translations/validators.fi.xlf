@@ -23,20 +23,20 @@
                 <target>Arvon tulee olla yksi annetuista vaihtoehdoista.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choices.</source>
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
                 <target>Sinun tulee valita vähintään {{ limit }} vaihtoehtoa.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choices.</source>
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
                 <target>Sinun tulee valitan enintään {{ limit }} vaihtoehtoa.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
-                <target>One or more of the given values is invalid.</target>
+                <target>Yksi tai useampi annetuista arvoista on virheellinen.</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected.</source>
-                <target> Odottamattomia kenttiä {{ fields }}.</target>
+                <target>Odottamattomia kenttiä {{ fields }}.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>The fields {{ fields }} are missing.</source>
@@ -75,7 +75,7 @@
                 <target>Arvon tulee olla {{ limit }} tai vähemmän.</target>
             </trans-unit>
             <trans-unit id="19">
-                <source>This value is too long. It should have {{ limit }} characters or less.</source>
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
                 <target>Liian pitkä syöte. Syöte saa olla enintään {{ limit }} merkkiä.</target>
             </trans-unit>
             <trans-unit id="20">
@@ -83,7 +83,7 @@
                 <target>Arvon tulee olla {{ limit }} tai enemmän.</target>
             </trans-unit>
             <trans-unit id="21">
-                <source>This value is too short. It should have {{ limit }} characters or more.</source>
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
                 <target>Liian lyhyt syöte. Syötteen tulee olla vähintään {{ limit }} merkkiä.</target>
             </trans-unit>
             <trans-unit id="22">
@@ -125,6 +125,102 @@
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
                 <target>Tiedoston siirto epäonnistui.</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number.</source>
+                <target>Tämän arvon tulee olla numero.</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image.</source>
+                <target>Tämä tiedosto ei ole kelvollinen kuva.</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address.</source>
+                <target>Tämä ei ole kelvollinen IP-osoite.</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language.</source>
+                <target>Tämä arvo ei ole kelvollinen kieli.</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale.</source>
+                <target>Tämä arvo ei ole kelvollinen kieli- ja alueasetus (locale).</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country.</source>
+                <target>Tämä arvo ei ole kelvollinen maa.</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used.</source>
+                <target>Tämä arvo on jo käytetty.</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected.</source>
+                <target>Kuvan kokoa ei voitu tunnistaa.</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>Kuva on liian leveä ({{ width }}px). Sallittu maksimileveys on {{ max_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>Kuva on liian kapea ({{ width }}px). Leveyden tulisi olla vähintään {{ min_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>Kuva on liian korkea ({{ width }}px). Sallittu maksimikorkeus on {{ max_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>Kuva on liian matala ({{ height }}px). Korkeuden tulisi olla vähintään {{ min_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user current password.</source>
+                <target>Tämän arvon tulisi olla käyttäjän tämänhetkinen salasana.</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
+                <target>Tämän arvon tulisi olla tasan yhden merkin pituinen.|Tämän arvon tulisi olla tasan {{ limit }} merkkiä pitkä.</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded.</source>
+                <target>Tiedosto ladattiin vain osittain.</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded.</source>
+                <target>Tiedostoa ei ladattu.</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini.</source>
+                <target>Väliaikaishakemistoa ei ole asetettu php.ini -tiedostoon.</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk.</source>
+                <target>Väliaikaistiedostoa ei voitu kirjoittaa levylle.</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail.</source>
+                <target>PHP-laajennoksen vuoksi tiedoston lataus epäonnistui.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
+                <target>Tässä ryhmässä tulisi olla yksi tai useampi elementti.|Tässä ryhmässä tulisi olla vähintään {{ limit }} elementtiä.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
+                <target>Tässä ryhmässä tulisi olla enintään yksi elementti.|Tässä ryhmässä tulisi olla enintään {{ limit }} elementtiä.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
+                <target>Tässä ryhmässä tulisi olla tasan yksi elementti.|Tässä ryhmässä tulisi olla enintään {{ limit }} elementtiä.</target>
+            </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>Virheellinen korttinumero.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>Tätä korttityyppiä ei tueta tai korttinumero on virheellinen.</target>
             </trans-unit>
         </body>
     </file>

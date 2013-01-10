@@ -47,7 +47,7 @@ class PhpGeneratorDumper extends GeneratorDumper
 
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * {$options['class']}
@@ -108,7 +108,7 @@ EOF;
     private function generateGenerateMethod()
     {
         return <<<EOF
-    public function generate(\$name, \$parameters = array(), \$absolute = false)
+    public function generate(\$name, \$parameters = array(), \$referenceType = self::ABSOLUTE_PATH)
     {
         if (!isset(self::\$declaredRoutes[\$name])) {
             throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', \$name));
@@ -116,7 +116,7 @@ EOF;
 
         list(\$variables, \$defaults, \$requirements, \$tokens, \$hostnameTokens) = self::\$declaredRoutes[\$name];
 
-        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$absolute, \$hostnameTokens);
+        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$referenceType, \$hostnameTokens);
     }
 EOF;
     }

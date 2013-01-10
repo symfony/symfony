@@ -67,6 +67,36 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
 
+    /**
+     * @dataProvider      getTransFileTests
+     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
+     */
+    public function testTransWithoutFallbackLocaleFile($format, $loader)
+    {
+        $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader($format, new $loaderClass());
+        $translator->addResource($format, __DIR__.'/fixtures/non-existing', 'en');
+        $translator->addResource($format, __DIR__.'/fixtures/resources.'.$format, 'en');
+
+        // force catalogue loading
+        $translator->trans('foo');
+    }
+
+    /**
+     * @dataProvider getTransFileTests
+     */
+    public function testTransWithFallbackLocaleFile($format, $loader)
+    {
+        $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
+        $translator = new Translator('en_GB', new MessageSelector());
+        $translator->addLoader($format, new $loaderClass());
+        $translator->addResource($format, __DIR__.'/fixtures/non-existing', 'en_GB');
+        $translator->addResource($format, __DIR__.'/fixtures/resources.'.$format, 'en', 'resources');
+
+        $this->assertEquals('bar', $translator->trans('foo', array(), 'resources'));
+    }
+
     public function testTransWithFallbackLocaleBis()
     {
         $translator = new Translator('en_US', new MessageSelector());
@@ -142,6 +172,20 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('array', array((string) $id => $translation), $locale, $domain);
 
         $this->assertEquals($expected, $translator->transChoice($id, $number, $parameters, $domain, $locale));
+    }
+
+    public function getTransFileTests()
+    {
+        return array(
+            array('csv', 'CsvFileLoader'),
+            array('ini', 'IniFileLoader'),
+            array('mo', 'MoFileLoader'),
+            array('po', 'PoFileLoader'),
+            array('php', 'PhpFileLoader'),
+            array('ts', 'QtFileLoader'),
+            array('xlf', 'XliffFileLoader'),
+            array('yml', 'YamlFileLoader'),
+        );
     }
 
     public function getTransTests()

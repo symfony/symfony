@@ -116,47 +116,6 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testGenerateInternalUriHandlesNullValues()
-    {
-        $request = new Request();
-
-        $router = $this->getMock('Symfony\\Component\\Routing\\RouterInterface');
-        $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
-        $container
-            ->expects($this->at(0))
-            ->method('get')
-            ->with($this->equalTo('router'))
-            ->will($this->returnValue($router))
-        ;
-        $container
-            ->expects($this->at('1'))
-            ->method('get')
-            ->with($this->equalTo('request'))
-            ->will($this->returnValue($request))
-        ;
-
-        $controller = 'AController';
-        $attributes = array('anAttribute' => null);
-        $query = array('aQueryParam' => null);
-
-        $expectedPath = 'none';
-
-        $routeParameters = array('controller' => $controller, 'path' => $expectedPath, '_format' => 'html');
-        $router
-            ->expects($this->once())
-            ->method('generate')
-            ->with($this->equalTo('_internal'), $this->equalTo($routeParameters))
-            ->will($this->returnValue('GENERATED_URI'))
-        ;
-
-        $dispatcher = new EventDispatcher();
-        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $kernel = new HttpKernel($dispatcher, $container, $resolver);
-
-        $uri = $kernel->generateInternalUri($controller, $attributes, $query);
-        $this->assertEquals('GENERATED_URI', $uri);
-    }
-
     public function getProviderTypes()
     {
         return array(
@@ -172,21 +131,21 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $container = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
         $container
             ->expects($this->at(0))
+            ->method('get')
+            ->with($this->equalTo('request'))
+            ->will($this->returnValue($request))
+        ;
+        $container
+            ->expects($this->at(1))
             ->method('getParameter')
             ->with($this->equalTo('kernel.debug'))
             ->will($this->returnValue(false))
         ;
         $container
-            ->expects($this->at(1))
+            ->expects($this->at(2))
             ->method('has')
             ->with($this->equalTo('esi'))
             ->will($this->returnValue(false))
-        ;
-        $container
-            ->expects($this->at(2))
-            ->method('get')
-            ->with($this->equalTo('request'))
-            ->will($this->returnValue($request))
         ;
 
         $dispatcher = new EventDispatcher();

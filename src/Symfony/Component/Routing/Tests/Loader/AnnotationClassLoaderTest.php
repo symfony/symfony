@@ -98,7 +98,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->reader
             ->expects($this->once())
             ->method('getMethodAnnotations')
-            ->will($this->returnValue(array($this->getAnnotedRoute($routeDatas))))
+            ->will($this->returnValue(array($this->getAnnotatedRoute($routeDatas))))
         ;
         $routeCollection = $this->loader->load($className);
         $route = $routeCollection->get($routeDatas['name']);
@@ -109,7 +109,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertSame(array_replace($routeDatas['defaults'], $methodArgs), $route->getDefaults(), '->load preserves defaults annotation');
     }
 
-    private function getAnnotedRoute($datas)
+    private function getAnnotatedRoute($datas)
     {
         return new \Symfony\Component\Routing\Annotation\Route($datas);
     }

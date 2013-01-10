@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -21,8 +23,6 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
     public function getHtml4Ids()
     {
         return array(
-            array('a0', true),
-            array('a9', true),
             array('z0', true),
             array('A0', true),
             array('A9', true),
@@ -53,6 +53,16 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
             // For root forms, leading underscores will be stripped from the
             // "id" attribute to produce valid HTML4.
             array('_', true),
+            // Integers are allowed
+            array(0, true),
+            array(123, true),
+            // NULL is allowed
+            array(null, true),
+            // Other types are not
+            array(1.23, false),
+            array(5., false),
+            array(true, false),
+            array(new \stdClass(), false),
         );
     }
 
@@ -67,6 +77,11 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
             new FormConfigBuilder($name, null, $dispatcher);
             if (!$accepted) {
                 $this->fail(sprintf('The value "%s" should not be accepted', $name));
+            }
+        } catch (UnexpectedTypeException $e) {
+            // if the value was not accepted, but should be, rethrow exception
+            if ($accepted) {
+                throw $e;
             }
         } catch (\InvalidArgumentException $e) {
             // if the value was not accepted, but should be, rethrow exception

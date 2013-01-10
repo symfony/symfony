@@ -65,6 +65,13 @@ class BinaryFileResponse extends Response
      * Sets the file to stream.
      *
      * @param SplFileInfo|string $file The file to stream
+     * @param string             $contentDisposition
+     * @param Boolean            $autoEtag
+     * @param Boolean            $autoLastModified
+     *
+     * @return BinaryFileResponse
+     *
+     * @throws FileException
      */
     public function setFile($file, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
@@ -127,6 +134,8 @@ class BinaryFileResponse extends Response
      * @param string $disposition      ResponseHeaderBag::DISPOSITION_INLINE or ResponseHeaderBag::DISPOSITION_ATTACHMENT
      * @param string $filename         Optionally use this filename instead of the real name of the file
      * @param string $filenameFallback A fallback filename, containing only ASCII characters. Defaults to an automatically encoded filename
+     *
+     * @return BinaryFileResponse
      */
     public function setContentDisposition($disposition, $filename = '', $filenameFallback = '')
     {
@@ -201,6 +210,8 @@ class BinaryFileResponse extends Response
                 $this->headers->set('Content-Range', sprintf('bytes %s-%s/%s', $start, $end, $this->file->getSize()));
             }
         }
+
+        return $this;
     }
 
     /**

@@ -30,6 +30,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
      * Example : "file:/path/to/the/storage/folder"
      *
      * @param string $dsn The DSN
+     *
+     * @throws \RuntimeException
      */
     public function __construct($dsn)
     {
@@ -46,7 +48,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method)
+    public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
         $file = $this->getIndexFilename();
 
@@ -72,7 +74,17 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
             list($csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent) = str_getcsv($line);
 
+            $csvTime = (int) $csvTime;
+
             if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url) || $method && false === strpos($csvMethod, $method)) {
+                continue;
+            }
+
+            if (!empty($start) && $csvTime < $start) {
+               continue;
+            }
+
+            if (!empty($end) && $csvTime > $end) {
                 continue;
             }
 
@@ -176,6 +188,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
     /**
      * Gets filename to store data, associated to the token.
+     *
+     * @param string $token
      *
      * @return string The profile filename
      */

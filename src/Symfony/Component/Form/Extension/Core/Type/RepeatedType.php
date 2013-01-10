@@ -27,6 +27,10 @@ class RepeatedType extends AbstractType
         $options['first_options']['required']  = $options['required'];
         $options['second_options']['required'] = $options['required'];
 
+        if (!isset($options['options']['error_bubbling'])) {
+            $options['options']['error_bubbling'] = $options['error_bubbling'];
+        }
+
         $builder
             ->addViewTransformer(new ValueToDuplicatesTransformer(array(
                 $options['first_name'],

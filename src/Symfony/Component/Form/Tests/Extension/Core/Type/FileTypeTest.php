@@ -11,16 +11,37 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
 class FileTypeTest extends TypeTestCase
 {
-    public function testFormBuilderIfEntityHasFile()
+    // https://github.com/symfony/symfony/pull/5028
+    public function testSetData()
     {
-        $this->factory->createBuilder('file')
-            ->getForm()
-            ->setData($this->createUploadedFileMock('abcdef', 'original.jpg', true))
-        ;
+        $form = $this->factory->createBuilder('file')->getForm();
+        $data = $this->createUploadedFileMock('abcdef', 'original.jpg', true);
+
+        $form->setData($data);
+
+        $this->assertSame($data, $form->getData());
+    }
+
+    public function testBind()
+    {
+        $form = $this->factory->createBuilder('file')->getForm();
+        $data = $this->createUploadedFileMock('abcdef', 'original.jpg', true);
+
+        $form->bind($data);
+
+        $this->assertSame($data, $form->getData());
+    }
+
+    // https://github.com/symfony/symfony/issues/6134
+    public function testBindEmpty()
+    {
+        $form = $this->factory->createBuilder('file')->getForm();
+
+        $form->bind(null);
+
+        $this->assertNull($form->getData());
     }
 
     public function testDontPassValueToView()

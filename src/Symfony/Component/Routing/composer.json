@@ -22,7 +22,8 @@
         "symfony/config": "2.2.*",
         "symfony/yaml": "2.2.*",
         "symfony/http-kernel": "2.2.*",
-        "doctrine/common": ">=2.2,<2.4-dev"
+        "doctrine/common": ">=2.2,<2.4-dev",
+        "psr/log": "~1.0"
     },
     "suggest": {
         "symfony/config": "2.2.*",

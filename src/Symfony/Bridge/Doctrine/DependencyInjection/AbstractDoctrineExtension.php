@@ -42,6 +42,8 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * @param array            $objectManager A configured object manager.
      * @param ContainerBuilder $container     A ContainerBuilder instance
+     *
+     * @throws \InvalidArgumentException
      */
     protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
     {
@@ -119,6 +121,8 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array  $mappingConfig
      * @param string $mappingName
+     *
+     * @throws \InvalidArgumentException
      */
     protected function setMappingDriverConfig(array $mappingConfig, $mappingName)
     {
@@ -228,6 +232,8 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array  $mappingConfig
      * @param string $objectManagerName
+     *
+     * @throws \InvalidArgumentException
      */
     protected function assertValidMappingConfiguration(array $mappingConfig, $objectManagerName)
     {
@@ -309,7 +315,7 @@ abstract class AbstractDoctrineExtension extends Extension
                 $memcacheClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%'.$this->getObjectManagerElementName('cache.memcache.class').'%';
                 $memcacheInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%'.$this->getObjectManagerElementName('cache.memcache_instance.class').'%';
                 $memcacheHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%'.$this->getObjectManagerElementName('cache.memcache_host').'%';
-                $memcachePort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.memcache_port').'%';
+                $memcachePort = !empty($cacheDriver['port']) || (isset($cacheDriver['port']) && $cacheDriver['port'] === 0)  ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.memcache_port').'%';
                 $cacheDef = new Definition($memcacheClass);
                 $memcacheInstance = new Definition($memcacheInstanceClass);
                 $memcacheInstance->addMethodCall('connect', array(

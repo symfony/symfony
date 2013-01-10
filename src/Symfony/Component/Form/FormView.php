@@ -64,6 +64,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function getName()
     {
+        trigger_error('getName() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'vars\' instead which contains an entry named "name".', E_USER_DEPRECATED);
+
         return $this->vars['name'];
     }
 
@@ -78,6 +80,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function set($name, $value)
     {
+        trigger_error('set() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'vars\' instead.', E_USER_DEPRECATED);
+
         $this->vars[$name] = $value;
 
         return $this;
@@ -93,6 +97,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function has($name)
     {
+        trigger_error('has() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'vars\' instead.', E_USER_DEPRECATED);
+
         return array_key_exists($name, $this->vars);
     }
 
@@ -107,6 +113,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function get($name, $default = null)
     {
+        trigger_error('get() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'vars\' instead.', E_USER_DEPRECATED);
+
         if (false === $this->has($name)) {
             return $default;
         }
@@ -122,6 +130,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function all()
     {
+        trigger_error('all() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'vars\' instead.', E_USER_DEPRECATED);
+
         return $this->vars;
     }
 
@@ -135,6 +145,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function getVars()
     {
+        trigger_error('getVars() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'vars\' instead.', E_USER_DEPRECATED);
+
         return $this->vars;
     }
 
@@ -152,6 +164,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function setAttribute($name, $value)
     {
+        trigger_error('setAttribute() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'vars\' instead which contains an entry named "attr".', E_USER_DEPRECATED);
+
         $this->vars['attr'][$name] = $value;
 
         return $this;
@@ -207,6 +221,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function setParent(FormView $parent = null)
     {
+        trigger_error('setParent() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'parent\' instead.', E_USER_DEPRECATED);
+
         $this->parent = $parent;
 
         return $this;
@@ -222,6 +238,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function getParent()
     {
+        trigger_error('getParent() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'parent\' instead.', E_USER_DEPRECATED);
+
         return $this->parent;
     }
 
@@ -235,6 +253,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function hasParent()
     {
+        trigger_error('hasParent() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'parent\' instead.', E_USER_DEPRECATED);
+
         return null !== $this->parent;
     }
 
@@ -250,6 +270,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function setChildren(array $children)
     {
+        trigger_error('setChildren() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'children\' instead.', E_USER_DEPRECATED);
+
         $this->children = $children;
 
         return $this;
@@ -265,6 +287,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function getChildren()
     {
+        trigger_error('getChildren() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'children\' instead.', E_USER_DEPRECATED);
+
         return $this->children;
     }
 
@@ -280,6 +304,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function getChild($name)
     {
+        trigger_error('getChild() is deprecated since version 2.1 and will be removed in 2.3. Access the public property \'children\' instead.', E_USER_DEPRECATED);
+
         return $this->children[$name];
     }
 
@@ -293,6 +319,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function hasChildren()
     {
+        trigger_error('hasChildren() is deprecated since version 2.1 and will be removed in 2.3. Use count() instead.', E_USER_DEPRECATED);
+
         return count($this->children) > 0;
     }
 

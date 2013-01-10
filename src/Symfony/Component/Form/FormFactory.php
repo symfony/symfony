@@ -99,7 +99,9 @@ class FormFactory implements FormFactoryInterface
         $typeGuess = $guesser->guessType($class, $property);
         $maxLengthGuess = $guesser->guessMaxLength($class, $property);
         // Keep $minLengthGuess for BC until Symfony 2.3
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
         $minLengthGuess = $guesser->guessMinLength($class, $property);
+        restore_error_handler();
         $requiredGuess = $guesser->guessRequired($class, $property);
         $patternGuess = $guesser->guessPattern($class, $property);
 
@@ -146,6 +148,8 @@ class FormFactory implements FormFactoryInterface
      */
     public function hasType($name)
     {
+        trigger_error('hasType() is deprecated since version 2.1 and will be removed in 2.3. Use FormRegistryInterface::hasType() instead.', E_USER_DEPRECATED);
+
         return $this->registry->hasType($name);
     }
 
@@ -160,6 +164,8 @@ class FormFactory implements FormFactoryInterface
      */
     public function addType(FormTypeInterface $type)
     {
+        trigger_error('addType() is deprecated since version 2.1 and will be removed in 2.3. Use form extensions or type registration in the Dependency Injection Container instead.', E_USER_DEPRECATED);
+
         $parentType = $type->getParent();
 
         $this->registry->addType($this->resolvedTypeFactory->createResolvedType(
@@ -185,6 +191,8 @@ class FormFactory implements FormFactoryInterface
      */
     public function getType($name)
     {
+        trigger_error('getType() is deprecated since version 2.1 and will be removed in 2.3. Use FormRegistryInterface::getType() instead.', E_USER_DEPRECATED);
+
         return $this->registry->getType($name)->getInnerType();
     }
 

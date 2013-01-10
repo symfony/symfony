@@ -12,6 +12,8 @@
 namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Config\Resource\FileResource;
 
 /**
@@ -31,7 +33,11 @@ class XliffFileLoader implements LoaderInterface
     public function load($resource, $locale, $domain = 'messages')
     {
         if (!stream_is_local($resource)) {
-            throw new \InvalidArgumentException(sprintf('This is not a local file "%s".', $resource));
+            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
+        }
+
+        if (!file_exists($resource)) {
+            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
         }
 
         $xml = $this->parseFile($resource);
@@ -55,6 +61,8 @@ class XliffFileLoader implements LoaderInterface
      * @param string $file
      *
      * @return \SimpleXMLElement
+     *
+     * @throws InvalidResourceException
      */
     private function parseFile($file)
     {
@@ -67,7 +75,7 @@ class XliffFileLoader implements LoaderInterface
         if (!@$dom->loadXML(file_get_contents($file), LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
             libxml_disable_entity_loader($disableEntities);
 
-            throw new \RuntimeException(implode("\n", $this->getXmlErrors($internalErrors)));
+            throw new InvalidResourceException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
 
         libxml_disable_entity_loader($disableEntities);
@@ -76,7 +84,7 @@ class XliffFileLoader implements LoaderInterface
             if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
                 libxml_use_internal_errors($internalErrors);
 
-                throw new \RuntimeException('Document types are not allowed.');
+                throw new InvalidResourceException('Document types are not allowed.');
             }
         }
 
@@ -96,7 +104,7 @@ class XliffFileLoader implements LoaderInterface
         $source = str_replace('http://www.w3.org/2001/xml.xsd', $location, $source);
 
         if (!@$dom->schemaValidateSource($source)) {
-            throw new \RuntimeException(implode("\n", $this->getXmlErrors($internalErrors)));
+            throw new InvalidResourceException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
 
         $dom->normalizeDocument();
@@ -108,6 +116,8 @@ class XliffFileLoader implements LoaderInterface
 
     /**
      * Returns the XML errors of the internal XML parser
+     *
+     * @param Boolean $internalErrors
      *
      * @return array An array of errors
      */

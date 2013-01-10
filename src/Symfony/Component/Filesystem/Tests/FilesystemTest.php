@@ -89,7 +89,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
     public function testCopyFails()
     {
@@ -207,7 +207,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
     public function testMkdirCreatesDirectoriesFails()
     {
@@ -229,7 +229,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
     public function testTouchFails()
     {
@@ -518,7 +518,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
     public function testChownSymlinkFails()
     {
@@ -535,7 +535,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
     public function testChownFail()
     {
@@ -584,7 +584,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
     public function testChgrpSymlinkFails()
     {
@@ -601,7 +601,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
     public function testChgrpFail()
     {
@@ -626,7 +626,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
     public function testRenameThrowsExceptionIfTargetAlreadyExists()
     {
@@ -640,7 +640,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
     public function testRenameThrowsExceptionOnError()
     {
@@ -886,7 +886,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     /**
      * Returns file permissions as three digits (i.e. 755)
      *
-     * @param string $filepath
+     * @param string $filePath
      *
      * @return integer
      */

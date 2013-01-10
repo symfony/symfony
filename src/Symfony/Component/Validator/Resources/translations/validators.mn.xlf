@@ -23,11 +23,11 @@
                 <target>Сонгосон утга буруу байна.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choices.</source>
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
                 <target>Хамгийн багадаа {{ limit }} утга сонгогдсон байх ёстой.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choices.</source>
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
                 <target>Хамгийн ихдээ {{ limit }} утга сонгогдох боломжтой.</target>
             </trans-unit>
             <trans-unit id="8">
@@ -75,7 +75,7 @@
                 <target>Энэ утга  {{ limit }} юмуу эсвэл бага байна.</target>
             </trans-unit>
             <trans-unit id="19">
-                <source>This value is too long. It should have {{ limit }} characters or less.</source>
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
                 <target>Энэ утга хэтэрхий урт байна. {{ limit }} тэмдэгтийн урттай юмуу эсвэл бага байна.</target>
             </trans-unit>
             <trans-unit id="20">
@@ -83,7 +83,7 @@
                 <target>Энэ утга {{ limit }} юмуу эсвэл их байна.</target>
             </trans-unit>
             <trans-unit id="21">
-                <source>This value is too short. It should have {{ limit }} characters or more.</source>
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
                 <target>Энэ утга хэтэрхий богино байна. {{ limit }} тэмдэгт эсвэл их байна.</target>
             </trans-unit>
             <trans-unit id="22">

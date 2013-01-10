@@ -194,6 +194,8 @@ class PluralizationRules
      * @param string $locale The locale
      *
      * @return null
+     *
+     * @throws \LogicException
      */
     public static function set($rule, $locale)
     {

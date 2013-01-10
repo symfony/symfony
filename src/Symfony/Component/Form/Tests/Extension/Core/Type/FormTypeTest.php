@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Tests\Fixtures\Author;
@@ -391,7 +391,7 @@ class FormTypeTest extends TypeTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testAttributesException()
     {

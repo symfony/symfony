@@ -26,6 +26,13 @@ class Min extends Constraint
     public $invalidMessage = 'This value should be a valid number.';
     public $limit;
 
+    public function __construct($options = null)
+    {
+        trigger_error('Min is deprecated since version 2.1 and will be removed in 2.3. Use Range instead.', E_USER_DEPRECATED);
+
+        parent::__construct($options);
+    }
+
     /**
      * {@inheritDoc}
      */

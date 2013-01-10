@@ -29,6 +29,8 @@ class ClassMetadataFactoryAdapter implements MetadataFactoryInterface
 
     public function __construct(ClassMetadataFactoryInterface $innerFactory)
     {
+        trigger_error(sprintf('ClassMetadataFactoryInterface is deprecated since version 2.1 and will be removed in 2.3. Implement MetadataFactoryInterface instead on %s.', get_class($innerFactory)), E_USER_DEPRECATED);
+
         $this->innerFactory = $innerFactory;
     }
 
@@ -54,6 +56,8 @@ class ClassMetadataFactoryAdapter implements MetadataFactoryInterface
     {
         $class = is_object($value) ? get_class($value) : $value;
 
-        return null !== $this->innerFactory->getClassMetadata($class);
+        $return = null !== $this->innerFactory->getClassMetadata($class);
+
+        return $return;
     }
 }

@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\EventListener;
 
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\ConstraintViolation;
 
 class ValidationListenerTest extends \PHPUnit_Framework_TestCase
@@ -49,6 +48,8 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     private $message;
 
+    private $messageTemplate;
+
     private $params;
 
     protected function setUp()
@@ -63,17 +64,13 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
         $this->violationMapper = $this->getMock('Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface');
         $this->listener = new ValidationListener($this->validator, $this->violationMapper);
         $this->message = 'Message';
+        $this->messageTemplate = 'Message template';
         $this->params = array('foo' => 'bar');
     }
 
     private function getConstraintViolation($code = null)
     {
-        return new ConstraintViolation($this->message, $this->params, null, 'prop.path', null, null, $code);
-    }
-
-    private function getFormError()
-    {
-        return new FormError($this->message, $this->params);
+        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code);
     }
 
     private function getBuilder($name = 'name', $propertyPath = null, $dataClass = null)
@@ -94,7 +91,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     private function getMockForm()
     {
-        return $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
     }
 
     // More specific mapping tests can be found in ViolationMapperTest

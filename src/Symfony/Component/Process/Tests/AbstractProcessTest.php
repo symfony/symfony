@@ -21,7 +21,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     abstract protected function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array());
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function testNegativeTimeoutFromConstructor()
     {
@@ -29,7 +29,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function testNegativeTimeoutFromSetter()
     {
@@ -282,10 +282,14 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Windows does not support POSIX signals');
         }
 
+        // SIGTERM is only defined if pcntl extension is present
+        $termSignal = defined('SIGTERM') ? SIGTERM : 15;
+
         $process = $this->getProcess('php -r "while (true) {}"');
         $process->start();
         $process->stop();
-        $this->assertEquals(SIGTERM, $process->getTermSignal());
+
+        $this->assertEquals($termSignal, $process->getTermSignal());
     }
 
     public function testRestart()

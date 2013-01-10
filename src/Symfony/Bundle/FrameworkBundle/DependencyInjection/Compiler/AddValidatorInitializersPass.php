@@ -28,6 +28,6 @@ class AddValidatorInitializersPass implements CompilerPassInterface
             $initializers[] = new Reference($id);
         }
 
-        $container->getDefinition('validator')->replaceArgument(2, $initializers);
+        $container->getDefinition('validator')->replaceArgument(4, $initializers);
     }
 }

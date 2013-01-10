@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Profiler.
@@ -110,7 +110,7 @@ class Profiler
     public function saveProfile(Profile $profile)
     {
         if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {
-            $this->logger->warn('Unable to store the profiler information.');
+            $this->logger->warning('Unable to store the profiler information.');
         }
 
         return $ret;
@@ -163,12 +163,30 @@ class Profiler
      * @param string $url    The URL
      * @param string $limit  The maximum number of tokens to return
      * @param string $method The request method
+     * @param string $start  The start date to search from
+     * @param string $end    The end date to search to
      *
      * @return array An array of tokens
+     *
+     * @see http://fr2.php.net/manual/en/datetime.formats.php for the supported date/time formats
      */
-    public function find($ip, $url, $limit, $method)
+    public function find($ip, $url, $limit, $method, $start, $end)
     {
-        return $this->storage->find($ip, $url, $limit, $method);
+        if ('' != $start && null !== $start) {
+            $start = new \DateTime($start);
+            $start = $start->getTimestamp();
+        } else {
+            $start = null;
+        }
+
+        if ('' != $end && null !== $end) {
+            $end = new \DateTime($end);
+            $end = $end->getTimestamp();
+        } else {
+            $end = null;
+        }
+
+        return $this->storage->find($ip, $url, $limit, $method, $start, $end);
     }
 
     /**

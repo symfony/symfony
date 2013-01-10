@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
-
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
@@ -79,7 +77,7 @@ class ChoiceTypeTest extends TypeTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testChoiceListOptionExpectsChoiceListInterface()
     {
@@ -89,7 +87,7 @@ class ChoiceTypeTest extends TypeTestCase
     }
 
     /**
-     * expectedException Symfony\Component\Form\Exception\FormException
+     * expectedException \Symfony\Component\Form\Exception\Exception
      */
     public function testEitherChoiceListOrChoicesMustBeSet()
     {

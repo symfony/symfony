@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\HttpKernel\Exception\FatalErrorException;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * ErrorHandler.
@@ -95,7 +95,7 @@ class ErrorHandler
                         : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10)
                 );
 
-                self::$logger->warn($message, $deprecation);
+                self::$logger->warning($message, $deprecation);
             }
 
             return true;

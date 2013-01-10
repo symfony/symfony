@@ -527,6 +527,8 @@ class Request
      * false otherwise.
      *
      * @return boolean
+     *
+     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use getTrustedProxies instead.
      */
     public static function isProxyTrusted()
     {

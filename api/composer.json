@@ -1,7 +1,7 @@
 {
-    "name": "symfony/translation",
+    "name": "symfony/api",
     "type": "library",
-    "description": "Symfony Translation Component",
+    "description": "The interfaces (API) of the Symfony components",
     "keywords": [],
     "homepage": "http://symfony.com",
     "license": "MIT",
@@ -16,21 +16,11 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/api": "2.2.*"
-    },
-    "require-dev": {
-        "symfony/config": "2.2.*",
-        "symfony/yaml": "2.2.*"
-    },
-    "suggest": {
-        "symfony/config": "2.2.*",
-        "symfony/yaml": "2.2.*"
+        "php": ">=5.3.3"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Translation\\": "" }
+        "psr-0": { "Symfony\\": "" }
     },
-    "target-dir": "Symfony/Component/Translation",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

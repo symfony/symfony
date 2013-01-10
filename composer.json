@@ -21,6 +21,7 @@
         "twig/twig": ">=1.11.0,<2.0-dev"
     },
     "replace": {
+        "symfony/api": "self.version",
         "symfony/browser-kit": "self.version",
         "symfony/class-loader": "self.version",
         "symfony/config": "self.version",
@@ -63,7 +64,7 @@
         "propel/propel1": "dev-master"
     },
     "autoload": {
-        "psr-0": { "Symfony\\": "src/" },
+        "psr-0": { "Symfony\\": ["src/", "api/"] },
         "classmap": [
             "src/Symfony/Component/HttpFoundation/Resources/stubs",
             "src/Symfony/Component/Locale/Resources/stubs"

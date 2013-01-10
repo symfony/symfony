@@ -310,6 +310,30 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Bernhard', $object->child['index']->firstName);
     }
 
+    public function testSetValueUpdateMagicGetMethod()
+    {
+        $object = new Magician();
+        $path = new PropertyPath('magicProperty');
+        $path->setValue($object, 'foobar');
+        $this->assertEquals($path->getValue($object), $object->getMagicProperty());
+    }
+
+    public function testSetValueUpdateMagicHasMethod()
+    {
+        $object = new Magician();
+        $path = new PropertyPath('magicProperty');
+        $path->setValue($object, 'foobar');
+        $this->assertEquals($path->getValue($object), $object->hasMagicProperty());
+    }
+
+    public function testSetValueUpdateMagicIsMethod()
+    {
+        $object = new Magician();
+        $path = new PropertyPath('magicProperty');
+        $path->setValue($object, 'foobar');
+        $this->assertEquals($path->getValue($object), $object->isMagicProperty());
+    }
+
     public function testSetValueUpdateMagicSet()
     {
         $object = new Magician();

@@ -24,4 +24,10 @@ class Magician
     {
         return isset($this->$property) ? $this->$property : null;
     }
+
+    public function __call($method, $arguments) {
+        if (preg_match('/^(get|is|has)([A-Z].*)$/', $method, $matches)) {
+            return $this->{lcfirst($matches[2])};
+        }
+    }
 }

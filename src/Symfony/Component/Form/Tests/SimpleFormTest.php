@@ -648,7 +648,6 @@ class SimpleFormTest extends AbstractFormTest
         $form = $this->getBuilder()
             ->addValidator($validator)
             ->getForm();
-        restore_error_handler();
 
         $validator->expects($this->once())
             ->method('validate')
@@ -658,6 +657,8 @@ class SimpleFormTest extends AbstractFormTest
         }));
 
         $form->bind('foobar');
+
+        restore_error_handler();
     }
 
     public function testBindResetsErrors()

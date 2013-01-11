@@ -263,7 +263,11 @@ class DateType extends AbstractType
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimezoneId();
 
-        $formatter->setTimezoneId(\DateTimeZone::UTC);
+        if (version_compare(\PHP_VERSION, '5.5.0-dev', '>=')) {
+            $formatter->setTimeZone(\DateTimeZone::UTC);
+        } else {
+            $formatter->setTimeZoneId(\DateTimeZone::UTC);
+        }
 
         if (preg_match($regex, $pattern, $matches)) {
             $formatter->setPattern($matches[0]);
@@ -277,7 +281,11 @@ class DateType extends AbstractType
             $formatter->setPattern($pattern);
         }
 
-        $formatter->setTimezoneId($timezone);
+        if (version_compare(\PHP_VERSION, '5.5.0-dev', '>=')) {
+            $formatter->setTimeZone($timezone);
+        } else {
+            $formatter->setTimeZoneId($timezone);
+        }
 
         return $timestamps;
     }

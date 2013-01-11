@@ -48,10 +48,10 @@ class PropertyPath extends BasePropertyPath
     /**
      * Alias for {@link PropertyAccessor::setValue()}
      */
-    public function setValue($objectOrArray, $value)
+    public function setValue(&$objectOrArray, $value)
     {
         $propertyAccessor = PropertyAccess::getPropertyAccessor();
 
-        return $propertyAccessor->getValue($objectOrArray, $this, $value);
+        return $propertyAccessor->setValue($objectOrArray, $this, $value);
     }
 }

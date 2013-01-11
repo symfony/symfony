@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Log;
 
-use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger as PsrNullLogger;
 
 /**

@@ -350,7 +350,7 @@ class EntityTypeTest extends TypeTestCase
         $this->assertSame(array('1', '3'), $field->getClientData());
     }
 
-    public function testSubmitMultipleNonExpandedSingleIdentifier_existingData()
+    public function testSubmitMultipleNonExpandedSingleIdentifierForExistingData()
     {
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
@@ -407,7 +407,7 @@ class EntityTypeTest extends TypeTestCase
         $this->assertSame(array('0', '2'), $field->getClientData());
     }
 
-    public function testSubmitMultipleNonExpandedCompositeIdentifier_existingData()
+    public function testSubmitMultipleNonExpandedCompositeIdentifierExistingData()
     {
         $entity1 = new CompositeIdentEntity(10, 20, 'Foo');
         $entity2 = new CompositeIdentEntity(30, 40, 'Bar');
@@ -583,7 +583,7 @@ class EntityTypeTest extends TypeTestCase
         $this->assertEquals(array(2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
     }
 
-    public function testDisallowChoicesThatAreNotIncluded_choicesSingleIdentifier()
+    public function testDisallowChoicesThatAreNotIncludedChoicesSingleIdentifier()
     {
         $entity1 = new SingleIdentEntity(1, 'Foo');
         $entity2 = new SingleIdentEntity(2, 'Bar');
@@ -604,7 +604,7 @@ class EntityTypeTest extends TypeTestCase
         $this->assertNull($field->getData());
     }
 
-    public function testDisallowChoicesThatAreNotIncluded_choicesCompositeIdentifier()
+    public function testDisallowChoicesThatAreNotIncludedChoicesCompositeIdentifier()
     {
         $entity1 = new CompositeIdentEntity(10, 20, 'Foo');
         $entity2 = new CompositeIdentEntity(30, 40, 'Bar');

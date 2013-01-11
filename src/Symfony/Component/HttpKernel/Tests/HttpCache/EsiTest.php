@@ -30,14 +30,14 @@ class EsiTest extends \PHPUnit_Framework_TestCase
 
         $request = Request::create('/');
         $request->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
-        $this->assertTrue($esi->hasSurrogateEsiCapability($request));
+        $this->assertTrue($esi->hasSurrogateCapability($request));
 
         $request = Request::create('/');
         $request->headers->set('Surrogate-Capability', 'foobar');
-        $this->assertFalse($esi->hasSurrogateEsiCapability($request));
+        $this->assertFalse($esi->hasSurrogateCapability($request));
 
         $request = Request::create('/');
-        $this->assertFalse($esi->hasSurrogateEsiCapability($request));
+        $this->assertFalse($esi->hasSurrogateCapability($request));
     }
 
     public function testAddSurrogateEsiCapability()

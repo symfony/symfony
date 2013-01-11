@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Esi
+class Esi implements RendererInterface
 {
     private $contentTypes;
 
@@ -58,7 +58,7 @@ class Esi
      *
      * @return Boolean true if one surrogate has ESI/1.0 capability, false otherwise
      */
-    public function hasSurrogateEsiCapability(Request $request)
+    public function hasSurrogateCapability(Request $request)
     {
         if (null === $value = $request->headers->get('Surrogate-Capability')) {
             return false;

@@ -35,7 +35,7 @@ class HttpUtils
      * Constructor.
      *
      * @param UrlGeneratorInterface                       $urlGenerator A UrlGeneratorInterface instance
-     * @param UrlMatcherInterface|RequestMatcherInterface $matcher      The Url or Request matcher
+     * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher   The Url or Request matcher
      */
     public function __construct(UrlGeneratorInterface $urlGenerator = null, $urlMatcher = null)
     {

@@ -952,8 +952,9 @@ EOF;
     /**
      * Checks if a service id has a reference
      *
-     * @param string $id
-     * @param array  $arguments
+     * @param string  $id
+     * @param array   $arguments
+     * @param Boolean $deep
      *
      * @return Boolean
      */

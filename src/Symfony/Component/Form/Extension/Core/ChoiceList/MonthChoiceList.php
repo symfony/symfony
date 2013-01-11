@@ -39,7 +39,7 @@ class MonthChoiceList extends PaddedChoiceList
         $pattern = $this->formatter->getPattern();
         $timezone = $this->formatter->getTimezoneId();
 
-        if (version_compare(phpversion(), '5.5.0alpha1', '<')) {
+        if (version_compare(phpversion(), '5.5.0-dev', '<')) {
             $this->formatter->setTimezoneId('UTC');
         } else {
             $this->formatter->setTimezone('UTC');
@@ -57,7 +57,7 @@ class MonthChoiceList extends PaddedChoiceList
             $this->formatter->setPattern($pattern);
         }
 
-        if (version_compare(phpversion(), '5.5.0alpha1', '<')) {
+        if (version_compare(phpversion(), '5.5.0-dev', '<')) {
             $this->formatter->setTimezoneId($timezone);
         } else {
             $this->formatter->setTimezone($timezone);

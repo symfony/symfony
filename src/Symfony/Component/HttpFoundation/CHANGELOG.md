@@ -6,7 +6,7 @@ CHANGELOG
 
  * added Request::getTrustedProxies()
  * deprecated Request::isProxyTrusted()
- * [BC BREAK] JsonResponse does not change a top level array to an object when the array is empty anymore in setData()
+ * [BC BREAK] JsonResponse does not turn a top level empty array to an object anymore, use an ArrayObject to enforce objects
  * added a IpUtils class to check if an IP belongs to a CIDR
  * added Request::getRealMethod() to get the "real" HTTP method (getMethod() returns the "intended" HTTP method)
  * disabled _method request parameter support by default (call Request::enableHttpMethodParameterOverride() to enable it)

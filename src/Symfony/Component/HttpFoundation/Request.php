@@ -487,6 +487,16 @@ class Request
     }
 
     /**
+     * Gets the list of trusted proxies.
+     *
+     * @return array An array of trusted proxies.
+     */
+    public static function getTrustedProxies()
+    {
+        return self::$trustedProxies;
+    }
+
+    /**
      * Sets the name for trusted headers.
      *
      * The following header keys are supported:
@@ -517,6 +527,8 @@ class Request
      * false otherwise.
      *
      * @return boolean
+     *
+     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use getTrustedProxies instead.
      */
     public static function isProxyTrusted()
     {
@@ -914,8 +926,7 @@ class Request
      */
     public function getUri()
     {
-        $qs = $this->getQueryString();
-        if (null !== $qs) {
+        if (null !== $qs = $this->getQueryString()) {
             $qs = '?'.$qs;
         }
 

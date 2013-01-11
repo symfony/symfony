@@ -26,7 +26,7 @@ class HttpKernelExtension extends \Twig_Extension
     /**
      * Constructor.
      *
-     * @param HttpContentRenderer $kernel A HttpContentRenderer instance
+     * @param HttpContentRenderer $renderer A HttpContentRenderer instance
      */
     public function __construct(HttpContentRenderer $renderer)
     {

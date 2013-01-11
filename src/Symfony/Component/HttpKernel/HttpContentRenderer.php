@@ -126,6 +126,10 @@ class HttpContentRenderer implements EventSubscriberInterface
                 trigger_error('The "true" value for the "standalone" option is deprecated in version 2.2 and replaced with the "esi" value.', E_USER_DEPRECATED);
 
                 $options['standalone'] = 'esi';
+            } elseif (false === $options['standalone']) {
+                trigger_error('The "false" value for the "standalone" option is deprecated in version 2.2 and replaced with the "default" value.', E_USER_DEPRECATED);
+
+                $options['standalone'] = 'default';
             } elseif ('js' === $options['standalone']) {
                 trigger_error('The "js" value for the "standalone" option is deprecated in version 2.2 and replaced with the "hinclude" value.', E_USER_DEPRECATED);
 

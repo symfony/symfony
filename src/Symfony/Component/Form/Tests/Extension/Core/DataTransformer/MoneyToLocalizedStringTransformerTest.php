@@ -38,7 +38,7 @@ class MoneyToLocalizedStringTransformerTest extends LocalizedTestCase
         $transformer->transform('abcd');
     }
 
-    public function testTransform_empty()
+    public function testTransformEmpty()
     {
         $transformer = new MoneyToLocalizedStringTransformer();
 
@@ -61,7 +61,7 @@ class MoneyToLocalizedStringTransformerTest extends LocalizedTestCase
         $transformer->reverseTransform(12345);
     }
 
-    public function testReverseTransform_empty()
+    public function testReverseTransformEmpty()
     {
         $transformer = new MoneyToLocalizedStringTransformer();
 

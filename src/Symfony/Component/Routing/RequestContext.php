@@ -44,6 +44,7 @@ class RequestContext
      * @param string  $scheme    The HTTP scheme
      * @param integer $httpPort  The HTTP port
      * @param integer $httpsPort The HTTPS port
+     * @param string  $path      The path
      *
      * @api
      */

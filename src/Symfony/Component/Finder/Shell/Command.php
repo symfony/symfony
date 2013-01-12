@@ -251,6 +251,7 @@ class Command
      * Insert a string or a Command instance before the bit at given position $index (index starts from 0).
      *
      * @param string|Command $bit
+     * @param integer        $index
      *
      * @return Command The current Command instance
      */

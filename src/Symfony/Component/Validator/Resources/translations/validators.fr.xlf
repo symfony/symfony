@@ -222,6 +222,18 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Type de carte non supporté ou numéro invalide.</target>
             </trans-unit>
+            <trans-unit id="59">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Cette valeur n'est pas un code ISBN-10 valide.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Cette valeur n'est pas un code ISBN-13 valide.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Cette valeur n'est ni un code ISBN-10, ni un code ISBN-13 valide.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

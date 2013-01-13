@@ -31,7 +31,7 @@ class Isbn extends Constraint
     
     public function __construct($options = null)
     {
-        if(null !== $options && !is_array($options)) {
+        if (null !== $options && !is_array($options)) {
             $options = array(
                 'isbn10' => $options,
                 'isbn13' => $options,
@@ -40,7 +40,7 @@ class Isbn extends Constraint
         
         parent::__construct($options);
         
-        if(null === $this->isbn10 && null === $this->isbn13) {
+        if (null === $this->isbn10 && null === $this->isbn13) {
             throw new MissingOptionsException('Either option "isbn10" or "isbn13" must be given for constraint ' . __CLASS__, array('isbn10', 'isbn13'));
         }
     }

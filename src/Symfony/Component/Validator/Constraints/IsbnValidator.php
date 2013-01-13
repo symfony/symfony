@@ -29,27 +29,23 @@ class IsbnValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        $validation = null;
-        $checkIsbn10 = false;
-        $checkIsbn13 = false;
-
         if (null === $value || '' === $value) {
             return;
         }
 
-        if (!is_scalar($value)
-                && !(is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $value = (string) $value;
-        $value = strtoupper($value);
-
-        if (!is_int($value)) {
+        if (!is_numeric($value)) {
             $value = str_replace('-', '', $value);
         }
+        
+        $validation = 0;
+        $value = strtoupper($value);
+        $valueLength = strlen($value);
 
-        if (10 == strlen($value)) {
+        if (10 === $valueLength && null !== $constraint->isbn10) {
             for ($i = 0; $i < 10; $i++) {
                 if ($value[$i] == 'X') {
                     $validation += 10 * intval(10 - $i);
@@ -58,12 +54,14 @@ class IsbnValidator extends ConstraintValidator
                 }
             }
 
-            if ($validation % 11 == 0) {
-                $checkIsbn10 = true;
+            if ($validation % 11 != 0) {
+                if (null !== $constraint->isbn13) {
+                    $this->context->addViolation($constraint->bothIsbnMessage);
+                } else {
+                    $this->context->addViolation($constraint->isbn10Message);
+                }
             }
-        }
-
-        if (13 == strlen($value)) {
+        } elseif (13 === $valueLength && null !== $constraint->isbn13) {
             for ($i = 0; $i < 13; $i += 2) {
                 $validation += intval($value[$i]);
             }
@@ -71,26 +69,21 @@ class IsbnValidator extends ConstraintValidator
                 $validation += intval($value[$i]) * 3;
             }
 
-            if ($validation % 10 == 0) {
-                $checkIsbn13 = true;
+            if ($validation % 10 != 0) {
+                if (null !== $constraint->isbn10) {
+                    $this->context->addViolation($constraint->bothIsbnMessage);
+                } else {
+                    $this->context->addViolation($constraint->isbn13Message);
+                }
             }
-        }
-
-        if (null !== $constraint->isbn10 && null !== $constraint->isbn13
-                && $checkIsbn10 === false && $checkIsbn13 === false) {
-            $this->context->addViolation($constraint->bothIsbnMessage);
-            return;
-        }
-
-        if (null !== $constraint->isbn10 && null === $constraint->isbn13
-                && $checkIsbn10 === false) {
-            $this->context->addViolation($constraint->isbn10Message);
-            return;
-        }
-
-        if (null !== $constraint->isbn13 && null === $constraint->isbn10
-                && $checkIsbn13 === false) {
-            $this->context->addViolation($constraint->isbn13Message);
+        } else {
+            if (null !== $constraint->isbn10 && null !== $constraint->isbn13) {
+                $this->context->addViolation($constraint->bothIsbnMessage);
+            } elseif (null !== $constraint->isbn10) {
+                $this->context->addViolation($constraint->isbn10Message);
+            } else {
+                $this->context->addViolation($constraint->isbn13Message);
+            }
         }
     }
 }

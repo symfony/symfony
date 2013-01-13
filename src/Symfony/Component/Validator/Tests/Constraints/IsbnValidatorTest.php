@@ -16,7 +16,6 @@ use Symfony\Component\Validator\Constraints\IsbnValidator;
 
 /**
  * @see https://en.wikipedia.org/wiki/Isbn
- * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
  *
  */
 class IsbnValidatorTest extends \PHPUnit_Framework_TestCase

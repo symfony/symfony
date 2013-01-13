@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Monolog;
 
 use Monolog\Logger as BaseLogger;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
@@ -30,10 +30,20 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
         return parent::addRecord(BaseLogger::EMERGENCY, $message, $context);
     }
 
+    public function emergency($message, array $context = array())
+    {
+        return parent::addRecord(BaseLogger::EMERGENCY, $message, $context);
+    }
+
     /**
      * @deprecated since 2.2, to be removed in 3.0. Use critical() which is PSR-3 compatible.
      */
     public function crit($message, array $context = array())
+    {
+        return parent::addRecord(BaseLogger::CRITICAL, $message, $context);
+    }
+
+    public function critical($message, array $context = array())
     {
         return parent::addRecord(BaseLogger::CRITICAL, $message, $context);
     }
@@ -46,12 +56,27 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
         return parent::addRecord(BaseLogger::ERROR, $message, $context);
     }
 
+    public function error($message, array $context = array())
+    {
+        return parent::addRecord(BaseLogger::ERROR, $message, $context);
+    }
+
     /**
      * @deprecated since 2.2, to be removed in 3.0. Use warning() which is PSR-3 compatible.
      */
     public function warn($message, array $context = array())
     {
         return parent::addRecord(BaseLogger::WARNING, $message, $context);
+    }
+
+    public function warning($message, array $context = array())
+    {
+        return parent::addRecord(BaseLogger::WARNING, $message, $context);
+    }
+
+    public function log($level, $message, array $context = array())
+    {
+        return parent::addRecord($level, $message, $context);
     }
 
     /**

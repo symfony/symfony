@@ -746,7 +746,7 @@ EOF;
     {
         \$name = strtolower(\$name);
 
-        if (!array_key_exists(\$name, \$this->parameters)) {
+        if (!(isset(\$this->parameters[\$name]) || array_key_exists(\$name, \$this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', \$name));
         }
 
@@ -758,7 +758,9 @@ EOF;
      */
     public function hasParameter(\$name)
     {
-        return array_key_exists(strtolower(\$name), \$this->parameters);
+        \$name = strtolower(\$name);
+
+        return isset(\$this->parameters[\$name]) || array_key_exists(\$name, \$this->parameters);
     }
 
     /**

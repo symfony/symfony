@@ -487,6 +487,16 @@ class Request
     }
 
     /**
+     * Gets the list of trusted proxies.
+     *
+     * @return array An array of trusted proxies.
+     */
+    public static function getTrustedProxies()
+    {
+        return self::$trustedProxies;
+    }
+
+    /**
      * Sets the name for trusted headers.
      *
      * The following header keys are supported:
@@ -517,6 +527,8 @@ class Request
      * false otherwise.
      *
      * @return boolean
+     *
+     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use getTrustedProxies instead.
      */
     public static function isProxyTrusted()
     {
@@ -572,7 +584,7 @@ class Request
      * Be warned that enabling this feature might lead to CSRF issues in your code.
      * Check that you are using CSRF tokens when required.
      *
-     * The HTTP method can only be overriden when the real HTTP method is POST.
+     * The HTTP method can only be overridden when the real HTTP method is POST.
      */
     public static function enableHttpMethodParameterOverride()
     {
@@ -676,8 +688,6 @@ class Request
      *
      * @see http://en.wikipedia.org/wiki/X-Forwarded-For
      *
-     * @deprecated The proxy argument is deprecated since version 2.0 and will be removed in 2.3. Use setTrustedProxies instead.
-     *
      * @api
      */
     public function getClientIp()
@@ -722,7 +732,7 @@ class Request
      *
      *  * http://localhost/mysite              returns an empty string
      *  * http://localhost/mysite/about        returns '/about'
-     *  * htpp://localhost/mysite/enco%20ded   returns '/enco%20ded'
+     *  * http://localhost/mysite/enco%20ded   returns '/enco%20ded'
      *  * http://localhost/mysite/about?var=1  returns '/about'
      *
      * @return string The raw path (i.e. not urldecoded)
@@ -916,8 +926,7 @@ class Request
      */
     public function getUri()
     {
-        $qs = $this->getQueryString();
-        if (null !== $qs) {
+        if (null !== $qs = $this->getQueryString()) {
             $qs = '?'.$qs;
         }
 
@@ -1404,7 +1413,8 @@ class Request
      * Returns true if the request is a XMLHttpRequest.
      *
      * It works if your JavaScript library set an X-Requested-With HTTP header.
-     * It is known to work with Prototype, Mootools, jQuery.
+     * It is known to work with common JavaScript frameworks:
+     * @link http://en.wikipedia.org/wiki/List_of_Ajax_frameworks#JavaScript
      *
      * @return Boolean true if the request is an XMLHttpRequest, false otherwise
      *

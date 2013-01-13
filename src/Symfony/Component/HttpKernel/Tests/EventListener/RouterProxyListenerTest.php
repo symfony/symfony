@@ -26,7 +26,7 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testOnlyTrigerredOnProxyRoute()
+    public function testOnlyTriggeredOnProxyRoute()
     {
         $request = Request::create('http://example.com/foo?path=foo%3D=bar');
 

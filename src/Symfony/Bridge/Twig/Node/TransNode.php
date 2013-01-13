@@ -41,7 +41,7 @@ class TransNode extends \Twig_Node
         $method = null === $this->getNode('count') ? 'trans' : 'transChoice';
 
         $compiler
-            ->write('echo $this->env->getExtension(\'translator\')->getTranslator()->'.$method.'(')
+            ->write('echo twig_escape_filter($this->env, $this->env->getExtension(\'translator\')->getTranslator()->'.$method.'(')
             ->subcompile($msg)
         ;
 
@@ -80,7 +80,7 @@ class TransNode extends \Twig_Node
                 ->subcompile($this->getNode('locale'))
             ;
         }
-        $compiler->raw(");\n");
+        $compiler->raw("), \"html\", null, true);\n");
     }
 
     protected function compileString(\Twig_NodeInterface $body, \Twig_Node_Expression_Array $vars)

@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Monolog;
 
 use Monolog\Logger as BaseLogger;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**

@@ -17,7 +17,7 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
@@ -49,6 +49,11 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
     private $message;
 
     /**
+     * @var string
+     */
+    private $messageTemplate;
+
+    /**
      * @var array
      */
     private $params;
@@ -62,6 +67,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->mapper = new ViolationMapper();
         $this->message = 'Message';
+        $this->messageTemplate = 'Message template';
         $this->params = array('foo' => 'bar');
     }
 
@@ -101,7 +107,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
      */
     protected function getConstraintViolation($propertyPath)
     {
-        return new ConstraintViolation($this->message, $this->params, null, $propertyPath, null);
+        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, $propertyPath, null);
     }
 
     /**
@@ -109,7 +115,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
      */
     protected function getFormError()
     {
-        return new FormError($this->message, $this->params);
+        return new FormError($this->message, $this->messageTemplate, $this->params);
     }
 
     public function testMapToVirtualFormIfDataDoesNotMatch()

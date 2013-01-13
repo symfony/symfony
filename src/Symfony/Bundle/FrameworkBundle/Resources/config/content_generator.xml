@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="http_content_renderer.class">Symfony\Component\HttpKernel\HttpContentRenderer</parameter>
+        <parameter key="http_content_renderer.strategy.default.class">Symfony\Component\HttpKernel\RenderingStrategy\DefaultRenderingStrategy</parameter>
+        <parameter key="http_content_renderer.strategy.hinclude.class">Symfony\Component\HttpKernel\RenderingStrategy\HIncludeRenderingStrategy</parameter>
+        <parameter key="http_content_renderer.strategy.hinclude.global_template"></parameter>
+        <parameter key="http_content_renderer.listener.router_proxy.class">Symfony\Component\HttpKernel\EventListener\RouterProxyListener</parameter>
+    </parameters>
+
+    <services>
+        <service id="http_content_renderer" class="%http_content_renderer.class%">
+            <tag name="kernel.event_subscriber" />
+            <argument type="collection" />
+            <argument>%kernel.debug%</argument>
+        </service>
+
+        <service id="http_content_renderer.strategy.default" class="%http_content_renderer.strategy.default.class%">
+            <tag name="kernel.content_renderer_strategy" />
+            <argument type="service" id="http_kernel" />
+            <call method="setUrlGenerator"><argument type="service" id="router" /></call>
+        </service>
+
+        <service id="http_content_renderer.strategy.hinclude" class="%http_content_renderer.strategy.hinclude.class%">
+            <tag name="kernel.content_renderer_strategy" />
+            <argument type="service" id="templating" on-invalid="null" />
+            <argument type="service" id="uri_signer" />
+            <argument>%http_content_renderer.strategy.hinclude.global_template%</argument>
+            <call method="setUrlGenerator"><argument type="service" id="router" /></call>
+        </service>
+
+<!-- FIXME: make the listener registration optional via a configuration setting? -->
+        <service id="http_content_renderer.listener.router_proxy" class="%http_content_renderer.listener.router_proxy.class%">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="uri_signer" />
+        </service>
+
+    </services>
+</container>

@@ -23,11 +23,11 @@
                 <target>O valor seleccionado non é unha opción válida.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choices.</source>
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
                 <target>Debe seleccionar polo menos {{ limit }} opción.|Debe seleccionar polo menos {{ limit }} opcions.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choices.</source>
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
                 <target>Debe seleccionar como máximo {{ limit }} opción.|Debe seleccionar como máximo {{ limit }} opcions.</target>
             </trans-unit>
             <trans-unit id="8">
@@ -75,7 +75,7 @@
                 <target>Este valor debería ser {{ limit }} ou menos.</target>
             </trans-unit>
             <trans-unit id="19">
-                <source>This value is too long. It should have {{ limit }} characters or less.</source>
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
                 <target>Este valor é demasiado longo. Debería ter {{ limit }} carácter ou menos.|Este valor é demasiado longo. Debería ter {{ limit }} caracteres ou menos.</target>
             </trans-unit>
             <trans-unit id="20">
@@ -83,7 +83,7 @@
                 <target>Este valor debería ser {{ limit }} ou máis.</target>
             </trans-unit>
             <trans-unit id="21">
-                <source>This value is too short. It should have {{ limit }} characters or more.</source>
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
                 <target>Este valor é demasiado curto. Debería ter {{ limit }} carácter ou máis.|Este valor é demasiado corto. Debería ter {{ limit }} caracteres ou máis.</target>
             </trans-unit>
             <trans-unit id="22">
@@ -179,7 +179,7 @@
                 <target>Este valor debería ser a contrasinal actual do usuario.</target>
             </trans-unit>
             <trans-unit id="48">
-                <source>This value should have exactly {{ limit }} characters.</source>
+                <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
                 <target>Este valor debería ter exactamente {{ limit }} carácter.|Este valor debería ter exactamente {{ limit }} caracteres.</target>
             </trans-unit>
             <trans-unit id="49">
@@ -203,15 +203,15 @@
                 <target>Unha extensión de PHP provocou que a subida fallara.</target>
             </trans-unit>
             <trans-unit id="54">
-                <source>This collection should contain {{ limit }} elements or more.</source>
+                <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
                 <target>Esta colección debe conter {{ limit }} elemento ou máis.|Esta colección debe conter {{ limit }} elementos ou máis.</target>
             </trans-unit>
             <trans-unit id="55">
-                <source>This collection should contain {{ limit }} elements or less.</source>
+                <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
                 <target>Esta colección debe conter {{ limit }} elemento ou menos.|Esta colección debe conter {{ limit }} elementos ou menos.</target>
             </trans-unit>
             <trans-unit id="56">
-                <source>This collection should contain exactly {{ limit }} elements.</source>
+                <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
                 <target>Esta colección debe conter exactamente {{ limit }} elemento.|Esta colección debe conter exactamente {{ limit }} elementos.</target>
             </trans-unit>
             <trans-unit id="57">

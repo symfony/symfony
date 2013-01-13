@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 class Logger implements LoggerInterface
 {
@@ -22,67 +22,107 @@ class Logger implements LoggerInterface
         $this->clear();
     }
 
-    public function getLogs($priority = false)
+    public function getLogs($level = false)
     {
-        return false === $priority ? $this->logs : $this->logs[$priority];
+        return false === $level ? $this->logs : $this->logs[$level];
     }
 
     public function clear()
     {
         $this->logs = array(
-            'emerg' => array(),
+            'emergency' => array(),
             'alert' => array(),
-            'crit' => array(),
-            'err' => array(),
-            'warn' => array(),
+            'critical' => array(),
+            'error' => array(),
+            'warning' => array(),
             'notice' => array(),
             'info' => array(),
             'debug' => array(),
         );
     }
 
-    public function log($message, $priority)
+    public function log($level, $message, array $context = array())
     {
-        $this->logs[$priority][] = $message;
+        $this->logs[$level][] = $message;
     }
 
-    public function emerg($message, array $context = array())
+    public function emergency($message, array $context = array())
     {
-        $this->log($message, 'emerg');
+        $this->log('emergency', $message, $context);
     }
 
     public function alert($message, array $context = array())
     {
-        $this->log($message, 'alert');
+        $this->log('alert', $message, $context);
     }
 
-    public function crit($message, array $context = array())
+    public function critical($message, array $context = array())
     {
-        $this->log($message, 'crit');
+        $this->log('critical', $message, $context);
     }
 
-    public function err($message, array $context = array())
+    public function error($message, array $context = array())
     {
-        $this->log($message, 'err');
+        $this->log('error', $message, $context);
     }
 
-    public function warn($message, array $context = array())
+    public function warning($message, array $context = array())
     {
-        $this->log($message, 'warn');
+        $this->log('warning', $message, $context);
     }
 
     public function notice($message, array $context = array())
     {
-        $this->log($message, 'notice');
+        $this->log('notice', $message, $context);
     }
 
     public function info($message, array $context = array())
     {
-        $this->log($message, 'info');
+        $this->log('info', $message, $context);
     }
 
     public function debug($message, array $context = array())
     {
-        $this->log($message, 'debug');
+        $this->log('debug', $message, $context);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function emerg($message, array $context = array())
+    {
+        trigger_error('Use emergency() which is PSR-3 compatible', E_USER_DEPRECATED);
+
+        $this->log('emergency', $message, $context);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function crit($message, array $context = array())
+    {
+        trigger_error('Use crit() which is PSR-3 compatible', E_USER_DEPRECATED);
+
+        $this->log('critical', $message, $context);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function err($message, array $context = array())
+    {
+        trigger_error('Use err() which is PSR-3 compatible', E_USER_DEPRECATED);
+
+        $this->log('error', $message, $context);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function warn($message, array $context = array())
+    {
+        trigger_error('Use warn() which is PSR-3 compatible', E_USER_DEPRECATED);
+
+        $this->log('warning', $message, $context);
     }
 }

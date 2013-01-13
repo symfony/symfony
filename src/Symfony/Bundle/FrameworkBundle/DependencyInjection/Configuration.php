@@ -370,6 +370,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
+                        ->scalarNode('translation_domain')->defaultValue('validators')->end()
                     ->end()
                 ->end()
             ->end()

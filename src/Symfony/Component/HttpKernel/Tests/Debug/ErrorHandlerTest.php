@@ -67,7 +67,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
         restore_error_handler();
 
-        $logger = $this->getMock('Symfony\Component\HttpKernel\Log\LoggerInterface');
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
 
         $that = $this;
         $warnArgCheck = function($message, $context) use ($that) {
@@ -84,7 +84,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
         $logger
             ->expects($this->once())
-            ->method('warn')
+            ->method('warning')
             ->will($this->returnCallback($warnArgCheck))
         ;
 

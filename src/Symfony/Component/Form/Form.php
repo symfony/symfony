@@ -16,8 +16,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Util\FormUtil;
-use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
  * Form represents a form.
@@ -367,11 +367,12 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Hook to change content of the data
         if ($dispatcher->hasListeners(FormEvents::PRE_SET_DATA) || $dispatcher->hasListeners(FormEvents::SET_DATA)) {
-            set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
             $event = new FormEvent($this, $modelData);
-            restore_error_handler();
             $dispatcher->dispatch(FormEvents::PRE_SET_DATA, $event);
             // BC until 2.3
+            if ($dispatcher->hasListeners(FormEvents::SET_DATA)) {
+                trigger_error('The FormEvents::SET_DATA event is deprecated since 2.1 and will be removed in 2.3. Use the FormEvents::PRE_SET_DATA event instead.', E_USER_DEPRECATED);
+            }
             $dispatcher->dispatch(FormEvents::SET_DATA, $event);
             $modelData = $event->getData();
         }
@@ -532,17 +533,18 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Hook to change content of the data bound by the browser
         if ($dispatcher->hasListeners(FormEvents::PRE_BIND) || $dispatcher->hasListeners(FormEvents::BIND_CLIENT_DATA)) {
-            set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
             $event = new FormEvent($this, $submittedData);
-            restore_error_handler();
             $dispatcher->dispatch(FormEvents::PRE_BIND, $event);
             // BC until 2.3
+            if ($dispatcher->hasListeners(FormEvents::BIND_CLIENT_DATA)) {
+                trigger_error('The FormEvents::BIND_CLIENT_DATA event is deprecated since 2.1 and will be removed in 2.3. Use the FormEvents::PRE_BIND event instead.', E_USER_DEPRECATED);
+            }
             $dispatcher->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
             $submittedData = $event->getData();
         }
 
         // Check whether the form is compound.
-        // This check is preferrable over checking the number of children,
+        // This check is preferable over checking the number of children,
         // since forms without children may also be compound.
         // (think of empty collection forms)
         if ($this->config->getCompound()) {
@@ -594,11 +596,12 @@ class Form implements \IteratorAggregate, FormInterface
             // Hook to change content of the data into the normalized
             // representation
             if ($dispatcher->hasListeners(FormEvents::BIND) || $dispatcher->hasListeners(FormEvents::BIND_NORM_DATA)) {
-                set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
                 $event = new FormEvent($this, $normData);
-                restore_error_handler();
                 $dispatcher->dispatch(FormEvents::BIND, $event);
                 // BC until 2.3
+                if ($dispatcher->hasListeners(FormEvents::BIND_NORM_DATA)) {
+                    trigger_error('The FormEvents::BIND_NORM_DATA event is deprecated since 2.1 and will be removed in 2.3. Use the FormEvents::BIND event instead.', E_USER_DEPRECATED);
+                }
                 $dispatcher->dispatch(FormEvents::BIND_NORM_DATA, $event);
                 $normData = $event->getData();
             }
@@ -621,10 +624,14 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
-        foreach ($this->config->getValidators() as $validator) {
+        $validators = $this->config->getValidators();
+        restore_error_handler();
+
+        foreach ($validators as $validator) {
+            trigger_error(sprintf('FormConfigInterface::getValidators() is deprecated since 2.1 and will be removed in 2.3. Convert your %s class to a listener on the FormEvents::POST_BIND event.', get_class($validator)), E_USER_DEPRECATED);
+
             $validator->validate($this);
         }
-        restore_error_handler();
 
         return $this;
     }
@@ -837,7 +844,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getChildren()
     {
-        trigger_error('getChilren() is deprecated since version 2.1 and will be removed in 2.3. Use all() instead.', E_USER_DEPRECATED);
+        trigger_error('getChildren() is deprecated since version 2.1 and will be removed in 2.3. Use all() instead.', E_USER_DEPRECATED);
 
         return $this->all();
     }

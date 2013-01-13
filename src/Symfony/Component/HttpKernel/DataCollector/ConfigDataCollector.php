@@ -54,6 +54,7 @@ class ConfigDataCollector extends DataCollector
             'xcache_enabled'   => extension_loaded('xcache') && ini_get('xcache.cacher'),
             'wincache_enabled' => extension_loaded('wincache') && ini_get('wincache.ocenabled'),
             'bundles'          => array(),
+            'sapi_name'        => php_sapi_name()
         );
 
         if (isset($this->kernel)) {
@@ -186,6 +187,16 @@ class ConfigDataCollector extends DataCollector
     public function getBundles()
     {
         return $this->data['bundles'];
+    }
+
+    /**
+     * Gets the PHP SAPI name.
+     *
+     * @return string The environment
+     */
+    public function getSapiName()
+    {
+        return $this->data['sapi_name'];
     }
 
     /**

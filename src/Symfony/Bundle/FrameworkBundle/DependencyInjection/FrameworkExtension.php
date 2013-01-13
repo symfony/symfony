@@ -41,6 +41,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('web.xml');
         $loader->load('services.xml');
+        $loader->load('content_generator.xml');
 
         // A translator must always be registered (as support is included by
         // default in the Form component). If disabled, an identity translator
@@ -527,6 +528,11 @@ class FrameworkExtension extends Extension
 
                 $dirs[] = dirname($r->getFilename()).'/Resources/translations';
             }
+            if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
+                $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
+
+                $dirs[] = dirname($r->getFilename()).'/../../Resources/translations';
+            }
             $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
             foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
                 $reflection = new \ReflectionClass($class);
@@ -574,6 +580,7 @@ class FrameworkExtension extends Extension
     {
         $loader->load('validator.xml');
 
+        $container->setParameter('validator.translation_domain', $config['translation_domain']);
         $container->setParameter('validator.mapping.loader.xml_files_loader.mapping_files', $this->getValidatorXmlMappingFiles($container));
         $container->setParameter('validator.mapping.loader.yaml_files_loader.mapping_files', $this->getValidatorYamlMappingFiles($container));
 

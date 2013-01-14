@@ -29,8 +29,9 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  * and on each method.
  *
  * The @Route annotation main value is the route path. The annotation also
- * recognizes three parameters: requirements, options, and name. The name parameter
- * is mandatory. Here is an example of how you should be able to use it:
+ * recognizes several parameters: requirements, options, defaults, schemes,
+ * methods, hostname, and name. The name parameter is mandatory.
+ * Here is an example of how you should be able to use it:
  *
  *     /**
  *      * @Route("/Blog")
@@ -112,6 +113,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
             'requirements' => array(),
             'options'      => array(),
             'defaults'     => array(),
+            'schemes'      => array(),
+            'methods'      => array(),
             'hostname'     => '',
         );
 
@@ -138,6 +141,14 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
             if (null !== $annot->getDefaults()) {
                 $globals['defaults'] = $annot->getDefaults();
+            }
+
+            if (null !== $annot->getSchemes()) {
+                $globals['schemes'] = $annot->getSchemes();
+            }
+
+            if (null !== $annot->getMethods()) {
+                $globals['methods'] = $annot->getMethods();
             }
 
             if (null !== $annot->getHostname()) {
@@ -175,13 +186,15 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
         $requirements = array_replace($globals['requirements'], $annot->getRequirements());
         $options = array_replace($globals['options'], $annot->getOptions());
+        $schemes = array_replace($globals['schemes'], $annot->getSchemes());
+        $methods = array_replace($globals['methods'], $annot->getMethods());
 
         $hostname = $annot->getHostname();
         if (null === $hostname) {
             $hostname = $globals['hostname'];
         }
 
-        $route = new Route($globals['path'].$annot->getPath(), $defaults, $requirements, $options, $hostname);
+        $route = new Route($globals['path'].$annot->getPath(), $defaults, $requirements, $options, $hostname, $schemes, $methods);
 
         $this->configureRoute($route, $class, $method, $annot);
 

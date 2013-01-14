@@ -33,9 +33,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->any())
             ->method('getGroup')
             ->will($this->returnValue('MyGroup'));
-        $this->context->expects($this->any())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('foo.bar'));
     }
 
     protected function tearDown()

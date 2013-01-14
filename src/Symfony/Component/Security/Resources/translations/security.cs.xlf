@@ -12,7 +12,7 @@
             </trans-unit>
             <trans-unit id="3">
                 <source>Authentication request could not be processed due to a system problem.</source>
-                <target>Požadavek na ověření nemohl být zpracován kvôli systémové chybě.</target>
+                <target>Požadavek na ověření nemohl být zpracován kvůli systémové chybě.</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>Invalid credentials.</source>

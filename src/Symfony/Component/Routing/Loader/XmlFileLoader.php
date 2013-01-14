@@ -121,7 +121,7 @@ class XmlFileLoader extends FileLoader
 
         list($defaults, $requirements, $options) = $this->parseConfigs($node, $path);
 
-        $route = new Route($node->getAttribute('pattern'), $defaults, $requirements, $options, $node->getAttribute('hostname-pattern'), $schemes, $methods);
+        $route = new Route($node->getAttribute('pattern'), $defaults, $requirements, $options, $node->getAttribute('hostname'), $schemes, $methods);
         $collection->add($id, $route);
     }
 
@@ -143,7 +143,7 @@ class XmlFileLoader extends FileLoader
 
         $type = $node->getAttribute('type');
         $prefix = $node->getAttribute('prefix');
-        $hostnamePattern = $node->hasAttribute('hostname-pattern') ? $node->getAttribute('hostname-pattern') : null;
+        $hostname = $node->hasAttribute('hostname') ? $node->getAttribute('hostname') : null;
         $schemes = $node->hasAttribute('schemes') ? array_filter(explode(' ', $node->getAttribute('schemes'))) : null;
         $methods = $node->hasAttribute('methods') ? array_filter(explode(' ', $node->getAttribute('methods'))) : null;
 
@@ -154,8 +154,8 @@ class XmlFileLoader extends FileLoader
         $subCollection = $this->import($resource, ('' !== $type ? $type : null), false, $file);
         /* @var $subCollection RouteCollection */
         $subCollection->addPrefix($prefix);
-        if (null !== $hostnamePattern) {
-            $subCollection->setHostnamePattern($hostnamePattern);
+        if (null !== $hostname) {
+            $subCollection->setHostname($hostname);
         }
         if (null !== $schemes) {
             $subCollection->setSchemes($schemes);

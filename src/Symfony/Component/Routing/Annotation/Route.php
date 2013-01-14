@@ -25,7 +25,7 @@ class Route
     private $requirements;
     private $options;
     private $defaults;
-    private $hostnamePattern;
+    private $hostname;
 
     /**
      * Constructor.
@@ -62,14 +62,14 @@ class Route
         return $this->pattern;
     }
 
-    public function setHostnamePattern($pattern)
+    public function setHostname($pattern)
     {
-        $this->hostnamePattern = $pattern;
+        $this->hostname = $pattern;
     }
 
-    public function getHostnamePattern()
+    public function getHostname()
     {
-        return $this->hostnamePattern;
+        return $this->hostname;
     }
 
     public function setName($name)

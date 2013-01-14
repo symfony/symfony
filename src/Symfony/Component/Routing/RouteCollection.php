@@ -261,10 +261,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param array  $defaults     An array of default values
      * @param array  $requirements An array of requirements
      */
-    public function setHostnamePattern($pattern, array $defaults = array(), array $requirements = array())
+    public function setHostname($pattern, array $defaults = array(), array $requirements = array())
     {
         foreach ($this->routes as $route) {
-            $route->setHostnamePattern($pattern);
+            $route->setHostname($pattern);
             $route->addDefaults($defaults);
             $route->addRequirements($requirements);
         }

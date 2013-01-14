@@ -28,7 +28,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'resource', 'type', 'prefix', 'pattern', 'hostname_pattern', 'schemes', 'methods', 'defaults', 'requirements', 'options',
+        'resource', 'type', 'prefix', 'pattern', 'hostname', 'schemes', 'methods', 'defaults', 'requirements', 'options',
     );
 
     /**
@@ -98,11 +98,11 @@ class YamlFileLoader extends FileLoader
         $defaults = isset($config['defaults']) ? $config['defaults'] : array();
         $requirements = isset($config['requirements']) ? $config['requirements'] : array();
         $options = isset($config['options']) ? $config['options'] : array();
-        $hostnamePattern = isset($config['hostname_pattern']) ? $config['hostname_pattern'] : '';
+        $hostname = isset($config['hostname']) ? $config['hostname'] : '';
         $schemes = isset($config['schemes']) ? $config['schemes'] : array();
         $methods = isset($config['methods']) ? $config['methods'] : array();
 
-        $route = new Route($config['pattern'], $defaults, $requirements, $options, $hostnamePattern, $schemes, $methods);
+        $route = new Route($config['pattern'], $defaults, $requirements, $options, $hostname, $schemes, $methods);
 
         $collection->add($name, $route);
     }
@@ -122,7 +122,7 @@ class YamlFileLoader extends FileLoader
         $defaults = isset($config['defaults']) ? $config['defaults'] : array();
         $requirements = isset($config['requirements']) ? $config['requirements'] : array();
         $options = isset($config['options']) ? $config['options'] : array();
-        $hostnamePattern = isset($config['hostname_pattern']) ? $config['hostname_pattern'] : null;
+        $hostname = isset($config['hostname']) ? $config['hostname'] : null;
         $schemes = isset($config['schemes']) ? $config['schemes'] : null;
         $methods = isset($config['methods']) ? $config['methods'] : null;
 
@@ -131,8 +131,8 @@ class YamlFileLoader extends FileLoader
         $subCollection = $this->import($config['resource'], $type, false, $file);
         /* @var $subCollection RouteCollection */
         $subCollection->addPrefix($prefix);
-        if (null !== $hostnamePattern) {
-            $subCollection->setHostnamePattern($hostnamePattern);
+        if (null !== $hostname) {
+            $subCollection->setHostname($hostname);
         }
         if (null !== $schemes) {
             $subCollection->setSchemes($schemes);

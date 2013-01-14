@@ -46,8 +46,8 @@ class RouteCompiler implements RouteCompilerInterface
         $hostnameRegex = null;
         $hostnameTokens = array();
 
-        if ('' !== $hostnamePattern = $route->getHostnamePattern()) {
-            $result = $this->compilePattern($route, $hostnamePattern, true);
+        if ('' !== $hostname = $route->getHostname()) {
+            $result = $this->compilePattern($route, $hostname, true);
 
             $hostnameVariables = $result['variables'];
             $variables = array_merge($variables, $hostnameVariables);

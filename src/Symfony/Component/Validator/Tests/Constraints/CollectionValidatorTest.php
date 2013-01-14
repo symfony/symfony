@@ -21,20 +21,15 @@ use Symfony\Component\Validator\Constraints\CollectionValidator;
 
 abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    protected $walker;
     protected $context;
     protected $validator;
 
     protected function setUp()
     {
-        $this->walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new CollectionValidator();
         $this->validator->initialize($this->context);
 
-        $this->context->expects($this->any())
-            ->method('getGraphWalker')
-            ->will($this->returnValue($this->walker));
         $this->context->expects($this->any())
             ->method('getGroup')
             ->will($this->returnValue('MyGroup'));
@@ -45,7 +40,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        $this->walker = null;
         $this->context = null;
         $this->validator = null;
     }
@@ -66,7 +60,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         set_error_handler(array($this, "deprecationErrorHandler"));
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $this->validator->validate(null, new Collection(array('fields' => array(
             'foo' => new Min(4),
@@ -82,7 +76,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $data = $this->prepareTestData(array('foo' => 'foobar'));
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $this->validator->validate($data, new Collection(array(
             'foo' => new Min(4),
@@ -115,18 +109,18 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => 3,
             'bar' => 5,
         );
-        $i = 0;
+        $i = 1;
 
         foreach ($array as $key => $value) {
-            $this->walker->expects($this->at($i++))
-                ->method('walkConstraint')
-                ->with($constraint, $value, 'MyGroup', 'foo.bar['.$key.']');
+            $this->context->expects($this->at($i++))
+                ->method('validateValue')
+                ->with($value, $constraint, '['.$key.']', 'MyGroup');
         }
 
         $data = $this->prepareTestData($array);
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $this->validator->validate($data, new Collection(array(
             'fields' => array(
@@ -149,20 +143,20 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => 3,
             'bar' => 5,
         );
-        $i = 0;
+        $i = 1;
 
         foreach ($array as $key => $value) {
             foreach ($constraints as $constraint) {
-                $this->walker->expects($this->at($i++))
-                    ->method('walkConstraint')
-                    ->with($constraint, $value, 'MyGroup', 'foo.bar['.$key.']');
+                $this->context->expects($this->at($i++))
+                    ->method('validateValue')
+                    ->with($value, $constraint, '['.$key.']', 'MyGroup');
             }
         }
 
         $data = $this->prepareTestData($array);
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $this->validator->validate($data, new Collection(array(
             'fields' => array(
@@ -182,7 +176,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->once())
-            ->method('addViolationAtSubPath')
+            ->method('addViolationAt')
             ->with('[baz]', 'myMessage', array(
                 '{{ field }}' => 'baz'
             ));
@@ -213,7 +207,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $this->validator->validate($data, $constraint);
 
@@ -237,7 +231,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $this->validator->validate($data, $constraint);
 
@@ -258,7 +252,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->once())
-            ->method('addViolationAtSubPath')
+            ->method('addViolationAt')
             ->with('[foo]', 'myMessage', array(
                 '{{ field }}' => 'foo',
             ));
@@ -282,7 +276,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $this->validator->validate($data, $constraint);
 
@@ -296,7 +290,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $this->validator->validate($data, new Collection(array(
             'foo' => new Optional(),
@@ -308,7 +302,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $data = $this->prepareTestData(array());
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $this->validator->validate($data, new Collection(array(
             'foo' => new Optional(),
@@ -325,12 +319,12 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraint = new Min(4);
 
-        $this->walker->expects($this->once())
-            ->method('walkConstraint')
-            ->with($constraint, $array['foo'], 'MyGroup', 'foo.bar[foo]');
+        $this->context->expects($this->once())
+            ->method('validateValue')
+            ->with($array['foo'], $constraint, '[foo]', 'MyGroup');
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $data = $this->prepareTestData($array);
 
@@ -353,15 +347,16 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             new NotNull(),
             new Min(4),
         );
+        $i = 1;
 
-        foreach ($constraints as $i => $constraint) {
-            $this->walker->expects($this->at($i))
-                ->method('walkConstraint')
-                ->with($constraint, $array['foo'], 'MyGroup', 'foo.bar[foo]');
+        foreach ($constraints as $constraint) {
+            $this->context->expects($this->at($i++))
+                ->method('validateValue')
+                ->with($array['foo'], $constraint, '[foo]', 'MyGroup');
         }
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $data = $this->prepareTestData($array);
 
@@ -379,7 +374,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $this->validator->validate($data, new Collection(array(
             'foo' => new Required(),
@@ -391,15 +386,15 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $data = $this->prepareTestData(array());
 
         $this->context->expects($this->once())
-            ->method('addViolationAtSubPath')
+            ->method('addViolationAt')
             ->with('[foo]', 'myMessage', array(
                 '{{ field }}' => 'foo',
             ));
 
         $this->validator->validate($data, new Collection(array(
             'fields' => array(
-                 'foo' => new Required(),
-             ),
+                'foo' => new Required(),
+            ),
             'missingFieldsMessage' => 'myMessage',
         )));
     }
@@ -414,12 +409,12 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraint = new Min(4);
 
-        $this->walker->expects($this->once())
-            ->method('walkConstraint')
-            ->with($constraint, $array['foo'], 'MyGroup', 'foo.bar[foo]');
+        $this->context->expects($this->once())
+            ->method('validateValue')
+            ->with($array['foo'], $constraint, '[foo]', 'MyGroup');
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $data = $this->prepareTestData($array);
 
@@ -442,15 +437,16 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             new NotNull(),
             new Min(4),
         );
+        $i = 1;
 
-        foreach ($constraints as $i => $constraint) {
-            $this->walker->expects($this->at($i))
-                ->method('walkConstraint')
-                ->with($constraint, $array['foo'], 'MyGroup', 'foo.bar[foo]');
+        foreach ($constraints as $constraint) {
+            $this->context->expects($this->at($i++))
+                ->method('validateValue')
+                ->with($array['foo'], $constraint, '[foo]', 'MyGroup');
         }
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $data = $this->prepareTestData($array);
 

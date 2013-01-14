@@ -41,6 +41,8 @@ class RouteTest extends \PHPUnit_Framework_TestCase
            array('options', array('compiler_class' => 'RouteCompiler'), 'getOptions'),
            array('name', 'blog_index', 'getName'),
            array('defaults', array('_controller' => 'MyBlogBundle:Blog:index'), 'getDefaults'),
+           array('schemes', array('https'), 'getSchemes'),
+           array('methods', array('GET', 'POST'), 'getMethods'),
            array('hostname', array('{locale}.example.com'), 'getHostname')
         );
     }

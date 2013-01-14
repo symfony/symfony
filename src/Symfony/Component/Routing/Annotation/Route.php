@@ -26,6 +26,8 @@ class Route
     private $options;
     private $defaults;
     private $hostname;
+    private $methods;
+    private $schemes;
 
     /**
      * Constructor.
@@ -37,6 +39,8 @@ class Route
         $this->requirements = array();
         $this->options = array();
         $this->defaults = array();
+        $this->methods = array();
+        $this->schemes = array();
 
         if (isset($data['value'])) {
             $data['path'] = $data['value'];
@@ -126,5 +130,25 @@ class Route
     public function getDefaults()
     {
         return $this->defaults;
+    }
+
+    public function setSchemes($schemes)
+    {
+        $this->schemes = is_array($schemes) ? $schemes : array($schemes);
+    }
+
+    public function getSchemes()
+    {
+        return $this->schemes;
+    }
+
+    public function setMethods($methods)
+    {
+        $this->methods = is_array($methods) ? $methods : array($methods);
+    }
+
+    public function getMethods()
+    {
+        return $this->methods;
     }
 }

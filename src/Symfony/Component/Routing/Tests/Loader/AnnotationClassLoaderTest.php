@@ -93,6 +93,8 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
             'requirements' => array(),
             'options'      => array(),
             'defaults'     => array(),
+            'schemes'      => array(),
+            'methods'      => array(),
         ), $routeDatas);
 
         $this->reader

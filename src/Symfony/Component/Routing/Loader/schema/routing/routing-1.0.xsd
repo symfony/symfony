@@ -46,7 +46,8 @@
     <xsd:group ref="configs" minOccurs="0" maxOccurs="unbounded" />
 
     <xsd:attribute name="id" type="xsd:string" use="required" />
-    <xsd:attribute name="pattern" type="xsd:string" use="required" />
+    <xsd:attribute name="path" type="xsd:string" />
+    <xsd:attribute name="pattern" type="xsd:string" />
     <xsd:attribute name="hostname" type="xsd:string" />
     <xsd:attribute name="schemes" type="stringlist" />
     <xsd:attribute name="methods" type="stringlist" />

@@ -18,7 +18,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $route = new Route('/{foo}', array('foo' => 'bar'), array('foo' => '\d+'), array('foo' => 'bar'), '{locale}.example.com');
-        $this->assertEquals('/{foo}', $route->getPattern(), '__construct() takes a pattern as its first argument');
+        $this->assertEquals('/{foo}', $route->getPath(), '__construct() takes a path as its first argument');
         $this->assertEquals(array('foo' => 'bar'), $route->getDefaults(), '__construct() takes defaults as its second argument');
         $this->assertEquals(array('foo' => '\d+'), $route->getRequirements(), '__construct() takes requirements as its third argument');
         $this->assertEquals('bar', $route->getOption('foo'), '__construct() takes options as its fourth argument');
@@ -33,18 +33,18 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('POST'), $route->getMethods(), '__construct() takes a single method as its seventh argument');
     }
 
-    public function testPattern()
+    public function testPath()
     {
         $route = new Route('/{foo}');
-        $route->setPattern('/{bar}');
-        $this->assertEquals('/{bar}', $route->getPattern(), '->setPattern() sets the pattern');
-        $route->setPattern('');
-        $this->assertEquals('/', $route->getPattern(), '->setPattern() adds a / at the beginning of the pattern if needed');
-        $route->setPattern('bar');
-        $this->assertEquals('/bar', $route->getPattern(), '->setPattern() adds a / at the beginning of the pattern if needed');
-        $this->assertEquals($route, $route->setPattern(''), '->setPattern() implements a fluent interface');
-        $route->setPattern('//path');
-        $this->assertEquals('/path', $route->getPattern(), '->setPattern() does not allow two slahes "//" at the beginning of the pattern as it would be confused with a network path when generating the path from the route');
+        $route->setPath('/{bar}');
+        $this->assertEquals('/{bar}', $route->getPath(), '->setPath() sets the path');
+        $route->setPath('');
+        $this->assertEquals('/', $route->getPath(), '->setPath() adds a / at the beginning of the path if needed');
+        $route->setPath('bar');
+        $this->assertEquals('/bar', $route->getPath(), '->setPath() adds a / at the beginning of the path if needed');
+        $this->assertEquals($route, $route->setPath(''), '->setPath() implements a fluent interface');
+        $route->setPath('//path');
+        $this->assertEquals('/path', $route->getPath(), '->setPath() does not allow two slahes "//" at the beginning of the path as it would be confused with a network path when generating the path from the route');
     }
 
     public function testOptions()
@@ -93,7 +93,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('\d+', $route->getRequirement('foo'), '->getRequirement() returns a requirement');
         $this->assertNull($route->getRequirement('bar'), '->getRequirement() returns null if a requirement is not defined');
         $route->setRequirements(array('foo' => '^\d+$'));
-        $this->assertEquals('\d+', $route->getRequirement('foo'), '->getRequirement() removes ^ and $ from the pattern');
+        $this->assertEquals('\d+', $route->getRequirement('foo'), '->getRequirement() removes ^ and $ from the path');
         $this->assertEquals($route, $route->setRequirements(array()), '->setRequirements() implements a fluent interface');
 
         $route->setRequirements(array('foo' => '\d+'));
@@ -106,7 +106,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     {
         $route = new Route('/{foo}');
         $route->setRequirement('foo', '^\d+$');
-        $this->assertEquals('\d+', $route->getRequirement('foo'), '->setRequirement() removes ^ and $ from the pattern');
+        $this->assertEquals('\d+', $route->getRequirement('foo'), '->setRequirement() removes ^ and $ from the path');
     }
 
     /**

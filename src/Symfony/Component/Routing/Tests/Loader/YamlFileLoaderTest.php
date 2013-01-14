@@ -70,7 +70,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $route = $routeCollection->get('#$péß^a|');
 
         $this->assertInstanceOf('Symfony\Component\Routing\Route', $route);
-        $this->assertSame('/true', $route->getPattern());
+        $this->assertSame('/true', $route->getPath());
     }
 
     public function testLoadWithPattern()
@@ -82,7 +82,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($routes), 'One route is loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
         $route = $routes['blog_show'];
-        $this->assertEquals('/blog/{slug}', $route->getPattern());
+        $this->assertEquals('/blog/{slug}', $route->getPath());
         $this->assertEquals('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
         $this->assertEquals('GET', $route->getRequirement('_method'));
         $this->assertEquals('\w+', $route->getRequirement('locale'));
@@ -98,7 +98,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($routes), 'One route is loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-        $this->assertEquals('/{foo}/blog/{slug}', $routes['blog_show']->getPattern());
+        $this->assertEquals('/{foo}/blog/{slug}', $routes['blog_show']->getPath());
         $this->assertEquals('MyBlogBundle:Blog:show', $routes['blog_show']->getDefault('_controller'));
         $this->assertEquals('123', $routes['blog_show']->getDefault('foo'));
         $this->assertEquals('\d+', $routes['blog_show']->getRequirement('foo'));

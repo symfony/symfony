@@ -29,7 +29,7 @@ class Route implements \Serializable
     /**
      * @var string
      */
-    private $hostnamePattern = '';
+    private $hostname = '';
 
     /**
      * @var array
@@ -70,24 +70,23 @@ class Route implements \Serializable
      *
      *  * compiler_class: A class name able to compile this route instance (RouteCompiler by default)
      *
-     * @param string       $pattern         The path pattern to match
-     * @param array        $defaults        An array of default parameter values
-     * @param array        $requirements    An array of requirements for parameters (regexes)
-     * @param array        $options         An array of options
-     * @param string       $hostnamePattern The hostname pattern to match
-     * @param string|array $schemes         A required URI scheme or an array of restricted schemes
-     * @param string|array $methods         A required HTTP method or an array of restricted methods
+     * @param string       $pattern      The path pattern to match
+     * @param array        $defaults     An array of default parameter values
+     * @param array        $requirements An array of requirements for parameters (regexes)
+     * @param array        $options      An array of options
+     * @param string       $hostname     The hostname pattern to match
+     * @param string|array $schemes      A required URI scheme or an array of restricted schemes
+     * @param string|array $methods      A required HTTP method or an array of restricted methods
      *
      * @api
      */
-    public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array(),
-                                $hostnamePattern = '', $schemes = array(), $methods = array())
+    public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array(), $hostname = '', $schemes = array(), $methods = array())
     {
         $this->setPattern($pattern);
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
         $this->setOptions($options);
-        $this->setHostnamePattern($hostnamePattern);
+        $this->setHostname($hostname);
         // The conditions make sure that an initial empty $schemes/$methods does not override the corresponding requirement.
         // They can be removed when the BC layer is removed.
         if ($schemes) {
@@ -101,13 +100,13 @@ class Route implements \Serializable
     public function serialize()
     {
         return serialize(array(
-            'pattern' => $this->pattern,
-            'hostnamePattern' => $this->hostnamePattern,
-            'defaults' => $this->defaults,
+            'pattern'      => $this->pattern,
+            'hostname'     => $this->hostname,
+            'defaults'     => $this->defaults,
             'requirements' => $this->requirements,
-            'options' => $this->options,
-            'schemes' => $this->schemes,
-            'methods' => $this->methods,
+            'options'      => $this->options,
+            'schemes'      => $this->schemes,
+            'methods'      => $this->methods,
         ));
     }
 
@@ -115,7 +114,7 @@ class Route implements \Serializable
     {
         $data = unserialize($data);
         $this->pattern = $data['pattern'];
-        $this->hostnamePattern = $data['hostnamePattern'];
+        $this->hostname = $data['hostname'];
         $this->defaults = $data['defaults'];
         $this->requirements = $data['requirements'];
         $this->options = $data['options'];
@@ -157,9 +156,9 @@ class Route implements \Serializable
      *
      * @return string The pattern
      */
-    public function getHostnamePattern()
+    public function getHostname()
     {
-        return $this->hostnamePattern;
+        return $this->hostname;
     }
 
     /**
@@ -167,9 +166,9 @@ class Route implements \Serializable
      *
      * @param string $pattern The pattern
      */
-    public function setHostnamePattern($pattern)
+    public function setHostname($pattern)
     {
-        $this->hostnamePattern = (string) $pattern;
+        $this->hostname = (string) $pattern;
         $this->compiled = null;
 
         return $this;

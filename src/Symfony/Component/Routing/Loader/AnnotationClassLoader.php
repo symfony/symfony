@@ -108,11 +108,11 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         $globals = array(
-            'pattern'          => '',
-            'requirements'     => array(),
-            'options'          => array(),
-            'defaults'         => array(),
-            'hostname_pattern' => '',
+            'pattern'      => '',
+            'requirements' => array(),
+            'options'      => array(),
+            'defaults'     => array(),
+            'hostname'     => '',
         );
 
         $class = new \ReflectionClass($class);
@@ -137,8 +137,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
                 $globals['defaults'] = $annot->getDefaults();
             }
 
-            if (null !== $annot->getHostnamePattern()) {
-                $globals['hostname_pattern'] = $annot->getHostnamePattern();
+            if (null !== $annot->getHostname()) {
+                $globals['hostname'] = $annot->getHostname();
             }
         }
 
@@ -173,12 +173,12 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $requirements = array_replace($globals['requirements'], $annot->getRequirements());
         $options = array_replace($globals['options'], $annot->getOptions());
 
-        $hostnamePattern = $annot->getHostnamePattern();
-        if (null === $hostnamePattern) {
-            $hostnamePattern = $globals['hostname_pattern'];
+        $hostname = $annot->getHostname();
+        if (null === $hostname) {
+            $hostname = $globals['hostname'];
         }
 
-        $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options, $hostnamePattern);
+        $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options, $hostname);
 
         $this->configureRoute($route, $class, $method, $annot);
 

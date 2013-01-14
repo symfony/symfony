@@ -111,7 +111,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
 
             foreach ($this->getConstrainedProperties() as $property) {
                 foreach ($this->getMemberMetadatas($property) as $member) {
-                    $member->accept($visitor, $member->getValue($value), $group, $pathPrefix.$property, $propagatedGroup);
+                    $member->accept($visitor, $member->getPropertyValue($value), $group, $pathPrefix.$property, $propagatedGroup);
                 }
             }
         }

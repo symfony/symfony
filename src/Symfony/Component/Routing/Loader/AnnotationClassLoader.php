@@ -28,7 +28,7 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  * The @Route annotation can be set on the class (for global parameters),
  * and on each method.
  *
- * The @Route annotation main value is the route pattern. The annotation also
+ * The @Route annotation main value is the route path. The annotation also
  * recognizes three parameters: requirements, options, and name. The name parameter
  * is mandatory. Here is an example of how you should be able to use it:
  *
@@ -108,7 +108,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         $globals = array(
-            'pattern'      => '',
+            'path'         => '',
             'requirements' => array(),
             'options'      => array(),
             'defaults'     => array(),
@@ -121,8 +121,11 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
-            if (null !== $annot->getPattern()) {
-                $globals['pattern'] = $annot->getPattern();
+            // for BC reasons
+            if (null !== $annot->getPath()) {
+                $globals['path'] = $annot->getPath();
+            } elseif (null !== $annot->getPattern()) {
+                $globals['path'] = $annot->getPattern();
             }
 
             if (null !== $annot->getRequirements()) {
@@ -178,7 +181,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $hostname = $globals['hostname'];
         }
 
-        $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options, $hostname);
+        $route = new Route($globals['path'].$annot->getPath(), $defaults, $requirements, $options, $hostname);
 
         $this->configureRoute($route, $class, $method, $annot);
 

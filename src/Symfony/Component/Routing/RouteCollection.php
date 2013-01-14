@@ -235,7 +235,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
         $options = func_num_args() > 3 ? func_get_arg(3) : array();
 
         foreach ($this->routes as $route) {
-            $route->setPattern('/' . $prefix . $route->getPattern());
+            $route->setPath('/' . $prefix . $route->getPath());
             $route->addDefaults($defaults);
             $route->addRequirements($requirements);
             $route->addOptions($options);

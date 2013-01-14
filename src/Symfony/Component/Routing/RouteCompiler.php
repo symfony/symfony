@@ -56,9 +56,9 @@ class RouteCompiler implements RouteCompilerInterface
             $hostnameRegex = $result['regex'];
         }
 
-        $pattern = $route->getPattern();
+        $path = $route->getPath();
 
-        $result = $this->compilePattern($route, $pattern, false);
+        $result = $this->compilePattern($route, $path, false);
 
         $staticPrefix = $result['staticPrefix'];
 

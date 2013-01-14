@@ -24,7 +24,7 @@ class Route implements \Serializable
     /**
      * @var string
      */
-    private $pattern = '/';
+    private $path = '/';
 
     /**
      * @var string
@@ -70,7 +70,7 @@ class Route implements \Serializable
      *
      *  * compiler_class: A class name able to compile this route instance (RouteCompiler by default)
      *
-     * @param string       $pattern      The path pattern to match
+     * @param string       $path         The path pattern to match
      * @param array        $defaults     An array of default parameter values
      * @param array        $requirements An array of requirements for parameters (regexes)
      * @param array        $options      An array of options
@@ -80,9 +80,9 @@ class Route implements \Serializable
      *
      * @api
      */
-    public function __construct($pattern, array $defaults = array(), array $requirements = array(), array $options = array(), $hostname = '', $schemes = array(), $methods = array())
+    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $hostname = '', $schemes = array(), $methods = array())
     {
-        $this->setPattern($pattern);
+        $this->setPath($path);
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
         $this->setOptions($options);
@@ -100,7 +100,7 @@ class Route implements \Serializable
     public function serialize()
     {
         return serialize(array(
-            'pattern'      => $this->pattern,
+            'path'         => $this->path,
             'hostname'     => $this->hostname,
             'defaults'     => $this->defaults,
             'requirements' => $this->requirements,
@@ -113,7 +113,7 @@ class Route implements \Serializable
     public function unserialize($data)
     {
         $data = unserialize($data);
-        $this->pattern = $data['pattern'];
+        $this->path = $data['path'];
         $this->hostname = $data['hostname'];
         $this->defaults = $data['defaults'];
         $this->requirements = $data['requirements'];
@@ -126,10 +126,12 @@ class Route implements \Serializable
      * Returns the pattern for the path.
      *
      * @return string The pattern
+     *
+     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use setPath instead.
      */
     public function getPattern()
     {
-        return $this->pattern;
+        return $this->path;
     }
 
     /**
@@ -140,12 +142,38 @@ class Route implements \Serializable
      * @param string $pattern The pattern
      *
      * @return Route The current Route instance
+     *
+     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use setPath instead.
      */
     public function setPattern($pattern)
     {
+        return $this->setPath($pattern);
+    }
+
+    /**
+     * Returns the pattern for the path.
+     *
+     * @return string The path pattern
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    /**
+     * Sets the pattern for the path.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param string $path The path pattern
+     *
+     * @return Route The current Route instance
+     */
+    public function setPath($path)
+    {
         // A pattern must start with a slash and must not have multiple slashes at the beginning because the
         // generated path for this route would be confused with a network path, e.g. '//domain.com/path'.
-        $this->pattern = '/' . ltrim(trim($pattern), '/');
+        $this->path = '/' . ltrim(trim($path), '/');
         $this->compiled = null;
 
         return $this;

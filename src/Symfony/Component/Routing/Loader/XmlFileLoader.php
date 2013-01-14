@@ -112,8 +112,17 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseRoute(RouteCollection $collection, \DOMElement $node, $path)
     {
-        if ('' === ($id = $node->getAttribute('id')) || !$node->hasAttribute('pattern')) {
-            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" and a "pattern" attribute.', $path));
+        if ('' === ($id = $node->getAttribute('id')) || (!$node->hasAttribute('pattern') && !$node->hasAttribute('path'))) {
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" and a "path" attribute.', $path));
+        }
+
+        if ($node->hasAttribute('pattern')) {
+            if ($node->hasAttribute('path')) {
+                throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" cannot define both a "path" and a "pattern" attribute. Use only "path".', $path));
+            }
+
+            $node->setAttribute('path', $node->getAttribute('pattern'));
+            $node->removeAttribute('pattern');
         }
 
         $schemes = array_filter(explode(' ', $node->getAttribute('schemes')));
@@ -121,7 +130,7 @@ class XmlFileLoader extends FileLoader
 
         list($defaults, $requirements, $options) = $this->parseConfigs($node, $path);
 
-        $route = new Route($node->getAttribute('pattern'), $defaults, $requirements, $options, $node->getAttribute('hostname'), $schemes, $methods);
+        $route = new Route($node->getAttribute('path'), $defaults, $requirements, $options, $node->getAttribute('hostname'), $schemes, $methods);
         $collection->add($id, $route);
     }
 

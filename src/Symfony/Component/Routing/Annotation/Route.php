@@ -20,7 +20,7 @@ namespace Symfony\Component\Routing\Annotation;
  */
 class Route
 {
-    private $pattern;
+    private $path;
     private $name;
     private $requirements;
     private $options;
@@ -39,7 +39,7 @@ class Route
         $this->defaults = array();
 
         if (isset($data['value'])) {
-            $data['pattern'] = $data['value'];
+            $data['path'] = $data['value'];
             unset($data['value']);
         }
 
@@ -52,14 +52,30 @@ class Route
         }
     }
 
+    /**
+     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use setPath instead.
+     */
     public function setPattern($pattern)
     {
-        $this->pattern = $pattern;
+        $this->path = $pattern;
     }
 
+    /**
+     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use getPath instead.
+     */
     public function getPattern()
     {
-        return $this->pattern;
+        return $this->path;
+    }
+
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
+
+    public function getPath()
+    {
+        return $this->path;
     }
 
     public function setHostname($pattern)

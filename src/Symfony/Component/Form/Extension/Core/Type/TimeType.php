@@ -63,7 +63,7 @@ class TimeType extends AbstractType
 
                 // Only pass a subset of the options to children
                 $hourOptions['choices'] = $hours;
-                $hourOptions['empty_value'] = $options['empty_value']['hour'];
+                $hourOptions['placeholder'] = $options['placeholder']['hour'];
 
                 if ($options['with_minutes']) {
                     foreach ($options['minutes'] as $minute) {
@@ -71,7 +71,7 @@ class TimeType extends AbstractType
                     }
 
                     $minuteOptions['choices'] = $minutes;
-                    $minuteOptions['empty_value'] = $options['empty_value']['minute'];
+                    $minuteOptions['placeholder'] = $options['placeholder']['minute'];
                 }
 
                 if ($options['with_seconds']) {
@@ -82,7 +82,7 @@ class TimeType extends AbstractType
                     }
 
                     $secondOptions['choices'] = $seconds;
-                    $secondOptions['empty_value'] = $options['empty_value']['second'];
+                    $secondOptions['placeholder'] = $options['placeholder']['second'];
                 }
 
                 // Append generic carry-along options
@@ -152,24 +152,31 @@ class TimeType extends AbstractType
             return $options['widget'] !== 'single_text';
         };
 
-        $emptyValue = $emptyValueDefault = function (Options $options) {
+        $placeholderValue = function (Options $options) {
+            // BC until Symfony 2.3
+            return $options['empty_value'] !== null
+                ? $options['empty_value']
+                : ($options['required'] ? null : '');
+        };
+
+        $placeholderValueDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
-        $emptyValueNormalizer = function (Options $options, $emptyValue) use ($emptyValueDefault) {
-            if (is_array($emptyValue)) {
-                $default = $emptyValueDefault($options);
+        $placeholderValueNormalizer = function (Options $options, $placeholderValue) use ($placeholderValueDefault) {
+            if (is_array($placeholderValue)) {
+                $default = $placeholderValueDefault($options);
 
                 return array_merge(
                     array('hour' => $default, 'minute' => $default, 'second' => $default),
-                    $emptyValue
+                    $placeholderValue
                 );
             }
 
             return array(
-                'hour' => $emptyValue,
-                'minute' => $emptyValue,
-                'second' => $emptyValue
+                'hour' => $placeholderValue,
+                'minute' => $placeholderValue,
+                'second' => $placeholderValue
             );
         };
 
@@ -196,7 +203,9 @@ class TimeType extends AbstractType
             // Deprecated timezone options
             'data_timezone'  => null,
             'user_timezone'  => null,
-            'empty_value'    => $emptyValue,
+            'placeholder'    => $placeholderValue,
+            // Deprecated empty_value option
+            'empty_value'    => null,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'   => false,
@@ -210,7 +219,7 @@ class TimeType extends AbstractType
         ));
 
         $resolver->setNormalizers(array(
-            'empty_value' => $emptyValueNormalizer,
+            'placeholder' => $placeholderValueNormalizer,
         ));
 
         $resolver->setAllowedValues(array(

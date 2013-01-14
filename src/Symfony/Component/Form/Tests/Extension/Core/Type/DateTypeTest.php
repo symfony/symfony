@@ -620,10 +620,38 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertSame('Empty', $view['day']->vars['empty_value']);
     }
 
+    public function testPassPlaceholderAsString()
+    {
+        $form = $this->factory->create('date', null, array(
+            'placeholder' => 'Empty',
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('Empty', $view['year']->vars['empty_value']);
+        $this->assertSame('Empty', $view['month']->vars['empty_value']);
+        $this->assertSame('Empty', $view['day']->vars['empty_value']);
+    }
+
     public function testPassEmptyValueAsArray()
     {
         $form = $this->factory->create('date', null, array(
             'empty_value' => array(
+                'year' => 'Empty year',
+                'month' => 'Empty month',
+                'day' => 'Empty day',
+            ),
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('Empty year', $view['year']->vars['empty_value']);
+        $this->assertSame('Empty month', $view['month']->vars['empty_value']);
+        $this->assertSame('Empty day', $view['day']->vars['empty_value']);
+    }
+
+    public function testPassPlaceholderAsArray()
+    {
+        $form = $this->factory->create('date', null, array(
+            'placeholder' => array(
                 'year' => 'Empty year',
                 'month' => 'Empty month',
                 'day' => 'Empty day',
@@ -652,11 +680,43 @@ class DateTypeTest extends LocalizedTestCase
         $this->assertSame('Empty day', $view['day']->vars['empty_value']);
     }
 
+    public function testPassPlaceholderAsPartialArray_addEmptyIfNotRequired()
+    {
+        $form = $this->factory->create('date', null, array(
+            'required' => false,
+            'placeholder' => array(
+                'year' => 'Empty year',
+                'day' => 'Empty day',
+            ),
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('Empty year', $view['year']->vars['empty_value']);
+        $this->assertSame('', $view['month']->vars['empty_value']);
+        $this->assertSame('Empty day', $view['day']->vars['empty_value']);
+    }
+
     public function testPassEmptyValueAsPartialArray_addNullIfRequired()
     {
         $form = $this->factory->create('date', null, array(
             'required' => true,
             'empty_value' => array(
+                'year' => 'Empty year',
+                'day' => 'Empty day',
+            ),
+        ));
+
+        $view = $form->createView();
+        $this->assertSame('Empty year', $view['year']->vars['empty_value']);
+        $this->assertNull($view['month']->vars['empty_value']);
+        $this->assertSame('Empty day', $view['day']->vars['empty_value']);
+    }
+
+    public function testPassPlaceholderAsPartialArray_addNullIfRequired()
+    {
+        $form = $this->factory->create('date', null, array(
+            'required' => true,
+            'placeholder' => array(
                 'year' => 'Empty year',
                 'day' => 'Empty day',
             ),

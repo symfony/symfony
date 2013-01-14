@@ -614,6 +614,23 @@ class ChoiceTypeTest extends TypeTestCase
     /**
      * @dataProvider getOptionsWithEmptyValue
      */
+    public function testPassPlaceholderToView($multiple, $expanded, $required, $placeholderValue, $viewValue)
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => $multiple,
+            'expanded' => $expanded,
+            'required' => $required,
+            'placeholder' => $placeholderValue,
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertEquals($viewValue, $view->vars['empty_value']);
+    }
+
+    /**
+     * @dataProvider getOptionsWithEmptyValue
+     */
     public function testDontPassEmptyValueIfContainedInChoices($multiple, $expanded, $required, $emptyValue, $viewValue)
     {
         $form = $this->factory->create('choice', null, array(
@@ -621,6 +638,23 @@ class ChoiceTypeTest extends TypeTestCase
             'expanded' => $expanded,
             'required' => $required,
             'empty_value' => $emptyValue,
+            'choices' => array('a' => 'A', '' => 'Empty'),
+        ));
+        $view = $form->createView();
+
+        $this->assertNull($view->vars['empty_value']);
+    }
+
+    /**
+     * @dataProvider getOptionsWithEmptyValue
+     */
+    public function testDontPassPlaceholderIfContainedInChoices($multiple, $expanded, $required, $placeholderValue, $viewValue)
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => $multiple,
+            'expanded' => $expanded,
+            'required' => $required,
+            'placeholder' => $placeholderValue,
             'choices' => array('a' => 'A', '' => 'Empty'),
         ));
         $view = $form->createView();

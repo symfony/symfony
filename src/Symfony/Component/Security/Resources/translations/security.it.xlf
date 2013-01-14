@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>Cookie has already been used by someone else.</source>
-                <target>Il cookie è già stato usato da qualcun'altro.</target>
+                <target>Il cookie è già stato usato da qualcun altro.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>

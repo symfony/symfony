@@ -319,6 +319,30 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Sets the schemes (e.g. 'https') all child routes are restricted to.
+     *
+     * @param string|array $schemes The scheme or an array of schemes
+     */
+    public function setSchemes($schemes)
+    {
+        foreach ($this->routes as $route) {
+            $route->setSchemes($schemes);
+        }
+    }
+
+    /**
+     * Sets the HTTP methods (e.g. 'POST') all child routes are restricted to.
+     *
+     * @param string|array $methods The method or an array of methods
+     */
+    public function setMethods($methods)
+    {
+        foreach ($this->routes as $route) {
+            $route->setMethods($methods);
+        }
+    }
+
+    /**
      * Returns an array of resources loaded to build this collection.
      *
      * @return ResourceInterface[] An array of resources

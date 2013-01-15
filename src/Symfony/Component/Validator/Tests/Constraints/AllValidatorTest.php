@@ -39,23 +39,12 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context = null;
     }
 
-    public function deprecationErrorHandler($errorNumber, $message, $file, $line, $context)
-    {
-        if ($errorNumber & E_USER_DEPRECATED) {
-            return true;
-        }
-
-        return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
-    }
-
     public function testNullIsValid()
     {
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->validator->validate(null, new All(new Range(array('min' => 4))));
-        restore_error_handler();
     }
 
     /**
@@ -63,9 +52,7 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowsExceptionIfNotTraversable()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->validator->validate('foo.barbar', new All(new Range(array('min' => 4))));
-        restore_error_handler();
     }
 
     /**
@@ -73,9 +60,7 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testWalkSingleConstraint($array)
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
         $constraint = new Range(array('min' => 4));
-        restore_error_handler();
 
         $i = 1;
 
@@ -96,10 +81,8 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testWalkMultipleConstraints($array)
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
         $constraint1 = new Range(array('min' => 4));
         $constraint2 = new NotNull();
-        restore_error_handler();
 
         $constraints = array($constraint1, $constraint2);
         $i = 1;

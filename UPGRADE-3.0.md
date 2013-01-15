@@ -36,7 +36,7 @@ UPGRADE FROM 2.x to 3.0
        schemes: https
        requirements: { 'id': '\d+' }
 
-   <route id="article_edit" pattern="/article/{id}" methods="POST PUT" schemes="https">
+   <route id="article_edit" path="/article/{id}" methods="POST PUT" schemes="https">
        <requirement key="id">\d+</requirement>
    </route>
 

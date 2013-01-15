@@ -12,8 +12,8 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\ExecutionContext;
-use Symfony\Component\Validator\Constraints\Min;
-use Symfony\Component\Validator\Constraints\Max;
+use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\AllValidator;
 
@@ -54,7 +54,7 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation');
 
         set_error_handler(array($this, "deprecationErrorHandler"));
-        $this->validator->validate(null, new All(new Min(4)));
+        $this->validator->validate(null, new All(new Range(array('min' => 4))));
         restore_error_handler();
     }
 
@@ -64,7 +64,7 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
     public function testThrowsExceptionIfNotTraversable()
     {
         set_error_handler(array($this, "deprecationErrorHandler"));
-        $this->validator->validate('foo.barbar', new All(new Min(4)));
+        $this->validator->validate('foo.barbar', new All(new Range(array('min' => 4))));
         restore_error_handler();
     }
 
@@ -74,7 +74,7 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
     public function testWalkSingleConstraint($array)
     {
         set_error_handler(array($this, "deprecationErrorHandler"));
-        $constraint = new Min(4);
+        $constraint = new Range(array('min' => 4));
         restore_error_handler();
 
         $i = 1;
@@ -97,8 +97,8 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
     public function testWalkMultipleConstraints($array)
     {
         set_error_handler(array($this, "deprecationErrorHandler"));
-        $constraint1 = new Min(4);
-        $constraint2 = new Max(6);
+        $constraint1 = new Range(array('min' => 4));
+        $constraint2 = new NotNull();
         restore_error_handler();
 
         $constraints = array($constraint1, $constraint2);

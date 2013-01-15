@@ -142,6 +142,12 @@ class ClassCollectionLoader
             $token = $tokens[$i];
             if (is_string($token)) {
                 $output .= $token;
+            } elseif (T_WHITESPACE === $token[0]) {
+                if (isset($tokens[$i+1]) && T_COMMENT === $tokens[$i+1][0]) {
+                    // remove spaces before a comment
+                    $token[1] = str_replace(' ', '', $token[1]);
+                }
+                $output .= $token[1];
             } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
                 // strip comments
                 continue;

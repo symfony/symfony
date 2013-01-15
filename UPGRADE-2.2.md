@@ -246,7 +246,7 @@
    So the correct sequence is the following (and not the reverse):
 
    ```
-   $childCollection->->addCollection($grandchildCollection);
+   $childCollection->addCollection($grandchildCollection);
    $rootCollection->addCollection($childCollection);
    ```
 

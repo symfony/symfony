@@ -12,7 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\ExecutionContext;
-use Symfony\Component\Validator\Constraints\Min;
+use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Collection\Required;
 use Symfony\Component\Validator\Constraints\Collection\Optional;
@@ -60,7 +60,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolationAt');
 
         $this->validator->validate(null, new Collection(array('fields' => array(
-            'foo' => new Min(4),
+            'foo' => new Range(array('min' => 4)),
         ))));
 
         restore_error_handler();
@@ -76,7 +76,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolationAt');
 
         $this->validator->validate($data, new Collection(array(
-            'foo' => new Min(4),
+            'foo' => new Range(array('min' => 4)),
         )));
 
         restore_error_handler();
@@ -90,7 +90,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         set_error_handler(array($this, "deprecationErrorHandler"));
 
         $this->validator->validate('foobar', new Collection(array('fields' => array(
-            'foo' => new Min(4),
+            'foo' => new Range(array('min' => 4)),
         ))));
 
         restore_error_handler();
@@ -99,7 +99,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
     public function testWalkSingleConstraint()
     {
         set_error_handler(array($this, "deprecationErrorHandler"));
-        $constraint = new Min(4);
+        $constraint = new Range(array('min' => 4));
         restore_error_handler();
 
         $array = array(
@@ -131,7 +131,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
     {
         set_error_handler(array($this, "deprecationErrorHandler"));
         $constraints = array(
-            new Min(4),
+            new Range(array('min' => 4)),
             new NotNull(),
         );
         restore_error_handler();
@@ -180,7 +180,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->validator->validate($data, new Collection(array(
             'fields' => array(
-                'foo' => new Min(4),
+                'foo' => new Range(array('min' => 4)),
             ),
             'extraFieldsMessage' => 'myMessage',
         )));
@@ -199,7 +199,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraint = new Collection(array(
             'fields' => array(
-                'foo' => new Min(4),
+                'foo' => new Range(array('min' => 4)),
             ),
         ));
 
@@ -222,7 +222,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraint = new Collection(array(
             'fields' => array(
-                'foo' => new Min(4),
+                'foo' => new Range(array('min' => 4)),
             ),
             'allowExtraFields' => true,
         ));
@@ -243,7 +243,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraint = new Collection(array(
             'fields' => array(
-                'foo' => new Min(4),
+                'foo' => new Range(array('min' => 4)),
             ),
             'missingFieldsMessage' => 'myMessage',
         ));
@@ -267,7 +267,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraint = new Collection(array(
             'fields' => array(
-                'foo' => new Min(4),
+                'foo' => new Range(array('min' => 4)),
             ),
             'allowMissingFields' => true,
         ));
@@ -314,7 +314,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => 5,
         );
 
-        $constraint = new Min(4);
+        $constraint = new Range(array('min' => 4));
 
         $this->context->expects($this->once())
             ->method('validateValue')
@@ -342,7 +342,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraints = array(
             new NotNull(),
-            new Min(4),
+            new Range(array('min' => 4)),
         );
         $i = 1;
 
@@ -404,7 +404,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => 5,
         );
 
-        $constraint = new Min(4);
+        $constraint = new Range(array('min' => 4));
 
         $this->context->expects($this->once())
             ->method('validateValue')
@@ -432,7 +432,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraints = array(
             new NotNull(),
-            new Min(4),
+            new Range(array('min' => 4)),
         );
         $i = 1;
 
@@ -464,7 +464,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->validator->validate($value, new Collection(array(
             'fields' => array(
-                'foo' => new Min(2),
+                'foo' => new Range(array('min' => 2)),
             )
         )));
 

@@ -105,7 +105,7 @@ EOF;
                 $string .= sprintf("%s|-coll %s\n", $prefix, $route->getPrefix());
                 $string .= $this->collectionToString($route, $prefix.'| ');
             } else {
-                $string .= sprintf("%s|-route %s %s\n", $prefix, $route->getName(), $route->getRoute()->getPattern());
+                $string .= sprintf("%s|-route %s %s\n", $prefix, $route->getName(), $route->getRoute()->getPath());
             }
         }
 

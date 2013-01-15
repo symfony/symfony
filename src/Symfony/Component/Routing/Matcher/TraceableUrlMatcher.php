@@ -48,16 +48,16 @@ class TraceableUrlMatcher extends UrlMatcher
 
             if (!preg_match($compiledRoute->getRegex(), $pathinfo, $matches)) {
                 // does it match without any requirements?
-                $r = new Route($route->getPattern(), $route->getDefaults(), array(), $route->getOptions());
+                $r = new Route($route->getPath(), $route->getDefaults(), array(), $route->getOptions());
                 $cr = $r->compile();
                 if (!preg_match($cr->getRegex(), $pathinfo)) {
-                    $this->addTrace(sprintf('Pattern "%s" does not match', $route->getPattern()), self::ROUTE_DOES_NOT_MATCH, $name, $route);
+                    $this->addTrace(sprintf('Path "%s" does not match', $route->getPath()), self::ROUTE_DOES_NOT_MATCH, $name, $route);
 
                     continue;
                 }
 
                 foreach ($route->getRequirements() as $n => $regex) {
-                    $r = new Route($route->getPattern(), $route->getDefaults(), array($n => $regex), $route->getOptions());
+                    $r = new Route($route->getPath(), $route->getDefaults(), array($n => $regex), $route->getOptions());
                     $cr = $r->compile();
 
                     if (in_array($n, $cr->getVariables()) && !preg_match($cr->getRegex(), $pathinfo)) {
@@ -104,10 +104,10 @@ class TraceableUrlMatcher extends UrlMatcher
     private function addTrace($log, $level = self::ROUTE_DOES_NOT_MATCH, $name = null, $route = null)
     {
         $this->traces[] = array(
-            'log'     => $log,
-            'name'    => $name,
-            'level'   => $level,
-            'pattern' => null !== $route ? $route->getPattern() : null,
+            'log'   => $log,
+            'name'  => $name,
+            'level' => $level,
+            'path'  => null !== $route ? $route->getPath() : null,
         );
     }
 }

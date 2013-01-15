@@ -92,7 +92,7 @@ EOF
                     ? implode(', ', $requirements['_method']) : $requirements['_method']
                 )
                 : 'ANY';
-            $hostname = '' !== $route->getHostnamePattern() ? $route->getHostnamePattern() : 'ANY';
+            $hostname = '' !== $route->getHostname() ? $route->getHostname() : 'ANY';
             $maxName = max($maxName, strlen($name));
             $maxMethod = max($maxMethod, strlen($method));
             $maxHostname = max($maxHostname, strlen($hostname));
@@ -109,7 +109,7 @@ EOF
                     ? implode(', ', $requirements['_method']) : $requirements['_method']
                 )
                 : 'ANY';
-            $hostname = '' !== $route->getHostnamePattern() ? $route->getHostnamePattern() : 'ANY';
+            $hostname = '' !== $route->getHostname() ? $route->getHostname() : 'ANY';
             $output->writeln(sprintf($format, $name, $method, $hostname, $route->getPattern()));
         }
     }
@@ -124,14 +124,14 @@ EOF
             throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
         }
 
-        $hostname = '' !== $route->getHostnamePattern() ? $route->getHostnamePattern() : 'ANY';
+        $hostname = '' !== $route->getHostname() ? $route->getHostname() : 'ANY';
 
         $output->writeln($this->getHelper('formatter')->formatSection('router', sprintf('Route "%s"', $name)));
 
-        $output->writeln(sprintf('<comment>Name</comment>         %s', $name));
-        $output->writeln(sprintf('<comment>Pattern</comment>      %s', $route->getPattern()));
-        $output->writeln(sprintf('<comment>HostnamePattern</comment>  %s', $hostname));
-        $output->writeln(sprintf('<comment>Class</comment>        %s', get_class($route)));
+        $output->writeln(sprintf('<comment>Name</comment>      %s', $name));
+        $output->writeln(sprintf('<comment>Pattern</comment>   %s', $route->getPattern()));
+        $output->writeln(sprintf('<comment>Hostname</comment>  %s', $hostname));
+        $output->writeln(sprintf('<comment>Class</comment>     %s', get_class($route)));
 
         $defaults = '';
         $d = $route->getDefaults();

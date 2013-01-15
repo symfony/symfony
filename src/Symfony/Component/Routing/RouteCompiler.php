@@ -46,8 +46,8 @@ class RouteCompiler implements RouteCompilerInterface
         $hostnameRegex = null;
         $hostnameTokens = array();
 
-        if ('' !== $hostnamePattern = $route->getHostnamePattern()) {
-            $result = self::compilePattern($route, $hostnamePattern, true);
+        if ('' !== $hostname = $route->getHostname()) {
+            $result = self::compilePattern($route, $hostname, true);
 
             $hostnameVariables = $result['variables'];
             $variables = array_merge($variables, $hostnameVariables);
@@ -56,9 +56,9 @@ class RouteCompiler implements RouteCompilerInterface
             $hostnameRegex = $result['regex'];
         }
 
-        $pattern = $route->getPattern();
+        $path = $route->getPath();
 
-        $result = self::compilePattern($route, $pattern, false);
+        $result = self::compilePattern($route, $path, false);
 
         $staticPrefix = $result['staticPrefix'];
 

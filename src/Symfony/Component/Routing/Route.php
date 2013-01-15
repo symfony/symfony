@@ -125,7 +125,7 @@ class Route implements \Serializable
      *
      * @return string The pattern
      *
-     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use setPath instead.
+     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use getPath instead.
      */
     public function getPattern()
     {
@@ -137,7 +137,7 @@ class Route implements \Serializable
      *
      * This method implements a fluent interface.
      *
-     * @param string $pattern The pattern
+     * @param string $pattern The path pattern
      *
      * @return Route The current Route instance
      *
@@ -163,24 +163,24 @@ class Route implements \Serializable
      *
      * This method implements a fluent interface.
      *
-     * @param string $path The path pattern
+     * @param string $pattern The path pattern
      *
      * @return Route The current Route instance
      */
-    public function setPath($path)
+    public function setPath($pattern)
     {
         // A pattern must start with a slash and must not have multiple slashes at the beginning because the
         // generated path for this route would be confused with a network path, e.g. '//domain.com/path'.
-        $this->path = '/' . ltrim(trim($path), '/');
+        $this->path = '/' . ltrim(trim($pattern), '/');
         $this->compiled = null;
 
         return $this;
     }
 
     /**
-     * Returns the hostname pattern.
+     * Returns the pattern for the hostname.
      *
-     * @return string The pattern
+     * @return string The hostname pattern
      */
     public function getHostname()
     {
@@ -188,9 +188,11 @@ class Route implements \Serializable
     }
 
     /**
-     * Sets the hostname pattern.
+     * Sets the pattern for the hostname.
      *
-     * @param string $pattern The pattern
+     * This method implements a fluent interface.
+     *
+     * @param string $pattern The hostname pattern
      *
      * @return Route The current Route instance
      */

@@ -19,32 +19,23 @@ use Symfony\Component\Validator\Constraints\AllValidator;
 
 class AllValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    protected $walker;
     protected $context;
     protected $validator;
 
     protected function setUp()
     {
-        $this->walker = $this->getMock('Symfony\Component\Validator\GraphWalker', array(), array(), '', false);
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new AllValidator();
         $this->validator->initialize($this->context);
 
         $this->context->expects($this->any())
-            ->method('getGraphWalker')
-            ->will($this->returnValue($this->walker));
-        $this->context->expects($this->any())
             ->method('getGroup')
             ->will($this->returnValue('MyGroup'));
-        $this->context->expects($this->any())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('foo.bar'));
     }
 
     protected function tearDown()
     {
         $this->validator = null;
-        $this->walker = null;
         $this->context = null;
     }
 
@@ -86,12 +77,12 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint = new Min(4);
         restore_error_handler();
 
-        $i = 0;
+        $i = 1;
 
         foreach ($array as $key => $value) {
-            $this->walker->expects($this->at($i++))
-                ->method('walkConstraint')
-                ->with($constraint, $value, 'MyGroup', 'foo.bar['.$key.']');
+            $this->context->expects($this->at($i++))
+                ->method('validateValue')
+                ->with($value, $constraint, '['.$key.']', 'MyGroup');
         }
 
         $this->context->expects($this->never())
@@ -111,15 +102,15 @@ class AllValidatorTest extends \PHPUnit_Framework_TestCase
         restore_error_handler();
 
         $constraints = array($constraint1, $constraint2);
-        $i = 0;
+        $i = 1;
 
         foreach ($array as $key => $value) {
-            $this->walker->expects($this->at($i++))
-                ->method('walkConstraint')
-                ->with($constraint1, $value, 'MyGroup', 'foo.bar['.$key.']');
-            $this->walker->expects($this->at($i++))
-                ->method('walkConstraint')
-                ->with($constraint2, $value, 'MyGroup', 'foo.bar['.$key.']');
+            $this->context->expects($this->at($i++))
+                ->method('validateValue')
+                ->with($value, $constraint1, '['.$key.']', 'MyGroup');
+            $this->context->expects($this->at($i++))
+                ->method('validateValue')
+                ->with($value, $constraint2, '['.$key.']', 'MyGroup');
         }
 
         $this->context->expects($this->never())

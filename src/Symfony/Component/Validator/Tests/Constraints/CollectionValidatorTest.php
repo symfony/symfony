@@ -41,35 +41,20 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = null;
     }
 
-    public function deprecationErrorHandler($errorNumber, $message, $file, $line, $context)
-    {
-        if ($errorNumber & E_USER_DEPRECATED) {
-            return true;
-        }
-
-        return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
-    }
-
     abstract protected function prepareTestData(array $contents);
 
     public function testNullIsValid()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
-
         $this->context->expects($this->never())
             ->method('addViolationAt');
 
         $this->validator->validate(null, new Collection(array('fields' => array(
             'foo' => new Range(array('min' => 4)),
         ))));
-
-        restore_error_handler();
     }
 
     public function testFieldsAsDefaultOption()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
-
         $data = $this->prepareTestData(array('foo' => 'foobar'));
 
         $this->context->expects($this->never())
@@ -78,8 +63,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($data, new Collection(array(
             'foo' => new Range(array('min' => 4)),
         )));
-
-        restore_error_handler();
     }
 
     /**
@@ -87,20 +70,14 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowsExceptionIfNotTraversable()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
-
         $this->validator->validate('foobar', new Collection(array('fields' => array(
             'foo' => new Range(array('min' => 4)),
         ))));
-
-        restore_error_handler();
     }
 
     public function testWalkSingleConstraint()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
         $constraint = new Range(array('min' => 4));
-        restore_error_handler();
 
         $array = array(
             'foo' => 3,
@@ -129,12 +106,10 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testWalkMultipleConstraints()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
         $constraints = array(
             new Range(array('min' => 4)),
             new NotNull(),
         );
-        restore_error_handler();
 
         $array = array(
             'foo' => 3,
@@ -165,8 +140,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testExtraFieldsDisallowed()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
-
         $data = $this->prepareTestData(array(
             'foo' => 5,
             'baz' => 6,
@@ -184,15 +157,11 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             ),
             'extraFieldsMessage' => 'myMessage',
         )));
-
-        restore_error_handler();
     }
 
     // bug fix
     public function testNullNotConsideredExtraField()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
-
         $data = $this->prepareTestData(array(
             'foo' => null,
         ));
@@ -207,14 +176,10 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolationAt');
 
         $this->validator->validate($data, $constraint);
-
-        restore_error_handler();
     }
 
     public function testExtraFieldsAllowed()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
-
         $data = $this->prepareTestData(array(
             'foo' => 5,
             'bar' => 6,
@@ -231,14 +196,10 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolationAt');
 
         $this->validator->validate($data, $constraint);
-
-        restore_error_handler();
     }
 
     public function testMissingFieldsDisallowed()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
-
         $data = $this->prepareTestData(array());
 
         $constraint = new Collection(array(
@@ -255,14 +216,10 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             ));
 
         $this->validator->validate($data, $constraint);
-
-        restore_error_handler();
     }
 
     public function testMissingFieldsAllowed()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
-
         $data = $this->prepareTestData(array());
 
         $constraint = new Collection(array(
@@ -276,8 +233,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolationAt');
 
         $this->validator->validate($data, $constraint);
-
-        restore_error_handler();
     }
 
     public function testOptionalFieldPresent()
@@ -308,8 +263,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testOptionalFieldSingleConstraint()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
-
         $array = array(
             'foo' => 5,
         );
@@ -328,14 +281,10 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($data, new Collection(array(
             'foo' => new Optional($constraint),
         )));
-
-        restore_error_handler();
     }
 
     public function testOptionalFieldMultipleConstraints()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
-
         $array = array(
             'foo' => 5,
         );
@@ -360,8 +309,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($data, new Collection(array(
             'foo' => new Optional($constraints),
         )));
-
-        restore_error_handler();
     }
 
     public function testRequiredFieldPresent()
@@ -398,8 +345,6 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testRequiredFieldSingleConstraint()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
-
         $array = array(
             'foo' => 5,
         );
@@ -418,14 +363,10 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($data, new Collection(array(
             'foo' => new Required($constraint),
         )));
-
-        restore_error_handler();
     }
 
     public function testRequiredFieldMultipleConstraints()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
-
         $array = array(
             'foo' => 5,
         );
@@ -450,14 +391,10 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($array, new Collection(array(
             'foo' => new Required($constraints),
         )));
-
-        restore_error_handler();
     }
 
     public function testObjectShouldBeLeftUnchanged()
     {
-        set_error_handler(array($this, "deprecationErrorHandler"));
-
         $value = new \ArrayObject(array(
             'foo' => 3
         ));
@@ -471,7 +408,5 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'foo' => 3
         ), (array) $value);
-
-        restore_error_handler();
     }
 }

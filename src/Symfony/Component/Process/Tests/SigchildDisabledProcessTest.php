@@ -13,15 +13,6 @@ namespace Symfony\Component\Process\Tests;
 
 class SigchildDisabledProcessTest extends AbstractProcessTest
 {
-
-    protected function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
-    {
-        $process = new ProcessInSigchildEnvironment($commandline, $cwd, $env, $stdin, $timeout, $options);
-        $process->setEnhanceSigchildCompatibility(false);
-
-        return $process;
-    }
-
     /**
      * @expectedException Symfony\Component\Process\Exception\RuntimeException
      */
@@ -95,5 +86,16 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
     public function testIsNotSuccessful()
     {
         parent::testIsNotSuccessful();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
+    {
+        $process = new ProcessInSigchildEnvironment($commandline, $cwd, $env, $stdin, $timeout, $options);
+        $process->setEnhanceSigchildCompatibility(false);
+
+        return $process;
     }
 }

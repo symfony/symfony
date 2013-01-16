@@ -159,8 +159,8 @@ class Process
      * The STDOUT and STDERR are also available after the process is finished
      * via the getOutput() and getErrorOutput() methods.
      *
-     * @param Closure|string|array $callback A PHP callback to run whenever there is some
-     *                                       output available on STDOUT or STDERR
+     * @param callback|null $callback A PHP callback to run whenever there is some
+     *                                output available on STDOUT or STDERR
      *
      * @return integer The exit status code
      *
@@ -190,8 +190,8 @@ class Process
      * with true as a second parameter then the callback will get all data occurred
      * in (and since) the start call.
      *
-     * @param Closure|string|array $callback A PHP callback to run whenever there is some
-     *                                       output available on STDOUT or STDERR
+     * @param callback|null $callback A PHP callback to run whenever there is some
+     *                                output available on STDOUT or STDERR
      *
      * @throws \RuntimeException When process can't be launch or is stopped
      * @throws \RuntimeException When process is already running
@@ -318,11 +318,12 @@ class Process
      * from the output in real-time while writing the standard input to the process.
      * It allows to have feedback from the independent process during execution.
      *
-     * @param mixed $callback A valid PHP callback
+     * @param callback|null $callback A valid PHP callback
      *
-     * @return int The exitcode of the process
+     * @return integer The exitcode of the process
      *
-     * @throws \RuntimeException
+     * @throws \RuntimeException When process timed out
+     * @throws \RuntimeException When process stopped after receiving signal
      */
     public function wait($callback = null)
     {
@@ -455,8 +456,6 @@ class Process
      *
      * @return string A string representation for the exit status code
      *
-     * @throws RuntimeException In case --enable-sigchild is activated and the sigchild compatibility mode is disabled
-     *
      * @see http://tldp.org/LDP/abs/html/exitcodes.html
      * @see http://en.wikipedia.org/wiki/Unix_signal
      */
@@ -471,8 +470,6 @@ class Process
      * Checks if the process ended successfully.
      *
      * @return Boolean true if the process ended successfully, false otherwise
-     *
-     * @throws RuntimeException In case --enable-sigchild is activated and the sigchild compatibility mode is disabled
      *
      * @api
      */
@@ -576,11 +573,9 @@ class Process
     /**
      * Stops the process.
      *
-     * @param float $timeout The timeout in seconds
+     * @param integer|float $timeout The timeout in seconds
      *
      * @return integer The exit-code of the process
-     *
-     * @throws \RuntimeException if the process got signaled
      */
     public function stop($timeout=10)
     {
@@ -828,9 +823,9 @@ class Process
      * The callbacks adds all occurred output to the specific buffer and calls
      * the user callback (if present) with the received output.
      *
-     * @param mixed $callback The user defined PHP callback
+     * @param callback|null $callback The user defined PHP callback
      *
-     * @return mixed A PHP callable
+     * @return callback A PHP callable
      */
     protected function buildCallback($callback)
     {
@@ -870,6 +865,9 @@ class Process
         }
     }
 
+    /**
+     * Updates the current error output of the process (STDERR).
+     */
     protected function updateErrorOutput()
     {
         if (isset($this->pipes[self::STDERR]) && is_resource($this->pipes[self::STDERR])) {
@@ -877,6 +875,9 @@ class Process
         }
     }
 
+    /**
+     * Updates the current output of the process (STDOUT).
+     */
     protected function updateOutput()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD') && isset($this->fileHandles[self::STDOUT]) && is_resource($this->fileHandles[self::STDOUT])) {

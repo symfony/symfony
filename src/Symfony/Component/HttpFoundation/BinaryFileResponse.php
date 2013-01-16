@@ -124,8 +124,7 @@ class BinaryFileResponse extends Response
      */
     public function setAutoEtag()
     {
-        $hash = $this->calculateFileHash($this->file->getPathname());
-        $this->setEtag($hash);
+        $this->setEtag($this->calculateFileHash($this->file->getPathname()));
 
         return $this;
     }

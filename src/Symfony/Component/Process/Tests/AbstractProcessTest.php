@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use Symfony\Component\Process\Process;
+
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
  */
@@ -307,7 +309,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      * @param integer $timeout
      * @param array   $options
      *
-     * @return \Symfony\Component\Process\Process
+     * @return Process
      */
     abstract protected function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array());
 }

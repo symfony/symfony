@@ -113,7 +113,7 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             '/before/foo/after/%unescaped%',
-            $route->getPattern()
+            $route->getPath()
         );
     }
 

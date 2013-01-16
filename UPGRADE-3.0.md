@@ -1,12 +1,28 @@
 UPGRADE FROM 2.x to 3.0
 =======================
 
+### HttpKernel
+
+ * The `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed in
+   favor of `Psr\Log\LoggerInterface`. The only difference is that some method
+   names are different:
+
+   * `emerg()` -> `emergency()`
+   * `crit()`  -> `critical()`
+   * `err()`   -> `error()`
+   * `warn()`  -> `warning()`
+
+   The previous method renames also happened to the following classes:
+
+   * `Symfony\Bridge\Monolog\Logger`
+   * `Symfony\Component\HttpKernel\Log\NullLogger`
+
 ### Routing
 
  * Some route settings have been renamed:
 
-    * The `pattern` setting for a route has been deprecated in favor of `path`
-    * The `_scheme` and `_method` requirements have been moved to the `schemes` and `methods` settings
+   * The `pattern` setting for a route has been deprecated in favor of `path`
+   * The `_scheme` and `_method` requirements have been moved to the `schemes` and `methods` settings
 
    Before:
 

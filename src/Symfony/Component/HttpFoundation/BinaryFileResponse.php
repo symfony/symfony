@@ -124,7 +124,8 @@ class BinaryFileResponse extends Response
      */
     public function setAutoEtag()
     {
-        $this->setEtag($this->calculateFileHash());
+        $hash = $this->calculateFileHash($this->file->getPathname());
+        $this->setEtag($hash);
 
         return $this;
     }
@@ -132,11 +133,13 @@ class BinaryFileResponse extends Response
     /**
      * Calculate file hash
      *
+     * @param string $filename The path to the file
+     * 
      * @return string
      */
-    protected function calculateFileHash()
+    protected function calculateFileHash($filename)
     {
-        return sha1_file($this->file->getPathname());
+        return sha1_file($filename);
     }
 
     /**

@@ -41,6 +41,16 @@ class ReplaceAliasByActualDefinitionPassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testProcessWithInvalidAlias()
+    {
+        $container = new ContainerBuilder();
+        $container->setAlias('a_alias', 'a');
+        $this->process($container);
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ReplaceAliasByActualDefinitionPass();

@@ -93,7 +93,7 @@ class Router extends BaseRouter implements WarmableInterface
                  $route->setRequirement($name, $this->resolve($value));
             }
 
-            $route->setPattern($this->resolve($route->getPattern()));
+            $route->setPath($this->resolve($route->getPath()));
             $route->setHostname($this->resolve($route->getHostname()));
         }
     }

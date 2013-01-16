@@ -110,7 +110,7 @@ EOF
                 )
                 : 'ANY';
             $hostname = '' !== $route->getHostname() ? $route->getHostname() : 'ANY';
-            $output->writeln(sprintf($format, $name, $method, $hostname, $route->getPattern()));
+            $output->writeln(sprintf($format, $name, $method, $hostname, $route->getPath()));
         }
     }
 
@@ -129,7 +129,7 @@ EOF
         $output->writeln($this->getHelper('formatter')->formatSection('router', sprintf('Route "%s"', $name)));
 
         $output->writeln(sprintf('<comment>Name</comment>      %s', $name));
-        $output->writeln(sprintf('<comment>Pattern</comment>   %s', $route->getPattern()));
+        $output->writeln(sprintf('<comment>Pattern</comment>   %s', $route->getPath()));
         $output->writeln(sprintf('<comment>Hostname</comment>  %s', $hostname));
         $output->writeln(sprintf('<comment>Class</comment>     %s', get_class($route)));
 

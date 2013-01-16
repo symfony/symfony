@@ -43,24 +43,24 @@ class QtFileLoaderTest extends \PHPUnit_Framework_TestCase
         $resource = __DIR__.'/../fixtures/non-existing.ts';
         $loader->load($resource, 'en', 'domain1');
     }
-	
-	/**
-	 * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
-	 */
-	public function testLoadNonLocalResource()
-	{
-		$loader = new QtFileLoader();
-		$resource = 'http://domain1.com/resources.ts';
-		$loader->load($resource, 'en', 'domain1');
-	}
 
-	/**
-	 * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
-	 */
-	public function testLoadInvalidResource()
-	{
-		$loader = new QtFileLoader();
-		$resource = __DIR__.'/../fixtures/invalid-xml-resources.xlf';
-		$loader->load($resource, 'en', 'domain1');
-	}
+    /**
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
+     */
+    public function testLoadNonLocalResource()
+    {
+        $loader = new QtFileLoader();
+        $resource = 'http://domain1.com/resources.ts';
+        $loader->load($resource, 'en', 'domain1');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
+     */
+    public function testLoadInvalidResource()
+    {
+        $loader = new QtFileLoader();
+        $resource = __DIR__.'/../fixtures/invalid-xml-resources.xlf';
+        $loader->load($resource, 'en', 'domain1');
+    }
 }

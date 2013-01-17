@@ -47,7 +47,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = null;
     }
 
-    public function testValidate_defaultGroup()
+    public function testValidateDefaultGroup()
     {
         $entity = new Entity();
         $metadata = new ClassMetadata(get_class($entity));
@@ -71,7 +71,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($violations, $this->validator->validate($entity));
     }
 
-    public function testValidate_oneGroup()
+    public function testValidateOneGroup()
     {
         $entity = new Entity();
         $metadata = new ClassMetadata(get_class($entity));
@@ -95,7 +95,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($violations, $this->validator->validate($entity, 'Custom'));
     }
 
-    public function testValidate_multipleGroups()
+    public function testValidateMultipleGroups()
     {
         $entity = new Entity();
         $metadata = new ClassMetadata(get_class($entity));
@@ -131,7 +131,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($violations, $result);
     }
 
-    public function testValidate_groupSequenceProvider()
+    public function testValidateGroupSequenceProvider()
     {
         $entity = new GroupSequenceProviderEntity();
         $metadata = new ClassMetadata(get_class($entity));

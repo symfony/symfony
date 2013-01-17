@@ -79,8 +79,6 @@
 }
 
 .sf-toolbar-block .sf-toolbar-info-piece {
-    padding-left: 9px;
-    padding-right: 9px;
     line-height: 19px;
     margin-bottom: 5px;
 }
@@ -263,8 +261,12 @@
 
 .sf-toolbar-block:hover .sf-toolbar-info {
     display: block;
-    min-width: 100%;
+    min-width: -webkit-calc(100% + 2px);
+    min-width: calc(100% + 2px);
     z-index: 10001;
+    box-sizing: border-box;
+    padding: 9px;
+    line-height: 19px;
 }
 
 /***** Override the setting when the toolbar is on the top *****/

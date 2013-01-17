@@ -150,6 +150,6 @@ class Yaml
         $yaml = new Dumper();
         $yaml->setIndentation($indent);
 
-        return $yaml->dump($array, $inline, $exceptionOnInvalidType, $objectSupport);
+        return $yaml->dump($array, $inline, 0, $exceptionOnInvalidType, $objectSupport);
     }
 }

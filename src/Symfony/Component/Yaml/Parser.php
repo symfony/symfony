@@ -38,13 +38,15 @@ class Parser
     /**
      * Parses a YAML string to a PHP value.
      *
-     * @param string $value A YAML string
+     * @param string  $value                  A YAML string
+     * @param Boolean $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
+     * @param Boolean $objectSupport          true if object support is enabled, false otherwise
      *
      * @return mixed  A PHP value
      *
      * @throws ParseException If the YAML is not valid
      */
-    public function parse($value)
+    public function parse($value, $exceptionOnInvalidType = false, $objectSupport = false)
     {
         $this->currentLineNb = -1;
         $this->currentLine = '';
@@ -82,7 +84,7 @@ class Parser
                     $c = $this->getRealCurrentLineNb() + 1;
                     $parser = new Parser($c);
                     $parser->refs =& $this->refs;
-                    $data[] = $parser->parse($this->getNextEmbedBlock());
+                    $data[] = $parser->parse($this->getNextEmbedBlock(), $exceptionOnInvalidType, $objectSupport);
                 } else {
                     if (isset($values['leadspaces'])
                         && ' ' == $values['leadspaces']
@@ -98,12 +100,14 @@ class Parser
                             $block .= "\n".$this->getNextEmbedBlock($this->getCurrentLineIndentation() + 2);
                         }
 
-                        $data[] = $parser->parse($block);
+                        $data[] = $parser->parse($block, $exceptionOnInvalidType, $objectSupport);
                     } else {
-                        $data[] = $this->parseValue($values['value']);
+                        $data[] = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport);
                     }
                 }
             } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
+                // force correct settings
+                Inline::parse(null, $exceptionOnInvalidType, $objectSupport);
                 try {
                     $key = Inline::parseScalar($values['key']);
                 } catch (ParseException $e) {
@@ -128,7 +132,7 @@ class Parser
                         $c = $this->getRealCurrentLineNb() + 1;
                         $parser = new Parser($c);
                         $parser->refs =& $this->refs;
-                        $parsed = $parser->parse($value);
+                        $parsed = $parser->parse($value, $exceptionOnInvalidType, $objectSupport);
 
                         $merged = array();
                         if (!is_array($parsed)) {
@@ -165,20 +169,20 @@ class Parser
                         $c = $this->getRealCurrentLineNb() + 1;
                         $parser = new Parser($c);
                         $parser->refs =& $this->refs;
-                        $data[$key] = $parser->parse($this->getNextEmbedBlock());
+                        $data[$key] = $parser->parse($this->getNextEmbedBlock(), $exceptionOnInvalidType, $objectSupport);
                     }
                 } else {
                     if ($isInPlace) {
                         $data = $this->refs[$isInPlace];
                     } else {
-                        $data[$key] = $this->parseValue($values['value']);
+                        $data[$key] = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport);
                     }
                 }
             } else {
                 // 1-liner followed by newline
                 if (2 == count($this->lines) && empty($this->lines[1])) {
                     try {
-                        $value = Inline::parse($this->lines[0]);
+                        $value = Inline::parse($this->lines[0], $exceptionOnInvalidType, $objectSupport);
                     } catch (ParseException $e) {
                         $e->setParsedLine($this->getRealCurrentLineNb() + 1);
                         $e->setSnippet($this->currentLine);
@@ -345,7 +349,7 @@ class Parser
      *
      * @throws ParseException When reference does not exist
      */
-    private function parseValue($value)
+    private function parseValue($value, $exceptionOnInvalidType, $objectSupport)
     {
         if (0 === strpos($value, '*')) {
             if (false !== $pos = strpos($value, '#')) {
@@ -368,7 +372,7 @@ class Parser
         }
 
         try {
-            return Inline::parse($value);
+            return Inline::parse($value, $exceptionOnInvalidType, $objectSupport);
         } catch (ParseException $e) {
             $e->setParsedLine($this->getRealCurrentLineNb() + 1);
             $e->setSnippet($this->currentLine);

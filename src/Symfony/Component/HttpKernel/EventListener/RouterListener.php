@@ -57,9 +57,9 @@ class RouterListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if ($this->matcher instanceof RequestContextAwareInterface) {
+        if ($this->matcher instanceof RequestContextAwareInterface && null !== $context = $this->matcher->getContext()) {
             // initialize the context that might also be used by the generator (assuming matcher and generator share the same context instance)
-            $this->matcher->getContext()->fromRequest($request);
+            $context->fromRequest($request);
         }
 
         if ($request->attributes->has('_controller')) {

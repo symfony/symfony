@@ -23,6 +23,53 @@ use Symfony\Component\Yaml\Exception\ParseException;
 class Yaml
 {
     /**
+     * Be warned that PHP support will be removed in Symfony 2.3.
+     *
+     * @deprecated Deprecated since version 2.0, to be removed in 2.3.
+     */
+    static public $enablePhpParsing = true;
+
+    /**
+     * Enables PHP support when parsing YAML files.
+     *
+     * Be warned that PHP support will be removed in Symfony 2.3.
+     *
+     * @deprecated Deprecated since version 2.0, to be removed in 2.3.
+     */
+    public static function enablePhpParsing()
+    {
+        self::$enablePhpParsing = true;
+    }
+
+    /**
+     * Sets the PHP support flag when parsing YAML files.
+     *
+     * Be warned that PHP support will be removed in Symfony 2.3.
+     *
+     * @param Boolean $boolean true if PHP parsing support is enabled, false otherwise
+     *
+     * @deprecated Deprecated since version 2.0, to be removed in 2.3.
+     */
+    public static function setPhpParsing($boolean)
+    {
+        self::$enablePhpParsing = (Boolean) $boolean;
+    }
+
+    /**
+     * Checks if PHP support is enabled when parsing YAML files.
+     *
+     * Be warned that PHP support will be removed in Symfony 2.3.
+     *
+     * @return Boolean true if PHP parsing support is enabled, false otherwise
+     *
+     * @deprecated Deprecated since version 2.0, to be removed in 2.3.
+     */
+    public static function supportsPhpParsing()
+    {
+        return self::$enablePhpParsing;
+    }
+
+    /**
      * Parses YAML into a PHP array.
      *
      * The parse method, when supplied with a YAML stream (string or file),
@@ -44,27 +91,29 @@ class Yaml
      */
     public static function parse($input)
     {
-        $file = '';
-
         // if input is a file, process it
+        $file = '';
         if (strpos($input, "\n") === false && is_file($input)) {
             if (false === is_readable($input)) {
                 throw new ParseException(sprintf('Unable to parse "%s" as the file is not readable.', $input));
             }
 
             $file = $input;
+            if (self::$enablePhpParsing) {
+                ob_start();
+                $retval = include($file);
+                $content = ob_get_clean();
 
-            ob_start();
-            $retval = include($input);
-            $content = ob_get_clean();
+                // if an array is returned by the config file assume it's in plain php form else in YAML
+                $input = is_array($retval) ? $retval : $content;
 
-            // if an array is returned by the config file assume it's in plain php form else in YAML
-            $input = is_array($retval) ? $retval : $content;
-        }
-
-        // if an array is returned by the config file assume it's in plain php form else in YAML
-        if (is_array($input)) {
-            return $input;
+                // if an array is returned by the config file assume it's in plain php form else in YAML
+                if (is_array($input)) {
+                    return $input;
+                }
+            } else {
+                $input = file_get_contents($file);
+            }
         }
 
         $yaml = new Parser();

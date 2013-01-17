@@ -803,6 +803,36 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Creates a clone Definition of an abstract service.
+     *
+     * Pass a Closure as second argument to modify the Definition instance.
+     *
+     * @param string   $id
+     * @param callable $callable
+     *
+     * @return Definition A concrete Definition instance
+     *
+     * @throws Exception\InvalidArgumentException
+     */
+    public function getDefinitionForAbstract($id, \Closure $callable = null)
+    {
+        $definition = $this->getDefinition($id);
+
+        if (!$definition->isAbstract()) {
+            throw new InvalidArgumentException(sprintf('The service definition "%s" is not declared abstract.', $id));
+        }
+
+        $definition = clone $definition;
+        $definition->setAbstract(false);
+
+        if ($callable) {
+            $callable($definition);
+        }
+
+        return $definition;
+    }
+
+    /**
      * Gets a service definition by id or alias.
      *
      * The method "unaliases" recursively to return a Definition instance.

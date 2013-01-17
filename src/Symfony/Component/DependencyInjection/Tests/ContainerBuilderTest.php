@@ -577,6 +577,38 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $configs = $container->getExtensionConfig('foo');
         $this->assertEquals(array($second, $first), $configs);
     }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::getDefinitionFromAbstract
+     */
+    public function testGetDefinitionFromAbstract()
+    {
+        $container = new ContainerBuilder();
+
+        $abstract = new Definition('stdClass');
+        $abstract->setAbstract(true);
+        $abstract->setArguments(array('abstractParam'));
+        $container->setDefinition('abstract', $abstract);
+
+        $concrete = $container->getDefinitionForAbstract('abstract');
+        $this->assertFalse($concrete->isAbstract());
+        $this->assertEquals(array('abstractParam'), $concrete->getArguments());
+
+        $concrete2 = $container->getDefinitionForAbstract('abstract');
+        $this->assertEquals($concrete, $concrete2);
+        $this->assertNotSame($concrete, $concrete2);
+
+        $concrete = $container->getDefinitionForAbstract('abstract', function($definition) {
+            $definition->addArgument('abstractTest');
+        });
+        $this->assertEquals(array('abstractParam', 'abstractTest'), $concrete->getArguments());
+
+        $this->setExpectedException('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException');
+        $concrete = new Definition('stdClass');
+        $container->setDefinition('abstractConcrete', $concrete);
+
+        $container->getDefinitionForAbstract('abstractConcrete');
+    }
 }
 
 class FooClass {}

@@ -33,19 +33,11 @@ class ApacheRequest extends Request
     {
         $baseUrl = $this->server->get('SCRIPT_NAME');
 
-        if (false === strpos($this->server->get('REQUEST_URI'), $baseUrl)) {
+        if (0 !== strpos($this->server->get('REQUEST_URI'), $baseUrl)) {
             // assume mod_rewrite
             return rtrim(dirname($baseUrl), '/\\');
         }
 
         return $baseUrl;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function preparePathInfo()
-    {
-        return $this->server->get('PATH_INFO') ?: substr($this->prepareRequestUri(), strlen($this->prepareBaseUrl())) ?: '/';
     }
 }

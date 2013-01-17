@@ -23,9 +23,9 @@ class ApacheRequestTest extends \PHPUnit_Framework_TestCase
         $request = new ApacheRequest();
         $request->server->replace($server);
 
-        $this->assertEquals($expectedRequestUri, $request->getRequestUri(), '->getRequestUri() is correct');
-        $this->assertEquals($expectedBaseUrl, $request->getBaseUrl(), '->getBaseUrl() is correct');
-        $this->assertEquals($expectedPathInfo, $request->getPathInfo(), '->getPathInfo() is correct');
+        $this->assertSame($expectedRequestUri, $request->getRequestUri(), '->getRequestUri() is correct');
+        $this->assertSame($expectedBaseUrl, $request->getBaseUrl(), '->getBaseUrl() is correct');
+        $this->assertSame($expectedPathInfo, $request->getPathInfo(), '->getPathInfo() is correct');
     }
 
     public function provideServerVars()
@@ -76,7 +76,7 @@ class ApacheRequestTest extends \PHPUnit_Framework_TestCase
                 ),
                 '/app_dev.php',
                 '/app_dev.php',
-                '/',
+                '',
             ),
             array(
                 array(
@@ -86,6 +86,24 @@ class ApacheRequestTest extends \PHPUnit_Framework_TestCase
                 '/',
                 '',
                 '/',
+            ),
+            array(
+                array(
+                    'REQUEST_URI' => '/symfony/app.php/',
+                    'SCRIPT_NAME' => '/symfony/app.php',
+                ),
+                '/symfony/app.php/',
+                '/symfony/app.php',
+                '/',
+            ),
+            array(
+                array(
+                    'REQUEST_URI' => '/symfony?foo=/symfony/index.php',
+                    'SCRIPT_NAME' => '/symfony/index.php',
+                ),
+                '/symfony?foo=/symfony/index.php',
+                '/symfony',
+                '',
             ),
         );
     }

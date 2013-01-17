@@ -166,11 +166,7 @@ class YamlDumper extends Dumper
             return '';
         }
 
-        if ($this->container->isFrozen()) {
-            $parameters = $this->prepareParameters($this->container->getParameterBag()->all());
-        } else {
-            $parameters = $this->container->getParameterBag()->all();
-        }
+        $parameters = $this->prepareParameters($this->container->getParameterBag()->all(), $this->container->isFrozen());
 
         return Yaml::dump(array('parameters' => $parameters), 2);
     }
@@ -240,12 +236,12 @@ class YamlDumper extends Dumper
      *
      * @return array
      */
-    private function prepareParameters($parameters)
+    private function prepareParameters($parameters, $escape = true)
     {
         $filtered = array();
         foreach ($parameters as $key => $value) {
             if (is_array($value)) {
-                $value = $this->prepareParameters($value);
+                $value = $this->prepareParameters($value, $escape);
             } elseif ($value instanceof Reference) {
                 $value = '@'.$value;
             }
@@ -253,7 +249,7 @@ class YamlDumper extends Dumper
             $filtered[$key] = $value;
         }
 
-        return $this->escape($filtered);
+        return $escape ? $this->escape($filtered) : $filtered;
     }
 
     /**

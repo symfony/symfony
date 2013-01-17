@@ -61,7 +61,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
             return array();
         }
 
-        $profileList = explode("\n", $indexContent);
+        $profileList = array_reverse(explode("\n", $indexContent));
         $result = array();
 
         foreach ($profileList as $item) {
@@ -99,14 +99,6 @@ class RedisProfilerStorage implements ProfilerStorageInterface
             );
             --$limit;
         }
-
-        usort($result, function($a, $b) {
-            if ($a['time'] === $b['time']) {
-                return 0;
-            }
-
-            return $a['time'] > $b['time'] ? -1 : 1;
-        });
 
         return $result;
     }

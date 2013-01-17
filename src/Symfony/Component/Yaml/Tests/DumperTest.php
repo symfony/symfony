@@ -154,7 +154,7 @@ EOF;
 
     public function testObjectSupportEnabled()
     {
-        $dump = $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, false, true);
+        $dump = $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, true);
 
         $this->assertEquals('{ foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}, bar: 1 }', $dump, '->dump() is able to dump objects');
     }
@@ -171,7 +171,7 @@ EOF;
      */
     public function testObjectSupportDisabledWithExceptions()
     {
-        $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, true, false);
+        $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, true, false);
     }
 }
 

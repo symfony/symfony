@@ -44,11 +44,11 @@ class RequestContext
      * @param string  $scheme    The HTTP scheme
      * @param integer $httpPort  The HTTP port
      * @param integer $httpsPort The HTTPS port
-     * @param string  $path      The path
+     * @param string  $pathinfo  The pathinfo
      *
      * @api
      */
-    public function __construct($baseUrl = '', $method = 'GET', $host = 'localhost', $scheme = 'http', $httpPort = 80, $httpsPort = 443, $path = '/')
+    public function __construct($baseUrl = '', $method = 'GET', $host = 'localhost', $scheme = 'http', $httpPort = 80, $httpsPort = 443, $pathinfo = '/')
     {
         $this->baseUrl = $baseUrl;
         $this->method = strtoupper($method);
@@ -56,7 +56,7 @@ class RequestContext
         $this->scheme = strtolower($scheme);
         $this->httpPort = $httpPort;
         $this->httpsPort = $httpsPort;
-        $this->pathInfo = $path;
+        $this->pathInfo = $pathinfo;
     }
 
     public function fromRequest(Request $request)

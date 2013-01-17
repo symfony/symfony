@@ -145,11 +145,11 @@ class Yaml
      *
      * @api
      */
-    public static function dump($array, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $objectSupport = false)
+    public static function dump($array, $inline = 2, $indent = 2, $exceptionOnInvalidType = false, $objectSupport = false)
     {
         $yaml = new Dumper();
         $yaml->setIndentation($indent);
 
-        return $yaml->dump($array, $inline, $exceptionOnInvalidType, $objectSupport);
+        return $yaml->dump($array, $inline, 0, $exceptionOnInvalidType, $objectSupport);
     }
 }

@@ -7,22 +7,22 @@ UPGRADE FROM 2.x to 3.0
    favor of `Psr\Log\LoggerInterface`. The only difference is that some method
    names are different:
 
-   * `emerg()` -> `emergency()`
-   * `crit()`  -> `critical()`
-   * `err()`   -> `error()`
-   * `warn()`  -> `warning()`
+     * `emerg()` -> `emergency()`
+     * `crit()`  -> `critical()`
+     * `err()`   -> `error()`
+     * `warn()`  -> `warning()`
 
    The previous method renames also happened to the following classes:
 
-   * `Symfony\Bridge\Monolog\Logger`
-   * `Symfony\Component\HttpKernel\Log\NullLogger`
+     * `Symfony\Bridge\Monolog\Logger`
+     * `Symfony\Component\HttpKernel\Log\NullLogger`
 
 ### Routing
 
  * Some route settings have been renamed:
 
-   * The `pattern` setting for a route has been deprecated in favor of `path`
-   * The `_scheme` and `_method` requirements have been moved to the `schemes` and `methods` settings
+     * The `pattern` setting for a route has been deprecated in favor of `path`
+     * The `_scheme` and `_method` requirements have been moved to the `schemes` and `methods` settings
 
    Before:
 
@@ -60,4 +60,20 @@ UPGRADE FROM 2.x to 3.0
    $route->setPath('/article/{id}');
    $route->setMethods(array('POST', 'PUT'));
    $route->setSchemes('https');
+   ```
+
+### Yaml
+
+ * The ability to pass file names to `Yaml::parse()` has been removed.
+
+   Before:
+
+   ```
+   Yaml::parse($fileName);
+   ```
+
+   After:
+
+   ```
+   Yaml::parse(file_get_contents($fileName));
    ```

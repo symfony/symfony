@@ -27,7 +27,7 @@ class Yaml
      *
      * @deprecated Deprecated since version 2.0, to be removed in 2.3.
      */
-    public static $enablePhpParsing = true;
+    public static $enablePhpParsing = false;
 
     /**
      * Enables PHP support when parsing YAML files.

@@ -138,7 +138,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Retrieves the default value.
      *
-     * The default value could be either explicited or derived from the prototype
+     * The default value could be either made explicit or derived from the prototype
      * default value.
      *
      * @return array The default value

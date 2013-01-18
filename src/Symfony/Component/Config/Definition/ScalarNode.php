@@ -40,6 +40,7 @@ class ScalarNode extends VariableNode
                 gettype($value)
             ));
             $ex->setPath($this->getPath());
+            $ex->setHint($this->getInfo());
 
             throw $ex;
         }

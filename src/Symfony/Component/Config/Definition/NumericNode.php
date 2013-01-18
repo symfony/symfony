@@ -47,6 +47,8 @@ class NumericNode extends ScalarNode
         if (isset($errorMsg)) {
             $ex = new InvalidConfigurationException($errorMsg);
             $ex->setPath($this->getPath());
+            $ex->setHint($this->getInfo());
+
             throw $ex;
         }
 

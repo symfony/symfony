@@ -30,4 +30,11 @@ class InvalidConfigurationException extends Exception
     {
         return $this->path;
     }
+
+    public function setHint($info)
+    {
+        if (null !== $info) {
+            $this->message .= sprintf("\nHint: %s.", $info);
+        }
+    }
 }

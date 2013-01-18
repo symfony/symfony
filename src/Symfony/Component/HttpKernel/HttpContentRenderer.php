@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HttpContentRenderer implements EventSubscriberInterface
+class HttpContentRenderer implements HttpContentRendererInterface, EventSubscriberInterface
 {
     private $debug;
     private $strategies;
@@ -33,7 +33,7 @@ class HttpContentRenderer implements EventSubscriberInterface
      * Constructor.
      *
      * @param RenderingStrategyInterface[] $strategies An array of RenderingStrategyInterface instances
-     * @param Boolean                      $debug      Whether the debug mode is enabled or not
+     * @param Boolean                      $debug      Whether the debug mode is enabled
      */
     public function __construct(array $strategies = array(), $debug = false)
     {
@@ -41,18 +41,27 @@ class HttpContentRenderer implements EventSubscriberInterface
         foreach ($strategies as $strategy) {
             $this->addStrategy($strategy);
         }
-        $this->debug = $debug;
+        $this->debug = (Boolean) $debug;
         $this->requests = array();
     }
 
     /**
-     * Adds a rendering strategy.
-     *
-     * @param RenderingStrategyInterface $strategy A RenderingStrategyInterface instance
+     * {@inheritdoc}
      */
     public function addStrategy(RenderingStrategyInterface $strategy)
     {
         $this->strategies[$strategy->getName()] = $strategy;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::REQUEST  => 'onKernelRequest',
+            KernelEvents::RESPONSE => 'onKernelResponse',
+        );
     }
 
     /**
@@ -76,22 +85,7 @@ class HttpContentRenderer implements EventSubscriberInterface
     }
 
     /**
-     * Renders a URI and returns the Response content.
-     *
-     * When the Response is a StreamedResponse, the content is streamed immediately
-     * instead of being returned.
-     *
-     * Available options:
-     *
-     *  * ignore_errors: true to return an empty string in case of an error
-     *
-     * @param string|ControllerReference $uri      A URI as a string or a ControllerReference instance
-     * @param string                     $strategy The strategy to use for the rendering
-     * @param array                      $options  An array of options
-     *
-     * @return string|null The Response content or null when the Response is streamed
-     *
-     * @throws \InvalidArgumentException when the strategy does not exist
+     * {@inheritdoc}
      */
     public function render($uri, $strategy = 'default', array $options = array())
     {
@@ -106,15 +100,9 @@ class HttpContentRenderer implements EventSubscriberInterface
         return $this->strategies[$strategy]->render($uri, $this->requests ? $this->requests[0] : null, $options);
     }
 
-    public static function getSubscribedEvents()
-    {
-        return array(
-            KernelEvents::REQUEST  => 'onKernelRequest',
-            KernelEvents::RESPONSE => 'onKernelResponse',
-        );
-    }
-
-    // to be removed in 2.3
+    /**
+     * {@inheritdoc}
+     */
     public function fixOptions(array $options)
     {
         // support for the standalone option is @deprecated in 2.2 and replaced with the strategy option

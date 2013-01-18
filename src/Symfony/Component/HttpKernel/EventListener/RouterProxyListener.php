@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\UriSigner;
+use Symfony\Component\HttpKernel\UriSignerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -31,7 +31,7 @@ class RouterProxyListener implements EventSubscriberInterface
 {
     private $signer;
 
-    public function __construct(UriSigner $signer)
+    public function __construct(UriSignerInterface $signer)
     {
         $this->signer = $signer;
     }

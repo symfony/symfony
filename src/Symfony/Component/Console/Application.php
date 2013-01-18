@@ -242,7 +242,8 @@ class Application
             $this->getLongVersion(),
             '',
             '<comment>Usage:</comment>',
-            sprintf("  [options] command [arguments]\n"),
+            '  [options] command [arguments]',
+            '',
             '<comment>Options:</comment>',
         );
 

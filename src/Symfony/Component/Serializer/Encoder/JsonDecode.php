@@ -57,7 +57,12 @@ class JsonDecode implements DecoderInterface
         $recursionDepth = $context['json_decode_recursion_depth'];
         $options        = $context['json_decode_options'];
 
-        $decodedData = json_decode($data, $associative, $recursionDepth, $options);
+        if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+            $decodedData = json_decode($data, $associative, $recursionDepth, $options);
+        } else {
+            $decodedData = json_decode($data, $associative, $recursionDepth);
+        }
+
         $this->lastError = json_last_error();
 
         return $decodedData;

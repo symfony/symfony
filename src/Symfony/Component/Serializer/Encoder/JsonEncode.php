@@ -16,7 +16,7 @@ namespace Symfony\Component\Serializer\Encoder;
  *
  * @author Sander Coolen <sander@jibber.nl>
  */
-class JsonEncode extends SerializerAwareEncoder implements EncoderInterface
+class JsonEncode implements EncoderInterface
 {
     private $options ;
     private $lastError = JSON_ERROR_NONE;
@@ -41,16 +41,13 @@ class JsonEncode extends SerializerAwareEncoder implements EncoderInterface
     /**
      * Encodes PHP data to a JSON string
      *
-     * @param mixed  $data
-     * @param string $format
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function encode($data, $format)
+    public function encode($data, $format, array $context = array())
     {
-        $options = $this->getContext();
+        $context = $this->resolveContext($context);
 
-        $encodedJson = json_encode($data, $options);
+        $encodedJson = json_encode($data, $context['json_encode_options']);
         $this->lastError = json_last_error();
 
         return $encodedJson;
@@ -64,22 +61,14 @@ class JsonEncode extends SerializerAwareEncoder implements EncoderInterface
         return JsonEncoder::FORMAT === $format;
     }
 
-    private function getContext()
+    /**
+     * Merge default json encode options with context.
+     *
+     * @param array $context
+     * @return array
+     */
+    private function resolveContext(array $context = array())
     {
-        if (!$this->serializer) {
-            return 0;
-        }
-
-        $context = $this->serializer->getContext();
-
-        if (empty($context)) {
-            $context = array(0);
-        }
-
-        if (!is_array($context)) {
-            $context = array($context);
-        }
-
-        return array_sum($context);
+        return array_merge(array('json_encode_options' => $this->options), $context);
     }
 }

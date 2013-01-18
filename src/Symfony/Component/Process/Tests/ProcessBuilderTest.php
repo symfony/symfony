@@ -114,5 +114,33 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $proc = $pb->getProcess();
 
         $this->assertContains("second", $proc->getCommandLine());
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
+     */
+    public function testAddAcceptStringOnly()
+    {
+        ProcessBuilder::create()->add(array());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
+     */
+    public function testSetArgumentsAcceptStringOnly()
+    {
+        ProcessBuilder::create()->setArguments(array(array()));
+    }
+
+    public function testAddUnescapedArguments()
+    {
+        $proc = ProcessBuilder::create(array('fooEscaped'))
+            ->add('barEscaped')
+            ->add('FooUnescaped', false)
+            ->getProcess()
+        ;
+
+        $this->assertContains(
+            escapeshellarg('fooEscaped') . ' ' . escapeshellarg('barEscaped') . ' FooUnescaped',
+            $proc->getCommandLine()
+        );
     }
 }

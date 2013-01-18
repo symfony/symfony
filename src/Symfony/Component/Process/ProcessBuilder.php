@@ -31,8 +31,7 @@ class ProcessBuilder
 
     public function __construct(array $arguments = array())
     {
-        $this->arguments = $arguments;
-
+        $this->setArguments($arguments);
         $this->timeout = 60;
         $this->options = array();
         $this->env = array();
@@ -51,9 +50,13 @@ class ProcessBuilder
      *
      * @return ProcessBuilder
      */
-    public function add($argument)
+    public function add($argument, $escape = true)
     {
-        $this->arguments[] = $argument;
+        if (!is_string($argument)) {
+            throw new InvalidArgumentException('The argument must be a string.');
+        }
+
+        $this->arguments[] = array($argument, $escape);
 
         return $this;
     }
@@ -65,7 +68,14 @@ class ProcessBuilder
      */
     public function setArguments(array $arguments)
     {
-        $this->arguments = $arguments;
+        $this->arguments = array_map(function($arg) {
+                if (!is_string($arg)) {
+                    throw new InvalidArgumentException('Arguments must be strings.');
+                }
+                return array($arg, true);
+            },
+            $arguments
+        );
 
         return $this;
     }
@@ -143,7 +153,7 @@ class ProcessBuilder
 
         $options = $this->options;
 
-        $script = implode(' ', array_map('escapeshellarg', $this->arguments));
+        $script = implode(' ', array_map(function($arg) { return $arg[1] ? escapeshellarg($arg[0]) : $arg[0]; }, $this->arguments));
 
         if ($this->inheritEnv) {
             $env = $this->env ? $this->env + $_ENV : null;

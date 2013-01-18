@@ -19,7 +19,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     public function testParse()
     {
         foreach ($this->getTestsForParse() as $yaml => $value) {
-            $this->assertEquals($value, Inline::parse($yaml), sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
+            $this->assertSame($value, Inline::parse($yaml), sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
         }
     }
 
@@ -73,6 +73,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             'false' => false,
             'true' => true,
             '12' => 12,
+            '-12' => -12,
             '"quoted string"' => 'quoted string',
             "'quoted string'" => 'quoted string',
             '12.30e+02' => 12.30e+02,
@@ -82,7 +83,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             '-.Inf' => log(0),
             "'686e444'" => '686e444',
             '686e444' => 646e444,
-            '123456789123456789' => '123456789123456789',
+            '123456789123456789123456789123456789' => '123456789123456789123456789123456789',
             '"foo\r\nbar"' => "foo\r\nbar",
             "'foo#bar'" => 'foo#bar',
             "'foo # bar'" => 'foo # bar',

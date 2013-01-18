@@ -393,6 +393,11 @@ class Inline
                 $cast = intval($scalar);
 
                 return '0' == $scalar[0] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
+            case '-' === $scalar[0] && ctype_digit(substr($scalar, 1)):
+                $raw = $scalar;
+                $cast = intval($scalar);
+
+                return '0' == $scalar[1] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
             case 'true' === strtolower($scalar):
                 return true;
             case 'false' === strtolower($scalar):

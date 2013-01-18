@@ -86,6 +86,7 @@ class ProcessBuilder
                 if (!is_string($arg)) {
                     throw new InvalidArgumentException('Arguments must be strings.');
                 }
+
                 return array($arg, true);
             },
             $arguments

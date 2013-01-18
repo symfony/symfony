@@ -11,15 +11,12 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\SerializerAwareInterface;
-
 /**
  * Decodes JSON data
  *
  * @author Sander Coolen <sander@jibber.nl>
  */
-class JsonDecode implements DecoderInterface, SerializerAwareInterface
+class JsonDecode implements DecoderInterface
 {
     private $associative;
     private $recursionDepth;
@@ -52,13 +49,13 @@ class JsonDecode implements DecoderInterface, SerializerAwareInterface
      *
      * @return mixed
      */
-    public function decode($data, $format)
+    public function decode($data, $format, array $context = array())
     {
-        $context = $this->getContext();
+        $context = $this->resolveContext($context);
 
-        $associative    = $context['associative'];
-        $recursionDepth = $context['recursionDepth'];
-        $options        = $context['options'];
+        $associative    = $context['json_decode_associative'];
+        $recursionDepth = $context['json_decode_recursion_depth'];
+        $options        = $context['json_decode_options'];
 
         $decodedData = json_decode($data, $associative, $recursionDepth, $options);
         $this->lastError = json_last_error();
@@ -75,45 +72,19 @@ class JsonDecode implements DecoderInterface, SerializerAwareInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Merge the default options of the Json Decoder with the passed context.
+     *
+     * @param array $context
+     * @return array
      */
-    public function setSerializer(SerializerInterface $serializer)
+    private function resolveContext(array $context)
     {
-        $this->serializer = $serializer;
-    }
-
-    private function getContext()
-    {
-        $options = array(
-            'associative' => $this->associative,
-            'recursionDepth' => $this->recursionDepth,
-            'options' => 0
+        $defaultOptions = array(
+            'json_decode_associative' => $this->associative,
+            'json_decode_recursion_depth' => $this->recursionDepth,
+            'json_decode_options' => 0
         );
 
-        if (!$this->serializer) {
-            return $options;
-        }
-
-        $options = array(
-            'associative' => false,
-            'recursionDepth' => 512,
-            'options' => 0
-        );
-
-        $context = $this->serializer->getContext();
-
-        if (isset($context['associative'])) {
-            $options['associative'] = $context['associative'];
-        }
-
-        if (isset($context['recursionDepth'])) {
-            $options['recursionDepth'] = $context['recursionDepth'];
-        }
-
-        if (isset($context['options'])) {
-            $options['options'] = $context['options'];
-        }
-
-        return $options;
+        return array_merge($defaultOptions, $context);
     }
 }

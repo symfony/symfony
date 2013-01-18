@@ -21,7 +21,6 @@ class JsonEncoderTest extends \PHPUnit_Framework_TestCase
     {
         $this->encoder = new JsonEncoder;
         $this->serializer = new Serializer(array(new CustomNormalizer()), array('json' => new JsonEncoder()));
-        $this->encoder->setSerializer($this->serializer);
     }
 
     public function testEncodeScalar()
@@ -45,7 +44,7 @@ class JsonEncoderTest extends \PHPUnit_Framework_TestCase
 
     public function testOptions()
     {
-        $context = array(JSON_NUMERIC_CHECK);
+        $context = array('json_encode_options' => JSON_NUMERIC_CHECK);
 
         $arr = array();
         $arr['foo'] = "3";

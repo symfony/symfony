@@ -40,11 +40,4 @@ interface SerializerInterface
      * @return object
      */
     public function deserialize($data, $type, $format, array $context = array());
-
-    /**
-     * Get current options of the serializer
-     *
-     * @return array
-     */
-    public function getContext();
 }

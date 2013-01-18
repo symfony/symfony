@@ -383,3 +383,9 @@
    framework:
       trusted_proxies: ['127.0.0.1', '10.0.0.1'] # a list of proxy IPs you trust
    ```
+
+#### Serializer
+
+ * All serializer interfaces (Serializer, Normalizer, Encoder) have been extended with an optional ``$context`` array.
+   This was necessary to allow for more complex use-cases that require context information during the (de)normalization
+   and en-/decoding steps.

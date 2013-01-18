@@ -206,7 +206,7 @@ abstract class FrameworkExtensionTest extends TestCase
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
         $this->assertContains(
-            'Symfony/Component/Security/Resources/translations/security.en.xlf',
+            str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Security/Resources/translations/security.en.xlf'),
             $files,
             '->registerTranslatorConfiguration() finds Security translation resources'
         );

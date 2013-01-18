@@ -48,6 +48,9 @@ class ControllerResolver extends BaseControllerResolver
      * @param string $controller A Controller string
      *
      * @return mixed A PHP callable
+     *
+     * @throws \LogicException When the controller format is not recognized
+     * @throws \InvalidArgumentException When the controller class does not exist
      */
     protected function createController($controller)
     {

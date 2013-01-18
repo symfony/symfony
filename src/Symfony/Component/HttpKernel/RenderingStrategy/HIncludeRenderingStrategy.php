@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\RenderingStrategy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
-use Symfony\Component\HttpKernel\UriSigner;
+use Symfony\Component\HttpKernel\UriSignerInterface;
 
 /**
  * Implements the Hinclude rendering strategy.
@@ -31,10 +31,12 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
      * Constructor.
      *
      * @param EngineInterface|\Twig_Environment $templating            An EngineInterface or a \Twig_Environment instance
-     * @param UriSigner                         $signer                A UriSigner instance
+     * @param UriSignerInterface                $signer                A UriSignerInterface instance
      * @param string                            $globalDefaultTemplate The global default content (it can be a template name or the content)
+     *
+     * @throws \InvalidArgumentException When an invalid $templating is given
      */
-    public function __construct($templating = null, UriSigner $signer = null, $globalDefaultTemplate = null)
+    public function __construct($templating = null, UriSignerInterface $signer = null, $globalDefaultTemplate = null)
     {
         if (null !== $templating && !$templating instanceof EngineInterface && !$templating instanceof \Twig_Environment) {
             throw new \InvalidArgumentException('The hinclude rendering strategy needs an instance of \Twig_Environment or Symfony\Component\Templating\EngineInterface');
@@ -72,6 +74,14 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
         return sprintf('<hx:include src="%s">%s</hx:include>', $uri, $content);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'hinclude';
+    }
+
     private function templateExists($template)
     {
         if ($this->templating instanceof EngineInterface) {
@@ -91,13 +101,5 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
         }
 
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'hinclude';
     }
 }

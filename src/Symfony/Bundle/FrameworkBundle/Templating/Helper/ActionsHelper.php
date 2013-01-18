@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\HttpKernel\HttpContentRenderer;
+use Symfony\Component\HttpKernel\HttpContentRendererInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
@@ -27,9 +27,9 @@ class ActionsHelper extends Helper
     /**
      * Constructor.
      *
-     * @param HttpContentRenderer $renderer A HttpContentRenderer instance
+     * @param HttpContentRendererInterface $renderer A HttpContentRendererInterface instance
      */
-    public function __construct(HttpContentRenderer $renderer)
+    public function __construct(HttpContentRendererInterface $renderer)
     {
         $this->renderer = $renderer;
     }

@@ -43,7 +43,7 @@ abstract class GeneratorAwareRenderingStrategy implements RenderingStrategyInter
      * placeholders.
      *
      * @param ControllerReference  $reference A ControllerReference instance
-     * @param Request              $request    A Request instance
+     * @param Request              $request   A Request instance
      *
      * @return string A proxy URI
      *

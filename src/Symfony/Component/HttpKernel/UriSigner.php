@@ -16,9 +16,9 @@ namespace Symfony\Component\HttpKernel;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class UriSigner
+class UriSigner implements UriSignerInterface
 {
-    private $secret;
+    protected $secret;
 
     /**
      * Constructor.
@@ -31,14 +31,7 @@ class UriSigner
     }
 
     /**
-     * Signs a URI.
-     *
-     * The given URI is signed by adding a _hash query string parameter
-     * which value depends on the URI and the secret.
-     *
-     * @param string $uri A URI to sign
-     *
-     * @return string The signed URI
+     * {@inheritdoc}
      */
     public function sign($uri)
     {
@@ -46,29 +39,23 @@ class UriSigner
     }
 
     /**
-     * Checks that a URI contains the correct hash.
-     *
-     * The _hash query string parameter must be the last one
-     * (as it is generated that way by the sign() method, it should
-     * never be a problem).
-     *
-     * @param string $uri A signed URI
-     *
-     * @return Boolean True if the URI is signed correctly, false otherwise
+     * {@inheritdoc}
      */
     public function check($uri)
     {
-        if (!preg_match('/(\?|&)_hash=(.+?)$/', $uri, $matches, PREG_OFFSET_CAPTURE)) {
+        if (!preg_match('/(.*)(?:\?|&)_hash=(.+?)$/', $uri, $matches)) {
             return false;
         }
 
-        // the naked URI is the URI without the _hash parameter (we need to keep the ? if there is some other parameters after)
-        $nakedUri = substr($uri, 0, $matches[0][1]).substr($uri, $matches[0][1] + strlen($matches[0][0]));
-
-        return $this->computeHash($nakedUri) === $matches[2][0];
+        return $this->computeHash($matches[1]) === $matches[2];
     }
 
-    private function computeHash($uri)
+    /**
+     * @param string $uri
+     *
+     * @return string A signature
+     */
+    protected function computeHash($uri)
     {
         return urlencode(base64_encode(hash_hmac('sha1', $uri, $this->secret, true)));
     }

@@ -89,7 +89,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
-            $result[$itemToken] = array(
+            $result[] = array(
                 'token'  => $itemToken,
                 'ip'     => $itemIp,
                 'method' => $itemMethod,

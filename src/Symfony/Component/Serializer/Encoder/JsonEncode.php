@@ -16,7 +16,7 @@ namespace Symfony\Component\Serializer\Encoder;
  *
  * @author Sander Coolen <sander@jibber.nl>
  */
-class JsonEncode implements EncoderInterface
+class JsonEncode extends SerializerAwareEncoder implements EncoderInterface
 {
     private $options ;
     private $lastError = JSON_ERROR_NONE;
@@ -48,7 +48,9 @@ class JsonEncode implements EncoderInterface
      */
     public function encode($data, $format)
     {
-        $encodedJson = json_encode($data, $this->options);
+        $options = $this->getContext();
+
+        $encodedJson = json_encode($data, $options);
         $this->lastError = json_last_error();
 
         return $encodedJson;
@@ -60,5 +62,24 @@ class JsonEncode implements EncoderInterface
     public function supportsEncoding($format)
     {
         return JsonEncoder::FORMAT === $format;
+    }
+
+    private function getContext()
+    {
+        if (!$this->serializer) {
+            return 0;
+        }
+
+        $context = $this->serializer->getContext();
+
+        if (empty($context)) {
+            $context = array(0);
+        }
+
+        if (!is_array($context)) {
+            $context = array($context);
+        }
+
+        return array_sum($context);
     }
 }

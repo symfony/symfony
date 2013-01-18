@@ -16,7 +16,7 @@ namespace Symfony\Component\Serializer\Encoder;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class JsonEncoder implements EncoderInterface, DecoderInterface
+class JsonEncoder extends SerializerAwareEncoder implements EncoderInterface, DecoderInterface
 {
     const FORMAT = 'json';
 
@@ -61,6 +61,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
      */
     public function encode($data, $format)
     {
+        $this->encodingImpl->setSerializer($this->serializer);
+
         return $this->encodingImpl->encode($data, self::FORMAT);
     }
 
@@ -69,6 +71,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
      */
     public function decode($data, $format)
     {
+        $this->decodingImpl->setSerializer($this->serializer);
+
         return $this->decodingImpl->decode($data, self::FORMAT);
     }
 

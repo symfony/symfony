@@ -4,5 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="_proxy" pattern="/_proxy/{_controller}.{_format}" />
+    <route id="_proxy" pattern="/_proxy/controller/{_controller}/format/{_format}">
+        <requirement key="_controller">.+</requirement>
+    </route>
 </routes>

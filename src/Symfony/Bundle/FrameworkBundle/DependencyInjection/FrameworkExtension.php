@@ -430,7 +430,9 @@ class FrameworkExtension extends Extension
         if (1 === count($engines)) {
             $container->setAlias('templating', (string) reset($engines));
         } else {
-            $container->getDefinition('templating.engine.delegating')->replaceArgument(1, $engines);
+            foreach ($engines as $engine) {
+                $container->getDefinition('templating.engine.delegating')->addMethodCall('addEngine', array($engine));
+            }
             $container->setAlias('templating', 'templating.engine.delegating');
         }
     }

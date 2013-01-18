@@ -65,6 +65,57 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($value, Inline::parse(Inline::dump($value)));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testParseScalarWithIncorrectlyQuotedStringShouldThrowException()
+    {
+        $value = "'don't do somthin' like that'";
+        Inline::parse($value);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testParseScalarWithIncorrectlyDoubleQuotedStringShouldThrowException()
+    {
+        $value = '"don"t do somthin" like that"';
+        Inline::parse($value);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testParseInvalidMappingKeyShouldThrowException()
+    {
+        $value = '{ "foo " bar": "bar" }';
+        Inline::parse($value);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testParseInvalidMappingShouldThrowException()
+    {
+        Inline::parse('[foo] bar');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testParseInvalidSequenceShouldThrowException()
+    {
+        Inline::parse('{ foo: bar } bar');
+    }
+
+    public function testParseScalarWithCorrectlyQuotedStringShouldReturnString()
+    {
+        $value = "'don''t do somthin'' like that'";
+        $expect = "don't do somthin' like that";
+
+        $this->assertSame($expect, Inline::parseScalar($value));
+    }
+
     protected function getTestsForParse()
     {
         return array(

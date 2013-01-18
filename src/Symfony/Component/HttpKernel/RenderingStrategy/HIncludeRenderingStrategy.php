@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\UriSigner;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Implements the Hinclude rendering strategy.
@@ -24,6 +25,8 @@ use Symfony\Component\HttpKernel\UriSigner;
 class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
 {
     private $templating;
+    private $container;
+    private $templatingServiceName;
     private $globalDefaultTemplate;
     private $signer;
 
@@ -46,6 +49,22 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
     }
 
     /**
+     * Set the container for the Templating service.
+     *
+     * We can't always inject the templating service
+     * in the constructor as this causes a circular reference.
+     *
+     * @param ContainerInterface $container
+     * @param string             $templatingServiceName
+     */
+    public function setContainer(ContainerInterface $container = null, $templatingServiceName = 'templating')
+    {
+        $this->container = $container;
+        $this->templatingServiceName = $templatingServiceName;
+        $this->templating = null;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * Additional available options:
@@ -60,6 +79,10 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
             }
 
             $uri = $this->signer->sign($this->generateProxyUri($uri, $request));
+        }
+
+        if (null === $this->templating && null !== $this->container) {
+            $this->templating = $this->container->get($this->templatingServiceName, ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
         }
 
         $template = isset($options['default']) ? $options['default'] : $this->globalDefaultTemplate;

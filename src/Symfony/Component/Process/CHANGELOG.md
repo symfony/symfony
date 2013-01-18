@@ -4,6 +4,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * [BC BREAK] added a second argument to ProcessBuilder::add() to force unescaping.
  * added ProcessBuilder::setArguments() to reset the arguments on a builder
  * added a way to retrieve the standard and error output incrementally
  * added Process:restart()

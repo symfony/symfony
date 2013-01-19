@@ -23,7 +23,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
 class SerializerPassTest extends \PHPUnit_Framework_TestCase
 {
 
-    
     public function testThrowExceptionWhenNoNormalizers()
     {
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');

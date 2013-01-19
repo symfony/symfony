@@ -42,13 +42,13 @@ class SerializerPass implements CompilerPassInterface
     {
         $services = $container->findTaggedServiceIds($tagName);
         
-        if(empty($services)) {
-            throw new \RuntimeException(sprintf("You must tag at least one service as '%s' to use the Serializer service", $tagName));    
+        if (empty($services)) {
+            throw new \RuntimeException(sprintf('You must tag at least one service as "%s" to use the Serializer service', $tagName));    
         }
         
         $sortedServices = array();
         foreach ($services as $serviceId => $tags) {
-            foreach($tags as $tag) {
+            foreach ($tags as $tag) {
                 $priority = isset($tag['priority']) ? $tag['priority'] : 0;
                 $sortedServices[$priority][] = new Reference($serviceId);
             }

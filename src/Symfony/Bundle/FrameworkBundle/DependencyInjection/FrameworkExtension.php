@@ -673,7 +673,7 @@ class FrameworkExtension extends Extension
      */
     private function registerSerializerConfiguration(array $config, XmlFileLoader $loader)
     {
-        if (!empty($config['enabled'])) {
+        if ($config['enabled']) {
             $loader->load('serializer.xml');
         }
     }

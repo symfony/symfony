@@ -110,6 +110,10 @@ class FrameworkExtension extends Extension
             $this->registerTranslatorConfiguration($config['translator'], $container);
         }
 
+        if (isset($config['serializer'])) {
+            $this->registerSerializerConfiguration($config['serializer'], $loader);
+        }
+
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
 
         $this->addClassesToCompile(array(
@@ -658,6 +662,19 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(2, $config['debug'])
             ;
             $container->setAlias('annotation_reader', 'annotations.cached_reader');
+        }
+    }
+
+    /**
+     * Loads the Serializer configuration.
+     *
+     * @param array         $config A Serializer configuration array
+     * @param XmlFileLoader $loader An XmlFileLoader instance
+     */
+    private function registerSerializerConfiguration(array $config, XmlFileLoader $loader)
+    {
+        if ($config['enabled']) {
+            $loader->load('serializer.xml');
         }
     }
 

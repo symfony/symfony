@@ -19,7 +19,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testRow()
     {
         $form = $this->factory->createNamed('name', 'text');
-        $form->addError(new FormError('Error!'));
+        $form->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
         $html = $this->renderRow($view);
 
@@ -58,7 +58,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testRepeatedRow()
     {
         $form = $this->factory->createNamed('name', 'repeated');
-        $form->addError(new FormError('Error!'));
+        $form->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
         $html = $this->renderRow($view);
 
@@ -398,7 +398,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             )
             ->getForm();
 
-        $form->get('child')->addError(new FormError('Error!'));
+        $form->get('child')->addError(new FormError('[trans]Error![/trans]'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
@@ -522,6 +522,23 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ./label[@for="name"][not(@id)]
         /following-sibling::input[@id="name"]
     ]
+'
+        );
+    }
+
+    public function testLabelIsNotRenderedWhenSetToFalse()
+    {
+        $form = $this->factory->createNamed('name', 'text', null, array(
+            'label' => false
+        ));
+        $html = $this->renderRow($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
+        ./input[@id="name"]
+    ]
+    [count(//label)=0]
 '
         );
     }

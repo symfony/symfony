@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\Exception;
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
 use Symfony\Component\Form\Extension\Core\EventListener\FixCheckboxInputListener;
@@ -41,7 +41,7 @@ class ChoiceType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$options['choice_list'] && !is_array($options['choices']) && !$options['choices'] instanceof \Traversable) {
-            throw new FormException('Either the option "choices" or "choice_list" must be set.');
+            throw new Exception('Either the option "choices" or "choice_list" must be set.');
         }
 
         if ($options['expanded']) {
@@ -256,7 +256,7 @@ class ChoiceType extends AbstractType
                     $choiceType = 'radio';
                 }
 
-                $builder->add((string) $i, $choiceType, $choiceOpts);
+                $builder->add($i, $choiceType, $choiceOpts);
             }
         }
     }

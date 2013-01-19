@@ -53,12 +53,14 @@
 .sf-toolbarreset .hide-button {
     display: block;
     position: absolute;
-    top: 12px;
-    right: 10px;
-    width: 15px;
-    height: 15px;
+    top: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
     cursor: pointer;
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAMAAAAMCGV4AAAAllBMVEXDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PExMTPz8/Q0NDR0dHT09Pb29vc3Nzf39/h4eHi4uLj4+P6+vr7+/v8/Pz9/f3///+Nh2QuAAAAIXRSTlMABgwPGBswMzk8QktRV4SKjZOWmaKlq7TAxszb3urt+fy1vNEpAAAAiklEQVQIHUXBBxKCQBREwRFzDqjoGh+C2YV//8u5Sll2S0E/dof1tKdKM6GyqCto7PjZRJIS/mbSELgXOSd/BzpKIH1ZefVWpDDTHsi8mZVnwImPi5ndCLbaAZk3M58Bay0h9VbeSvMpjDUAHj4jL55AW1rxN5fU2PLjIgVRzNdxVFOlGzvnJi0Fb1XNGBHA9uQOAAAAAElFTkSuQmCC');
+    background-repeat: no-repeat;
+    background-position: 13px 11px;
 }
 
 .sf-toolbar-block {
@@ -77,11 +79,19 @@
 }
 
 .sf-toolbar-block .sf-toolbar-info-piece {
-    padding-bottom: 5px;
+    line-height: 19px;
+    margin-bottom: 5px;
+}
+
+.sf-toolbar-block .sf-toolbar-info-piece .sf-toolbar-status {
+    padding: 0px 5px;
+    border-radius: 5px;
+    margin-bottom: 0px;
+    vertical-align: top;
 }
 
 .sf-toolbar-block .sf-toolbar-info-piece:last-child {
-    padding-bottom: 0;
+    margin-bottom: 0;
 }
 
 .sf-toolbar-block .sf-toolbar-info-piece a,
@@ -92,6 +102,7 @@
 .sf-toolbar-block .sf-toolbar-info-piece b {
     display: inline-block;
     width: 110px;
+    vertical-align: top;
 }
 
 .sf-toolbar-block .sf-toolbar-info-with-next-pointer:after {
@@ -110,11 +121,17 @@
     position: absolute;
     background-color: #fff;
     border: 1px solid #bbb;
-    padding: 10px 8px;
+    padding: 9px 0;
     margin-left: -1px;
 
     bottom: 38px;
     border-bottom-width: 0;
+    border-bottom: 1px solid #bbb;
+    border-radius: 4px 4px 0 0;
+}
+
+.sf-toolbarreset > div:last-of-type .sf-toolbar-info {
+    right: -1px;
 }
 
 .sf-toolbar-block .sf-toolbar-info:empty {
@@ -228,14 +245,28 @@
 }
 
 .sf-toolbar-block:hover {
-    box-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0 0 5px;
+    border-right: none;
+    margin-right: 1px;
+    position: relative;
 }
 
 .sf-toolbar-block:hover .sf-toolbar-icon {
     background-color: #fff;
+    border-top: 1px dotted #DDD;
+    position: relative;
+    margin-top: -1px;
+    z-index: 10002;
 }
+
 .sf-toolbar-block:hover .sf-toolbar-info {
     display: block;
+    min-width: -webkit-calc(100% + 2px);
+    min-width: calc(100% + 2px);
+    z-index: 10001;
+    box-sizing: border-box;
+    padding: 9px;
+    line-height: 19px;
 }
 
 /***** Override the setting when the toolbar is on the top *****/
@@ -272,7 +303,14 @@
         top: 39px;
         bottom: auto;
         border-top-width: 0;
-        border-bottom: 1px solid #bbb;
+        border-radius: 0 0 4px 4px;
+    }
+
+    .sf-toolbar-block:hover .sf-toolbar-icon {
+        border-top: none;
+        border-bottom: 1px dotted #DDD;
+        margin-top: 0;
+        margin-bottom: -1px;
     }
 {% endif %}
 

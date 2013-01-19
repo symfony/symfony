@@ -44,12 +44,29 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the 'baz' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return Baz A Baz instance.
+     */
+    protected function getBazService()
+    {
+        $this->services['baz'] = $instance = new \Baz();
+
+        $instance->setFoo($this->get('foo_with_inline'));
+
+        return $instance;
+    }
+
+    /**
      * Gets the 'factory_service' service.
      *
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return Object An instance returned by foo.baz::getInstance().
+     * @return Bar A Bar instance.
      */
     protected function getFactoryServiceService()
     {
@@ -59,13 +76,16 @@ class ProjectServiceContainer extends Container
     /**
      * Gets the 'foo' service.
      *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
      * @return FooClass A FooClass instance.
      */
     protected function getFooService()
     {
         $a = $this->get('foo.baz');
 
-        $instance = call_user_func(array('FooClass', 'getInstance'), 'foo', $a, array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'bar' => $this->getParameter('foo')), true, $this);
+        $this->services['foo'] = $instance = call_user_func(array('FooClass', 'getInstance'), 'foo', $a, array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo')), true, $this);
 
         $instance->setBar($this->get('bar'));
         $instance->initialize();
@@ -96,16 +116,30 @@ class ProjectServiceContainer extends Container
     /**
      * Gets the 'foo_bar' service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
      * @return Object A %foo_class% instance.
      */
     protected function getFooBarService()
     {
         $class = $this->getParameter('foo_class');
 
-        return $this->services['foo_bar'] = new $class();
+        return new $class();
+    }
+
+    /**
+     * Gets the 'foo_with_inline' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return Foo A Foo instance.
+     */
+    protected function getFooWithInlineService()
+    {
+        $this->services['foo_with_inline'] = $instance = new \Foo();
+
+        $instance->setBar($this->get('inlined'));
+
+        return $instance;
     }
 
     /**
@@ -142,6 +176,28 @@ class ProjectServiceContainer extends Container
     protected function getAliasForFooService()
     {
         return $this->get('foo');
+    }
+
+    /**
+     * Gets the 'inlined' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * This service is private.
+     * If you want to be able to request this service from the container directly,
+     * make it public, otherwise you might end up with broken code.
+     *
+     * @return Bar A Bar instance.
+     */
+    protected function getInlinedService()
+    {
+        $this->services['inlined'] = $instance = new \Bar();
+
+        $instance->setBaz($this->get('baz'));
+        $instance->pub = 'pub';
+
+        return $instance;
     }
 
     /**

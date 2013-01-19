@@ -7,6 +7,7 @@
     <parameters>
         <parameter key="web_profiler.controller.profiler.class">Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController</parameter>
         <parameter key="web_profiler.controller.router.class">Symfony\Bundle\WebProfilerBundle\Controller\RouterController</parameter>
+        <parameter key="web_profiler.controller.exception.class">Symfony\Bundle\WebProfilerBundle\Controller\ExceptionController</parameter>
     </parameters>
 
     <services>
@@ -22,6 +23,12 @@
             <argument type="service" id="profiler" />
             <argument type="service" id="twig" />
             <argument type="service" id="router" on-invalid="null" />
+        </service>
+
+        <service id="web_profiler.controller.exception" class="%web_profiler.controller.exception.class%">
+            <argument type="service" id="profiler" />
+            <argument type="service" id="twig" />
+            <argument>%kernel.debug%</argument>
         </service>
     </services>
 </container>

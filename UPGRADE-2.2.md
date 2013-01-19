@@ -1,6 +1,22 @@
 ﻿UPGRADE FROM 2.1 to 2.2
 =======================
 
+### TwigBridge
+
+ * The `render` tag signature and arguments changed.
+
+   Before:
+
+   ```
+   {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
+   ```
+
+   After:
+
+   ```
+   {% render controller('BlogBundle:Post:list', { 'limit': 2 }), { 'alt': 'BlogBundle:Post:error' } %}
+   ```
+
 ### HttpFoundation
 
  * The MongoDbSessionHandler default field names and timestamp type have changed.
@@ -37,7 +53,169 @@
 
 ### Form
 
-  * The PasswordType is now not trimmed by default.
+ * The PasswordType is now not trimmed by default.
+
+ * The class FormException is now an interface. The old class is still available
+   under the name Symfony\Component\Form\Exception\Exception, but will probably
+   be removed before 2.2. If you created FormException instances manually,
+   you are now advised to create any of the other exceptions in the
+   Symfony\Component\Form\Exception namespace or to create custom exception
+   classes for your purpose.
+
+ * Translating validation errors is now optional. You can still do so
+   manually if you like, or you can simplify your templates to simply output
+   the already translated message.
+
+   Before:
+
+   ```
+   {{
+       error.messagePluralization is null
+           ? error.messageTemplate|trans(error.messageParameters, 'validators')
+           : error.messageTemplate|transchoice(error.messagePluralization, error.messageParameters, 'validators')
+   }}
+   ```
+
+   After:
+
+   ```
+   {{ error.message }}
+   ```
+
+ * FormType, ModelType and PropertyPathMapper now have constructors. If you
+   extended these classes, you should call the parent constructor now.
+   Note that you are not recommended to extend FormType nor ModelType. You should
+   extend AbstractType instead and use the Form component's own inheritance
+   mechanism (`AbstractType::getParent()`).
+
+   Before:
+
+   ```
+   use Symfony\Component\Form\Extensions\Core\DataMapper\PropertyPathMapper;
+
+   class CustomMapper extends PropertyPathMapper
+   {
+       public function __construct()
+       {
+           // ...
+       }
+
+       // ...
+   }
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\Form\Extensions\Core\DataMapper\PropertyPathMapper;
+
+   class CustomMapper extends PropertyPathMapper
+   {
+       public function __construct()
+       {
+           parent::__construct();
+
+           // ...
+       }
+
+       // ...
+   }
+   ```
+
+#### Deprecations
+
+ * The methods `getParent()`, `setParent()` and `hasParent()` in
+   `FormBuilderInterface` were deprecated and will be removed in Symfony 2.3.
+   You should not rely on these methods in your form type because the parent
+   of a form can change after building it.
+
+ * The class PropertyPath and related classes were deprecated and moved to a
+   dedicated component PropertyAccess. If you used any of these classes or
+   interfaces, you should adapt the namespaces now. During the move,
+   InvalidPropertyException was renamed to NoSuchPropertyException.
+
+   Before:
+
+   ```
+   use Symfony\Component\Form\Util\PropertyPath;
+   use Symfony\Component\Form\Util\PropertyPathBuilder;
+   use Symfony\Component\Form\Util\PropertyPathInterface;
+   use Symfony\Component\Form\Util\PropertyPathIterator;
+   use Symfony\Component\Form\Util\PropertyPathIteratorInterface;
+   use Symfony\Component\Form\Exception\InvalidPropertyException;
+   use Symfony\Component\Form\Exception\InvalidPropertyPathException;
+   use Symfony\Component\Form\Exception\PropertyAccessDeniedException;
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\PropertyAccess\PropertyPath;
+   use Symfony\Component\PropertyAccess\PropertyPathBuilder;
+   use Symfony\Component\PropertyAccess\PropertyPathInterface;
+   use Symfony\Component\PropertyAccess\PropertyPathIterator;
+   use Symfony\Component\PropertyAccess\PropertyPathIteratorInterface;
+   use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+   use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
+   use Symfony\Component\PropertyAccess\Exception\PropertyAccessDeniedException;
+   ```
+
+   Also, `FormUtil::singularify()` was split away into a class StringUtil
+   in the new component.
+
+   Before:
+
+   ```
+   use Symfony\Component\Form\Util\FormUtil;
+
+   $singular = FormUtil::singularify($plural);
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\PropertyAccess\StringUtil;
+
+   $singular = StringUtil::singularify($plural);
+   ```
+
+   The methods `getValue()` and `setValue()` were moved to a new class
+   PropertyAccessor.
+
+   Before:
+
+   ```
+   use Symfony\Component\Form\Util\PropertyPath;
+
+   $propertyPath = new PropertyPath('some.path');
+
+   $value = $propertyPath->getValue($object);
+   $propertyPath->setValue($object, 'new value');
+   ```
+
+   After (alternative 1):
+
+   ```
+   use Symfony\Component\PropertyAccess\PropertyAccess;
+
+   $accessor = PropertyAccess::getPropertyAccessor();
+
+   $value = $propertyAccessor->getValue($object, 'some.path');
+   $accessor->setValue($object, 'some.path', 'new value');
+   ```
+
+   After (alternative 2):
+
+   ```
+   use Symfony\Component\PropertyAccess\PropertyAccess;
+   use Symfony\Component\PropertyAccess\PropertyPath;
+
+   $accessor = PropertyAccess::getPropertyAccessor();
+   $propertyPath = new PropertyPath('some.path');
+
+   $value = $propertyAccessor->getValue($object, $propertyPath);
+   $accessor->setValue($object, $propertyPath, 'new value');
+   ```
 
 ### Routing
 
@@ -68,7 +246,7 @@
    So the correct sequence is the following (and not the reverse):
 
    ```
-   $childCollection->->addCollection($grandchildCollection);
+   $childCollection->addCollection($grandchildCollection);
    $rootCollection->addCollection($childCollection);
    ```
 
@@ -153,6 +331,27 @@
        }
    }
    ```
+
+ * The sources of the pluralized messages in translation files have changed
+   from the singular to the pluralized version. If you created custom
+   translation files for validator errors, you should adapt them.
+
+   Before:
+
+   <trans-unit id="6">
+       <source>You must select at least {{ limit }} choices.</source>
+       <target>Sie müssen mindestens {{ limit }} Möglichkeit wählen.|Sie müssen mindestens {{ limit }} Möglichkeiten wählen.</target>
+   </trans-unit>
+
+   After:
+
+   <trans-unit id="6">
+       <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+       <target>Sie müssen mindestens {{ limit }} Möglichkeit wählen.|Sie müssen mindestens {{ limit }} Möglichkeiten wählen.</target>
+   </trans-unit>
+
+   Check the file src/Symfony/Component/Validator/Resources/translations/validators.en.xlf
+   for the new message sources.
 
 #### Deprecations
 
@@ -319,3 +518,54 @@
        // ...
    }
    ```
+
+### FrameworkBundle
+
+ * The `render` method of the `actions` templating helper signature and arguments changed:
+
+   Before:
+
+   ```
+   <?php echo $view['actions']->render('BlogBundle:Post:list', array('limit' => 2), array('alt' => 'BlogBundle:Post:error')) ?>
+   ```
+
+   After:
+
+   ```
+   <?php echo $view['actions']->render($view['router']->generate('post_list', array('limit' => 2)), array('alt' => 'BlogBundle:Post:error')) ?>
+   ```
+
+   where `post_list` is the route name for the `BlogBundle:Post:list`
+   controller, or if you don't want to create a route:
+
+   ```
+   <?php echo $view['actions']->render(new ControllerReference('BlogBundle:Post:list', array('limit' => 2)), array('alt' => 'BlogBundle:Post:error')) ?>
+   ```
+
+#### Configuration
+
+ * The 2.2 version introduces a new parameter `trusted_proxies` that replaces
+   `trust_proxy_headers` in the framework configuration.
+
+   Before:
+
+   ```
+   # app/config/config.yml
+   framework:
+       trust_proxy_headers: false
+   ```
+
+   After:
+
+   ```
+   # app/config/config.yml
+   framework:
+      trusted_proxies: ['127.0.0.1', '10.0.0.1'] # a list of proxy IPs you trust
+   ```
+
+### Serializer
+
+ * All serializer interfaces (Serializer, Normalizer, Encoder) have been
+   extended with an optional `$context` array. This was necessary to allow for
+   more complex use-cases that require context information during the
+   (de)normalization and en-/decoding steps.

@@ -41,7 +41,7 @@ class ScalarNodeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getInvalidValues
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidTypeException
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
      */
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {

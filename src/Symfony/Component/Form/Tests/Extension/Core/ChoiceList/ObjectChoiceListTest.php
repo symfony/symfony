@@ -39,6 +39,9 @@ class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
 
     private $obj4;
 
+    /**
+     * @var ObjectChoiceList
+     */
     private $list;
 
     protected function setUp()
@@ -193,7 +196,7 @@ class ObjectChoiceListTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\Exception
      */
     public function testInitArrayThrowsExceptionIfToStringNotFound()
     {

@@ -1,4 +1,4 @@
-{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
     {% if collector.user %}
@@ -18,6 +18,12 @@
                 <b>Authenticated</b>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ authentication_color_code }}">{{ authentication_color_text }}</span>
             </div>
+            {% if collector.tokenClass != null %}
+            <div class="sf-toolbar-info-piece">
+                <b>Token class</b>
+                {{ collector.tokenClass|abbr_class }}
+            </div>
+            {% endif %}
         {% elseif collector.enabled %}
             You are not authenticated.
         {% else %}
@@ -29,7 +35,7 @@
         <span class="sf-toolbar-status sf-toolbar-status-{{ color_code }}"></span>
         {% if collector.user %}<div class="sf-toolbar-status sf-toolbar-info-piece-additional">{{ collector.user }}</div>{% endif %}
     {% endset %}
-    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
 {% endblock %}
 
 {% block menu %}
@@ -61,6 +67,12 @@
                 <th>Roles</th>
                 <td>{{ collector.roles|yaml_encode }}</td>
             </tr>
+            {% if collector.tokenClass != null %}
+            <tr>
+                <th>Token class</th>
+                <td>{{ collector.tokenClass }}</td>
+            </tr>
+            {% endif %}
         </table>
     {% elseif collector.enabled %}
         <p>

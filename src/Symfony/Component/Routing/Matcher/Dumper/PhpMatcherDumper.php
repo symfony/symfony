@@ -100,7 +100,7 @@ EOF;
     }
 
     /**
-     * Generates PHP code recursively to match a RouteCollection with all child routes and child collections.
+     * Generates PHP code to match a RouteCollection with all its routes.
      *
      * @param RouteCollection $routes               A RouteCollection instance
      * @param Boolean         $supportsRedirections Whether redirections are supported by the base class
@@ -143,9 +143,9 @@ EOF;
     /**
      * Generates PHP code recursively to match a tree of routes
      *
-     * @param DumperPrefixCollection $routes               A DumperPrefixCollection instance
+     * @param DumperPrefixCollection $collection           A DumperPrefixCollection instance
      * @param Boolean                $supportsRedirections Whether redirections are supported by the base class
-     * @parma string                 $prefix               Prefix of the parent collection
+     * @param string                 $parentPrefix         Prefix of the parent collection
      *
      * @return string PHP code
      */
@@ -188,6 +188,8 @@ EOF;
      * @param string|null $parentPrefix         The prefix of the parent collection used to optimize the code
      *
      * @return string PHP code
+     *
+     * @throws \LogicException
      */
     private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)
     {
@@ -323,9 +325,9 @@ EOF;
     /**
      * Groups consecutive routes having the same hostname regex.
      *
-     * The results is a collection of collections of routes having the same hostname regex.
+     * The result is a collection of collections of routes having the same hostname regex.
      *
-     * @param DumperCollection $routes Flat collection of DumperRoutes
+     * @param RouteCollection $routes A flat RouteCollection
      *
      * @return DumperCollection A collection with routes grouped by hostname regex in sub-collections
      */
@@ -354,7 +356,7 @@ EOF;
      * Organizes the routes into a prefix tree.
      *
      * Routes order is preserved such that traversing the tree will traverse the
-     * routes in the origin order
+     * routes in the origin order.
      *
      * @param DumperCollection $collection A collection of routes
      *

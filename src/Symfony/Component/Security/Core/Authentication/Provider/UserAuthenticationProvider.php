@@ -37,6 +37,8 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      * @param UserCheckerInterface $userChecker                An UserCheckerInterface interface
      * @param string               $providerKey                A provider key
      * @param Boolean              $hideUserNotFoundExceptions Whether to hide user not found exception or not
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(UserCheckerInterface $userChecker, $providerKey, $hideUserNotFoundExceptions = true)
     {
@@ -69,6 +71,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             if ($this->hideUserNotFoundExceptions) {
                 throw new BadCredentialsException('Bad credentials', 0, $notFound);
             }
+            $notFound->setUsername($username);
 
             throw $notFound;
         }

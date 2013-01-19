@@ -1,9 +1,11 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block head %}
-    <style type="text/css">
-        {% include '@WebProfiler/Collector/exception.css.twig' %}
-    </style>
+    {% if collector.hasexception %}
+        <style type="text/css">
+            {{ render(path('_profiler_exception_css', { 'token': token })) }}
+        </style>
+    {% endif %}
     {{ parent() }}
 {% endblock %}
 
@@ -28,7 +30,7 @@
         </p>
     {% else %}
         <div class="sf-reset">
-            {% render 'WebProfilerBundle:Exception:show' with { 'exception': collector.exception, 'format': 'html' } %}
+            {{ render(path('_profiler_exception', { 'token': token })) }}
         </div>
     {% endif %}
 {% endblock %}

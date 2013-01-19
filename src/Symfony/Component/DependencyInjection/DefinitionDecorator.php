@@ -159,7 +159,7 @@ class DefinitionDecorator extends Definition
      *
      * @return mixed The argument value
      *
-     * @throws \OutOfBoundsException When the argument does not exist
+     * @throws OutOfBoundsException When the argument does not exist
      *
      * @api
      */

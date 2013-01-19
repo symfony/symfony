@@ -16,17 +16,20 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.3",
+        "symfony/translation": "2.2.*"
     },
     "require-dev": {
         "symfony/http-foundation": "2.2.*",
         "symfony/locale": "2.2.*",
-        "symfony/yaml": "2.2.*"
+        "symfony/yaml": "2.2.*",
+        "symfony/config": "2.2.*"
     },
     "suggest": {
         "doctrine/common": ">=2.1,<2.4-dev",
         "symfony/http-foundation": "2.2.*",
-        "symfony/yaml": "2.2.*"
+        "symfony/yaml": "2.2.*",
+        "symfony/config": "2.2.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Validator\\": "" }

@@ -2,7 +2,7 @@
 
 {% block body %}
 
-    {% render 'web_profiler.controller.profiler:toolbarAction' with { 'token': token, 'position': 'normal' } %}
+    {{ render(path('_wdt', { 'token': token, 'position': 'normal' })) }}
 
     <div id="content">
         {% include '@WebProfiler/Profiler/header.html.twig' only %}
@@ -53,7 +53,7 @@
                             </li>
                         </ul>
                     {% endif %}
-                    {% render 'web_profiler.controller.profiler:searchBarAction' %}
+                    {{ render(path('_profiler_search_bar')) }}
                     {% include '@WebProfiler/Profiler/admin.html.twig' with { 'token': token } only %}
                 </div>
             </div>
@@ -107,6 +107,10 @@
         }
 
         window.setTimeout(function() {
+            if (document.getElementById('menu-profiler') == null) {
+                return;
+            }
+
             var menuItems = document.getElementById('menu-profiler').getElementsByTagName('LI'),
                 elem, value, child, displayState = Sfjs.getPreference('menu/displayState');
 

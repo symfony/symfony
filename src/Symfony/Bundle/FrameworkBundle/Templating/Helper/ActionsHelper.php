@@ -12,7 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Bundle\FrameworkBundle\HttpKernel;
+use Symfony\Component\HttpKernel\HttpContentRenderer;
+use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
  * ActionsHelper manages action inclusions.
@@ -21,32 +22,41 @@ use Symfony\Bundle\FrameworkBundle\HttpKernel;
  */
 class ActionsHelper extends Helper
 {
-    protected $kernel;
+    private $renderer;
 
     /**
      * Constructor.
      *
-     * @param HttpKernel $kernel A HttpKernel instance
+     * @param HttpContentRenderer $renderer A HttpContentRenderer instance
      */
-    public function __construct(HttpKernel $kernel)
+    public function __construct(HttpContentRenderer $renderer)
     {
-        $this->kernel = $kernel;
+        $this->renderer = $renderer;
     }
 
     /**
-     * Returns the Response content for a given controller or URI.
+     * Returns the Response content for a given URI.
      *
-     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
-     * @param array  $attributes An array of request attributes
-     * @param array  $options    An array of options
+     * @param string $uri     A URI
+     * @param array  $options An array of options
      *
-     * @see Symfony\Bundle\FrameworkBundle\HttpKernel::render()
+     * @return string
+     *
+     * @see Symfony\Component\HttpKernel\HttpContentRenderer::render()
      */
-    public function render($controller, array $attributes = array(), array $options = array())
+    public function render($uri, array $options = array())
     {
-        $options['attributes'] = $attributes;
+        $options = $this->renderer->fixOptions($options);
 
-        return $this->kernel->render($controller, $options);
+        $strategy = isset($options['strategy']) ? $options['strategy'] : 'default';
+        unset($options['strategy']);
+
+        return $this->renderer->render($uri, $strategy, $options);
+    }
+
+    public function controller($controller, $attributes = array(), $query = array())
+    {
+        return new ControllerReference($controller, $attributes, $query);
     }
 
     /**

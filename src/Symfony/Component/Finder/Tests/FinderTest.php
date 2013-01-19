@@ -23,13 +23,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         parent::setUpBeforeClass();
 
-        self::$tmpDir = sys_get_temp_dir().'/symfony2_finder';
+        self::$tmpDir = realpath(sys_get_temp_dir().'/symfony2_finder');
     }
 
-    /**
-     * @dataProvider getAdaptersTestData
-     */
-    public function testCreate($adapter)
+    public function testCreate()
     {
         $this->assertInstanceOf('Symfony\Component\Finder\Finder', Finder::create());
     }
@@ -209,7 +206,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder($adapter);
         $this->assertSame($finder, $finder->ignoreDotFiles(true)->ignoreVCS(false));
         $this->assertIterator($this->toAbsolute(array('foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
-
     }
 
     /**
@@ -313,6 +309,27 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $iterator = $finder->files()->name('*.php')->depth('< 1')->in(array(self::$tmpDir, __DIR__))->getIterator();
 
         $this->assertIterator(array(self::$tmpDir.DIRECTORY_SEPARATOR.'test.php', __DIR__.DIRECTORY_SEPARATOR.'FinderTest.php'), $iterator);
+    }
+
+    /**
+     * @dataProvider getAdaptersTestData
+     */
+    public function testInWithGlob($adapter)
+    {
+        $finder = $this->buildFinder($adapter);
+        $finder->in(array(__DIR__.'/Fixtures/*/B/C', __DIR__.'/Fixtures/*/*/B/C'))->getIterator();
+
+        $this->assertIterator($this->toAbsoluteFixtures(array('A/B/C/abc.dat', 'copy/A/B/C/abc.dat.copy')), $finder);
+    }
+
+    /**
+     * @dataProvider getAdaptersTestData
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInWithNonDirectoryGlob($adapter)
+    {
+        $finder = $this->buildFinder($adapter);
+        $finder->in(__DIR__.'/Fixtures/A/a*');
     }
 
     /**

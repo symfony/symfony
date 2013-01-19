@@ -70,10 +70,10 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\FormException
      * @expectedMessage   Entity "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity" passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).
      */
-    public function testEntitesMustHaveAToStringMethod()
+    public function testEntitiesMustHaveAToStringMethod()
     {
         $entity1 = new NoToStringSingleIdentEntity(1, 'Foo');
         $entity2 = new NoToStringSingleIdentEntity(2, 'Bar');
@@ -97,7 +97,7 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\FormException
      */
     public function testChoicesMustBeManaged()
     {
@@ -311,5 +311,48 @@ class EntityChoiceListTest extends DoctrineOrmTestCase
         );
 
         $this->assertSame(array(0 => $entity1, 1 => $entity2), $choiceList->getChoices());
+    }
+
+    public function testMinusReplacedByUnderscoreInNegativeIntIds()
+    {
+        $entity1 = new SingleIdentEntity(-1, 'Foo');
+        $entity2 = new SingleIdentEntity(1, 'Bar');
+
+        // Persist for managed state
+        $this->em->persist($entity1);
+        $this->em->persist($entity2);
+        $this->em->flush();
+
+        $choiceList = new EntityChoiceList(
+            $this->em,
+            self::SINGLE_IDENT_CLASS,
+            'name'
+        );
+
+        $this->assertSame(array('_1' => $entity1, 1 => $entity2), $choiceList->getChoices());
+        $this->assertSame(array('_1', 1), $choiceList->getIndicesForChoices(array($entity1, $entity2)));
+        $this->assertSame(array('_1', 1), $choiceList->getIndicesForValues(array('-1', '1')));
+    }
+
+    public function testMinusReplacedByUnderscoreIfNotLoaded()
+    {
+        $entity1 = new SingleIdentEntity(-1, 'Foo');
+        $entity2 = new SingleIdentEntity(1, 'Bar');
+
+        // Persist for managed state
+        $this->em->persist($entity1);
+        $this->em->persist($entity2);
+        $this->em->flush();
+
+        $choiceList = new EntityChoiceList(
+            $this->em,
+            self::SINGLE_IDENT_CLASS,
+            'name'
+        );
+
+        // no getChoices()!
+
+        $this->assertSame(array('_1', 1), $choiceList->getIndicesForChoices(array($entity1, $entity2)));
+        $this->assertSame(array('_1', 1), $choiceList->getIndicesForValues(array('-1', '1')));
     }
 }

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

@@ -179,6 +179,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * @param integer    $type    The type of the request
      *
      * @return Response A Response instance
+     *
+     * @throws \Exception
      */
     private function handleException(\Exception $e, $request, $type)
     {

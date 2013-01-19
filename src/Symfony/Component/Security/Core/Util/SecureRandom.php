@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Util;
 
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * A secure random number generator implementation.

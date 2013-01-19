@@ -107,15 +107,31 @@ class TemplateManager
                 $template = substr($template, 0, -10);
             }
 
-// FIXME when Twig is able to check for template existence
-/*
-            if (!$this->twig->exists($template.'.html.twig')) {
+            if (!$this->templateExists($template.'.html.twig')) {
                 throw new \UnexpectedValueException(sprintf('The profiler template "%s.html.twig" for data collector "%s" does not exist.', $template, $name));
             }
-*/
+
             $templates[$name] = $template.'.html.twig';
         }
 
         return $templates;
+    }
+
+    // to be removed when the minimum required version of Twig is >= 2.0
+    protected function templateExists($template)
+    {
+        $loader = $this->twig->getLoader();
+        if ($loader instanceof \Twig_ExistsLoaderInterface) {
+            return $loader->exists($template);
+        }
+
+        try {
+            $loader->getSource($template);
+
+            return true;
+        } catch (\Twig_Error_Loader $e) {
+        }
+
+        return false;
     }
 }

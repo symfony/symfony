@@ -20,9 +20,10 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  *
  * @api
  */
-class MessageCatalogue implements MessageCatalogueInterface
+class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterface
 {
     private $messages = array();
+    private $metadata = array();
     private $locale;
     private $resources;
     private $fallbackCatalogue;
@@ -175,6 +176,9 @@ class MessageCatalogue implements MessageCatalogueInterface
         foreach ($catalogue->getResources() as $resource) {
             $this->addResource($resource);
         }
+
+        $metadata = $catalogue->getMetadata('', '');
+        $this->addMetadata($metadata);
     }
 
     /**
@@ -230,5 +234,63 @@ class MessageCatalogue implements MessageCatalogueInterface
     public function addResource(ResourceInterface $resource)
     {
         $this->resources[] = $resource;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadata($key = '', $domain = 'messages')
+    {
+        if (empty($domain)) {
+            return $this->metadata;
+        }
+
+        if (isset($this->metadata[$domain])) {
+            if (!empty($key)) {
+                if (isset($this->metadata[$domain][$key])) {
+                    return $this->metadata[$domain][$key];
+                }
+            } else {
+                return $this->metadata[$domain];
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMetadata($key, $value, $domain = 'messages')
+    {
+        $this->metadata[$domain][$key] = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteMetadata($key = '', $domain = 'messages')
+    {
+        if (empty($domain)) {
+            $this->metadata = array();
+        }
+
+        if (empty($key)) {
+            unset($this->metadata[$domain]);
+        }
+
+        unset($this->metadata[$domain][$key]);
+    }
+
+    /**
+     * Adds current values with the new values.
+     *
+     * @param array $values Values to add
+     */
+    private function addMetadata(array $values)
+    {
+        foreach ($values as $domain => $keys) {
+            foreach ($keys as $key => $value) {
+                $this->setMetadata($key, $value, $domain);
+            }
+        }
     }
 }

@@ -79,7 +79,14 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
             case \PropelColumnTypes::BIGINT:
             case \PropelColumnTypes::NUMERIC:
                 return new TypeGuess('integer', array(), Guess::MEDIUM_CONFIDENCE);
+            case \PropelColumnTypes::ENUM:
             case \PropelColumnTypes::CHAR:
+                if ($column->getValueSet()) {
+                    //check if this is mysql enum
+                    $choices = $column->getValueSet();
+                    $labels = array_map('ucfirst', $choices);
+                    return new TypeGuess('choice', array('choices' => array_combine($choices, $labels)), Guess::MEDIUM_CONFIDENCE);
+                }
             case \PropelColumnTypes::VARCHAR:
                 return new TypeGuess('text', array(), Guess::MEDIUM_CONFIDENCE);
             case \PropelColumnTypes::LONGVARCHAR:
@@ -126,6 +133,7 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessMinLength($class, $property)
     {
+        trigger_error('guessMinLength() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
     }
 
     /**

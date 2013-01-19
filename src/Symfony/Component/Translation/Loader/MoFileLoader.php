@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation\Loader;
 
+use Symfony\Component\Translation\Exception\InvalidResourceException;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Config\Resource\FileResource;
 
 /**
@@ -43,6 +45,14 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
 
     public function load($resource, $locale, $domain = 'messages')
     {
+        if (!stream_is_local($resource)) {
+            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
+        }
+
+        if (!file_exists($resource)) {
+            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
+        }
+
         $messages = $this->parse($resource);
 
         // empty file
@@ -52,7 +62,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
 
         // not an array
         if (!is_array($messages)) {
-            throw new \InvalidArgumentException(sprintf('The file "%s" must contain a valid mo file.', $resource));
+            throw new InvalidResourceException(sprintf('The file "%s" must contain a valid mo file.', $resource));
         }
 
         $catalogue = parent::load($messages, $locale, $domain);
@@ -68,7 +78,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      * @param resource $resource
      *
      * @return array
-     * @throws \InvalidArgumentException If stream content has an invalid format.
+     * @throws InvalidResourceException If stream content has an invalid format.
      */
     private function parse($resource)
     {
@@ -77,7 +87,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
         $stat = fstat($stream);
 
         if ($stat['size'] < self::MO_HEADER_SIZE) {
-            throw new \InvalidArgumentException("MO stream content has an invalid format.");
+            throw new InvalidResourceException("MO stream content has an invalid format.");
         }
         $magic = unpack('V1', fread($stream, 4));
         $magic = hexdec(substr(dechex(current($magic)), -8));
@@ -87,7 +97,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
         } elseif ($magic == self::MO_BIG_ENDIAN_MAGIC) {
             $isBigEndian = true;
         } else {
-            throw new \InvalidArgumentException("MO stream content has an invalid format.");
+            throw new InvalidResourceException("MO stream content has an invalid format.");
         }
 
         $formatRevision = $this->readLong($stream, $isBigEndian);
@@ -155,8 +165,8 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
     /**
      * Reads an unsigned long from stream respecting endianess.
      *
-     * @param resource $stream
-     * @param boolean  $isBigEndian
+     * @param  resource $stream
+     * @param  boolean  $isBigEndian
      * @return integer
      */
     private function readLong($stream, $isBigEndian)

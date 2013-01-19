@@ -38,6 +38,11 @@ class ControllerNameParser
      * Converts a short notation a:b:c to a class::method.
      *
      * @param string $controller A short notation controller (a:b:c)
+     *
+     * @return string A string with class::method
+     *
+     * @throws \InvalidArgumentException when the specified bundle is not enabled
+     *                                   or the controller cannot be found
      */
     public function parse($controller)
     {
@@ -47,39 +52,22 @@ class ControllerNameParser
 
         list($bundle, $controller, $action) = $parts;
         $controller = str_replace('/', '\\', $controller);
-        $class = null;
-        $logs = array();
+        $bundles = array();
+
+        // this throws an exception if there is no such bundle
         foreach ($this->kernel->getBundle($bundle, false) as $b) {
             $try = $b->getNamespace().'\\Controller\\'.$controller.'Controller';
-            if (!class_exists($try)) {
-                $logs[] = sprintf('Unable to find controller "%s:%s" - class "%s" does not exist.', $bundle, $controller, $try);
-            } else {
-                $class = $try;
-
-                break;
+            if (class_exists($try)) {
+                return $try.'::'.$action.'Action';
             }
+
+            $bundles[] = $b->getName();
+            $msg = sprintf('Unable to find controller "%s:%s" - class "%s" does not exist.', $bundle, $controller, $try);
         }
 
-        if (null === $class) {
-            $this->handleControllerNotFoundException($bundle, $controller, $logs);
+        if (count($bundles) > 1) {
+            $msg = sprintf('Unable to find controller "%s:%s" in bundles %s.', $bundle, $controller, implode(', ', $bundles));
         }
-
-        return $class.'::'.$action.'Action';
-    }
-
-    private function handleControllerNotFoundException($bundle, $controller, array $logs)
-    {
-        // just one log, return it as the exception
-        if (1 == count($logs)) {
-            throw new \InvalidArgumentException($logs[0]);
-        }
-
-        // many logs, use a message that mentions each searched bundle
-        $names = array();
-        foreach ($this->kernel->getBundle($bundle, false) as $b) {
-            $names[] = $b->getName();
-        }
-        $msg = sprintf('Unable to find controller "%s:%s" in bundles %s.', $bundle, $controller, implode(', ', $names));
 
         throw new \InvalidArgumentException($msg);
     }

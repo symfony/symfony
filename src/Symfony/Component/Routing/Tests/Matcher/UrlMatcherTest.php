@@ -295,7 +295,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
     public function testDefaultRequirementOfVariableDisallowsSlash()
     {
@@ -307,7 +307,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
     public function testDefaultRequirementOfVariableDisallowsNextSeparator()
     {
@@ -319,7 +319,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
     public function testSchemeRequirement()
     {
@@ -368,7 +368,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}'));
         $coll->add('bar', new Route('/bar/{foo}', array(), array(), array(), '{locale}.example.net'));
-        $coll->setHostnamePattern('{locale}.example.com');
+        $coll->setHostname('{locale}.example.com');
 
         $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'));
         $this->assertEquals(array('foo' => 'bar', '_route' => 'foo', 'locale' => 'en'), $matcher->match('/foo/bar'));
@@ -378,7 +378,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
     public function testWithOutHostnameHostnameDoesNotMatch()
     {

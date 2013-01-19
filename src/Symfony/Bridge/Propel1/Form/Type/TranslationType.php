@@ -28,8 +28,9 @@ class TranslationType extends AbstractType
       */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $listener = new TranslationFormListener($builder->getFormFactory(), $options['columns'], $options['data_class']);
-        $builder->addEventSubscriber($listener);
+        $builder->addEventSubscriber(
+            new TranslationFormListener($options['columns'], $options['data_class'])
+        );
     }
 
     /**

@@ -47,6 +47,15 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session = null;
     }
 
+    public function deprecationErrorHandler($errorNumber, $message, $file, $line, $context)
+    {
+        if ($errorNumber & E_USER_DEPRECATED) {
+            return true;
+        }
+
+        return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
+    }
+
     public function testStart()
     {
         $this->assertEquals('', $this->session->getId());
@@ -174,6 +183,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testSave()
     {
+        $this->session->start();
         $this->session->save();
     }
 
@@ -193,6 +203,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetFlashes()
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
+
         $array = array('notice' => 'hello', 'error' => 'none');
         $this->assertEquals(array(), $this->session->getFlashes());
         $this->session->setFlashes($array);
@@ -203,10 +215,14 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         // test that BC works by only retrieving the first added.
         $this->session->getFlashBag()->add('notice', 'foo2');
         $this->assertEquals(array('notice' => 'foo'), $this->session->getFlashes());
+
+        restore_error_handler();
     }
 
     public function testGetFlashesWithArray()
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
+
         $array = array('notice' => 'hello', 'error' => 'none');
         $this->assertEquals(array(), $this->session->getFlashes());
         $this->session->setFlash('foo', $array);
@@ -218,10 +234,14 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->setFlash('foo', $array);
         $this->assertEquals(array('foo' => 'hello'), $this->session->getFlashes());
         $this->assertEquals(array(), $this->session->getFlashes());
+
+        restore_error_handler();
     }
 
     public function testGetSetFlash()
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
+
         $this->assertNull($this->session->getFlash('notice'));
         $this->assertEquals('default', $this->session->getFlash('notice', 'default'));
         $this->session->getFlashBag()->add('notice', 'foo');
@@ -230,27 +250,39 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         // test that BC works by only retrieving the first added.
         $this->assertEquals('foo', $this->session->getFlash('notice'));
         $this->assertNull($this->session->getFlash('notice'));
+
+        restore_error_handler();
     }
 
     public function testHasFlash()
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
+
         $this->assertFalse($this->session->hasFlash('notice'));
         $this->session->setFlash('notice', 'foo');
         $this->assertTrue($this->session->hasFlash('notice'));
+
+        restore_error_handler();
     }
 
     public function testRemoveFlash()
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
+
         $this->session->setFlash('notice', 'foo');
         $this->session->setFlash('error', 'bar');
         $this->assertTrue($this->session->hasFlash('notice'));
         $this->session->removeFlash('error');
         $this->assertTrue($this->session->hasFlash('notice'));
         $this->assertFalse($this->session->hasFlash('error'));
+
+        restore_error_handler();
     }
 
     public function testClearFlashes()
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
+
         $this->assertFalse($this->session->hasFlash('notice'));
         $this->assertFalse($this->session->hasFlash('error'));
         $this->session->setFlash('notice', 'foo');
@@ -260,6 +292,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->clearFlashes();
         $this->assertFalse($this->session->hasFlash('notice'));
         $this->assertFalse($this->session->hasFlash('error'));
+
+        restore_error_handler();
     }
 
     /**

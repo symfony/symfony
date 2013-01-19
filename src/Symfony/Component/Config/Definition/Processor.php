@@ -23,16 +23,11 @@ class Processor
      *
      * @param NodeInterface $configTree The node tree describing the configuration
      * @param array         $configs    An array of configuration items to process
-     * @param bool          $normalizeKeys Flag indicating if config key normalization is needed. True by default.
      *
      * @return array The processed configuration
      */
-    public function process(NodeInterface $configTree, array $configs, $normalizeKeys = true)
+    public function process(NodeInterface $configTree, array $configs)
     {
-        if ($normalizeKeys) {
-            $configs = self::normalizeKeys($configs);
-        }
-
         $currentConfig = array();
         foreach ($configs as $config) {
             $config = $configTree->normalize($config);
@@ -47,42 +42,12 @@ class Processor
      *
      * @param ConfigurationInterface $configuration The configuration class
      * @param array                  $configs       An array of configuration items to process
-     * @param bool                   $normalizeKeys Flag indicating if config key normalization is needed. True by default.
      *
      * @return array The processed configuration
      */
-    public function processConfiguration(ConfigurationInterface $configuration, array $configs, $normalizeKeys = true)
+    public function processConfiguration(ConfigurationInterface $configuration, array $configs)
     {
-        return $this->process($configuration->getConfigTreeBuilder()->buildTree(), $configs, $normalizeKeys);
-    }
-
-    /**
-     * This method normalizes keys between the different configuration formats
-     *
-     * Namely, you mostly have foo_bar in YAML while you have foo-bar in XML.
-     * After running this method, all keys are normalized to foo_bar.
-     *
-     * If you have a mixed key like foo-bar_moo, it will not be altered.
-     * The key will also not be altered if the target key already exists.
-     *
-     * @param array $config
-     *
-     * @return array the config with normalized keys
-     */
-    public static function normalizeKeys(array $config)
-    {
-        foreach ($config as $key => $value) {
-            if (is_array($value)) {
-                $config[$key] = self::normalizeKeys($value);
-            }
-
-            if (false !== strpos($key, '-') && false === strpos($key, '_') && !array_key_exists($normalizedKey = str_replace('-', '_', $key), $config)) {
-                $config[$normalizedKey] = $config[$key];
-                unset($config[$key]);
-            }
-        }
-
-        return $config;
+        return $this->process($configuration->getConfigTreeBuilder()->buildTree(), $configs);
     }
 
     /**

@@ -166,7 +166,7 @@ class LogoutListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\LogoutException
+     * @expectedException \Symfony\Component\Security\Core\Exception\LogoutException
      */
     public function testCsrfValidationFails()
     {

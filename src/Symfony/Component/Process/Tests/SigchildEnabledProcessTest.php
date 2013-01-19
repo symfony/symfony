@@ -13,17 +13,8 @@ namespace Symfony\Component\Process\Tests;
 
 class SigchildEnabledProcessTest extends AbstractProcessTest
 {
-
-    protected function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
-    {
-        $process = new ProcessInSigchildEnvironment($commandline, $cwd, $env, $stdin, $timeout, $options);
-        $process->setEnhanceSigchildCompatibility(true);
-
-        return $process;
-    }
-
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testProcessIsSignaledIfStopped()
     {
@@ -31,7 +22,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testProcessWithTermSignal()
     {
@@ -39,7 +30,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testProcessIsNotSignaled()
     {
@@ -47,7 +38,7 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
     public function testProcessWithoutTermSignal()
     {
@@ -62,4 +53,14 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
         $this->assertInternalType('string', $process->getExitCodeText());
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
+    {
+        $process = new ProcessInSigchildEnvironment($commandline, $cwd, $env, $stdin, $timeout, $options);
+        $process->setEnhanceSigchildCompatibility(true);
+
+        return $process;
+    }
 }

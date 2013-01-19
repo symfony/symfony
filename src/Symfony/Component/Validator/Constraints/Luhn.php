@@ -20,5 +20,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class Luhn extends Constraint
 {
-    public $message = 'Invalid card number';
+    public $message = 'Invalid card number.';
 }

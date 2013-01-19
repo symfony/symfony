@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 /**
  * Default implementation of {@link ExecutionContextInterface}.
  *
@@ -25,6 +27,16 @@ class ExecutionContext implements ExecutionContextInterface
      * @var GlobalExecutionContextInterface
      */
     private $globalContext;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var null|string
+     */
+    private $translationDomain;
 
     /**
      * @var MetadataInterface
@@ -49,19 +61,23 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * Creates a new execution context.
      *
-     * @param GlobalExecutionContextInterface $globalContext The global context storing node-independent state.
-     * @param MetadataInterface               $metadata      The metadata of the validated node.
-     * @param mixed                           $value         The value of the validated node.
-     * @param string                          $group         The current validation group.
-     * @param string                          $propertyPath  The property path to the current node.
+     * @param GlobalExecutionContextInterface $globalContext     The global context storing node-independent state.
+     * @param TranslatorInterface             $translator        The translator for translating violation messages.
+     * @param null|string                     $translationDomain The domain of the validation messages.
+     * @param MetadataInterface               $metadata          The metadata of the validated node.
+     * @param mixed                           $value             The value of the validated node.
+     * @param string                          $group             The current validation group.
+     * @param string                          $propertyPath      The property path to the current node.
      */
-    public function __construct(GlobalExecutionContextInterface $globalContext, MetadataInterface $metadata = null, $value = null, $group = null, $propertyPath = '')
+    public function __construct(GlobalExecutionContextInterface $globalContext, TranslatorInterface $translator, $translationDomain = null, MetadataInterface $metadata = null, $value = null, $group = null, $propertyPath = '')
     {
         if (null === $group) {
             $group = Constraint::DEFAULT_GROUP;
         }
 
         $this->globalContext = $globalContext;
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
         $this->metadata = $metadata;
         $this->value = $value;
         $this->propertyPath = $propertyPath;
@@ -74,6 +90,9 @@ class ExecutionContext implements ExecutionContextInterface
     public function addViolation($message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
         $this->globalContext->getViolations()->add(new ConstraintViolation(
+            null === $pluralization
+                ? $this->translator->trans($message, $params, $this->translationDomain)
+                : $this->translator->transChoice($message, $pluralization, $params, $this->translationDomain),
             $message,
             $params,
             $this->globalContext->getRoot(),
@@ -100,7 +119,12 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function addViolationAtPath($propertyPath, $message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
+        trigger_error('addViolationAtPath() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         $this->globalContext->getViolations()->add(new ConstraintViolation(
+            null === $pluralization
+                ? $this->translator->trans($message, $params, $this->translationDomain)
+                : $this->translator->transChoice($message, $pluralization, $params, $this->translationDomain),
             $message,
             $params,
             $this->globalContext->getRoot(),
@@ -124,10 +148,12 @@ class ExecutionContext implements ExecutionContextInterface
      * @param integer|null $code          The violation code.
      *
      * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use the
-     *             method {@link atViolationAt} instead.
+     *             method {@link addViolationAt} instead.
      */
     public function addViolationAtSubPath($subPath, $message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
+        trigger_error('addViolationAtSubPath() is deprecated since version 2.2 and will be removed in 2.3. Use addViolationAt() instead.', E_USER_DEPRECATED);
+
         if (func_num_args() >= 4) {
             $this->addViolationAt($subPath, $message, $params, $invalidValue, $pluralization, $code);
         } else {
@@ -142,6 +168,9 @@ class ExecutionContext implements ExecutionContextInterface
     public function addViolationAt($subPath, $message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
         $this->globalContext->getViolations()->add(new ConstraintViolation(
+            null === $pluralization
+                ? $this->translator->trans($message, $params, $this->translationDomain)
+                : $this->translator->transChoice($message, $pluralization, $params, $this->translationDomain),
             $message,
             $params,
             $this->globalContext->getRoot(),
@@ -288,6 +317,8 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getCurrentClass()
     {
+        trigger_error('getCurrentClass() is deprecated since version 2.2 and will be removed in 2.3. Use getClassName() instead', E_USER_DEPRECATED);
+
         return $this->getClassName();
     }
 
@@ -304,6 +335,8 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getCurrentProperty()
     {
+        trigger_error('getCurrentProperty() is deprecated since version 2.2 and will be removed in 2.3. Use getClassName() instead', E_USER_DEPRECATED);
+
         return $this->getPropertyName();
     }
 
@@ -319,6 +352,8 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getCurrentValue()
     {
+        trigger_error('getCurrentValue() is deprecated since version 2.2 and will be removed in 2.3. Use getValue() instead', E_USER_DEPRECATED);
+
         return $this->value;
     }
 
@@ -332,6 +367,8 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getGraphWalker()
     {
+        trigger_error('getGraphWalker() is deprecated since version 2.2 and will be removed in 2.3. Use validate() and validateValue() instead', E_USER_DEPRECATED);
+
         return $this->globalContext->getVisitor()->getGraphWalker();
     }
 

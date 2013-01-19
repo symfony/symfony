@@ -32,6 +32,8 @@ class AnnotationFileLoader extends FileLoader
      * @param FileLocatorInterface  $locator A FileLocator instance
      * @param AnnotationClassLoader $loader  An AnnotationClassLoader instance
      * @param string|array          $paths   A path or an array of paths where to look for resources
+     *
+     * @throws \RuntimeException
      */
     public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader, $paths = array())
     {

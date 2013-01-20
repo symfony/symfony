@@ -26,6 +26,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDum
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtractorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FragmentRendererPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpFoundation\Request;
@@ -66,6 +67,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TranslationExtractorPass());
         $container->addCompilerPass(new TranslationDumperPass());
         $container->addCompilerPass(new FragmentRendererPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new SerializerPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);

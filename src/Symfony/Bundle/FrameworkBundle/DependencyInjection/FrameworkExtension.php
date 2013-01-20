@@ -100,6 +100,10 @@ class FrameworkExtension extends Extension
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
 
+        if (isset($config['serializer']) && $config['serializer']['enabled']) {
+            $loader->load('serializer.xml');
+        }
+
         $this->addClassesToCompile(array(
             'Symfony\\Component\\HttpFoundation\\ParameterBag',
             'Symfony\\Component\\HttpFoundation\\HeaderBag',

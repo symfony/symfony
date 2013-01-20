@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\RenderingStrategy;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 
@@ -69,7 +70,9 @@ class EsiRenderingStrategy extends GeneratorAwareRenderingStrategy
             $alt = $this->generateProxyUri($alt, $request);
         }
 
-        return $this->esi->renderIncludeTag($uri, $alt, isset($options['ignore_errors']) ? $options['ignore_errors'] : false, isset($options['comment']) ? $options['comment'] : '');
+        $tag = $this->esi->renderIncludeTag($uri, $alt, isset($options['ignore_errors']) ? $options['ignore_errors'] : false, isset($options['comment']) ? $options['comment'] : '');
+
+        return new Response($tag);
     }
 
     /**

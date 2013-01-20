@@ -35,7 +35,7 @@ class DefaultRenderingStrategyTest extends AbstractRenderingStrategyTest
     {
         $strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
 
-        $this->assertEquals('foo', $strategy->render('/'));
+        $this->assertEquals('foo', $strategy->render('/')->getContent());
     }
 
     public function testRenderWithControllerReference()
@@ -43,7 +43,7 @@ class DefaultRenderingStrategyTest extends AbstractRenderingStrategyTest
         $strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
         $strategy->setUrlGenerator($this->getUrlGenerator());
 
-        $this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', array(), array())));
+        $this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', array(), array()))->getContent());
     }
 
     /**
@@ -53,14 +53,14 @@ class DefaultRenderingStrategyTest extends AbstractRenderingStrategyTest
     {
         $strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
 
-        $this->assertEquals('foo', $strategy->render('/'));
+        $this->assertEquals('foo', $strategy->render('/')->getContent());
     }
 
     public function testRenderExceptionIgnoreErrors()
     {
         $strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
 
-        $this->assertNull($strategy->render('/', null, array('ignore_errors' => true)));
+        $this->assertEmpty($strategy->render('/', null, array('ignore_errors' => true))->getContent());
     }
 
     public function testRenderExceptionIgnoreErrorsWithAlt()
@@ -70,7 +70,7 @@ class DefaultRenderingStrategyTest extends AbstractRenderingStrategyTest
             $this->returnValue(new Response('bar'))
         )));
 
-        $this->assertEquals('bar', $strategy->render('/', null, array('ignore_errors' => true, 'alt' => '/foo')));
+        $this->assertEquals('bar', $strategy->render('/', null, array('ignore_errors' => true, 'alt' => '/foo'))->getContent());
     }
 
     private function getKernel($returnValue)

@@ -26,14 +26,11 @@ interface RenderingStrategyInterface
     /**
      * Renders a URI and returns the Response content.
      *
-     * When the Response is a StreamedResponse, the content is streamed immediately
-     * instead of being returned.
-     *
      * @param string|ControllerReference $uri     A URI as a string or a ControllerReference instance
      * @param Request                    $request A Request instance
      * @param array                      $options An array of options
      *
-     * @return string|null The Response content or null when the Response is streamed
+     * @return Response A Response instance
      */
     public function render($uri, Request $request = null, array $options = array());
 

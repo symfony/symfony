@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\RenderingStrategy;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\UriSigner;
@@ -69,7 +70,7 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
             $content = $template;
         }
 
-        return sprintf('<hx:include src="%s">%s</hx:include>', $uri, $content);
+        return new Response(sprintf('<hx:include src="%s">%s</hx:include>', $uri, $content));
     }
 
     private function templateExists($template)

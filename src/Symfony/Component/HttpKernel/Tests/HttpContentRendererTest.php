@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use Symfony\Component\HttpKernel\HttpContentRenderer;
+use Symfony\Component\HttpFoundation\Response;
 
 class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
 {
@@ -43,7 +44,7 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('render')
             ->with('/', null, array('foo' => 'foo', 'ignore_errors' => true))
-            ->will($this->returnValue('foo'))
+            ->will($this->returnValue(new Response('foo')))
         ;
 
         $renderer = new HttpContentRenderer();

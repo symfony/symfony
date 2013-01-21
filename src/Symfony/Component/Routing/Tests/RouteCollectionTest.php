@@ -224,7 +224,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($collection1->get(0), '->get() does not disclose internal child RouteCollection');
     }
 
-    public function testSetHostname()
+    public function testSetHost()
     {
         $collection = new RouteCollection();
         $routea = new Route('/a');
@@ -232,9 +232,9 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection->add('a', $routea);
         $collection->add('b', $routeb);
 
-        $collection->setHostname('{locale}.example.com');
+        $collection->setHost('{locale}.example.com');
 
-        $this->assertEquals('{locale}.example.com', $routea->getHostname());
-        $this->assertEquals('{locale}.example.com', $routeb->getHostname());
+        $this->assertEquals('{locale}.example.com', $routea->getHost());
+        $this->assertEquals('{locale}.example.com', $routeb->getHost());
     }
 }

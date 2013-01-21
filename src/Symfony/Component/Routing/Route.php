@@ -29,7 +29,7 @@ class Route implements \Serializable
     /**
      * @var string
      */
-    private $hostname = '';
+    private $host = '';
 
     /**
      * @var array
@@ -72,19 +72,19 @@ class Route implements \Serializable
      * @param array        $defaults     An array of default parameter values
      * @param array        $requirements An array of requirements for parameters (regexes)
      * @param array        $options      An array of options
-     * @param string       $hostname     The hostname pattern to match
+     * @param string       $host         The host pattern to match
      * @param string|array $schemes      A required URI scheme or an array of restricted schemes
      * @param string|array $methods      A required HTTP method or an array of restricted methods
      *
      * @api
      */
-    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $hostname = '', $schemes = array(), $methods = array())
+    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array())
     {
         $this->setPath($path);
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
         $this->setOptions($options);
-        $this->setHostname($hostname);
+        $this->setHost($host);
         // The conditions make sure that an initial empty $schemes/$methods does not override the corresponding requirement.
         // They can be removed when the BC layer is removed.
         if ($schemes) {
@@ -99,7 +99,7 @@ class Route implements \Serializable
     {
         return serialize(array(
             'path'         => $this->path,
-            'hostname'     => $this->hostname,
+            'host'         => $this->host,
             'defaults'     => $this->defaults,
             'requirements' => $this->requirements,
             'options'      => $this->options,
@@ -112,7 +112,7 @@ class Route implements \Serializable
     {
         $data = unserialize($data);
         $this->path = $data['path'];
-        $this->hostname = $data['hostname'];
+        $this->host = $data['host'];
         $this->defaults = $data['defaults'];
         $this->requirements = $data['requirements'];
         $this->options = $data['options'];
@@ -178,27 +178,27 @@ class Route implements \Serializable
     }
 
     /**
-     * Returns the pattern for the hostname.
+     * Returns the pattern for the host.
      *
-     * @return string The hostname pattern
+     * @return string The host pattern
      */
-    public function getHostname()
+    public function getHost()
     {
-        return $this->hostname;
+        return $this->host;
     }
 
     /**
-     * Sets the pattern for the hostname.
+     * Sets the pattern for the host.
      *
      * This method implements a fluent interface.
      *
-     * @param string $pattern The hostname pattern
+     * @param string $pattern The host pattern
      *
      * @return Route The current Route instance
      */
-    public function setHostname($pattern)
+    public function setHost($pattern)
     {
-        $this->hostname = (string) $pattern;
+        $this->host = (string) $pattern;
         $this->compiled = null;
 
         return $this;
@@ -549,7 +549,7 @@ class Route implements \Serializable
      * @return CompiledRoute A CompiledRoute instance
      *
      * @throws \LogicException If the Route cannot be compiled because the
-     *                         path or hostname pattern is invalid
+     *                         path or host pattern is invalid
      *
      * @see RouteCompiler which is responsible for the compilation process
      */

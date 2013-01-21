@@ -30,7 +30,7 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  *
  * The @Route annotation main value is the route path. The annotation also
  * recognizes several parameters: requirements, options, defaults, schemes,
- * methods, hostname, and name. The name parameter is mandatory.
+ * methods, host, and name. The name parameter is mandatory.
  * Here is an example of how you should be able to use it:
  *
  *     /**
@@ -115,7 +115,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
             'defaults'     => array(),
             'schemes'      => array(),
             'methods'      => array(),
-            'hostname'     => '',
+            'host'         => '',
         );
 
         $class = new \ReflectionClass($class);
@@ -151,8 +151,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
                 $globals['methods'] = $annot->getMethods();
             }
 
-            if (null !== $annot->getHostname()) {
-                $globals['hostname'] = $annot->getHostname();
+            if (null !== $annot->getHost()) {
+                $globals['host'] = $annot->getHost();
             }
         }
 
@@ -189,12 +189,12 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $schemes = array_replace($globals['schemes'], $annot->getSchemes());
         $methods = array_replace($globals['methods'], $annot->getMethods());
 
-        $hostname = $annot->getHostname();
-        if (null === $hostname) {
-            $hostname = $globals['hostname'];
+        $host = $annot->getHost();
+        if (null === $host) {
+            $host = $globals['host'];
         }
 
-        $route = new Route($globals['path'].$annot->getPath(), $defaults, $requirements, $options, $hostname, $schemes, $methods);
+        $route = new Route($globals['path'].$annot->getPath(), $defaults, $requirements, $options, $host, $schemes, $methods);
 
         $this->configureRoute($route, $class, $method, $annot);
 

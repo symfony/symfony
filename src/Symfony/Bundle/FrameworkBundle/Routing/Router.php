@@ -78,7 +78,7 @@ class Router extends BaseRouter implements WarmableInterface
      * - the route defaults,
      * - the route requirements,
      * - the route pattern.
-     * - the route hostname.
+     * - the route host.
      *
      * @param RouteCollection $collection
      */
@@ -94,7 +94,7 @@ class Router extends BaseRouter implements WarmableInterface
             }
 
             $route->setPath($this->resolve($route->getPath()));
-            $route->setHostname($this->resolve($route->getHostname()));
+            $route->setHost($this->resolve($route->getHost()));
         }
     }
 

@@ -83,7 +83,7 @@ EOF
 
         $maxName = strlen('name');
         $maxMethod = strlen('method');
-        $maxHostname = strlen('hostname');
+        $maxHost = strlen('host');
 
         foreach ($routes as $name => $route) {
             $requirements = $route->getRequirements();
@@ -92,16 +92,16 @@ EOF
                     ? implode(', ', $requirements['_method']) : $requirements['_method']
                 )
                 : 'ANY';
-            $hostname = '' !== $route->getHostname() ? $route->getHostname() : 'ANY';
+            $host = '' !== $route->getHost() ? $route->getHost() : 'ANY';
             $maxName = max($maxName, strlen($name));
             $maxMethod = max($maxMethod, strlen($method));
-            $maxHostname = max($maxHostname, strlen($hostname));
+            $maxHost = max($maxHost, strlen($host));
         }
-        $format  = '%-'.$maxName.'s %-'.$maxMethod.'s %-'.$maxHostname.'s %s';
+        $format  = '%-'.$maxName.'s %-'.$maxMethod.'s %-'.$maxHost.'s %s';
 
         // displays the generated routes
-        $format1  = '%-'.($maxName + 19).'s %-'.($maxMethod + 19).'s %-'.($maxHostname + 19).'s %s';
-        $output->writeln(sprintf($format1, '<comment>Name</comment>', '<comment>Method</comment>', '<comment>Hostname</comment>', '<comment>Pattern</comment>'));
+        $format1  = '%-'.($maxName + 19).'s %-'.($maxMethod + 19).'s %-'.($maxHost + 19).'s %s';
+        $output->writeln(sprintf($format1, '<comment>Name</comment>', '<comment>Method</comment>', '<comment>Host</comment>', '<comment>Pattern</comment>'));
         foreach ($routes as $name => $route) {
             $requirements = $route->getRequirements();
             $method = isset($requirements['_method'])
@@ -109,8 +109,8 @@ EOF
                     ? implode(', ', $requirements['_method']) : $requirements['_method']
                 )
                 : 'ANY';
-            $hostname = '' !== $route->getHostname() ? $route->getHostname() : 'ANY';
-            $output->writeln(sprintf($format, $name, $method, $hostname, $route->getPath()));
+            $host = '' !== $route->getHost() ? $route->getHost() : 'ANY';
+            $output->writeln(sprintf($format, $name, $method, $host, $route->getPath()));
         }
     }
 
@@ -124,13 +124,13 @@ EOF
             throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
         }
 
-        $hostname = '' !== $route->getHostname() ? $route->getHostname() : 'ANY';
+        $host = '' !== $route->getHost() ? $route->getHost() : 'ANY';
 
         $output->writeln($this->getHelper('formatter')->formatSection('router', sprintf('Route "%s"', $name)));
 
         $output->writeln(sprintf('<comment>Name</comment>      %s', $name));
         $output->writeln(sprintf('<comment>Pattern</comment>   %s', $route->getPath()));
-        $output->writeln(sprintf('<comment>Hostname</comment>  %s', $hostname));
+        $output->writeln(sprintf('<comment>Host</comment>  %s', $host));
         $output->writeln(sprintf('<comment>Class</comment>     %s', get_class($route)));
 
         $defaults = '';

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\RenderingStrategy;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
@@ -51,7 +52,7 @@ class DefaultRenderingStrategy extends GeneratorAwareRenderingStrategy
 
         $level = ob_get_level();
         try {
-            return $this->handle($subRequest);
+            return $this->kernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST, false);
         } catch (\Exception $e) {
             // let's clean up the output buffers that were created by the sub-request
             while (ob_get_level() > $level) {
@@ -68,22 +69,9 @@ class DefaultRenderingStrategy extends GeneratorAwareRenderingStrategy
             if (!isset($options['ignore_errors']) || !$options['ignore_errors']) {
                 throw $e;
             }
+
+            return new Response();
         }
-    }
-
-    protected function handle(Request $request)
-    {
-        $response = $this->kernel->handle($request, HttpKernelInterface::SUB_REQUEST, false);
-
-        if (!$response->isSuccessful()) {
-            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
-        }
-
-        if (!$response instanceof StreamedResponse) {
-            return $response->getContent();
-        }
-
-        $response->sendContent();
     }
 
     protected function createSubRequest($uri, Request $request = null)

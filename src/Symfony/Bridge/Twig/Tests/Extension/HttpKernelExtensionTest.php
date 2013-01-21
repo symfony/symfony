@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Tests\TestCase;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpContentRenderer;
 
 class HttpKernelExtensionTest extends TestCase
@@ -30,7 +31,7 @@ class HttpKernelExtensionTest extends TestCase
 
     public function testRenderWithoutMasterRequest()
     {
-        $kernel = $this->getHttpContentRenderer($this->returnValue('foo'));
+        $kernel = $this->getHttpContentRenderer($this->returnValue(new Response('foo')));
 
         $this->assertEquals('foo', $this->renderTemplate($kernel));
     }

@@ -49,10 +49,10 @@ class EsiRenderingStrategyTest extends AbstractRenderingStrategyTest
         $request = Request::create('/');
         $request->headers->set('Surrogate-Capability', 'ESI/1.0');
 
-        $this->assertEquals('<esi:include src="/" />', $strategy->render('/', $request));
-        $this->assertEquals("<esi:comment text=\"This is a comment\" />\n<esi:include src=\"/\" />", $strategy->render('/', $request, array('comment' => 'This is a comment')));
-        $this->assertEquals('<esi:include src="/" alt="foo" />', $strategy->render('/', $request, array('alt' => 'foo')));
-        $this->assertEquals('<esi:include src="/main_controller.html" alt="/alt_controller.html" />', $strategy->render(new ControllerReference('main_controller', array(), array()), $request, array('alt' => new ControllerReference('alt_controller', array(), array()))));
+        $this->assertEquals('<esi:include src="/" />', $strategy->render('/', $request)->getContent());
+        $this->assertEquals("<esi:comment text=\"This is a comment\" />\n<esi:include src=\"/\" />", $strategy->render('/', $request, array('comment' => 'This is a comment'))->getContent());
+        $this->assertEquals('<esi:include src="/" alt="foo" />', $strategy->render('/', $request, array('alt' => 'foo'))->getContent());
+        $this->assertEquals('<esi:include src="/main_controller.html" alt="/alt_controller.html" />', $strategy->render(new ControllerReference('main_controller', array(), array()), $request, array('alt' => new ControllerReference('alt_controller', array(), array())))->getContent());
     }
 
     private function getDefaultStrategy($called = false)

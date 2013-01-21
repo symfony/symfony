@@ -17,6 +17,9 @@
    {% render controller('BlogBundle:Post:list', { 'limit': 2 }), { 'alt': 'BlogBundle:Post:error' } %}
    ```
 
+ * The `{% trans %}` and `{% transchoice %}` behavior has been change to allow
+   the automatic escaping of the translations.
+
 ### HttpFoundation
 
  * The MongoDbSessionHandler default field names and timestamp type have changed.

@@ -725,6 +725,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private function createService(Definition $definition, $id)
     {
+        if ($definition->isSynthetic()) {
+            throw new \RuntimeException(sprintf('You have requested a synthetic service ("%s"). The DIC does not know how to construct this service.', $id));
+        }
+
         if (null !== $definition->getFile()) {
             require_once $this->getParameterBag()->resolveValue($definition->getFile());
         }

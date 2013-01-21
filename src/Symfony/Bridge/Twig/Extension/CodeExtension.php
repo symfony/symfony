@@ -164,14 +164,14 @@ class CodeExtension extends \Twig_Extension
     {
         if (null === $text) {
             $file = trim($file);
-            $fileStr = $file;
-            if (0 === strpos($fileStr, $this->rootDir)) {
-                $fileStr = str_replace($this->rootDir, '', str_replace('\\', '/', $fileStr));
-                $fileStr = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, $fileStr);
+            $text = $file;
+            if (0 === strpos($text, $this->rootDir)) {
+                $text = str_replace($this->rootDir, '', str_replace('\\', '/', $text));
+                $text = sprintf('<abbr title="%s">kernel.root_dir</abbr>/%s', $this->rootDir, $text);
             }
-
-            $text = "$fileStr at line $line";
         }
+
+        $text = "$text at line $line";
 
         if (false !== $link = $this->getFileLink($file, $line)) {
             return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset), $text);

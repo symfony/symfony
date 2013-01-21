@@ -273,6 +273,19 @@ class SecurityExtension extends Extension
             $listeners[] = new Reference($this->createContextListener($container, $contextKey));
         }
 
+        // Authentication listeners
+        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $factories);
+
+        $listeners = array_merge($listeners, $authListeners);
+
+        // Access listener
+        $listeners[] = new Reference('security.access_listener');
+
+        // Switch user listener
+        if (isset($firewall['switch_user'])) {
+            $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider));
+        }
+
         // Logout listener
         if (isset($firewall['logout'])) {
             $listenerId = 'security.logout_listener.'.$id;
@@ -304,19 +317,6 @@ class SecurityExtension extends Extension
             foreach ($firewall['logout']['handlers'] as $handlerId) {
                 $listener->addMethodCall('addHandler', array(new Reference($handlerId)));
             }
-        }
-
-        // Authentication listeners
-        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $factories);
-
-        $listeners = array_merge($listeners, $authListeners);
-
-        // Access listener
-        $listeners[] = new Reference('security.access_listener');
-
-        // Switch user listener
-        if (isset($firewall['switch_user'])) {
-            $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider));
         }
 
         // Determine default entry point

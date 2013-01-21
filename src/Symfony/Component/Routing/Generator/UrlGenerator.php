@@ -137,7 +137,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // the Route has a cache of its own and is not recompiled as long as it does not get modified
         $compiledRoute = $route->compile();
 
-        return $this->doGenerate($compiledRoute->getVariables(), $route->getDefaults(), $route->getRequirements(), $compiledRoute->getTokens(), $parameters, $name, $referenceType, $compiledRoute->getHostnameTokens());
+        return $this->doGenerate($compiledRoute->getVariables(), $route->getDefaults(), $route->getRequirements(), $compiledRoute->getTokens(), $parameters, $name, $referenceType, $compiledRoute->getHostTokens());
     }
 
     /**
@@ -145,7 +145,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
      */
-    protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostnameTokens)
+    protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens)
     {
         $variables = array_flip($variables);
         $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
@@ -209,9 +209,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                 $scheme = $req;
             }
 
-            if ($hostnameTokens) {
+            if ($hostTokens) {
                 $routeHost = '';
-                foreach ($hostnameTokens as $token) {
+                foreach ($hostTokens as $token) {
                     if ('variable' === $token[0]) {
                         if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
                             $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
@@ -272,7 +272,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     /**
      * Returns the target path as relative reference from the base path.
      *
-     * Only the URIs path component (no schema, hostname etc.) is relevant and must be given, starting with a slash.
+     * Only the URIs path component (no schema, host etc.) is relevant and must be given, starting with a slash.
      * Both paths must be absolute and not contain relative parts.
      * Relative URLs from one resource to another are useful when generating self-contained downloadable document archives.
      * Furthermore, they can be used to reduce the link size in documents.

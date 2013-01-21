@@ -46,7 +46,7 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/blog/{slug}', $route->getPath());
         $this->assertEquals('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
         $this->assertEquals('GET', $route->getRequirement('_method'));
-        $this->assertEquals('{locale}.example.com', $route->getHostname());
+        $this->assertEquals('{locale}.example.com', $route->getHost());
         $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
     }
 }

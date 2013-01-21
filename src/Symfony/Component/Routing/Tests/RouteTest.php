@@ -22,7 +22,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar'), $route->getDefaults(), '__construct() takes defaults as its second argument');
         $this->assertEquals(array('foo' => '\d+'), $route->getRequirements(), '__construct() takes requirements as its third argument');
         $this->assertEquals('bar', $route->getOption('foo'), '__construct() takes options as its fourth argument');
-        $this->assertEquals('{locale}.example.com', $route->getHostname(), '__construct() takes a hostname pattern as its fifth argument');
+        $this->assertEquals('{locale}.example.com', $route->getHost(), '__construct() takes a host pattern as its fifth argument');
 
         $route = new Route('/', array(), array(), array(), '', array('Https'), array('POST', 'put'));
         $this->assertEquals(array('https'), $route->getSchemes(), '__construct() takes schemes as its sixth argument and lowercases it');
@@ -130,11 +130,11 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testHostname()
+    public function testHost()
     {
         $route = new Route('/');
-        $route->setHostname('{locale}.example.net');
-        $this->assertEquals('{locale}.example.net', $route->getHostname(), '->setHostname() sets the hostname pattern');
+        $route->setHost('{locale}.example.net');
+        $this->assertEquals('{locale}.example.net', $route->getHost(), '->setHost() sets the host pattern');
     }
 
     public function testScheme()

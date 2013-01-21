@@ -72,10 +72,6 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         $that = $this;
         $warnArgCheck = function($message, $context) use ($that) {
             $that->assertEquals('foo', $message);
-            $that->assertArrayHasKey('file', $context);
-            $that->assertEquals($context['file'], 'foo.php');
-            $that->assertArrayHasKey('line', $context);
-            $that->assertEquals($context['line'], 12);
             $that->assertArrayHasKey('type', $context);
             $that->assertEquals($context['type'], ErrorHandler::TYPE_DEPRECATION);
             $that->assertArrayHasKey('stack', $context);

@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -78,9 +80,6 @@ class HttpContentRenderer implements EventSubscriberInterface
     /**
      * Renders a URI and returns the Response content.
      *
-     * When the Response is a StreamedResponse, the content is streamed immediately
-     * instead of being returned.
-     *
      * Available options:
      *
      *  * ignore_errors: true to return an empty string in case of an error
@@ -92,6 +91,7 @@ class HttpContentRenderer implements EventSubscriberInterface
      * @return string|null The Response content or null when the Response is streamed
      *
      * @throws \InvalidArgumentException when the strategy does not exist
+     * @throws \RuntimeException         when the Response is not successful
      */
     public function render($uri, $strategy = 'default', array $options = array())
     {
@@ -103,7 +103,34 @@ class HttpContentRenderer implements EventSubscriberInterface
             throw new \InvalidArgumentException(sprintf('The "%s" rendering strategy does not exist.', $strategy));
         }
 
-        return $this->strategies[$strategy]->render($uri, $this->requests ? $this->requests[0] : null, $options);
+        $request = $this->requests ? $this->requests[0] : null;
+
+        return $this->deliver($this->strategies[$strategy]->render($uri, $request, $options));
+    }
+
+    /**
+     * Delivers the Response as a string.
+     *
+     * When the Response is a StreamedResponse, the content is streamed immediately
+     * instead of being returned.
+     *
+     * @param Response $response A Response instance
+     *
+     * @return string|null The Response content or null when the Response is streamed
+     *
+     * @throws \RuntimeException when the Response is not successful
+     */
+    protected function deliver(Response $response)
+    {
+        if (!$response->isSuccessful()) {
+            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
+        }
+
+        if (!$response instanceof StreamedResponse) {
+            return $response->getContent();
+        }
+
+        $response->sendContent();
     }
 
     public static function getSubscribedEvents()

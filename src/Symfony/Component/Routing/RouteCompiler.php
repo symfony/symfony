@@ -38,22 +38,22 @@ class RouteCompiler implements RouteCompilerInterface
     public static function compile(Route $route)
     {
         $staticPrefix = null;
-        $hostnameVariables = array();
+        $hostVariables = array();
         $pathVariables = array();
         $variables = array();
         $tokens = array();
         $regex = null;
-        $hostnameRegex = null;
-        $hostnameTokens = array();
+        $hostRegex = null;
+        $hostTokens = array();
 
-        if ('' !== $hostname = $route->getHostname()) {
-            $result = self::compilePattern($route, $hostname, true);
+        if ('' !== $host = $route->getHost()) {
+            $result = self::compilePattern($route, $host, true);
 
-            $hostnameVariables = $result['variables'];
-            $variables = array_merge($variables, $hostnameVariables);
+            $hostVariables = $result['variables'];
+            $variables = array_merge($variables, $hostVariables);
 
-            $hostnameTokens = $result['tokens'];
-            $hostnameRegex = $result['regex'];
+            $hostTokens = $result['tokens'];
+            $hostRegex = $result['regex'];
         }
 
         $path = $route->getPath();
@@ -73,20 +73,20 @@ class RouteCompiler implements RouteCompilerInterface
             $regex,
             $tokens,
             $pathVariables,
-            $hostnameRegex,
-            $hostnameTokens,
-            $hostnameVariables,
+            $hostRegex,
+            $hostTokens,
+            $hostVariables,
             array_unique($variables)
         );
     }
 
-    private static function compilePattern(Route $route, $pattern, $isHostname)
+    private static function compilePattern(Route $route, $pattern, $isHost)
     {
         $tokens = array();
         $variables = array();
         $matches = array();
         $pos = 0;
-        $defaultSeparator = $isHostname ? '.' : '/';
+        $defaultSeparator = $isHost ? '.' : '/';
 
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
@@ -148,7 +148,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         // find the first optional token
         $firstOptional = INF;
-        if (!$isHostname) {
+        if (!$isHost) {
             for ($i = count($tokens) - 1; $i >= 0; $i--) {
                 $token = $tokens[$i];
                 if ('variable' === $token[0] && $route->hasDefault($token[3])) {

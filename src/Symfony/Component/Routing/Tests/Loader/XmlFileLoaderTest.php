@@ -48,7 +48,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('MyBundle:Blog:show', $route->getDefault('_controller'));
         $this->assertEquals('GET', $route->getRequirement('_method'));
         $this->assertEquals('\w+', $route->getRequirement('locale'));
-        $this->assertEquals('{locale}.example.com', $route->getHostname());
+        $this->assertEquals('{locale}.example.com', $route->getHost());
         $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
     }
 
@@ -63,7 +63,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('MyBundle:Blog:show', $route->getDefault('_controller'));
         $this->assertEquals('\w+', $route->getRequirement('slug'));
         $this->assertEquals('en|fr|de', $route->getRequirement('_locale'));
-        $this->assertEquals('{_locale}.example.com', $route->getHostname());
+        $this->assertEquals('{_locale}.example.com', $route->getHost());
         $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
     }
 
@@ -80,7 +80,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('123', $routes['blog_show']->getDefault('foo'));
         $this->assertEquals('\d+', $routes['blog_show']->getRequirement('foo'));
         $this->assertEquals('bar', $routes['blog_show']->getOption('foo'));
-        $this->assertEquals('{locale}.example.com', $routes['blog_show']->getHostname());
+        $this->assertEquals('{locale}.example.com', $routes['blog_show']->getHost());
     }
 
     /**

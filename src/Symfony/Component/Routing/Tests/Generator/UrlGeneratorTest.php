@@ -384,21 +384,21 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->getGenerator($routes)->generate('test', array('page' => 'do.t', '_format' => 'html'));
     }
 
-    public function testWithHostnameDifferentFromContext()
+    public function testWithHostDifferentFromContext()
     {
         $routes = $this->getRoutes('test', new Route('/{name}', array(), array(), array(), '{locale}.example.com'));
 
         $this->assertEquals('//fr.example.com/app.php/Fabien', $this->getGenerator($routes)->generate('test', array('name' =>'Fabien', 'locale' => 'fr')));
     }
 
-    public function testWithHostnameSameAsContext()
+    public function testWithHostSameAsContext()
     {
         $routes = $this->getRoutes('test', new Route('/{name}', array(), array(), array(), '{locale}.example.com'));
 
         $this->assertEquals('/app.php/Fabien', $this->getGenerator($routes, array('host' => 'fr.example.com'))->generate('test', array('name' =>'Fabien', 'locale' => 'fr')));
     }
 
-    public function testWithHostnameSameAsContextAndAbsolute()
+    public function testWithHostSameAsContextAndAbsolute()
     {
         $routes = $this->getRoutes('test', new Route('/{name}', array(), array(), array(), '{locale}.example.com'));
 
@@ -408,7 +408,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Routing\Exception\InvalidParameterException
      */
-    public function testUrlWithInvalidParameterInHostname()
+    public function testUrlWithInvalidParameterInHost()
     {
         $routes = $this->getRoutes('test', new Route('/', array(), array('foo' => 'bar'), array(), '{foo}.example.com'));
         $this->getGenerator($routes)->generate('test', array('foo' => 'baz'), false);
@@ -417,7 +417,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Routing\Exception\InvalidParameterException
      */
-    public function testUrlWithInvalidParameterInHostnameWhenParamHasADefaultValue()
+    public function testUrlWithInvalidParameterInHostWhenParamHasADefaultValue()
     {
         $routes = $this->getRoutes('test', new Route('/', array('foo' => 'bar'), array('foo' => 'bar'), array(), '{foo}.example.com'));
         $this->getGenerator($routes)->generate('test', array('foo' => 'baz'), false);
@@ -426,13 +426,13 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Routing\Exception\InvalidParameterException
      */
-    public function testUrlWithInvalidParameterEqualsDefaultValueInHostname()
+    public function testUrlWithInvalidParameterEqualsDefaultValueInHost()
     {
         $routes = $this->getRoutes('test', new Route('/', array('foo' => 'baz'), array('foo' => 'bar'), array(), '{foo}.example.com'));
         $this->getGenerator($routes)->generate('test', array('foo' => 'baz'), false);
     }
 
-    public function testUrlWithInvalidParameterInHostnameInNonStrictMode()
+    public function testUrlWithInvalidParameterInHostInNonStrictMode()
     {
         $routes = $this->getRoutes('test', new Route('/', array(), array('foo' => 'bar'), array(), '{foo}.example.com'));
         $generator = $this->getGenerator($routes);
@@ -463,7 +463,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $routes = new RouteCollection();
         $routes->add('article', new Route('/{author}/{article}/'));
         $routes->add('comments', new Route('/{author}/{article}/comments'));
-        $routes->add('hostname', new Route('/{article}', array(), array(), array(), '{author}.example.com'));
+        $routes->add('host', new Route('/{article}', array(), array(), array(), '{author}.example.com'));
         $routes->add('scheme', new Route('/{author}', array(), array('_scheme' => 'https')));
         $routes->add('unrelated', new Route('/about'));
 
@@ -481,7 +481,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('../../bernhard/forms-are-great/', $generator->generate('article',
             array('author' =>'bernhard', 'article' => 'forms-are-great'), UrlGeneratorInterface::RELATIVE_PATH)
         );
-        $this->assertSame('//bernhard.example.com/app.php/forms-are-great', $generator->generate('hostname',
+        $this->assertSame('//bernhard.example.com/app.php/forms-are-great', $generator->generate('host',
             array('author' =>'bernhard', 'article' => 'forms-are-great'), UrlGeneratorInterface::RELATIVE_PATH)
         );
         $this->assertSame('https://example.com/app.php/bernhard', $generator->generate('scheme',

@@ -155,7 +155,7 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection1->add('foo4', new Route('/{foo}'));
         $collection->addCollection($collection1, '/aba');
 
-        // prefix and hostname
+        // prefix and host
 
         $collection1 = new RouteCollection();
 
@@ -181,7 +181,7 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 
         $collection->addCollection($collection1);
 
-        // hostname and variables
+        // host and variables
 
         $collection1 = new RouteCollection();
 

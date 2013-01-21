@@ -25,7 +25,7 @@ class Route
     private $requirements;
     private $options;
     private $defaults;
-    private $hostname;
+    private $host;
     private $methods;
     private $schemes;
 
@@ -84,14 +84,14 @@ class Route
         return $this->path;
     }
 
-    public function setHostname($pattern)
+    public function setHost($pattern)
     {
-        $this->hostname = $pattern;
+        $this->host = $pattern;
     }
 
-    public function getHostname()
+    public function getHost()
     {
-        return $this->hostname;
+        return $this->host;
     }
 
     public function setName($name)

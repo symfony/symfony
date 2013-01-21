@@ -275,6 +275,10 @@
    $collection->addPrefix('/prefix', array(...), array(...));
    $parentCollection->addCollection($collection);
    ```
+ * What was called `pattern` is now called `path` in the routing configuration. The old key `pattern`
+   is deprecated and will be removed in Symfony 3.0.
+ * The `Route::getPattern` and `Route::setPattern` methods have been renamed to `Route::getPath` and 
+   `Route::setPath`. The old methods have been deprecated and will be removed in Symfony 3.0
 
 ### Validator
 

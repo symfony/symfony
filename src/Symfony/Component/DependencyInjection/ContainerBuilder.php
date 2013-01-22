@@ -734,19 +734,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @throws RuntimeException When the scope is inactive
      * @throws RuntimeException When the factory definition is incomplete
+     * @throws RuntimeException When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
      */
     private function createService(Definition $definition, $id)
     {
+        if ($definition->isSynthetic()) {
+            throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The DIC does not know how to construct this service.', $id));
+        }
+
         $parameterBag = $this->getParameterBag();
 
         if (null !== $definition->getFile()) {
             require_once $parameterBag->resolveValue($definition->getFile());
         }
 
-        $arguments = $this->resolveServices(
-            $parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments()))
-        );
+        $arguments = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())));
 
         if (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryClass()) {

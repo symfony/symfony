@@ -44,7 +44,7 @@ class ChromePhpHandler extends BaseChromePhpHandler
 
         if (!preg_match('{\bChrome/\d+[\.\d+]*\b}', $event->getRequest()->headers->get('User-Agent'))) {
 
-            $this->sendHeaders = false;
+            self::$sendHeaders = false;
             $this->headers = array();
 
             return;
@@ -62,7 +62,7 @@ class ChromePhpHandler extends BaseChromePhpHandler
      */
     protected function sendHeader($header, $content)
     {
-        if (!$this->sendHeaders) {
+        if (!self::$sendHeaders) {
             return;
         }
 

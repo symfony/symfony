@@ -155,7 +155,7 @@ class Request
     protected $format;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
+     * @var SessionInterface
      */
     protected $session;
 
@@ -1534,12 +1534,12 @@ class Request
         // Does the baseUrl have anything in common with the request_uri?
         $requestUri = $this->getRequestUri();
 
-        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) {
+        if ($baseUrl && null !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) {
             // full $baseUrl matches
             return $prefix;
         }
 
-        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, dirname($baseUrl))) {
+        if ($baseUrl && null !== $prefix = $this->getUrlencodedPrefix($requestUri, dirname($baseUrl))) {
             // directory portion of $baseUrl matches
             return rtrim($prefix, '/');
         }
@@ -1658,12 +1658,12 @@ class Request
      * @param string $string The urlencoded string
      * @param string $prefix The prefix not encoded
      *
-     * @return string|false The prefix as it is encoded in $string, or false
+     * @return string|null The prefix as it is encoded in $string, or null
      */
     private function getUrlencodedPrefix($string, $prefix)
     {
         if (0 !== strpos(rawurldecode($string), $prefix)) {
-            return false;
+            return null;
         }
 
         $len = strlen($prefix);
@@ -1672,6 +1672,6 @@ class Request
             return $match[0];
         }
 
-        return false;
+        return null;
     }
 }

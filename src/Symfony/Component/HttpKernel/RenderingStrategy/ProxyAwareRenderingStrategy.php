@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\RenderingStrategy;
 
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\EventListener\RouterProxyListener;
 
 /**
  * Adds the possibility to generate a proxy URI for a given Controller.
@@ -21,6 +22,20 @@ use Symfony\Component\HttpFoundation\Request;
  */
 abstract class ProxyAwareRenderingStrategy implements RenderingStrategyInterface
 {
+    private $proxyPath = '/_proxy';
+
+    /**
+     * Sets the proxy path that triggers the proxy listener
+     *
+     * @param string $path The path
+     *
+     * @see RouterProxyListener
+     */
+    public function setProxyPath($path)
+    {
+        $this->proxyPath = $path;
+    }
+
     /**
      * Generates a proxy URI for a given controller.
      *
@@ -39,6 +54,6 @@ abstract class ProxyAwareRenderingStrategy implements RenderingStrategyInterface
 
         $reference->query['path'] = http_build_query($reference->attributes, '', '&');
 
-        return $request->getUriForPath('/_proxy?'.http_build_query($reference->query, '', '&'));
+        return $request->getUriForPath($this->proxyPath.'?'.http_build_query($reference->query, '', '&'));
     }
 }

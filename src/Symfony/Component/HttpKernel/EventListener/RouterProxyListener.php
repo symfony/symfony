@@ -30,10 +30,18 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class RouterProxyListener implements EventSubscriberInterface
 {
     private $signer;
+    private $proxyPath;
 
-    public function __construct(UriSigner $signer)
+    /**
+     * Constructor.
+     *
+     * @param UriSigner $signer    A UriSigner instance
+     * @param string    $proxyPath The path that triggers this listener
+     */
+    public function __construct(UriSigner $signer, $proxyPath = '/_proxy')
     {
         $this->signer = $signer;
+        $this->proxyPath = $proxyPath;
     }
 
     /**
@@ -47,7 +55,7 @@ class RouterProxyListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if ('/_proxy' !== rawurldecode($request->getPathInfo())) {
+        if ($this->proxyPath !== rawurldecode($request->getPathInfo())) {
             return;
         }
 

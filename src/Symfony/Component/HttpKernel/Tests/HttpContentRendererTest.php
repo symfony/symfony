@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use Symfony\Component\HttpKernel\HttpContentRenderer;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
@@ -34,6 +35,8 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
 
     public function testRender()
     {
+        $request = Request::create('/');
+
         $strategy = $this->getMock('Symfony\Component\HttpKernel\RenderingStrategy\RenderingStrategyInterface');
         $strategy
             ->expects($this->any())
@@ -43,12 +46,21 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
         $strategy
             ->expects($this->any())
             ->method('render')
-            ->with('/', null, array('foo' => 'foo', 'ignore_errors' => true))
+            ->with('/', $request, array('foo' => 'foo', 'ignore_errors' => true))
             ->will($this->returnValue(new Response('foo')))
         ;
 
         $renderer = new HttpContentRenderer();
         $renderer->addStrategy($strategy);
+
+        // simulate a master request
+        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event
+            ->expects($this->once())
+            ->method('getRequest')
+            ->will($this->returnValue(Request::create('/')))
+        ;
+        $renderer->onKernelRequest($event);
 
         $this->assertEquals('foo', $renderer->render('/', 'foo', array('foo' => 'foo')));
     }

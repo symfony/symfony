@@ -23,7 +23,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Renders a URI using different strategies.
  *
+ * This class handles sub-requests. The response content from the sub-request
+ * is then embedded into a master request. The handling of the sub-request
+ * is managed by rendering strategies.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @see RenderingStrategyInterface
  */
 class HttpContentRenderer implements EventSubscriberInterface
 {
@@ -103,9 +109,7 @@ class HttpContentRenderer implements EventSubscriberInterface
             throw new \InvalidArgumentException(sprintf('The "%s" rendering strategy does not exist.', $strategy));
         }
 
-        $request = $this->requests ? $this->requests[0] : null;
-
-        return $this->deliver($this->strategies[$strategy]->render($uri, $request, $options));
+        return $this->deliver($this->strategies[$strategy]->render($uri, $this->requests[0], $options));
     }
 
     /**

@@ -50,7 +50,7 @@ abstract class GeneratorAwareRenderingStrategy implements RenderingStrategyInter
      * @throws \LogicException when the _proxy route is not available
      * @throws \LogicException when there is no registered route generator
      */
-    protected function generateProxyUri(ControllerReference $reference, Request $request = null)
+    protected function generateProxyUri(ControllerReference $reference, Request $request)
     {
         if (null === $this->generator) {
             throw new \LogicException('Unable to generate a proxy URL as there is no registered route generator.');
@@ -59,10 +59,8 @@ abstract class GeneratorAwareRenderingStrategy implements RenderingStrategyInter
         if (isset($reference->attributes['_format'])) {
             $format = $reference->attributes['_format'];
             unset($reference->attributes['_format']);
-        } elseif (null !== $request) {
-            $format = $request->getRequestFormat();
         } else {
-            $format = 'html';
+            $format = $request->getRequestFormat();
         }
 
         try {

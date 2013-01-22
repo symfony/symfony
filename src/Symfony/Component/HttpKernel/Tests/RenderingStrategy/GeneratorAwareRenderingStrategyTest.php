@@ -32,7 +32,7 @@ class GeneratorAwareRenderingStrategyTest extends AbstractRenderingStrategyTest
     public function testGenerateProxyUriWithNoGenerator()
     {
         $strategy = new Strategy();
-        $strategy->doGenerateProxyUri(new ControllerReference('controller', array(), array()));
+        $strategy->doGenerateProxyUri(new ControllerReference('controller', array(), array()), Request::create('/'));
     }
 
     /**
@@ -49,7 +49,7 @@ class GeneratorAwareRenderingStrategyTest extends AbstractRenderingStrategyTest
 
         $strategy = new Strategy();
         $strategy->setUrlGenerator($generator);
-        $strategy->doGenerateProxyUri(new ControllerReference('controller', array(), array()));
+        $strategy->doGenerateProxyUri(new ControllerReference('controller', array(), array()), Request::create('/'));
     }
 
     /**
@@ -57,7 +57,7 @@ class GeneratorAwareRenderingStrategyTest extends AbstractRenderingStrategyTest
      */
     public function testGenerateProxyUri($uri, $controller)
     {
-        $this->assertEquals($uri, $this->getStrategy()->doGenerateProxyUri($controller));
+        $this->assertEquals($uri, $this->getStrategy()->doGenerateProxyUri($controller, Request::create('/')));
     }
 
     public function getGeneratorProxyUriData()
@@ -91,10 +91,10 @@ class GeneratorAwareRenderingStrategyTest extends AbstractRenderingStrategyTest
 
 class Strategy extends GeneratorAwareRenderingStrategy
 {
-    public function render($uri, Request $request = null, array $options = array()) {}
+    public function render($uri, Request $request, array $options = array()) {}
     public function getName() {}
 
-    public function doGenerateProxyUri(ControllerReference $reference, Request $request = null)
+    public function doGenerateProxyUri(ControllerReference $reference, Request $request)
     {
         return parent::generateProxyUri($reference, $request);
     }

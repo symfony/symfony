@@ -155,7 +155,7 @@ class ProcessBuilder
     /**
      * Sets the process timeout.
      *
-     * @param integer|null The timeout in seconds, null to disable.
+     * @param integer The timeout in seconds, 0 to disable.
      *
      * @return ProcessBuilder
      *
@@ -163,19 +163,11 @@ class ProcessBuilder
      */
     public function setTimeout($timeout)
     {
-        if (null === $timeout) {
-            $this->timeout = null;
+        $this->timeout = (integer) $timeout;
 
-            return $this;
-        }
-
-        $timeout = (integer) $timeout;
-
-        if ($timeout < 0) {
+        if ($this->timeout < 0) {
             throw new InvalidArgumentException('The timeout value must be a valid positive integer.');
         }
-
-        $this->timeout = $timeout;
 
         return $this;
     }

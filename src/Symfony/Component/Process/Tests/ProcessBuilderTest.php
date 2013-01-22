@@ -82,9 +82,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testNegativeTimeoutFromSetter()
     {
-        $pb = ProcessBuilder::create()
-            ->setTimeout(-1)
-        ;
+        ProcessBuilder::create()->setTimeout(-1);
     }
 
     public function testNullTimeout()
@@ -92,11 +90,11 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $proc = ProcessBuilder::create()
             ->add('foo')
             ->setTimeout(10)
-            ->setTimeout(null)
+            ->setTimeout(0)
             ->getProcess()
         ;
 
-        $this->assertNull($proc->getTimeout());
+        $this->assertEquals(0, $proc->getTimeout());
     }
 
     public function testShouldSetArguments()

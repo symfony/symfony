@@ -292,7 +292,7 @@ class Process
             $w = $writePipes;
             $e = null;
 
-            $n = @stream_select($r, $w, $e, $this->timeout);
+            $n = @stream_select($r, $w, $e, 0 === $this->timeout ? null : $this->timeout);
 
             if (false === $n) {
                 break;
@@ -384,7 +384,7 @@ class Process
                 $w = null;
                 $e = null;
 
-                if (false === $n = @stream_select($r, $w, $e, $this->timeout)) {
+                if (false === $n = @stream_select($r, $w, $e, 0 === $this->timeout ? null : $this->timeout)) {
                     $lastError = error_get_last();
 
                     // stream_select returns false when the `select` system call is interrupted by an incoming signal
@@ -779,7 +779,7 @@ class Process
     /**
      * Gets the process timeout.
      *
-     * @return integer|null The timeout in seconds or null if it's disabled
+     * @return integer The timeout in seconds or 0 if it's disabled
      */
     public function getTimeout()
     {
@@ -789,9 +789,7 @@ class Process
     /**
      * Sets the process timeout.
      *
-     * To disable the timeout, set this value to null.
-     *
-     * @param integer|null $timeout The timeout in seconds
+     * @param integer $timeout The timeout in seconds (0 to disable)
      *
      * @return self The current Process instance
      *
@@ -799,19 +797,11 @@ class Process
      */
     public function setTimeout($timeout)
     {
-        if (null === $timeout) {
-            $this->timeout = null;
+        $this->timeout = (integer) $timeout;
 
-            return $this;
-        }
-
-        $timeout = (integer) $timeout;
-
-        if ($timeout < 0) {
+        if ($this->timeout < 0) {
             throw new InvalidArgumentException('The timeout value must be a valid positive integer.');
         }
-
-        $this->timeout = $timeout;
 
         return $this;
     }

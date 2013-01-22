@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DefaultRenderingStrategy extends GeneratorAwareRenderingStrategy
+class DefaultRenderingStrategy extends ProxyAwareRenderingStrategy
 {
     private $kernel;
 

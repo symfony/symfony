@@ -16,16 +16,12 @@ use Symfony\Component\HttpKernel\RenderingStrategy\EsiRenderingStrategy;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpFoundation\Request;
 
-class EsiRenderingStrategyTest extends AbstractRenderingStrategyTest
+class EsiRenderingStrategyTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
-        if (!interface_exists('Symfony\Component\Routing\Generator\UrlGeneratorInterface')) {
-            $this->markTestSkipped('The "Routing" component is not available');
         }
     }
 
@@ -44,7 +40,6 @@ class EsiRenderingStrategyTest extends AbstractRenderingStrategyTest
     public function testRender()
     {
         $strategy = new EsiRenderingStrategy(new Esi(), $this->getDefaultStrategy());
-        $strategy->setUrlGenerator($this->getUrlGenerator());
 
         $request = Request::create('/');
         $request->headers->set('Surrogate-Capability', 'ESI/1.0');
@@ -52,7 +47,7 @@ class EsiRenderingStrategyTest extends AbstractRenderingStrategyTest
         $this->assertEquals('<esi:include src="/" />', $strategy->render('/', $request)->getContent());
         $this->assertEquals("<esi:comment text=\"This is a comment\" />\n<esi:include src=\"/\" />", $strategy->render('/', $request, array('comment' => 'This is a comment'))->getContent());
         $this->assertEquals('<esi:include src="/" alt="foo" />', $strategy->render('/', $request, array('alt' => 'foo'))->getContent());
-        $this->assertEquals('<esi:include src="/main_controller.html" alt="/alt_controller.html" />', $strategy->render(new ControllerReference('main_controller', array(), array()), $request, array('alt' => new ControllerReference('alt_controller', array(), array())))->getContent());
+        $this->assertEquals('<esi:include src="http://localhost/_proxy?path=_format%3Dhtml%26_controller%3Dmain_controller" alt="http://localhost/_proxy?path=_format%3Dhtml%26_controller%3Dalt_controller" />', $strategy->render(new ControllerReference('main_controller', array(), array()), $request, array('alt' => new ControllerReference('alt_controller', array(), array())))->getContent());
     }
 
     private function getDefaultStrategy($called = false)

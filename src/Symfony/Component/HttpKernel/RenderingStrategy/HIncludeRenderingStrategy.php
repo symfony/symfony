@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\UriSigner;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
+class HIncludeRenderingStrategy extends ProxyAwareRenderingStrategy
 {
     private $templating;
     private $globalDefaultTemplate;

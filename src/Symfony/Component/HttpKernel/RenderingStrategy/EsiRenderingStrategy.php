@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\HttpCache\Esi;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class EsiRenderingStrategy extends GeneratorAwareRenderingStrategy
+class EsiRenderingStrategy extends ProxyAwareRenderingStrategy
 {
     private $esi;
     private $defaultStrategy;

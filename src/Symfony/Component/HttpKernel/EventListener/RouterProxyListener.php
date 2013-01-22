@@ -47,7 +47,7 @@ class RouterProxyListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if ('_proxy' !== $request->attributes->get('_route')) {
+        if ('/_proxy' !== rawurldecode($request->getPathInfo())) {
             return;
         }
 
@@ -92,7 +92,7 @@ class RouterProxyListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::REQUEST => array(array('onKernelRequest', 16)),
+            KernelEvents::REQUEST => array(array('onKernelRequest', 48)),
         );
     }
 }

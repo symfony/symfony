@@ -28,10 +28,10 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnlyTriggeredOnProxyRoute()
     {
-        $request = Request::create('http://example.com/foo?path=foo%3D=bar');
+        $request = Request::create('http://example.com/foo?path=foo%3Dbar%26_controller%3Dfoo');
 
         $listener = new RouterProxyListener(new UriSigner('foo'));
-        $event = $this->createGetResponseEvent($request, 'foobar');
+        $event = $this->createGetResponseEvent($request);
 
         $expected = $request->attributes->all();
 
@@ -46,7 +46,7 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAccessDeniedWithNonSafeMethods()
     {
-        $request = Request::create('http://example.com/foo', 'POST');
+        $request = Request::create('http://example.com/_proxy', 'POST');
 
         $listener = new RouterProxyListener(new UriSigner('foo'));
         $event = $this->createGetResponseEvent($request);
@@ -59,7 +59,7 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAccessDeniedWithNonLocalIps()
     {
-        $request = Request::create('http://example.com/foo', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
+        $request = Request::create('http://example.com/_proxy', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
 
         $listener = new RouterProxyListener(new UriSigner('foo'));
         $event = $this->createGetResponseEvent($request);
@@ -72,7 +72,7 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAccessDeniedWithWrongSignature()
     {
-        $request = Request::create('http://example.com/foo', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
+        $request = Request::create('http://example.com/_proxy', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
 
         $listener = new RouterProxyListener(new UriSigner('foo'));
         $event = $this->createGetResponseEvent($request);
@@ -80,40 +80,22 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($event);
     }
 
-    public function testWithSignatureAndNoPath()
+    public function testWithSignature()
     {
         $signer = new UriSigner('foo');
-        $request = Request::create($signer->sign('http://example.com/foo'), 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
+        $request = Request::create($signer->sign('http://example.com/_proxy?path=foo%3Dbar%26_controller%3Dfoo'), 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
 
         $listener = new RouterProxyListener($signer);
         $event = $this->createGetResponseEvent($request);
 
         $listener->onKernelRequest($event);
 
-        $this->assertEquals(array('foo' => 'foo'), $request->attributes->get('_route_params'));
+        $this->assertEquals(array('foo' => 'bar', '_controller' => 'foo'), $request->attributes->get('_route_params'));
         $this->assertFalse($request->query->has('path'));
     }
 
-    public function testWithSignatureAndPath()
+    private function createGetResponseEvent(Request $request)
     {
-        $signer = new UriSigner('foo');
-        $request = Request::create($signer->sign('http://example.com/foo?path=bar%3Dbar'), 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
-
-        $listener = new RouterProxyListener($signer);
-        $event = $this->createGetResponseEvent($request);
-
-        $listener->onKernelRequest($event);
-
-        $this->assertEquals(array('foo' => 'foo', 'bar' => 'bar'), $request->attributes->get('_route_params'));
-        $this->assertFalse($request->query->has('path'));
-    }
-
-    private function createGetResponseEvent(Request $request, $route = '_proxy')
-    {
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-        $request->attributes->set('_route', $route);
-        $request->attributes->set('_route_params', array('foo' => 'foo'));
-
-        return new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        return new GetResponseEvent($this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'), $request, HttpKernelInterface::MASTER_REQUEST);
     }
 }

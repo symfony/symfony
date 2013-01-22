@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class DefaultRenderingStrategyTest extends AbstractRenderingStrategyTest
+class DefaultRenderingStrategyTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -41,7 +41,6 @@ class DefaultRenderingStrategyTest extends AbstractRenderingStrategyTest
     public function testRenderWithControllerReference()
     {
         $strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
-        $strategy->setUrlGenerator($this->getUrlGenerator());
 
         $this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
     }

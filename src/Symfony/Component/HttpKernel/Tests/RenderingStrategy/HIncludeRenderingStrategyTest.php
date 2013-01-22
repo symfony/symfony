@@ -16,16 +16,12 @@ use Symfony\Component\HttpKernel\RenderingStrategy\HIncludeRenderingStrategy;
 use Symfony\Component\HttpKernel\UriSigner;
 use Symfony\Component\HttpFoundation\Request;
 
-class HIncludeRenderingStrategyTest extends AbstractRenderingStrategyTest
+class HIncludeRenderingStrategyTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
-        if (!interface_exists('Symfony\Component\Routing\Generator\UrlGeneratorInterface')) {
-            $this->markTestSkipped('The "Routing" component is not available');
         }
     }
 
@@ -41,8 +37,8 @@ class HIncludeRenderingStrategyTest extends AbstractRenderingStrategyTest
     public function testRenderWithControllerAndSigner()
     {
         $strategy = new HIncludeRenderingStrategy(null, new UriSigner('foo'));
-        $strategy->setUrlGenerator($this->getUrlGenerator());
-        $this->assertEquals('<hx:include src="/main_controller.html?_hash=6MuxpWUHcqIddMMmoN36uPsEjws%3D"></hx:include>', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
+
+        $this->assertEquals('<hx:include src="http://localhost/_proxy?path=_format%3Dhtml%26_controller%3Dmain_controller&_hash=hMh5ZalYRj5kWGIGawbIS93KFBE%3D"></hx:include>', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
     }
 
     public function testRenderWithUri()

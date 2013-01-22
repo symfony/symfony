@@ -407,7 +407,7 @@ class Process
                     if (strlen($data) > 0) {
                         // last exit code is output and caught to work around --enable-sigchild
                         if (3 == $type) {
-                            $this->fallbackExitcode = (int) $data;
+                            $this->fallbackExitcode = (integer) $data;
                         } else {
                             call_user_func($callback, $type == 1 ? self::OUT : self::ERR, $data);
                         }
@@ -424,9 +424,7 @@ class Process
             throw new RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->processInformation['stopsig']));
         }
 
-        $time = 0;
-        while ($this->isRunning() && $time < 1000000) {
-            $time += 1000;
+        for ($time = 0; $this->isRunning() && $time < 1000000; $time += 1000) {
             usleep(1000);
         }
 
@@ -703,12 +701,10 @@ class Process
      */
     public function stop($timeout = 10)
     {
-        $timeoutMicro = (int) $timeout*10E6;
+        $timeoutMicro = (integer) $timeout * 10E6;
         if ($this->isRunning()) {
             proc_terminate($this->process);
-            $time = 0;
-            while (1 == $this->isRunning() && $time < $timeoutMicro) {
-                $time += 1000;
+            for ($time = 0; $this->isRunning() && $time < $timeoutMicro; $time += 1000) {
                 usleep(1000);
             }
 

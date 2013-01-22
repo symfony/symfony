@@ -42,7 +42,7 @@ class DefaultRenderingStrategy extends GeneratorAwareRenderingStrategy
      *
      *  * alt: an alternative URI to render in case of an error
      */
-    public function render($uri, Request $request = null, array $options = array())
+    public function render($uri, Request $request, array $options = array())
     {
         if ($uri instanceof ControllerReference) {
             $uri = $this->generateProxyUri($uri, $request);
@@ -74,21 +74,16 @@ class DefaultRenderingStrategy extends GeneratorAwareRenderingStrategy
         }
     }
 
-    protected function createSubRequest($uri, Request $request = null)
+    protected function createSubRequest($uri, Request $request)
     {
-        if (null !== $request) {
-            $cookies = $request->cookies->all();
-            $server = $request->server->all();
+        $cookies = $request->cookies->all();
+        $server = $request->server->all();
 
-            // the sub-request is internal
-            $server['REMOTE_ADDR'] = '127.0.0.1';
-        } else {
-            $cookies = array();
-            $server = array();
-        }
+        // the sub-request is internal
+        $server['REMOTE_ADDR'] = '127.0.0.1';
 
         $subRequest = Request::create($uri, 'get', array(), $cookies, array(), $server);
-        if (null !== $request && $session = $request->getSession()) {
+        if ($session = $request->getSession()) {
             $subRequest->setSession($session);
         }
 

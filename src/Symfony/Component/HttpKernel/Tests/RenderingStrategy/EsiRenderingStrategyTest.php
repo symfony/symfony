@@ -32,7 +32,7 @@ class EsiRenderingStrategyTest extends AbstractRenderingStrategyTest
     public function testRenderFallbackToDefaultStrategyIfNoRequest()
     {
         $strategy = new EsiRenderingStrategy(new Esi(), $this->getDefaultStrategy(true));
-        $strategy->render('/');
+        $strategy->render('/', Request::create('/'));
     }
 
     public function testRenderFallbackToDefaultStrategyIfEsiNotSupported()

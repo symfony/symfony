@@ -53,7 +53,7 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
      *
      *  * default: The default content (it can be a template name or the content)
      */
-    public function render($uri, Request $request = null, array $options = array())
+    public function render($uri, Request $request, array $options = array())
     {
         if ($uri instanceof ControllerReference) {
             if (null === $this->signer) {

@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Tests\TestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpContentRenderer;
 
@@ -27,13 +28,6 @@ class HttpKernelExtensionTest extends TestCase
         if (!class_exists('Twig_Environment')) {
             $this->markTestSkipped('Twig is not available.');
         }
-    }
-
-    public function testRenderWithoutMasterRequest()
-    {
-        $kernel = $this->getHttpContentRenderer($this->returnValue(new Response('foo')));
-
-        $this->assertEquals('foo', $this->renderTemplate($kernel));
     }
 
     /**
@@ -56,7 +50,18 @@ class HttpKernelExtensionTest extends TestCase
         $strategy->expects($this->once())->method('getName')->will($this->returnValue('default'));
         $strategy->expects($this->once())->method('render')->will($return);
 
-        return new HttpContentRenderer(array($strategy));
+        // simulate a master request
+        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event
+            ->expects($this->once())
+            ->method('getRequest')
+            ->will($this->returnValue(Request::create('/')))
+        ;
+
+        $renderer = new HttpContentRenderer(array($strategy));
+        $renderer->onKernelRequest($event);
+
+        return $renderer;
     }
 
     protected function renderTemplate(HttpContentRenderer $renderer, $template = '{{ render("foo") }}')

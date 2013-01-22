@@ -10,7 +10,7 @@
     </parameters>
 
     <services>
-        <service id="esi_listener" class="%ssi_listener.class%">
+        <service id="ssi_listener" class="%ssi_listener.class%">
             <tag name="kernel.event_subscriber"/>
         </service>
 

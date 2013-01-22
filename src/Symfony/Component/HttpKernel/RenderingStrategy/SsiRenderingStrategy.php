@@ -16,11 +16,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
- * Implements the ESI rendering strategy.
+ * Implements the SSI rendering strategy.
  *
  * @author Sebastian Krebs <krebs.seb@gmail.com>
  */
-class SsiRenderingStrategy extends GeneratorAwareRenderingStrategy
+class SsiRenderingStrategy extends ProxyAwareRenderingStrategy
 {
     private $defaultStrategy;
 
@@ -48,9 +48,11 @@ class SsiRenderingStrategy extends GeneratorAwareRenderingStrategy
      *
      *  * comment: a comment to add when returning an esi:include tag
      */
-    public function render($uri, Request $request = null, array $options = array())
+    public function render($uri, Request $request, array $options = array())
     {
-        if (null === $request) {
+        $value = $request->headers->get('Surrogate-Capability');
+
+        if ($value && strpos($value, 'SSI/1.0') !== false) {
             return $this->defaultStrategy->render($uri, $request, $options);
         }
 
@@ -70,7 +72,6 @@ class SsiRenderingStrategy extends GeneratorAwareRenderingStrategy
     {
         return 'ssi';
     }
-
 
     private function renderIncludeTag ($uri, $ignoreErrors = true, $comment = '') {
         $html = sprintf('<!--#include virtual="%s"%s -->',

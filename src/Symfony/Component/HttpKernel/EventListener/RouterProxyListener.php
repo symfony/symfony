@@ -30,10 +30,18 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class RouterProxyListener implements EventSubscriberInterface
 {
     private $signer;
+    private $proxyPath;
 
-    public function __construct(UriSigner $signer)
+    /**
+     * Constructor.
+     *
+     * @param UriSigner $signer    A UriSigner instance
+     * @param string    $proxyPath The path that triggers this listener
+     */
+    public function __construct(UriSigner $signer, $proxyPath = '/_proxy')
     {
         $this->signer = $signer;
+        $this->proxyPath = $proxyPath;
     }
 
     /**
@@ -47,16 +55,16 @@ class RouterProxyListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if ('_proxy' !== $request->attributes->get('_route')) {
+        if ($this->proxyPath !== rawurldecode($request->getPathInfo())) {
             return;
         }
 
         $this->validateRequest($request);
 
-        parse_str($request->query->get('path', ''), $attributes);
+        parse_str($request->query->get('_path', ''), $attributes);
         $request->attributes->add($attributes);
         $request->attributes->set('_route_params', array_replace($request->attributes->get('_route_params', array()), $attributes));
-        $request->query->remove('path');
+        $request->query->remove('_path');
     }
 
     protected function validateRequest(Request $request)
@@ -92,7 +100,7 @@ class RouterProxyListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::REQUEST => array(array('onKernelRequest', 16)),
+            KernelEvents::REQUEST => array(array('onKernelRequest', 48)),
         );
     }
 }

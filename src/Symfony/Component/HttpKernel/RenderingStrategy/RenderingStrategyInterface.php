@@ -32,7 +32,7 @@ interface RenderingStrategyInterface
      *
      * @return Response A Response instance
      */
-    public function render($uri, Request $request = null, array $options = array());
+    public function render($uri, Request $request, array $options = array());
 
     /**
      * Gets the name of the strategy.

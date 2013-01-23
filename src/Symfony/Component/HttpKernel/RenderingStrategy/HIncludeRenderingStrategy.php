@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\UriSigner;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
+class HIncludeRenderingStrategy extends ProxyAwareRenderingStrategy
 {
     private $templating;
     private $globalDefaultTemplate;
@@ -53,7 +53,7 @@ class HIncludeRenderingStrategy extends GeneratorAwareRenderingStrategy
      *
      *  * default: The default content (it can be a template name or the content)
      */
-    public function render($uri, Request $request = null, array $options = array())
+    public function render($uri, Request $request, array $options = array())
     {
         if ($uri instanceof ControllerReference) {
             if (null === $this->signer) {

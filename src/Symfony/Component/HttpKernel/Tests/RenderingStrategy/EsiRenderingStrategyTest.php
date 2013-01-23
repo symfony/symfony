@@ -47,7 +47,7 @@ class EsiRenderingStrategyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('<esi:include src="/" />', $strategy->render('/', $request)->getContent());
         $this->assertEquals("<esi:comment text=\"This is a comment\" />\n<esi:include src=\"/\" />", $strategy->render('/', $request, array('comment' => 'This is a comment'))->getContent());
         $this->assertEquals('<esi:include src="/" alt="foo" />', $strategy->render('/', $request, array('alt' => 'foo'))->getContent());
-        $this->assertEquals('<esi:include src="http://localhost/_proxy?path=_format%3Dhtml%26_controller%3Dmain_controller" alt="http://localhost/_proxy?path=_format%3Dhtml%26_controller%3Dalt_controller" />', $strategy->render(new ControllerReference('main_controller', array(), array()), $request, array('alt' => new ControllerReference('alt_controller', array(), array())))->getContent());
+        $this->assertEquals('<esi:include src="http://localhost/_proxy?_path=_format%3Dhtml%26_controller%3Dmain_controller" alt="http://localhost/_proxy?_path=_format%3Dhtml%26_controller%3Dalt_controller" />', $strategy->render(new ControllerReference('main_controller', array(), array()), $request, array('alt' => new ControllerReference('alt_controller', array(), array())))->getContent());
     }
 
     private function getDefaultStrategy($called = false)

@@ -52,7 +52,7 @@ abstract class ProxyAwareRenderingStrategy implements RenderingStrategyInterface
 
         $reference->attributes['_controller'] = $reference->controller;
 
-        $reference->query['path'] = http_build_query($reference->attributes, '', '&');
+        $reference->query['_path'] = http_build_query($reference->attributes, '', '&');
 
         return $request->getUriForPath($this->proxyPath.'?'.http_build_query($reference->query, '', '&'));
     }

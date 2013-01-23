@@ -61,10 +61,10 @@ class RouterProxyListener implements EventSubscriberInterface
 
         $this->validateRequest($request);
 
-        parse_str($request->query->get('path', ''), $attributes);
+        parse_str($request->query->get('_path', ''), $attributes);
         $request->attributes->add($attributes);
         $request->attributes->set('_route_params', array_replace($request->attributes->get('_route_params', array()), $attributes));
-        $request->query->remove('path');
+        $request->query->remove('_path');
     }
 
     protected function validateRequest(Request $request)

@@ -38,7 +38,7 @@ class HIncludeRenderingStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $strategy = new HIncludeRenderingStrategy(null, new UriSigner('foo'));
 
-        $this->assertEquals('<hx:include src="http://localhost/_proxy?path=_format%3Dhtml%26_controller%3Dmain_controller&_hash=hMh5ZalYRj5kWGIGawbIS93KFBE%3D"></hx:include>', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
+        $this->assertEquals('<hx:include src="http://localhost/_proxy?_path=_format%3Dhtml%26_controller%3Dmain_controller&_hash=ctQ5X4vzZnFmmPiqIqnBkVr%2B%2B10%3D"></hx:include>', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
     }
 
     public function testRenderWithUri()

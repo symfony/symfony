@@ -28,7 +28,7 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnlyTriggeredOnProxyRoute()
     {
-        $request = Request::create('http://example.com/foo?path=foo%3Dbar%26_controller%3Dfoo');
+        $request = Request::create('http://example.com/foo?_path=foo%3Dbar%26_controller%3Dfoo');
 
         $listener = new RouterProxyListener(new UriSigner('foo'));
         $event = $this->createGetResponseEvent($request);
@@ -38,7 +38,7 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($event);
 
         $this->assertEquals($expected, $request->attributes->all());
-        $this->assertTrue($request->query->has('path'));
+        $this->assertTrue($request->query->has('_path'));
     }
 
     /**
@@ -83,7 +83,7 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
     public function testWithSignature()
     {
         $signer = new UriSigner('foo');
-        $request = Request::create($signer->sign('http://example.com/_proxy?path=foo%3Dbar%26_controller%3Dfoo'), 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
+        $request = Request::create($signer->sign('http://example.com/_proxy?_path=foo%3Dbar%26_controller%3Dfoo'), 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
 
         $listener = new RouterProxyListener($signer);
         $event = $this->createGetResponseEvent($request);
@@ -91,7 +91,7 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($event);
 
         $this->assertEquals(array('foo' => 'bar', '_controller' => 'foo'), $request->attributes->get('_route_params'));
-        $this->assertFalse($request->query->has('path'));
+        $this->assertFalse($request->query->has('_path'));
     }
 
     private function createGetResponseEvent(Request $request)

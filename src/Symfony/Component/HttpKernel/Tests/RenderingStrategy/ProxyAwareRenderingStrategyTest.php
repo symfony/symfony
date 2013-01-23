@@ -28,11 +28,11 @@ class ProxyAwareRenderingStrategyTest extends \PHPUnit_Framework_TestCase
     public function getGenerateProxyUriData()
     {
         return array(
-            array('http://localhost/_proxy?path=_format%3Dhtml%26_controller%3Dcontroller', new ControllerReference('controller', array(), array())),
-            array('http://localhost/_proxy?path=_format%3Dxml%26_controller%3Dcontroller', new ControllerReference('controller', array('_format' => 'xml'), array())),
-            array('http://localhost/_proxy?path=foo%3Dfoo%26_format%3Djson%26_controller%3Dcontroller', new ControllerReference('controller', array('foo' => 'foo', '_format' => 'json'), array())),
-            array('http://localhost/_proxy?bar=bar&path=foo%3Dfoo%26_format%3Dhtml%26_controller%3Dcontroller', new ControllerReference('controller', array('foo' => 'foo'), array('bar' => 'bar'))),
-            array('http://localhost/_proxy?foo=foo&path=_format%3Dhtml%26_controller%3Dcontroller', new ControllerReference('controller', array(), array('foo' => 'foo'))),
+            array('http://localhost/_proxy?_path=_format%3Dhtml%26_controller%3Dcontroller', new ControllerReference('controller', array(), array())),
+            array('http://localhost/_proxy?_path=_format%3Dxml%26_controller%3Dcontroller', new ControllerReference('controller', array('_format' => 'xml'), array())),
+            array('http://localhost/_proxy?_path=foo%3Dfoo%26_format%3Djson%26_controller%3Dcontroller', new ControllerReference('controller', array('foo' => 'foo', '_format' => 'json'), array())),
+            array('http://localhost/_proxy?bar=bar&_path=foo%3Dfoo%26_format%3Dhtml%26_controller%3Dcontroller', new ControllerReference('controller', array('foo' => 'foo'), array('bar' => 'bar'))),
+            array('http://localhost/_proxy?foo=foo&_path=_format%3Dhtml%26_controller%3Dcontroller', new ControllerReference('controller', array(), array('foo' => 'foo'))),
         );
     }
 
@@ -42,7 +42,7 @@ class ProxyAwareRenderingStrategyTest extends \PHPUnit_Framework_TestCase
         $request->attributes->set('_format', 'json');
         $controller = new ControllerReference('controller', array(), array());
 
-        $this->assertEquals('http://localhost/_proxy?path=_format%3Djson%26_controller%3Dcontroller', $this->getStrategy()->doGenerateProxyUri($controller, $request));
+        $this->assertEquals('http://localhost/_proxy?_path=_format%3Djson%26_controller%3Dcontroller', $this->getStrategy()->doGenerateProxyUri($controller, $request));
     }
 
     private function getStrategy()

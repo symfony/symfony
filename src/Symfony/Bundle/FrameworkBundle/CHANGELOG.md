@@ -12,7 +12,7 @@ CHANGELOG
  * [BC BREAK] restricted the `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` method to only accept URIs or ControllerReference instances
    * `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` method signature changed and the first argument
      must now be a URI or a ControllerReference instance (the `generateInternalUri()` method was removed)
-   * The internal routes (`Resources/config/routing/internal.xml`) have been replaced with a new proxy route (`Resources/config/routing/proxy.xml`)
+   * The internal routes (`Resources/config/routing/internal.xml`) have been removed and replaced with a listener (`Symfony\Component\HttpKernel\EventListener\RouterProxyListener`)
    * The `render` method of the `actions` templating helper signature and arguments changed
  * replaced Symfony\Bundle\FrameworkBundle\Controller\TraceableControllerResolver by Symfony\Component\HttpKernel\Controller\TraceableControllerResolver
  * replaced Symfony\Component\HttpKernel\Debug\ContainerAwareTraceableEventDispatcher by Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher

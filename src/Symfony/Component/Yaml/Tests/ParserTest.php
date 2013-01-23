@@ -105,6 +105,201 @@ EOF;
         $this->assertEquals('foo', $this->parser->parse($yaml));
     }
 
+    public function getBlockChompingTests()
+    {
+        $tests = array();
+
+        $yaml = <<<'EOF'
+foo: |-
+    one
+    two
+
+bar: |-
+    one
+    two
+
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo",
+            'bar' => "one\ntwo",
+        );
+        $tests['Literal block chomping strip with trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: |-
+    one
+    two
+bar: |-
+    one
+    two
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo",
+            'bar' => "one\ntwo",
+        );
+        $tests['Literal block chomping strip without trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: |
+    one
+    two
+
+bar: |
+    one
+    two
+
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo\n",
+            'bar' => "one\ntwo\n",
+        );
+        $tests['Literal block chomping clip with trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: |
+    one
+    two
+bar: |
+    one
+    two
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo\n",
+            'bar' => "one\ntwo\n",
+        );
+        $tests['Literal block chomping clip without trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: |+
+    one
+    two
+
+bar: |+
+    one
+    two
+
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo\n\n",
+            'bar' => "one\ntwo\n\n",
+        );
+        $tests['Literal block chomping keep with trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: |+
+    one
+    two
+bar: |+
+    one
+    two
+EOF;
+        $expected = array(
+            'foo' => "one\ntwo\n",
+            'bar' => "one\ntwo\n",
+        );
+        $tests['Literal block chomping keep without trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >-
+    one
+    two
+
+bar: >-
+    one
+    two
+
+EOF;
+        $expected = array(
+            'foo' => "one two",
+            'bar' => "one two",
+        );
+        $tests['Folded block chomping strip with trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >-
+    one
+    two
+bar: >-
+    one
+    two
+EOF;
+        $expected = array(
+            'foo' => "one two",
+            'bar' => "one two",
+        );
+        $tests['Folded block chomping strip without trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >
+    one
+    two
+
+bar: >
+    one
+    two
+
+EOF;
+        $expected = array(
+            'foo' => "one two\n",
+            'bar' => "one two\n",
+        );
+        $tests['Folded block chomping clip with trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >
+    one
+    two
+bar: >
+    one
+    two
+EOF;
+        $expected = array(
+            'foo' => "one two\n",
+            'bar' => "one two\n",
+        );
+        $tests['Folded block chomping clip without trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >+
+    one
+    two
+
+bar: >+
+    one
+    two
+
+EOF;
+        $expected = array(
+            'foo' => "one two\n\n",
+            'bar' => "one two\n\n",
+        );
+        $tests['Folded block chomping keep with trailing newline'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
+foo: >+
+    one
+    two
+bar: >+
+    one
+    two
+EOF;
+        $expected = array(
+            'foo' => "one two\n",
+            'bar' => "one two\n",
+        );
+        $tests['Folded block chomping keep without trailing newline'] = array($expected, $yaml);
+
+        return $tests;
+    }
+
+    /**
+     * @dataProvider getBlockChompingTests
+     */
+    public function testBlockChomping($expected, $yaml)
+    {
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
     public function testObjectSupportEnabled()
     {
         $input = <<<EOF

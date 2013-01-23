@@ -317,6 +317,17 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
+     * @expectedException \RuntimeException
+     */
+    public function testCreateSyntheticService()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'FooClass')->setSynthetic(true);
+        $builder->get('foo');
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::resolveServices
      */
     public function testResolveServices()

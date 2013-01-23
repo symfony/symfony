@@ -7,7 +7,7 @@
     <parameters>
         <parameter key="http_content_renderer.class">Symfony\Component\HttpKernel\HttpContentRenderer</parameter>
         <parameter key="http_content_renderer.strategy.default.class">Symfony\Component\HttpKernel\RenderingStrategy\DefaultRenderingStrategy</parameter>
-        <parameter key="http_content_renderer.strategy.hinclude.class">Symfony\Component\HttpKernel\RenderingStrategy\HIncludeRenderingStrategy</parameter>
+        <parameter key="http_content_renderer.strategy.hinclude.class">Symfony\Bundle\FrameworkBundle\RenderingStrategy\ContainerAwareHIncludeRenderingStrategy</parameter>
         <parameter key="http_content_renderer.strategy.hinclude.global_template"></parameter>
         <parameter key="http_content_renderer.proxy_path">/_proxy</parameter>
     </parameters>
@@ -27,7 +27,7 @@
 
         <service id="http_content_renderer.strategy.hinclude" class="%http_content_renderer.strategy.hinclude.class%">
             <tag name="kernel.content_renderer_strategy" />
-            <argument type="service" id="templating" on-invalid="null" />
+            <argument type="service" id="service_container" />
             <argument type="service" id="uri_signer" />
             <argument>%http_content_renderer.strategy.hinclude.global_template%</argument>
             <call method="setProxyPath"><argument>%http_content_renderer.proxy_path%</argument></call>

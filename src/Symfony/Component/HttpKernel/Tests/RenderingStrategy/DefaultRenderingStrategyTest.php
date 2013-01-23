@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class DefaultRenderingStrategyTest extends AbstractRenderingStrategyTest
+class DefaultRenderingStrategyTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -35,15 +35,14 @@ class DefaultRenderingStrategyTest extends AbstractRenderingStrategyTest
     {
         $strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
 
-        $this->assertEquals('foo', $strategy->render('/')->getContent());
+        $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
     public function testRenderWithControllerReference()
     {
         $strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
-        $strategy->setUrlGenerator($this->getUrlGenerator());
 
-        $this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', array(), array()))->getContent());
+        $this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
     }
 
     /**
@@ -53,14 +52,14 @@ class DefaultRenderingStrategyTest extends AbstractRenderingStrategyTest
     {
         $strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
 
-        $this->assertEquals('foo', $strategy->render('/')->getContent());
+        $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
     public function testRenderExceptionIgnoreErrors()
     {
         $strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
 
-        $this->assertEmpty($strategy->render('/', null, array('ignore_errors' => true))->getContent());
+        $this->assertEmpty($strategy->render('/', Request::create('/'), array('ignore_errors' => true))->getContent());
     }
 
     public function testRenderExceptionIgnoreErrorsWithAlt()
@@ -70,7 +69,7 @@ class DefaultRenderingStrategyTest extends AbstractRenderingStrategyTest
             $this->returnValue(new Response('bar'))
         )));
 
-        $this->assertEquals('bar', $strategy->render('/', null, array('ignore_errors' => true, 'alt' => '/foo'))->getContent());
+        $this->assertEquals('bar', $strategy->render('/', Request::create('/'), array('ignore_errors' => true, 'alt' => '/foo'))->getContent());
     }
 
     private function getKernel($returnValue)

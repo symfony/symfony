@@ -73,6 +73,7 @@ class Configuration implements ConfigurationInterface
 
         $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
+        $this->addRouterProxySection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
@@ -109,6 +110,21 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('esi')
                     ->info('esi configuration')
                     ->canBeDisabled()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addRouterProxySection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('router_proxy')
+                    ->info('proxy configuration for the HTTP content renderer')
+                    ->canBeDisabled()
+                    ->children()
+                        ->scalarNode('path')->defaultValue('/_proxy')->end()
+                    ->end()
                 ->end()
             ->end()
         ;

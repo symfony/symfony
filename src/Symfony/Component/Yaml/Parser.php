@@ -190,8 +190,9 @@ class Parser
                     }
                 }
             } else {
-                // 1-liner followed by newline
-                if (2 == count($this->lines) && empty($this->lines[1])) {
+                // 1-liner optionally followed by newline
+                $lineCount = count($this->lines);
+                if (1 === $lineCount || (2 === $lineCount && empty($this->lines[1]))) {
                     try {
                         $value = Inline::parse($this->lines[0], $exceptionOnInvalidType, $objectSupport);
                     } catch (ParseException $e) {
@@ -547,10 +548,6 @@ class Parser
     private function cleanup($value)
     {
         $value = str_replace(array("\r\n", "\r"), "\n", $value);
-
-        if (!preg_match("#\n$#", $value)) {
-            $value .= "\n";
-        }
 
         // strip YAML header
         $count = 0;

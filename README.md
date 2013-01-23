@@ -27,6 +27,9 @@ work for you:
  * before PHP 5.3.8, if you get an error involving annotations, you've hit a
    known PHP bug (see https://bugs.php.net/bug.php?id=55156).
 
+ * PHP 5.3.16 has a major bug in the Reflection subsystem and is not suitable to
+   run Symfony2 (https://bugs.php.net/bug.php?id=62715)
+
 Installation
 ------------
 

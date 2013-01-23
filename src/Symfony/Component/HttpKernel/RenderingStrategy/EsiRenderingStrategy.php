@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\HttpCache\Esi;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class EsiRenderingStrategy extends GeneratorAwareRenderingStrategy
+class EsiRenderingStrategy extends ProxyAwareRenderingStrategy
 {
     private $esi;
     private $defaultStrategy;
@@ -55,9 +55,9 @@ class EsiRenderingStrategy extends GeneratorAwareRenderingStrategy
      *
      * @see Symfony\Component\HttpKernel\HttpCache\ESI
      */
-    public function render($uri, Request $request = null, array $options = array())
+    public function render($uri, Request $request, array $options = array())
     {
-        if (null === $request || !$this->esi->hasSurrogateEsiCapability($request)) {
+        if (!$this->esi->hasSurrogateEsiCapability($request)) {
             return $this->defaultStrategy->render($uri, $request, $options);
         }
 

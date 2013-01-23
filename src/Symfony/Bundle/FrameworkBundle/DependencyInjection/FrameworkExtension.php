@@ -94,8 +94,8 @@ class FrameworkExtension extends Extension
             $this->registerEsiConfiguration($config['esi'], $loader);
         }
 
-        if (isset($config['proxy'])) {
-            $this->registerProxyConfiguration($config['proxy'], $container, $loader);
+        if (isset($config['router_proxy'])) {
+            $this->registerRouterProxyConfiguration($config['router_proxy'], $container, $loader);
         }
 
         if (isset($config['profiler'])) {
@@ -189,12 +189,12 @@ class FrameworkExtension extends Extension
     }
 
     /**
-     * Loads the proxy configuration.
+     * Loads the router proxy configuration.
      *
      * @param array         $config A proxy configuration array
      * @param XmlFileLoader $loader An XmlFileLoader instance
      */
-    private function registerProxyConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerRouterProxyConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!empty($config['enabled'])) {
             $loader->load('proxy.xml');

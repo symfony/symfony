@@ -58,11 +58,13 @@ class DelegatingLoader extends BaseDelegatingLoader
 
         foreach ($collection->all() as $name => $route) {
             if ($controller = $route->getDefault('_controller')) {
-                try {
-                    $controller = $this->parser->parse($controller);
-                } catch (\Exception $e) {
-                    // unable to optimize unknown notation
-                }
+                if(strpos($controller, '::') === false) {
+					try {
+						$controller = $this->parser->parse($controller);
+					} catch (\Exception $e) {
+						// unable to optimize unknown notation
+					}
+				}
 
                 $route->setDefault('_controller', $controller);
             }

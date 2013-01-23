@@ -24,7 +24,8 @@ use Symfony\Component\HttpKernel\UriSigner;
  */
 class HIncludeRenderingStrategy extends ProxyAwareRenderingStrategy
 {
-    private $templating;
+    protected $templating;
+
     private $globalDefaultTemplate;
     private $signer;
 

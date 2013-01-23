@@ -4,6 +4,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * added Extension::isConfigEnabled() to ease working with enableable configurations
  * added an Extension base class with sensible defaults to be used in conjunction
    with the Config component.
  * added PrependExtensionInterface (to be able to allow extensions to prepend

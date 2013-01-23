@@ -91,10 +91,10 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('form')
                     ->info('form configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                 ->end()
                 ->arrayNode('csrf_protection')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->children()
                         ->scalarNode('field_name')->defaultValue('_token')->end()
                     ->end()
@@ -109,7 +109,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('esi')
                     ->info('esi configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                 ->end()
             ->end()
         ;
@@ -121,7 +121,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('router_proxy')
                     ->info('proxy configuration for the HTTP content renderer')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->children()
                         ->scalarNode('path')->defaultValue('/_proxy')->end()
                     ->end()
@@ -136,7 +136,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('profiler')
                     ->info('profiler configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->children()
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_master_requests')->defaultFalse()->end()
@@ -176,8 +176,10 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('https_port')->defaultValue(443)->end()
                         ->scalarNode('strict_requirements')
                             ->info(
-                                'set to false to disable exceptions when a route is '.
-                                'generated with invalid parameters (and return null instead)'
+                                "set to true to throw an exception when a parameter does not match the requirements\n".
+                                "set to false to disable exceptions when a parameter does not match the requirements (and return null instead)\n".
+                                "set to null to disable parameter checks against requirements\n".
+                                "'true' is the preferred configuration in development mode, while 'false' or 'null' might be preferred in production"
                             )
                             ->defaultTrue()
                         ->end()
@@ -367,7 +369,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('translator')
                     ->info('translator configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->children()
                         ->scalarNode('fallback')->defaultValue('en')->end()
                     ->end()
@@ -382,7 +384,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('validation')
                     ->info('validation configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->children()
                         ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()

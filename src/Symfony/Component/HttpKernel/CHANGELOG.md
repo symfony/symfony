@@ -4,6 +4,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * added Symfony\Component\HttpKernel\EventListener\RouterProxyListener
  * added Symfony\Component\HttpKernel\UriSigner
  * added Symfony\Component\HttpKernel\HttpContentRenderer and rendering strategies (in Symfony\Component\HttpKernel\RenderingStrategy)
  * added Symfony\Component\HttpKernel\EventListener\RouterProxyListener

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Compiler;
+namespace Symfony\Component\DependencyInjection\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

@@ -221,6 +221,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     public function canBeEnabled()
     {
         $this
+            ->addDefaultsIfNotSet()
             ->treatFalseLike(array('enabled' => false))
             ->treatTrueLike(array('enabled' => true))
             ->treatNullLike(array('enabled' => true))
@@ -242,6 +243,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     public function canBeDisabled()
     {
         $this
+            ->addDefaultsIfNotSet()
             ->treatFalseLike(array('enabled' => false))
             ->treatTrueLike(array('enabled' => true))
             ->treatNullLike(array('enabled' => true))

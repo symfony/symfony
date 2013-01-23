@@ -42,6 +42,7 @@
         "symfony/options-resolver": "self.version",
         "symfony/process": "self.version",
         "symfony/propel1-bridge": "self.version",
+        "symfony/property-access": "self.version",
         "symfony/routing": "self.version",
         "symfony/security": "self.version",
         "symfony/security-bundle": "self.version",

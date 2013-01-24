@@ -21,6 +21,8 @@ class MaxValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
+
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new MaxValidator();
         $this->validator->initialize($this->context);
@@ -28,8 +30,19 @@ class MaxValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
+        restore_error_handler();
+
         $this->context = null;
         $this->validator = null;
+    }
+
+    public function deprecationErrorHandler($errorNumber, $message, $file, $line, $context)
+    {
+        if ($errorNumber & E_USER_DEPRECATED) {
+            return true;
+        }
+
+        return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
     }
 
     public function testNullIsValid()

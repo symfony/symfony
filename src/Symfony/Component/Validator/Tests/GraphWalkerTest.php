@@ -53,6 +53,8 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
+
         $this->metadataFactory = new FakeMetadataFactory();
         $this->visitor = new ValidationVisitor('Root', $this->metadataFactory, new ConstraintValidatorFactory(), new DefaultTranslator());
         $this->walker = $this->visitor->getGraphWalker();
@@ -62,10 +64,21 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
+        restore_error_handler();
+
         $this->metadataFactory = null;
         $this->visitor = null;
         $this->walker = null;
         $this->metadata = null;
+    }
+
+    public function deprecationErrorHandler($errorNumber, $message, $file, $line, $context)
+    {
+        if ($errorNumber & E_USER_DEPRECATED) {
+            return true;
+        }
+
+        return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
     }
 
     public function testWalkObjectPassesCorrectClassAndProperty()

@@ -41,7 +41,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('web.xml');
         $loader->load('services.xml');
-        $loader->load('content_generator.xml');
+        $loader->load('sub_request.xml');
 
         // A translator must always be registered (as support is included by
         // default in the Form component). If disabled, an identity translator

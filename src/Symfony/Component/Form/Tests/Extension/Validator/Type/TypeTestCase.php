@@ -25,10 +25,10 @@ abstract class TypeTestCase extends BaseTestCase
         }
 
         $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
-        $metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
+        $metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
         $this->validator->expects($this->once())->method('getMetadataFactory')->will($this->returnValue($metadataFactory));
         $metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
-        $metadataFactory->expects($this->once())->method('getClassMetadata')->will($this->returnValue($metadata));
+        $metadataFactory->expects($this->once())->method('getMetadataFor')->will($this->returnValue($metadata));
 
         parent::setUp();
     }

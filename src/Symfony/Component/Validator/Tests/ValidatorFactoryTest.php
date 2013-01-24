@@ -32,14 +32,27 @@ class ValidatorFactoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
+
         $this->defaultContext = new ValidatorContext();
         $this->factory = new ValidatorFactory($this->defaultContext);
     }
 
     protected function tearDown()
     {
+        restore_error_handler();
+
         $this->defaultContext = null;
         $this->factory = null;
+    }
+
+    public function deprecationErrorHandler($errorNumber, $message, $file, $line, $context)
+    {
+        if ($errorNumber & E_USER_DEPRECATED) {
+            return true;
+        }
+
+        return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
     }
 
     public function testOverrideClassMetadataFactory()

@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\TerminableInterface;
 /**
  * @author Sebastian Krebs <krebs.seb@gmail.com>
  */
-class IncludeProxy implements IncludeProxyInterface
+class IncludeProxy implements HttpKernelInterface, TerminableInterface
 {
     private $kernel;
     private $strategies;

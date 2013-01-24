@@ -215,7 +215,8 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            filesize(__DIR__.'/Fixtures/test.gif')
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            UPLOAD_ERR_OK
         );
 
         $this->assertFalse($file->isValid());

@@ -35,13 +35,11 @@ class AllValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'array or Traversable');
         }
 
-        $walker = $this->context->getGraphWalker();
         $group = $this->context->getGroup();
-        $propertyPath = $this->context->getPropertyPath();
 
         foreach ($value as $key => $element) {
             foreach ($constraint->constraints as $constr) {
-                $walker->walkConstraint($constr, $element, $group, $propertyPath.'['.$key.']');
+                $this->context->validateValue($element, $constr, '['.$key.']', $group);
             }
         }
     }

@@ -6,7 +6,7 @@
 
     <parameters>
         <parameter key="sub_request_renderer.class">Symfony\Component\HttpKernel\SubRequestRenderer</parameter>
-        <parameter key="sub_request_renderer.strategy.default.class">Symfony\Component\HttpKernel\RenderingStrategy\DefaultRenderingStrategy</parameter>
+        <parameter key="sub_request_renderer.strategy.inline.class">Symfony\Component\HttpKernel\RenderingStrategy\InlineRenderingStrategy</parameter>
         <parameter key="sub_request_renderer.strategy.hinclude.class">Symfony\Bundle\FrameworkBundle\RenderingStrategy\ContainerAwareHIncludeRenderingStrategy</parameter>
         <parameter key="sub_request_renderer.strategy.hinclude.global_template"></parameter>
         <parameter key="sub_request_renderer.proxy_path">/_proxy</parameter>
@@ -19,7 +19,7 @@
             <argument>%kernel.debug%</argument>
         </service>
 
-        <service id="sub_request_renderer.strategy.default" class="%sub_request_renderer.strategy.default.class%">
+        <service id="sub_request_renderer.strategy.inline" class="%sub_request_renderer.strategy.inline.class%">
             <tag name="kernel.content_renderer_strategy" />
             <argument type="service" id="http_kernel" />
             <call method="setProxyPath"><argument>%sub_request_renderer.proxy_path%</argument></call>

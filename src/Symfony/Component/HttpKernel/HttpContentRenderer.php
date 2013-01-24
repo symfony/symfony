@@ -127,7 +127,7 @@ class HttpContentRenderer implements EventSubscriberInterface
     protected function deliver(Response $response)
     {
         if (!$response->isSuccessful()) {
-            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
+            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $this->requests[0]->getUri(), $response->getStatusCode()));
         }
 
         if (!$response instanceof StreamedResponse) {

@@ -33,34 +33,22 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
         $renderer->render('/', 'foo');
     }
 
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Error when rendering "http://localhost/" (Status code is 404).
+     */
+    public function testDeliverWithUnSuccessfulResponse()
+    {
+        $strategy = $this->getStrategy($this->returnValue(new Response('foo', 404)));
+        $renderer = $this->getRenderer($strategy);
+
+        $renderer->render('/', 'foo');
+    }
+
     public function testRender()
     {
-        $request = Request::create('/');
-
-        $strategy = $this->getMock('Symfony\Component\HttpKernel\RenderingStrategy\RenderingStrategyInterface');
-        $strategy
-            ->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('foo'))
-        ;
-        $strategy
-            ->expects($this->any())
-            ->method('render')
-            ->with('/', $request, array('foo' => 'foo', 'ignore_errors' => true))
-            ->will($this->returnValue(new Response('foo')))
-        ;
-
-        $renderer = new HttpContentRenderer();
-        $renderer->addStrategy($strategy);
-
-        // simulate a master request
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->will($this->returnValue(Request::create('/')))
-        ;
-        $renderer->onKernelRequest($event);
+        $strategy = $this->getStrategy($this->returnValue(new Response('foo')), array('/', Request::create('/'), array('foo' => 'foo', 'ignore_errors' => true)));
+        $renderer = $this->getRenderer($strategy);
 
         $this->assertEquals('foo', $renderer->render('/', 'foo', array('foo' => 'foo')));
     }
@@ -84,5 +72,42 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
             array(array('strategy' => 'esi'), array('standalone' => 'esi')),
             array(array('strategy' => 'hinclude'), array('standalone' => 'js')),
         );
+    }
+
+    protected function getStrategy($returnValue, $arguments = array())
+    {
+        $strategy = $this->getMock('Symfony\Component\HttpKernel\RenderingStrategy\RenderingStrategyInterface');
+        $strategy
+            ->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('foo'))
+        ;
+        $e = $strategy
+            ->expects($this->any())
+            ->method('render')
+            ->will($returnValue)
+        ;
+
+        if ($arguments) {
+            call_user_func_array(array($e, 'with'), $arguments);
+        }
+
+        return $strategy;
+    }
+
+    protected function getRenderer($strategy)
+    {
+        $renderer = new HttpContentRenderer();
+        $renderer->addStrategy($strategy);
+
+        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event
+            ->expects($this->once())
+            ->method('getRequest')
+            ->will($this->returnValue(Request::create('/')))
+        ;
+        $renderer->onKernelRequest($event);
+
+        return $renderer;
     }
 }

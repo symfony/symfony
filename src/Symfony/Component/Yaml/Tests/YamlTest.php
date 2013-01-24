@@ -38,4 +38,13 @@ class YamlTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('value' => 6), $parsed);
     }
 
+    public function testParseObjectWithScalar()
+    {
+        $yaml = 'test: { key: "value", date: !!php/object:O:8:"DateTime":3:{s:4:"date";s:19:"2012-12-25 00:00:00";s:13:"timezone_type";i:3;s:8:"timezone";s:13:"Europe/London";} }';
+        $date = new \DateTime('2012-12-25 00:00:00', new \DateTimeZone('Europe/London'));
+        $expected = array('test' => array('key' => 'value', 'date' => $date));
+
+        $this->assertEquals($expected, Yaml::parse($yaml));
+    }
+
 }

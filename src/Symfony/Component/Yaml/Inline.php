@@ -219,6 +219,10 @@ class Inline
                 throw new ParseException(sprintf('Malformed inline YAML string (%s).', $scalar));
             }
 
+            if (0 === strpos($output, '!!php/object')) {
+                $output .= '}';
+            }
+
             $output = $evaluate ? self::evaluateScalar($output) : $output;
         }
 

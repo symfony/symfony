@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
-use Symfony\Component\HttpKernel\HttpContentRenderer;
+use Symfony\Component\HttpKernel\SubRequestRenderer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
+class SubRequestRendererTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -29,7 +29,7 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderWhenStrategyDoesNotExist()
     {
-        $renderer = new HttpContentRenderer();
+        $renderer = new SubRequestRenderer();
         $renderer->render('/', 'foo');
     }
 
@@ -69,7 +69,7 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function testFixOptions($expected, $options)
     {
-        $renderer = new HttpContentRenderer();
+        $renderer = new SubRequestRenderer();
 
         set_error_handler(function ($errorNumber, $message, $file, $line, $context) { return $errorNumber & E_USER_DEPRECATED; });
         $this->assertEquals($expected, $renderer->fixOptions($options));
@@ -108,7 +108,7 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
 
     protected function getRenderer($strategy)
     {
-        $renderer = new HttpContentRenderer();
+        $renderer = new SubRequestRenderer();
         $renderer->addStrategy($strategy);
 
         $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();

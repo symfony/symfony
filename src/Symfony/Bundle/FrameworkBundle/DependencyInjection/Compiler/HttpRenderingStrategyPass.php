@@ -24,11 +24,11 @@ class HttpRenderingStrategyPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (false === $container->hasDefinition('http_content_renderer')) {
+        if (false === $container->hasDefinition('sub_request_renderer')) {
             return;
         }
 
-        $definition = $container->getDefinition('http_content_renderer');
+        $definition = $container->getDefinition('sub_request_renderer');
         foreach (array_keys($container->findTaggedServiceIds('kernel.content_renderer_strategy')) as $id) {
             // We must assume that the class value has been correctly filled, even if the service is created by a factory
             $class = $container->getDefinition($id)->getClass();

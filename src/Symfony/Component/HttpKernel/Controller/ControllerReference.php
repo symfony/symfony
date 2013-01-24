@@ -20,7 +20,7 @@ namespace Symfony\Component\HttpKernel\Controller;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @see Symfony\Component\HttpKernel\HttpContentRenderer
+ * @see Symfony\Component\HttpKernel\SubRequestRenderer
  * @see Symfony\Component\HttpKernel\RenderingStrategy\RenderingStrategyInterface
  */
 class ControllerReference

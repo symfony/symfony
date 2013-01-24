@@ -33,8 +33,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private $kernel;
     private $store;
     private $request;
-    private $esi;
-    private $esiCacheStrategy;
     private $traces;
 
     /**
@@ -74,10 +72,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param HttpKernelInterface $kernel  An HttpKernelInterface instance
      * @param StoreInterface      $store   A Store instance
-     * @param Esi                 $esi     An Esi instance
      * @param array               $options An array of options
      */
-    public function __construct(HttpKernelInterface $kernel, StoreInterface $store, Esi $esi = null, array $options = array())
+    public function __construct(HttpKernelInterface $kernel, StoreInterface $store, array $options = array())
     {
         $this->store = $store;
         $this->kernel = $kernel;
@@ -94,7 +91,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             'stale_while_revalidate' => 2,
             'stale_if_error'         => 60,
         ), $options);
-        $this->esi = $esi;
         $this->traces = array();
     }
 
@@ -153,17 +149,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         return $this->kernel;
     }
 
-
-    /**
-     * Gets the Esi instance
-     *
-     * @return Esi An Esi instance
-     */
-    public function getEsi()
-    {
-        return $this->esi;
-    }
-
     /**
      * {@inheritdoc}
      *
@@ -175,9 +160,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
             $this->traces = array();
             $this->request = $request;
-            if (null !== $this->esi) {
-                $this->esiCacheStrategy = $this->esi->createCacheStrategy();
-            }
         }
 
         $path = $request->getPathInfo();
@@ -202,14 +184,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
         if (HttpKernelInterface::MASTER_REQUEST === $type && $this->options['debug']) {
             $response->headers->set('X-Symfony-Cache', $this->getLog());
-        }
-
-        if (null !== $this->esi) {
-            $this->esiCacheStrategy->add($response);
-
-            if (HttpKernelInterface::MASTER_REQUEST === $type) {
-                $this->esiCacheStrategy->update($response);
-            }
         }
 
         $response->prepare($request);
@@ -444,10 +418,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     protected function forward(Request $request, $catch = false, Response $entry = null)
     {
-        if ($this->esi) {
-            $this->esi->addSurrogateEsiCapability($request);
-        }
-
         // always a "master" request (as the real master request can be in cache)
         $response = $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, $catch);
         // FIXME: we probably need to also catch exceptions if raw === true
@@ -464,8 +434,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
                 return $entry;
             }
         }
-
-        $this->processResponseBody($request, $response);
 
         return $response;
     }
@@ -616,13 +584,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         }
 
         $response->headers->remove('X-Body-File');
-    }
-
-    protected function processResponseBody(Request $request, Response $response)
-    {
-        if (null !== $this->esi && $this->esi->needsEsiParsing($response)) {
-            $this->esi->process($request, $response);
-        }
     }
 
     /**

@@ -153,8 +153,10 @@ class FrameworkExtension extends Extension
             }
             $loader->load('form_csrf.xml');
 
-            $container->setParameter('form.type_extension.csrf.enabled', $config['csrf_protection']['enabled']);
+            $container->setParameter('form.type_extension.csrf.enabled', true);
             $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
+        } else {
+            $container->setParameter('form.type_extension.csrf.enabled', false);
         }
     }
 
@@ -203,6 +205,8 @@ class FrameworkExtension extends Extension
     private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
+            $container->getDefinition('profiler')->addMethodCall('disable', array());
+
             return;
         }
 
@@ -249,10 +253,6 @@ class FrameworkExtension extends Extension
                     $definition->addMethodCall('matchPath', array($config['matcher']['path']));
                 }
             }
-        }
-
-        if (!$config['enabled']) {
-            $container->getDefinition('profiler')->addMethodCall('disable', array());
         }
     }
 

@@ -34,10 +34,21 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testRenderWithUnknownStrategy()
+    {
+        $strategy = $this->getStrategy($this->returnValue(new Response('foo')));
+        $renderer = $this->getRenderer($strategy);
+
+        $renderer->render('/', 'bar');
+    }
+
+    /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage Error when rendering "http://localhost/" (Status code is 404).
      */
-    public function testDeliverWithUnSuccessfulResponse()
+    public function testDeliverWithUnsuccessfulResponse()
     {
         $strategy = $this->getStrategy($this->returnValue(new Response('foo', 404)));
         $renderer = $this->getRenderer($strategy);

@@ -102,7 +102,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return Object A %baz_class% instance.
+     * @return object A %baz_class% instance.
      */
     protected function getFoo_BazService()
     {
@@ -116,7 +116,7 @@ class ProjectServiceContainer extends Container
     /**
      * Gets the 'foo_bar' service.
      *
-     * @return Object A %foo_class% instance.
+     * @return object A %foo_class% instance.
      */
     protected function getFooBarService()
     {

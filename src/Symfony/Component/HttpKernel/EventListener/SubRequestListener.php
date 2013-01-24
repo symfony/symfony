@@ -27,7 +27,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RouterProxyListener implements EventSubscriberInterface
+class SubRequestListener implements EventSubscriberInterface
 {
     private $signer;
     private $proxyPath;

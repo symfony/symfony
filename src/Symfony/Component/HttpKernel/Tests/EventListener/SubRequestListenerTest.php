@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
-use Symfony\Component\HttpKernel\EventListener\RouterProxyListener;
+use Symfony\Component\HttpKernel\EventListener\SubRequestListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\UriSigner;
 
-class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
+class SubRequestListenerTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -30,7 +30,7 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = Request::create('http://example.com/foo?_path=foo%3Dbar%26_controller%3Dfoo');
 
-        $listener = new RouterProxyListener(new UriSigner('foo'));
+        $listener = new SubRequestListener(new UriSigner('foo'));
         $event = $this->createGetResponseEvent($request);
 
         $expected = $request->attributes->all();
@@ -48,7 +48,7 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = Request::create('http://example.com/_proxy', 'POST');
 
-        $listener = new RouterProxyListener(new UriSigner('foo'));
+        $listener = new SubRequestListener(new UriSigner('foo'));
         $event = $this->createGetResponseEvent($request);
 
         $listener->onKernelRequest($event);
@@ -61,7 +61,7 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = Request::create('http://example.com/_proxy', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
 
-        $listener = new RouterProxyListener(new UriSigner('foo'));
+        $listener = new SubRequestListener(new UriSigner('foo'));
         $event = $this->createGetResponseEvent($request);
 
         $listener->onKernelRequest($event);
@@ -74,7 +74,7 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = Request::create('http://example.com/_proxy', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
 
-        $listener = new RouterProxyListener(new UriSigner('foo'));
+        $listener = new SubRequestListener(new UriSigner('foo'));
         $event = $this->createGetResponseEvent($request);
 
         $listener->onKernelRequest($event);
@@ -85,7 +85,7 @@ class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
         $signer = new UriSigner('foo');
         $request = Request::create($signer->sign('http://example.com/_proxy?_path=foo%3Dbar%26_controller%3Dfoo'), 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
 
-        $listener = new RouterProxyListener($signer);
+        $listener = new SubRequestListener($signer);
         $event = $this->createGetResponseEvent($request);
 
         $listener->onKernelRequest($event);

@@ -52,7 +52,7 @@ class SsiRenderingStrategy extends ProxyAwareRenderingStrategy
     {
         $value = $request->headers->get('Surrogate-Capability');
 
-        if ($value && strpos($value, 'SSI/1.0') !== false) {
+        if (!$value || strpos($value, 'SSI/1.0') === false) {
             return $this->defaultStrategy->render($uri, $request, $options);
         }
 

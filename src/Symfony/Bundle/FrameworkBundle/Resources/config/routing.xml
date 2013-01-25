@@ -46,10 +46,6 @@
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="routing.config_cache_factory" class="%routing.config_cache_factory.class%" public="false">
-            <argument>%kernel.debug%</argument>
-        </service>
-
         <service id="routing.loader" class="%routing.loader.class%">
             <tag name="monolog.logger" channel="router" />
             <argument type="service" id="controller_name_converter" />
@@ -76,7 +72,7 @@
             <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
             <call method="setConfigCacheFactory">
-                <argument type="service" id="routing.config_cache_factory" />
+                <argument type="service" id="config.config_cache_factory" />
             </call>
         </service>
 

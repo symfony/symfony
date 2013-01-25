@@ -357,6 +357,9 @@ class FrameworkExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('templating_debug.xml');
+
+            $container->setDefinition('templating.engine.php', $container->findDefinition('debug.templating.engine.php'));
+            $container->setAlias('debug.templating.engine.php', 'templating.engine.php');
         }
 
         // create package definitions and add them to the assets helper

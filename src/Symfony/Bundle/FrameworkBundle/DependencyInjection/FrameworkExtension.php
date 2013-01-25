@@ -191,8 +191,9 @@ class FrameworkExtension extends Extension
     /**
      * Loads the router proxy configuration.
      *
-     * @param array         $config A proxy configuration array
-     * @param XmlFileLoader $loader An XmlFileLoader instance
+     * @param array            $config    A proxy configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
     private function registerRouterProxyConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {

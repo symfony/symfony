@@ -29,7 +29,7 @@ class PhpExtractorTest extends TestCase
 
         // Assert
         $this->assertCount(1, $catalogue->all('messages'), '->extract() should find 1 translation');
-        $this->assertTrue($catalogue->has('new key'), '->extract() should find at leat "new key" message');
+        $this->assertTrue($catalogue->has('new key'), '->extract() should find at least "new key" message');
         $this->assertEquals('prefixnew key', $catalogue->get('new key'), '->extract() should apply "prefix" as prefix');
     }
 }

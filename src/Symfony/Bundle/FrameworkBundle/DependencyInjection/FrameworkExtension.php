@@ -94,8 +94,11 @@ class FrameworkExtension extends Extension
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerRouterProxyConfiguration($config['router_proxy'], $container, $loader);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
-        $this->registerRouterConfiguration($config['router'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container);
+
+        if (isset($config['router'])) {
+            $this->registerRouterConfiguration($config['router'], $container, $loader);
+        }
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
 
@@ -204,12 +207,6 @@ class FrameworkExtension extends Extension
      */
     private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
-            $container->getDefinition('profiler')->addMethodCall('disable', array());
-
-            return;
-        }
-
         $loader->load('profiling.xml');
         $loader->load('collectors.xml');
 
@@ -254,6 +251,10 @@ class FrameworkExtension extends Extension
                 }
             }
         }
+
+        if (!$this->isConfigEnabled($container, $config)) {
+            $container->getDefinition('profiler')->addMethodCall('disable', array());
+        }
     }
 
     /**
@@ -265,10 +266,6 @@ class FrameworkExtension extends Extension
      */
     private function registerRouterConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
-            return;
-        }
-
         $loader->load('routing.xml');
 
         $container->setParameter('router.resource', $config['resource']);

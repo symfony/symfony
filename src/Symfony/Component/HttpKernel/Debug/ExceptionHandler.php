@@ -201,6 +201,8 @@ EOF;
                 border-top:1px solid #ccc;
                 border-right:1px solid #ccc;
                 border-left:1px solid #ccc;
+                overflow: hidden;
+                word-wrap: break-word;
             }
             .sf-reset li a { background:none; color:#868686; text-decoration:none; }
             .sf-reset li a:hover { background:none; color:#313131; text-decoration:underline; }

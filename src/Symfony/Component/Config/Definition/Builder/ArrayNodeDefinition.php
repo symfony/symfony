@@ -214,7 +214,14 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Adds an "enabled" boolean to enable the current section.
      *
-     * By default, the section is disabled.
+     * By default, the section is disabled. If any configuration is specified then
+     * the node will be automatically enabled:
+     *
+     * enableableArrayNode: {enabled: true} # The config is enabled & use the default values
+     * enableableArrayNode: ~               # The config is enabled & use the default values
+     * enableableArrayNode: true            # The config is enabled & use the default values
+     * enableableArrayNode: {other: value}  # The config is enabled & default values get overridden
+     * enableableArrayNode: false           # The config is disabled
      *
      * @return ArrayNodeDefinition
      */
@@ -225,6 +232,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             ->treatFalseLike(array('enabled' => false))
             ->treatTrueLike(array('enabled' => true))
             ->treatNullLike(array('enabled' => true))
+            ->beforeNormalization()
+                ->ifArray()
+                ->then(function($v) {
+                    $v['enabled'] = true;
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->booleanNode('enabled')
                     ->defaultFalse()

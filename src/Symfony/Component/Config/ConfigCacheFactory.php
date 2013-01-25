@@ -16,8 +16,8 @@ namespace Symfony\Component\Config;
  *
  * @author Benjamin Klotz <bk@webfactory.de>
  */
-class ConfigCacheFactory implements ConfigCacheFactoryInterface {
-
+class ConfigCacheFactory implements ConfigCacheFactoryInterface 
+{
     protected $debug;
 
     /**

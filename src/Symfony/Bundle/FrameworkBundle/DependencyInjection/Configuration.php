@@ -176,8 +176,10 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('https_port')->defaultValue(443)->end()
                         ->scalarNode('strict_requirements')
                             ->info(
-                                'set to false to disable exceptions when a route is '.
-                                'generated with invalid parameters (and return null instead)'
+                                "set to true to throw an exception when a parameter does not match the requirements\n".
+                                "set to false to disable exceptions when a parameter does not match the requirements (and return null instead)\n".
+                                "set to null to disable parameter checks against requirements\n".
+                                "'true' is the preferred configuration in development mode, while 'false' or 'null' might be preferred in production"
                             )
                             ->defaultTrue()
                         ->end()

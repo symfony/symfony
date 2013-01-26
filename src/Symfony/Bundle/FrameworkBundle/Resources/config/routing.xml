@@ -6,7 +6,6 @@
 
     <parameters>
         <parameter key="router.class">Symfony\Bundle\FrameworkBundle\Routing\Router</parameter>
-        <parameter key="routing.config_cache_factory.class">Symfony\Component\Config\ConfigCacheFactory</parameter>
         <parameter key="router.request_context.class">Symfony\Component\Routing\RequestContext</parameter>
         <parameter key="routing.loader.class">Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader</parameter>
         <parameter key="routing.resolver.class">Symfony\Component\Config\Loader\LoaderResolver</parameter>

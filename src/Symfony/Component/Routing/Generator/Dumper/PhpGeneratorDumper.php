@@ -111,7 +111,7 @@ EOF;
     public function generate(\$name, \$parameters = array(), \$referenceType = self::ABSOLUTE_PATH)
     {
         if (!isset(self::\$declaredRoutes[\$name])) {
-            throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', \$name));
+            throw new RouteNotFoundException(sprintf('A route named "%s" does not exist.', \$name));
         }
 
         list(\$variables, \$defaults, \$requirements, \$tokens, \$hostTokens) = self::\$declaredRoutes[\$name];

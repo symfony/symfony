@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Core\Validator\Constraint;
+namespace Symfony\Component\Security\Core\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
@@ -19,9 +19,4 @@ use Symfony\Component\Validator\Constraint;
 class UserPassword extends Constraint
 {
     public $message = 'This value should be the user current password.';
-
-    public function validatedBy()
-    {
-        return 'security.validator.user_password';
-    }
 }

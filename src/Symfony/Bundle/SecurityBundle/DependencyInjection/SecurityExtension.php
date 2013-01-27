@@ -243,6 +243,8 @@ class SecurityExtension extends Extension
         $matcher = null;
         if (isset($firewall['request_matcher'])) {
             $matcher = new Reference($firewall['request_matcher']);
+        } elseif (isset($firewall['path'])) {
+            $matcher = $this->createRequestMatcher($container, $firewall['path']);
         } elseif (isset($firewall['pattern'])) {
             $matcher = $this->createRequestMatcher($container, $firewall['pattern']);
         }

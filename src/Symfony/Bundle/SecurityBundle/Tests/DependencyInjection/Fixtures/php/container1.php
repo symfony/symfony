@@ -57,7 +57,7 @@ $container->loadFromExtension('security', array(
     ),
 
     'firewalls' => array(
-        'simple' => array('pattern' => '/login', 'security' => false),
+        'simple' => array('path' => '/login', 'security' => false),
         'secure' => array('stateless' => true,
             'http_basic' => true,
             'http_digest' => array('key' => 'TheKey'),

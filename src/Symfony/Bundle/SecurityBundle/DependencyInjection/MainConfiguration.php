@@ -194,7 +194,8 @@ class MainConfiguration implements ConfigurationInterface
         ;
 
         $firewallNodeBuilder
-            ->scalarNode('pattern')->end()
+            ->scalarNode('pattern')->defaultNull()->end()
+            ->scalarNode('path')->defaultNull()->end()
             ->booleanNode('security')->defaultTrue()->end()
             ->scalarNode('request_matcher')->end()
             ->scalarNode('access_denied_url')->end()
@@ -275,7 +276,7 @@ class MainConfiguration implements ConfigurationInterface
             ->end()
             ->validate()
                 ->ifTrue(function($v) {
-                    return true === $v['security'] && isset($v['pattern']) && !isset($v['request_matcher']);
+                    return true === $v['security'] && isset($v['path']) && !isset($v['request_matcher']);
                 })
                 ->then(function($firewall) use ($abstractFactoryKeys) {
                     foreach ($abstractFactoryKeys as $k) {
@@ -283,8 +284,10 @@ class MainConfiguration implements ConfigurationInterface
                             continue;
                         }
 
-                        if (false !== strpos('/', $firewall[$k]['check_path']) && !preg_match('#'.$firewall['pattern'].'#', $firewall[$k]['check_path'])) {
-                            throw new \LogicException(sprintf('The check_path "%s" for login method "%s" is not matched by the firewall pattern "%s".', $firewall[$k]['check_path'], $k, $firewall['pattern']));
+                        if (false !== strpos('/',
+                            $firewall[$k]['check_path'])
+                            && !preg_match('#'.$firewall['path'].'#', $firewall[$k]['check_path'])) {
+                            throw new \LogicException(sprintf('The check_path "%s" for login method "%s" is not matched by the firewall path "%s".', $firewall[$k]['check_path'], $k, $firewall['path']));
                         }
                     }
 

@@ -25,7 +25,7 @@ security:
         # configuration file, but it's here for testing purposes (do not use
         # this file in a real world scenario though)
         login_form:
-            pattern: ^/login$
+            path:     ^/login$
             security: false
 
         default:

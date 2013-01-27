@@ -4,7 +4,36 @@ CHANGELOG
 2.2.0
 -----
 
-* Added PBKDF2 Password encoder
+ * [DEPRECATION] The `pattern` setting of a firewall has been renamed to `path`
+   (`pattern` will be removed in 3.0)
+  
+   Before:
+
+   ````
+   security:
+       firewalls:
+           secured_area:
+               pattern: /^
+
+   <firewall name="secured_area" pattern="/^">
+       <!-- ... -->
+   </firewall>
+   ````
+
+   After:
+
+   ````
+   security:
+       firewalls:
+           secured_area:
+               path: /^
+
+   <firewall name="secured_area" path="/^">
+       <!-- ... -->
+   </firewall>
+   ````
+
+ * Added PBKDF2 Password encoder
 
 2.1.0
 -----

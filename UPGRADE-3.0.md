@@ -62,6 +62,36 @@ UPGRADE FROM 2.x to 3.0
    $route->setSchemes('https');
    ```
 
+### Security
+
+ * The `pattern` setting for a firewall has been deprecated in favor of `path`
+
+   Before:
+
+   ````
+   security:
+       firewalls:
+           secured_area:
+               pattern: /^
+
+   <firewall name="secured_area" pattern="/^">
+       <!-- ... -->
+   </firewall>
+   ````
+
+   After:
+
+   ````
+   security:
+       firewalls:
+           secured_area:
+               path: /^
+
+   <firewall name="secured_area" path="/^">
+       <!-- ... -->
+   </firewall>
+   ````
+
 ### Yaml
 
  * The ability to pass file names to `Yaml::parse()` has been removed.

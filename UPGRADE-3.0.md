@@ -62,6 +62,10 @@ UPGRADE FROM 2.x to 3.0
    $route->setSchemes('https');
    ```
 
+### Twig Bridge
+
+ * The `render` tag is deprecated in favor of the `render` function.
+
 ### Yaml
 
  * The ability to pass file names to `Yaml::parse()` has been removed.

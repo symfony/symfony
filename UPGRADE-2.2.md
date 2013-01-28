@@ -15,7 +15,11 @@
 
    ```
    {% render controller('BlogBundle:Post:list', { 'limit': 2 }), { 'alt': 'BlogBundle:Post:error' } %}
+   {# Or: #}
+   {{ render(controller('BlogBundle:Post:list', { 'limit': 2 }), { 'alt': 'BlogBundle:Post:error'}) }}
    ```
+
+   Note: The function is the preferred way.
 
 ### HttpFoundation
 

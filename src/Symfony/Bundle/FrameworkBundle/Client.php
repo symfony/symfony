@@ -62,6 +62,18 @@ class Client extends BaseClient
     }
 
     /**
+     * Returns the current Response instance.
+     *
+     * @return Response A Response instance
+     *
+     * @api
+     */
+    public function getResponse()
+    {
+        return parent::getResponse();
+    }
+
+    /**
      * Makes a request.
      *
      * @param Request $request A Request instance

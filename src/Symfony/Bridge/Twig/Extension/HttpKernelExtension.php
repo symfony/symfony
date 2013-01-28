@@ -64,6 +64,10 @@ class HttpKernelExtension extends \Twig_Extension
 
     public function renderStrategy($strategy, $uri, $options = array())
     {
+        if (isset($options['strategy'])) {
+            unset($options['strategy']);
+        }
+
         return $this->renderer->render($uri, $strategy, $options);
     }
 

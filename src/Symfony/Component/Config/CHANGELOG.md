@@ -4,6 +4,9 @@ CHANGELOG
 2.2.0
 -----
 
+ * added ArrayNodeDefinition::canBeEnabled() and ArrayNodeDefinition::canBeDisabled()
+   to ease configuration when some sections are respectively disabled / enabled
+   by default.
  * added a `normalizeKeys()` method for array nodes (to avoid key normalization)
  * added numerical type handling for config definitions
  * added convenience methods for optional configuration sections to ArrayNodeDefinition

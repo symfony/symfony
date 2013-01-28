@@ -23,45 +23,45 @@ use Symfony\Component\Validator\Constraints\Collection\Optional;
  */
 class CollectionValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (null === $value) {
-            return;
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (null === $value) {
+						return;
+				}
 
-        if (!is_array($value) && !($value instanceof \Traversable && $value instanceof \ArrayAccess)) {
-            throw new UnexpectedTypeException($value, 'array or Traversable and ArrayAccess');
-        }
+				if (!is_array($value) && !($value instanceof \Traversable && $value instanceof \ArrayAccess)) {
+						throw new UnexpectedTypeException($value, 'array or Traversable and ArrayAccess');
+				}
 
-        $group = $this->context->getGroup();
+				$group = $this->context->getGroup();
 
-        foreach ($constraint->fields as $field => $fieldConstraint) {
-            if (
-                // bug fix issue #2779
-                (is_array($value) && array_key_exists($field, $value)) ||
-                ($value instanceof \ArrayAccess && $value->offsetExists($field))
-            ) {
-                foreach ($fieldConstraint->constraints as $constr) {
-                    $this->context->validateValue($value[$field], $constr, '['.$field.']', $group);
-                }
-            } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
-                $this->context->addViolationAt('['.$field.']', $constraint->missingFieldsMessage, array(
-                    '{{ field }}' => $field
-                ), null);
-            }
-        }
+				foreach ($constraint->fields as $field => $fieldConstraint) {
+						if (
+								// bug fix issue #2779
+								(is_array($value) && array_key_exists($field, $value)) ||
+								($value instanceof \ArrayAccess && $value->offsetExists($field))
+						) {
+								foreach ($fieldConstraint->constraints as $constr) {
+										$this->context->validateValue($value[$field], $constr, '['.$field.']', $group);
+								}
+						} elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
+								$this->context->addViolationAt('['.$field.']', $constraint->missingFieldsMessage, array(
+										'{{ field }}' => $field
+								), null);
+						}
+				}
 
-        if (!$constraint->allowExtraFields) {
-            foreach ($value as $field => $fieldValue) {
-                if (!isset($constraint->fields[$field])) {
-                    $this->context->addViolationAt('['.$field.']', $constraint->extraFieldsMessage, array(
-                        '{{ field }}' => $field
-                    ), $fieldValue);
-                }
-            }
-        }
-    }
+				if (!$constraint->allowExtraFields) {
+						foreach ($value as $field => $fieldValue) {
+								if (!isset($constraint->fields[$field])) {
+										$this->context->addViolationAt('['.$field.']', $constraint->extraFieldsMessage, array(
+												'{{ field }}' => $field
+										), $fieldValue);
+								}
+						}
+				}
+		}
 }

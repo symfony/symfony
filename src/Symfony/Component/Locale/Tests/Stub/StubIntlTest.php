@@ -19,31 +19,31 @@ use Symfony\Component\Locale\Tests\TestCase as LocaleTestCase;
 
 class StubIntlTest extends LocaleTestCase
 {
-    public function codeProvider()
-    {
-        return array (
-            array(-129, '[BOGUS UErrorCode]'),
-            array(0, 'U_ZERO_ERROR'),
-            array(1, 'U_ILLEGAL_ARGUMENT_ERROR'),
-            array(9, 'U_PARSE_ERROR'),
-            array(129, '[BOGUS UErrorCode]'),
-        );
-    }
+		public function codeProvider()
+		{
+				return array (
+						array(-129, '[BOGUS UErrorCode]'),
+						array(0, 'U_ZERO_ERROR'),
+						array(1, 'U_ILLEGAL_ARGUMENT_ERROR'),
+						array(9, 'U_PARSE_ERROR'),
+						array(129, '[BOGUS UErrorCode]'),
+				);
+		}
 
-    /**
-     * @dataProvider codeProvider
-     */
-    public function testGetErrorName($code, $name)
-    {
-        $this->assertSame($name, StubIntl::getErrorName($code));
-    }
+		/**
+		 * @dataProvider codeProvider
+		 */
+		public function testGetErrorName($code, $name)
+		{
+				$this->assertSame($name, StubIntl::getErrorName($code));
+		}
 
-    /**
-     * @dataProvider codeProvider
-     */
-    public function testGetErrorNameWithIntl($code, $name)
-    {
-        $this->skipIfIntlExtensionIsNotLoaded();
-        $this->assertSame(intl_error_name($code), StubIntl::getErrorName($code));
-    }
+		/**
+		 * @dataProvider codeProvider
+		 */
+		public function testGetErrorNameWithIntl($code, $name)
+		{
+				$this->skipIfIntlExtensionIsNotLoaded();
+				$this->assertSame(intl_error_name($code), StubIntl::getErrorName($code));
+		}
 }

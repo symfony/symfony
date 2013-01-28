@@ -13,8 +13,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 class CollectionValidatorArrayObjectTest extends CollectionValidatorTest
 {
-    public function prepareTestData(array $contents)
-    {
-        return new \ArrayObject($contents);
-    }
+		public function prepareTestData(array $contents)
+		{
+				return new \ArrayObject($contents);
+		}
 }

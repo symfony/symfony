@@ -18,57 +18,57 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class NumberType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->addViewTransformer(new NumberToLocalizedStringTransformer(
-            $options['precision'],
-            $options['grouping'],
-            $options['rounding_mode']
-        ));
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+				$builder->addViewTransformer(new NumberToLocalizedStringTransformer(
+						$options['precision'],
+						$options['grouping'],
+						$options['rounding_mode']
+				));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            // default precision is locale specific (usually around 3)
-            'precision'     => null,
-            'grouping'      => false,
-            'rounding_mode' => \NumberFormatter::ROUND_HALFUP,
-            'compound'      => false,
-        ));
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				$resolver->setDefaults(array(
+						// default precision is locale specific (usually around 3)
+						'precision'		 => null,
+						'grouping'			=> false,
+						'rounding_mode' => \NumberFormatter::ROUND_HALFUP,
+						'compound'			=> false,
+				));
 
-        $resolver->setAllowedValues(array(
-            'rounding_mode' => array(
-                \NumberFormatter::ROUND_FLOOR,
-                \NumberFormatter::ROUND_DOWN,
-                \NumberFormatter::ROUND_HALFDOWN,
-                \NumberFormatter::ROUND_HALFEVEN,
-                \NumberFormatter::ROUND_HALFUP,
-                \NumberFormatter::ROUND_UP,
-                \NumberFormatter::ROUND_CEILING,
-            ),
-        ));
-    }
+				$resolver->setAllowedValues(array(
+						'rounding_mode' => array(
+								\NumberFormatter::ROUND_FLOOR,
+								\NumberFormatter::ROUND_DOWN,
+								\NumberFormatter::ROUND_HALFDOWN,
+								\NumberFormatter::ROUND_HALFEVEN,
+								\NumberFormatter::ROUND_HALFUP,
+								\NumberFormatter::ROUND_UP,
+								\NumberFormatter::ROUND_CEILING,
+						),
+				));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'field';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getParent()
+		{
+				return 'field';
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'number';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'number';
+		}
 }

@@ -22,53 +22,53 @@ use Doctrine\DBAL\Logging\SQLLogger;
  */
 class DbalLogger implements SQLLogger
 {
-    protected $logger;
-    protected $stopwatch;
+		protected $logger;
+		protected $stopwatch;
 
-    /**
-     * Constructor.
-     *
-     * @param LoggerInterface $logger    A LoggerInterface instance
-     * @param Stopwatch       $stopwatch A Stopwatch instance
-     */
-    public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
-    {
-        $this->logger = $logger;
-        $this->stopwatch = $stopwatch;
-    }
+		/**
+		 * Constructor.
+		 *
+		 * @param LoggerInterface $logger		A LoggerInterface instance
+		 * @param Stopwatch			 $stopwatch A Stopwatch instance
+		 */
+		public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
+		{
+				$this->logger = $logger;
+				$this->stopwatch = $stopwatch;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function startQuery($sql, array $params = null, array $types = null)
-    {
-        if (null !== $this->stopwatch) {
-            $this->stopwatch->start('doctrine', 'doctrine');
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function startQuery($sql, array $params = null, array $types = null)
+		{
+				if (null !== $this->stopwatch) {
+						$this->stopwatch->start('doctrine', 'doctrine');
+				}
 
-        if (null !== $this->logger) {
-            $this->log($sql, null === $params ? array() : $params);
-        }
-    }
+				if (null !== $this->logger) {
+						$this->log($sql, null === $params ? array() : $params);
+				}
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function stopQuery()
-    {
-        if (null !== $this->stopwatch) {
-            $this->stopwatch->stop('doctrine');
-        }
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function stopQuery()
+		{
+				if (null !== $this->stopwatch) {
+						$this->stopwatch->stop('doctrine');
+				}
+		}
 
-    /**
-     * Logs a message.
-     *
-     * @param string $message A message to log
-     * @param array  $params  The context
-     */
-    protected function log($message, array $params)
-    {
-        $this->logger->debug($message, $params);
-    }
+		/**
+		 * Logs a message.
+		 *
+		 * @param string $message A message to log
+		 * @param array	$params	The context
+		 */
+		protected function log($message, array $params)
+		{
+				$this->logger->debug($message, $params);
+		}
 }

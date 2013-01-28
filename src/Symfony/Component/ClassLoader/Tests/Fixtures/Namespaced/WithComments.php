@@ -13,6 +13,6 @@ namespace Namespaced;
 
 class WithComments
 {
-    /** @Boolean */
-    public static $loaded = true;
+		/** @Boolean */
+		public static $loaded = true;
 }

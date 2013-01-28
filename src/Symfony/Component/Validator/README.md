@@ -12,38 +12,38 @@ The component provides "validation constraints", which are simple objects
 containing the rules for the validation. Let's validate a simple string
 as an example:
 
-    use Symfony\Component\Validator\Validation;
-    use Symfony\Component\Validator\Constraints\Length;
+		use Symfony\Component\Validator\Validation;
+		use Symfony\Component\Validator\Constraints\Length;
 
-    $validator = Validation::createValidator();
+		$validator = Validation::createValidator();
 
-    $violations = $validator->validateValue('Bernhard', new Length(array('min' => 10)));
+		$violations = $validator->validateValue('Bernhard', new Length(array('min' => 10)));
 
 This validation will fail because the given string is shorter than ten
-characters. The precise errors, here called "constraint violations",  are
+characters. The precise errors, here called "constraint violations",	are
 returned by the validator. You can analyze these or return them to the user.
 If the violation list is empty, validation succeeded.
 
 Validation of arrays is possible using the `Collection` constraint:
 
-    use Symfony\Component\Validator\Validation;
-    use Symfony\Component\Validator\Constraints as Assert;
+		use Symfony\Component\Validator\Validation;
+		use Symfony\Component\Validator\Constraints as Assert;
 
-    $validator = Validation::createValidator();
+		$validator = Validation::createValidator();
 
-    $constraint = new Assert\Collection(array(
-        'name' => new Assert\Collection(array(
-            'first_name' => new Assert\Length(array('min' => 101)),
-            'last_name'  => new Assert\Length(array('min' => 1)),
-        )),
-        'email'    => new Assert\Email(),
-        'simple'   => new Assert\Length(array('min' => 102)),
-        'gender'   => new Assert\Choice(array(3, 4)),
-        'file'     => new Assert\File(),
-        'password' => new Assert\Length(array('min' => 60)),
-    ));
+		$constraint = new Assert\Collection(array(
+				'name' => new Assert\Collection(array(
+						'first_name' => new Assert\Length(array('min' => 101)),
+						'last_name'	=> new Assert\Length(array('min' => 1)),
+				)),
+				'email'		=> new Assert\Email(),
+				'simple'	 => new Assert\Length(array('min' => 102)),
+				'gender'	 => new Assert\Choice(array(3, 4)),
+				'file'		 => new Assert\File(),
+				'password' => new Assert\Length(array('min' => 60)),
+		));
 
-    $violations = $validator->validateValue($input, $constraint);
+		$violations = $validator->validateValue($input, $constraint);
 
 Again, the validator returns the list of violations.
 
@@ -52,45 +52,45 @@ a mapping you can put constraints onto properties and objects of classes.
 Whenever an object of this class is validated, its properties and
 method results are matched against the constraints.
 
-    use Symfony\Component\Validator\Validation;
-    use Symfony\Component\Validator\Constraints as Assert;
+		use Symfony\Component\Validator\Validation;
+		use Symfony\Component\Validator\Constraints as Assert;
 
-    class User
-    {
-        /**
-         * @Assert\Length(min = 3)
-         * @Assert\NotBlank
-         */
-        private $name;
+		class User
+		{
+				/**
+				 * @Assert\Length(min = 3)
+				 * @Assert\NotBlank
+				 */
+				private $name;
 
-        /**
-         * @Assert\Email
-         * @Assert\NotBlank
-         */
-        private $email;
+				/**
+				 * @Assert\Email
+				 * @Assert\NotBlank
+				 */
+				private $email;
 
-        public function __construct($name, $email)
-        {
-            $this->name = $name;
-            $this->email = $email;
-        }
+				public function __construct($name, $email)
+				{
+						$this->name = $name;
+						$this->email = $email;
+				}
 
-        /**
-         * @Assert\True(message = "The user should have a Google Mail account")
-         */
-        public function isGmailUser()
-        {
-            return false !== strpos($this->email, '@gmail.com');
-        }
-    }
+				/**
+				 * @Assert\True(message = "The user should have a Google Mail account")
+				 */
+				public function isGmailUser()
+				{
+						return false !== strpos($this->email, '@gmail.com');
+				}
+		}
 
-    $validator = Validation::createValidatorBuilder()
-        ->enableAnnotationMapping()
-        ->getValidator();
+		$validator = Validation::createValidatorBuilder()
+				->enableAnnotationMapping()
+				->getValidator();
 
-    $user = new User('John Doe', 'john@example.com');
+		$user = new User('John Doe', 'john@example.com');
 
-    $violations = $validator->validate($user);
+		$violations = $validator->validate($user);
 
 This example uses the annotation support of Doctrine Common to
 map constraints to properties and methods. You can also map constraints
@@ -115,6 +115,6 @@ http://jcp.org/en/jsr/detail?id=303
 
 You can run the unit tests with the following command:
 
-    $ cd path/to/Symfony/Component/Validator/
-    $ composer.phar install --dev
-    $ phpunit
+		$ cd path/to/Symfony/Component/Validator/
+		$ composer.phar install --dev
+	$ phpunit

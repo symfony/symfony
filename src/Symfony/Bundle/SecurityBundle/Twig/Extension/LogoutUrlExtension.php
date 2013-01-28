@@ -20,56 +20,56 @@ use Symfony\Bundle\SecurityBundle\Templating\Helper\LogoutUrlHelper;
  */
 class LogoutUrlExtension extends \Twig_Extension
 {
-    private $helper;
+		private $helper;
 
-    /**
-     * Constructor.
-     *
-     * @param LogoutUrlHelper $helper
-     */
-    public function __construct(LogoutUrlHelper $helper)
-    {
-        $this->helper = $helper;
-    }
+		/**
+		 * Constructor.
+		 *
+		 * @param LogoutUrlHelper $helper
+		 */
+		public function __construct(LogoutUrlHelper $helper)
+		{
+				$this->helper = $helper;
+		}
 
-    /**
-     * @see Twig_Extension::getFunctions()
-     */
-    public function getFunctions()
-    {
-        return array(
-            'logout_url'  => new \Twig_Function_Method($this, 'getLogoutUrl'),
-            'logout_path' => new \Twig_Function_Method($this, 'getLogoutPath'),
-        );
-    }
+		/**
+		 * @see Twig_Extension::getFunctions()
+		 */
+		public function getFunctions()
+		{
+				return array(
+						'logout_url'	=> new \Twig_Function_Method($this, 'getLogoutUrl'),
+						'logout_path' => new \Twig_Function_Method($this, 'getLogoutPath'),
+				);
+		}
 
-    /**
-     * Generate the relative logout URL for the firewall.
-     *
-     * @param string $key The firewall key
-     * @return string The relative logout URL
-     */
-    public function getLogoutPath($key)
-    {
-        return $this->helper->getLogoutPath($key);
-    }
+		/**
+		 * Generate the relative logout URL for the firewall.
+		 *
+		 * @param string $key The firewall key
+		 * @return string The relative logout URL
+		 */
+		public function getLogoutPath($key)
+		{
+				return $this->helper->getLogoutPath($key);
+		}
 
-    /**
-     * Generate the absolute logout URL for the firewall.
-     *
-     * @param string $key The firewall key
-     * @return string The absolute logout URL
-     */
-    public function getLogoutUrl($key)
-    {
-        return $this->helper->getLogoutUrl($key);
-    }
+		/**
+		 * Generate the absolute logout URL for the firewall.
+		 *
+		 * @param string $key The firewall key
+		 * @return string The absolute logout URL
+		 */
+		public function getLogoutUrl($key)
+		{
+				return $this->helper->getLogoutUrl($key);
+		}
 
-    /**
-     * @see Twig_ExtensionInterface::getName()
-     */
-    public function getName()
-    {
-        return 'logout_url';
-    }
+		/**
+		 * @see Twig_ExtensionInterface::getName()
+		 */
+		public function getName()
+		{
+				return 'logout_url';
+		}
 }

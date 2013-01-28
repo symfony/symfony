@@ -5,50 +5,50 @@ CHANGELOG
 -----
 
  * [BC BREAK] All Serializer, Normalizer and Encoder interfaces have been
-   modified to include an optional `$context` array parameter.
+	 modified to include an optional `$context` array parameter.
  * The XML Root name can now be configured with the `xml_root_name`
-   parameter in the context option to the `XmlEncoder`.
+	 parameter in the context option to the `XmlEncoder`.
  * Options to `json_encode` and `json_decode` can be passed through
-   the context options of `JsonEncode` and `JsonDecode` encoder/decoders.
+	 the context options of `JsonEncode` and `JsonDecode` encoder/decoders.
 
 2.1.0
 -----
 
  * added DecoderInterface::supportsDecoding(),
-   EncoderInterface::supportsEncoding()
+	 EncoderInterface::supportsEncoding()
  * removed NormalizableInterface::denormalize(),
-   NormalizerInterface::denormalize(),
-   NormalizerInterface::supportsDenormalization()
+	 NormalizerInterface::denormalize(),
+	 NormalizerInterface::supportsDenormalization()
  * removed normalize() denormalize() encode() decode() supportsSerialization()
-   supportsDeserialization() supportsEncoding() supportsDecoding()
-   getEncoder() from SerializerInterface
+	 supportsDeserialization() supportsEncoding() supportsDecoding()
+	 getEncoder() from SerializerInterface
  * Serializer now implements NormalizerInterface, DenormalizerInterface,
-   EncoderInterface, DecoderInterface in addition to SerializerInterface
+	 EncoderInterface, DecoderInterface in addition to SerializerInterface
  * added DenormalizableInterface and DenormalizerInterface
  * [BC BREAK] changed `GetSetMethodNormalizer`'s key names from all lowercased
-   to camelCased (e.g. `mypropertyvalue` to `myPropertyValue`)
+	 to camelCased (e.g. `mypropertyvalue` to `myPropertyValue`)
  * [BC BREAK] convert the `item` XML tag to an array
 
-    ``` xml
-    <?xml version="1.0"?>
-    <response>
-        <item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>
-    </response>
-    ```
+		``` xml
+		<?xml version="1.0"?>
+		<response>
+				<item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>
+		</response>
+		```
 
-    Before:
+		Before:
 
-        Array()
+				Array()
 
-    After:
+		After:
 
-        Array(
-            [item] => Array(
-                [0] => Array(
-                    [title] => title1
-                )
-                [1] => Array(
-                    [title] => title2
-                )
-            )
-        )
+				Array(
+						[item] => Array(
+								[0] => Array(
+										[title] => title1
+								)
+								[1] => Array(
+										[title] => title2
+								)
+						)
+				)

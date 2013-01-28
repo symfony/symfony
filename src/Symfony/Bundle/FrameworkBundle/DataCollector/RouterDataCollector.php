@@ -22,16 +22,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
  */
 class RouterDataCollector extends BaseRouterDataCollector
 {
-    public function guessRoute(Request $request, $controller)
-    {
-        if (is_array($controller)) {
-            $controller = $controller[0];
-        }
+		public function guessRoute(Request $request, $controller)
+		{
+				if (is_array($controller)) {
+						$controller = $controller[0];
+				}
 
-        if ($controller instanceof RedirectController) {
-            return $request->attributes->get('_route');
-        }
+				if ($controller instanceof RedirectController) {
+						return $request->attributes->get('_route');
+				}
 
-        return parent::guessRoute($request, $controller);
-    }
+				return parent::guessRoute($request, $controller);
+		}
 }

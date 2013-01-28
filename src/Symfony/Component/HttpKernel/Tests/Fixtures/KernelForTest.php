@@ -16,39 +16,39 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 
 class KernelForTest extends Kernel
 {
-    public function getBundleMap()
-    {
-        return $this->bundleMap;
-    }
+		public function getBundleMap()
+		{
+				return $this->bundleMap;
+		}
 
-    public function registerBundles()
-    {
-    }
+		public function registerBundles()
+		{
+		}
 
-    public function init()
-    {
-    }
+		public function init()
+		{
+		}
 
-    public function registerBundleDirs()
-    {
-    }
+		public function registerBundleDirs()
+		{
+		}
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
-    {
-    }
+		public function registerContainerConfiguration(LoaderInterface $loader)
+		{
+		}
 
-    public function initializeBundles()
-    {
-        parent::initializeBundles();
-    }
+		public function initializeBundles()
+		{
+				parent::initializeBundles();
+		}
 
-    public function isBooted()
-    {
-        return $this->booted;
-    }
+		public function isBooted()
+		{
+				return $this->booted;
+		}
 
-    public function setIsBooted($value)
-    {
-        $this->booted = (Boolean) $value;
-    }
+		public function setIsBooted($value)
+		{
+				$this->booted = (Boolean) $value;
+		}
 }

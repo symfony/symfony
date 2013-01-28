@@ -18,20 +18,20 @@ namespace Symfony\Component\Validator;
  */
 interface ConstraintValidatorInterface
 {
-    /**
-     * Initializes the constraint validator.
-     *
-     * @param ExecutionContextInterface $context The current validation context
-     */
-    public function initialize(ExecutionContextInterface $context);
+		/**
+		 * Initializes the constraint validator.
+		 *
+		 * @param ExecutionContextInterface $context The current validation context
+		 */
+		public function initialize(ExecutionContextInterface $context);
 
-    /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @api
-     */
-    public function validate($value, Constraint $constraint);
+		/**
+		 * Checks if the passed value is valid.
+		 *
+		 * @param mixed			$value			The value that should be validated
+		 * @param Constraint $constraint The constraint for the validation
+		 *
+		 * @api
+		 */
+		public function validate($value, Constraint $constraint);
 }

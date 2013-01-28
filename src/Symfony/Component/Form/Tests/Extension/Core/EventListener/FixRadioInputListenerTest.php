@@ -17,57 +17,57 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 
 class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
 {
-    private $listener;
+		private $listener;
 
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
+		protected function setUp()
+		{
+				if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
+						$this->markTestSkipped('The "EventDispatcher" component is not available');
+				}
 
-        parent::setUp();
+				parent::setUp();
 
-        $list = new SimpleChoiceList(array(0 => 'A', 1 => 'B'));
-        $this->listener = new FixRadioInputListener($list);
-    }
+				$list = new SimpleChoiceList(array(0 => 'A', 1 => 'B'));
+				$this->listener = new FixRadioInputListener($list);
+		}
 
-    protected function tearDown()
-    {
-        parent::tearDown();
+		protected function tearDown()
+		{
+				parent::tearDown();
 
-        $this->listener = null;
-    }
+				$this->listener = null;
+		}
 
-    public function testFixRadio()
-    {
-        $data = '1';
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $event = new FormEvent($form, $data);
+		public function testFixRadio()
+		{
+				$data = '1';
+				$form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+				$event = new FormEvent($form, $data);
 
-        $this->listener->preBind($event);
+				$this->listener->preBind($event);
 
-        $this->assertEquals(array(1 => '1'), $event->getData());
-    }
+				$this->assertEquals(array(1 => '1'), $event->getData());
+		}
 
-    public function testFixZero()
-    {
-        $data = '0';
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $event = new FormEvent($form, $data);
+		public function testFixZero()
+		{
+				$data = '0';
+				$form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+				$event = new FormEvent($form, $data);
 
-        $this->listener->preBind($event);
+				$this->listener->preBind($event);
 
-        $this->assertEquals(array(0 => '0'), $event->getData());
-    }
+				$this->assertEquals(array(0 => '0'), $event->getData());
+		}
 
-    public function testIgnoreEmptyString()
-    {
-        $data = '';
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $event = new FormEvent($form, $data);
+		public function testIgnoreEmptyString()
+		{
+				$data = '';
+				$form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+				$event = new FormEvent($form, $data);
 
-        $this->listener->preBind($event);
+				$this->listener->preBind($event);
 
-        $this->assertEquals(array(), $event->getData());
-    }
+				$this->assertEquals(array(), $event->getData());
+		}
 }

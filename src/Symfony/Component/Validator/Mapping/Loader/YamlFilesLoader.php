@@ -16,15 +16,15 @@ namespace Symfony\Component\Validator\Mapping\Loader;
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  *
- * @see    Symfony\Component\Validator\Mapping\Loader\FilesLoader
+ * @see		Symfony\Component\Validator\Mapping\Loader\FilesLoader
  */
 class YamlFilesLoader extends FilesLoader
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function getFileLoaderInstance($file)
-    {
-        return new YamlFileLoader($file);
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function getFileLoaderInstance($file)
+		{
+				return new YamlFileLoader($file);
+		}
 }

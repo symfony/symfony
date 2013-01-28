@@ -18,10 +18,10 @@ use Symfony\Component\Form\FormRendererInterface;
  */
 interface TwigRendererInterface extends FormRendererInterface
 {
-    /**
-     * Sets Twig's environment.
-     *
-     * @param \Twig_Environment $environment
-     */
-    public function setEnvironment(\Twig_Environment $environment);
+		/**
+		 * Sets Twig's environment.
+		 *
+		 * @param \Twig_Environment $environment
+		 */
+		public function setEnvironment(\Twig_Environment $environment);
 }

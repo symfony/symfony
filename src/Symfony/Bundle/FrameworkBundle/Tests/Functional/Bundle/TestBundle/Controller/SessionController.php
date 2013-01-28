@@ -17,56 +17,56 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 
 class SessionController extends ContainerAware
 {
-    public function welcomeAction($name=null)
-    {
-        $request = $this->container->get('request');
-        $session = $request->getSession();
+		public function welcomeAction($name=null)
+		{
+				$request = $this->container->get('request');
+				$session = $request->getSession();
 
-        // new session case
-        if (!$session->has('name')) {
-            if (!$name) {
-                return new Response('You are new here and gave no name.');
-            }
+				// new session case
+				if (!$session->has('name')) {
+						if (!$name) {
+								return new Response('You are new here and gave no name.');
+						}
 
-            // remember name
-            $session->set('name', $name);
+						// remember name
+						$session->set('name', $name);
 
-            return new Response(sprintf('Hello %s, nice to meet you.', $name));
-        }
+						return new Response(sprintf('Hello %s, nice to meet you.', $name));
+				}
 
-        // existing session
-        $name = $session->get('name');
+				// existing session
+				$name = $session->get('name');
 
-        return new Response(sprintf('Welcome back %s, nice to meet you.', $name));
-    }
+				return new Response(sprintf('Welcome back %s, nice to meet you.', $name));
+		}
 
-    public function logoutAction()
-    {
-        $request = $this->container->get('request')->getSession('session')->invalidate();
+		public function logoutAction()
+		{
+				$request = $this->container->get('request')->getSession('session')->invalidate();
 
-        return new Response('Session cleared.');
-    }
+				return new Response('Session cleared.');
+		}
 
-    public function setFlashAction($message)
-    {
-        $request = $this->container->get('request');
-        $session = $request->getSession();
-        $session->getFlashBag()->set('notice', $message);
+		public function setFlashAction($message)
+		{
+				$request = $this->container->get('request');
+				$session = $request->getSession();
+				$session->getFlashBag()->set('notice', $message);
 
-        return new RedirectResponse($this->container->get('router')->generate('session_showflash'));
-    }
+				return new RedirectResponse($this->container->get('router')->generate('session_showflash'));
+		}
 
-    public function showFlashAction()
-    {
-        $request = $this->container->get('request');
-        $session = $request->getSession();
+		public function showFlashAction()
+		{
+				$request = $this->container->get('request');
+				$session = $request->getSession();
 
-        if ($session->getFlashBag()->has('notice')) {
-            list($output) = $session->getFlashBag()->get('notice');
-        } else {
-            $output = 'No flash was set.';
-        }
+				if ($session->getFlashBag()->has('notice')) {
+						list($output) = $session->getFlashBag()->get('notice');
+				} else {
+						$output = 'No flash was set.';
+				}
 
-        return new Response($output);
-    }
+				return new Response($output);
+		}
 }

@@ -21,37 +21,37 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class All extends Constraint
 {
-    public $constraints = array();
+		public $constraints = array();
 
-    /**
-     * {@inheritDoc}
-     */
-    public function __construct($options = null)
-    {
-        parent::__construct($options);
+		/**
+		 * {@inheritDoc}
+		 */
+		public function __construct($options = null)
+		{
+				parent::__construct($options);
 
-        if (!is_array($this->constraints)) {
-            $this->constraints = array($this->constraints);
-        }
+				if (!is_array($this->constraints)) {
+						$this->constraints = array($this->constraints);
+				}
 
-        foreach ($this->constraints as $constraint) {
-            if (!$constraint instanceof Constraint) {
-                throw new ConstraintDefinitionException('The value ' . $constraint . ' is not an instance of Constraint in constraint ' . __CLASS__);
-            }
+				foreach ($this->constraints as $constraint) {
+						if (!$constraint instanceof Constraint) {
+								throw new ConstraintDefinitionException('The value ' . $constraint . ' is not an instance of Constraint in constraint ' . __CLASS__);
+						}
 
-            if ($constraint instanceof Valid) {
-                throw new ConstraintDefinitionException('The constraint Valid cannot be nested inside constraint ' . __CLASS__ . '. You can only declare the Valid constraint directly on a field or method.');
-            }
-        }
-    }
+						if ($constraint instanceof Valid) {
+								throw new ConstraintDefinitionException('The constraint Valid cannot be nested inside constraint ' . __CLASS__ . '. You can only declare the Valid constraint directly on a field or method.');
+						}
+				}
+		}
 
-    public function getDefaultOption()
-    {
-        return 'constraints';
-    }
+		public function getDefaultOption()
+		{
+				return 'constraints';
+		}
 
-    public function getRequiredOptions()
-    {
-        return array('constraints');
-    }
+		public function getRequiredOptions()
+		{
+				return array('constraints');
+		}
 }

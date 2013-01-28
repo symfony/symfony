@@ -16,34 +16,34 @@ use Symfony\Component\HttpKernel\Tests\Profiler\Mock\RedisMock;
 
 class RedisProfilerStorageTest extends AbstractProfilerStorageTest
 {
-    protected static $storage;
+		protected static $storage;
 
-    protected function setUp()
-    {
-        $redisMock = new RedisMock();
-        $redisMock->connect('127.0.0.1', 6379);
+		protected function setUp()
+		{
+				$redisMock = new RedisMock();
+				$redisMock->connect('127.0.0.1', 6379);
 
-        self::$storage = new RedisProfilerStorage('redis://127.0.0.1:6379', '', '', 86400);
-        self::$storage->setRedis($redisMock);
+				self::$storage = new RedisProfilerStorage('redis://127.0.0.1:6379', '', '', 86400);
+				self::$storage->setRedis($redisMock);
 
-        if (self::$storage) {
-            self::$storage->purge();
-        }
-    }
+				if (self::$storage) {
+						self::$storage->purge();
+				}
+		}
 
-    protected function tearDown()
-    {
-        if (self::$storage) {
-            self::$storage->purge();
-            self::$storage = false;
-        }
-    }
+		protected function tearDown()
+		{
+				if (self::$storage) {
+						self::$storage->purge();
+						self::$storage = false;
+				}
+		}
 
-    /**
-     * @return \Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface
-     */
-    protected function getStorage()
-    {
-        return self::$storage;
-    }
+		/**
+		 * @return \Symfony\Component\HttpKernel\Profiler\ProfilerStorageInterface
+		 */
+		protected function getStorage()
+		{
+				return self::$storage;
+		}
 }

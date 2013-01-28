@@ -16,106 +16,106 @@ namespace Symfony\Component\Console\Formatter;
  */
 class OutputFormatterStyleStack
 {
-    /**
-     * @var OutputFormatterStyleInterface[]
-     */
-    private $styles;
+		/**
+		 * @var OutputFormatterStyleInterface[]
+		 */
+		private $styles;
 
-    /**
-     * @var OutputFormatterStyleInterface
-     */
-    private $emptyStyle;
+		/**
+		 * @var OutputFormatterStyleInterface
+		 */
+		private $emptyStyle;
 
-    /**
-     * Constructor.
-     *
-     * @param OutputFormatterStyleInterface $emptyStyle
-     */
-    public function __construct(OutputFormatterStyleInterface $emptyStyle = null)
-    {
-        $this->emptyStyle = $emptyStyle ?: new OutputFormatterStyle();
-        $this->reset();
-    }
+		/**
+		 * Constructor.
+		 *
+		 * @param OutputFormatterStyleInterface $emptyStyle
+		 */
+		public function __construct(OutputFormatterStyleInterface $emptyStyle = null)
+		{
+				$this->emptyStyle = $emptyStyle ?: new OutputFormatterStyle();
+				$this->reset();
+		}
 
-    /**
-     * Resets stack (ie. empty internal arrays).
-     */
-    public function reset()
-    {
-        $this->styles = array();
-    }
+		/**
+		 * Resets stack (ie. empty internal arrays).
+		 */
+		public function reset()
+		{
+				$this->styles = array();
+		}
 
-    /**
-     * Pushes a style in the stack.
-     *
-     * @param OutputFormatterStyleInterface $style
-     */
-    public function push(OutputFormatterStyleInterface $style)
-    {
-        $this->styles[] = $style;
-    }
+		/**
+		 * Pushes a style in the stack.
+		 *
+		 * @param OutputFormatterStyleInterface $style
+		 */
+		public function push(OutputFormatterStyleInterface $style)
+		{
+				$this->styles[] = $style;
+		}
 
-    /**
-     * Pops a style from the stack.
-     *
-     * @param OutputFormatterStyleInterface $style
-     *
-     * @return OutputFormatterStyleInterface
-     *
-     * @throws \InvalidArgumentException  When style tags incorrectly nested
-     */
-    public function pop(OutputFormatterStyleInterface $style = null)
-    {
-        if (empty($this->styles)) {
-            return $this->emptyStyle;
-        }
+		/**
+		 * Pops a style from the stack.
+		 *
+		 * @param OutputFormatterStyleInterface $style
+		 *
+		 * @return OutputFormatterStyleInterface
+		 *
+		 * @throws \InvalidArgumentException	When style tags incorrectly nested
+		 */
+		public function pop(OutputFormatterStyleInterface $style = null)
+		{
+				if (empty($this->styles)) {
+						return $this->emptyStyle;
+				}
 
-        if (null === $style) {
-            return array_pop($this->styles);
-        }
+				if (null === $style) {
+						return array_pop($this->styles);
+				}
 
-        foreach (array_reverse($this->styles, true) as $index => $stackedStyle) {
-            if ($style->apply('') === $stackedStyle->apply('')) {
-                $this->styles = array_slice($this->styles, 0, $index);
+				foreach (array_reverse($this->styles, true) as $index => $stackedStyle) {
+						if ($style->apply('') === $stackedStyle->apply('')) {
+								$this->styles = array_slice($this->styles, 0, $index);
 
-                return $stackedStyle;
-            }
-        }
+								return $stackedStyle;
+						}
+				}
 
-        throw new \InvalidArgumentException('Incorrectly nested style tag found.');
-    }
+				throw new \InvalidArgumentException('Incorrectly nested style tag found.');
+		}
 
-    /**
-     * Computes current style with stacks top codes.
-     *
-     * @return OutputFormatterStyle
-     */
-    public function getCurrent()
-    {
-        if (empty($this->styles)) {
-            return $this->emptyStyle;
-        }
+		/**
+		 * Computes current style with stacks top codes.
+		 *
+		 * @return OutputFormatterStyle
+		 */
+		public function getCurrent()
+		{
+				if (empty($this->styles)) {
+						return $this->emptyStyle;
+				}
 
-        return $this->styles[count($this->styles)-1];
-    }
+				return $this->styles[count($this->styles)-1];
+		}
 
-    /**
-     * @param OutputFormatterStyleInterface $emptyStyle
-     *
-     * @return OutputFormatterStyleStack
-     */
-    public function setEmptyStyle(OutputFormatterStyleInterface $emptyStyle)
-    {
-        $this->emptyStyle = $emptyStyle;
+		/**
+		 * @param OutputFormatterStyleInterface $emptyStyle
+		 *
+		 * @return OutputFormatterStyleStack
+		 */
+		public function setEmptyStyle(OutputFormatterStyleInterface $emptyStyle)
+		{
+				$this->emptyStyle = $emptyStyle;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * @return OutputFormatterStyleInterface
-     */
-    public function getEmptyStyle()
-    {
-        return $this->emptyStyle;
-    }
+		/**
+		 * @return OutputFormatterStyleInterface
+		 */
+		public function getEmptyStyle()
+		{
+				return $this->emptyStyle;
+		}
 }

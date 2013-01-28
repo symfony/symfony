@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\File\File;
 
 class FileValidatorObjectTest extends FileValidatorTest
 {
-    protected function getFile($filename)
-    {
-        return new File($filename);
-    }
+		protected function getFile($filename)
+		{
+				return new File($filename);
+		}
 }

@@ -16,20 +16,20 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class FooTypeBarExtension extends AbstractTypeExtension
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->setAttribute('bar', 'x');
-    }
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+				$builder->setAttribute('bar', 'x');
+		}
 
-    public function getAllowedOptionValues()
-    {
-        return array(
-            'a_or_b' => array('c'),
-        );
-    }
+		public function getAllowedOptionValues()
+		{
+				return array(
+						'a_or_b' => array('c'),
+				);
+		}
 
-    public function getExtendedType()
-    {
-        return 'foo';
-    }
+		public function getExtendedType()
+		{
+				return 'foo';
+		}
 }

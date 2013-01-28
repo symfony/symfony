@@ -19,12 +19,12 @@ namespace Symfony\Component\Translation\Loader;
  * @api
  *
  * @deprecated Deprecated since version 2.2, to be removed in 2.3.
- *             Use QtFileLoader instead.
+ *						 Use QtFileLoader instead.
  */
 class QtTranslationsLoader extends QtFileLoader
 {
-    public function __construct()
-    {
-        trigger_error('QtTranslationsLoader is deprecated since version 2.2 and will be removed in 2.3. Use QtFileLoader instead.', E_USER_DEPRECATED);
-    }
+		public function __construct()
+		{
+				trigger_error('QtTranslationsLoader is deprecated since version 2.2 and will be removed in 2.3. Use QtFileLoader instead.', E_USER_DEPRECATED);
+		}
 }

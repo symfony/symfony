@@ -21,17 +21,17 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class TrueValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (null === $value) {
-            return;
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (null === $value) {
+						return;
+				}
 
-        if (true !== $value && 1 !== $value && '1' !== $value) {
-            $this->context->addViolation($constraint->message);
-        }
-    }
+				if (true !== $value && 1 !== $value && '1' !== $value) {
+						$this->context->addViolation($constraint->message);
+				}
+		}
 }

@@ -19,83 +19,83 @@ use Symfony\Component\HttpKernel\UriSigner;
 
 class RouterProxyListenerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-    }
+		protected function setUp()
+		{
+				if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
+						$this->markTestSkipped('The "EventDispatcher" component is not available');
+				}
+		}
 
-    public function testOnlyTriggeredOnProxyRoute()
-    {
-        $request = Request::create('http://example.com/foo?_path=foo%3Dbar%26_controller%3Dfoo');
+		public function testOnlyTriggeredOnProxyRoute()
+		{
+				$request = Request::create('http://example.com/foo?_path=foo%3Dbar%26_controller%3Dfoo');
 
-        $listener = new RouterProxyListener(new UriSigner('foo'));
-        $event = $this->createGetResponseEvent($request);
+				$listener = new RouterProxyListener(new UriSigner('foo'));
+				$event = $this->createGetResponseEvent($request);
 
-        $expected = $request->attributes->all();
+				$expected = $request->attributes->all();
 
-        $listener->onKernelRequest($event);
+				$listener->onKernelRequest($event);
 
-        $this->assertEquals($expected, $request->attributes->all());
-        $this->assertTrue($request->query->has('_path'));
-    }
+				$this->assertEquals($expected, $request->attributes->all());
+				$this->assertTrue($request->query->has('_path'));
+		}
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     */
-    public function testAccessDeniedWithNonSafeMethods()
-    {
-        $request = Request::create('http://example.com/_proxy', 'POST');
+		/**
+		 * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+		 */
+		public function testAccessDeniedWithNonSafeMethods()
+		{
+				$request = Request::create('http://example.com/_proxy', 'POST');
 
-        $listener = new RouterProxyListener(new UriSigner('foo'));
-        $event = $this->createGetResponseEvent($request);
+				$listener = new RouterProxyListener(new UriSigner('foo'));
+				$event = $this->createGetResponseEvent($request);
 
-        $listener->onKernelRequest($event);
-    }
+				$listener->onKernelRequest($event);
+		}
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     */
-    public function testAccessDeniedWithNonLocalIps()
-    {
-        $request = Request::create('http://example.com/_proxy', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
+		/**
+		 * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+		 */
+		public function testAccessDeniedWithNonLocalIps()
+		{
+				$request = Request::create('http://example.com/_proxy', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
 
-        $listener = new RouterProxyListener(new UriSigner('foo'));
-        $event = $this->createGetResponseEvent($request);
+				$listener = new RouterProxyListener(new UriSigner('foo'));
+				$event = $this->createGetResponseEvent($request);
 
-        $listener->onKernelRequest($event);
-    }
+				$listener->onKernelRequest($event);
+		}
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     */
-    public function testAccessDeniedWithWrongSignature()
-    {
-        $request = Request::create('http://example.com/_proxy', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
+		/**
+		 * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+		 */
+		public function testAccessDeniedWithWrongSignature()
+		{
+				$request = Request::create('http://example.com/_proxy', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
 
-        $listener = new RouterProxyListener(new UriSigner('foo'));
-        $event = $this->createGetResponseEvent($request);
+				$listener = new RouterProxyListener(new UriSigner('foo'));
+				$event = $this->createGetResponseEvent($request);
 
-        $listener->onKernelRequest($event);
-    }
+				$listener->onKernelRequest($event);
+		}
 
-    public function testWithSignature()
-    {
-        $signer = new UriSigner('foo');
-        $request = Request::create($signer->sign('http://example.com/_proxy?_path=foo%3Dbar%26_controller%3Dfoo'), 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
+		public function testWithSignature()
+		{
+				$signer = new UriSigner('foo');
+				$request = Request::create($signer->sign('http://example.com/_proxy?_path=foo%3Dbar%26_controller%3Dfoo'), 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
 
-        $listener = new RouterProxyListener($signer);
-        $event = $this->createGetResponseEvent($request);
+				$listener = new RouterProxyListener($signer);
+				$event = $this->createGetResponseEvent($request);
 
-        $listener->onKernelRequest($event);
+				$listener->onKernelRequest($event);
 
-        $this->assertEquals(array('foo' => 'bar', '_controller' => 'foo'), $request->attributes->get('_route_params'));
-        $this->assertFalse($request->query->has('_path'));
-    }
+				$this->assertEquals(array('foo' => 'bar', '_controller' => 'foo'), $request->attributes->get('_route_params'));
+				$this->assertFalse($request->query->has('_path'));
+		}
 
-    private function createGetResponseEvent(Request $request)
-    {
-        return new GetResponseEvent($this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'), $request, HttpKernelInterface::MASTER_REQUEST);
-    }
+		private function createGetResponseEvent(Request $request)
+		{
+				return new GetResponseEvent($this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'), $request, HttpKernelInterface::MASTER_REQUEST);
+		}
 }

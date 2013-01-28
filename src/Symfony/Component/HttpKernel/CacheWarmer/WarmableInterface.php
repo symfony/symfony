@@ -18,10 +18,10 @@ namespace Symfony\Component\HttpKernel\CacheWarmer;
  */
 interface WarmableInterface
 {
-    /**
-     * Warms up the cache.
-     *
-     * @param string $cacheDir The cache directory
-     */
-    public function warmUp($cacheDir);
+		/**
+		 * Warms up the cache.
+		 *
+		 * @param string $cacheDir The cache directory
+		 */
+		public function warmUp($cacheDir);
 }

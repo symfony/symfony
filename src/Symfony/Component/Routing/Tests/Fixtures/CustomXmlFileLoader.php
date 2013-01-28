@@ -18,8 +18,8 @@ use Symfony\Component\Routing\Loader\XmlFileLoader;
  */
 class CustomXmlFileLoader extends XmlFileLoader
 {
-    protected function validate(\DOMDocument $dom)
-    {
-        return true;
-    }
+		protected function validate(\DOMDocument $dom)
+		{
+				return true;
+		}
 }

@@ -19,8 +19,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface as BasePropertyPathIn
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated deprecated since version 2.2, to be removed in 2.3. Use
- *             {@link \Symfony\Component\PropertyAccess\PropertyPathInterface}
- *             instead.
+ *						 {@link \Symfony\Component\PropertyAccess\PropertyPathInterface}
+ *						 instead.
  */
 interface PropertyPathInterface extends BasePropertyPathInterface
 {

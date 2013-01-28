@@ -16,25 +16,25 @@ namespace Symfony\Bridge\Twig\Node;
  */
 class FormThemeNode extends \Twig_Node
 {
-    public function __construct(\Twig_NodeInterface $form, \Twig_NodeInterface $resources, $lineno, $tag = null)
-    {
-        parent::__construct(array('form' => $form, 'resources' => $resources), array(), $lineno, $tag);
-    }
+		public function __construct(\Twig_NodeInterface $form, \Twig_NodeInterface $resources, $lineno, $tag = null)
+		{
+				parent::__construct(array('form' => $form, 'resources' => $resources), array(), $lineno, $tag);
+		}
 
-    /**
-     * Compiles the node to PHP.
-     *
-     * @param \Twig_Compiler $compiler A Twig_Compiler instance
-     */
-    public function compile(\Twig_Compiler $compiler)
-    {
-        $compiler
-            ->addDebugInfo($this)
-            ->write('$this->env->getExtension(\'form\')->renderer->setTheme(')
-            ->subcompile($this->getNode('form'))
-            ->raw(', ')
-            ->subcompile($this->getNode('resources'))
-            ->raw(");\n");
-        ;
-    }
+		/**
+		 * Compiles the node to PHP.
+		 *
+		 * @param \Twig_Compiler $compiler A Twig_Compiler instance
+		 */
+		public function compile(\Twig_Compiler $compiler)
+		{
+				$compiler
+						->addDebugInfo($this)
+						->write('$this->env->getExtension(\'form\')->renderer->setTheme(')
+						->subcompile($this->getNode('form'))
+						->raw(', ')
+						->subcompile($this->getNode('resources'))
+						->raw(");\n");
+				;
+		}
 }

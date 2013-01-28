@@ -21,45 +21,45 @@ namespace Symfony\Component\Security\Acl\Model;
  */
 interface EntryInterface extends \Serializable
 {
-    /**
-     * The ACL this ACE is associated with.
-     *
-     * @return AclInterface
-     */
-    public function getAcl();
+		/**
+		 * The ACL this ACE is associated with.
+		 *
+		 * @return AclInterface
+		 */
+		public function getAcl();
 
-    /**
-     * The primary key of this ACE
-     *
-     * @return integer
-     */
-    public function getId();
+		/**
+		 * The primary key of this ACE
+		 *
+		 * @return integer
+		 */
+		public function getId();
 
-    /**
-     * The permission mask of this ACE
-     *
-     * @return integer
-     */
-    public function getMask();
+		/**
+		 * The permission mask of this ACE
+		 *
+		 * @return integer
+		 */
+		public function getMask();
 
-    /**
-     * The security identity associated with this ACE
-     *
-     * @return SecurityIdentityInterface
-     */
-    public function getSecurityIdentity();
+		/**
+		 * The security identity associated with this ACE
+		 *
+		 * @return SecurityIdentityInterface
+		 */
+		public function getSecurityIdentity();
 
-    /**
-     * The strategy for comparing masks
-     *
-     * @return string
-     */
-    public function getStrategy();
+		/**
+		 * The strategy for comparing masks
+		 *
+		 * @return string
+		 */
+		public function getStrategy();
 
-    /**
-     * Returns whether this ACE is granting, or denying
-     *
-     * @return Boolean
-     */
-    public function isGranting();
+		/**
+		 * Returns whether this ACE is granting, or denying
+		 *
+		 * @return Boolean
+		 */
+		public function isGranting();
 }

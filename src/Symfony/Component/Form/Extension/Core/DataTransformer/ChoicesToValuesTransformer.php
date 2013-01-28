@@ -22,62 +22,62 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
  */
 class ChoicesToValuesTransformer implements DataTransformerInterface
 {
-    private $choiceList;
+		private $choiceList;
 
-    /**
-     * Constructor.
-     *
-     * @param ChoiceListInterface $choiceList
-     */
-    public function __construct(ChoiceListInterface $choiceList)
-    {
-        $this->choiceList = $choiceList;
-    }
+		/**
+		 * Constructor.
+		 *
+		 * @param ChoiceListInterface $choiceList
+		 */
+		public function __construct(ChoiceListInterface $choiceList)
+		{
+				$this->choiceList = $choiceList;
+		}
 
-    /**
-     * @param array $array
-     *
-     * @return array
-     *
-     * @throws UnexpectedTypeException if the given value is not an array
-     */
-    public function transform($array)
-    {
-        if (null === $array) {
-            return array();
-        }
+		/**
+		 * @param array $array
+		 *
+		 * @return array
+		 *
+		 * @throws UnexpectedTypeException if the given value is not an array
+		 */
+		public function transform($array)
+		{
+				if (null === $array) {
+						return array();
+				}
 
-        if (!is_array($array)) {
-            throw new UnexpectedTypeException($array, 'array');
-        }
+				if (!is_array($array)) {
+						throw new UnexpectedTypeException($array, 'array');
+				}
 
-        return $this->choiceList->getValuesForChoices($array);
-    }
+				return $this->choiceList->getValuesForChoices($array);
+		}
 
-    /**
-     * @param array $array
-     *
-     * @return array
-     *
-     * @throws UnexpectedTypeException       if the given value is not an array
-     * @throws TransformationFailedException if could not find all matching choices for the given values
-     */
-    public function reverseTransform($array)
-    {
-        if (null === $array) {
-            return array();
-        }
+		/**
+		 * @param array $array
+		 *
+		 * @return array
+		 *
+		 * @throws UnexpectedTypeException			 if the given value is not an array
+		 * @throws TransformationFailedException if could not find all matching choices for the given values
+		 */
+		public function reverseTransform($array)
+		{
+				if (null === $array) {
+						return array();
+				}
 
-        if (!is_array($array)) {
-            throw new UnexpectedTypeException($array, 'array');
-        }
+				if (!is_array($array)) {
+						throw new UnexpectedTypeException($array, 'array');
+				}
 
-        $choices = $this->choiceList->getChoicesForValues($array);
+				$choices = $this->choiceList->getChoicesForValues($array);
 
-        if (count($choices) !== count($array)) {
-            throw new TransformationFailedException('Could not find all matching choices for the given values');
-        }
+				if (count($choices) !== count($array)) {
+						throw new TransformationFailedException('Could not find all matching choices for the given values');
+				}
 
-        return $choices;
-    }
+				return $choices;
+		}
 }

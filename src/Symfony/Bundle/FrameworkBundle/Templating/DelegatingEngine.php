@@ -23,67 +23,67 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
 {
-    protected $container;
+		protected $container;
 
-    /**
-     * Constructor.
-     *
-     * @param ContainerInterface $container The DI container
-     * @param array              $engineIds An array of engine Ids
-     */
-    public function __construct(ContainerInterface $container, array $engineIds)
-    {
-        $this->container = $container;
-        $this->engines = $engineIds;
-    }
+		/**
+		 * Constructor.
+		 *
+		 * @param ContainerInterface $container The DI container
+		 * @param array							$engineIds An array of engine Ids
+		 */
+		public function __construct(ContainerInterface $container, array $engineIds)
+		{
+				$this->container = $container;
+				$this->engines = $engineIds;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports($name)
-    {
-        foreach ($this->engines as $i => $engine) {
-            if (is_string($engine)) {
-                $engine = $this->engines[$i] = $this->container->get($engine);
-            }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function supports($name)
+		{
+				foreach ($this->engines as $i => $engine) {
+						if (is_string($engine)) {
+								$engine = $this->engines[$i] = $this->container->get($engine);
+						}
 
-            if ($engine->supports($name)) {
-                return true;
-            }
-        }
+						if ($engine->supports($name)) {
+								return true;
+						}
+				}
 
-        return false;
-    }
+				return false;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getEngine($name)
-    {
-        foreach ($this->engines as $i => $engine) {
-            if (is_string($engine)) {
-                $engine = $this->engines[$i] = $this->container->get($engine);
-            }
+		/**
+		 * {@inheritdoc}
+		 */
+		protected function getEngine($name)
+		{
+				foreach ($this->engines as $i => $engine) {
+						if (is_string($engine)) {
+								$engine = $this->engines[$i] = $this->container->get($engine);
+						}
 
-            if ($engine->supports($name)) {
-                return $engine;
-            }
-        }
+						if ($engine->supports($name)) {
+								return $engine;
+						}
+				}
 
-        throw new \RuntimeException(sprintf('No engine is able to work with the template "%s".', $name));
-    }
+				throw new \RuntimeException(sprintf('No engine is able to work with the template "%s".', $name));
+		}
 
-    /**
-     * Renders a view and returns a Response.
-     *
-     * @param string   $view       The view name
-     * @param array    $parameters An array of parameters to pass to the view
-     * @param Response $response   A Response instance
-     *
-     * @return Response A Response instance
-     */
-    public function renderResponse($view, array $parameters = array(), Response $response = null)
-    {
-        return $this->getEngine($view)->renderResponse($view, $parameters, $response);
-    }
+		/**
+		 * Renders a view and returns a Response.
+		 *
+		 * @param string	 $view			 The view name
+		 * @param array		$parameters An array of parameters to pass to the view
+		 * @param Response $response	 A Response instance
+		 *
+		 * @return Response A Response instance
+		 */
+		public function renderResponse($view, array $parameters = array(), Response $response = null)
+		{
+				return $this->getEngine($view)->renderResponse($view, $parameters, $response);
+		}
 }

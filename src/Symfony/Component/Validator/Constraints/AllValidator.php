@@ -22,25 +22,25 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class AllValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (null === $value) {
-            return;
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (null === $value) {
+						return;
+				}
 
-        if (!is_array($value) && !$value instanceof \Traversable) {
-            throw new UnexpectedTypeException($value, 'array or Traversable');
-        }
+				if (!is_array($value) && !$value instanceof \Traversable) {
+						throw new UnexpectedTypeException($value, 'array or Traversable');
+				}
 
-        $group = $this->context->getGroup();
+				$group = $this->context->getGroup();
 
-        foreach ($value as $key => $element) {
-            foreach ($constraint->constraints as $constr) {
-                $this->context->validateValue($element, $constr, '['.$key.']', $group);
-            }
-        }
-    }
+				foreach ($value as $key => $element) {
+						foreach ($constraint->constraints as $constr) {
+								$this->context->validateValue($element, $constr, '['.$key.']', $group);
+						}
+				}
+		}
 }

@@ -18,52 +18,52 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class FileType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    {
-        $view->vars = array_replace($view->vars, array(
-            'type'  => 'file',
-            'value' => '',
-        ));
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function buildView(FormView $view, FormInterface $form, array $options)
+		{
+				$view->vars = array_replace($view->vars, array(
+						'type'	=> 'file',
+						'value' => '',
+				));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
-    {
-        $view
-            ->vars['multipart'] = true
-        ;
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function finishView(FormView $view, FormInterface $form, array $options)
+		{
+				$view
+						->vars['multipart'] = true
+				;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'compound' => false,
-            'data_class' => 'Symfony\Component\HttpFoundation\File\File',
-            'empty_data' => null,
-        ));
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				$resolver->setDefaults(array(
+						'compound' => false,
+						'data_class' => 'Symfony\Component\HttpFoundation\File\File',
+						'empty_data' => null,
+				));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'field';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getParent()
+		{
+				return 'field';
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'file';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'file';
+		}
 }

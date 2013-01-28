@@ -20,172 +20,172 @@ namespace Symfony\Component\Config\Definition;
  */
 class ReferenceDumper
 {
-    private $reference;
+		private $reference;
 
-    public function dump(ConfigurationInterface $configuration)
-    {
-        return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree());
-    }
+		public function dump(ConfigurationInterface $configuration)
+		{
+				return $this->dumpNode($configuration->getConfigTreeBuilder()->buildTree());
+		}
 
-    public function dumpNode(NodeInterface $node)
-    {
-        $this->reference = '';
-        $this->writeNode($node);
-        $ref = $this->reference;
-        $this->reference = null;
+		public function dumpNode(NodeInterface $node)
+		{
+				$this->reference = '';
+				$this->writeNode($node);
+				$ref = $this->reference;
+				$this->reference = null;
 
-        return $ref;
-    }
+				return $ref;
+		}
 
-    /**
-     * @param NodeInterface $node
-     * @param integer       $depth
-     */
-    private function writeNode(NodeInterface $node, $depth = 0)
-    {
-        $comments = array();
-        $default = '';
-        $defaultArray = null;
-        $children = null;
-        $example = $node->getExample();
+		/**
+		 * @param NodeInterface $node
+		 * @param integer			 $depth
+		 */
+		private function writeNode(NodeInterface $node, $depth = 0)
+		{
+				$comments = array();
+				$default = '';
+				$defaultArray = null;
+				$children = null;
+				$example = $node->getExample();
 
-        // defaults
-        if ($node instanceof ArrayNode) {
-            $children = $node->getChildren();
+				// defaults
+				if ($node instanceof ArrayNode) {
+						$children = $node->getChildren();
 
-            if ($node instanceof PrototypedArrayNode) {
-                $prototype = $node->getPrototype();
+						if ($node instanceof PrototypedArrayNode) {
+								$prototype = $node->getPrototype();
 
-                if ($prototype instanceof ArrayNode) {
-                    $children = $prototype->getChildren();
-                }
+								if ($prototype instanceof ArrayNode) {
+										$children = $prototype->getChildren();
+								}
 
-                // check for attribute as key
-                if ($key = $node->getKeyAttribute()) {
-                    $keyNode = new ArrayNode($key, $node);
-                    $keyNode->setInfo('Prototype');
+								// check for attribute as key
+								if ($key = $node->getKeyAttribute()) {
+										$keyNode = new ArrayNode($key, $node);
+										$keyNode->setInfo('Prototype');
 
-                    // add children
-                    foreach ($children as $childNode) {
-                        $keyNode->addChild($childNode);
-                    }
-                    $children = array($key => $keyNode);
-                }
-            }
+										// add children
+										foreach ($children as $childNode) {
+												$keyNode->addChild($childNode);
+										}
+										$children = array($key => $keyNode);
+								}
+						}
 
-            if (!$children) {
-                if ($node->hasDefaultValue() && count($defaultArray = $node->getDefaultValue())) {
-                    $default = '';
-                } elseif (!is_array($example)) {
-                    $default = '[]';
-                }
-            }
-        } else {
-            $default = '~';
+						if (!$children) {
+								if ($node->hasDefaultValue() && count($defaultArray = $node->getDefaultValue())) {
+										$default = '';
+								} elseif (!is_array($example)) {
+										$default = '[]';
+								}
+						}
+				} else {
+						$default = '~';
 
-            if ($node->hasDefaultValue()) {
-                $default = $node->getDefaultValue();
+						if ($node->hasDefaultValue()) {
+								$default = $node->getDefaultValue();
 
-                if (true === $default) {
-                    $default = 'true';
-                } elseif (false === $default) {
-                    $default = 'false';
-                } elseif (null === $default) {
-                    $default = '~';
-                } elseif (is_array($default)) {
-                    if ($node->hasDefaultValue() && count($defaultArray = $node->getDefaultValue())) {
-                        $default = '';
-                    } elseif (!is_array($example)) {
-                        $default = '[]';
-                    }
-                }
-            }
-        }
+								if (true === $default) {
+										$default = 'true';
+								} elseif (false === $default) {
+										$default = 'false';
+								} elseif (null === $default) {
+										$default = '~';
+								} elseif (is_array($default)) {
+										if ($node->hasDefaultValue() && count($defaultArray = $node->getDefaultValue())) {
+												$default = '';
+										} elseif (!is_array($example)) {
+												$default = '[]';
+										}
+								}
+						}
+				}
 
-        // required?
-        if ($node->isRequired()) {
-            $comments[] = 'Required';
-        }
+				// required?
+				if ($node->isRequired()) {
+						$comments[] = 'Required';
+				}
 
-        // example
-        if ($example && !is_array($example)) {
-            $comments[] = 'Example: '.$example;
-        }
+				// example
+				if ($example && !is_array($example)) {
+						$comments[] = 'Example: '.$example;
+				}
 
-        $default = (string) $default != '' ? ' '.$default : '';
-        $comments = count($comments) ? '# '.implode(', ', $comments) : '';
+				$default = (string) $default != '' ? ' '.$default : '';
+				$comments = count($comments) ? '# '.implode(', ', $comments) : '';
 
-        $text = sprintf('%-20s %s %s', $node->getName().':', $default, $comments);
+				$text = sprintf('%-20s %s %s', $node->getName().':', $default, $comments);
 
-        if ($info = $node->getInfo()) {
-            $this->writeLine('');
-            $this->writeLine('# '.$info, $depth * 4);
-        }
+				if ($info = $node->getInfo()) {
+						$this->writeLine('');
+						$this->writeLine('# '.$info, $depth * 4);
+				}
 
-        $this->writeLine($text, $depth * 4);
+				$this->writeLine($text, $depth * 4);
 
-        // output defaults
-        if ($defaultArray) {
-            $this->writeLine('');
+				// output defaults
+				if ($defaultArray) {
+						$this->writeLine('');
 
-            $message = count($defaultArray) > 1 ? 'Defaults' : 'Default';
+						$message = count($defaultArray) > 1 ? 'Defaults' : 'Default';
 
-            $this->writeLine('# '.$message.':', $depth * 4 + 4);
+						$this->writeLine('# '.$message.':', $depth * 4 + 4);
 
-            $this->writeArray($defaultArray, $depth + 1);
-        }
+						$this->writeArray($defaultArray, $depth + 1);
+				}
 
-        if (is_array($example)) {
-            $this->writeLine('');
+				if (is_array($example)) {
+						$this->writeLine('');
 
-            $message = count($example) > 1 ? 'Examples' : 'Example';
+						$message = count($example) > 1 ? 'Examples' : 'Example';
 
-            $this->writeLine('# '.$message.':', $depth * 4 + 4);
+						$this->writeLine('# '.$message.':', $depth * 4 + 4);
 
-            $this->writeArray($example, $depth + 1);
-        }
+						$this->writeArray($example, $depth + 1);
+				}
 
-        if ($children) {
-            foreach ($children as $childNode) {
-                $this->writeNode($childNode, $depth + 1);
-            }
-        }
-    }
+				if ($children) {
+						foreach ($children as $childNode) {
+								$this->writeNode($childNode, $depth + 1);
+						}
+				}
+		}
 
-    /**
-     * Outputs a single config reference line
-     *
-     * @param string $text
-     * @param int    $indent
-     */
-    private function writeLine($text, $indent = 0)
-    {
-        $indent = strlen($text) + $indent;
-        $format = '%'.$indent.'s';
+		/**
+		 * Outputs a single config reference line
+		 *
+		 * @param string $text
+		 * @param int		$indent
+		 */
+		private function writeLine($text, $indent = 0)
+		{
+				$indent = strlen($text) + $indent;
+				$format = '%'.$indent.'s';
 
-        $this->reference .= sprintf($format, $text)."\n";
-    }
+				$this->reference .= sprintf($format, $text)."\n";
+		}
 
-    private function writeArray(array $array, $depth)
-    {
-        $isIndexed = array_values($array) === $array;
+		private function writeArray(array $array, $depth)
+		{
+				$isIndexed = array_values($array) === $array;
 
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $val = '';
-            } else {
-                $val = $value;
-            }
+				foreach ($array as $key => $value) {
+						if (is_array($value)) {
+								$val = '';
+						} else {
+								$val = $value;
+						}
 
-            if ($isIndexed) {
-                $this->writeLine('- '.$val, $depth * 4);
-            } else {
-                $this->writeLine(sprintf('%-20s %s', $key.':', $val), $depth * 4);
-            }
+						if ($isIndexed) {
+								$this->writeLine('- '.$val, $depth * 4);
+						} else {
+								$this->writeLine(sprintf('%-20s %s', $key.':', $val), $depth * 4);
+						}
 
-            if (is_array($value)) {
-                $this->writeArray($value, $depth + 1);
-            }
-        }
-    }
+						if (is_array($value)) {
+								$this->writeArray($value, $depth + 1);
+						}
+				}
+		}
 }

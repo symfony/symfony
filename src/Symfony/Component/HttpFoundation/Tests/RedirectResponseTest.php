@@ -15,69 +15,69 @@ use \Symfony\Component\HttpFoundation\RedirectResponse;
 
 class RedirectResponseTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGenerateMetaRedirect()
-    {
-        $response = new RedirectResponse('foo.bar');
+		public function testGenerateMetaRedirect()
+		{
+				$response = new RedirectResponse('foo.bar');
 
-        $this->assertEquals(1, preg_match(
-            '#<meta http-equiv="refresh" content="\d+;url=foo\.bar" />#',
-            preg_replace(array('/\s+/', '/\'/'), array(' ', '"'), $response->getContent())
-        ));
-    }
+				$this->assertEquals(1, preg_match(
+						'#<meta http-equiv="refresh" content="\d+;url=foo\.bar" />#',
+						preg_replace(array('/\s+/', '/\'/'), array(' ', '"'), $response->getContent())
+				));
+		}
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testRedirectResponseConstructorNullUrl()
-    {
-        $response = new RedirectResponse(null);
-    }
+		/**
+		 * @expectedException \InvalidArgumentException
+		 */
+		public function testRedirectResponseConstructorNullUrl()
+		{
+				$response = new RedirectResponse(null);
+		}
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testRedirectResponseConstructorWrongStatusCode()
-    {
-        $response = new RedirectResponse('foo.bar', 404);
-    }
+		/**
+		 * @expectedException \InvalidArgumentException
+		 */
+		public function testRedirectResponseConstructorWrongStatusCode()
+		{
+				$response = new RedirectResponse('foo.bar', 404);
+		}
 
-    public function testGenerateLocationHeader()
-    {
-        $response = new RedirectResponse('foo.bar');
+		public function testGenerateLocationHeader()
+		{
+				$response = new RedirectResponse('foo.bar');
 
-        $this->assertTrue($response->headers->has('Location'));
-        $this->assertEquals('foo.bar', $response->headers->get('Location'));
-    }
+				$this->assertTrue($response->headers->has('Location'));
+				$this->assertEquals('foo.bar', $response->headers->get('Location'));
+		}
 
-    public function testGetTargetUrl()
-    {
-        $response = new RedirectResponse('foo.bar');
+		public function testGetTargetUrl()
+		{
+				$response = new RedirectResponse('foo.bar');
 
-        $this->assertEquals('foo.bar', $response->getTargetUrl());
-    }
+				$this->assertEquals('foo.bar', $response->getTargetUrl());
+		}
 
-    public function testSetTargetUrl()
-    {
-        $response = new RedirectResponse('foo.bar');
-        $response->setTargetUrl('baz.beep');
+		public function testSetTargetUrl()
+		{
+				$response = new RedirectResponse('foo.bar');
+				$response->setTargetUrl('baz.beep');
 
-        $this->assertEquals('baz.beep', $response->getTargetUrl());
-    }
+				$this->assertEquals('baz.beep', $response->getTargetUrl());
+		}
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testSetTargetUrlNull()
-    {
-        $response = new RedirectResponse('foo.bar');
-        $response->setTargetUrl(null);
-    }
+		/**
+		 * @expectedException \InvalidArgumentException
+		 */
+		public function testSetTargetUrlNull()
+		{
+				$response = new RedirectResponse('foo.bar');
+				$response->setTargetUrl(null);
+		}
 
-    public function testCreate()
-    {
-        $response = RedirectResponse::create('foo', 301);
+		public function testCreate()
+		{
+				$response = RedirectResponse::create('foo', 301);
 
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
-        $this->assertEquals(301, $response->getStatusCode());
-    }
+				$this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
+				$this->assertEquals(301, $response->getStatusCode());
+		}
 }

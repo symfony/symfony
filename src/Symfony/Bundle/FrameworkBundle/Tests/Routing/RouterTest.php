@@ -17,206 +17,206 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RoutingTest extends \PHPUnit_Framework_TestCase
 {
-    public function testDefaultsPlaceholders()
-    {
-        $routes = new RouteCollection();
+		public function testDefaultsPlaceholders()
+		{
+				$routes = new RouteCollection();
 
-        $routes->add('foo', new Route(
-            '/foo',
-            array(
-                'foo'    => 'before_%parameter.foo%',
-                'bar'    => '%parameter.bar%_after',
-                'baz'    => '%%unescaped%%',
-                'boo'    => array('%parameter%', '%%escaped_parameter%%', array('%bee_parameter%', 'bee')),
-                'bee'    => array('bee', 'bee'),
-            ),
-            array(
-            )
-        ));
+				$routes->add('foo', new Route(
+						'/foo',
+						array(
+								'foo'		=> 'before_%parameter.foo%',
+								'bar'		=> '%parameter.bar%_after',
+								'baz'		=> '%%unescaped%%',
+								'boo'		=> array('%parameter%', '%%escaped_parameter%%', array('%bee_parameter%', 'bee')),
+								'bee'		=> array('bee', 'bee'),
+						),
+						array(
+						)
+				));
 
-        $sc = $this->getServiceContainer($routes);
+				$sc = $this->getServiceContainer($routes);
 
-        $sc->expects($this->at(1))->method('hasParameter')->will($this->returnValue(true));
-        $sc->expects($this->at(2))->method('getParameter')->will($this->returnValue('foo'));
-        $sc->expects($this->at(3))->method('hasParameter')->will($this->returnValue(true));
-        $sc->expects($this->at(4))->method('getParameter')->will($this->returnValue('bar'));
+				$sc->expects($this->at(1))->method('hasParameter')->will($this->returnValue(true));
+				$sc->expects($this->at(2))->method('getParameter')->will($this->returnValue('foo'));
+				$sc->expects($this->at(3))->method('hasParameter')->will($this->returnValue(true));
+				$sc->expects($this->at(4))->method('getParameter')->will($this->returnValue('bar'));
 
-        $sc->expects($this->at(5))->method('hasParameter')->will($this->returnValue(true));
-        $sc->expects($this->at(6))->method('getParameter')->will($this->returnValue('boo'));
+				$sc->expects($this->at(5))->method('hasParameter')->will($this->returnValue(true));
+				$sc->expects($this->at(6))->method('getParameter')->will($this->returnValue('boo'));
 
-        $sc->expects($this->at(7))->method('hasParameter')->will($this->returnValue(true));
-        $sc->expects($this->at(8))->method('getParameter')->will($this->returnValue('foo_bee'));
+				$sc->expects($this->at(7))->method('hasParameter')->will($this->returnValue(true));
+				$sc->expects($this->at(8))->method('getParameter')->will($this->returnValue('foo_bee'));
 
-        $router = new Router($sc, 'foo');
-        $route = $router->getRouteCollection()->get('foo');
+				$router = new Router($sc, 'foo');
+				$route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(
-            array(
-                'foo' => 'before_foo',
-                'bar' => 'bar_after',
-                'baz' => '%unescaped%',
-                'boo' => array('boo', '%escaped_parameter%', array('foo_bee', 'bee')),
-                'bee' => array('bee', 'bee'),
-            ),
-            $route->getDefaults()
-        );
-    }
+				$this->assertEquals(
+						array(
+								'foo' => 'before_foo',
+								'bar' => 'bar_after',
+								'baz' => '%unescaped%',
+								'boo' => array('boo', '%escaped_parameter%', array('foo_bee', 'bee')),
+								'bee' => array('bee', 'bee'),
+						),
+						$route->getDefaults()
+				);
+		}
 
-    public function testRequirementsPlaceholders()
-    {
-        $routes = new RouteCollection();
+		public function testRequirementsPlaceholders()
+		{
+				$routes = new RouteCollection();
 
-        $routes->add('foo', new Route(
-            '/foo',
-            array(
-            ),
-            array(
-                'foo'    => 'before_%parameter.foo%',
-                'bar'    => '%parameter.bar%_after',
-                'baz'    => '%%unescaped%%',
-            )
-        ));
+				$routes->add('foo', new Route(
+						'/foo',
+						array(
+						),
+						array(
+								'foo'		=> 'before_%parameter.foo%',
+								'bar'		=> '%parameter.bar%_after',
+								'baz'		=> '%%unescaped%%',
+						)
+				));
 
-        $sc = $this->getServiceContainer($routes);
+				$sc = $this->getServiceContainer($routes);
 
-        $sc->expects($this->at(1))->method('hasParameter')->with('parameter.foo')->will($this->returnValue(true));
-        $sc->expects($this->at(2))->method('getParameter')->with('parameter.foo')->will($this->returnValue('foo'));
-        $sc->expects($this->at(3))->method('hasParameter')->with('parameter.bar')->will($this->returnValue(true));
-        $sc->expects($this->at(4))->method('getParameter')->with('parameter.bar')->will($this->returnValue('bar'));
+				$sc->expects($this->at(1))->method('hasParameter')->with('parameter.foo')->will($this->returnValue(true));
+				$sc->expects($this->at(2))->method('getParameter')->with('parameter.foo')->will($this->returnValue('foo'));
+				$sc->expects($this->at(3))->method('hasParameter')->with('parameter.bar')->will($this->returnValue(true));
+				$sc->expects($this->at(4))->method('getParameter')->with('parameter.bar')->will($this->returnValue('bar'));
 
-        $router = new Router($sc, 'foo');
-        $route = $router->getRouteCollection()->get('foo');
+				$router = new Router($sc, 'foo');
+				$route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(
-            array(
-                'foo' => 'before_foo',
-                'bar' => 'bar_after',
-                'baz' => '%unescaped%',
-            ),
-            $route->getRequirements()
-        );
-    }
+				$this->assertEquals(
+						array(
+								'foo' => 'before_foo',
+								'bar' => 'bar_after',
+								'baz' => '%unescaped%',
+						),
+						$route->getRequirements()
+				);
+		}
 
-    public function testPatternPlaceholders()
-    {
-        $routes = new RouteCollection();
+		public function testPatternPlaceholders()
+		{
+				$routes = new RouteCollection();
 
-        $routes->add('foo', new Route('/before/%parameter.foo%/after/%%unescaped%%'));
+				$routes->add('foo', new Route('/before/%parameter.foo%/after/%%unescaped%%'));
 
-        $sc = $this->getServiceContainer($routes);
+				$sc = $this->getServiceContainer($routes);
 
-        $sc->expects($this->at(1))->method('hasParameter')->with('parameter.foo')->will($this->returnValue(true));
-        $sc->expects($this->at(2))->method('getParameter')->with('parameter.foo')->will($this->returnValue('foo'));
+				$sc->expects($this->at(1))->method('hasParameter')->with('parameter.foo')->will($this->returnValue(true));
+				$sc->expects($this->at(2))->method('getParameter')->with('parameter.foo')->will($this->returnValue('foo'));
 
-        $router = new Router($sc, 'foo');
-        $route = $router->getRouteCollection()->get('foo');
+				$router = new Router($sc, 'foo');
+				$route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(
-            '/before/foo/after/%unescaped%',
-            $route->getPath()
-        );
-    }
+				$this->assertEquals(
+						'/before/foo/after/%unescaped%',
+						$route->getPath()
+				);
+		}
 
-    public function testHostPlaceholders()
-    {
-        $routes = new RouteCollection();
+		public function testHostPlaceholders()
+		{
+				$routes = new RouteCollection();
 
-        $route = new Route('foo');
-        $route->setHost('/before/%parameter.foo%/after/%%unescaped%%');
+				$route = new Route('foo');
+				$route->setHost('/before/%parameter.foo%/after/%%unescaped%%');
 
-        $routes->add('foo', $route);
+				$routes->add('foo', $route);
 
-        $sc = $this->getServiceContainer($routes);
+				$sc = $this->getServiceContainer($routes);
 
-        $sc->expects($this->at(1))->method('hasParameter')->with('parameter.foo')->will($this->returnValue(true));
-        $sc->expects($this->at(2))->method('getParameter')->with('parameter.foo')->will($this->returnValue('foo'));
+				$sc->expects($this->at(1))->method('hasParameter')->with('parameter.foo')->will($this->returnValue(true));
+				$sc->expects($this->at(2))->method('getParameter')->with('parameter.foo')->will($this->returnValue('foo'));
 
-        $router = new Router($sc, 'foo');
-        $route = $router->getRouteCollection()->get('foo');
+				$router = new Router($sc, 'foo');
+				$route = $router->getRouteCollection()->get('foo');
 
-        $this->assertEquals(
-            '/before/foo/after/%unescaped%',
-            $route->getHost()
-        );
-    }
+				$this->assertEquals(
+						'/before/foo/after/%unescaped%',
+						$route->getHost()
+				);
+		}
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException
-     * @expectedExceptionMessage You have requested a non-existent parameter "nope".
-     */
-    public function testExceptionOnNonExistentParameter()
-    {
-        $routes = new RouteCollection();
+		/**
+		 * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException
+		 * @expectedExceptionMessage You have requested a non-existent parameter "nope".
+		 */
+		public function testExceptionOnNonExistentParameter()
+		{
+				$routes = new RouteCollection();
 
-        $routes->add('foo', new Route('/%nope%'));
+				$routes->add('foo', new Route('/%nope%'));
 
-        $sc = $this->getServiceContainer($routes);
+				$sc = $this->getServiceContainer($routes);
 
-        $sc->expects($this->at(1))->method('hasParameter')->with('nope')->will($this->returnValue(false));
+				$sc->expects($this->at(1))->method('hasParameter')->with('nope')->will($this->returnValue(false));
 
-        $router = new Router($sc, 'foo');
-        $router->getRouteCollection()->get('foo');
-    }
+				$router = new Router($sc, 'foo');
+				$router->getRouteCollection()->get('foo');
+		}
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage  A string value must be composed of strings and/or numbers,but found parameter "object" of type object inside string value "/%object%".
-     */
-    public function testExceptionOnNonStringParameter()
-    {
-        $routes = new RouteCollection();
+		/**
+		 * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+		 * @expectedExceptionMessage	A string value must be composed of strings and/or numbers,but found parameter "object" of type object inside string value "/%object%".
+		 */
+		public function testExceptionOnNonStringParameter()
+		{
+				$routes = new RouteCollection();
 
-        $routes->add('foo', new Route('/%object%'));
+				$routes->add('foo', new Route('/%object%'));
 
-        $sc = $this->getServiceContainer($routes);
+				$sc = $this->getServiceContainer($routes);
 
-        $sc->expects($this->at(1))->method('hasParameter')->with('object')->will($this->returnValue(true));
-        $sc->expects($this->at(2))->method('getParameter')->with('object')->will($this->returnValue(new \stdClass()));
+				$sc->expects($this->at(1))->method('hasParameter')->with('object')->will($this->returnValue(true));
+				$sc->expects($this->at(2))->method('getParameter')->with('object')->will($this->returnValue(new \stdClass()));
 
-        $router = new Router($sc, 'foo');
-        $router->getRouteCollection()->get('foo');
-    }
+				$router = new Router($sc, 'foo');
+				$router->getRouteCollection()->get('foo');
+		}
 
-    /**
-     * @dataProvider getNonStringValues
-     */
-    public function testDefaultValuesAsNonStrings($value)
-    {
-        $routes = new RouteCollection();
-        $routes->add('foo', new Route('foo', array('foo' => $value), array('foo' => '\d+')));
+		/**
+		 * @dataProvider getNonStringValues
+		 */
+		public function testDefaultValuesAsNonStrings($value)
+		{
+				$routes = new RouteCollection();
+				$routes->add('foo', new Route('foo', array('foo' => $value), array('foo' => '\d+')));
 
-        $sc = $this->getServiceContainer($routes);
+				$sc = $this->getServiceContainer($routes);
 
-        $router = new Router($sc, 'foo');
+				$router = new Router($sc, 'foo');
 
-        $route = $router->getRouteCollection()->get('foo');
+				$route = $router->getRouteCollection()->get('foo');
 
-        $this->assertSame($value, $route->getDefault('foo'));
-    }
+				$this->assertSame($value, $route->getDefault('foo'));
+		}
 
-    public function getNonStringValues()
-    {
-        return array(array(null), array(false), array(true), array(new \stdClass()), array(array('foo', 'bar')), array(array(array())));
-    }
+		public function getNonStringValues()
+		{
+				return array(array(null), array(false), array(true), array(new \stdClass()), array(array('foo', 'bar')), array(array(array())));
+		}
 
-    private function getServiceContainer(RouteCollection $routes)
-    {
-        $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
+		private function getServiceContainer(RouteCollection $routes)
+		{
+				$loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
 
-        $loader
-            ->expects($this->any())
-            ->method('load')
-            ->will($this->returnValue($routes))
-        ;
+				$loader
+						->expects($this->any())
+						->method('load')
+						->will($this->returnValue($routes))
+				;
 
-        $sc = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
+				$sc = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
 
-        $sc
-            ->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($loader))
-        ;
+				$sc
+						->expects($this->once())
+						->method('get')
+						->will($this->returnValue($loader))
+				;
 
-        return $sc;
-    }
+				return $sc;
+		}
 }

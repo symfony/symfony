@@ -20,79 +20,79 @@ use Symfony\Component\Finder\Iterator;
  */
 class PhpAdapter extends AbstractAdapter
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function searchInDirectory($dir)
-    {
-        $flags = \RecursiveDirectoryIterator::SKIP_DOTS;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function searchInDirectory($dir)
+		{
+				$flags = \RecursiveDirectoryIterator::SKIP_DOTS;
 
-        if ($this->followLinks) {
-            $flags |= \RecursiveDirectoryIterator::FOLLOW_SYMLINKS;
-        }
+				if ($this->followLinks) {
+						$flags |= \RecursiveDirectoryIterator::FOLLOW_SYMLINKS;
+				}
 
-        $iterator = new \RecursiveIteratorIterator(
-            new Iterator\RecursiveDirectoryIterator($dir, $flags),
-            \RecursiveIteratorIterator::SELF_FIRST
-        );
+				$iterator = new \RecursiveIteratorIterator(
+						new Iterator\RecursiveDirectoryIterator($dir, $flags),
+						\RecursiveIteratorIterator::SELF_FIRST
+				);
 
-        if ($this->minDepth > 0 || $this->maxDepth < INF) {
-            $iterator = new Iterator\DepthRangeFilterIterator($iterator, $this->minDepth, $this->maxDepth);
-        }
+				if ($this->minDepth > 0 || $this->maxDepth < INF) {
+						$iterator = new Iterator\DepthRangeFilterIterator($iterator, $this->minDepth, $this->maxDepth);
+				}
 
-        if ($this->mode) {
-            $iterator = new Iterator\FileTypeFilterIterator($iterator, $this->mode);
-        }
+				if ($this->mode) {
+						$iterator = new Iterator\FileTypeFilterIterator($iterator, $this->mode);
+				}
 
-        if ($this->exclude) {
-            $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
-        }
+				if ($this->exclude) {
+						$iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
+				}
 
-        if ($this->names || $this->notNames) {
-            $iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames);
-        }
+				if ($this->names || $this->notNames) {
+						$iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames);
+				}
 
-        if ($this->contains || $this->notContains) {
-            $iterator = new Iterator\FilecontentFilterIterator($iterator, $this->contains, $this->notContains);
-        }
+				if ($this->contains || $this->notContains) {
+						$iterator = new Iterator\FilecontentFilterIterator($iterator, $this->contains, $this->notContains);
+				}
 
-        if ($this->sizes) {
-            $iterator = new Iterator\SizeRangeFilterIterator($iterator, $this->sizes);
-        }
+				if ($this->sizes) {
+						$iterator = new Iterator\SizeRangeFilterIterator($iterator, $this->sizes);
+				}
 
-        if ($this->dates) {
-            $iterator = new Iterator\DateRangeFilterIterator($iterator, $this->dates);
-        }
+				if ($this->dates) {
+						$iterator = new Iterator\DateRangeFilterIterator($iterator, $this->dates);
+				}
 
-        if ($this->filters) {
-            $iterator = new Iterator\CustomFilterIterator($iterator, $this->filters);
-        }
+				if ($this->filters) {
+						$iterator = new Iterator\CustomFilterIterator($iterator, $this->filters);
+				}
 
-        if ($this->sort) {
-            $iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort);
-            $iterator = $iteratorAggregate->getIterator();
-        }
+				if ($this->sort) {
+						$iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort);
+						$iterator = $iteratorAggregate->getIterator();
+				}
 
-        if ($this->paths || $this->notPaths) {
-            $iterator = new Iterator\PathFilterIterator($iterator, $this->paths, $this->notPaths);
-        }
+				if ($this->paths || $this->notPaths) {
+						$iterator = new Iterator\PathFilterIterator($iterator, $this->paths, $this->notPaths);
+				}
 
-        return $iterator;
-    }
+				return $iterator;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'php';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'php';
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function canBeUsed()
-    {
-        return true;
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		protected function canBeUsed()
+		{
+				return true;
+		}
 }

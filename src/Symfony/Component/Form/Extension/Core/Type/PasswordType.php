@@ -18,40 +18,40 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class PasswordType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    {
-        if ($options['always_empty'] || !$form->isBound()) {
-            $view->vars['value'] = '';
-        }
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function buildView(FormView $view, FormInterface $form, array $options)
+		{
+				if ($options['always_empty'] || !$form->isBound()) {
+						$view->vars['value'] = '';
+				}
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'always_empty' => true,
-            'trim'         => false,
-        ));
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				$resolver->setDefaults(array(
+						'always_empty' => true,
+						'trim'				 => false,
+				));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'text';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getParent()
+		{
+				return 'text';
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'password';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'password';
+		}
 }

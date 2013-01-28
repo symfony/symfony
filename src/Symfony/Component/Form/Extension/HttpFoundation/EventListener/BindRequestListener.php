@@ -22,64 +22,64 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class BindRequestListener implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
-    {
-        // High priority in order to supersede other listeners
-        return array(FormEvents::PRE_BIND => array('preBind', 128));
-    }
+		public static function getSubscribedEvents()
+		{
+				// High priority in order to supersede other listeners
+				return array(FormEvents::PRE_BIND => array('preBind', 128));
+		}
 
-    public function preBind(FormEvent $event)
-    {
-        $form = $event->getForm();
+		public function preBind(FormEvent $event)
+		{
+				$form = $event->getForm();
 
-        /* @var Request $request */
-        $request = $event->getData();
+				/* @var Request $request */
+				$request = $event->getData();
 
-        // Only proceed if we actually deal with a Request
-        if (!$request instanceof Request) {
-            return;
-        }
+				// Only proceed if we actually deal with a Request
+				if (!$request instanceof Request) {
+						return;
+				}
 
-        $name = $form->getConfig()->getName();
-        $default = $form->getConfig()->getCompound() ? array() : null;
+				$name = $form->getConfig()->getName();
+				$default = $form->getConfig()->getCompound() ? array() : null;
 
-        // Store the bound data in case of a post request
-        switch ($request->getMethod()) {
-            case 'POST':
-            case 'PUT':
-            case 'DELETE':
-            case 'PATCH':
-                if ('' === $name) {
-                    // Form bound without name
-                    $params = $request->request->all();
-                    $files = $request->files->all();
-                } else {
-                    $params = $request->request->get($name, $default);
-                    $files = $request->files->get($name, $default);
-                }
+				// Store the bound data in case of a post request
+				switch ($request->getMethod()) {
+						case 'POST':
+						case 'PUT':
+						case 'DELETE':
+						case 'PATCH':
+								if ('' === $name) {
+										// Form bound without name
+										$params = $request->request->all();
+										$files = $request->files->all();
+								} else {
+										$params = $request->request->get($name, $default);
+										$files = $request->files->get($name, $default);
+								}
 
-                if (is_array($params) && is_array($files)) {
-                    $data = array_replace_recursive($params, $files);
-                } else {
-                    $data = $params ?: $files;
-                }
+								if (is_array($params) && is_array($files)) {
+										$data = array_replace_recursive($params, $files);
+								} else {
+										$data = $params ?: $files;
+								}
 
-                break;
+								break;
 
-            case 'GET':
-                $data = '' === $name
-                    ? $request->query->all()
-                    : $request->query->get($name, $default);
+						case 'GET':
+								$data = '' === $name
+										? $request->query->all()
+										: $request->query->get($name, $default);
 
-                break;
+								break;
 
-            default:
-                throw new Exception(sprintf(
-                    'The request method "%s" is not supported',
-                    $request->getMethod()
-                ));
-        }
+						default:
+								throw new Exception(sprintf(
+										'The request method "%s" is not supported',
+										$request->getMethod()
+								));
+				}
 
-        $event->setData($data);
-    }
+				$event->setData($data);
+		}
 }

@@ -18,10 +18,10 @@ use Symfony\Component\Validator\Constraint;
  */
 class Required extends Constraint
 {
-    public $constraints = array();
+		public $constraints = array();
 
-    public function getDefaultOption()
-    {
-        return 'constraints';
-    }
+		public function getDefaultOption()
+		{
+				return 'constraints';
+		}
 }

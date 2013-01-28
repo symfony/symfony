@@ -15,8 +15,8 @@ use Symfony\Component\Form\Tests\Fixtures\CustomArrayObject;
 
 class PropertyAccessorCustomArrayObjectTest extends PropertyAccessorCollectionTest
 {
-    protected function getCollection(array $array)
-    {
-        return new CustomArrayObject($array);
-    }
+		protected function getCollection(array $array)
+		{
+				return new CustomArrayObject($array);
+		}
 }

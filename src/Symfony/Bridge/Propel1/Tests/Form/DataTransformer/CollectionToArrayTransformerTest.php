@@ -17,95 +17,95 @@ use Symfony\Bridge\Propel1\Tests\Propel1TestCase;
 
 class CollectionToArrayTransformerTest extends Propel1TestCase
 {
-    private $transformer;
+		private $transformer;
 
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Form\Form')) {
-            $this->markTestSkipped('The "Form" component is not available');
-        }
+		protected function setUp()
+		{
+				if (!class_exists('Symfony\Component\Form\Form')) {
+						$this->markTestSkipped('The "Form" component is not available');
+				}
 
-        parent::setUp();
+				parent::setUp();
 
-        $this->transformer = new CollectionToArrayTransformer();
-    }
+				$this->transformer = new CollectionToArrayTransformer();
+		}
 
-    public function testTransform()
-    {
-        $result = $this->transformer->transform(new PropelObjectCollection());
+		public function testTransform()
+		{
+				$result = $this->transformer->transform(new PropelObjectCollection());
 
-        $this->assertTrue(is_array($result));
-        $this->assertEquals(0, count($result));
-    }
+				$this->assertTrue(is_array($result));
+				$this->assertEquals(0, count($result));
+		}
 
-    public function testTransformWithNull()
-    {
-        $result = $this->transformer->transform(null);
+		public function testTransformWithNull()
+		{
+				$result = $this->transformer->transform(null);
 
-        $this->assertTrue(is_array($result));
-        $this->assertEquals(0, count($result));
-    }
+				$this->assertTrue(is_array($result));
+				$this->assertEquals(0, count($result));
+		}
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testTransformThrowsExceptionIfNotPropelObjectCollection()
-    {
-        $this->transformer->transform(new DummyObject());
-    }
+		/**
+		 * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+		 */
+		public function testTransformThrowsExceptionIfNotPropelObjectCollection()
+		{
+				$this->transformer->transform(new DummyObject());
+		}
 
-    public function testTransformWithData()
-    {
-        $coll = new PropelObjectCollection();
-        $coll->setData(array('foo', 'bar'));
+		public function testTransformWithData()
+		{
+				$coll = new PropelObjectCollection();
+				$coll->setData(array('foo', 'bar'));
 
-        $result = $this->transformer->transform($coll);
+				$result = $this->transformer->transform($coll);
 
-        $this->assertTrue(is_array($result));
-        $this->assertEquals(2, count($result));
-        $this->assertEquals('foo', $result[0]);
-        $this->assertEquals('bar', $result[1]);
-    }
+				$this->assertTrue(is_array($result));
+				$this->assertEquals(2, count($result));
+				$this->assertEquals('foo', $result[0]);
+				$this->assertEquals('bar', $result[1]);
+		}
 
-    public function testReverseTransformWithNull()
-    {
-        $result = $this->transformer->reverseTransform(null);
+		public function testReverseTransformWithNull()
+		{
+				$result = $this->transformer->reverseTransform(null);
 
-        $this->assertInstanceOf('\PropelObjectCollection', $result);
-        $this->assertEquals(0, count($result->getData()));
-    }
+				$this->assertInstanceOf('\PropelObjectCollection', $result);
+				$this->assertEquals(0, count($result->getData()));
+		}
 
-    public function testReverseTransformWithEmptyString()
-    {
-        $result = $this->transformer->reverseTransform('');
+		public function testReverseTransformWithEmptyString()
+		{
+				$result = $this->transformer->reverseTransform('');
 
-        $this->assertInstanceOf('\PropelObjectCollection', $result);
-        $this->assertEquals(0, count($result->getData()));
-    }
+				$this->assertInstanceOf('\PropelObjectCollection', $result);
+				$this->assertEquals(0, count($result->getData()));
+		}
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testReverseTransformThrowsExceptionIfNotArray()
-    {
-        $this->transformer->reverseTransform(new DummyObject());
-    }
+		/**
+		 * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+		 */
+		public function testReverseTransformThrowsExceptionIfNotArray()
+		{
+				$this->transformer->reverseTransform(new DummyObject());
+		}
 
-    public function testReverseTransformWithData()
-    {
-        $inputData  = array('foo', 'bar');
+		public function testReverseTransformWithData()
+		{
+				$inputData	= array('foo', 'bar');
 
-        $result     = $this->transformer->reverseTransform($inputData);
-        $data       = $result->getData();
+				$result		 = $this->transformer->reverseTransform($inputData);
+				$data			 = $result->getData();
 
-        $this->assertInstanceOf('\PropelObjectCollection', $result);
+				$this->assertInstanceOf('\PropelObjectCollection', $result);
 
-        $this->assertTrue(is_array($data));
-        $this->assertEquals(2, count($data));
-        $this->assertEquals('foo', $data[0]);
-        $this->assertEquals('bar', $data[1]);
-        $this->assertsame($inputData, $data);
-    }
+				$this->assertTrue(is_array($data));
+				$this->assertEquals(2, count($data));
+				$this->assertEquals('foo', $data[0]);
+				$this->assertEquals('bar', $data[1]);
+				$this->assertsame($inputData, $data);
+		}
 }
 
 class DummyObject {}

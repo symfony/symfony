@@ -24,82 +24,82 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class FormTypeValidatorExtension extends AbstractTypeExtension
 {
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
+		/**
+		 * @var ValidatorInterface
+		 */
+		private $validator;
 
-    /**
-     * @var ViolationMapper
-     */
-    private $violationMapper;
+		/**
+		 * @var ViolationMapper
+		 */
+		private $violationMapper;
 
-    public function __construct(ValidatorInterface $validator)
-    {
-        $this->validator = $validator;
-        $this->violationMapper = new ViolationMapper();
-    }
+		public function __construct(ValidatorInterface $validator)
+		{
+				$this->validator = $validator;
+				$this->violationMapper = new ViolationMapper();
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->addEventSubscriber(new ValidationListener($this->validator, $this->violationMapper));
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+				$builder->addEventSubscriber(new ValidationListener($this->validator, $this->violationMapper));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        // BC clause
-        $constraints = function (Options $options) {
-            return $options['validation_constraint'];
-        };
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				// BC clause
+				$constraints = function (Options $options) {
+						return $options['validation_constraint'];
+				};
 
-        // Make sure that validation groups end up as null, closure or array
-        $validationGroupsNormalizer = function (Options $options, $groups) {
-            if (empty($groups)) {
-                return null;
-            }
+				// Make sure that validation groups end up as null, closure or array
+				$validationGroupsNormalizer = function (Options $options, $groups) {
+						if (empty($groups)) {
+								return null;
+						}
 
-            if (is_callable($groups)) {
-                return $groups;
-            }
+						if (is_callable($groups)) {
+								return $groups;
+						}
 
-            return (array) $groups;
-        };
+						return (array) $groups;
+				};
 
-        // Constraint should always be converted to an array
-        $constraintsNormalizer = function (Options $options, $constraints) {
-            return is_object($constraints) ? array($constraints) : (array) $constraints;
-        };
+				// Constraint should always be converted to an array
+				$constraintsNormalizer = function (Options $options, $constraints) {
+						return is_object($constraints) ? array($constraints) : (array) $constraints;
+				};
 
-        $resolver->setDefaults(array(
-            'error_mapping'              => array(),
-            'validation_groups'          => null,
-            // "validation_constraint" is deprecated. Use "constraints".
-            'validation_constraint'      => null,
-            'constraints'                => $constraints,
-            'cascade_validation'         => false,
-            'invalid_message'            => 'This value is not valid.',
-            'invalid_message_parameters' => array(),
-            'extra_fields_message'       => 'This form should not contain extra fields.',
-            'post_max_size_message'      => 'The uploaded file was too large. Please try to upload a smaller file.',
-        ));
+				$resolver->setDefaults(array(
+						'error_mapping'							=> array(),
+						'validation_groups'					=> null,
+						// "validation_constraint" is deprecated. Use "constraints".
+						'validation_constraint'			=> null,
+						'constraints'								=> $constraints,
+						'cascade_validation'				 => false,
+						'invalid_message'						=> 'This value is not valid.',
+						'invalid_message_parameters' => array(),
+						'extra_fields_message'			 => 'This form should not contain extra fields.',
+						'post_max_size_message'			=> 'The uploaded file was too large. Please try to upload a smaller file.',
+				));
 
-        $resolver->setNormalizers(array(
-            'validation_groups' => $validationGroupsNormalizer,
-            'constraints'       => $constraintsNormalizer,
-        ));
-    }
+				$resolver->setNormalizers(array(
+						'validation_groups' => $validationGroupsNormalizer,
+						'constraints'			 => $constraintsNormalizer,
+				));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getExtendedType()
+		{
+				return 'form';
+		}
 }

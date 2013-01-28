@@ -18,208 +18,208 @@ namespace Symfony\Component\Finder\Adapter;
  */
 abstract class AbstractAdapter implements AdapterInterface
 {
-    protected $followLinks = false;
-    protected $mode        = 0;
-    protected $minDepth    = 0;
-    protected $maxDepth    = INF;
-    protected $exclude     = array();
-    protected $names       = array();
-    protected $notNames    = array();
-    protected $contains    = array();
-    protected $notContains = array();
-    protected $sizes       = array();
-    protected $dates       = array();
-    protected $filters     = array();
-    protected $sort        = false;
-    protected $paths       = array();
-    protected $notPaths    = array();
+		protected $followLinks = false;
+		protected $mode				= 0;
+		protected $minDepth		= 0;
+		protected $maxDepth		= INF;
+		protected $exclude		 = array();
+		protected $names			 = array();
+		protected $notNames		= array();
+		protected $contains		= array();
+		protected $notContains = array();
+		protected $sizes			 = array();
+		protected $dates			 = array();
+		protected $filters		 = array();
+		protected $sort				= false;
+		protected $paths			 = array();
+		protected $notPaths		= array();
 
-    private static $areSupported = array();
+		private static $areSupported = array();
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isSupported()
-    {
-        $name = $this->getName();
+		/**
+		 * {@inheritDoc}
+		 */
+		public function isSupported()
+		{
+				$name = $this->getName();
 
-        if (!array_key_exists($name, self::$areSupported)) {
-            self::$areSupported[$name] = $this->canBeUsed();
-        }
+				if (!array_key_exists($name, self::$areSupported)) {
+						self::$areSupported[$name] = $this->canBeUsed();
+				}
 
-        return self::$areSupported[$name];
-    }
+				return self::$areSupported[$name];
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setFollowLinks($followLinks)
-    {
-        $this->followLinks = $followLinks;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setFollowLinks($followLinks)
+		{
+				$this->followLinks = $followLinks;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setMode($mode)
-    {
-        $this->mode = $mode;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setMode($mode)
+		{
+				$this->mode = $mode;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDepths(array $depths)
-    {
-        $this->minDepth = 0;
-        $this->maxDepth = INF;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDepths(array $depths)
+		{
+				$this->minDepth = 0;
+				$this->maxDepth = INF;
 
-        foreach ($depths as $comparator) {
-            switch ($comparator->getOperator()) {
-                case '>':
-                    $this->minDepth = $comparator->getTarget() + 1;
-                    break;
-                case '>=':
-                    $this->minDepth = $comparator->getTarget();
-                    break;
-                case '<':
-                    $this->maxDepth = $comparator->getTarget() - 1;
-                    break;
-                case '<=':
-                    $this->maxDepth = $comparator->getTarget();
-                    break;
-                default:
-                    $this->minDepth = $this->maxDepth = $comparator->getTarget();
-            }
-        }
+				foreach ($depths as $comparator) {
+						switch ($comparator->getOperator()) {
+								case '>':
+										$this->minDepth = $comparator->getTarget() + 1;
+										break;
+								case '>=':
+										$this->minDepth = $comparator->getTarget();
+										break;
+								case '<':
+										$this->maxDepth = $comparator->getTarget() - 1;
+										break;
+								case '<=':
+										$this->maxDepth = $comparator->getTarget();
+										break;
+								default:
+										$this->minDepth = $this->maxDepth = $comparator->getTarget();
+						}
+				}
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setExclude(array $exclude)
-    {
-        $this->exclude = $exclude;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setExclude(array $exclude)
+		{
+				$this->exclude = $exclude;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setNames(array $names)
-    {
-        $this->names = $names;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setNames(array $names)
+		{
+				$this->names = $names;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setNotNames(array $notNames)
-    {
-        $this->notNames = $notNames;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setNotNames(array $notNames)
+		{
+				$this->notNames = $notNames;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setContains(array $contains)
-    {
-        $this->contains = $contains;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setContains(array $contains)
+		{
+				$this->contains = $contains;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setNotContains(array $notContains)
-    {
-        $this->notContains = $notContains;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setNotContains(array $notContains)
+		{
+				$this->notContains = $notContains;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setSizes(array $sizes)
-    {
-        $this->sizes = $sizes;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setSizes(array $sizes)
+		{
+				$this->sizes = $sizes;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDates(array $dates)
-    {
-        $this->dates = $dates;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDates(array $dates)
+		{
+				$this->dates = $dates;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setFilters(array $filters)
-    {
-        $this->filters = $filters;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setFilters(array $filters)
+		{
+				$this->filters = $filters;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setSort($sort)
-    {
-        $this->sort = $sort;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setSort($sort)
+		{
+				$this->sort = $sort;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setPath(array $paths)
-    {
-        $this->paths = $paths;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setPath(array $paths)
+		{
+				$this->paths = $paths;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setNotPath(array $notPaths)
-    {
-        $this->notPaths = $notPaths;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setNotPath(array $notPaths)
+		{
+				$this->notPaths = $notPaths;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * Returns whether the adapter is supported in the current environment.
-     *
-     * This method should be implemented in all adapters. Do not implement
-     * isSupported in the adapters as the generic implementation provides a cache
-     * layer.
-     *
-     * @see isSupported
-     *
-     * @return Boolean Whether the adapter is supported
-     */
-    abstract protected function canBeUsed();
+		/**
+		 * Returns whether the adapter is supported in the current environment.
+		 *
+		 * This method should be implemented in all adapters. Do not implement
+		 * isSupported in the adapters as the generic implementation provides a cache
+		 * layer.
+		 *
+		 * @see isSupported
+		 *
+		 * @return Boolean Whether the adapter is supported
+		 */
+		abstract protected function canBeUsed();
 }

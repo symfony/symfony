@@ -22,39 +22,39 @@ namespace Symfony\Component\Security\Core\Util;
  */
 class ClassUtils
 {
-    /**
-     * Marker for Proxy class names.
-     *
-     * @var string
-     */
-    const MARKER = '__CG__';
+		/**
+		 * Marker for Proxy class names.
+		 *
+		 * @var string
+		 */
+		const MARKER = '__CG__';
 
-    /**
-     * Length of the proxy marker
-     *
-     * @var int
-     */
-    const MARKER_LENGTH = 6;
+		/**
+		 * Length of the proxy marker
+		 *
+		 * @var int
+		 */
+		const MARKER_LENGTH = 6;
 
-    /**
-     * This class should not be instantiated
-     */
-    private function __construct() {}
+		/**
+		 * This class should not be instantiated
+		 */
+		private function __construct() {}
 
-    /**
-     * Gets the real class name of a class name that could be a proxy.
-     *
-     * @param string|object
-     * @return string
-     */
-    public static function getRealClass($object)
-    {
-        $class = is_object($object) ? get_class($object) : $object;
+		/**
+		 * Gets the real class name of a class name that could be a proxy.
+		 *
+		 * @param string|object
+		 * @return string
+		 */
+		public static function getRealClass($object)
+		{
+				$class = is_object($object) ? get_class($object) : $object;
 
-        if (false === $pos = strrpos($class, '\\'.self::MARKER.'\\')) {
-            return $class;
-        }
+				if (false === $pos = strrpos($class, '\\'.self::MARKER.'\\')) {
+						return $class;
+				}
 
-        return substr($class, $pos + self::MARKER_LENGTH + 2);
-    }
+				return substr($class, $pos + self::MARKER_LENGTH + 2);
+		}
 }

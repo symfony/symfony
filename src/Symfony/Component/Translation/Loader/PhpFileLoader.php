@@ -24,26 +24,26 @@ use Symfony\Component\Config\Resource\FileResource;
  */
 class PhpFileLoader extends ArrayLoader implements LoaderInterface
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function load($resource, $locale, $domain = 'messages')
-    {
-        if (!stream_is_local($resource)) {
-            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
-        }
+		/**
+		 * {@inheritdoc}
+		 *
+		 * @api
+		 */
+		public function load($resource, $locale, $domain = 'messages')
+		{
+				if (!stream_is_local($resource)) {
+						throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
+				}
 
-        if (!file_exists($resource)) {
-            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
-        }
+				if (!file_exists($resource)) {
+						throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
+				}
 
-        $messages = require($resource);
+				$messages = require($resource);
 
-        $catalogue = parent::load($messages, $locale, $domain);
-        $catalogue->addResource(new FileResource($resource));
+				$catalogue = parent::load($messages, $locale, $domain);
+				$catalogue->addResource(new FileResource($resource));
 
-        return $catalogue;
-    }
+				return $catalogue;
+		}
 }

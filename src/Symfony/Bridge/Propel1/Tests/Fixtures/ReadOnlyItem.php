@@ -13,13 +13,13 @@ namespace Symfony\Bridge\Propel1\Tests\Fixtures;
 
 class ReadOnlyItem extends \BaseObject
 {
-    public function getName()
-    {
-        return 'Marvin';
-    }
+		public function getName()
+		{
+				return 'Marvin';
+		}
 
-    public function getPrimaryKey()
-    {
-        return 42;
-    }
+		public function getPrimaryKey()
+		{
+				return 42;
+		}
 }

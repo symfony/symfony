@@ -13,8 +13,8 @@ namespace Symfony\Component\PropertyAccess\Tests;
 
 class PropertyAccessorArrayObjectTest extends PropertyAccessorCollectionTest
 {
-    protected function getCollection(array $array)
-    {
-        return new \ArrayObject($array);
-    }
+		protected function getCollection(array $array)
+		{
+				return new \ArrayObject($array);
+		}
 }

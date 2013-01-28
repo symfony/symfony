@@ -8,23 +8,23 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class AuthorType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder
-            ->add('firstName')
-            ->add('lastName')
-        ;
-    }
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+				$builder
+						->add('firstName')
+						->add('lastName')
+				;
+		}
 
-    public function getName()
-    {
-        return 'author';
-    }
+		public function getName()
+		{
+				return 'author';
+		}
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
-        ));
-    }
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				$resolver->setDefaults(array(
+						'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
+				));
+		}
 }

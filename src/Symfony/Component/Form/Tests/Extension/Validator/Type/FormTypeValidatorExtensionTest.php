@@ -15,62 +15,62 @@ use Symfony\Component\Form\FormInterface;
 
 class FormTypeValidatorExtensionTest extends TypeTestCase
 {
-    public function testValidationGroupNullByDefault()
-    {
-        $form =  $this->factory->create('form');
+		public function testValidationGroupNullByDefault()
+		{
+				$form =	$this->factory->create('form');
 
-        $this->assertNull($form->getConfig()->getOption('validation_groups'));
-    }
+				$this->assertNull($form->getConfig()->getOption('validation_groups'));
+		}
 
-    public function testValidationGroupsTransformedToArray()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => 'group',
-        ));
+		public function testValidationGroupsTransformedToArray()
+		{
+				$form = $this->factory->create('form', null, array(
+						'validation_groups' => 'group',
+				));
 
-        $this->assertEquals(array('group'), $form->getConfig()->getOption('validation_groups'));
-    }
+				$this->assertEquals(array('group'), $form->getConfig()->getOption('validation_groups'));
+		}
 
-    public function testValidationGroupsCanBeSetToArray()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => array('group1', 'group2'),
-        ));
+		public function testValidationGroupsCanBeSetToArray()
+		{
+				$form = $this->factory->create('form', null, array(
+						'validation_groups' => array('group1', 'group2'),
+				));
 
-        $this->assertEquals(array('group1', 'group2'), $form->getConfig()->getOption('validation_groups'));
-    }
+				$this->assertEquals(array('group1', 'group2'), $form->getConfig()->getOption('validation_groups'));
+		}
 
-    public function testValidationGroupsCanBeSetToCallback()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => array($this, 'testValidationGroupsCanBeSetToCallback'),
-        ));
+		public function testValidationGroupsCanBeSetToCallback()
+		{
+				$form = $this->factory->create('form', null, array(
+						'validation_groups' => array($this, 'testValidationGroupsCanBeSetToCallback'),
+				));
 
-        $this->assertTrue(is_callable($form->getConfig()->getOption('validation_groups')));
-    }
+				$this->assertTrue(is_callable($form->getConfig()->getOption('validation_groups')));
+		}
 
-    public function testValidationGroupsCanBeSetToClosure()
-    {
-        $form = $this->factory->create('form', null, array(
-            'validation_groups' => function(FormInterface $form){ return null; },
-        ));
+		public function testValidationGroupsCanBeSetToClosure()
+		{
+				$form = $this->factory->create('form', null, array(
+						'validation_groups' => function(FormInterface $form){ return null; },
+				));
 
-        $this->assertTrue(is_callable($form->getConfig()->getOption('validation_groups')));
-    }
+				$this->assertTrue(is_callable($form->getConfig()->getOption('validation_groups')));
+		}
 
-    public function testBindValidatesData()
-    {
-        $builder = $this->factory->createBuilder('form', null, array(
-            'validation_groups' => 'group',
-        ));
-        $builder->add('firstName', 'form');
-        $form = $builder->getForm();
+		public function testBindValidatesData()
+		{
+				$builder = $this->factory->createBuilder('form', null, array(
+						'validation_groups' => 'group',
+				));
+				$builder->add('firstName', 'form');
+				$form = $builder->getForm();
 
-        $this->validator->expects($this->once())
-            ->method('validate')
-            ->with($this->equalTo($form));
+				$this->validator->expects($this->once())
+						->method('validate')
+						->with($this->equalTo($form));
 
-        // specific data is irrelevant
-        $form->bind(array());
-    }
+				// specific data is irrelevant
+				$form->bind(array());
+		}
 }

@@ -36,55 +36,55 @@ namespace Symfony\Component\Validator;
  */
 interface ValidationVisitorInterface
 {
-    /**
-     * Validates a value.
-     *
-     * If the value is an array or a traversable object, you can set the
-     * parameter <tt>$traverse</tt> to <tt>true</tt> in order to run through
-     * the collection and validate each element. If these elements can be
-     * collections again and you want to traverse them recursively, set the
-     * parameter <tt>$deep</tt> to <tt>true</tt> as well.
-     *
-     * If you set <tt>$traversable</tt> to <tt>true</tt>, the visitor will
-     * nevertheless try to find metadata for the collection and validate its
-     * constraints. If no such metadata is found, the visitor ignores that and
-     * only iterates the collection.
-     *
-     * If you don't set <tt>$traversable</tt> to <tt>true</tt> and the visitor
-     * does not find metadata for the given value, it will fail with an
-     * exception.
-     *
-     * @param mixed   $value        The value to validate.
-     * @param string  $group        The validation group to validate.
-     * @param string  $propertyPath The current property path in the validation graph.
-     * @param Boolean $traverse     Whether to traverse the value if it is traversable.
-     * @param Boolean $deep         Whether to traverse nested traversable values recursively.
-     *
-     * @throws Exception\NoSuchMetadataException If no metadata can be found for
-     *                                           the given value.
-     */
-    public function validate($value, $group, $propertyPath, $traverse = false, $deep = false);
+		/**
+		 * Validates a value.
+		 *
+		 * If the value is an array or a traversable object, you can set the
+		 * parameter <tt>$traverse</tt> to <tt>true</tt> in order to run through
+		 * the collection and validate each element. If these elements can be
+		 * collections again and you want to traverse them recursively, set the
+		 * parameter <tt>$deep</tt> to <tt>true</tt> as well.
+		 *
+		 * If you set <tt>$traversable</tt> to <tt>true</tt>, the visitor will
+		 * nevertheless try to find metadata for the collection and validate its
+		 * constraints. If no such metadata is found, the visitor ignores that and
+		 * only iterates the collection.
+		 *
+		 * If you don't set <tt>$traversable</tt> to <tt>true</tt> and the visitor
+		 * does not find metadata for the given value, it will fail with an
+		 * exception.
+		 *
+		 * @param mixed	 $value				The value to validate.
+		 * @param string	$group				The validation group to validate.
+		 * @param string	$propertyPath The current property path in the validation graph.
+		 * @param Boolean $traverse		 Whether to traverse the value if it is traversable.
+		 * @param Boolean $deep				 Whether to traverse nested traversable values recursively.
+		 *
+		 * @throws Exception\NoSuchMetadataException If no metadata can be found for
+		 *																					 the given value.
+		 */
+		public function validate($value, $group, $propertyPath, $traverse = false, $deep = false);
 
-    /**
-     * Validates a value against the constraints defined in some metadata.
-     *
-     * This method implements the Visitor design pattern. See also
-     * {@link ValidationVisitorInterface}.
-     *
-     * @param MetadataInterface $metadata     The metadata holding the constraints.
-     * @param mixed             $value        The value to validate.
-     * @param string            $group        The validation group to validate.
-     * @param string            $propertyPath The current property path in the validation graph.
-     */
-    public function visit(MetadataInterface $metadata, $value, $group, $propertyPath);
+		/**
+		 * Validates a value against the constraints defined in some metadata.
+		 *
+		 * This method implements the Visitor design pattern. See also
+		 * {@link ValidationVisitorInterface}.
+		 *
+		 * @param MetadataInterface $metadata		 The metadata holding the constraints.
+		 * @param mixed						 $value				The value to validate.
+		 * @param string						$group				The validation group to validate.
+		 * @param string						$propertyPath The current property path in the validation graph.
+		 */
+		public function visit(MetadataInterface $metadata, $value, $group, $propertyPath);
 
-    /**
-     * Returns a graph walker with an alternative, deprecated API of the
-     * visitor.
-     *
-     * @return GraphWalker The graph walker.
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3.
-     */
-    public function getGraphWalker();
+		/**
+		 * Returns a graph walker with an alternative, deprecated API of the
+		 * visitor.
+		 *
+		 * @return GraphWalker The graph walker.
+		 *
+		 * @deprecated Deprecated since version 2.2, to be removed in 2.3.
+		 */
+		public function getGraphWalker();
 }

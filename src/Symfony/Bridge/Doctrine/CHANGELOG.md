@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * added an optional PropertyAccessorInterface parameter to DoctrineType,
-   EntityType and EntityChoiceList
+	 EntityType and EntityChoiceList
 
 2.1.0
 -----
@@ -17,4 +17,4 @@ CHANGELOG
  * DoctrineType now uses ManagerRegistry::getManagerForClass() if the option "em" is not set
  * UniqueEntity validation constraint now accepts a "repositoryMethod" option that will be used to check for uniqueness instead of the default "findBy"
  * [BC BREAK] the DbalLogger::log() visibility has been changed from public to
-   protected
+	 protected

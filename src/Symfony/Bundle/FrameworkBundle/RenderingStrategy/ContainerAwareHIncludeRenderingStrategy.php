@@ -23,27 +23,27 @@ use Symfony\Component\HttpKernel\RenderingStrategy\HIncludeRenderingStrategy;
  */
 class ContainerAwareHIncludeRenderingStrategy extends HIncludeRenderingStrategy
 {
-    private $container;
+		private $container;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(ContainerInterface $container, UriSigner $signer = null, $globalDefaultTemplate = null)
-    {
-        $this->container = $container;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function __construct(ContainerInterface $container, UriSigner $signer = null, $globalDefaultTemplate = null)
+		{
+				$this->container = $container;
 
-        parent::__construct(null, $signer, $globalDefaultTemplate);
-    }
+				parent::__construct(null, $signer, $globalDefaultTemplate);
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function render($uri, Request $request, array $options = array())
-    {
-        if (!$this->templating) {
-            $this->templating = $this->container->get('templating');
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function render($uri, Request $request, array $options = array())
+		{
+				if (!$this->templating) {
+						$this->templating = $this->container->get('templating');
+				}
 
-        return parent::render($uri, $request, $options);
-    }
+				return parent::render($uri, $request, $options);
+		}
 }

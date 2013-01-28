@@ -25,15 +25,15 @@ use Symfony\Component\HttpFoundation\Request;
  */
 interface AuthenticationSuccessHandlerInterface
 {
-    /**
-     * This is called when an interactive authentication attempt succeeds. This
-     * is called by authentication listeners inheriting from
-     * AbstractAuthenticationListener.
-     *
-     * @param Request        $request
-     * @param TokenInterface $token
-     *
-     * @return Response never null
-     */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token);
+		/**
+		 * This is called when an interactive authentication attempt succeeds. This
+		 * is called by authentication listeners inheriting from
+		 * AbstractAuthenticationListener.
+		 *
+		 * @param Request				$request
+		 * @param TokenInterface $token
+		 *
+		 * @return Response never null
+		 */
+		public function onAuthenticationSuccess(Request $request, TokenInterface $token);
 }

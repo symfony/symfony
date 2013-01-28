@@ -27,57 +27,57 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ChoiceValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (!$constraint->choices && !$constraint->callback) {
-            throw new ConstraintDefinitionException('Either "choices" or "callback" must be specified on constraint Choice');
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (!$constraint->choices && !$constraint->callback) {
+						throw new ConstraintDefinitionException('Either "choices" or "callback" must be specified on constraint Choice');
+				}
 
-        if (null === $value) {
-            return;
-        }
+				if (null === $value) {
+						return;
+				}
 
-        if ($constraint->multiple && !is_array($value)) {
-            throw new UnexpectedTypeException($value, 'array');
-        }
+				if ($constraint->multiple && !is_array($value)) {
+						throw new UnexpectedTypeException($value, 'array');
+				}
 
-        if ($constraint->callback) {
-            if (is_callable(array($this->context->getCurrentClass(), $constraint->callback))) {
-                $choices = call_user_func(array($this->context->getCurrentClass(), $constraint->callback));
-            } elseif (is_callable($constraint->callback)) {
-                $choices = call_user_func($constraint->callback);
-            } else {
-                throw new ConstraintDefinitionException('The Choice constraint expects a valid callback');
-            }
-        } else {
-            $choices = $constraint->choices;
-        }
+				if ($constraint->callback) {
+						if (is_callable(array($this->context->getCurrentClass(), $constraint->callback))) {
+								$choices = call_user_func(array($this->context->getCurrentClass(), $constraint->callback));
+						} elseif (is_callable($constraint->callback)) {
+								$choices = call_user_func($constraint->callback);
+						} else {
+								throw new ConstraintDefinitionException('The Choice constraint expects a valid callback');
+						}
+				} else {
+						$choices = $constraint->choices;
+				}
 
-        if ($constraint->multiple) {
-            foreach ($value as $_value) {
-                if (!in_array($_value, $choices, $constraint->strict)) {
-                    $this->context->addViolation($constraint->multipleMessage, array('{{ value }}' => $_value));
-                }
-            }
+				if ($constraint->multiple) {
+						foreach ($value as $_value) {
+								if (!in_array($_value, $choices, $constraint->strict)) {
+										$this->context->addViolation($constraint->multipleMessage, array('{{ value }}' => $_value));
+								}
+						}
 
-            $count = count($value);
+						$count = count($value);
 
-            if ($constraint->min !== null && $count < $constraint->min) {
-                $this->context->addViolation($constraint->minMessage, array('{{ limit }}' => $constraint->min), null, (int) $constraint->min);
+						if ($constraint->min !== null && $count < $constraint->min) {
+								$this->context->addViolation($constraint->minMessage, array('{{ limit }}' => $constraint->min), null, (int) $constraint->min);
 
-                return;
-            }
+								return;
+						}
 
-            if ($constraint->max !== null && $count > $constraint->max) {
-                $this->context->addViolation($constraint->maxMessage, array('{{ limit }}' => $constraint->max), null, (int) $constraint->max);
+						if ($constraint->max !== null && $count > $constraint->max) {
+								$this->context->addViolation($constraint->maxMessage, array('{{ limit }}' => $constraint->max), null, (int) $constraint->max);
 
-                return;
-            }
-        } elseif (!in_array($value, $choices, $constraint->strict)) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
-        }
-    }
+								return;
+						}
+				} elseif (!in_array($value, $choices, $constraint->strict)) {
+						$this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+				}
+		}
 }

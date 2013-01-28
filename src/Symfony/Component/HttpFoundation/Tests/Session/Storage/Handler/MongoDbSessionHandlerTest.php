@@ -18,154 +18,154 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandl
  */
 class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $mongo;
-    private $storage;
-    public $options;
+		/**
+		 * @var \PHPUnit_Framework_MockObject_MockObject
+		 */
+		private $mongo;
+		private $storage;
+		public $options;
 
-    protected function setUp()
-    {
-        if (!extension_loaded('mongo')) {
-            $this->markTestSkipped('MongoDbSessionHandler requires the PHP "mongo" extension.');
-        }
+		protected function setUp()
+		{
+				if (!extension_loaded('mongo')) {
+						$this->markTestSkipped('MongoDbSessionHandler requires the PHP "mongo" extension.');
+				}
 
-        $mongoClass = (version_compare(phpversion('mongo'), '1.3.0', '<')) ? 'Mongo' : 'MongoClient';
+				$mongoClass = (version_compare(phpversion('mongo'), '1.3.0', '<')) ? 'Mongo' : 'MongoClient';
 
-        $this->mongo = $this->getMockBuilder($mongoClass)
-            ->disableOriginalConstructor()
-            ->getMock();
+				$this->mongo = $this->getMockBuilder($mongoClass)
+						->disableOriginalConstructor()
+						->getMock();
 
-        $this->options = array(
-            'id_field'   => '_id',
-            'data_field' => 'data',
-            'time_field' => 'time',
-            'database' => 'sf2-test',
-            'collection' => 'session-test'
-        );
+				$this->options = array(
+						'id_field'	 => '_id',
+						'data_field' => 'data',
+						'time_field' => 'time',
+						'database' => 'sf2-test',
+						'collection' => 'session-test'
+				);
 
-        $this->storage = new MongoDbSessionHandler($this->mongo, $this->options);
-    }
+				$this->storage = new MongoDbSessionHandler($this->mongo, $this->options);
+		}
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testConstructorShouldThrowExceptionForInvalidMongo()
-    {
-        new MongoDbSessionHandler(new \stdClass(), $this->options);
-    }
+		/**
+		 * @expectedException InvalidArgumentException
+		 */
+		public function testConstructorShouldThrowExceptionForInvalidMongo()
+		{
+				new MongoDbSessionHandler(new \stdClass(), $this->options);
+		}
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testConstructorShouldThrowExceptionForMissingOptions()
-    {
-        new MongoDbSessionHandler($this->mongo, array());
-    }
+		/**
+		 * @expectedException InvalidArgumentException
+		 */
+		public function testConstructorShouldThrowExceptionForMissingOptions()
+		{
+				new MongoDbSessionHandler($this->mongo, array());
+		}
 
-    public function testOpenMethodAlwaysReturnTrue()
-    {
-        $this->assertTrue($this->storage->open('test', 'test'), 'The "open" method should always return true');
-    }
+		public function testOpenMethodAlwaysReturnTrue()
+		{
+				$this->assertTrue($this->storage->open('test', 'test'), 'The "open" method should always return true');
+		}
 
-    public function testCloseMethodAlwaysReturnTrue()
-    {
-        $this->assertTrue($this->storage->close(), 'The "close" method should always return true');
-    }
+		public function testCloseMethodAlwaysReturnTrue()
+		{
+				$this->assertTrue($this->storage->close(), 'The "close" method should always return true');
+		}
 
-    public function testWrite()
-    {
-        $collection = $this->getMockBuilder('MongoCollection')
-            ->disableOriginalConstructor()
-            ->getMock();
+		public function testWrite()
+		{
+				$collection = $this->getMockBuilder('MongoCollection')
+						->disableOriginalConstructor()
+						->getMock();
 
-        $this->mongo->expects($this->once())
-            ->method('selectCollection')
-            ->with($this->options['database'], $this->options['collection'])
-            ->will($this->returnValue($collection));
+				$this->mongo->expects($this->once())
+						->method('selectCollection')
+						->with($this->options['database'], $this->options['collection'])
+						->will($this->returnValue($collection));
 
-        $that = $this;
-        $data = array();
+				$that = $this;
+				$data = array();
 
-        $collection->expects($this->once())
-            ->method('update')
-            ->will($this->returnCallback(function($criteria, $updateData, $options) use ($that, &$data) {
-                $that->assertEquals(array($that->options['id_field'] => 'foo'), $criteria);
-                $that->assertEquals(array('upsert' => true, 'multiple' => false), $options);
+				$collection->expects($this->once())
+						->method('update')
+						->will($this->returnCallback(function($criteria, $updateData, $options) use ($that, &$data) {
+								$that->assertEquals(array($that->options['id_field'] => 'foo'), $criteria);
+								$that->assertEquals(array('upsert' => true, 'multiple' => false), $options);
 
-                $data = $updateData['$set'];
-            }));
+								$data = $updateData['$set'];
+						}));
 
-        $this->assertTrue($this->storage->write('foo', 'bar'));
+				$this->assertTrue($this->storage->write('foo', 'bar'));
 
-        $this->assertEquals('bar', $data[$this->options['data_field']]->bin);
-        $that->assertInstanceOf('MongoDate', $data[$this->options['time_field']]);
-    }
+				$this->assertEquals('bar', $data[$this->options['data_field']]->bin);
+				$that->assertInstanceOf('MongoDate', $data[$this->options['time_field']]);
+		}
 
-    public function testReplaceSessionData()
-    {
-        $collection = $this->getMockBuilder('MongoCollection')
-            ->disableOriginalConstructor()
-            ->getMock();
+		public function testReplaceSessionData()
+		{
+				$collection = $this->getMockBuilder('MongoCollection')
+						->disableOriginalConstructor()
+						->getMock();
 
-        $this->mongo->expects($this->once())
-            ->method('selectCollection')
-            ->with($this->options['database'], $this->options['collection'])
-            ->will($this->returnValue($collection));
+				$this->mongo->expects($this->once())
+						->method('selectCollection')
+						->with($this->options['database'], $this->options['collection'])
+						->will($this->returnValue($collection));
 
-        $data = array();
+				$data = array();
 
-        $collection->expects($this->exactly(2))
-            ->method('update')
-            ->will($this->returnCallback(function($criteria, $updateData, $options) use (&$data) {
-                $data = $updateData;
-            }));
+				$collection->expects($this->exactly(2))
+						->method('update')
+						->will($this->returnCallback(function($criteria, $updateData, $options) use (&$data) {
+								$data = $updateData;
+						}));
 
-        $this->storage->write('foo', 'bar');
-        $this->storage->write('foo', 'foobar');
+				$this->storage->write('foo', 'bar');
+				$this->storage->write('foo', 'foobar');
 
-        $this->assertEquals('foobar', $data['$set'][$this->options['data_field']]->bin);
-    }
+				$this->assertEquals('foobar', $data['$set'][$this->options['data_field']]->bin);
+		}
 
-    public function testDestroy()
-    {
-        $collection = $this->getMockBuilder('MongoCollection')
-            ->disableOriginalConstructor()
-            ->getMock();
+		public function testDestroy()
+		{
+				$collection = $this->getMockBuilder('MongoCollection')
+						->disableOriginalConstructor()
+						->getMock();
 
-        $this->mongo->expects($this->once())
-            ->method('selectCollection')
-            ->with($this->options['database'], $this->options['collection'])
-            ->will($this->returnValue($collection));
+				$this->mongo->expects($this->once())
+						->method('selectCollection')
+						->with($this->options['database'], $this->options['collection'])
+						->will($this->returnValue($collection));
 
-        $collection->expects($this->once())
-            ->method('remove')
-            ->with(array($this->options['id_field'] => 'foo'));
+				$collection->expects($this->once())
+						->method('remove')
+						->with(array($this->options['id_field'] => 'foo'));
 
-        $this->assertTrue($this->storage->destroy('foo'));
-    }
+				$this->assertTrue($this->storage->destroy('foo'));
+		}
 
-    public function testGc()
-    {
-        $collection = $this->getMockBuilder('MongoCollection')
-            ->disableOriginalConstructor()
-            ->getMock();
+		public function testGc()
+		{
+				$collection = $this->getMockBuilder('MongoCollection')
+						->disableOriginalConstructor()
+						->getMock();
 
-        $this->mongo->expects($this->once())
-            ->method('selectCollection')
-            ->with($this->options['database'], $this->options['collection'])
-            ->will($this->returnValue($collection));
+				$this->mongo->expects($this->once())
+						->method('selectCollection')
+						->with($this->options['database'], $this->options['collection'])
+						->will($this->returnValue($collection));
 
-        $that = $this;
+				$that = $this;
 
-        $collection->expects($this->once())
-            ->method('remove')
-            ->will($this->returnCallback(function($criteria) use ($that) {
-                $that->assertInstanceOf('MongoDate', $criteria[$that->options['time_field']]['$lt']);
-                $that->assertGreaterThanOrEqual(time() - -1, $criteria[$that->options['time_field']]['$lt']->sec);
-            }));
+				$collection->expects($this->once())
+						->method('remove')
+						->will($this->returnCallback(function($criteria) use ($that) {
+								$that->assertInstanceOf('MongoDate', $criteria[$that->options['time_field']]['$lt']);
+								$that->assertGreaterThanOrEqual(time() - -1, $criteria[$that->options['time_field']]['$lt']->sec);
+						}));
 
-        $this->assertTrue($this->storage->gc(-1));
-    }
+				$this->assertTrue($this->storage->gc(-1));
+		}
 }

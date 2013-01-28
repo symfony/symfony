@@ -23,25 +23,25 @@ use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
  */
 class DefaultLogoutSuccessHandler implements LogoutSuccessHandlerInterface
 {
-    protected $httpUtils;
-    protected $targetUrl;
+		protected $httpUtils;
+		protected $targetUrl;
 
-    /**
-     * @param HttpUtils $httpUtils
-     * @param string    $targetUrl
-     */
-    public function __construct(HttpUtils $httpUtils, $targetUrl = '/')
-    {
-        $this->httpUtils = $httpUtils;
+		/**
+		 * @param HttpUtils $httpUtils
+		 * @param string		$targetUrl
+		 */
+		public function __construct(HttpUtils $httpUtils, $targetUrl = '/')
+		{
+				$this->httpUtils = $httpUtils;
 
-        $this->targetUrl = $targetUrl;
-    }
+				$this->targetUrl = $targetUrl;
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function onLogoutSuccess(Request $request)
-    {
-        return $this->httpUtils->createRedirectResponse($request, $this->targetUrl);
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function onLogoutSuccess(Request $request)
+		{
+				return $this->httpUtils->createRedirectResponse($request, $this->targetUrl);
+		}
 }

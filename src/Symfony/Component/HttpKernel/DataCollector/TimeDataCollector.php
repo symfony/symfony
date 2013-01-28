@@ -23,87 +23,87 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TimeDataCollector extends DataCollector
 {
-    protected $kernel;
+		protected $kernel;
 
-    public function __construct(KernelInterface $kernel = null)
-    {
-        $this->kernel = $kernel;
-    }
+		public function __construct(KernelInterface $kernel = null)
+		{
+				$this->kernel = $kernel;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
-    {
-        $this->data = array(
-            'start_time' => (null !== $this->kernel ? $this->kernel->getStartTime() : $_SERVER['REQUEST_TIME']) * 1000,
-            'events'     => array(),
-        );
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function collect(Request $request, Response $response, \Exception $exception = null)
+		{
+				$this->data = array(
+						'start_time' => (null !== $this->kernel ? $this->kernel->getStartTime() : $_SERVER['REQUEST_TIME']) * 1000,
+						'events'		 => array(),
+				);
+		}
 
-    /**
-     * Sets the request events.
-     *
-     * @param array $events The request events
-     */
-    public function setEvents(array $events)
-    {
-        foreach ($events as $event) {
-            $event->ensureStopped();
-        }
+		/**
+		 * Sets the request events.
+		 *
+		 * @param array $events The request events
+		 */
+		public function setEvents(array $events)
+		{
+				foreach ($events as $event) {
+						$event->ensureStopped();
+				}
 
-        $this->data['events'] = $events;
-    }
+				$this->data['events'] = $events;
+		}
 
-    /**
-     * Gets the request events.
-     *
-     * @return array The request events
-     */
-    public function getEvents()
-    {
-        return $this->data['events'];
-    }
+		/**
+		 * Gets the request events.
+		 *
+		 * @return array The request events
+		 */
+		public function getEvents()
+		{
+				return $this->data['events'];
+		}
 
-    /**
-     * Gets the request elapsed time.
-     *
-     * @return float The elapsed time
-     */
-    public function getDuration()
-    {
-        $lastEvent = $this->data['events']['__section__'];
+		/**
+		 * Gets the request elapsed time.
+		 *
+		 * @return float The elapsed time
+		 */
+		public function getDuration()
+		{
+				$lastEvent = $this->data['events']['__section__'];
 
-        return $lastEvent->getOrigin() + $lastEvent->getDuration() - $this->getStartTime();
-    }
+				return $lastEvent->getOrigin() + $lastEvent->getDuration() - $this->getStartTime();
+		}
 
-    /**
-     * Gets the initialization time.
-     *
-     * This is the time spent until the beginning of the request handling.
-     *
-     * @return float The elapsed time
-     */
-    public function getInitTime()
-    {
-        return $this->data['events']['__section__']->getOrigin() - $this->getStartTime();
-    }
+		/**
+		 * Gets the initialization time.
+		 *
+		 * This is the time spent until the beginning of the request handling.
+		 *
+		 * @return float The elapsed time
+		 */
+		public function getInitTime()
+		{
+				return $this->data['events']['__section__']->getOrigin() - $this->getStartTime();
+		}
 
-    /**
-     * Gets the request time.
-     *
-     * @return integer The time
-     */
-    public function getStartTime()
-    {
-        return $this->data['start_time'];
-    }
+		/**
+		 * Gets the request time.
+		 *
+		 * @return integer The time
+		 */
+		public function getStartTime()
+		{
+				return $this->data['start_time'];
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'time';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'time';
+		}
 }

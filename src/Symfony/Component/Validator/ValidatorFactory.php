@@ -35,8 +35,8 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
  *
  * // read from XML and YAML, suppress annotations
  * $factory = ValidatorFactory::buildDefault(array(
- *   '/path/to/mapping.xml',
- *   '/path/to/other/mapping.yml',
+ *	 '/path/to/mapping.xml',
+ *	 '/path/to/other/mapping.yml',
  * ), false);
  * </code>
  *
@@ -66,8 +66,8 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
  *
  * <code>
  * $form = $factory
- *     ->setClassMetadataFactory($customFactory);
- *     ->getValidator();
+ *		 ->setClassMetadataFactory($customFactory);
+ *		 ->getValidator();
  * </code>
  *
  * ValidatorFactory instances should be cached and reused in your application.
@@ -75,160 +75,160 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
- *             {@link Validation::createValidatorBuilder()} instead.
+ *						 {@link Validation::createValidatorBuilder()} instead.
  */
 class ValidatorFactory implements ValidatorContextInterface
 {
-    /**
-     * Holds the context with the default configuration
-     * @var ValidatorContextInterface
-     */
-    protected $defaultContext;
+		/**
+		 * Holds the context with the default configuration
+		 * @var ValidatorContextInterface
+		 */
+		protected $defaultContext;
 
-    /**
-     * Builds a validator factory with the default mapping loaders
-     *
-     * @param array $mappingFiles A list of XML or YAML file names
-     *                                      where mapping information can be
-     *                                      found. Can be empty.
-     * @param Boolean $annotations Whether to use annotations for
-     *                                      retrieving mapping information
-     * @param string $staticMethod The name of the static method to
-     *                                      use, if static method loading should
-     *                                      be enabled
-     *
-     * @return ValidatorFactory             The validator factory.
-     *
-     * @throws MappingException             If any of the files in $mappingFiles
-     *                                      has neither the extension ".xml" nor
-     *                                      ".yml" nor ".yaml"
-     * @throws \RuntimeException            If annotations are not supported.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link Validation::createValidatorBuilder()} instead.
-     */
-    public static function buildDefault(array $mappingFiles = array(), $annotations = false, $staticMethod = null)
-    {
-        trigger_error('buildDefault() is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidatorBuilder() instead.', E_USER_DEPRECATED);
+		/**
+		 * Builds a validator factory with the default mapping loaders
+		 *
+		 * @param array $mappingFiles A list of XML or YAML file names
+		 *																			where mapping information can be
+		 *																			found. Can be empty.
+		 * @param Boolean $annotations Whether to use annotations for
+		 *																			retrieving mapping information
+		 * @param string $staticMethod The name of the static method to
+		 *																			use, if static method loading should
+		 *																			be enabled
+		 *
+		 * @return ValidatorFactory						 The validator factory.
+		 *
+		 * @throws MappingException						 If any of the files in $mappingFiles
+		 *																			has neither the extension ".xml" nor
+		 *																			".yml" nor ".yaml"
+		 * @throws \RuntimeException						If annotations are not supported.
+		 *
+		 * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+		 *						 {@link Validation::createValidatorBuilder()} instead.
+		 */
+		public static function buildDefault(array $mappingFiles = array(), $annotations = false, $staticMethod = null)
+		{
+				trigger_error('buildDefault() is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidatorBuilder() instead.', E_USER_DEPRECATED);
 
-        $xmlMappingFiles = array();
-        $yamlMappingFiles = array();
-        $loaders = array();
-        $context = new ValidatorContext();
+				$xmlMappingFiles = array();
+				$yamlMappingFiles = array();
+				$loaders = array();
+				$context = new ValidatorContext();
 
-        foreach ($mappingFiles as $file) {
-            $extension = pathinfo($file, PATHINFO_EXTENSION);
+				foreach ($mappingFiles as $file) {
+						$extension = pathinfo($file, PATHINFO_EXTENSION);
 
-            if ($extension === 'xml') {
-                $xmlMappingFiles[] = $file;
-            } elseif ($extension === 'yaml' || $extension === 'yml') {
-                $yamlMappingFiles[] = $file;
-            } else {
-                throw new MappingException('The only supported mapping file formats are XML and YAML');
-            }
-        }
+						if ($extension === 'xml') {
+								$xmlMappingFiles[] = $file;
+						} elseif ($extension === 'yaml' || $extension === 'yml') {
+								$yamlMappingFiles[] = $file;
+						} else {
+								throw new MappingException('The only supported mapping file formats are XML and YAML');
+						}
+				}
 
-        if (count($xmlMappingFiles) > 0) {
-            $loaders[] = new XmlFilesLoader($xmlMappingFiles);
-        }
+				if (count($xmlMappingFiles) > 0) {
+						$loaders[] = new XmlFilesLoader($xmlMappingFiles);
+				}
 
-        if (count($yamlMappingFiles) > 0) {
-            $loaders[] = new YamlFilesLoader($yamlMappingFiles);
-        }
+				if (count($yamlMappingFiles) > 0) {
+						$loaders[] = new YamlFilesLoader($yamlMappingFiles);
+				}
 
-        if ($annotations) {
-            if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-                throw new \RuntimeException('Requested a ValidatorFactory with an AnnotationLoader, but the AnnotationReader was not found. You should add Doctrine Common to your project.');
-            }
+				if ($annotations) {
+						if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
+								throw new \RuntimeException('Requested a ValidatorFactory with an AnnotationLoader, but the AnnotationReader was not found. You should add Doctrine Common to your project.');
+						}
 
-            $loaders[] = new AnnotationLoader(new AnnotationReader());
-        }
+						$loaders[] = new AnnotationLoader(new AnnotationReader());
+				}
 
-        if ($staticMethod) {
-            $loaders[] = new StaticMethodLoader($staticMethod);
-        }
+				if ($staticMethod) {
+						$loaders[] = new StaticMethodLoader($staticMethod);
+				}
 
-        if (count($loaders) > 1) {
-            $loader = new LoaderChain($loaders);
-        } elseif (count($loaders) === 1) {
-            $loader = $loaders[0];
-        } else {
-            throw new MappingException('No mapping loader was found for the given parameters');
-        }
+				if (count($loaders) > 1) {
+						$loader = new LoaderChain($loaders);
+				} elseif (count($loaders) === 1) {
+						$loader = $loaders[0];
+				} else {
+						throw new MappingException('No mapping loader was found for the given parameters');
+				}
 
-        $context->setClassMetadataFactory(new ClassMetadataFactory($loader));
-        $context->setConstraintValidatorFactory(new ConstraintValidatorFactory());
+				$context->setClassMetadataFactory(new ClassMetadataFactory($loader));
+				$context->setConstraintValidatorFactory(new ConstraintValidatorFactory());
 
-        return new static($context);
-    }
+				return new static($context);
+		}
 
-    /**
-     * Sets the given context as default context
-     *
-     * @param ValidatorContextInterface $defaultContext A preconfigured context
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link Validation::createValidatorBuilder()} instead.
-     */
-    public function __construct(ValidatorContextInterface $defaultContext = null)
-    {
-        trigger_error('ValidatorFactory is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidatorBuilder() instead.', E_USER_DEPRECATED);
+		/**
+		 * Sets the given context as default context
+		 *
+		 * @param ValidatorContextInterface $defaultContext A preconfigured context
+		 *
+		 * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+		 *						 {@link Validation::createValidatorBuilder()} instead.
+		 */
+		public function __construct(ValidatorContextInterface $defaultContext = null)
+		{
+				trigger_error('ValidatorFactory is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidatorBuilder() instead.', E_USER_DEPRECATED);
 
-        $this->defaultContext = null === $defaultContext ? new ValidatorContext() : $defaultContext;
-    }
+				$this->defaultContext = null === $defaultContext ? new ValidatorContext() : $defaultContext;
+		}
 
-    /**
-     * Overrides the class metadata factory of the default context and returns
-     * the new context
-     *
-     * @param ClassMetadataFactoryInterface $metadataFactory The new factory instance
-     *
-     * @return ValidatorContextInterface                       The preconfigured form context
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link Validation::createValidatorBuilder()} instead.
-     */
-    public function setClassMetadataFactory(ClassMetadataFactoryInterface $metadataFactory)
-    {
-        trigger_error('setClassMetadataFactory() is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidatorBuilder() instead.', E_USER_DEPRECATED);
+		/**
+		 * Overrides the class metadata factory of the default context and returns
+		 * the new context
+		 *
+		 * @param ClassMetadataFactoryInterface $metadataFactory The new factory instance
+		 *
+		 * @return ValidatorContextInterface											 The preconfigured form context
+		 *
+		 * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+		 *						 {@link Validation::createValidatorBuilder()} instead.
+		 */
+		public function setClassMetadataFactory(ClassMetadataFactoryInterface $metadataFactory)
+		{
+				trigger_error('setClassMetadataFactory() is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidatorBuilder() instead.', E_USER_DEPRECATED);
 
-        $context = clone $this->defaultContext;
+				$context = clone $this->defaultContext;
 
-        return $context->setClassMetadataFactory($metadataFactory);
-    }
+				return $context->setClassMetadataFactory($metadataFactory);
+		}
 
-    /**
-     * Overrides the constraint validator factory of the default context and
-     * returns the new context
-     *
-     * @param ClassMetadataFactoryInterface $validatorFactory The new factory instance
-     *
-     * @return ValidatorContextInterface                        The preconfigured form context
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link Validation::createValidatorBuilder()} instead.
-     */
-    public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
-    {
-        trigger_error('setConstraintValidatorFactory() is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidatorBuilder() instead.', E_USER_DEPRECATED);
+		/**
+		 * Overrides the constraint validator factory of the default context and
+		 * returns the new context
+		 *
+		 * @param ClassMetadataFactoryInterface $validatorFactory The new factory instance
+		 *
+		 * @return ValidatorContextInterface												The preconfigured form context
+		 *
+		 * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+		 *						 {@link Validation::createValidatorBuilder()} instead.
+		 */
+		public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
+		{
+				trigger_error('setConstraintValidatorFactory() is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidatorBuilder() instead.', E_USER_DEPRECATED);
 
-        $context = clone $this->defaultContext;
+				$context = clone $this->defaultContext;
 
-        return $context->setConstraintValidatorFactory($validatorFactory);
-    }
+				return $context->setConstraintValidatorFactory($validatorFactory);
+		}
 
-    /**
-     * Creates a new validator with the settings stored in the default context
-     *
-     * @return ValidatorInterface  The new validator
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link Validation::createValidator()} instead.
-     */
-    public function getValidator()
-    {
-        trigger_error('getValidator() is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidator() instead.', E_USER_DEPRECATED);
+		/**
+		 * Creates a new validator with the settings stored in the default context
+		 *
+		 * @return ValidatorInterface	The new validator
+		 *
+		 * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
+		 *						 {@link Validation::createValidator()} instead.
+		 */
+		public function getValidator()
+		{
+				trigger_error('getValidator() is deprecated since version 2.1 and will be removed in 2.3. Use Validation::createValidator() instead.', E_USER_DEPRECATED);
 
-        return $this->defaultContext->getValidator();
-    }
+				return $this->defaultContext->getValidator();
+		}
 }

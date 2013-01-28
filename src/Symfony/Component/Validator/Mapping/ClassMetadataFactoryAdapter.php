@@ -22,42 +22,42 @@ use Symfony\Component\Validator\Exception\NoSuchMetadataException;
  */
 class ClassMetadataFactoryAdapter implements MetadataFactoryInterface
 {
-    /**
-     * @var ClassMetadataFactoryInterface
-     */
-    private $innerFactory;
+		/**
+		 * @var ClassMetadataFactoryInterface
+		 */
+		private $innerFactory;
 
-    public function __construct(ClassMetadataFactoryInterface $innerFactory)
-    {
-        trigger_error(sprintf('ClassMetadataFactoryInterface is deprecated since version 2.1 and will be removed in 2.3. Implement MetadataFactoryInterface instead on %s.', get_class($innerFactory)), E_USER_DEPRECATED);
+		public function __construct(ClassMetadataFactoryInterface $innerFactory)
+		{
+				trigger_error(sprintf('ClassMetadataFactoryInterface is deprecated since version 2.1 and will be removed in 2.3. Implement MetadataFactoryInterface instead on %s.', get_class($innerFactory)), E_USER_DEPRECATED);
 
-        $this->innerFactory = $innerFactory;
-    }
+				$this->innerFactory = $innerFactory;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadataFor($value)
-    {
-        $class = is_object($value) ? get_class($value) : $value;
-        $metadata = $this->innerFactory->getClassMetadata($class);
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getMetadataFor($value)
+		{
+				$class = is_object($value) ? get_class($value) : $value;
+				$metadata = $this->innerFactory->getClassMetadata($class);
 
-        if (null === $metadata) {
-            throw new NoSuchMetadataException('No metadata exists for class '. $class);
-        }
+				if (null === $metadata) {
+						throw new NoSuchMetadataException('No metadata exists for class '. $class);
+				}
 
-        return $metadata;
-    }
+				return $metadata;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasMetadataFor($value)
-    {
-        $class = is_object($value) ? get_class($value) : $value;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function hasMetadataFor($value)
+		{
+				$class = is_object($value) ? get_class($value) : $value;
 
-        $return = null !== $this->innerFactory->getClassMetadata($class);
+				$return = null !== $this->innerFactory->getClassMetadata($class);
 
-        return $return;
-    }
+				return $return;
+		}
 }

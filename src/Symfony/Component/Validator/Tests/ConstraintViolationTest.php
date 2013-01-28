@@ -15,22 +15,22 @@ use Symfony\Component\Validator\ConstraintViolation;
 
 class ConstraintViolationTest extends \PHPUnit_Framework_TestCase
 {
-    public function testToStringHandlesArrays()
-    {
-        $violation = new ConstraintViolation(
-            'Array',
-            '{{ value }}',
-            array('{{ value }}' => array(1, 2, 3)),
-            'Root',
-            'property.path',
-            null
-        );
+		public function testToStringHandlesArrays()
+		{
+				$violation = new ConstraintViolation(
+						'Array',
+						'{{ value }}',
+						array('{{ value }}' => array(1, 2, 3)),
+						'Root',
+						'property.path',
+						null
+				);
 
-        $expected = <<<EOF
+				$expected = <<<EOF
 Root.property.path:
-    Array
+		Array
 EOF;
 
-        $this->assertSame($expected, (string) $violation);
-    }
+				$this->assertSame($expected, (string) $violation);
+		}
 }

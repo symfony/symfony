@@ -22,50 +22,50 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
  */
 class ActionsHelper extends Helper
 {
-    private $renderer;
+		private $renderer;
 
-    /**
-     * Constructor.
-     *
-     * @param HttpContentRenderer $renderer A HttpContentRenderer instance
-     */
-    public function __construct(HttpContentRenderer $renderer)
-    {
-        $this->renderer = $renderer;
-    }
+		/**
+		 * Constructor.
+		 *
+		 * @param HttpContentRenderer $renderer A HttpContentRenderer instance
+		 */
+		public function __construct(HttpContentRenderer $renderer)
+		{
+				$this->renderer = $renderer;
+		}
 
-    /**
-     * Returns the Response content for a given URI.
-     *
-     * @param string $uri     A URI
-     * @param array  $options An array of options
-     *
-     * @return string
-     *
-     * @see Symfony\Component\HttpKernel\HttpContentRenderer::render()
-     */
-    public function render($uri, array $options = array())
-    {
-        $options = $this->renderer->fixOptions($options);
+		/**
+		 * Returns the Response content for a given URI.
+		 *
+		 * @param string $uri		 A URI
+		 * @param array	$options An array of options
+		 *
+		 * @return string
+		 *
+		 * @see Symfony\Component\HttpKernel\HttpContentRenderer::render()
+		 */
+		public function render($uri, array $options = array())
+		{
+				$options = $this->renderer->fixOptions($options);
 
-        $strategy = isset($options['strategy']) ? $options['strategy'] : 'default';
-        unset($options['strategy']);
+				$strategy = isset($options['strategy']) ? $options['strategy'] : 'default';
+				unset($options['strategy']);
 
-        return $this->renderer->render($uri, $strategy, $options);
-    }
+				return $this->renderer->render($uri, $strategy, $options);
+		}
 
-    public function controller($controller, $attributes = array(), $query = array())
-    {
-        return new ControllerReference($controller, $attributes, $query);
-    }
+		public function controller($controller, $attributes = array(), $query = array())
+		{
+				return new ControllerReference($controller, $attributes, $query);
+		}
 
-    /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
-     */
-    public function getName()
-    {
-        return 'actions';
-    }
+		/**
+		 * Returns the canonical name of this helper.
+		 *
+		 * @return string The canonical name
+		 */
+		public function getName()
+		{
+				return 'actions';
+		}
 }

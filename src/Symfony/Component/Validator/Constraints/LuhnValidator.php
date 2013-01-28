@@ -20,39 +20,39 @@ use Symfony\Component\Validator\ConstraintValidator;
  * For a list of example card numbers that are used to test this
  * class, please see the LuhnValidatorTest class.
  *
- * @see    http://en.wikipedia.org/wiki/Luhn_algorithm
+ * @see		http://en.wikipedia.org/wiki/Luhn_algorithm
  * @author Tim Nagel <t.nagel@infinite.net.au>
  * @author Greg Knapp http://gregk.me/2011/php-implementation-of-bank-card-luhn-algorithm/
  */
 class LuhnValidator extends ConstraintValidator
 {
-    /**
-     * Validates a creditcard number with the Luhn algorithm.
-     *
-     * @param mixed      $value
-     * @param Constraint $constraint
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (null === $value || '' === $value) {
-            return;
-        }
+		/**
+		 * Validates a creditcard number with the Luhn algorithm.
+		 *
+		 * @param mixed			$value
+		 * @param Constraint $constraint
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (null === $value || '' === $value) {
+						return;
+				}
 
-        if (!is_numeric($value)) {
-            $this->context->addViolation($constraint->message);
+				if (!is_numeric($value)) {
+						$this->context->addViolation($constraint->message);
 
-            return;
-        }
+						return;
+				}
 
-        $length = strlen($value);
-        $oddLength = $length % 2;
-        for ($sum = 0, $i = $length - 1; $i >= 0; $i--) {
-            $digit = (int) $value[$i];
-            $sum += (($i % 2) === $oddLength) ? array_sum(str_split($digit * 2)) : $digit;
-        }
+				$length = strlen($value);
+				$oddLength = $length % 2;
+				for ($sum = 0, $i = $length - 1; $i >= 0; $i--) {
+						$digit = (int) $value[$i];
+						$sum += (($i % 2) === $oddLength) ? array_sum(str_split($digit * 2)) : $digit;
+				}
 
-        if ($sum === 0 || ($sum % 10) !== 0) {
-            $this->context->addViolation($constraint->message);
-        }
-    }
+				if ($sum === 0 || ($sum % 10) !== 0) {
+						$this->context->addViolation($constraint->message);
+				}
+		}
 }

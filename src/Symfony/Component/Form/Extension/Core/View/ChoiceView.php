@@ -18,38 +18,38 @@ namespace Symfony\Component\Form\Extension\Core\View;
  */
 class ChoiceView
 {
-    /**
-     * The original choice value.
-     *
-     * @var mixed
-     */
-    public $data;
+		/**
+		 * The original choice value.
+		 *
+		 * @var mixed
+		 */
+		public $data;
 
-    /**
-     * The view representation of the choice.
-     *
-     * @var string
-     */
-    public $value;
+		/**
+		 * The view representation of the choice.
+		 *
+		 * @var string
+		 */
+		public $value;
 
-    /**
-     * The label displayed to humans.
-     *
-     * @var string
-     */
-    public $label;
+		/**
+		 * The label displayed to humans.
+		 *
+		 * @var string
+		 */
+		public $label;
 
-    /**
-     * Creates a new ChoiceView.
-     *
-     * @param mixed  $data  The original choice.
-     * @param string $value The view representation of the choice.
-     * @param string $label The label displayed to humans.
-     */
-    public function __construct($data, $value, $label)
-    {
-        $this->data = $data;
-        $this->value = $value;
-        $this->label = $label;
-    }
+		/**
+		 * Creates a new ChoiceView.
+		 *
+		 * @param mixed	$data	The original choice.
+		 * @param string $value The view representation of the choice.
+		 * @param string $label The label displayed to humans.
+		 */
+		public function __construct($data, $value, $label)
+		{
+				$this->data = $data;
+				$this->value = $value;
+				$this->label = $label;
+		}
 }

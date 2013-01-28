@@ -30,63 +30,63 @@ use Symfony\Component\Security\Http\HttpUtils;
  */
 class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandlerInterface
 {
-    protected $httpKernel;
-    protected $httpUtils;
-    protected $logger;
-    protected $options;
+		protected $httpKernel;
+		protected $httpUtils;
+		protected $logger;
+		protected $options;
 
-    /**
-     * Constructor.
-     *
-     * @param HttpKernelInterface $httpKernel
-     * @param HttpUtils           $httpUtils
-     * @param array               $options    Options for processing a failed authentication attempt.
-     * @param LoggerInterface     $logger     Optional logger
-     */
-    public function __construct(HttpKernelInterface $httpKernel, HttpUtils $httpUtils, array $options, LoggerInterface $logger = null)
-    {
-        $this->httpKernel = $httpKernel;
-        $this->httpUtils  = $httpUtils;
-        $this->logger     = $logger;
+		/**
+		 * Constructor.
+		 *
+		 * @param HttpKernelInterface $httpKernel
+		 * @param HttpUtils					 $httpUtils
+		 * @param array							 $options		Options for processing a failed authentication attempt.
+		 * @param LoggerInterface		 $logger		 Optional logger
+		 */
+		public function __construct(HttpKernelInterface $httpKernel, HttpUtils $httpUtils, array $options, LoggerInterface $logger = null)
+		{
+				$this->httpKernel = $httpKernel;
+				$this->httpUtils	= $httpUtils;
+				$this->logger		 = $logger;
 
-        $this->options = array_merge(array(
-            'failure_path'           => null,
-            'failure_forward'        => false,
-            'login_path'             => '/login',
-            'failure_path_parameter' => '_failure_path'
-        ), $options);
-    }
+				$this->options = array_merge(array(
+						'failure_path'					 => null,
+						'failure_forward'				=> false,
+						'login_path'						 => '/login',
+						'failure_path_parameter' => '_failure_path'
+				), $options);
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
-    {
-        if ($failureUrl = $request->get($this->options['failure_path_parameter'], null, true)) {
-             $this->options['failure_path'] = $failureUrl;
-         }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+		{
+				if ($failureUrl = $request->get($this->options['failure_path_parameter'], null, true)) {
+						 $this->options['failure_path'] = $failureUrl;
+				 }
 
-        if (null === $this->options['failure_path']) {
-            $this->options['failure_path'] = $this->options['login_path'];
-        }
+				if (null === $this->options['failure_path']) {
+						$this->options['failure_path'] = $this->options['login_path'];
+				}
 
-        if ($this->options['failure_forward']) {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Forwarding to %s', $this->options['failure_path']));
-            }
+				if ($this->options['failure_forward']) {
+						if (null !== $this->logger) {
+								$this->logger->debug(sprintf('Forwarding to %s', $this->options['failure_path']));
+						}
 
-            $subRequest = $this->httpUtils->createRequest($request, $this->options['failure_path']);
-            $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $exception);
+						$subRequest = $this->httpUtils->createRequest($request, $this->options['failure_path']);
+						$subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $exception);
 
-            return $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
-        }
+						return $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+				}
 
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
-        }
+				if (null !== $this->logger) {
+						$this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
+				}
 
-        $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $exception);
+				$request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $exception);
 
-        return $this->httpUtils->createRedirectResponse($request, $this->options['failure_path']);
-    }
+				return $this->httpUtils->createRedirectResponse($request, $this->options['failure_path']);
+		}
 }

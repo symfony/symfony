@@ -16,26 +16,26 @@ use Symfony\Component\Yaml\Yaml;
 class YamlTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testParseAndDump()
-    {
-        $data = array('lorem' => 'ipsum', 'dolor' => 'sit');
-        $yml = Yaml::dump($data);
-        $parsed = Yaml::parse($yml);
-        $this->assertEquals($data, $parsed);
+		public function testParseAndDump()
+		{
+				$data = array('lorem' => 'ipsum', 'dolor' => 'sit');
+				$yml = Yaml::dump($data);
+				$parsed = Yaml::parse($yml);
+				$this->assertEquals($data, $parsed);
 
-        $filename = __DIR__.'/Fixtures/index.yml';
-        $contents = file_get_contents($filename);
-        $parsedByFilename = Yaml::parse($filename);
-        $parsedByContents = Yaml::parse($contents);
-        $this->assertEquals($parsedByFilename, $parsedByContents);
-    }
+				$filename = __DIR__.'/Fixtures/index.yml';
+				$contents = file_get_contents($filename);
+				$parsedByFilename = Yaml::parse($filename);
+				$parsedByContents = Yaml::parse($contents);
+				$this->assertEquals($parsedByFilename, $parsedByContents);
+		}
 
-    public function testEmbededPhp()
-    {
-        $filename = __DIR__.'/Fixtures/embededPhp.yml';
-        Yaml::enablePhpParsing();
-        $parsed = Yaml::parse($filename);
-        $this->assertEquals(array('value' => 6), $parsed);
-    }
+		public function testEmbededPhp()
+		{
+				$filename = __DIR__.'/Fixtures/embededPhp.yml';
+				Yaml::enablePhpParsing();
+				$parsed = Yaml::parse($filename);
+				$this->assertEquals(array('value' => 6), $parsed);
+		}
 
 }

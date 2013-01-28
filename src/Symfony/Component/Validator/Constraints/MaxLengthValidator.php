@@ -24,39 +24,39 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class MaxLengthValidator extends ConstraintValidator
 {
-    public function __construct($options = null)
-    {
-        trigger_error('MaxLengthValidator is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
-    }
+		public function __construct($options = null)
+		{
+				trigger_error('MaxLengthValidator is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (null === $value || '' === $value) {
-            return;
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (null === $value || '' === $value) {
+						return;
+				}
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
-        }
+				if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+						throw new UnexpectedTypeException($value, 'string');
+				}
 
-        $stringValue = (string) $value;
+				$stringValue = (string) $value;
 
-        if (function_exists('grapheme_strlen') && 'UTF-8' === $constraint->charset) {
-            $length = grapheme_strlen($stringValue);
-        } elseif (function_exists('mb_strlen')) {
-            $length = mb_strlen($stringValue, $constraint->charset);
-        } else {
-            $length = strlen($stringValue);
-        }
+				if (function_exists('grapheme_strlen') && 'UTF-8' === $constraint->charset) {
+						$length = grapheme_strlen($stringValue);
+				} elseif (function_exists('mb_strlen')) {
+						$length = mb_strlen($stringValue, $constraint->charset);
+				} else {
+						$length = strlen($stringValue);
+				}
 
-        if ($length > $constraint->limit) {
-            $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $stringValue,
-                '{{ limit }}' => $constraint->limit,
-            ), $value, (int) $constraint->limit);
-        }
-    }
+				if ($length > $constraint->limit) {
+						$this->context->addViolation($constraint->message, array(
+								'{{ value }}' => $stringValue,
+								'{{ limit }}' => $constraint->limit,
+						), $value, (int) $constraint->limit);
+				}
+		}
 }

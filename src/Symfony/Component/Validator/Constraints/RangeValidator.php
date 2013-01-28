@@ -19,37 +19,37 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class RangeValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (null === $value) {
-            return;
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (null === $value) {
+						return;
+				}
 
-        if (!is_numeric($value)) {
-            $this->context->addViolation($constraint->invalidMessage, array(
-                '{{ value }}' => $value,
-            ));
+				if (!is_numeric($value)) {
+						$this->context->addViolation($constraint->invalidMessage, array(
+								'{{ value }}' => $value,
+						));
 
-            return;
-        }
+						return;
+				}
 
-        if (null !== $constraint->max && $value > $constraint->max) {
-            $this->context->addViolation($constraint->maxMessage, array(
-                '{{ value }}' => $value,
-                '{{ limit }}' => $constraint->max,
-            ));
+				if (null !== $constraint->max && $value > $constraint->max) {
+						$this->context->addViolation($constraint->maxMessage, array(
+								'{{ value }}' => $value,
+								'{{ limit }}' => $constraint->max,
+						));
 
-            return;
-        }
+						return;
+				}
 
-        if (null !== $constraint->min && $value < $constraint->min) {
-            $this->context->addViolation($constraint->minMessage, array(
-                '{{ value }}' => $value,
-                '{{ limit }}' => $constraint->min,
-            ));
-        }
-    }
+				if (null !== $constraint->min && $value < $constraint->min) {
+						$this->context->addViolation($constraint->minMessage, array(
+								'{{ value }}' => $value,
+								'{{ limit }}' => $constraint->min,
+						));
+				}
+		}
 }

@@ -16,214 +16,214 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class NormalizerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider getEncoderTests
-     */
-    public function testNormalizeEncoders($denormalized)
-    {
-        $tb = new TreeBuilder();
-        $tree = $tb
-            ->root('root_name', 'array')
-                ->fixXmlConfig('encoder')
-                ->children()
-                    ->node('encoders', 'array')
-                        ->useAttributeAsKey('class')
-                        ->prototype('array')
-                            ->beforeNormalization()->ifString()->then(function($v) { return array('algorithm' => $v); })->end()
-                            ->children()
-                                ->node('algorithm', 'scalar')->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-            ->buildTree()
-        ;
+		/**
+		 * @dataProvider getEncoderTests
+		 */
+		public function testNormalizeEncoders($denormalized)
+		{
+				$tb = new TreeBuilder();
+				$tree = $tb
+						->root('root_name', 'array')
+								->fixXmlConfig('encoder')
+								->children()
+										->node('encoders', 'array')
+												->useAttributeAsKey('class')
+												->prototype('array')
+														->beforeNormalization()->ifString()->then(function($v) { return array('algorithm' => $v); })->end()
+														->children()
+																->node('algorithm', 'scalar')->end()
+														->end()
+												->end()
+										->end()
+								->end()
+						->end()
+						->buildTree()
+				;
 
-        $normalized = array(
-            'encoders' => array(
-                'foo' => array('algorithm' => 'plaintext'),
-            ),
-        );
+				$normalized = array(
+						'encoders' => array(
+								'foo' => array('algorithm' => 'plaintext'),
+						),
+				);
 
-        $this->assertNormalized($tree, $denormalized, $normalized);
-    }
+				$this->assertNormalized($tree, $denormalized, $normalized);
+		}
 
-    public function getEncoderTests()
-    {
-        $configs = array();
+		public function getEncoderTests()
+		{
+				$configs = array();
 
-        // XML
-        $configs[] = array(
-            'encoder' => array(
-                array('class' => 'foo', 'algorithm' => 'plaintext'),
-            ),
-        );
+				// XML
+				$configs[] = array(
+						'encoder' => array(
+								array('class' => 'foo', 'algorithm' => 'plaintext'),
+						),
+				);
 
-        // XML when only one element of this type
-        $configs[] = array(
-            'encoder' => array('class' => 'foo', 'algorithm' => 'plaintext'),
-        );
+				// XML when only one element of this type
+				$configs[] = array(
+						'encoder' => array('class' => 'foo', 'algorithm' => 'plaintext'),
+				);
 
-        // YAML/PHP
-        $configs[] = array(
-            'encoders' => array(
-                array('class' => 'foo', 'algorithm' => 'plaintext'),
-            ),
-        );
+				// YAML/PHP
+				$configs[] = array(
+						'encoders' => array(
+								array('class' => 'foo', 'algorithm' => 'plaintext'),
+						),
+				);
 
-        // YAML/PHP
-        $configs[] = array(
-            'encoders' => array(
-                'foo' => 'plaintext',
-            ),
-        );
+				// YAML/PHP
+				$configs[] = array(
+						'encoders' => array(
+								'foo' => 'plaintext',
+						),
+				);
 
-        // YAML/PHP
-        $configs[] = array(
-            'encoders' => array(
-                'foo' => array('algorithm' => 'plaintext'),
-            ),
-        );
+				// YAML/PHP
+				$configs[] = array(
+						'encoders' => array(
+								'foo' => array('algorithm' => 'plaintext'),
+						),
+				);
 
-        return array_map(function($v) {
-            return array($v);
-        }, $configs);
-    }
+				return array_map(function($v) {
+						return array($v);
+				}, $configs);
+		}
 
-    /**
-     * @dataProvider getAnonymousKeysTests
-     */
-    public function testAnonymousKeysArray($denormalized)
-    {
-        $tb = new TreeBuilder();
-        $tree = $tb
-            ->root('root', 'array')
-                ->children()
-                    ->node('logout', 'array')
-                        ->fixXmlConfig('handler')
-                        ->children()
-                            ->node('handlers', 'array')
-                                ->prototype('scalar')->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-            ->buildTree()
-        ;
+		/**
+		 * @dataProvider getAnonymousKeysTests
+		 */
+		public function testAnonymousKeysArray($denormalized)
+		{
+				$tb = new TreeBuilder();
+				$tree = $tb
+						->root('root', 'array')
+								->children()
+										->node('logout', 'array')
+												->fixXmlConfig('handler')
+												->children()
+														->node('handlers', 'array')
+																->prototype('scalar')->end()
+														->end()
+												->end()
+										->end()
+								->end()
+						->end()
+						->buildTree()
+				;
 
-        $normalized = array('logout' => array('handlers' => array('a', 'b', 'c')));
+				$normalized = array('logout' => array('handlers' => array('a', 'b', 'c')));
 
-        $this->assertNormalized($tree, $denormalized, $normalized);
-    }
+				$this->assertNormalized($tree, $denormalized, $normalized);
+		}
 
-    public function getAnonymousKeysTests()
-    {
-        $configs = array();
+		public function getAnonymousKeysTests()
+		{
+				$configs = array();
 
-        $configs[] = array(
-            'logout' => array(
-                'handlers' => array('a', 'b', 'c'),
-            ),
-        );
+				$configs[] = array(
+						'logout' => array(
+								'handlers' => array('a', 'b', 'c'),
+						),
+				);
 
-        $configs[] = array(
-            'logout' => array(
-                'handler' => array('a', 'b', 'c'),
-            ),
-        );
+				$configs[] = array(
+						'logout' => array(
+								'handler' => array('a', 'b', 'c'),
+						),
+				);
 
-        return array_map(function($v) { return array($v); }, $configs);
-    }
+				return array_map(function($v) { return array($v); }, $configs);
+		}
 
-    /**
-     * @dataProvider getNumericKeysTests
-     */
-    public function testNumericKeysAsAttributes($denormalized)
-    {
-        $normalized = array(
-            'thing' => array(42 => array('foo', 'bar'), 1337 => array('baz', 'qux')),
-        );
+		/**
+		 * @dataProvider getNumericKeysTests
+		 */
+		public function testNumericKeysAsAttributes($denormalized)
+		{
+				$normalized = array(
+						'thing' => array(42 => array('foo', 'bar'), 1337 => array('baz', 'qux')),
+				);
 
-        $this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, $normalized);
-    }
+				$this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, $normalized);
+		}
 
-    public function getNumericKeysTests()
-    {
-        $configs = array();
+		public function getNumericKeysTests()
+		{
+				$configs = array();
 
-        $configs[] = array(
-            'thing' => array(
-                42 => array('foo', 'bar'), 1337 => array('baz', 'qux'),
-            ),
-        );
+				$configs[] = array(
+						'thing' => array(
+								42 => array('foo', 'bar'), 1337 => array('baz', 'qux'),
+						),
+				);
 
-        $configs[] = array(
-            'thing' => array(
-                array('foo', 'bar', 'id' => 42), array('baz', 'qux', 'id' => 1337),
-            ),
-        );
+				$configs[] = array(
+						'thing' => array(
+								array('foo', 'bar', 'id' => 42), array('baz', 'qux', 'id' => 1337),
+						),
+				);
 
-        return array_map(function($v) { return array($v); }, $configs);
-    }
+				return array_map(function($v) { return array($v); }, $configs);
+		}
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The attribute "id" must be set for path "root.thing".
-     */
-    public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet()
-    {
-        $denormalized = array(
-            'thing' => array(
-                array('foo', 'bar'), array('baz', 'qux')
-            )
-        );
+		/**
+		 * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+		 * @expectedExceptionMessage The attribute "id" must be set for path "root.thing".
+		 */
+		public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet()
+		{
+				$denormalized = array(
+						'thing' => array(
+								array('foo', 'bar'), array('baz', 'qux')
+						)
+				);
 
-        $this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, array());
-    }
+				$this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, array());
+		}
 
-    public function testAssociativeArrayPreserveKeys()
-    {
-        $tb = new TreeBuilder();
-        $tree = $tb
-            ->root('root', 'array')
-                ->prototype('array')
-                    ->children()
-                        ->node('foo', 'scalar')->end()
-                    ->end()
-                ->end()
-            ->end()
-            ->buildTree()
-        ;
+		public function testAssociativeArrayPreserveKeys()
+		{
+				$tb = new TreeBuilder();
+				$tree = $tb
+						->root('root', 'array')
+								->prototype('array')
+										->children()
+												->node('foo', 'scalar')->end()
+										->end()
+								->end()
+						->end()
+						->buildTree()
+				;
 
-        $data = array('first' => array('foo' => 'bar'));
+				$data = array('first' => array('foo' => 'bar'));
 
-        $this->assertNormalized($tree, $data, $data);
-    }
+				$this->assertNormalized($tree, $data, $data);
+		}
 
-    public static function assertNormalized(NodeInterface $tree, $denormalized, $normalized)
-    {
-        self::assertSame($normalized, $tree->normalize($denormalized));
-    }
+		public static function assertNormalized(NodeInterface $tree, $denormalized, $normalized)
+		{
+				self::assertSame($normalized, $tree->normalize($denormalized));
+		}
 
-    private function getNumericKeysTestTree()
-    {
-        $tb = new TreeBuilder();
-        $tree = $tb
-            ->root('root', 'array')
-                ->children()
-                    ->node('thing', 'array')
-                        ->useAttributeAsKey('id')
-                        ->prototype('array')
-                            ->prototype('scalar')->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-            ->buildTree()
-        ;
+		private function getNumericKeysTestTree()
+		{
+				$tb = new TreeBuilder();
+				$tree = $tb
+						->root('root', 'array')
+								->children()
+										->node('thing', 'array')
+												->useAttributeAsKey('id')
+												->prototype('array')
+														->prototype('scalar')->end()
+												->end()
+										->end()
+								->end()
+						->end()
+						->buildTree()
+				;
 
-        return $tree;
-    }
+				return $tree;
+		}
 }

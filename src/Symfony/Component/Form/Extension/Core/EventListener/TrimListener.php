@@ -22,23 +22,23 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class TrimListener implements EventSubscriberInterface
 {
-    public function preBind(FormEvent $event)
-    {
-        $data = $event->getData();
+		public function preBind(FormEvent $event)
+		{
+				$data = $event->getData();
 
-        if (!is_string($data)) {
-            return;
-        }
+				if (!is_string($data)) {
+						return;
+				}
 
-        if (null !== $result = @preg_replace('/^[\pZ\p{Cc}]+|[\pZ\p{Cc}]+$/u', '', $data)) {
-            $event->setData($result);
-        } else {
-            $event->setData(trim($data));
-        }
-    }
+				if (null !== $result = @preg_replace('/^[\pZ\p{Cc}]+|[\pZ\p{Cc}]+$/u', '', $data)) {
+						$event->setData($result);
+				} else {
+						$event->setData(trim($data));
+				}
+		}
 
-    public static function getSubscribedEvents()
-    {
-        return array(FormEvents::PRE_BIND => 'preBind');
-    }
+		public static function getSubscribedEvents()
+		{
+				return array(FormEvents::PRE_BIND => 'preBind');
+		}
 }

@@ -17,103 +17,103 @@ use Symfony\Component\Form\Guess\Guess;
 
 class PropelTypeGuesserTest extends Propel1TestCase
 {
-    const CLASS_NAME = 'Symfony\Bridge\Propel1\Tests\Fixtures\Item';
+		const CLASS_NAME = 'Symfony\Bridge\Propel1\Tests\Fixtures\Item';
 
-    const UNKNOWN_CLASS_NAME = 'Symfony\Bridge\Propel1\Tests\Fixtures\UnknownItem';
+		const UNKNOWN_CLASS_NAME = 'Symfony\Bridge\Propel1\Tests\Fixtures\UnknownItem';
 
-    private $guesser;
+		private $guesser;
 
-    public function setUp()
-    {
-        $this->guesser = new PropelTypeGuesser();
-    }
+		public function setUp()
+		{
+				$this->guesser = new PropelTypeGuesser();
+		}
 
-    public function testGuessMaxLengthWithText()
-    {
-        $value = $this->guesser->guessMaxLength(self::CLASS_NAME, 'value');
+		public function testGuessMaxLengthWithText()
+		{
+				$value = $this->guesser->guessMaxLength(self::CLASS_NAME, 'value');
 
-        $this->assertNotNull($value);
-        $this->assertEquals(255, $value->getValue());
-    }
+				$this->assertNotNull($value);
+				$this->assertEquals(255, $value->getValue());
+		}
 
-    public function testGuessMaxLengthWithFloat()
-    {
-        $value = $this->guesser->guessMaxLength(self::CLASS_NAME, 'price');
+		public function testGuessMaxLengthWithFloat()
+		{
+				$value = $this->guesser->guessMaxLength(self::CLASS_NAME, 'price');
 
-        $this->assertNotNull($value);
-        $this->assertNull($value->getValue());
-    }
+				$this->assertNotNull($value);
+				$this->assertNull($value->getValue());
+		}
 
-    public function testGuessMinLengthWithText()
-    {
-        $value = $this->guesser->guessPattern(self::CLASS_NAME, 'value');
+		public function testGuessMinLengthWithText()
+		{
+				$value = $this->guesser->guessPattern(self::CLASS_NAME, 'value');
 
-        $this->assertNull($value);
-    }
+				$this->assertNull($value);
+		}
 
-    public function testGuessMinLengthWithFloat()
-    {
-        $value = $this->guesser->guessPattern(self::CLASS_NAME, 'price');
+		public function testGuessMinLengthWithFloat()
+		{
+				$value = $this->guesser->guessPattern(self::CLASS_NAME, 'price');
 
-        $this->assertNotNull($value);
-        $this->assertNull($value->getValue());
-    }
+				$this->assertNotNull($value);
+				$this->assertNull($value->getValue());
+		}
 
-    public function testGuessRequired()
-    {
-        $value = $this->guesser->guessRequired(self::CLASS_NAME, 'id');
+		public function testGuessRequired()
+		{
+				$value = $this->guesser->guessRequired(self::CLASS_NAME, 'id');
 
-        $this->assertNotNull($value);
-        $this->assertTrue($value->getValue());
-    }
+				$this->assertNotNull($value);
+				$this->assertTrue($value->getValue());
+		}
 
-    public function testGuessRequiredWithNullableColumn()
-    {
-        $value = $this->guesser->guessRequired(self::CLASS_NAME, 'value');
+		public function testGuessRequiredWithNullableColumn()
+		{
+				$value = $this->guesser->guessRequired(self::CLASS_NAME, 'value');
 
-        $this->assertNotNull($value);
-        $this->assertFalse($value->getValue());
-    }
+				$this->assertNotNull($value);
+				$this->assertFalse($value->getValue());
+		}
 
-    public function testGuessTypeWithoutTable()
-    {
-        $value = $this->guesser->guessType(self::UNKNOWN_CLASS_NAME, 'property');
+		public function testGuessTypeWithoutTable()
+		{
+				$value = $this->guesser->guessType(self::UNKNOWN_CLASS_NAME, 'property');
 
-        $this->assertNotNull($value);
-        $this->assertEquals('text', $value->getType());
-        $this->assertEquals(Guess::LOW_CONFIDENCE, $value->getConfidence());
-    }
+				$this->assertNotNull($value);
+				$this->assertEquals('text', $value->getType());
+				$this->assertEquals(Guess::LOW_CONFIDENCE, $value->getConfidence());
+		}
 
-    public function testGuessTypeWithoutColumn()
-    {
-        $value = $this->guesser->guessType(self::CLASS_NAME, 'property');
+		public function testGuessTypeWithoutColumn()
+		{
+				$value = $this->guesser->guessType(self::CLASS_NAME, 'property');
 
-        $this->assertNotNull($value);
-        $this->assertEquals('text', $value->getType());
-        $this->assertEquals(Guess::LOW_CONFIDENCE, $value->getConfidence());
-    }
+				$this->assertNotNull($value);
+				$this->assertEquals('text', $value->getType());
+				$this->assertEquals(Guess::LOW_CONFIDENCE, $value->getConfidence());
+		}
 
-    /**
-     * @dataProvider dataProviderForGuessType
-     */
-    public function testGuessType($property, $type, $confidence)
-    {
-        $value = $this->guesser->guessType(self::CLASS_NAME, $property);
+		/**
+		 * @dataProvider dataProviderForGuessType
+		 */
+		public function testGuessType($property, $type, $confidence)
+		{
+				$value = $this->guesser->guessType(self::CLASS_NAME, $property);
 
-        $this->assertNotNull($value);
-        $this->assertEquals($type, $value->getType());
-        $this->assertEquals($confidence, $value->getConfidence());
-    }
+				$this->assertNotNull($value);
+				$this->assertEquals($type, $value->getType());
+				$this->assertEquals($confidence, $value->getConfidence());
+		}
 
-    public static function dataProviderForGuessType()
-    {
-        return array(
-            array('is_active',  'checkbox', Guess::HIGH_CONFIDENCE),
-            array('enabled',    'checkbox', Guess::HIGH_CONFIDENCE),
-            array('id',         'integer',  Guess::MEDIUM_CONFIDENCE),
-            array('value',      'text',     Guess::MEDIUM_CONFIDENCE),
-            array('price',      'number',   Guess::MEDIUM_CONFIDENCE),
-            array('updated_at', 'datetime', Guess::HIGH_CONFIDENCE),
-        );
-    }
+		public static function dataProviderForGuessType()
+		{
+				return array(
+						array('is_active',	'checkbox', Guess::HIGH_CONFIDENCE),
+						array('enabled',		'checkbox', Guess::HIGH_CONFIDENCE),
+						array('id',				 'integer',	Guess::MEDIUM_CONFIDENCE),
+						array('value',			'text',		 Guess::MEDIUM_CONFIDENCE),
+						array('price',			'number',	 Guess::MEDIUM_CONFIDENCE),
+						array('updated_at', 'datetime', Guess::HIGH_CONFIDENCE),
+				);
+		}
 }

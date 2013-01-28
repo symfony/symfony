@@ -24,34 +24,34 @@ use Symfony\Component\HttpFoundation\Session\Session;
  */
 class NullSessionStorageTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSaveHandlers()
-    {
-        $storage = $this->getStorage();
-        $this->assertEquals('user', ini_get('session.save_handler'));
-    }
+		public function testSaveHandlers()
+		{
+				$storage = $this->getStorage();
+				$this->assertEquals('user', ini_get('session.save_handler'));
+		}
 
-    public function testSession()
-    {
-        session_id('nullsessionstorage');
-        $storage = $this->getStorage();
-        $session = new Session($storage);
-        $this->assertNull($session->get('something'));
-        $session->set('something', 'unique');
-        $this->assertEquals('unique', $session->get('something'));
-    }
+		public function testSession()
+		{
+				session_id('nullsessionstorage');
+				$storage = $this->getStorage();
+				$session = new Session($storage);
+				$this->assertNull($session->get('something'));
+				$session->set('something', 'unique');
+				$this->assertEquals('unique', $session->get('something'));
+		}
 
-    public function testNothingIsPersisted()
-    {
-        session_id('nullsessionstorage');
-        $storage = $this->getStorage();
-        $session = new Session($storage);
-        $session->start();
-        $this->assertEquals('nullsessionstorage', $session->getId());
-        $this->assertNull($session->get('something'));
-    }
+		public function testNothingIsPersisted()
+		{
+				session_id('nullsessionstorage');
+				$storage = $this->getStorage();
+				$session = new Session($storage);
+				$session->start();
+				$this->assertEquals('nullsessionstorage', $session->getId());
+				$this->assertNull($session->get('something'));
+		}
 
-    public function getStorage()
-    {
-        return new NativeSessionStorage(array(), new NullSessionHandler());
-    }
+		public function getStorage()
+		{
+				return new NativeSessionStorage(array(), new NullSessionHandler());
+		}
 }

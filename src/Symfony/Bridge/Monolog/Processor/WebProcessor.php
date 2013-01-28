@@ -23,16 +23,16 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class WebProcessor extends BaseWebProcessor
 {
-    public function __construct()
-    {
-        // Pass an empty array as the default null value would access $_SERVER
-        parent::__construct(array());
-    }
+		public function __construct()
+		{
+				// Pass an empty array as the default null value would access $_SERVER
+				parent::__construct(array());
+		}
 
-    public function onKernelRequest(GetResponseEvent $event)
-    {
-        if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
-            $this->serverData = $event->getRequest()->server->all();
-        }
-    }
+		public function onKernelRequest(GetResponseEvent $event)
+		{
+				if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
+						$this->serverData = $event->getRequest()->server->all();
+				}
+		}
 }

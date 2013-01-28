@@ -14,13 +14,13 @@ namespace Symfony\Component\Finder;
 /**
  * Glob matches globbing patterns against text.
  *
- *   if match_glob("foo.*", "foo.bar") echo "matched\n";
+ *	 if match_glob("foo.*", "foo.bar") echo "matched\n";
  *
  * // prints foo.bar and foo.baz
  * $regex = glob_to_regex("foo.*");
  * for (array('foo.bar', 'foo.baz', 'foo', 'bar') as $t)
  * {
- *   if (/$regex/) echo "matched: $car\n";
+ *	 if (/$regex/) echo "matched: $car\n";
  * }
  *
  * Glob implements glob(3) style matching that can be used to match
@@ -29,75 +29,75 @@ namespace Symfony\Component\Finder;
  * Based on the Perl Text::Glob module.
  *
  * @author Fabien Potencier <fabien@symfony.com> PHP port
- * @author     Richard Clamp <richardc@unixbeard.net> Perl version
- * @copyright  2004-2005 Fabien Potencier <fabien@symfony.com>
- * @copyright  2002 Richard Clamp <richardc@unixbeard.net>
+ * @author		 Richard Clamp <richardc@unixbeard.net> Perl version
+ * @copyright	2004-2005 Fabien Potencier <fabien@symfony.com>
+ * @copyright	2002 Richard Clamp <richardc@unixbeard.net>
  */
 class Glob
 {
-    /**
-     * Returns a regexp which is the equivalent of the glob pattern.
-     *
-     * @param string  $glob                The glob pattern
-     * @param Boolean $strictLeadingDot
-     * @param Boolean $strictWildcardSlash
-     *
-     * @return string regex The regexp
-     */
-    public static function toRegex($glob, $strictLeadingDot = true, $strictWildcardSlash = true)
-    {
-        $firstByte = true;
-        $escaping = false;
-        $inCurlies = 0;
-        $regex = '';
-        $sizeGlob = strlen($glob);
-        for ($i = 0; $i < $sizeGlob; $i++) {
-            $car = $glob[$i];
-            if ($firstByte) {
-                if ($strictLeadingDot && '.' !== $car) {
-                    $regex .= '(?=[^\.])';
-                }
+		/**
+		 * Returns a regexp which is the equivalent of the glob pattern.
+		 *
+		 * @param string	$glob								The glob pattern
+		 * @param Boolean $strictLeadingDot
+		 * @param Boolean $strictWildcardSlash
+		 *
+		 * @return string regex The regexp
+		 */
+		public static function toRegex($glob, $strictLeadingDot = true, $strictWildcardSlash = true)
+		{
+				$firstByte = true;
+				$escaping = false;
+				$inCurlies = 0;
+				$regex = '';
+				$sizeGlob = strlen($glob);
+				for ($i = 0; $i < $sizeGlob; $i++) {
+						$car = $glob[$i];
+						if ($firstByte) {
+								if ($strictLeadingDot && '.' !== $car) {
+										$regex .= '(?=[^\.])';
+								}
 
-                $firstByte = false;
-            }
+								$firstByte = false;
+						}
 
-            if ('/' === $car) {
-                $firstByte = true;
-            }
+						if ('/' === $car) {
+								$firstByte = true;
+						}
 
-            if ('.' === $car || '(' === $car || ')' === $car || '|' === $car || '+' === $car || '^' === $car || '$' === $car) {
-                $regex .= "\\$car";
-            } elseif ('*' === $car) {
-                $regex .= $escaping ? '\\*' : ($strictWildcardSlash ? '[^/]*' : '.*');
-            } elseif ('?' === $car) {
-                $regex .= $escaping ? '\\?' : ($strictWildcardSlash ? '[^/]' : '.');
-            } elseif ('{' === $car) {
-                $regex .= $escaping ? '\\{' : '(';
-                if (!$escaping) {
-                    ++$inCurlies;
-                }
-            } elseif ('}' === $car && $inCurlies) {
-                $regex .= $escaping ? '}' : ')';
-                if (!$escaping) {
-                    --$inCurlies;
-                }
-            } elseif (',' === $car && $inCurlies) {
-                $regex .= $escaping ? ',' : '|';
-            } elseif ('\\' === $car) {
-                if ($escaping) {
-                    $regex .= '\\\\';
-                    $escaping = false;
-                } else {
-                    $escaping = true;
-                }
+						if ('.' === $car || '(' === $car || ')' === $car || '|' === $car || '+' === $car || '^' === $car || '$' === $car) {
+								$regex .= "\\$car";
+						} elseif ('*' === $car) {
+								$regex .= $escaping ? '\\*' : ($strictWildcardSlash ? '[^/]*' : '.*');
+						} elseif ('?' === $car) {
+								$regex .= $escaping ? '\\?' : ($strictWildcardSlash ? '[^/]' : '.');
+						} elseif ('{' === $car) {
+								$regex .= $escaping ? '\\{' : '(';
+								if (!$escaping) {
+										++$inCurlies;
+								}
+						} elseif ('}' === $car && $inCurlies) {
+								$regex .= $escaping ? '}' : ')';
+								if (!$escaping) {
+										--$inCurlies;
+								}
+						} elseif (',' === $car && $inCurlies) {
+								$regex .= $escaping ? ',' : '|';
+						} elseif ('\\' === $car) {
+								if ($escaping) {
+										$regex .= '\\\\';
+										$escaping = false;
+								} else {
+										$escaping = true;
+								}
 
-                continue;
-            } else {
-                $regex .= $car;
-            }
-            $escaping = false;
-        }
+								continue;
+						} else {
+								$regex .= $car;
+						}
+						$escaping = false;
+				}
 
-        return '#^'.$regex.'$#';
-    }
+				return '#^'.$regex.'$#';
+		}
 }

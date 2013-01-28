@@ -17,26 +17,26 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class TypeTestCase extends FormIntegrationTestCase
 {
-    /**
-     * @var FormBuilder
-     */
-    protected $builder;
+		/**
+		 * @var FormBuilder
+		 */
+		protected $builder;
 
-    /**
-     * @var EventDispatcher
-     */
-    protected $dispatcher;
+		/**
+		 * @var EventDispatcher
+		 */
+		protected $dispatcher;
 
-    protected function setUp()
-    {
-        parent::setUp();
+		protected function setUp()
+		{
+				parent::setUp();
 
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
-    }
+				$this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+				$this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
+		}
 
-    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
-    {
-        self::assertEquals($expected->format('c'), $actual->format('c'));
-    }
+		public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
+		{
+				self::assertEquals($expected->format('c'), $actual->format('c'));
+		}
 }

@@ -17,27 +17,27 @@ use Symfony\Component\Form\FormInterface;
 
 class TextareaType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    {
-        $view->vars['pattern'] = null;
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function buildView(FormView $view, FormInterface $form, array $options)
+		{
+				$view->vars['pattern'] = null;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'text';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getParent()
+		{
+				return 'text';
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'textarea';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'textarea';
+		}
 }

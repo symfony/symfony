@@ -17,21 +17,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MemoryDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
+		protected function setUp()
+		{
+				if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
+						$this->markTestSkipped('The "HttpFoundation" component is not available');
+				}
+		}
 
-    public function testCollect()
-    {
-        $c = new MemoryDataCollector();
+		public function testCollect()
+		{
+				$c = new MemoryDataCollector();
 
-        $c->collect(new Request(), new Response());
+				$c->collect(new Request(), new Response());
 
-        $this->assertInternalType('integer',$c->getMemory());
-        $this->assertSame('memory',$c->getName());
-    }
+				$this->assertInternalType('integer',$c->getMemory());
+				$this->assertSame('memory',$c->getName());
+		}
 
 }

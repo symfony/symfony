@@ -15,47 +15,47 @@ use Symfony\Component\Config\Definition\IntegerNode;
 
 class IntegerNodeTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider getValidValues
-     */
-    public function testNormalize($value)
-    {
-        $node = new IntegerNode('test');
-        $this->assertSame($value, $node->normalize($value));
-    }
+		/**
+		 * @dataProvider getValidValues
+		 */
+		public function testNormalize($value)
+		{
+				$node = new IntegerNode('test');
+				$this->assertSame($value, $node->normalize($value));
+		}
 
-    public function getValidValues()
-    {
-        return array(
-            array(1798),
-            array(-678),
-            array(0),
-        );
-    }
+		public function getValidValues()
+		{
+				return array(
+						array(1798),
+						array(-678),
+						array(0),
+				);
+		}
 
-    /**
-     * @dataProvider getInvalidValues
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
-     */
-    public function testNormalizeThrowsExceptionOnInvalidValues($value)
-    {
-        $node = new IntegerNode('test');
-        $node->normalize($value);
-    }
+		/**
+		 * @dataProvider getInvalidValues
+		 * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
+		 */
+		public function testNormalizeThrowsExceptionOnInvalidValues($value)
+		{
+				$node = new IntegerNode('test');
+				$node->normalize($value);
+		}
 
-    public function getInvalidValues()
-    {
-        return array(
-            array(null),
-            array(''),
-            array('foo'),
-            array(true),
-            array(false),
-            array(0.0),
-            array(0.1),
-            array(array()),
-            array(array('foo' => 'bar')),
-            array(new \stdClass()),
-        );
-    }
+		public function getInvalidValues()
+		{
+				return array(
+						array(null),
+						array(''),
+						array('foo'),
+						array(true),
+						array(false),
+						array(0.0),
+						array(0.1),
+						array(array()),
+						array(array('foo' => 'bar')),
+						array(new \stdClass()),
+				);
+		}
 }

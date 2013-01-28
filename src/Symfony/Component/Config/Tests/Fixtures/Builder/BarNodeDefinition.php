@@ -15,7 +15,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 class BarNodeDefinition extends NodeDefinition
 {
-    protected function createNode()
-    {
-    }
+		protected function createNode()
+		{
+		}
 }

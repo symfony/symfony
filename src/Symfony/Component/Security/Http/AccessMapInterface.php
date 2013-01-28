@@ -22,12 +22,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 interface AccessMapInterface
 {
-    /**
-     * Returns security attributes and required channel for the supplied request.
-     *
-     * @param Request $request The current request
-     *
-     * @return array A tuple of security attributes and the required channel
-     */
-    public function getPatterns(Request $request);
+		/**
+		 * Returns security attributes and required channel for the supplied request.
+		 *
+		 * @param Request $request The current request
+		 *
+		 * @return array A tuple of security attributes and the required channel
+		 */
+		public function getPatterns(Request $request);
 }

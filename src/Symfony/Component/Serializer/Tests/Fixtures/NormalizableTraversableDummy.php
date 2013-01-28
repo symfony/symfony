@@ -18,19 +18,19 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class NormalizableTraversableDummy extends TraversableDummy implements NormalizableInterface, DenormalizableInterface
 {
-    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array())
-    {
-        return array(
-            'foo' => 'normalizedFoo',
-            'bar' => 'normalizedBar',
-        );
-    }
+		public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array())
+		{
+				return array(
+						'foo' => 'normalizedFoo',
+						'bar' => 'normalizedBar',
+				);
+		}
 
-    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array())
-    {
-        return array(
-            'foo' => 'denormalizedFoo',
-            'bar' => 'denormalizedBar',
-        );
-    }
+		public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array())
+		{
+				return array(
+						'foo' => 'denormalizedFoo',
+						'bar' => 'denormalizedBar',
+				);
+		}
 }

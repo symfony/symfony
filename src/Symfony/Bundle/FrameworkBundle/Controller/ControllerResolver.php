@@ -24,62 +24,62 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
  */
 class ControllerResolver extends BaseControllerResolver
 {
-    protected $container;
-    protected $parser;
+		protected $container;
+		protected $parser;
 
-    /**
-     * Constructor.
-     *
-     * @param ContainerInterface   $container A ContainerInterface instance
-     * @param ControllerNameParser $parser    A ControllerNameParser instance
-     * @param LoggerInterface      $logger    A LoggerInterface instance
-     */
-    public function __construct(ContainerInterface $container, ControllerNameParser $parser, LoggerInterface $logger = null)
-    {
-        $this->container = $container;
-        $this->parser = $parser;
+		/**
+		 * Constructor.
+		 *
+		 * @param ContainerInterface	 $container A ContainerInterface instance
+		 * @param ControllerNameParser $parser		A ControllerNameParser instance
+		 * @param LoggerInterface			$logger		A LoggerInterface instance
+		 */
+		public function __construct(ContainerInterface $container, ControllerNameParser $parser, LoggerInterface $logger = null)
+		{
+				$this->container = $container;
+				$this->parser = $parser;
 
-        parent::__construct($logger);
-    }
+				parent::__construct($logger);
+		}
 
-    /**
-     * Returns a callable for the given controller.
-     *
-     * @param string $controller A Controller string
-     *
-     * @return mixed A PHP callable
-     *
-     * @throws \LogicException When the name could not be parsed
-     * @throws \InvalidArgumentException When the controller class does not exist
-     */
-    protected function createController($controller)
-    {
-        if (false === strpos($controller, '::')) {
-            $count = substr_count($controller, ':');
-            if (2 == $count) {
-                // controller in the a:b:c notation then
-                $controller = $this->parser->parse($controller);
-            } elseif (1 == $count) {
-                // controller in the service:method notation
-                list($service, $method) = explode(':', $controller, 2);
+		/**
+		 * Returns a callable for the given controller.
+		 *
+		 * @param string $controller A Controller string
+		 *
+		 * @return mixed A PHP callable
+		 *
+		 * @throws \LogicException When the name could not be parsed
+		 * @throws \InvalidArgumentException When the controller class does not exist
+		 */
+		protected function createController($controller)
+		{
+				if (false === strpos($controller, '::')) {
+						$count = substr_count($controller, ':');
+						if (2 == $count) {
+								// controller in the a:b:c notation then
+								$controller = $this->parser->parse($controller);
+						} elseif (1 == $count) {
+								// controller in the service:method notation
+								list($service, $method) = explode(':', $controller, 2);
 
-                return array($this->container->get($service), $method);
-            } else {
-                throw new \LogicException(sprintf('Unable to parse the controller name "%s".', $controller));
-            }
-        }
+								return array($this->container->get($service), $method);
+						} else {
+								throw new \LogicException(sprintf('Unable to parse the controller name "%s".', $controller));
+						}
+				}
 
-        list($class, $method) = explode('::', $controller, 2);
+				list($class, $method) = explode('::', $controller, 2);
 
-        if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
-        }
+				if (!class_exists($class)) {
+						throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
+				}
 
-        $controller = new $class();
-        if ($controller instanceof ContainerAwareInterface) {
-            $controller->setContainer($this->container);
-        }
+				$controller = new $class();
+				if ($controller instanceof ContainerAwareInterface) {
+						$controller->setContainer($this->container);
+				}
 
-        return array($controller, $method);
-    }
+				return array($controller, $method);
+		}
 }

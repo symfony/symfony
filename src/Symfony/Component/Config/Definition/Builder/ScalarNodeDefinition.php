@@ -20,13 +20,13 @@ use Symfony\Component\Config\Definition\ScalarNode;
  */
 class ScalarNodeDefinition extends VariableNodeDefinition
 {
-    /**
-     * Instantiate a Node
-     *
-     * @return ScalarNode The node
-     */
-    protected function instantiateNode()
-    {
-        return new ScalarNode($this->name, $this->parent);
-    }
+		/**
+		 * Instantiate a Node
+		 *
+		 * @return ScalarNode The node
+		 */
+		protected function instantiateNode()
+		{
+				return new ScalarNode($this->name, $this->parent);
+		}
 }

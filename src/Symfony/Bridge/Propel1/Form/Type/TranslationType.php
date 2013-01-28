@@ -23,32 +23,32 @@ use Symfony\Bridge\Propel1\Form\EventListener\TranslationFormListener;
  */
 class TranslationType extends AbstractType
 {
-    /**
-      * {@inheritdoc}
-      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->addEventSubscriber(
-            new TranslationFormListener($options['columns'], $options['data_class'])
-        );
-    }
+		/**
+			* {@inheritdoc}
+			*/
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+				$builder->addEventSubscriber(
+						new TranslationFormListener($options['columns'], $options['data_class'])
+				);
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'propel1_translation';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'propel1_translation';
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setRequired(array(
-            'data_class',
-            'columns'
-        ));
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				$resolver->setRequired(array(
+						'data_class',
+						'columns'
+				));
+		}
 }

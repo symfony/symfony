@@ -30,100 +30,100 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class WebDebugToolbarListener implements EventSubscriberInterface
 {
-    const DISABLED = 1;
-    const ENABLED  = 2;
+		const DISABLED = 1;
+		const ENABLED	= 2;
 
-    protected $twig;
-    protected $interceptRedirects;
-    protected $mode;
-    protected $position;
+		protected $twig;
+		protected $interceptRedirects;
+		protected $mode;
+		protected $position;
 
-    public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom')
-    {
-        $this->twig = $twig;
-        $this->interceptRedirects = (Boolean) $interceptRedirects;
-        $this->mode = (integer) $mode;
-        $this->position = $position;
-    }
+		public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom')
+		{
+				$this->twig = $twig;
+				$this->interceptRedirects = (Boolean) $interceptRedirects;
+				$this->mode = (integer) $mode;
+				$this->position = $position;
+		}
 
-    public function isEnabled()
-    {
-        return self::DISABLED !== $this->mode;
-    }
+		public function isEnabled()
+		{
+				return self::DISABLED !== $this->mode;
+		}
 
-    public function onKernelResponse(FilterResponseEvent $event)
-    {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
-            return;
-        }
+		public function onKernelResponse(FilterResponseEvent $event)
+		{
+				if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+						return;
+				}
 
-        $response = $event->getResponse();
-        $request = $event->getRequest();
+				$response = $event->getResponse();
+				$request = $event->getRequest();
 
-        // do not capture redirects or modify XML HTTP Requests
-        if ($request->isXmlHttpRequest()) {
-            return;
-        }
+				// do not capture redirects or modify XML HTTP Requests
+				if ($request->isXmlHttpRequest()) {
+						return;
+				}
 
-        if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
-            $session = $request->getSession();
-            if ($session && $session->getFlashBag() instanceof AutoExpireFlashBag) {
-                // keep current flashes for one more request if using AutoExpireFlashBag
-                $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
-            }
+				if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
+						$session = $request->getSession();
+						if ($session && $session->getFlashBag() instanceof AutoExpireFlashBag) {
+								// keep current flashes for one more request if using AutoExpireFlashBag
+								$session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
+						}
 
-            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));
-            $response->setStatusCode(200);
-            $response->headers->remove('Location');
-        }
+						$response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));
+						$response->setStatusCode(200);
+						$response->headers->remove('Location');
+				}
 
-        if (self::DISABLED === $this->mode
-            || !$response->headers->has('X-Debug-Token')
-            || $response->isRedirection()
-            || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
-            || 'html' !== $request->getRequestFormat()
-        ) {
-            return;
-        }
+				if (self::DISABLED === $this->mode
+						|| !$response->headers->has('X-Debug-Token')
+						|| $response->isRedirection()
+						|| ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
+						|| 'html' !== $request->getRequestFormat()
+				) {
+						return;
+				}
 
-        $this->injectToolbar($response);
-    }
+				$this->injectToolbar($response);
+		}
 
-    /**
-     * Injects the web debug toolbar into the given Response.
-     *
-     * @param Response $response A Response instance
-     */
-    protected function injectToolbar(Response $response)
-    {
-        if (function_exists('mb_stripos')) {
-            $posrFunction   = 'mb_strripos';
-            $substrFunction = 'mb_substr';
-        } else {
-            $posrFunction   = 'strripos';
-            $substrFunction = 'substr';
-        }
+		/**
+		 * Injects the web debug toolbar into the given Response.
+		 *
+		 * @param Response $response A Response instance
+		 */
+		protected function injectToolbar(Response $response)
+		{
+				if (function_exists('mb_stripos')) {
+						$posrFunction	 = 'mb_strripos';
+						$substrFunction = 'mb_substr';
+				} else {
+						$posrFunction	 = 'strripos';
+						$substrFunction = 'substr';
+				}
 
-        $content = $response->getContent();
-        $pos = $posrFunction($content, '</body>');
+				$content = $response->getContent();
+				$pos = $posrFunction($content, '</body>');
 
-        if (false !== $pos) {
-            $toolbar = "\n".str_replace("\n", '', $this->twig->render(
-                '@WebProfiler/Profiler/toolbar_js.html.twig',
-                array(
-                    'position' => $this->position,
-                    'token' => $response->headers->get('X-Debug-Token'),
-                )
-            ))."\n";
-            $content = $substrFunction($content, 0, $pos).$toolbar.$substrFunction($content, $pos);
-            $response->setContent($content);
-        }
-    }
+				if (false !== $pos) {
+						$toolbar = "\n".str_replace("\n", '', $this->twig->render(
+								'@WebProfiler/Profiler/toolbar_js.html.twig',
+								array(
+										'position' => $this->position,
+										'token' => $response->headers->get('X-Debug-Token'),
+								)
+						))."\n";
+						$content = $substrFunction($content, 0, $pos).$toolbar.$substrFunction($content, $pos);
+						$response->setContent($content);
+				}
+		}
 
-    public static function getSubscribedEvents()
-    {
-        return array(
-            KernelEvents::RESPONSE => array('onKernelResponse', -128),
-        );
-    }
+		public static function getSubscribedEvents()
+		{
+				return array(
+						KernelEvents::RESPONSE => array('onKernelResponse', -128),
+				);
+		}
 }

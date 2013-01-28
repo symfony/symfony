@@ -18,46 +18,46 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class PercentType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->addViewTransformer(new PercentToLocalizedStringTransformer($options['precision'], $options['type']));
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+				$builder->addViewTransformer(new PercentToLocalizedStringTransformer($options['precision'], $options['type']));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'precision' => 0,
-            'type'      => 'fractional',
-            'compound'  => false,
-        ));
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				$resolver->setDefaults(array(
+						'precision' => 0,
+						'type'			=> 'fractional',
+						'compound'	=> false,
+				));
 
-        $resolver->setAllowedValues(array(
-            'type' => array(
-                'fractional',
-                'integer',
-            ),
-        ));
-    }
+				$resolver->setAllowedValues(array(
+						'type' => array(
+								'fractional',
+								'integer',
+						),
+				));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'field';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getParent()
+		{
+				return 'field';
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'percent';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'percent';
+		}
 }

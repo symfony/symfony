@@ -16,10 +16,10 @@ namespace Symfony\Component\ClassLoader;
  *
  * It is able to load classes that use either:
  *
- *  * The technical interoperability standards for PHP 5.3 namespaces and
- *    class names (https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md);
+ *	* The technical interoperability standards for PHP 5.3 namespaces and
+ *		class names (https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md);
  *
- *  * The PEAR naming convention for classes (http://pear.php.net/).
+ *	* The PEAR naming convention for classes (http://pear.php.net/).
  *
  * Classes from a sub-namespace or a sub-hierarchy of PEAR classes can be
  * looked for in a list of locations to ease the vendoring of a sub-set of
@@ -27,27 +27,27 @@ namespace Symfony\Component\ClassLoader;
  *
  * Example usage:
  *
- *     require 'vendor/symfony/src/Symfony/Component/ClassLoader/UniversalClassLoader.php';
- *     require 'vendor/symfony/src/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php';
+ *		 require 'vendor/symfony/src/Symfony/Component/ClassLoader/UniversalClassLoader.php';
+ *		 require 'vendor/symfony/src/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php';
  *
- *     use Symfony\Component\ClassLoader\ApcUniversalClassLoader;
+ *		 use Symfony\Component\ClassLoader\ApcUniversalClassLoader;
  *
- *     $loader = new ApcUniversalClassLoader('apc.prefix.');
+ *		 $loader = new ApcUniversalClassLoader('apc.prefix.');
  *
- *     // register classes with namespaces
- *     $loader->registerNamespaces(array(
- *         'Symfony\Component' => __DIR__.'/component',
- *         'Symfony'           => __DIR__.'/framework',
- *         'Sensio'            => array(__DIR__.'/src', __DIR__.'/vendor'),
- *     ));
+ *		 // register classes with namespaces
+ *		 $loader->registerNamespaces(array(
+ *				 'Symfony\Component' => __DIR__.'/component',
+ *				 'Symfony'					 => __DIR__.'/framework',
+ *				 'Sensio'						=> array(__DIR__.'/src', __DIR__.'/vendor'),
+ *		 ));
  *
- *     // register a library using the PEAR naming convention
- *     $loader->registerPrefixes(array(
- *         'Swift_' => __DIR__.'/Swift',
- *     ));
+ *		 // register a library using the PEAR naming convention
+ *		 $loader->registerPrefixes(array(
+ *				 'Swift_' => __DIR__.'/Swift',
+ *		 ));
  *
- *     // activate the autoloader
- *     $loader->register();
+ *		 // activate the autoloader
+ *		 $loader->register();
  *
  * In this example, if you try to use a class in the Symfony\Component
  * namespace or one of its children (Symfony\Component\Console for instance),
@@ -62,39 +62,39 @@ namespace Symfony\Component\ClassLoader;
  */
 class ApcUniversalClassLoader extends UniversalClassLoader
 {
-    private $prefix;
+		private $prefix;
 
-    /**
-     * Constructor.
-     *
-     * @param string $prefix A prefix to create a namespace in APC
-     *
-     * @throws \RuntimeException
-     *
-     * @api
-     */
-    public function __construct($prefix)
-    {
-        if (!extension_loaded('apc')) {
-            throw new \RuntimeException('Unable to use ApcUniversalClassLoader as APC is not enabled.');
-        }
+		/**
+		 * Constructor.
+		 *
+		 * @param string $prefix A prefix to create a namespace in APC
+		 *
+		 * @throws \RuntimeException
+		 *
+		 * @api
+		 */
+		public function __construct($prefix)
+		{
+				if (!extension_loaded('apc')) {
+						throw new \RuntimeException('Unable to use ApcUniversalClassLoader as APC is not enabled.');
+				}
 
-        $this->prefix = $prefix;
-    }
+				$this->prefix = $prefix;
+		}
 
-    /**
-     * Finds a file by class name while caching lookups to APC.
-     *
-     * @param string $class A class name to resolve to file
-     *
-     * @return string|null The path, if found
-     */
-    public function findFile($class)
-    {
-        if (false === $file = apc_fetch($this->prefix.$class)) {
-            apc_store($this->prefix.$class, $file = parent::findFile($class));
-        }
+		/**
+		 * Finds a file by class name while caching lookups to APC.
+		 *
+		 * @param string $class A class name to resolve to file
+		 *
+		 * @return string|null The path, if found
+		 */
+		public function findFile($class)
+		{
+				if (false === $file = apc_fetch($this->prefix.$class)) {
+						apc_store($this->prefix.$class, $file = parent::findFile($class));
+				}
 
-        return $file;
-    }
+				return $file;
+		}
 }

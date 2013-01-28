@@ -21,13 +21,13 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class NotNullValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (null === $value) {
-            $this->context->addViolation($constraint->message);
-        }
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (null === $value) {
+						$this->context->addViolation($constraint->message);
+				}
+		}
 }

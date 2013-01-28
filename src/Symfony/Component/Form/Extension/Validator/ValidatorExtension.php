@@ -24,33 +24,33 @@ use Symfony\Component\Validator\Constraints\Valid;
  */
 class ValidatorExtension extends AbstractExtension
 {
-    private $validator;
+		private $validator;
 
-    public function __construct(ValidatorInterface $validator)
-    {
-        $this->validator = $validator;
+		public function __construct(ValidatorInterface $validator)
+		{
+				$this->validator = $validator;
 
-        // Register the form constraints in the validator programmatically.
-        // This functionality is required when using the Form component without
-        // the DIC, where the XML file is loaded automatically. Thus the following
-        // code must be kept synchronized with validation.xml
+				// Register the form constraints in the validator programmatically.
+				// This functionality is required when using the Form component without
+				// the DIC, where the XML file is loaded automatically. Thus the following
+				// code must be kept synchronized with validation.xml
 
-        /** @var \Symfony\Component\Validator\Mapping\ClassMetadata $metadata */
-        $metadata = $this->validator->getMetadataFactory()->getMetadataFor('Symfony\Component\Form\Form');
-        $metadata->addConstraint(new Form());
-        $metadata->addPropertyConstraint('children', new Valid());
-    }
+				/** @var \Symfony\Component\Validator\Mapping\ClassMetadata $metadata */
+				$metadata = $this->validator->getMetadataFactory()->getMetadataFor('Symfony\Component\Form\Form');
+				$metadata->addConstraint(new Form());
+				$metadata->addPropertyConstraint('children', new Valid());
+		}
 
-    public function loadTypeGuesser()
-    {
-        return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
-    }
+		public function loadTypeGuesser()
+		{
+				return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
+		}
 
-    protected function loadTypeExtensions()
-    {
-        return array(
-            new Type\FormTypeValidatorExtension($this->validator),
-            new Type\RepeatedTypeValidatorExtension(),
-        );
-    }
+		protected function loadTypeExtensions()
+		{
+				return array(
+						new Type\FormTypeValidatorExtension($this->validator),
+						new Type\RepeatedTypeValidatorExtension(),
+				);
+		}
 }

@@ -20,15 +20,15 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerI
 
 class LocalizedFormFailureHandler implements AuthenticationFailureHandlerInterface
 {
-    private $router;
+		private $router;
 
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
-    }
+		public function __construct(RouterInterface $router)
+		{
+				$this->router = $router;
+		}
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
-    {
-        return new RedirectResponse($this->router->generate('localized_login_path', array(), UrlGeneratorInterface::ABSOLUTE_URL));
-    }
+		public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+		{
+				return new RedirectResponse($this->router->generate('localized_login_path', array(), UrlGeneratorInterface::ABSOLUTE_URL));
+		}
 }

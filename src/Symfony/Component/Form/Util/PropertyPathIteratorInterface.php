@@ -19,8 +19,8 @@ use Symfony\Component\PropertyAccess\PropertyPathIteratorInterface as BaseProper
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated deprecated since version 2.2, to be removed in 2.3. Use
- *             {@link \Symfony\Component\PropertyAccess\PropertyPathIterator}
- *             instead.
+ *						 {@link \Symfony\Component\PropertyAccess\PropertyPathIterator}
+ *						 instead.
  */
 interface PropertyPathIteratorInterface extends BasePropertyPathIteratorInterface
 {

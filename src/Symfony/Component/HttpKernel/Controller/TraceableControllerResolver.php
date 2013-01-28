@@ -21,46 +21,46 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class TraceableControllerResolver implements ControllerResolverInterface
 {
-    private $resolver;
-    private $stopwatch;
+		private $resolver;
+		private $stopwatch;
 
-    /**
-     * Constructor.
-     *
-     * @param ControllerResolverInterface $resolver  A ControllerResolverInterface instance
-     * @param Stopwatch                   $stopwatch A Stopwatch instance
-     */
-    public function __construct(ControllerResolverInterface $resolver, Stopwatch $stopwatch)
-    {
-        $this->resolver = $resolver;
-        $this->stopwatch = $stopwatch;
-    }
+		/**
+		 * Constructor.
+		 *
+		 * @param ControllerResolverInterface $resolver	A ControllerResolverInterface instance
+		 * @param Stopwatch									 $stopwatch A Stopwatch instance
+		 */
+		public function __construct(ControllerResolverInterface $resolver, Stopwatch $stopwatch)
+		{
+				$this->resolver = $resolver;
+				$this->stopwatch = $stopwatch;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getController(Request $request)
-    {
-        $e = $this->stopwatch->start('controller.get_callable');
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getController(Request $request)
+		{
+				$e = $this->stopwatch->start('controller.get_callable');
 
-        $ret = $this->resolver->getController($request);
+				$ret = $this->resolver->getController($request);
 
-        $e->stop();
+				$e->stop();
 
-        return $ret;
-    }
+				return $ret;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getArguments(Request $request, $controller)
-    {
-        $e = $this->stopwatch->start('controller.get_arguments');
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getArguments(Request $request, $controller)
+		{
+				$e = $this->stopwatch->start('controller.get_arguments');
 
-        $ret = $this->resolver->getArguments($request, $controller);
+				$ret = $this->resolver->getArguments($request, $controller);
 
-        $e->stop();
+				$e->stop();
 
-        return $ret;
-    }
+				return $ret;
+		}
 }

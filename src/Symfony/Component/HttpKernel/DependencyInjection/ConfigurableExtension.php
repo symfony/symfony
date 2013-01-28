@@ -19,27 +19,27 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * You can use this as base class if you
  *
- *    a) use the Config/Definition component for configuration
- *    b) your configuration class is named "Configuration" and
- *    c) the configuration class resides in the DependencyInjection sub-folder
+ *		a) use the Config/Definition component for configuration
+ *		b) your configuration class is named "Configuration" and
+ *		c) the configuration class resides in the DependencyInjection sub-folder
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 abstract class ConfigurableExtension extends Extension
 {
-    /**
-     * {@inheritDoc}
-     */
-    final public function load(array $configs, ContainerBuilder $container)
-    {
-        $this->loadInternal($this->processConfiguration($this->getConfiguration(array(), $container), $configs), $container);
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		final public function load(array $configs, ContainerBuilder $container)
+		{
+				$this->loadInternal($this->processConfiguration($this->getConfiguration(array(), $container), $configs), $container);
+		}
 
-    /**
-     * Configures the passed container according to the merged configuration.
-     *
-     * @param array            $mergedConfig
-     * @param ContainerBuilder $container
-     */
-    abstract protected function loadInternal(array $mergedConfig, ContainerBuilder $container);
+		/**
+		 * Configures the passed container according to the merged configuration.
+		 *
+		 * @param array						$mergedConfig
+		 * @param ContainerBuilder $container
+		 */
+		abstract protected function loadInternal(array $mergedConfig, ContainerBuilder $container);
 }

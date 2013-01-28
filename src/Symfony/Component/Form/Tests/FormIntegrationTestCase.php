@@ -18,31 +18,31 @@ use Symfony\Component\Form\Forms;
  */
 abstract class FormIntegrationTestCase extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
-     */
-    protected $factory;
+		/**
+		 * @var \Symfony\Component\Form\FormFactoryInterface
+		 */
+		protected $factory;
 
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
+		protected function setUp()
+		{
+				if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
+						$this->markTestSkipped('The "EventDispatcher" component is not available');
+				}
 
-        $this->factory = Forms::createFormFactoryBuilder()
-            ->addExtensions($this->getExtensions())
-            ->getFormFactory();
+				$this->factory = Forms::createFormFactoryBuilder()
+						->addExtensions($this->getExtensions())
+						->getFormFactory();
 
-        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
-    }
+				set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
+		}
 
-    protected function tearDown()
-    {
-        restore_error_handler();
-    }
+		protected function tearDown()
+		{
+				restore_error_handler();
+		}
 
-    protected function getExtensions()
-    {
-        return array();
-    }
+		protected function getExtensions()
+		{
+				return array();
+		}
 }

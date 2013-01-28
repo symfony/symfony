@@ -11,9 +11,9 @@ CHANGELOG
  * added Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel
  * added ControllerReference to create reference of Controllers (used in the HttpContentRenderer class)
  * [BC BREAK] renamed TimeDataCollector::getTotalTime() to
-   TimeDataCollector::getDuration()
- * updated the MemoryDataCollector to include the memory used in the 
-   kernel.terminate event listeners
+	 TimeDataCollector::getDuration()
+ * updated the MemoryDataCollector to include the memory used in the
+	 kernel.terminate event listeners
  * moved the Stopwatch classes to a new component
  * added TraceableControllerResolver
  * added TraceableEventDispatcher (removed ContainerAwareTraceableEventDispatcher)

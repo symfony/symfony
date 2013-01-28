@@ -17,60 +17,60 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransfo
 
 class ChoicesToValuesTransformerTest extends \PHPUnit_Framework_TestCase
 {
-    protected $transformer;
+		protected $transformer;
 
-    protected function setUp()
-    {
-        $list = new SimpleChoiceList(array(0 => 'A', 1 => 'B', 2 => 'C'));
-        $this->transformer = new ChoicesToValuesTransformer($list);
-    }
+		protected function setUp()
+		{
+				$list = new SimpleChoiceList(array(0 => 'A', 1 => 'B', 2 => 'C'));
+				$this->transformer = new ChoicesToValuesTransformer($list);
+		}
 
-    protected function tearDown()
-    {
-        $this->transformer = null;
-    }
+		protected function tearDown()
+		{
+				$this->transformer = null;
+		}
 
-    public function testTransform()
-    {
-        // Value strategy in SimpleChoiceList is to copy and convert to string
-        $in = array(0, 1, 2);
-        $out = array('0', '1', '2');
+		public function testTransform()
+		{
+				// Value strategy in SimpleChoiceList is to copy and convert to string
+				$in = array(0, 1, 2);
+				$out = array('0', '1', '2');
 
-        $this->assertSame($out, $this->transformer->transform($in));
-    }
+				$this->assertSame($out, $this->transformer->transform($in));
+		}
 
-    public function testTransformNull()
-    {
-        $this->assertSame(array(), $this->transformer->transform(null));
-    }
+		public function testTransformNull()
+		{
+				$this->assertSame(array(), $this->transformer->transform(null));
+		}
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testTransformExpectsArray()
-    {
-        $this->transformer->transform('foobar');
-    }
+		/**
+		 * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+		 */
+		public function testTransformExpectsArray()
+		{
+				$this->transformer->transform('foobar');
+		}
 
-    public function testReverseTransform()
-    {
-        // values are expected to be valid choices and stay the same
-        $in = array('0', '1', '2');
-        $out = array(0, 1, 2);
+		public function testReverseTransform()
+		{
+				// values are expected to be valid choices and stay the same
+				$in = array('0', '1', '2');
+				$out = array(0, 1, 2);
 
-        $this->assertSame($out, $this->transformer->reverseTransform($in));
-    }
+				$this->assertSame($out, $this->transformer->reverseTransform($in));
+		}
 
-    public function testReverseTransformNull()
-    {
-        $this->assertSame(array(), $this->transformer->reverseTransform(null));
-    }
+		public function testReverseTransformNull()
+		{
+				$this->assertSame(array(), $this->transformer->reverseTransform(null));
+		}
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testReverseTransformExpectsArray()
-    {
-        $this->transformer->reverseTransform('foobar');
-    }
+		/**
+		 * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+		 */
+		public function testReverseTransformExpectsArray()
+		{
+				$this->transformer->reverseTransform('foobar');
+		}
 }

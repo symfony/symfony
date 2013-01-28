@@ -2,5 +2,5 @@
 
 class Pearlike2_Foo
 {
-    public static $loaded = true;
+		public static $loaded = true;
 }

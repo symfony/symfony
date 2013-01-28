@@ -15,13 +15,13 @@ use Symfony\Component\Form\FormBuilder;
 
 class MergeCollectionListenerArrayTest extends MergeCollectionListenerTest
 {
-    protected function getData(array $data)
-    {
-        return $data;
-    }
+		protected function getData(array $data)
+		{
+				return $data;
+		}
 
-    protected function getBuilder($name = 'name')
-    {
-        return new FormBuilder($name, null, $this->dispatcher, $this->factory);
-    }
+		protected function getBuilder($name = 'name')
+		{
+				return new FormBuilder($name, null, $this->dispatcher, $this->factory);
+		}
 }

@@ -18,20 +18,20 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class ScalarDummy implements NormalizableInterface, DenormalizableInterface
 {
-    public $foo;
-    public $xmlFoo;
+		public $foo;
+		public $xmlFoo;
 
-    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array())
-    {
-        return $format === 'xml' ? $this->xmlFoo : $this->foo;
-    }
+		public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array())
+		{
+				return $format === 'xml' ? $this->xmlFoo : $this->foo;
+		}
 
-    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array())
-    {
-        if ($format === 'xml') {
-            $this->xmlFoo = $data;
-        } else {
-            $this->foo = $data;
-        }
-    }
+		public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array())
+		{
+				if ($format === 'xml') {
+						$this->xmlFoo = $data;
+				} else {
+						$this->foo = $data;
+				}
+		}
 }

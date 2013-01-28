@@ -17,40 +17,40 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 
 class TemplateFilenameParserTest extends TestCase
 {
-    protected $parser;
+		protected $parser;
 
-    protected function setUp()
-    {
-        $this->parser = new TemplateFilenameParser();
-    }
+		protected function setUp()
+		{
+				$this->parser = new TemplateFilenameParser();
+		}
 
-    protected function tearDown()
-    {
-        $this->parser = null;
-    }
+		protected function tearDown()
+		{
+				$this->parser = null;
+		}
 
-    /**
-     * @dataProvider getFilenameToTemplateProvider
-     */
-    public function testParseFromFilename($file, $ref)
-    {
-        $template = $this->parser->parse($file);
+		/**
+		 * @dataProvider getFilenameToTemplateProvider
+		 */
+		public function testParseFromFilename($file, $ref)
+		{
+				$template = $this->parser->parse($file);
 
-        if ($ref === false) {
-            $this->assertFalse($template);
-        } else {
-            $this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
-        }
-    }
+				if ($ref === false) {
+						$this->assertFalse($template);
+				} else {
+						$this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
+				}
+		}
 
-    public function getFilenameToTemplateProvider()
-    {
-        return array(
-            array('/path/to/section/name.format.engine', new TemplateReference('', '/path/to/section', 'name', 'format', 'engine')),
-            array('\\path\\to\\section\\name.format.engine', new TemplateReference('', '/path/to/section', 'name', 'format', 'engine')),
-            array('name.format.engine', new TemplateReference('', '', 'name', 'format', 'engine')),
-            array('name.format', false),
-            array('name', false),
-        );
-    }
+		public function getFilenameToTemplateProvider()
+		{
+				return array(
+						array('/path/to/section/name.format.engine', new TemplateReference('', '/path/to/section', 'name', 'format', 'engine')),
+						array('\\path\\to\\section\\name.format.engine', new TemplateReference('', '/path/to/section', 'name', 'format', 'engine')),
+						array('name.format.engine', new TemplateReference('', '', 'name', 'format', 'engine')),
+						array('name.format', false),
+						array('name', false),
+				);
+		}
 }

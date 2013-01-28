@@ -15,19 +15,19 @@ use Symfony\Component\Form\AbstractType;
 
 class RadioType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'checkbox';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getParent()
+		{
+				return 'checkbox';
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'radio';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'radio';
+		}
 }

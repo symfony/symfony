@@ -1,6 +1,6 @@
 imports:
-    - { resource: ../config/default.yml }
+		- { resource: ../config/default.yml }
 
 framework:
-    profiler:
-        enabled: false
+		profiler:
+				enabled: false

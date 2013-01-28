@@ -22,26 +22,26 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @see    Doctrine\Common\Collections\Collection
+ * @see		Doctrine\Common\Collections\Collection
  */
 class MergeDoctrineCollectionListener implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
-    {
-        // Higher priority than core MergeCollectionListener so that this one
-        // is called before
-        return array(FormEvents::BIND => array('onBind', 10));
-    }
+		public static function getSubscribedEvents()
+		{
+				// Higher priority than core MergeCollectionListener so that this one
+				// is called before
+				return array(FormEvents::BIND => array('onBind', 10));
+		}
 
-    public function onBind(FormEvent $event)
-    {
-        $collection = $event->getForm()->getData();
-        $data = $event->getData();
+		public function onBind(FormEvent $event)
+		{
+				$collection = $event->getForm()->getData();
+				$data = $event->getData();
 
-        // If all items were removed, call clear which has a higher
-        // performance on persistent collections
-        if ($collection && count($data) === 0) {
-            $collection->clear();
-        }
-    }
+				// If all items were removed, call clear which has a higher
+				// performance on persistent collections
+				if ($collection && count($data) === 0) {
+						$collection->clear();
+				}
+		}
 }

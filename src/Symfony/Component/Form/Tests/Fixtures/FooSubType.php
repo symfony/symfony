@@ -20,13 +20,13 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class FooSubType extends AbstractType
 {
-    public function getName()
-    {
-        return 'foo_sub_type';
-    }
+		public function getName()
+		{
+				return 'foo_sub_type';
+		}
 
-    public function getParent()
-    {
-        return 'foo';
-    }
+		public function getParent()
+		{
+				return 'foo';
+		}
 }

@@ -13,47 +13,47 @@ namespace Symfony\Bridge\Propel1\Tests\Fixtures;
 
 class Column
 {
-    private $name;
+		private $name;
 
-    private $type;
+		private $type;
 
-    public function __construct($name, $type)
-    {
-        $this->name = $name;
-        $this->type = $type;
-    }
+		public function __construct($name, $type)
+		{
+				$this->name = $name;
+				$this->type = $type;
+		}
 
-    public function getType()
-    {
-        return $this->type;
-    }
+		public function getType()
+		{
+				return $this->type;
+		}
 
-    public function isText()
-    {
-        if (!$this->type) {
-            return false;
-        }
+		public function isText()
+		{
+				if (!$this->type) {
+						return false;
+				}
 
-        switch ($this->type) {
-        case \PropelColumnTypes::CHAR:
-        case \PropelColumnTypes::VARCHAR:
-        case \PropelColumnTypes::LONGVARCHAR:
-        case \PropelColumnTypes::BLOB:
-        case \PropelColumnTypes::CLOB:
-        case \PropelColumnTypes::CLOB_EMU:
-            return true;
-        }
+				switch ($this->type) {
+				case \PropelColumnTypes::CHAR:
+				case \PropelColumnTypes::VARCHAR:
+				case \PropelColumnTypes::LONGVARCHAR:
+				case \PropelColumnTypes::BLOB:
+				case \PropelColumnTypes::CLOB:
+				case \PropelColumnTypes::CLOB_EMU:
+						return true;
+				}
 
-        return false;
-    }
+				return false;
+		}
 
-    public function getSize()
-    {
-        return $this->isText() ? 255 : 0;
-    }
+		public function getSize()
+		{
+				return $this->isText() ? 255 : 0;
+		}
 
-    public function isNotNull()
-    {
-        return ('id' === $this->name);
-    }
+		public function isNotNull()
+		{
+				return ('id' === $this->name);
+		}
 }

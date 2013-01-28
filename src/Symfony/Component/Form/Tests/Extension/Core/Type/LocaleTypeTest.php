@@ -15,16 +15,16 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 class LocaleTypeTest extends LocalizedTestCase
 {
-    public function testLocalesAreSelectable()
-    {
-        \Locale::setDefault('de_AT');
+		public function testLocalesAreSelectable()
+		{
+				\Locale::setDefault('de_AT');
 
-        $form = $this->factory->create('locale');
-        $view = $form->createView();
-        $choices = $view->vars['choices'];
+				$form = $this->factory->create('locale');
+				$view = $form->createView();
+				$choices = $view->vars['choices'];
 
-        $this->assertContains(new ChoiceView('en', 'en', 'Englisch'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'Englisch (Vereinigtes Königreich)'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'Chinesisch (traditionell, Sonderverwaltungszone Macao)'), $choices, '', false, false);
-    }
+				$this->assertContains(new ChoiceView('en', 'en', 'Englisch'), $choices, '', false, false);
+				$this->assertContains(new ChoiceView('en_GB', 'en_GB', 'Englisch (Vereinigtes Königreich)'), $choices, '', false, false);
+				$this->assertContains(new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'Chinesisch (traditionell, Sonderverwaltungszone Macao)'), $choices, '', false, false);
+		}
 }

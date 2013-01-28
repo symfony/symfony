@@ -5,4 +5,4 @@ CHANGELOG
 -----
 
  * Yaml::parse() does not evaluate loaded files as PHP files by default
-   anymore (call Yaml::enablePhpParsing() to get back the old behavior)
+	 anymore (call Yaml::enablePhpParsing() to get back the old behavior)

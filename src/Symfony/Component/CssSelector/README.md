@@ -6,9 +6,9 @@ CssSelector converts CSS selectors to XPath expressions.
 The component only goal is to convert CSS selectors to their XPath
 equivalents:
 
-    use Symfony\Component\CssSelector\CssSelector;
+		use Symfony\Component\CssSelector\CssSelector;
 
-    print CssSelector::toXPath('div.item > h4 > a');
+		print CssSelector::toXPath('div.item > h4 > a');
 
 Resources
 ---------
@@ -20,6 +20,6 @@ Current code is a port of https://github.com/SimonSapin/cssselect@fd2e70
 
 You can run the unit tests with the following command:
 
-    $ cd path/to/Symfony/Component/CssSelector/
-    $ composer.phar install --dev
-    $ phpunit
+		$ cd path/to/Symfony/Component/CssSelector/
+		$ composer.phar install --dev
+	$ phpunit

@@ -4,5 +4,5 @@ namespace ClassesWithParents;
 
 trait BTrait
 {
-    use ATrait;
+		use ATrait;
 }

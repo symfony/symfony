@@ -15,16 +15,16 @@ namespace Symfony\Component\Validator\Mapping;
  * A factory for {@link ClassMetadata} objects.
  *
  * @deprecated Deprecated since version 2.2, to be removed in 2.3. Implement
- *             {@link \Symfony\Component\Validator\MetadataFactoryInterface} instead.
+ *						 {@link \Symfony\Component\Validator\MetadataFactoryInterface} instead.
  */
 interface ClassMetadataFactoryInterface
 {
-    /**
-     * Returns metadata for a given class.
-     *
-     * @param string $class The class name.
-     *
-     * @return ClassMetadata The class metadata instance.
-     */
-    public function getClassMetadata($class);
+		/**
+		 * Returns metadata for a given class.
+		 *
+		 * @param string $class The class name.
+		 *
+		 * @return ClassMetadata The class metadata instance.
+		 */
+		public function getClassMetadata($class);
 }

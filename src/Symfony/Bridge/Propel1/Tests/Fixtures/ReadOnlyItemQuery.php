@@ -13,18 +13,18 @@ namespace Symfony\Bridge\Propel1\Tests\Fixtures;
 
 class ReadOnlyItemQuery
 {
-    public function getTableMap()
-    {
-        // Allows to define methods in this class
-        // to avoid a lot of mock classes
-        return $this;
-    }
+		public function getTableMap()
+		{
+				// Allows to define methods in this class
+				// to avoid a lot of mock classes
+				return $this;
+		}
 
-    public function getPrimaryKeys()
-    {
-        $cm = new \ColumnMap('id', new \TableMap());
-        $cm->setType('INTEGER');
+		public function getPrimaryKeys()
+		{
+				$cm = new \ColumnMap('id', new \TableMap());
+				$cm->setType('INTEGER');
 
-        return array('id' => $cm);
-    }
+				return array('id' => $cm);
+		}
 }

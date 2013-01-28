@@ -21,43 +21,43 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class CollectionToArrayTransformer implements DataTransformerInterface
 {
-    /**
-     * Transforms a collection into an array.
-     *
-     * @param Collection $collection A collection of entities
-     *
-     * @return mixed An array of entities
-     *
-     * @throws UnexpectedTypeException
-     */
-    public function transform($collection)
-    {
-        if (null === $collection) {
-            return array();
-        }
+		/**
+		 * Transforms a collection into an array.
+		 *
+		 * @param Collection $collection A collection of entities
+		 *
+		 * @return mixed An array of entities
+		 *
+		 * @throws UnexpectedTypeException
+		 */
+		public function transform($collection)
+		{
+				if (null === $collection) {
+						return array();
+				}
 
-        if (!$collection instanceof Collection) {
-            throw new UnexpectedTypeException($collection, 'Doctrine\Common\Collections\Collection');
-        }
+				if (!$collection instanceof Collection) {
+						throw new UnexpectedTypeException($collection, 'Doctrine\Common\Collections\Collection');
+				}
 
-        return $collection->toArray();
-    }
+				return $collection->toArray();
+		}
 
-    /**
-     * Transforms choice keys into entities.
-     *
-     * @param mixed $array An array of entities
-     *
-     * @return Collection   A collection of entities
-     */
-    public function reverseTransform($array)
-    {
-        if ('' === $array || null === $array) {
-            $array = array();
-        } else {
-            $array = (array) $array;
-        }
+		/**
+		 * Transforms choice keys into entities.
+		 *
+		 * @param mixed $array An array of entities
+		 *
+		 * @return Collection	 A collection of entities
+		 */
+		public function reverseTransform($array)
+		{
+				if ('' === $array || null === $array) {
+						$array = array();
+				} else {
+						$array = (array) $array;
+				}
 
-        return new ArrayCollection($array);
-    }
+				return new ArrayCollection($array);
+		}
 }

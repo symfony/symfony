@@ -22,26 +22,26 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  */
 interface LoaderInterface
 {
-    /**
-     * Loads a template.
-     *
-     * @param TemplateReferenceInterface $template A template
-     *
-     * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
-     *
-     * @api
-     */
-    public function load(TemplateReferenceInterface $template);
+		/**
+		 * Loads a template.
+		 *
+		 * @param TemplateReferenceInterface $template A template
+		 *
+		 * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+		 *
+		 * @api
+		 */
+		public function load(TemplateReferenceInterface $template);
 
-    /**
-     * Returns true if the template is still fresh.
-     *
-     * @param TemplateReferenceInterface $template A template
-     * @param integer                    $time     The last modification time of the cached template (timestamp)
-     *
-     * @return Boolean
-     *
-     * @api
-     */
-    public function isFresh(TemplateReferenceInterface $template, $time);
+		/**
+		 * Returns true if the template is still fresh.
+		 *
+		 * @param TemplateReferenceInterface $template A template
+		 * @param integer										$time		 The last modification time of the cached template (timestamp)
+		 *
+		 * @return Boolean
+		 *
+		 * @api
+		 */
+		public function isFresh(TemplateReferenceInterface $template, $time);
 }

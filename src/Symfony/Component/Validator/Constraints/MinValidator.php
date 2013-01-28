@@ -23,39 +23,39 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class MinValidator extends ConstraintValidator
 {
-    public function __construct($options = null)
-    {
-        trigger_error('MinValidator is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
-    }
+		public function __construct($options = null)
+		{
+				trigger_error('MinValidator is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+		}
 
-    /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @api
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (null === $value || '' === $value) {
-            return;
-        }
+		/**
+		 * Checks if the passed value is valid.
+		 *
+		 * @param mixed			$value			The value that should be validated
+		 * @param Constraint $constraint The constraint for the validation
+		 *
+		 * @api
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (null === $value || '' === $value) {
+						return;
+				}
 
-        if (!is_numeric($value)) {
-            $this->context->addViolation($constraint->invalidMessage, array(
-                '{{ value }}' => $value,
-                '{{ limit }}' => $constraint->limit,
-            ));
+				if (!is_numeric($value)) {
+						$this->context->addViolation($constraint->invalidMessage, array(
+								'{{ value }}' => $value,
+								'{{ limit }}' => $constraint->limit,
+						));
 
-            return;
-        }
+						return;
+				}
 
-        if ($value < $constraint->limit) {
-            $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $value,
-                '{{ limit }}' => $constraint->limit,
-            ));
-        }
-    }
+				if ($value < $constraint->limit) {
+						$this->context->addViolation($constraint->message, array(
+								'{{ value }}' => $value,
+								'{{ limit }}' => $constraint->limit,
+						));
+				}
+		}
 }

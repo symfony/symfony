@@ -23,108 +23,108 @@ use Symfony\Component\DependencyInjection\Scope;
 
 class WebProfilerExtensionTest extends TestCase
 {
-    private $kernel;
-    /**
-     * @var Symfony\Component\DependencyInjection\Container $container
-     */
-    private $container;
+		private $kernel;
+		/**
+		 * @var Symfony\Component\DependencyInjection\Container $container
+		 */
+		private $container;
 
-    public static function assertSaneContainer(Container $container, $message = '')
-    {
-        $errors = array();
-        foreach ($container->getServiceIds() as $id) {
-            try {
-                $container->get($id);
-            } catch (\Exception $e) {
-                $errors[$id] = $e->getMessage();
-            }
-        }
+		public static function assertSaneContainer(Container $container, $message = '')
+		{
+				$errors = array();
+				foreach ($container->getServiceIds() as $id) {
+						try {
+								$container->get($id);
+						} catch (\Exception $e) {
+								$errors[$id] = $e->getMessage();
+						}
+				}
 
-        self::assertEquals(array(), $errors, $message);
-    }
+				self::assertEquals(array(), $errors, $message);
+		}
 
-    protected function setUp()
-    {
-        parent::setUp();
+		protected function setUp()
+		{
+				parent::setUp();
 
-        $this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
+				$this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
 
-        $this->container = new ContainerBuilder();
-        $this->container->addScope(new Scope('request'));
-        $this->container->register('request', 'Symfony\\Component\\HttpFoundation\\Request')->setScope('request');
-        $this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'));
-        $this->container->register('templating.helper.assets', $this->getMockClass('Symfony\\Component\\Templating\\Helper\\AssetsHelper'));
-        $this->container->register('templating.helper.router', $this->getMockClass('Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper'))
-            ->addArgument(new Reference('router'));
-        $this->container->register('twig', 'Twig_Environment');
-        $this->container->setParameter('kernel.bundles', array());
-        $this->container->setParameter('kernel.cache_dir', __DIR__);
-        $this->container->setParameter('kernel.debug', false);
-        $this->container->setParameter('kernel.root_dir', __DIR__);
-        $this->container->register('profiler', $this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\Profiler'))
-            ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\ProfilerStorageInterface')));
-        $this->container->setParameter('data_collector.templates', array());
-        $this->container->set('kernel', $this->kernel);
-    }
+				$this->container = new ContainerBuilder();
+				$this->container->addScope(new Scope('request'));
+				$this->container->register('request', 'Symfony\\Component\\HttpFoundation\\Request')->setScope('request');
+				$this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'));
+				$this->container->register('templating.helper.assets', $this->getMockClass('Symfony\\Component\\Templating\\Helper\\AssetsHelper'));
+				$this->container->register('templating.helper.router', $this->getMockClass('Symfony\\Bundle\\FrameworkBundle\\Templating\\Helper\\RouterHelper'))
+						->addArgument(new Reference('router'));
+				$this->container->register('twig', 'Twig_Environment');
+				$this->container->setParameter('kernel.bundles', array());
+				$this->container->setParameter('kernel.cache_dir', __DIR__);
+				$this->container->setParameter('kernel.debug', false);
+				$this->container->setParameter('kernel.root_dir', __DIR__);
+				$this->container->register('profiler', $this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\Profiler'))
+						->addArgument(new Definition($this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\ProfilerStorageInterface')));
+				$this->container->setParameter('data_collector.templates', array());
+				$this->container->set('kernel', $this->kernel);
+		}
 
-    protected function tearDown()
-    {
-        parent::tearDown();
+		protected function tearDown()
+		{
+				parent::tearDown();
 
-        $this->container = null;
-        $this->kernel = null;
-    }
+				$this->container = null;
+				$this->kernel = null;
+		}
 
-    /**
-     * @dataProvider getDebugModes
-     */
-    public function testDefaultConfig($debug)
-    {
-        $this->container->setParameter('kernel.debug', $debug);
+		/**
+		 * @dataProvider getDebugModes
+		 */
+		public function testDefaultConfig($debug)
+		{
+				$this->container->setParameter('kernel.debug', $debug);
 
-        $extension = new WebProfilerExtension();
-        $extension->load(array(array()), $this->container);
+				$extension = new WebProfilerExtension();
+				$extension->load(array(array()), $this->container);
 
-        $this->assertFalse($this->container->get('web_profiler.debug_toolbar')->isEnabled());
+				$this->assertFalse($this->container->get('web_profiler.debug_toolbar')->isEnabled());
 
-        $this->assertSaneContainer($this->getDumpedContainer());
-    }
+				$this->assertSaneContainer($this->getDumpedContainer());
+		}
 
-    /**
-     * @dataProvider getDebugModes
-     */
-    public function testToolbarConfig($enabled)
-    {
-        $extension = new WebProfilerExtension();
-        $extension->load(array(array('toolbar' => $enabled)), $this->container);
+		/**
+		 * @dataProvider getDebugModes
+		 */
+		public function testToolbarConfig($enabled)
+		{
+				$extension = new WebProfilerExtension();
+				$extension->load(array(array('toolbar' => $enabled)), $this->container);
 
-        $this->assertSame($enabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
+				$this->assertSame($enabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
 
-        $this->assertSaneContainer($this->getDumpedContainer());
-    }
+				$this->assertSaneContainer($this->getDumpedContainer());
+		}
 
-    public function getDebugModes()
-    {
-        return array(
-            array(true),
-            array(false),
-        );
-    }
+		public function getDebugModes()
+		{
+				return array(
+						array(true),
+						array(false),
+				);
+		}
 
-    private function getDumpedContainer()
-    {
-        static $i = 0;
-        $class = 'WebProfilerExtensionTestContainer'.$i++;
+		private function getDumpedContainer()
+		{
+				static $i = 0;
+				$class = 'WebProfilerExtensionTestContainer'.$i++;
 
-        $this->container->compile();
+				$this->container->compile();
 
-        $dumper = new PhpDumper($this->container);
-        eval('?>'.$dumper->dump(array('class' => $class)));
+				$dumper = new PhpDumper($this->container);
+				eval('?>'.$dumper->dump(array('class' => $class)));
 
-        $container = new $class();
-        $container->enterScope('request');
-        $container->set('kernel', $this->kernel);
+				$container = new $class();
+				$container->enterScope('request');
+				$container->set('kernel', $this->kernel);
 
-        return $container;
-    }
+				return $container;
+		}
 }

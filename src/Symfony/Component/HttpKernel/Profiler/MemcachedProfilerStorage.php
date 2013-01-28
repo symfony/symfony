@@ -20,86 +20,86 @@ use Memcached;
  */
 class MemcachedProfilerStorage extends BaseMemcacheProfilerStorage
 {
-    /**
-     * @var Memcached
-     */
-    private $memcached;
+		/**
+		 * @var Memcached
+		 */
+		private $memcached;
 
-    /**
-     * Internal convenience method that returns the instance of the Memcached
-     *
-     * @return Memcached
-     *
-     * @throws \RuntimeException
-     */
-    protected function getMemcached()
-    {
-        if (null === $this->memcached) {
-            if (!preg_match('#^memcached://(?(?=\[.*\])\[(.*)\]|(.*)):(.*)$#', $this->dsn, $matches)) {
-                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Memcached with an invalid dsn "%s". The expected format is "memcached://[host]:port".', $this->dsn));
-            }
+		/**
+		 * Internal convenience method that returns the instance of the Memcached
+		 *
+		 * @return Memcached
+		 *
+		 * @throws \RuntimeException
+		 */
+		protected function getMemcached()
+		{
+				if (null === $this->memcached) {
+						if (!preg_match('#^memcached://(?(?=\[.*\])\[(.*)\]|(.*)):(.*)$#', $this->dsn, $matches)) {
+								throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Memcached with an invalid dsn "%s". The expected format is "memcached://[host]:port".', $this->dsn));
+						}
 
-            $host = $matches[1] ?: $matches[2];
-            $port = $matches[3];
+						$host = $matches[1] ?: $matches[2];
+						$port = $matches[3];
 
-            $memcached = new Memcached;
+						$memcached = new Memcached;
 
-            //disable compression to allow appending
-            $memcached->setOption(Memcached::OPT_COMPRESSION, false);
+						//disable compression to allow appending
+						$memcached->setOption(Memcached::OPT_COMPRESSION, false);
 
-            $memcached->addServer($host, $port);
+						$memcached->addServer($host, $port);
 
-            $this->memcached = $memcached;
-        }
+						$this->memcached = $memcached;
+				}
 
-        return $this->memcached;
-    }
+				return $this->memcached;
+		}
 
-    /**
-     * Set instance of the Memcached
-     *
-     * @param Memcached $memcached
-     */
-    public function setMemcached($memcached)
-    {
-        $this->memcached = $memcached;
-    }
+		/**
+		 * Set instance of the Memcached
+		 *
+		 * @param Memcached $memcached
+		 */
+		public function setMemcached($memcached)
+		{
+				$this->memcached = $memcached;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getValue($key)
-    {
-        return $this->getMemcached()->get($key);
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		protected function getValue($key)
+		{
+				return $this->getMemcached()->get($key);
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setValue($key, $value, $expiration = 0)
-    {
-        return $this->getMemcached()->set($key, $value, time() + $expiration);
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		protected function setValue($key, $value, $expiration = 0)
+		{
+				return $this->getMemcached()->set($key, $value, time() + $expiration);
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function delete($key)
-    {
-        return $this->getMemcached()->delete($key);
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		protected function delete($key)
+		{
+				return $this->getMemcached()->delete($key);
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function appendValue($key, $value, $expiration = 0)
-    {
-        $memcached = $this->getMemcached();
+		/**
+		 * {@inheritdoc}
+		 */
+		protected function appendValue($key, $value, $expiration = 0)
+		{
+				$memcached = $this->getMemcached();
 
-        if (!$result = $memcached->append($key, $value)) {
-            return $memcached->set($key, $value, $expiration);
-        }
+				if (!$result = $memcached->append($key, $value)) {
+						return $memcached->set($key, $value, $expiration);
+				}
 
-        return $result;
-    }
+				return $result;
+		}
 }

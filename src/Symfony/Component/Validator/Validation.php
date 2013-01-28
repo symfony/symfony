@@ -18,33 +18,33 @@ namespace Symfony\Component\Validator;
  */
 final class Validation
 {
-    /**
-     * Creates a new validator.
-     *
-     * If you want to configure the validator, use
-     * {@link createValidatorBuilder()} instead.
-     *
-     * @return ValidatorInterface The new validator.
-     */
-    public static function createValidator()
-    {
-        return self::createValidatorBuilder()->getValidator();
-    }
+		/**
+		 * Creates a new validator.
+		 *
+		 * If you want to configure the validator, use
+		 * {@link createValidatorBuilder()} instead.
+		 *
+		 * @return ValidatorInterface The new validator.
+		 */
+		public static function createValidator()
+		{
+				return self::createValidatorBuilder()->getValidator();
+		}
 
-    /**
-     * Creates a configurable builder for validator objects.
-     *
-     * @return ValidatorBuilderInterface The new builder.
-     */
-    public static function createValidatorBuilder()
-    {
-        return new ValidatorBuilder();
-    }
+		/**
+		 * Creates a configurable builder for validator objects.
+		 *
+		 * @return ValidatorBuilderInterface The new builder.
+		 */
+		public static function createValidatorBuilder()
+		{
+				return new ValidatorBuilder();
+		}
 
-    /**
-     * This class cannot be instantiated.
-     */
-    private function __construct()
-    {
-    }
+		/**
+		 * This class cannot be instantiated.
+		 */
+		private function __construct()
+		{
+		}
 }

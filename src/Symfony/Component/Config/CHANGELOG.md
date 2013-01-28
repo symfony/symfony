@@ -4,9 +4,9 @@ CHANGELOG
 2.2.0
 -----
 
- * [BC BREAK] changed ArrayNodeDefinition::canBeEnabled() and ArrayNodeDefinition::canBeDisabled()
-   to add the defaults when the node is not set - the methods were ineffective
-   if ArrayNodeDefinition::setDefaultsIfNotSet() was not explicitely called.
+ * added ArrayNodeDefinition::canBeEnabled() and ArrayNodeDefinition::canBeDisabled()
+   to ease configuration when some sections are respectively disabled / enabled
+   by default.
  * added a `normalizeKeys()` method for array nodes (to avoid key normalization)
  * added numerical type handling for config definitions
  * added convenience methods for optional configuration sections to ArrayNodeDefinition

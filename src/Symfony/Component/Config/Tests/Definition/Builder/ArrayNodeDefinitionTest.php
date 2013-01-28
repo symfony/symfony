@@ -62,7 +62,10 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     public function testConcreteNodeSpecificOption()
     {
         $node = new ArrayNodeDefinition('root');
-        $node->addDefaultsIfNotSet()->prototype('array');
+        $node
+            ->addDefaultsIfNotSet()
+            ->prototype('array')
+        ;
         $node->getNode();
     }
 

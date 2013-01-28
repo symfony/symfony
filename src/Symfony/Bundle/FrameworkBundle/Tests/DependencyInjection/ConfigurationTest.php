@@ -16,46 +16,41 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider getTestConfigTreeData
-     */
-    public function testConfigTree($options, $results)
+    public function testDefaultConfig()
     {
         $processor = new Processor();
-        $configuration = new Configuration(array());
-        $config = $processor->processConfiguration($configuration, array($options));
+        $config = $processor->processConfiguration(new Configuration(), array(array('secret' => 's3cr3t')));
 
-        $this->assertEquals($results, $config);
-    }
-
-    public function getTestConfigTreeData()
-    {
-        return array(
-            array(array('secret' => 's3cr3t'), array('secret' => 's3cr3t', 'trusted_proxies' => array(), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => '%kernel.debug%'), 'default_locale' => 'en', 'charset' => null)),
+        $this->assertEquals(
+            array_merge(array('secret' => 's3cr3t'), self::getBundleDefaultConfig()),
+            $config
         );
     }
 
     /**
      * @dataProvider getTestValidTrustedProxiesData
      */
-    public function testValidTrustedProxies($options, $results)
+    public function testValidTrustedProxies($trustedProxies, $processedProxies)
     {
         $processor = new Processor();
         $configuration = new Configuration(array());
-        $config = $processor->processConfiguration($configuration, array($options));
+        $config = $processor->processConfiguration($configuration, array(array(
+            'secret'          => 's3cr3t',
+            'trusted_proxies' => $trustedProxies
+        )));
 
-        $this->assertEquals($results, $config);
+        $this->assertEquals($processedProxies, $config['trusted_proxies']);
     }
 
     public function getTestValidTrustedProxiesData()
     {
         return array(
-            array(array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1')), array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1'), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => '%kernel.debug%'), 'default_locale' => 'en', 'charset' => null)),
-            array(array('secret' => 's3cr3t', 'trusted_proxies' => array('::1')), array('secret' => 's3cr3t', 'trusted_proxies' => array('::1'), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => '%kernel.debug%'), 'default_locale' => 'en', 'charset' => null)),
-            array(array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1', '::1')), array('secret' => 's3cr3t', 'trusted_proxies' => array('127.0.0.1', '::1'), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => '%kernel.debug%'), 'default_locale' => 'en', 'charset' => null)),
-            array(array('secret' => 's3cr3t', 'trusted_proxies' => null), array('secret' => 's3cr3t', 'trusted_proxies' => array(), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => '%kernel.debug%'), 'default_locale' => 'en', 'charset' => null)),
-            array(array('secret' => 's3cr3t', 'trusted_proxies' => false), array('secret' => 's3cr3t', 'trusted_proxies' => array(), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => '%kernel.debug%'), 'default_locale' => 'en', 'charset' => null)),
-            array(array('secret' => 's3cr3t', 'trusted_proxies' => array()), array('secret' => 's3cr3t', 'trusted_proxies' => array(), 'trust_proxy_headers' => false, 'ide' => NULL, 'annotations' => array('cache' => 'file', 'file_cache_dir' => '%kernel.cache_dir%/annotations', 'debug' => '%kernel.debug%'), 'default_locale' => 'en', 'charset' => null)),
+            array(array('127.0.0.1'), array('127.0.0.1')),
+            array(array('::1'), array('::1')),
+            array(array('127.0.0.1', '::1'), array('127.0.0.1', '::1')),
+            array(null, array()),
+            array(false, array()),
+            array(array(), array()),
         );
     }
 
@@ -66,7 +61,12 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(array());
-        $config = $processor->processConfiguration($configuration, array(array('secret' => 's3cr3t', 'trusted_proxies' => 'Not an IP address')));
+        $processor->processConfiguration($configuration, array(
+            array(
+                'secret' => 's3cr3t',
+                'trusted_proxies' => 'Not an IP address'
+            )
+        ));
     }
 
     /**
@@ -76,6 +76,55 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(array());
-        $config = $processor->processConfiguration($configuration, array(array('secret' => 's3cr3t', 'trusted_proxies' => array('Not an IP address'))));
+        $processor->processConfiguration($configuration, array(
+            array(
+                'secret' => 's3cr3t',
+                'trusted_proxies' => array('Not an IP address')
+            )
+        ));
+    }
+
+    protected static function getBundleDefaultConfig()
+    {
+        return array(
+            'charset'             => null,
+            'trust_proxy_headers' => false,
+            'trusted_proxies'     => array(),
+            'ide'                 => null,
+            'default_locale'      => 'en',
+            'form'                => array('enabled' => false),
+            'csrf_protection'     => array(
+                'enabled'    => false,
+                'field_name' => '_token',
+            ),
+            'esi'                 => array('enabled' => false),
+            'router_proxy'        => array(
+                'enabled' => false,
+                'path'    => '/_proxy',
+            ),
+            'profiler'            => array(
+                'enabled'              => false,
+                'only_exceptions'      => false,
+                'only_master_requests' => false,
+                'dsn'                  => 'file:%kernel.cache_dir%/profiler',
+                'username'             => '',
+                'password'             => '',
+                'lifetime'             => 86400,
+            ),
+            'translator'          => array(
+                'enabled'  => false,
+                'fallback' => 'en',
+            ),
+            'validation'          => array(
+                'enabled'            => false,
+                'enable_annotations' => false,
+                'translation_domain' => 'validators',
+            ),
+            'annotations'         => array(
+                'cache'          => 'file',
+                'file_cache_dir' => '%kernel.cache_dir%/annotations',
+                'debug'          => '%kernel.debug%',
+            ),
+        );
     }
 }

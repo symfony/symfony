@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 
@@ -62,7 +63,10 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     public function testConcreteNodeSpecificOption()
     {
         $node = new ArrayNodeDefinition('root');
-        $node->addDefaultsIfNotSet()->prototype('array');
+        $node
+            ->addDefaultsIfNotSet()
+            ->prototype('array')
+        ;
         $node->getNode();
     }
 
@@ -147,6 +151,50 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
                   ->prototype('array')
         ;
         $node->getNode();
+    }
+
+    public function testEnabledNodeDefaults()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->canBeEnabled()
+            ->children()
+                ->scalarNode('foo')->defaultValue('bar')->end()
+        ;
+
+        $this->assertEquals(array('enabled' => false, 'foo' => 'bar'), $node->getNode()->getDefaultValue());
+    }
+
+    /**
+     * @dataProvider getEnableableNodeFixtures
+     */
+    public function testTrueEnableEnabledNode($expected, $config, $message)
+    {
+        $processor = new Processor();
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->canBeEnabled()
+            ->children()
+                ->scalarNode('foo')->defaultValue('bar')->end()
+        ;
+
+        $this->assertEquals(
+            $expected,
+            $processor->process($node->getNode(), $config),
+            $message
+        );
+    }
+
+    public function getEnableableNodeFixtures()
+    {
+        return array(
+            array(array('enabled' => true, 'foo' => 'bar'), array(true), 'true enables an enableable node'),
+            array(array('enabled' => true, 'foo' => 'bar'), array(null), 'null enables an enableable node'),
+            array(array('enabled' => true, 'foo' => 'bar'), array(array('enabled' => true)), 'An enableable node can be enabled'),
+            array(array('enabled' => true, 'foo' => 'baz'), array(array('foo' => 'baz')), 'any configuration enables an enableable node'),
+            array(array('enabled' => false, 'foo' => 'baz'), array(array('foo' => 'baz', 'enabled' => false)), 'An enableable node can be disabled'),
+            array(array('enabled' => false, 'foo' => 'bar'), array(false), 'false disables an enableable node'),
+        );
     }
 
     protected function getField($object, $field)

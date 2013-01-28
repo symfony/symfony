@@ -1,9 +1,7 @@
 
+	[InvalidArgumentException]
+	Command "foo" is not define
+	d.
 
-                               
-  [InvalidArgumentException]   
-  Command "foo" is not define  
-  d.                           
-                               
 
 

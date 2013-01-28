@@ -16,117 +16,117 @@ namespace Symfony\Component\Finder\Expression;
  */
 class Expression implements ValueInterface
 {
-    const TYPE_REGEX = 1;
-    const TYPE_GLOB  = 2;
+		const TYPE_REGEX = 1;
+		const TYPE_GLOB	= 2;
 
-    /**
-     * @var ValueInterface
-     */
-    private $value;
+		/**
+		 * @var ValueInterface
+		 */
+		private $value;
 
-    /**
-     * @param string $expr
-     *
-     * @return Expression
-     */
-    public static function create($expr)
-    {
-        return new self($expr);
-    }
+		/**
+		 * @param string $expr
+		 *
+		 * @return Expression
+		 */
+		public static function create($expr)
+		{
+				return new self($expr);
+		}
 
-    /**
-     * @param string $expr
-     */
-    public function __construct($expr)
-    {
-        try {
-            $this->value = Regex::create($expr);
-        } catch (\InvalidArgumentException $e) {
-            $this->value = new Glob($expr);
-        }
-    }
+		/**
+		 * @param string $expr
+		 */
+		public function __construct($expr)
+		{
+				try {
+						$this->value = Regex::create($expr);
+				} catch (\InvalidArgumentException $e) {
+						$this->value = new Glob($expr);
+				}
+		}
 
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->render();
-    }
+		/**
+		 * @return string
+		 */
+		public function __toString()
+		{
+				return $this->render();
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function render()
-    {
-        return $this->value->render();
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function render()
+		{
+				return $this->value->render();
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function renderPattern()
-    {
-        return $this->value->renderPattern();
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function renderPattern()
+		{
+				return $this->value->renderPattern();
+		}
 
-    /**
-     * @return bool
-     */
-    public function isCaseSensitive()
-    {
-        return $this->value->isCaseSensitive();
-    }
+		/**
+		 * @return bool
+		 */
+		public function isCaseSensitive()
+		{
+				return $this->value->isCaseSensitive();
+		}
 
-    /**
-     * @return int
-     */
-    public function getType()
-    {
-        return $this->value->getType();
-    }
+		/**
+		 * @return int
+		 */
+		public function getType()
+		{
+				return $this->value->getType();
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function prepend($expr)
-    {
-        $this->value->prepend($expr);
+		/**
+		 * {@inheritdoc}
+		 */
+		public function prepend($expr)
+		{
+				$this->value->prepend($expr);
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function append($expr)
-    {
-        $this->value->append($expr);
+		/**
+		 * {@inheritdoc}
+		 */
+		public function append($expr)
+		{
+				$this->value->append($expr);
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * @return bool
-     */
-    public function isRegex()
-    {
-        return self::TYPE_REGEX === $this->value->getType();
-    }
+		/**
+		 * @return bool
+		 */
+		public function isRegex()
+		{
+				return self::TYPE_REGEX === $this->value->getType();
+		}
 
-    /**
-     * @return bool
-     */
-    public function isGlob()
-    {
-        return self::TYPE_GLOB === $this->value->getType();
-    }
+		/**
+		 * @return bool
+		 */
+		public function isGlob()
+		{
+				return self::TYPE_GLOB === $this->value->getType();
+		}
 
-    /**
-     * @return Regex
-     */
-    public function getRegex()
-    {
-        return self::TYPE_REGEX === $this->value->getType() ? $this->value : $this->value->toRegex();
-    }
+		/**
+		 * @return Regex
+		 */
+		public function getRegex()
+		{
+				return self::TYPE_REGEX === $this->value->getType() ? $this->value : $this->value->toRegex();
+		}
 }

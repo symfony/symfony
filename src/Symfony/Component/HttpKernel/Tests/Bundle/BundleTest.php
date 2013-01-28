@@ -19,30 +19,30 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\F
 
 class BundleTest extends \PHPUnit_Framework_TestCase
 {
-    public function testRegisterCommands()
-    {
-        if (!class_exists('Symfony\Component\Console\Application')) {
-            $this->markTestSkipped('The "Console" component is not available');
-        }
+		public function testRegisterCommands()
+		{
+				if (!class_exists('Symfony\Component\Console\Application')) {
+						$this->markTestSkipped('The "Console" component is not available');
+				}
 
-        if (!interface_exists('Symfony\Component\DependencyInjection\ContainerAwareInterface')) {
-            $this->markTestSkipped('The "DependencyInjection" component is not available');
-        }
+				if (!interface_exists('Symfony\Component\DependencyInjection\ContainerAwareInterface')) {
+						$this->markTestSkipped('The "DependencyInjection" component is not available');
+				}
 
-        if (!class_exists('Symfony\Component\Finder\Finder')) {
-            $this->markTestSkipped('The "Finder" component is not available');
-        }
+				if (!class_exists('Symfony\Component\Finder\Finder')) {
+						$this->markTestSkipped('The "Finder" component is not available');
+				}
 
-        $cmd = new FooCommand();
-        $app = $this->getMock('Symfony\Component\Console\Application');
-        $app->expects($this->once())->method('add')->with($this->equalTo($cmd));
+				$cmd = new FooCommand();
+				$app = $this->getMock('Symfony\Component\Console\Application');
+				$app->expects($this->once())->method('add')->with($this->equalTo($cmd));
 
-        $bundle = new ExtensionPresentBundle();
-        $bundle->registerCommands($app);
+				$bundle = new ExtensionPresentBundle();
+				$bundle->registerCommands($app);
 
-        $bundle2 = new ExtensionAbsentBundle();
+				$bundle2 = new ExtensionAbsentBundle();
 
-        $this->assertNull($bundle2->registerCommands($app));
+				$this->assertNull($bundle2->registerCommands($app));
 
-    }
+		}
 }

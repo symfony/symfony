@@ -20,56 +20,56 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CheckboxType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder
-            ->addViewTransformer(new BooleanToStringTransformer($options['value']))
-        ;
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+				$builder
+						->addViewTransformer(new BooleanToStringTransformer($options['value']))
+				;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    {
-        $view->vars = array_replace($view->vars, array(
-            'value'   => $options['value'],
-            'checked' => null !== $form->getViewData(),
-        ));
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function buildView(FormView $view, FormInterface $form, array $options)
+		{
+				$view->vars = array_replace($view->vars, array(
+						'value'	 => $options['value'],
+						'checked' => null !== $form->getViewData(),
+				));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $emptyData = function (FormInterface $form, $clientData) {
-            return $clientData;
-        };
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				$emptyData = function (FormInterface $form, $clientData) {
+						return $clientData;
+				};
 
-        $resolver->setDefaults(array(
-            'value'      => '1',
-            'empty_data' => $emptyData,
-            'compound'   => false,
-        ));
-    }
+				$resolver->setDefaults(array(
+						'value'			=> '1',
+						'empty_data' => $emptyData,
+						'compound'	 => false,
+				));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'field';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getParent()
+		{
+				return 'field';
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'checkbox';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'checkbox';
+		}
 }

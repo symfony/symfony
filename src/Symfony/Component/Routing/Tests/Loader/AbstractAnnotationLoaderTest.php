@@ -13,26 +13,26 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 abstract class AbstractAnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Doctrine\\Common\\Version')) {
-            $this->markTestSkipped('Doctrine is not available.');
-        }
-    }
+		protected function setUp()
+		{
+				if (!class_exists('Doctrine\\Common\\Version')) {
+						$this->markTestSkipped('Doctrine is not available.');
+				}
+		}
 
-    public function getReader()
-    {
-        return $this->getMockBuilder('Doctrine\Common\Annotations\Reader')
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-    }
+		public function getReader()
+		{
+				return $this->getMockBuilder('Doctrine\Common\Annotations\Reader')
+						->disableOriginalConstructor()
+						->getMock()
+				;
+		}
 
-    public function getClassLoader($reader)
-    {
-        return $this->getMockBuilder('Symfony\Component\Routing\Loader\AnnotationClassLoader')
-            ->setConstructorArgs(array($reader))
-            ->getMockForAbstractClass()
-        ;
-    }
+		public function getClassLoader($reader)
+		{
+				return $this->getMockBuilder('Symfony\Component\Routing\Loader\AnnotationClassLoader')
+						->setConstructorArgs(array($reader))
+						->getMockForAbstractClass()
+				;
+		}
 }

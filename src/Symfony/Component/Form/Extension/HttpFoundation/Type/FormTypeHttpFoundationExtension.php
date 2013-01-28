@@ -20,29 +20,29 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class FormTypeHttpFoundationExtension extends AbstractTypeExtension
 {
-    /**
-     * @var BindRequestListener
-     */
-    private $listener;
+		/**
+		 * @var BindRequestListener
+		 */
+		private $listener;
 
-    public function __construct()
-    {
-        $this->listener = new BindRequestListener();
-    }
+		public function __construct()
+		{
+				$this->listener = new BindRequestListener();
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->addEventSubscriber($this->listener);
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+				$builder->addEventSubscriber($this->listener);
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtendedType()
-    {
-        return 'form';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getExtendedType()
+		{
+				return 'form';
+		}
 }

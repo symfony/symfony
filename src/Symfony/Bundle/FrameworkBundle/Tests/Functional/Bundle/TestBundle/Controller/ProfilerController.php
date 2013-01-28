@@ -16,8 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 
 class ProfilerController extends ContainerAware
 {
-    public function indexAction()
-    {
-        return new Response('Hello');
-    }
+		public function indexAction()
+		{
+				return new Response('Hello');
+		}
 }

@@ -20,38 +20,38 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated deprecated since version 2.2, to be removed in 2.3. Use
- *             {@link \Symfony\Component\PropertyAccess\PropertyPath}
- *             instead.
+ *						 {@link \Symfony\Component\PropertyAccess\PropertyPath}
+ *						 instead.
  */
 class PropertyPath extends BasePropertyPath
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct($propertyPath)
-    {
-        parent::__construct($propertyPath);
+		/**
+		 * {@inheritdoc}
+		 */
+		public function __construct($propertyPath)
+		{
+				parent::__construct($propertyPath);
 
-        trigger_error('\Symfony\Component\Form\Util\PropertyPath is deprecated since version 2.2 and will be removed in 2.3. Use \Symfony\Component\PropertyAccess\PropertyPath instead.', E_USER_DEPRECATED);
-    }
+				trigger_error('\Symfony\Component\Form\Util\PropertyPath is deprecated since version 2.2 and will be removed in 2.3. Use \Symfony\Component\PropertyAccess\PropertyPath instead.', E_USER_DEPRECATED);
+		}
 
-    /**
-     * Alias for {@link PropertyAccessor::getValue()}
-     */
-    public function getValue($objectOrArray)
-    {
-        $propertyAccessor = PropertyAccess::getPropertyAccessor();
+		/**
+		 * Alias for {@link PropertyAccessor::getValue()}
+		 */
+		public function getValue($objectOrArray)
+		{
+				$propertyAccessor = PropertyAccess::getPropertyAccessor();
 
-        return $propertyAccessor->getValue($objectOrArray, $this);
-    }
+				return $propertyAccessor->getValue($objectOrArray, $this);
+		}
 
-    /**
-     * Alias for {@link PropertyAccessor::setValue()}
-     */
-    public function setValue(&$objectOrArray, $value)
-    {
-        $propertyAccessor = PropertyAccess::getPropertyAccessor();
+		/**
+		 * Alias for {@link PropertyAccessor::setValue()}
+		 */
+		public function setValue(&$objectOrArray, $value)
+		{
+				$propertyAccessor = PropertyAccess::getPropertyAccessor();
 
-        return $propertyAccessor->setValue($objectOrArray, $this, $value);
-    }
+				return $propertyAccessor->setValue($objectOrArray, $this, $value);
+		}
 }

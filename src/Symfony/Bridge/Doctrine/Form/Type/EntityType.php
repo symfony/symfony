@@ -16,25 +16,25 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 
 class EntityType extends DoctrineType
 {
-    /**
-     * Return the default loader object.
-     *
-     * @param ObjectManager $manager
-     * @param mixed         $queryBuilder
-     * @param string        $class
-     * @return ORMQueryBuilderLoader
-     */
-    public function getLoader(ObjectManager $manager, $queryBuilder, $class)
-    {
-        return new ORMQueryBuilderLoader(
-            $queryBuilder,
-            $manager,
-            $class
-        );
-    }
+		/**
+		 * Return the default loader object.
+		 *
+		 * @param ObjectManager $manager
+		 * @param mixed				 $queryBuilder
+		 * @param string				$class
+		 * @return ORMQueryBuilderLoader
+		 */
+		public function getLoader(ObjectManager $manager, $queryBuilder, $class)
+		{
+				return new ORMQueryBuilderLoader(
+						$queryBuilder,
+						$manager,
+						$class
+				);
+		}
 
-    public function getName()
-    {
-        return 'entity';
-    }
+		public function getName()
+		{
+				return 'entity';
+		}
 }

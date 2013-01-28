@@ -17,50 +17,50 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FixedFilterListener implements EventSubscriberInterface
 {
-    private $mapping;
+		private $mapping;
 
-    public function __construct(array $mapping)
-    {
-        $this->mapping = array_merge(array(
-            'preBind' => array(),
-            'onBind' => array(),
-            'preSetData' => array(),
-        ), $mapping);
-    }
+		public function __construct(array $mapping)
+		{
+				$this->mapping = array_merge(array(
+						'preBind' => array(),
+						'onBind' => array(),
+						'preSetData' => array(),
+				), $mapping);
+		}
 
-    public function preBind(FormEvent $event)
-    {
-        $data = $event->getData();
+		public function preBind(FormEvent $event)
+		{
+				$data = $event->getData();
 
-        if (isset($this->mapping['preBind'][$data])) {
-            $event->setData($this->mapping['preBind'][$data]);
-        }
-    }
+				if (isset($this->mapping['preBind'][$data])) {
+						$event->setData($this->mapping['preBind'][$data]);
+				}
+		}
 
-    public function onBind(FormEvent $event)
-    {
-        $data = $event->getData();
+		public function onBind(FormEvent $event)
+		{
+				$data = $event->getData();
 
-        if (isset($this->mapping['onBind'][$data])) {
-            $event->setData($this->mapping['onBind'][$data]);
-        }
-    }
+				if (isset($this->mapping['onBind'][$data])) {
+						$event->setData($this->mapping['onBind'][$data]);
+				}
+		}
 
-    public function preSetData(FormEvent $event)
-    {
-        $data = $event->getData();
+		public function preSetData(FormEvent $event)
+		{
+				$data = $event->getData();
 
-        if (isset($this->mapping['preSetData'][$data])) {
-            $event->setData($this->mapping['preSetData'][$data]);
-        }
-    }
+				if (isset($this->mapping['preSetData'][$data])) {
+						$event->setData($this->mapping['preSetData'][$data]);
+				}
+		}
 
-    public static function getSubscribedEvents()
-    {
-        return array(
-            FormEvents::PRE_BIND => 'preBind',
-            FormEvents::BIND => 'onBind',
-            FormEvents::PRE_SET_DATA => 'preSetData',
-        );
-    }
+		public static function getSubscribedEvents()
+		{
+				return array(
+						FormEvents::PRE_BIND => 'preBind',
+						FormEvents::BIND => 'onBind',
+						FormEvents::PRE_SET_DATA => 'preSetData',
+				);
+		}
 }

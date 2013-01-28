@@ -18,31 +18,31 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->services =
-        $this->scopedServices =
-        $this->scopeStacks = array();
+		/**
+		 * Constructor.
+		 */
+		public function __construct()
+		{
+				$this->services =
+				$this->scopedServices =
+				$this->scopeStacks = array();
 
-        $this->set('service_container', $this);
+				$this->set('service_container', $this);
 
-        $this->scopes = array();
-        $this->scopeChildren = array();
-    }
+				$this->scopes = array();
+				$this->scopeChildren = array();
+		}
 
-    /**
-     * Gets the 'foo' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return stdClass A stdClass instance.
-     */
-    protected function getFooService()
-    {
-        return $this->services['foo'] = new \stdClass();
-    }
+		/**
+		 * Gets the 'foo' service.
+		 *
+		 * This service is shared.
+		 * This method always returns the same instance of the service.
+		 *
+		 * @return stdClass A stdClass instance.
+		 */
+		protected function getFooService()
+		{
+				return $this->services['foo'] = new \stdClass();
+		}
 }

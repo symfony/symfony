@@ -24,10 +24,10 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper;
  */
 class TemplatingExtension extends AbstractExtension
 {
-    public function __construct(PhpEngine $engine, CsrfProviderInterface $csrfProvider = null, array $defaultThemes = array())
-    {
-        $engine->addHelpers(array(
-            new FormHelper(new FormRenderer(new TemplatingRendererEngine($engine, $defaultThemes), $csrfProvider))
-        ));
-    }
+		public function __construct(PhpEngine $engine, CsrfProviderInterface $csrfProvider = null, array $defaultThemes = array())
+		{
+				$engine->addHelpers(array(
+						new FormHelper(new FormRenderer(new TemplatingRendererEngine($engine, $defaultThemes), $csrfProvider))
+				));
+		}
 }

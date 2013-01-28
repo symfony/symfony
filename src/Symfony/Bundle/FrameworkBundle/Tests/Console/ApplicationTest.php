@@ -18,36 +18,36 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class ApplicationTest extends TestCase
 {
-    public function testBundleInterfaceImplementation()
-    {
-        $bundle = $this->getMock("Symfony\Component\HttpKernel\Bundle\BundleInterface");
+		public function testBundleInterfaceImplementation()
+		{
+				$bundle = $this->getMock("Symfony\Component\HttpKernel\Bundle\BundleInterface");
 
-        $kernel = $this->getKernel(array($bundle));
+				$kernel = $this->getKernel(array($bundle));
 
-        $application = new Application($kernel);
-        $application->doRun(new ArrayInput(array('list')), new NullOutput());
-    }
+				$application = new Application($kernel);
+				$application->doRun(new ArrayInput(array('list')), new NullOutput());
+		}
 
-    public function testBundleCommandsAreRegistered()
-    {
-        $bundle = $this->getMock("Symfony\Component\HttpKernel\Bundle\Bundle");
-        $bundle->expects($this->once())->method('registerCommands');
+		public function testBundleCommandsAreRegistered()
+		{
+				$bundle = $this->getMock("Symfony\Component\HttpKernel\Bundle\Bundle");
+				$bundle->expects($this->once())->method('registerCommands');
 
-        $kernel = $this->getKernel(array($bundle));
+				$kernel = $this->getKernel(array($bundle));
 
-        $application = new Application($kernel);
-        $application->doRun(new ArrayInput(array('list')), new NullOutput());
-    }
+				$application = new Application($kernel);
+				$application->doRun(new ArrayInput(array('list')), new NullOutput());
+		}
 
-    private function getKernel(array $bundles)
-    {
-        $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
-        $kernel
-            ->expects($this->any())
-            ->method('getBundles')
-            ->will($this->returnValue($bundles))
-        ;
+		private function getKernel(array $bundles)
+		{
+				$kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
+				$kernel
+						->expects($this->any())
+						->method('getBundles')
+						->will($this->returnValue($bundles))
+				;
 
-        return $kernel;
-    }
+				return $kernel;
+		}
 }

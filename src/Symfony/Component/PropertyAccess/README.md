@@ -9,6 +9,6 @@ Resources
 
 You can run the unit tests with the following command:
 
-    $ cd path/to/Symfony/Component/PropertyAccess/
-    $ composer.phar install --dev
-    $ phpunit
+		$ cd path/to/Symfony/Component/PropertyAccess/
+		$ composer.phar install --dev
+	$ phpunit

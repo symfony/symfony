@@ -19,23 +19,23 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
  */
 class TwigRenderer extends FormRenderer implements TwigRendererInterface
 {
-    /**
-     * @var TwigRendererEngineInterface
-     */
-    private $engine;
+		/**
+		 * @var TwigRendererEngineInterface
+		 */
+		private $engine;
 
-    public function __construct(TwigRendererEngineInterface $engine, CsrfProviderInterface $csrfProvider = null)
-    {
-        parent::__construct($engine, $csrfProvider);
+		public function __construct(TwigRendererEngineInterface $engine, CsrfProviderInterface $csrfProvider = null)
+		{
+				parent::__construct($engine, $csrfProvider);
 
-        $this->engine = $engine;
-    }
+				$this->engine = $engine;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setEnvironment(\Twig_Environment $environment)
-    {
-        $this->engine->setEnvironment($environment);
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setEnvironment(\Twig_Environment $environment)
+		{
+				$this->engine->setEnvironment($environment);
+		}
 }

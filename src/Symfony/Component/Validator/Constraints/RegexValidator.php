@@ -25,23 +25,23 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class RegexValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (null === $value || '' === $value) {
-            return;
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (null === $value || '' === $value) {
+						return;
+				}
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
-        }
+				if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+						throw new UnexpectedTypeException($value, 'string');
+				}
 
-        $value = (string) $value;
+				$value = (string) $value;
 
-        if ($constraint->match xor preg_match($constraint->pattern, $value)) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
-        }
-    }
+				if ($constraint->match xor preg_match($constraint->pattern, $value)) {
+						$this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+				}
+		}
 }

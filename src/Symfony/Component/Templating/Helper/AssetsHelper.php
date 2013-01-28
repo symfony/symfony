@@ -20,7 +20,7 @@ use Symfony\Component\Templating\Asset\UrlPackage;
  * Usage:
  *
  * <code>
- *   <img src="<?php echo $view['assets']->getUrl('foo.png') ?>" />
+ *	 <img src="<?php echo $view['assets']->getUrl('foo.png') ?>" />
  * </code>
  *
  * @author Fabien Potencier <fabien@symfony.com>
@@ -28,23 +28,23 @@ use Symfony\Component\Templating\Asset\UrlPackage;
  */
 class AssetsHelper extends CoreAssetsHelper
 {
-    /**
-     * Constructor.
-     *
-     * @param string       $basePath      The base path
-     * @param string|array $baseUrls      Base asset URLs
-     * @param string       $version       The asset version
-     * @param string       $format        The version format
-     * @param array        $namedPackages Additional packages
-     */
-    public function __construct($basePath = null, $baseUrls = array(), $version = null, $format = null, $namedPackages = array())
-    {
-        if ($baseUrls) {
-            $defaultPackage = new UrlPackage($baseUrls, $version, $format);
-        } else {
-            $defaultPackage = new PathPackage($basePath, $version, $format);
-        }
+		/**
+		 * Constructor.
+		 *
+		 * @param string			 $basePath			The base path
+		 * @param string|array $baseUrls			Base asset URLs
+		 * @param string			 $version			 The asset version
+		 * @param string			 $format				The version format
+		 * @param array				$namedPackages Additional packages
+		 */
+		public function __construct($basePath = null, $baseUrls = array(), $version = null, $format = null, $namedPackages = array())
+		{
+				if ($baseUrls) {
+						$defaultPackage = new UrlPackage($baseUrls, $version, $format);
+				} else {
+						$defaultPackage = new PathPackage($basePath, $version, $format);
+				}
 
-        parent::__construct($defaultPackage, $namedPackages);
-    }
+				parent::__construct($defaultPackage, $namedPackages);
+		}
 }

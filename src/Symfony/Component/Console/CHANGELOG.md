@@ -17,11 +17,11 @@ CHANGELOG
  * added suggestions when a command does not exist
  * added a --raw option to the list command
  * added support for STDERR in the console output class (errors are now sent
-   to STDERR)
+	 to STDERR)
  * made the defaults (helper set, commands, input definition) in Application
-   more easily customizable
+	 more easily customizable
  * added support for the shell even if readline is not available
  * added support for process isolation in Symfony shell via
-   `--process-isolation` switch
+	 `--process-isolation` switch
  * added support for `--`, which disables options parsing after that point
-   (tokens will be parsed as arguments)
+	 (tokens will be parsed as arguments)

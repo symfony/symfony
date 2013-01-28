@@ -36,8 +36,8 @@ use Symfony\Component\Security\Http\HttpUtils;
  * Subclasses likely have to implement the following:
  * - an TokenInterface to hold authentication related data
  * - an AuthenticationProvider to perform the actual authentication of the
- *   token, retrieve the UserInterface implementation from a database, and
- *   perform the specific account checks using the UserChecker
+ *	 token, retrieve the UserInterface implementation from a database, and
+ *	 perform the specific account checks using the UserChecker
  *
  * By default, this listener only is active for a specific path, e.g.
  * /login_check. If you want to change this behavior, you can overwrite the
@@ -48,182 +48,182 @@ use Symfony\Component\Security\Http\HttpUtils;
  */
 abstract class AbstractAuthenticationListener implements ListenerInterface
 {
-    protected $options;
-    protected $logger;
-    protected $authenticationManager;
-    protected $providerKey;
-    protected $httpUtils;
+		protected $options;
+		protected $logger;
+		protected $authenticationManager;
+		protected $providerKey;
+		protected $httpUtils;
 
-    private $securityContext;
-    private $sessionStrategy;
-    private $dispatcher;
-    private $successHandler;
-    private $failureHandler;
-    private $rememberMeServices;
+		private $securityContext;
+		private $sessionStrategy;
+		private $dispatcher;
+		private $successHandler;
+		private $failureHandler;
+		private $rememberMeServices;
 
-    /**
-     * Constructor.
-     *
-     * @param SecurityContextInterface               $securityContext       A SecurityContext instance
-     * @param AuthenticationManagerInterface         $authenticationManager An AuthenticationManagerInterface instance
-     * @param SessionAuthenticationStrategyInterface $sessionStrategy
-     * @param HttpUtils                              $httpUtils             An HttpUtilsInterface instance
-     * @param string                                 $providerKey
-     * @param AuthenticationSuccessHandlerInterface  $successHandler
-     * @param AuthenticationFailureHandlerInterface  $failureHandler
-     * @param array                                  $options               An array of options for the processing of a
-     *                                                                      successful, or failed authentication attempt
-     * @param LoggerInterface                        $logger                A LoggerInterface instance
-     * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
-    {
-        if (empty($providerKey)) {
-            throw new \InvalidArgumentException('$providerKey must not be empty.');
-        }
+		/**
+		 * Constructor.
+		 *
+		 * @param SecurityContextInterface							 $securityContext			 A SecurityContext instance
+		 * @param AuthenticationManagerInterface				 $authenticationManager An AuthenticationManagerInterface instance
+		 * @param SessionAuthenticationStrategyInterface $sessionStrategy
+		 * @param HttpUtils															$httpUtils						 An HttpUtilsInterface instance
+		 * @param string																 $providerKey
+		 * @param AuthenticationSuccessHandlerInterface	$successHandler
+		 * @param AuthenticationFailureHandlerInterface	$failureHandler
+		 * @param array																	$options							 An array of options for the processing of a
+		 *																																			successful, or failed authentication attempt
+		 * @param LoggerInterface												$logger								A LoggerInterface instance
+		 * @param EventDispatcherInterface							 $dispatcher						An EventDispatcherInterface instance
+		 *
+		 * @throws \InvalidArgumentException
+		 */
+		public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+		{
+				if (empty($providerKey)) {
+						throw new \InvalidArgumentException('$providerKey must not be empty.');
+				}
 
-        $this->securityContext = $securityContext;
-        $this->authenticationManager = $authenticationManager;
-        $this->sessionStrategy = $sessionStrategy;
-        $this->providerKey = $providerKey;
-        $this->successHandler = $successHandler;
-        $this->failureHandler = $failureHandler;
-        $this->options = array_merge(array(
-            'check_path'                     => '/login_check',
-        ), $options);
-        $this->logger = $logger;
-        $this->dispatcher = $dispatcher;
-        $this->httpUtils = $httpUtils;
-    }
+				$this->securityContext = $securityContext;
+				$this->authenticationManager = $authenticationManager;
+				$this->sessionStrategy = $sessionStrategy;
+				$this->providerKey = $providerKey;
+				$this->successHandler = $successHandler;
+				$this->failureHandler = $failureHandler;
+				$this->options = array_merge(array(
+						'check_path'										 => '/login_check',
+				), $options);
+				$this->logger = $logger;
+				$this->dispatcher = $dispatcher;
+				$this->httpUtils = $httpUtils;
+		}
 
-    /**
-     * Sets the RememberMeServices implementation to use
-     *
-     * @param RememberMeServicesInterface $rememberMeServices
-     */
-    public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
-    {
-        $this->rememberMeServices = $rememberMeServices;
-    }
+		/**
+		 * Sets the RememberMeServices implementation to use
+		 *
+		 * @param RememberMeServicesInterface $rememberMeServices
+		 */
+		public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
+		{
+				$this->rememberMeServices = $rememberMeServices;
+		}
 
-    /**
-     * Handles form based authentication.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
-     *
-     * @throws \RuntimeException
-     * @throws SessionUnavailableException
-     */
-    final public function handle(GetResponseEvent $event)
-    {
-        $request = $event->getRequest();
+		/**
+		 * Handles form based authentication.
+		 *
+		 * @param GetResponseEvent $event A GetResponseEvent instance
+		 *
+		 * @throws \RuntimeException
+		 * @throws SessionUnavailableException
+		 */
+		final public function handle(GetResponseEvent $event)
+		{
+				$request = $event->getRequest();
 
-        if (!$this->requiresAuthentication($request)) {
-            return;
-        }
+				if (!$this->requiresAuthentication($request)) {
+						return;
+				}
 
-        if (!$request->hasSession()) {
-            throw new \RuntimeException('This authentication method requires a session.');
-        }
+				if (!$request->hasSession()) {
+						throw new \RuntimeException('This authentication method requires a session.');
+				}
 
-        try {
-            if (!$request->hasPreviousSession()) {
-                throw new SessionUnavailableException('Your session has timed out, or you have disabled cookies.');
-            }
+				try {
+						if (!$request->hasPreviousSession()) {
+								throw new SessionUnavailableException('Your session has timed out, or you have disabled cookies.');
+						}
 
-            if (null === $returnValue = $this->attemptAuthentication($request)) {
-                return;
-            }
+						if (null === $returnValue = $this->attemptAuthentication($request)) {
+								return;
+						}
 
-            if ($returnValue instanceof TokenInterface) {
-                $this->sessionStrategy->onAuthentication($request, $returnValue);
+						if ($returnValue instanceof TokenInterface) {
+								$this->sessionStrategy->onAuthentication($request, $returnValue);
 
-                $response = $this->onSuccess($event, $request, $returnValue);
-            } elseif ($returnValue instanceof Response) {
-                $response = $returnValue;
-            } else {
-                throw new \RuntimeException('attemptAuthentication() must either return a Response, an implementation of TokenInterface, or null.');
-            }
-        } catch (AuthenticationException $e) {
-            $response = $this->onFailure($event, $request, $e);
-        }
+								$response = $this->onSuccess($event, $request, $returnValue);
+						} elseif ($returnValue instanceof Response) {
+								$response = $returnValue;
+						} else {
+								throw new \RuntimeException('attemptAuthentication() must either return a Response, an implementation of TokenInterface, or null.');
+						}
+				} catch (AuthenticationException $e) {
+						$response = $this->onFailure($event, $request, $e);
+				}
 
-        $event->setResponse($response);
-    }
+				$event->setResponse($response);
+		}
 
-    /**
-     * Whether this request requires authentication.
-     *
-     * The default implementation only processed requests to a specific path,
-     * but a subclass could change this to only authenticate requests where a
-     * certain parameters is present.
-     *
-     * @param Request $request
-     *
-     * @return Boolean
-     */
-    protected function requiresAuthentication(Request $request)
-    {
-        return $this->httpUtils->checkRequestPath($request, $this->options['check_path']);
-    }
+		/**
+		 * Whether this request requires authentication.
+		 *
+		 * The default implementation only processed requests to a specific path,
+		 * but a subclass could change this to only authenticate requests where a
+		 * certain parameters is present.
+		 *
+		 * @param Request $request
+		 *
+		 * @return Boolean
+		 */
+		protected function requiresAuthentication(Request $request)
+		{
+				return $this->httpUtils->checkRequestPath($request, $this->options['check_path']);
+		}
 
-    /**
-     * Performs authentication.
-     *
-     * @param Request $request A Request instance
-     *
-     * @return TokenInterface|Response|null The authenticated token, null if full authentication is not possible, or a Response
-     *
-     * @throws AuthenticationException if the authentication fails
-     */
-    abstract protected function attemptAuthentication(Request $request);
+		/**
+		 * Performs authentication.
+		 *
+		 * @param Request $request A Request instance
+		 *
+		 * @return TokenInterface|Response|null The authenticated token, null if full authentication is not possible, or a Response
+		 *
+		 * @throws AuthenticationException if the authentication fails
+		 */
+		abstract protected function attemptAuthentication(Request $request);
 
-    private function onFailure(GetResponseEvent $event, Request $request, AuthenticationException $failed)
-    {
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
-        }
+		private function onFailure(GetResponseEvent $event, Request $request, AuthenticationException $failed)
+		{
+				if (null !== $this->logger) {
+						$this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
+				}
 
-        $this->securityContext->setToken(null);
+				$this->securityContext->setToken(null);
 
-        $response = $this->failureHandler->onAuthenticationFailure($request, $failed);
+				$response = $this->failureHandler->onAuthenticationFailure($request, $failed);
 
-        if (!$response instanceof Response) {
-            throw new \RuntimeException('Authentication Failure Handler did not return a Response.');
-        }
+				if (!$response instanceof Response) {
+						throw new \RuntimeException('Authentication Failure Handler did not return a Response.');
+				}
 
-        return $response;
-    }
+				return $response;
+		}
 
-    private function onSuccess(GetResponseEvent $event, Request $request, TokenInterface $token)
-    {
-        if (null !== $this->logger) {
-            $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUsername()));
-        }
+		private function onSuccess(GetResponseEvent $event, Request $request, TokenInterface $token)
+		{
+				if (null !== $this->logger) {
+						$this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUsername()));
+				}
 
-        $this->securityContext->setToken($token);
+				$this->securityContext->setToken($token);
 
-        $session = $request->getSession();
-        $session->remove(SecurityContextInterface::AUTHENTICATION_ERROR);
-        $session->remove(SecurityContextInterface::LAST_USERNAME);
+				$session = $request->getSession();
+				$session->remove(SecurityContextInterface::AUTHENTICATION_ERROR);
+				$session->remove(SecurityContextInterface::LAST_USERNAME);
 
-        if (null !== $this->dispatcher) {
-            $loginEvent = new InteractiveLoginEvent($request, $token);
-            $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
-        }
+				if (null !== $this->dispatcher) {
+						$loginEvent = new InteractiveLoginEvent($request, $token);
+						$this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
+				}
 
-        $response = $this->successHandler->onAuthenticationSuccess($request, $token);
+				$response = $this->successHandler->onAuthenticationSuccess($request, $token);
 
-        if (!$response instanceof Response) {
-            throw new \RuntimeException('Authentication Success Handler did not return a Response.');
-        }
+				if (!$response instanceof Response) {
+						throw new \RuntimeException('Authentication Success Handler did not return a Response.');
+				}
 
-        if (null !== $this->rememberMeServices) {
-            $this->rememberMeServices->loginSuccess($request, $response, $token);
-        }
+				if (null !== $this->rememberMeServices) {
+						$this->rememberMeServices->loginSuccess($request, $response, $token);
+				}
 
-        return $response;
-    }
+				return $response;
+		}
 }

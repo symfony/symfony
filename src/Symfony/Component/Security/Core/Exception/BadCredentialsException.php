@@ -19,11 +19,11 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class BadCredentialsException extends AuthenticationException
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function getMessageKey()
-    {
-        return 'Invalid credentials.';
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function getMessageKey()
+		{
+				return 'Invalid credentials.';
+		}
 }

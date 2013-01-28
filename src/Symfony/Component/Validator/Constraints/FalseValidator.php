@@ -21,15 +21,15 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class FalseValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (null === $value || false === $value || 0 === $value || '0' === $value) {
-            return;
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (null === $value || false === $value || 0 === $value || '0' === $value) {
+						return;
+				}
 
-        $this->context->addViolation($constraint->message);
-    }
+				$this->context->addViolation($constraint->message);
+		}
 }

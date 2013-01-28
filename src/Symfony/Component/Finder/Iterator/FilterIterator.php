@@ -20,23 +20,23 @@ namespace Symfony\Component\Finder\Iterator;
  */
 abstract class FilterIterator extends \FilterIterator
 {
-    /**
-     * This is a workaround for the problem with \FilterIterator leaving inner \FilesystemIterator in wrong state after
-     * rewind in some cases.
-     *
-     * @see FilterIterator::rewind()
-     */
-    public function rewind()
-    {
-        $iterator = $this;
-        while ($iterator instanceof \OuterIterator) {
-            if ($iterator->getInnerIterator() instanceof \FilesystemIterator) {
-                $iterator->getInnerIterator()->next();
-                $iterator->getInnerIterator()->rewind();
-            }
-            $iterator = $iterator->getInnerIterator();
-        }
+		/**
+		 * This is a workaround for the problem with \FilterIterator leaving inner \FilesystemIterator in wrong state after
+		 * rewind in some cases.
+		 *
+		 * @see FilterIterator::rewind()
+		 */
+		public function rewind()
+		{
+				$iterator = $this;
+				while ($iterator instanceof \OuterIterator) {
+						if ($iterator->getInnerIterator() instanceof \FilesystemIterator) {
+								$iterator->getInnerIterator()->next();
+								$iterator->getInnerIterator()->rewind();
+						}
+						$iterator = $iterator->getInnerIterator();
+				}
 
-        parent::rewind();
-    }
+				parent::rewind();
+		}
 }

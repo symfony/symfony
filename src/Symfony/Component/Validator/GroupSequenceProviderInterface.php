@@ -16,11 +16,11 @@ namespace Symfony\Component\Validator;
  */
 interface GroupSequenceProviderInterface
 {
-    /**
-     * Returns which validation groups should be used for a certain state
-     * of the object.
-     *
-     * @return array An array of validation groups
-     */
-    public function getGroupSequence();
+		/**
+		 * Returns which validation groups should be used for a certain state
+		 * of the object.
+		 *
+		 * @return array An array of validation groups
+		 */
+		public function getGroupSequence();
 }

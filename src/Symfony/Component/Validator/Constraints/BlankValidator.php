@@ -21,13 +21,13 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class BlankValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if ('' !== $value && null !== $value) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
-        }
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if ('' !== $value && null !== $value) {
+						$this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+				}
+		}
 }

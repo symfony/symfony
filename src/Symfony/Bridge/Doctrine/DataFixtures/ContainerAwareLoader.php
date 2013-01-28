@@ -25,30 +25,30 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ContainerAwareLoader extends Loader
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+		/**
+		 * @var ContainerInterface
+		 */
+		private $container;
 
-    /**
-     * Constructor.
-     *
-     * @param ContainerInterface $container A ContainerInterface instance
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
+		/**
+		 * Constructor.
+		 *
+		 * @param ContainerInterface $container A ContainerInterface instance
+		 */
+		public function __construct(ContainerInterface $container)
+		{
+				$this->container = $container;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addFixture(FixtureInterface $fixture)
-    {
-        if ($fixture instanceof ContainerAwareInterface) {
-            $fixture->setContainer($this->container);
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function addFixture(FixtureInterface $fixture)
+		{
+				if ($fixture instanceof ContainerAwareInterface) {
+						$fixture->setContainer($this->container);
+				}
 
-        parent::addFixture($fixture);
-    }
+				parent::addFixture($fixture);
+		}
 }

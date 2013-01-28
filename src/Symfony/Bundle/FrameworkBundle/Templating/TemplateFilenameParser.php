@@ -21,20 +21,20 @@ use Symfony\Component\Templating\TemplateNameParserInterface;
  */
 class TemplateFilenameParser implements TemplateNameParserInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function parse($file)
-    {
-        $parts = explode('/', strtr($file, '\\', '/'));
+		/**
+		 * {@inheritdoc}
+		 */
+		public function parse($file)
+		{
+				$parts = explode('/', strtr($file, '\\', '/'));
 
-        $elements = explode('.', array_pop($parts));
-        if (3 > count($elements)) {
-            return false;
-        }
-        $engine = array_pop($elements);
-        $format = array_pop($elements);
+				$elements = explode('.', array_pop($parts));
+				if (3 > count($elements)) {
+						return false;
+				}
+				$engine = array_pop($elements);
+				$format = array_pop($elements);
 
-        return new TemplateReference('', implode('/', $parts), implode('.', $elements), $format, $engine);
-    }
+				return new TemplateReference('', implode('/', $parts), implode('.', $elements), $format, $engine);
+		}
 }

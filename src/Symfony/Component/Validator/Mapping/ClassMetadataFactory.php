@@ -23,103 +23,103 @@ use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
  */
 class ClassMetadataFactory implements ClassMetadataFactoryInterface, MetadataFactoryInterface
 {
-    /**
-     * The loader for loading the class metadata
-     * @var LoaderInterface
-     */
-    protected $loader;
+		/**
+		 * The loader for loading the class metadata
+		 * @var LoaderInterface
+		 */
+		protected $loader;
 
-    /**
-     * The cache for caching class metadata
-     * @var CacheInterface
-     */
-    protected $cache;
+		/**
+		 * The cache for caching class metadata
+		 * @var CacheInterface
+		 */
+		protected $cache;
 
-    protected $loadedClasses = array();
+		protected $loadedClasses = array();
 
-    public function __construct(LoaderInterface $loader = null, CacheInterface $cache = null)
-    {
-        $this->loader = $loader;
-        $this->cache = $cache;
-    }
+		public function __construct(LoaderInterface $loader = null, CacheInterface $cache = null)
+		{
+				$this->loader = $loader;
+				$this->cache = $cache;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadataFor($value)
-    {
-        if (!is_object($value) && !is_string($value)) {
-            throw new NoSuchMetadataException('Cannot create metadata for non-objects. Got: ' . gettype($value));
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getMetadataFor($value)
+		{
+				if (!is_object($value) && !is_string($value)) {
+						throw new NoSuchMetadataException('Cannot create metadata for non-objects. Got: ' . gettype($value));
+				}
 
-        $class = ltrim(is_object($value) ? get_class($value) : $value, '\\');
+				$class = ltrim(is_object($value) ? get_class($value) : $value, '\\');
 
-        if (isset($this->loadedClasses[$class])) {
-            return $this->loadedClasses[$class];
-        }
+				if (isset($this->loadedClasses[$class])) {
+						return $this->loadedClasses[$class];
+				}
 
-        if (null !== $this->cache && false !== ($this->loadedClasses[$class] = $this->cache->read($class))) {
-            return $this->loadedClasses[$class];
-        }
+				if (null !== $this->cache && false !== ($this->loadedClasses[$class] = $this->cache->read($class))) {
+						return $this->loadedClasses[$class];
+				}
 
-        if (!class_exists($class) && !interface_exists($class)) {
-            throw new NoSuchMetadataException('The class or interface "' . $class . '" does not exist.');
-        }
+				if (!class_exists($class) && !interface_exists($class)) {
+						throw new NoSuchMetadataException('The class or interface "' . $class . '" does not exist.');
+				}
 
-        $metadata = new ClassMetadata($class);
+				$metadata = new ClassMetadata($class);
 
-        // Include constraints from the parent class
-        if ($parent = $metadata->getReflectionClass()->getParentClass()) {
-            $metadata->mergeConstraints($this->getMetadataFor($parent->name));
-        }
+				// Include constraints from the parent class
+				if ($parent = $metadata->getReflectionClass()->getParentClass()) {
+						$metadata->mergeConstraints($this->getMetadataFor($parent->name));
+				}
 
-        // Include constraints from all implemented interfaces
-        foreach ($metadata->getReflectionClass()->getInterfaces() as $interface) {
-            if ('Symfony\Component\Validator\GroupSequenceProviderInterface' === $interface->name) {
-                continue;
-            }
-            $metadata->mergeConstraints($this->getMetadataFor($interface->name));
-        }
+				// Include constraints from all implemented interfaces
+				foreach ($metadata->getReflectionClass()->getInterfaces() as $interface) {
+						if ('Symfony\Component\Validator\GroupSequenceProviderInterface' === $interface->name) {
+								continue;
+						}
+						$metadata->mergeConstraints($this->getMetadataFor($interface->name));
+				}
 
-        if (null !== $this->loader) {
-            $this->loader->loadClassMetadata($metadata);
-        }
+				if (null !== $this->loader) {
+						$this->loader->loadClassMetadata($metadata);
+				}
 
-        if (null !== $this->cache) {
-            $this->cache->write($metadata);
-        }
+				if (null !== $this->cache) {
+						$this->cache->write($metadata);
+				}
 
-        return $this->loadedClasses[$class] = $metadata;
-    }
+				return $this->loadedClasses[$class] = $metadata;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasMetadataFor($value)
-    {
-        if (!is_object($value) && !is_string($value)) {
-            return false;
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function hasMetadataFor($value)
+		{
+				if (!is_object($value) && !is_string($value)) {
+						return false;
+				}
 
-        $class = ltrim(is_object($value) ? get_class($value) : $value, '\\');
+				$class = ltrim(is_object($value) ? get_class($value) : $value, '\\');
 
-        if (class_exists($class) || interface_exists($class)) {
-            return true;
-        }
+				if (class_exists($class) || interface_exists($class)) {
+						return true;
+				}
 
-        return false;
-    }
+				return false;
+		}
 
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
-     *             {@link getMetadataFor} instead.
-     */
-    public function getClassMetadata($class)
-    {
-        trigger_error('getClassMetadata() is deprecated since version 2.2 and will be removed in 2.3. Use getMetadataFor() instead.', E_USER_DEPRECATED);
+		/**
+		 * {@inheritdoc}
+		 *
+		 * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
+		 *						 {@link getMetadataFor} instead.
+		 */
+		public function getClassMetadata($class)
+		{
+				trigger_error('getClassMetadata() is deprecated since version 2.2 and will be removed in 2.3. Use getMetadataFor() instead.', E_USER_DEPRECATED);
 
-        return $this->getMetadataFor($class);
-    }
+				return $this->getMetadataFor($class);
+		}
 }

@@ -22,30 +22,30 @@ use Symfony\Component\Validator\Constraint;
  */
 class MinLength extends Constraint
 {
-    public $message = 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.';
-    public $limit;
-    public $charset = 'UTF-8';
+		public $message = 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.';
+		public $limit;
+		public $charset = 'UTF-8';
 
-    public function __construct($options = null)
-    {
-        trigger_error('MinLength is deprecated since version 2.1 and will be removed in 2.3. Use Length instead.', E_USER_DEPRECATED);
+		public function __construct($options = null)
+		{
+				trigger_error('MinLength is deprecated since version 2.1 and will be removed in 2.3. Use Length instead.', E_USER_DEPRECATED);
 
-        parent::__construct($options);
-    }
+				parent::__construct($options);
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDefaultOption()
-    {
-        return 'limit';
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function getDefaultOption()
+		{
+				return 'limit';
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getRequiredOptions()
-    {
-        return array('limit');
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function getRequiredOptions()
+		{
+				return array('limit');
+		}
 }

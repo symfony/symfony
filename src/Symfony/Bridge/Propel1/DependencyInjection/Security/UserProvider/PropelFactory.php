@@ -23,36 +23,36 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class PropelFactory implements UserProviderFactoryInterface
 {
-    private $key;
-    private $providerId;
+		private $key;
+		private $providerId;
 
-    public function __construct($key, $providerId)
-    {
-        $this->key = $key;
-        $this->providerId = $providerId;
-    }
+		public function __construct($key, $providerId)
+		{
+				$this->key = $key;
+				$this->providerId = $providerId;
+		}
 
-    public function create(ContainerBuilder $container, $id, $config)
-    {
-        $container
-            ->setDefinition($id, new DefinitionDecorator($this->providerId))
-            ->addArgument($config['class'])
-            ->addArgument($config['property'])
-            ;
-    }
+		public function create(ContainerBuilder $container, $id, $config)
+		{
+				$container
+						->setDefinition($id, new DefinitionDecorator($this->providerId))
+						->addArgument($config['class'])
+						->addArgument($config['property'])
+						;
+		}
 
-    public function getKey()
-    {
-        return $this->key;
-    }
+		public function getKey()
+		{
+				return $this->key;
+		}
 
-    public function addConfiguration(NodeDefinition $node)
-    {
-        $node
-            ->children()
-            ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
-            ->scalarNode('property')->defaultNull()->end()
-            ->end()
-            ;
-    }
+		public function addConfiguration(NodeDefinition $node)
+		{
+				$node
+						->children()
+						->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
+						->scalarNode('property')->defaultNull()->end()
+						->end()
+						;
+		}
 }

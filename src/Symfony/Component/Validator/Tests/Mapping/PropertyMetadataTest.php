@@ -16,20 +16,20 @@ use Symfony\Component\Validator\Tests\Fixtures\Entity;
 
 class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
 {
-    const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
+		const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
 
-    public function testInvalidPropertyName()
-    {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ValidatorException');
+		public function testInvalidPropertyName()
+		{
+				$this->setExpectedException('Symfony\Component\Validator\Exception\ValidatorException');
 
-        new PropertyMetadata(self::CLASSNAME, 'foobar');
-    }
+				new PropertyMetadata(self::CLASSNAME, 'foobar');
+		}
 
-    public function testGetPropertyValueFromPrivateProperty()
-    {
-        $entity = new Entity('foobar');
-        $metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
+		public function testGetPropertyValueFromPrivateProperty()
+		{
+				$entity = new Entity('foobar');
+				$metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
 
-        $this->assertEquals('foobar', $metadata->getPropertyValue($entity));
-    }
+				$this->assertEquals('foobar', $metadata->getPropertyValue($entity));
+		}
 }

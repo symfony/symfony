@@ -16,13 +16,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class FooTypeBazExtension extends AbstractTypeExtension
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->setAttribute('baz', 'x');
-    }
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+				$builder->setAttribute('baz', 'x');
+		}
 
-    public function getExtendedType()
-    {
-        return 'foo';
-    }
+		public function getExtendedType()
+		{
+				return 'foo';
+		}
 }

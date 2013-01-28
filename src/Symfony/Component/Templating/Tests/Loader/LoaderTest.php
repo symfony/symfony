@@ -17,27 +17,27 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 
 class LoaderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetSetDebugger()
-    {
-        $loader = new ProjectTemplateLoader4(new TemplateNameParser());
-        $loader->setDebugger($debugger = new \Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateDebugger());
-        $this->assertTrue($loader->getDebugger() === $debugger, '->setDebugger() sets the debugger instance');
-    }
+		public function testGetSetDebugger()
+		{
+				$loader = new ProjectTemplateLoader4(new TemplateNameParser());
+				$loader->setDebugger($debugger = new \Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateDebugger());
+				$this->assertTrue($loader->getDebugger() === $debugger, '->setDebugger() sets the debugger instance');
+		}
 }
 
 class ProjectTemplateLoader4 extends Loader
 {
-    public function load(TemplateReferenceInterface $template)
-    {
-    }
+		public function load(TemplateReferenceInterface $template)
+		{
+		}
 
-    public function getDebugger()
-    {
-        return $this->debugger;
-    }
+		public function getDebugger()
+		{
+				return $this->debugger;
+		}
 
-    public function isFresh(TemplateReferenceInterface $template, $time)
-    {
-        return false;
-    }
+		public function isFresh(TemplateReferenceInterface $template, $time)
+		{
+				return false;
+		}
 }

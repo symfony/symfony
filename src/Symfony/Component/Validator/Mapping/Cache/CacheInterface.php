@@ -20,26 +20,26 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 interface CacheInterface
 {
-    /**
-     * Returns whether metadata for the given class exists in the cache
-     *
-     * @param string $class
-     */
-    public function has($class);
+		/**
+		 * Returns whether metadata for the given class exists in the cache
+		 *
+		 * @param string $class
+		 */
+		public function has($class);
 
-    /**
-     * Returns the metadata for the given class from the cache
-     *
-     * @param string $class Class Name
-     *
-     * @return ClassMetadata|false A ClassMetadata instance or false on miss
-     */
-    public function read($class);
+		/**
+		 * Returns the metadata for the given class from the cache
+		 *
+		 * @param string $class Class Name
+		 *
+		 * @return ClassMetadata|false A ClassMetadata instance or false on miss
+		 */
+		public function read($class);
 
-    /**
-     * Stores a class metadata in the cache
-     *
-     * @param ClassMetadata $metadata A Class Metadata
-     */
-    public function write(ClassMetadata $metadata);
+		/**
+		 * Stores a class metadata in the cache
+		 *
+		 * @param ClassMetadata $metadata A Class Metadata
+		 */
+		public function write(ClassMetadata $metadata);
 }

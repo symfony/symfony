@@ -15,13 +15,13 @@ use Symfony\Component\Locale\Stub\StubIntl;
  * Stub implementation for the intl_is_failure function of the intl extension
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- * @param  integer $errorCode  The error code returned by intl_get_error_code()
+ * @param	integer $errorCode	The error code returned by intl_get_error_code()
  * @return Boolean Whether the error code indicates an error
- * @see    Symfony\Component\Locale\Stub\StubIntl::isFailure
+ * @see		Symfony\Component\Locale\Stub\StubIntl::isFailure
  */
 function intl_is_failure($errorCode)
 {
-    return StubIntl::isFailure($errorCode);
+		return StubIntl::isFailure($errorCode);
 }
 
 /**
@@ -29,12 +29,12 @@ function intl_is_failure($errorCode)
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @return Boolean The error code of the last intl function call or
- *                 StubIntl::U_ZERO_ERROR if no error occurred
- * @see    Symfony\Component\Locale\Stub\StubIntl::getErrorCode
+ *								 StubIntl::U_ZERO_ERROR if no error occurred
+ * @see		Symfony\Component\Locale\Stub\StubIntl::getErrorCode
  */
 function intl_get_error_code()
 {
-    return StubIntl::getErrorCode();
+		return StubIntl::getErrorCode();
 }
 
 /**
@@ -42,12 +42,12 @@ function intl_get_error_code()
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @return Boolean The error message of the last intl function call or
- *                 "U_ZERO_ERROR" if no error occurred
- * @see    Symfony\Component\Locale\Stub\StubIntl::getErrorMessage
+ *								 "U_ZERO_ERROR" if no error occurred
+ * @see		Symfony\Component\Locale\Stub\StubIntl::getErrorMessage
  */
 function intl_get_error_message()
 {
-    return StubIntl::getErrorMessage();
+		return StubIntl::getErrorMessage();
 }
 
 /**
@@ -57,9 +57,9 @@ function intl_get_error_message()
  *
  * @return String will be the same as the name of the error code constant
  *
- * @see    Symfony\Component\Locale\Stub\StubIntl::getErrorName
+ * @see		Symfony\Component\Locale\Stub\StubIntl::getErrorName
  */
 function intl_error_name($errorCode)
 {
-    return StubIntl::getErrorName($errorCode);
+		return StubIntl::getErrorName($errorCode);
 }

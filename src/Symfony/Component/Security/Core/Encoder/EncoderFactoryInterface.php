@@ -20,14 +20,14 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 interface EncoderFactoryInterface
 {
-    /**
-     * Returns the password encoder to use for the given account.
-     *
-     * @param UserInterface|string $user A UserInterface instance or a class name
-     *
-     * @return PasswordEncoderInterface
-     *
-     * @throws \RuntimeException when no password encoder could be found for the user
-     */
-    public function getEncoder($user);
+		/**
+		 * Returns the password encoder to use for the given account.
+		 *
+		 * @param UserInterface|string $user A UserInterface instance or a class name
+		 *
+		 * @return PasswordEncoderInterface
+		 *
+		 * @throws \RuntimeException when no password encoder could be found for the user
+		 */
+		public function getEncoder($user);
 }

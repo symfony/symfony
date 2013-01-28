@@ -21,106 +21,106 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class MergeCollectionListener implements EventSubscriberInterface
 {
-    /**
-     * Whether elements may be added to the collection
-     * @var Boolean
-     */
-    private $allowAdd;
+		/**
+		 * Whether elements may be added to the collection
+		 * @var Boolean
+		 */
+		private $allowAdd;
 
-    /**
-     * Whether elements may be removed from the collection
-     * @var Boolean
-     */
-    private $allowDelete;
+		/**
+		 * Whether elements may be removed from the collection
+		 * @var Boolean
+		 */
+		private $allowDelete;
 
-    /**
-     * Creates a new listener.
-     *
-     * @param Boolean $allowAdd Whether values might be added to the
-     *                                collection.
-     * @param Boolean $allowDelete Whether values might be removed from the
-     *                                collection.
-     */
-    public function __construct($allowAdd = false, $allowDelete = false)
-    {
-        $this->allowAdd = $allowAdd;
-        $this->allowDelete = $allowDelete;
-    }
+		/**
+		 * Creates a new listener.
+		 *
+		 * @param Boolean $allowAdd Whether values might be added to the
+		 *																collection.
+		 * @param Boolean $allowDelete Whether values might be removed from the
+		 *																collection.
+		 */
+		public function __construct($allowAdd = false, $allowDelete = false)
+		{
+				$this->allowAdd = $allowAdd;
+				$this->allowDelete = $allowDelete;
+		}
 
-    public static function getSubscribedEvents()
-    {
-        return array(
-            FormEvents::BIND => 'onBind',
-        );
-    }
+		public static function getSubscribedEvents()
+		{
+				return array(
+						FormEvents::BIND => 'onBind',
+				);
+		}
 
-    public function onBind(FormEvent $event)
-    {
-        $dataToMergeInto = $event->getForm()->getNormData();
-        $data = $event->getData();
+		public function onBind(FormEvent $event)
+		{
+				$dataToMergeInto = $event->getForm()->getNormData();
+				$data = $event->getData();
 
-        if (null === $data) {
-            $data = array();
-        }
+				if (null === $data) {
+						$data = array();
+				}
 
-        if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
-            throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
-        }
+				if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
+						throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
+				}
 
-        if (null !== $dataToMergeInto && !is_array($dataToMergeInto) && !($dataToMergeInto instanceof \Traversable && $dataToMergeInto instanceof \ArrayAccess)) {
-            throw new UnexpectedTypeException($dataToMergeInto, 'array or (\Traversable and \ArrayAccess)');
-        }
+				if (null !== $dataToMergeInto && !is_array($dataToMergeInto) && !($dataToMergeInto instanceof \Traversable && $dataToMergeInto instanceof \ArrayAccess)) {
+						throw new UnexpectedTypeException($dataToMergeInto, 'array or (\Traversable and \ArrayAccess)');
+				}
 
-        // If we are not allowed to change anything, return immediately
-        if ((!$this->allowAdd && !$this->allowDelete) || $data === $dataToMergeInto) {
-            $event->setData($dataToMergeInto);
+				// If we are not allowed to change anything, return immediately
+				if ((!$this->allowAdd && !$this->allowDelete) || $data === $dataToMergeInto) {
+						$event->setData($dataToMergeInto);
 
-            return;
-        }
+						return;
+				}
 
-        if (!$dataToMergeInto) {
-            // No original data was set. Set it if allowed
-            if ($this->allowAdd) {
-                $dataToMergeInto = $data;
-            }
-        } else {
-            // Calculate delta
-            $itemsToAdd = is_object($data) ? clone $data : $data;
-            $itemsToDelete = array();
+				if (!$dataToMergeInto) {
+						// No original data was set. Set it if allowed
+						if ($this->allowAdd) {
+								$dataToMergeInto = $data;
+						}
+				} else {
+						// Calculate delta
+						$itemsToAdd = is_object($data) ? clone $data : $data;
+						$itemsToDelete = array();
 
-            foreach ($dataToMergeInto as $beforeKey => $beforeItem) {
-                foreach ($data as $afterKey => $afterItem) {
-                    if ($afterItem === $beforeItem) {
-                        // Item found, next original item
-                        unset($itemsToAdd[$afterKey]);
-                        continue 2;
-                    }
-                }
+						foreach ($dataToMergeInto as $beforeKey => $beforeItem) {
+								foreach ($data as $afterKey => $afterItem) {
+										if ($afterItem === $beforeItem) {
+												// Item found, next original item
+												unset($itemsToAdd[$afterKey]);
+												continue 2;
+										}
+								}
 
-                // Item not found, remember for deletion
-                $itemsToDelete[] = $beforeKey;
-            }
+								// Item not found, remember for deletion
+								$itemsToDelete[] = $beforeKey;
+						}
 
-            // Remove deleted items before adding to free keys that are to be
-            // replaced
-            if ($this->allowDelete) {
-                foreach ($itemsToDelete as $key) {
-                    unset($dataToMergeInto[$key]);
-                }
-            }
+						// Remove deleted items before adding to free keys that are to be
+						// replaced
+						if ($this->allowDelete) {
+								foreach ($itemsToDelete as $key) {
+										unset($dataToMergeInto[$key]);
+								}
+						}
 
-            // Add remaining items
-            if ($this->allowAdd) {
-                foreach ($itemsToAdd as $key => $item) {
-                    if (!isset($dataToMergeInto[$key])) {
-                        $dataToMergeInto[$key] = $item;
-                    } else {
-                        $dataToMergeInto[] = $item;
-                    }
-                }
-            }
-        }
+						// Add remaining items
+						if ($this->allowAdd) {
+								foreach ($itemsToAdd as $key => $item) {
+										if (!isset($dataToMergeInto[$key])) {
+												$dataToMergeInto[$key] = $item;
+										} else {
+												$dataToMergeInto[] = $item;
+										}
+								}
+						}
+				}
 
-        $event->setData($dataToMergeInto);
-    }
+				$event->setData($dataToMergeInto);
+		}
 }

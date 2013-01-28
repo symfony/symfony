@@ -18,23 +18,23 @@ namespace Symfony\Component\Serializer\Encoder;
  */
 interface EncoderInterface
 {
-    /**
-     * Encodes data into the given format
-     *
-     * @param mixed  $data   Data to encode
-     * @param string $format Format name
-     * @param array  $context options that normalizers/encoders have access to.
-     *
-     * @return scalar
-     */
-    public function encode($data, $format, array $context = array());
+		/**
+		 * Encodes data into the given format
+		 *
+		 * @param mixed	$data	 Data to encode
+		 * @param string $format Format name
+		 * @param array	$context options that normalizers/encoders have access to.
+		 *
+		 * @return scalar
+		 */
+		public function encode($data, $format, array $context = array());
 
-    /**
-     * Checks whether the serializer can encode to given format
-     *
-     * @param string $format format name
-     *
-     * @return Boolean
-     */
-    public function supportsEncoding($format);
+		/**
+		 * Checks whether the serializer can encode to given format
+		 *
+		 * @param string $format format name
+		 *
+		 * @return Boolean
+		 */
+		public function supportsEncoding($format);
 }

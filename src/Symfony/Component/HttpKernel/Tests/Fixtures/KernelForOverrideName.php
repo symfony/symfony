@@ -16,15 +16,15 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 
 class KernelForOverrideName extends Kernel
 {
-    protected $name = 'overridden';
+		protected $name = 'overridden';
 
-    public function registerBundles()
-    {
+		public function registerBundles()
+		{
 
-    }
+		}
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
-    {
+		public function registerContainerConfiguration(LoaderInterface $loader)
+		{
 
-    }
+		}
 }

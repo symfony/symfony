@@ -16,29 +16,29 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class TextType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'compound' => false,
-        ));
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				$resolver->setDefaults(array(
+						'compound' => false,
+				));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'field';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getParent()
+		{
+				return 'field';
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'text';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'text';
+		}
 }

@@ -23,60 +23,60 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  */
 class ChainDecoder implements DecoderInterface
 {
-    protected $decoders = array();
-    protected $decoderByFormat = array();
+		protected $decoders = array();
+		protected $decoderByFormat = array();
 
-    public function __construct(array $decoders = array())
-    {
-        $this->decoders = $decoders;
-    }
+		public function __construct(array $decoders = array())
+		{
+				$this->decoders = $decoders;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    final public function decode($data, $format, array $context = array())
-    {
-        return $this->getDecoder($format)->decode($data, $format, $context);
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		final public function decode($data, $format, array $context = array())
+		{
+				return $this->getDecoder($format)->decode($data, $format, $context);
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDecoding($format)
-    {
-        try {
-            $this->getDecoder($format);
-        } catch (RuntimeException $e) {
-            return false;
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function supportsDecoding($format)
+		{
+				try {
+						$this->getDecoder($format);
+				} catch (RuntimeException $e) {
+						return false;
+				}
 
-        return true;
-    }
+				return true;
+		}
 
-    /**
-     * Gets the decoder supporting the format.
-     *
-     * @param string $format
-     *
-     * @return DecoderInterface
-     * @throws RuntimeException if no decoder is found
-     */
-    private function getDecoder($format)
-    {
-        if (isset($this->decoderByFormat[$format])
-            && isset($this->decoders[$this->decoderByFormat[$format]])
-        ) {
-            return $this->decoders[$this->decoderByFormat[$format]];
-        }
+		/**
+		 * Gets the decoder supporting the format.
+		 *
+		 * @param string $format
+		 *
+		 * @return DecoderInterface
+		 * @throws RuntimeException if no decoder is found
+		 */
+		private function getDecoder($format)
+		{
+				if (isset($this->decoderByFormat[$format])
+						&& isset($this->decoders[$this->decoderByFormat[$format]])
+				) {
+						return $this->decoders[$this->decoderByFormat[$format]];
+				}
 
-        foreach ($this->decoders as $i => $decoder) {
-            if ($decoder->supportsDecoding($format)) {
-                $this->decoderByFormat[$format] = $i;
+				foreach ($this->decoders as $i => $decoder) {
+						if ($decoder->supportsDecoding($format)) {
+								$this->decoderByFormat[$format] = $i;
 
-                return $decoder;
-            }
-        }
+								return $decoder;
+						}
+				}
 
-        throw new RuntimeException(sprintf('No decoder found for format "%s".', $format));
-    }
+				throw new RuntimeException(sprintf('No decoder found for format "%s".', $format));
+		}
 }

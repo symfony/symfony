@@ -26,40 +26,40 @@ use Symfony\Component\Yaml\Exception\ParseException;
  */
 class YamlFileLoader extends ArrayLoader implements LoaderInterface
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function load($resource, $locale, $domain = 'messages')
-    {
-        if (!stream_is_local($resource)) {
-            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
-        }
+		/**
+		 * {@inheritdoc}
+		 *
+		 * @api
+		 */
+		public function load($resource, $locale, $domain = 'messages')
+		{
+				if (!stream_is_local($resource)) {
+						throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
+				}
 
-        if (!file_exists($resource)) {
-            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
-        }
+				if (!file_exists($resource)) {
+						throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
+				}
 
-        try {
-            $messages = Yaml::parse($resource);
-        } catch (ParseException $e) {
-            throw new InvalidResourceException('Error parsing YAML.', 0, $e);
-        }
+				try {
+						$messages = Yaml::parse($resource);
+				} catch (ParseException $e) {
+						throw new InvalidResourceException('Error parsing YAML.', 0, $e);
+				}
 
-        // empty file
-        if (null === $messages) {
-            $messages = array();
-        }
+				// empty file
+				if (null === $messages) {
+						$messages = array();
+				}
 
-        // not an array
-        if (!is_array($messages)) {
-            throw new InvalidResourceException(sprintf('The file "%s" must contain a YAML array.', $resource));
-        }
+				// not an array
+				if (!is_array($messages)) {
+						throw new InvalidResourceException(sprintf('The file "%s" must contain a YAML array.', $resource));
+				}
 
-        $catalogue = parent::load($messages, $locale, $domain);
-        $catalogue->addResource(new FileResource($resource));
+				$catalogue = parent::load($messages, $locale, $domain);
+				$catalogue->addResource(new FileResource($resource));
 
-        return $catalogue;
-    }
+				return $catalogue;
+		}
 }

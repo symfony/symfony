@@ -19,11 +19,11 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class AuthenticationServiceException extends AuthenticationException
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function getMessageKey()
-    {
-        return 'Authentication request could not be processed due to a system problem.';
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function getMessageKey()
+		{
+				return 'Authentication request could not be processed due to a system problem.';
+		}
 }

@@ -24,68 +24,68 @@ use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
  */
 class RouterMatchCommand extends ContainerAwareCommand
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function isEnabled()
-    {
-        if (!$this->getContainer()->has('router')) {
-            return false;
-        }
-        $router = $this->getContainer()->get('router');
-        if (!$router instanceof RouterInterface) {
-            return false;
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function isEnabled()
+		{
+				if (!$this->getContainer()->has('router')) {
+						return false;
+				}
+				$router = $this->getContainer()->get('router');
+				if (!$router instanceof RouterInterface) {
+						return false;
+				}
 
-        return parent::isEnabled();
-    }
+				return parent::isEnabled();
+		}
 
-    /**
-     * @see Command
-     */
-    protected function configure()
-    {
-        $this
-            ->setName('router:match')
-            ->setDefinition(array(
-                new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
-            ))
-            ->setDescription('Helps debug routes by simulating a path info match')
-            ->setHelp(<<<EOF
+		/**
+		 * @see Command
+		 */
+		protected function configure()
+		{
+				$this
+						->setName('router:match')
+						->setDefinition(array(
+								new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
+						))
+						->setDescription('Helps debug routes by simulating a path info match')
+						->setHelp(<<<EOF
 The <info>%command.name%</info> simulates a path info match:
 
-  <info>php %command.full_name% /foo</info>
+	<info>php %command.full_name% /foo</info>
 EOF
-            )
-        ;
-    }
+						)
+				;
+		}
 
-    /**
-     * @see Command
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $router = $this->getContainer()->get('router');
-        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $router->getContext());
+		/**
+		 * @see Command
+		 */
+		protected function execute(InputInterface $input, OutputInterface $output)
+		{
+				$router = $this->getContainer()->get('router');
+				$matcher = new TraceableUrlMatcher($router->getRouteCollection(), $router->getContext());
 
-        $traces = $matcher->getTraces($input->getArgument('path_info'));
+				$traces = $matcher->getTraces($input->getArgument('path_info'));
 
-        $matches = false;
-        foreach ($traces as $i => $trace) {
-            if (TraceableUrlMatcher::ROUTE_ALMOST_MATCHES == $trace['level']) {
-                $output->writeln(sprintf('<fg=yellow>Route "%s" almost matches but %s</>', $trace['name'], lcfirst($trace['log'])));
-            } elseif (TraceableUrlMatcher::ROUTE_MATCHES == $trace['level']) {
-                $output->writeln(sprintf('<fg=green>Route "%s" matches</>', $trace['name']));
-                $matches = true;
-            } elseif ($input->getOption('verbose')) {
-                $output->writeln(sprintf('Route "%s" does not match: %s', $trace['name'], $trace['log']));
-            }
-        }
+				$matches = false;
+				foreach ($traces as $i => $trace) {
+						if (TraceableUrlMatcher::ROUTE_ALMOST_MATCHES == $trace['level']) {
+								$output->writeln(sprintf('<fg=yellow>Route "%s" almost matches but %s</>', $trace['name'], lcfirst($trace['log'])));
+						} elseif (TraceableUrlMatcher::ROUTE_MATCHES == $trace['level']) {
+								$output->writeln(sprintf('<fg=green>Route "%s" matches</>', $trace['name']));
+								$matches = true;
+						} elseif ($input->getOption('verbose')) {
+								$output->writeln(sprintf('Route "%s" does not match: %s', $trace['name'], $trace['log']));
+						}
+				}
 
-        if (!$matches) {
-            $output->writeln('<fg=red>None of the routes matches</>');
+				if (!$matches) {
+						$output->writeln('<fg=red>None of the routes matches</>');
 
-            return 1;
-        }
-    }
+						return 1;
+				}
+		}
 }

@@ -21,16 +21,16 @@ use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
  */
 class AclSchemaListener
 {
-    private $container;
+		private $container;
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
+		public function __construct(ContainerInterface $container)
+		{
+				$this->container = $container;
+		}
 
-    public function postGenerateSchema(GenerateSchemaEventArgs $args)
-    {
-        $schema = $args->getSchema();
-        $this->container->get('security.acl.dbal.schema')->addToSchema($schema);
-    }
+		public function postGenerateSchema(GenerateSchemaEventArgs $args)
+		{
+				$schema = $args->getSchema();
+				$this->container->get('security.acl.dbal.schema')->addToSchema($schema);
+		}
 }

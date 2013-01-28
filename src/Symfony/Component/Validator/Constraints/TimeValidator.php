@@ -22,25 +22,25 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class TimeValidator extends ConstraintValidator
 {
-    const PATTERN = '/^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/';
+		const PATTERN = '/^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/';
 
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (null === $value || '' === $value || $value instanceof \DateTime) {
-            return;
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (null === $value || '' === $value || $value instanceof \DateTime) {
+						return;
+				}
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
-        }
+				if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+						throw new UnexpectedTypeException($value, 'string');
+				}
 
-        $value = (string) $value;
+				$value = (string) $value;
 
-        if (!preg_match(static::PATTERN, $value)) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
-        }
-    }
+				if (!preg_match(static::PATTERN, $value)) {
+						$this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+				}
+		}
 }

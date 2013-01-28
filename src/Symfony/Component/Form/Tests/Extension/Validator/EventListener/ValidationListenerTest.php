@@ -21,126 +21,126 @@ use Symfony\Component\Validator\ConstraintViolation;
 
 class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $dispatcher;
+		/**
+		 * @var \PHPUnit_Framework_MockObject_MockObject
+		 */
+		private $dispatcher;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $factory;
+		/**
+		 * @var \PHPUnit_Framework_MockObject_MockObject
+		 */
+		private $factory;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $validator;
+		/**
+		 * @var \PHPUnit_Framework_MockObject_MockObject
+		 */
+		private $validator;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $violationMapper;
+		/**
+		 * @var \PHPUnit_Framework_MockObject_MockObject
+		 */
+		private $violationMapper;
 
-    /**
-     * @var ValidationListener
-     */
-    private $listener;
+		/**
+		 * @var ValidationListener
+		 */
+		private $listener;
 
-    private $message;
+		private $message;
 
-    private $messageTemplate;
+		private $messageTemplate;
 
-    private $params;
+		private $params;
 
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\EventDispatcher\Event')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
+		protected function setUp()
+		{
+				if (!class_exists('Symfony\Component\EventDispatcher\Event')) {
+						$this->markTestSkipped('The "EventDispatcher" component is not available');
+				}
 
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
-        $this->violationMapper = $this->getMock('Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface');
-        $this->listener = new ValidationListener($this->validator, $this->violationMapper);
-        $this->message = 'Message';
-        $this->messageTemplate = 'Message template';
-        $this->params = array('foo' => 'bar');
-    }
+				$this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+				$this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+				$this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
+				$this->violationMapper = $this->getMock('Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface');
+				$this->listener = new ValidationListener($this->validator, $this->violationMapper);
+				$this->message = 'Message';
+				$this->messageTemplate = 'Message template';
+				$this->params = array('foo' => 'bar');
+		}
 
-    private function getConstraintViolation($code = null)
-    {
-        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code);
-    }
+		private function getConstraintViolation($code = null)
+		{
+				return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code);
+		}
 
-    private function getBuilder($name = 'name', $propertyPath = null, $dataClass = null)
-    {
-        $builder = new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory);
-        $builder->setPropertyPath(new PropertyPath($propertyPath ?: $name));
-        $builder->setAttribute('error_mapping', array());
-        $builder->setErrorBubbling(false);
-        $builder->setMapped(true);
+		private function getBuilder($name = 'name', $propertyPath = null, $dataClass = null)
+		{
+				$builder = new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory);
+				$builder->setPropertyPath(new PropertyPath($propertyPath ?: $name));
+				$builder->setAttribute('error_mapping', array());
+				$builder->setErrorBubbling(false);
+				$builder->setMapped(true);
 
-        return $builder;
-    }
+				return $builder;
+		}
 
-    private function getForm($name = 'name', $propertyPath = null, $dataClass = null)
-    {
-        return $this->getBuilder($name, $propertyPath, $dataClass)->getForm();
-    }
+		private function getForm($name = 'name', $propertyPath = null, $dataClass = null)
+		{
+				return $this->getBuilder($name, $propertyPath, $dataClass)->getForm();
+		}
 
-    private function getMockForm()
-    {
-        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
-    }
+		private function getMockForm()
+		{
+				return $this->getMock('Symfony\Component\Form\Test\FormInterface');
+		}
 
-    // More specific mapping tests can be found in ViolationMapperTest
-    public function testMapViolation()
-    {
-        $violation = $this->getConstraintViolation();
-        $form = $this->getForm('street');
+		// More specific mapping tests can be found in ViolationMapperTest
+		public function testMapViolation()
+		{
+				$violation = $this->getConstraintViolation();
+				$form = $this->getForm('street');
 
-        $this->validator->expects($this->once())
-            ->method('validate')
-            ->will($this->returnValue(array($violation)));
+				$this->validator->expects($this->once())
+						->method('validate')
+						->will($this->returnValue(array($violation)));
 
-        $this->violationMapper->expects($this->once())
-            ->method('mapViolation')
-            ->with($violation, $form, false);
+				$this->violationMapper->expects($this->once())
+						->method('mapViolation')
+						->with($violation, $form, false);
 
-        $this->listener->validateForm(new FormEvent($form, null));
-    }
+				$this->listener->validateForm(new FormEvent($form, null));
+		}
 
-    public function testMapViolationAllowsNonSyncIfInvalid()
-    {
-        $violation = $this->getConstraintViolation(Form::ERR_INVALID);
-        $form = $this->getForm('street');
+		public function testMapViolationAllowsNonSyncIfInvalid()
+		{
+				$violation = $this->getConstraintViolation(Form::ERR_INVALID);
+				$form = $this->getForm('street');
 
-        $this->validator->expects($this->once())
-            ->method('validate')
-            ->will($this->returnValue(array($violation)));
+				$this->validator->expects($this->once())
+						->method('validate')
+						->will($this->returnValue(array($violation)));
 
-        $this->violationMapper->expects($this->once())
-            ->method('mapViolation')
-            // pass true now
-            ->with($violation, $form, true);
+				$this->violationMapper->expects($this->once())
+						->method('mapViolation')
+						// pass true now
+						->with($violation, $form, true);
 
-        $this->listener->validateForm(new FormEvent($form, null));
-    }
+				$this->listener->validateForm(new FormEvent($form, null));
+		}
 
-    public function testValidateIgnoresNonRoot()
-    {
-        $form = $this->getMockForm();
-        $form->expects($this->once())
-            ->method('isRoot')
-            ->will($this->returnValue(false));
+		public function testValidateIgnoresNonRoot()
+		{
+				$form = $this->getMockForm();
+				$form->expects($this->once())
+						->method('isRoot')
+						->will($this->returnValue(false));
 
-        $this->validator->expects($this->never())
-            ->method('validate');
+				$this->validator->expects($this->never())
+						->method('validate');
 
-        $this->violationMapper->expects($this->never())
-            ->method('mapViolation');
+				$this->violationMapper->expects($this->never())
+						->method('mapViolation');
 
-        $this->listener->validateForm(new FormEvent($form, null));
-    }
+				$this->listener->validateForm(new FormEvent($form, null));
+		}
 }

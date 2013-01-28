@@ -18,50 +18,50 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class RepeatedType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        // Overwrite required option for child fields
-        $options['first_options']['required']  = $options['required'];
-        $options['second_options']['required'] = $options['required'];
+		/**
+		 * {@inheritdoc}
+		 */
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+				// Overwrite required option for child fields
+				$options['first_options']['required']	= $options['required'];
+				$options['second_options']['required'] = $options['required'];
 
-        if (!isset($options['options']['error_bubbling'])) {
-            $options['options']['error_bubbling'] = $options['error_bubbling'];
-        }
+				if (!isset($options['options']['error_bubbling'])) {
+						$options['options']['error_bubbling'] = $options['error_bubbling'];
+				}
 
-        $builder
-            ->addViewTransformer(new ValueToDuplicatesTransformer(array(
-                $options['first_name'],
-                $options['second_name'],
-            )))
-            ->add($options['first_name'], $options['type'], array_merge($options['options'], $options['first_options']))
-            ->add($options['second_name'], $options['type'], array_merge($options['options'], $options['second_options']))
-        ;
-    }
+				$builder
+						->addViewTransformer(new ValueToDuplicatesTransformer(array(
+								$options['first_name'],
+								$options['second_name'],
+						)))
+						->add($options['first_name'], $options['type'], array_merge($options['options'], $options['first_options']))
+						->add($options['second_name'], $options['type'], array_merge($options['options'], $options['second_options']))
+				;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'type'           => 'text',
-            'options'        => array(),
-            'first_options'  => array(),
-            'second_options' => array(),
-            'first_name'     => 'first',
-            'second_name'    => 'second',
-            'error_bubbling' => false,
-        ));
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				$resolver->setDefaults(array(
+						'type'					 => 'text',
+						'options'				=> array(),
+						'first_options'	=> array(),
+						'second_options' => array(),
+						'first_name'		 => 'first',
+						'second_name'		=> 'second',
+						'error_bubbling' => false,
+				));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'repeated';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'repeated';
+		}
 }

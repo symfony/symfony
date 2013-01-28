@@ -44,25 +44,25 @@ namespace Symfony\Component\Validator;
  */
 interface MetadataInterface
 {
-    /**
-     * Implementation of the Visitor design pattern.
-     *
-     * Calls {@link ValidationVisitorInterface::visit} and then forwards the
-     * <tt>accept()</tt>-call to all property metadata instances.
-     *
-     * @param ValidationVisitorInterface $visitor      The visitor implementing the validation logic.
-     * @param mixed                      $value        The value to validate.
-     * @param string|string[]            $group        The validation group to validate in.
-     * @param string                     $propertyPath The current property path in the validation graph.
-     */
-    public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath);
+		/**
+		 * Implementation of the Visitor design pattern.
+		 *
+		 * Calls {@link ValidationVisitorInterface::visit} and then forwards the
+		 * <tt>accept()</tt>-call to all property metadata instances.
+		 *
+		 * @param ValidationVisitorInterface $visitor			The visitor implementing the validation logic.
+		 * @param mixed											$value				The value to validate.
+		 * @param string|string[]						$group				The validation group to validate in.
+		 * @param string										 $propertyPath The current property path in the validation graph.
+		 */
+		public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath);
 
-    /**
-     * Returns all constraints for a given validation group.
-     *
-     * @param string $group The validation group.
-     *
-     * @return Constraint[] A list of constraint instances.
-     */
-    public function findConstraints($group);
+		/**
+		 * Returns all constraints for a given validation group.
+		 *
+		 * @param string $group The validation group.
+		 *
+		 * @return Constraint[] A list of constraint instances.
+		 */
+		public function findConstraints($group);
 }

@@ -29,70 +29,70 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class UserLoginFormType extends AbstractType
 {
-    private $request;
+		private $request;
 
-    /**
-     * @param Request $request A request instance
-     */
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
+		/**
+		 * @param Request $request A request instance
+		 */
+		public function __construct(Request $request)
+		{
+				$this->request = $request;
+		}
 
-    /**
-     * @see Symfony\Component\Form\AbstractType::buildForm()
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder
-            ->add('username', 'text')
-            ->add('password', 'password')
-            ->add('_target_path', 'hidden')
-        ;
+		/**
+		 * @see Symfony\Component\Form\AbstractType::buildForm()
+		 */
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+				$builder
+						->add('username', 'text')
+						->add('password', 'password')
+						->add('_target_path', 'hidden')
+				;
 
-        $request = $this->request;
+				$request = $this->request;
 
-        /* Note: since the Security component's form login listener intercepts
-         * the POST request, this form will never really be bound to the
-         * request; however, we can match the expected behavior by checking the
-         * session for an authentication error and last username.
-         */
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($request) {
-            if ($request->attributes->has(SecurityContextInterface::AUTHENTICATION_ERROR)) {
-                $error = $request->attributes->get(SecurityContextInterface::AUTHENTICATION_ERROR);
-            } else {
-                $error = $request->getSession()->get(SecurityContextInterface::AUTHENTICATION_ERROR);
-            }
+				/* Note: since the Security component's form login listener intercepts
+				 * the POST request, this form will never really be bound to the
+				 * request; however, we can match the expected behavior by checking the
+				 * session for an authentication error and last username.
+				 */
+				$builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($request) {
+						if ($request->attributes->has(SecurityContextInterface::AUTHENTICATION_ERROR)) {
+								$error = $request->attributes->get(SecurityContextInterface::AUTHENTICATION_ERROR);
+						} else {
+								$error = $request->getSession()->get(SecurityContextInterface::AUTHENTICATION_ERROR);
+						}
 
-            if ($error) {
-                $event->getForm()->addError(new FormError($error->getMessage()));
-            }
+						if ($error) {
+								$event->getForm()->addError(new FormError($error->getMessage()));
+						}
 
-            $event->setData(array_replace((array) $event->getData(), array(
-                'username' => $request->getSession()->get(SecurityContextInterface::LAST_USERNAME),
-            )));
-        });
-    }
+						$event->setData(array_replace((array) $event->getData(), array(
+								'username' => $request->getSession()->get(SecurityContextInterface::LAST_USERNAME),
+						)));
+				});
+		}
 
-    /**
-     * @see Symfony\Component\Form\AbstractType::setDefaultOptions()
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        /* Note: the form's intention must correspond to that for the form login
-         * listener in order for the CSRF token to validate successfully.
-         */
+		/**
+		 * @see Symfony\Component\Form\AbstractType::setDefaultOptions()
+		 */
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				/* Note: the form's intention must correspond to that for the form login
+				 * listener in order for the CSRF token to validate successfully.
+				 */
 
-        $resolver->setDefaults(array(
-            'intention' => 'authenticate',
-        ));
-    }
+				$resolver->setDefaults(array(
+						'intention' => 'authenticate',
+				));
+		}
 
-    /**
-     * @see Symfony\Component\Form\FormTypeInterface::getName()
-     */
-    public function getName()
-    {
-        return 'user_login';
-    }
+		/**
+		 * @see Symfony\Component\Form\FormTypeInterface::getName()
+		 */
+		public function getName()
+		{
+				return 'user_login';
+		}
 }

@@ -28,34 +28,34 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class SessionListener implements EventSubscriberInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+		/**
+		 * @var ContainerInterface
+		 */
+		private $container;
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
+		public function __construct(ContainerInterface $container)
+		{
+				$this->container = $container;
+		}
 
-    public function onKernelRequest(GetResponseEvent $event)
-    {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
-            return;
-        }
+		public function onKernelRequest(GetResponseEvent $event)
+		{
+				if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+						return;
+				}
 
-        $request = $event->getRequest();
-        if (!$this->container->has('session') || $request->hasSession()) {
-            return;
-        }
+				$request = $event->getRequest();
+				if (!$this->container->has('session') || $request->hasSession()) {
+						return;
+				}
 
-        $request->setSession($this->container->get('session'));
-    }
+				$request->setSession($this->container->get('session'));
+		}
 
-    public static function getSubscribedEvents()
-    {
-        return array(
-            KernelEvents::REQUEST => array('onKernelRequest', 128),
-        );
-    }
+		public static function getSubscribedEvents()
+		{
+				return array(
+						KernelEvents::REQUEST => array('onKernelRequest', 128),
+				);
+		}
 }

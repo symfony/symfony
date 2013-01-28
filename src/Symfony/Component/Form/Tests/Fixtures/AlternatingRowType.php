@@ -9,19 +9,19 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class AlternatingRowType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $formFactory = $builder->getFormFactory();
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+				$formFactory = $builder->getFormFactory();
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($formFactory) {
-            $form = $event->getForm();
-            $type = $form->getName() % 2 === 0 ? 'text' : 'textarea';
-            $form->add($formFactory->createNamed('title', $type));
-        });
-    }
+				$builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($formFactory) {
+						$form = $event->getForm();
+						$type = $form->getName() % 2 === 0 ? 'text' : 'textarea';
+						$form->add($formFactory->createNamed('title', $type));
+				});
+		}
 
-    public function getName()
-    {
-        return 'alternating_row';
-    }
+		public function getName()
+		{
+				return 'alternating_row';
+		}
 }

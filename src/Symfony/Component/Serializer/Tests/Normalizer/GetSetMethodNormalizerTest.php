@@ -15,206 +15,206 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        $this->normalizer = new GetSetMethodNormalizer;
-        $this->normalizer->setSerializer($this->getMock('Symfony\Component\Serializer\Serializer'));
-    }
+		protected function setUp()
+		{
+				$this->normalizer = new GetSetMethodNormalizer;
+				$this->normalizer->setSerializer($this->getMock('Symfony\Component\Serializer\Serializer'));
+		}
 
-    public function testNormalize()
-    {
-        $obj = new GetSetDummy;
-        $obj->setFoo('foo');
-        $obj->setBar('bar');
-        $this->assertEquals(
-            array('foo' => 'foo', 'bar' => 'bar', 'fooBar' => 'foobar'),
-            $this->normalizer->normalize($obj, 'any')
-        );
-    }
+		public function testNormalize()
+		{
+				$obj = new GetSetDummy;
+				$obj->setFoo('foo');
+				$obj->setBar('bar');
+				$this->assertEquals(
+						array('foo' => 'foo', 'bar' => 'bar', 'fooBar' => 'foobar'),
+						$this->normalizer->normalize($obj, 'any')
+				);
+		}
 
-    public function testDenormalize()
-    {
-        $obj = $this->normalizer->denormalize(
-            array('foo' => 'foo', 'bar' => 'bar', 'fooBar' => 'foobar'),
-            __NAMESPACE__.'\GetSetDummy',
-            'any'
-        );
-        $this->assertEquals('foo', $obj->getFoo());
-        $this->assertEquals('bar', $obj->getBar());
-    }
+		public function testDenormalize()
+		{
+				$obj = $this->normalizer->denormalize(
+						array('foo' => 'foo', 'bar' => 'bar', 'fooBar' => 'foobar'),
+						__NAMESPACE__.'\GetSetDummy',
+						'any'
+				);
+				$this->assertEquals('foo', $obj->getFoo());
+				$this->assertEquals('bar', $obj->getBar());
+		}
 
-    public function testConstructorDenormalize()
-    {
-        $obj = $this->normalizer->denormalize(
-            array('foo' => 'foo', 'bar' => 'bar', 'fooBar' => 'foobar'),
-            __NAMESPACE__.'\GetConstructorDummy', 'any');
-        $this->assertEquals('foo', $obj->getFoo());
-        $this->assertEquals('bar', $obj->getBar());
-    }
+		public function testConstructorDenormalize()
+		{
+				$obj = $this->normalizer->denormalize(
+						array('foo' => 'foo', 'bar' => 'bar', 'fooBar' => 'foobar'),
+						__NAMESPACE__.'\GetConstructorDummy', 'any');
+				$this->assertEquals('foo', $obj->getFoo());
+				$this->assertEquals('bar', $obj->getBar());
+		}
 
-    /**
-     * @dataProvider provideCallbacks
-     */
-    public function testCallbacks($callbacks, $value, $result, $message)
-    {
-        $this->normalizer->setCallbacks($callbacks);
+		/**
+		 * @dataProvider provideCallbacks
+		 */
+		public function testCallbacks($callbacks, $value, $result, $message)
+		{
+				$this->normalizer->setCallbacks($callbacks);
 
-        $obj = new GetConstructorDummy('', $value);
+				$obj = new GetConstructorDummy('', $value);
 
-        $this->assertEquals(
-            $result,
-            $this->normalizer->normalize($obj, 'any'),
-            $message
-        );
-    }
+				$this->assertEquals(
+						$result,
+						$this->normalizer->normalize($obj, 'any'),
+						$message
+				);
+		}
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testUncallableCallbacks()
-    {
-        $this->normalizer->setCallbacks(array('bar' => null));
+		/**
+		 * @expectedException \InvalidArgumentException
+		 */
+		public function testUncallableCallbacks()
+		{
+				$this->normalizer->setCallbacks(array('bar' => null));
 
-        $obj = new GetConstructorDummy('baz', 'quux');
+				$obj = new GetConstructorDummy('baz', 'quux');
 
-        $this->normalizer->normalize($obj, 'any');
-    }
+				$this->normalizer->normalize($obj, 'any');
+		}
 
-    public function testIgnoredAttributes()
-    {
-        $this->normalizer->setIgnoredAttributes(array('foo', 'bar'));
+		public function testIgnoredAttributes()
+		{
+				$this->normalizer->setIgnoredAttributes(array('foo', 'bar'));
 
-        $obj = new GetSetDummy;
-        $obj->setFoo('foo');
-        $obj->setBar('bar');
+				$obj = new GetSetDummy;
+				$obj->setFoo('foo');
+				$obj->setBar('bar');
 
-        $this->assertEquals(
-            array('fooBar' => 'foobar'),
-            $this->normalizer->normalize($obj, 'any')
-        );
-    }
+				$this->assertEquals(
+						array('fooBar' => 'foobar'),
+						$this->normalizer->normalize($obj, 'any')
+				);
+		}
 
-    public function provideCallbacks()
-    {
-        return array(
-            array(
-                array(
-                    'bar' => function ($bar) {
-                        return 'baz';
-                    },
-                ),
-                'baz',
-                array('foo' => '', 'bar' => 'baz'),
-                'Change a string',
-            ),
-            array(
-                array(
-                    'bar' => function ($bar) {
-                        return null;
-                    },
-                ),
-                'baz',
-                array('foo' => '', 'bar' => null),
-                'Null an item'
-            ),
-            array(
-                array(
-                    'bar' => function ($bar) {
-                        return $bar->format('d-m-Y H:i:s');
-                    },
-                ),
-                new \DateTime('2011-09-10 06:30:00'),
-                array('foo' => '', 'bar' => '10-09-2011 06:30:00'),
-                'Format a date',
-            ),
-            array(
-                array(
-                    'bar' => function ($bars) {
-                        $foos = '';
-                        foreach ($bars as $bar) {
-                            $foos .= $bar->getFoo();
-                        }
+		public function provideCallbacks()
+		{
+				return array(
+						array(
+								array(
+										'bar' => function ($bar) {
+												return 'baz';
+										},
+								),
+								'baz',
+								array('foo' => '', 'bar' => 'baz'),
+								'Change a string',
+						),
+						array(
+								array(
+										'bar' => function ($bar) {
+												return null;
+										},
+								),
+								'baz',
+								array('foo' => '', 'bar' => null),
+								'Null an item'
+						),
+						array(
+								array(
+										'bar' => function ($bar) {
+												return $bar->format('d-m-Y H:i:s');
+										},
+								),
+								new \DateTime('2011-09-10 06:30:00'),
+								array('foo' => '', 'bar' => '10-09-2011 06:30:00'),
+								'Format a date',
+						),
+						array(
+								array(
+										'bar' => function ($bars) {
+												$foos = '';
+												foreach ($bars as $bar) {
+														$foos .= $bar->getFoo();
+												}
 
-                        return $foos;
-                    },
-                ),
-                array(new GetConstructorDummy('baz', ''), new GetConstructorDummy('quux', '')),
-                array('foo' => '', 'bar' => 'bazquux'),
-                'Collect a property',
-            ),
-            array(
-                array(
-                    'bar' => function ($bars) {
-                        return count($bars);
-                    },
-                ),
-                array(new GetConstructorDummy('baz', ''), new GetConstructorDummy('quux', '')),
-                array('foo' => '', 'bar' => 2),
-                'Count a property',
-            ),
-        );
-    }
+												return $foos;
+										},
+								),
+								array(new GetConstructorDummy('baz', ''), new GetConstructorDummy('quux', '')),
+								array('foo' => '', 'bar' => 'bazquux'),
+								'Collect a property',
+						),
+						array(
+								array(
+										'bar' => function ($bars) {
+												return count($bars);
+										},
+								),
+								array(new GetConstructorDummy('baz', ''), new GetConstructorDummy('quux', '')),
+								array('foo' => '', 'bar' => 2),
+								'Count a property',
+						),
+				);
+		}
 }
 
 class GetSetDummy
 {
-    protected $foo;
-    private $bar;
+		protected $foo;
+		private $bar;
 
-    public function getFoo()
-    {
-        return $this->foo;
-    }
+		public function getFoo()
+		{
+				return $this->foo;
+		}
 
-    public function setFoo($foo)
-    {
-        $this->foo = $foo;
-    }
+		public function setFoo($foo)
+		{
+				$this->foo = $foo;
+		}
 
-    public function getBar()
-    {
-        return $this->bar;
-    }
+		public function getBar()
+		{
+				return $this->bar;
+		}
 
-    public function setBar($bar)
-    {
-        $this->bar = $bar;
-    }
+		public function setBar($bar)
+		{
+				$this->bar = $bar;
+		}
 
-    public function getFooBar()
-    {
-        return $this->foo . $this->bar;
-    }
+		public function getFooBar()
+		{
+				return $this->foo . $this->bar;
+		}
 
-    public function otherMethod()
-    {
-        throw new \RuntimeException("Dummy::otherMethod() should not be called");
-    }
+		public function otherMethod()
+		{
+				throw new \RuntimeException("Dummy::otherMethod() should not be called");
+		}
 }
 
 class GetConstructorDummy
 {
-    protected $foo;
-    private $bar;
+		protected $foo;
+		private $bar;
 
-    public function __construct($foo, $bar)
-    {
-        $this->foo = $foo;
-        $this->bar = $bar;
-    }
+		public function __construct($foo, $bar)
+		{
+				$this->foo = $foo;
+				$this->bar = $bar;
+		}
 
-    public function getFoo()
-    {
-        return $this->foo;
-    }
+		public function getFoo()
+		{
+				return $this->foo;
+		}
 
-    public function getBar()
-    {
-        return $this->bar;
-    }
+		public function getBar()
+		{
+				return $this->bar;
+		}
 
-    public function otherMethod()
-    {
-        throw new \RuntimeException("Dummy::otherMethod() should not be called");
-    }
+		public function otherMethod()
+		{
+				throw new \RuntimeException("Dummy::otherMethod() should not be called");
+		}
 }

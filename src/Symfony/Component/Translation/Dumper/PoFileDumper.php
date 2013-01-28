@@ -20,36 +20,36 @@ use Symfony\Component\Translation\MessageCatalogue;
  */
 class PoFileDumper extends FileDumper
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(MessageCatalogue $messages, $domain = 'messages')
-    {
-        $output = '';
-        $newLine = false;
-        foreach ($messages->all($domain) as $source => $target) {
-            if ($newLine) {
-              $output .= "\n";
-            } else {
-              $newLine = true;
-            }
-            $output .= sprintf('msgid "%s"'."\n", $this->escape($source));
-            $output .= sprintf('msgstr "%s"', $this->escape($target));
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function format(MessageCatalogue $messages, $domain = 'messages')
+		{
+				$output = '';
+				$newLine = false;
+				foreach ($messages->all($domain) as $source => $target) {
+						if ($newLine) {
+							$output .= "\n";
+						} else {
+							$newLine = true;
+						}
+						$output .= sprintf('msgid "%s"'."\n", $this->escape($source));
+						$output .= sprintf('msgstr "%s"', $this->escape($target));
+				}
 
-        return $output;
-    }
+				return $output;
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function getExtension()
-    {
-        return 'po';
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		protected function getExtension()
+		{
+				return 'po';
+		}
 
-    private function escape($str)
-    {
-        return addcslashes($str, "\0..\37\42\134");
-    }
+		private function escape($str)
+		{
+				return addcslashes($str, "\0..\37\42\134");
+		}
 }

@@ -15,23 +15,23 @@ use Symfony\Component\Validator\Constraints\File;
 
 class FileValidatorPathTest extends FileValidatorTest
 {
-    protected function getFile($filename)
-    {
-        return $filename;
-    }
+		protected function getFile($filename)
+		{
+				return $filename;
+		}
 
-    public function testFileNotFound()
-    {
-        $constraint = new File(array(
-            'notFoundMessage' => 'myMessage',
-        ));
+		public function testFileNotFound()
+		{
+				$constraint = new File(array(
+						'notFoundMessage' => 'myMessage',
+				));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ file }}' => 'foobar',
-            ));
+				$this->context->expects($this->once())
+						->method('addViolation')
+						->with('myMessage', array(
+								'{{ file }}' => 'foobar',
+						));
 
-        $this->validator->validate('foobar', $constraint);
-    }
+				$this->validator->validate('foobar', $constraint);
+		}
 }

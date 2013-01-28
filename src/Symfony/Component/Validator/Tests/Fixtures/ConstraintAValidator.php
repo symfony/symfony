@@ -17,23 +17,23 @@ use Symfony\Component\Validator\ExecutionContextInterface;
 
 class ConstraintAValidator extends ConstraintValidator
 {
-    public static $passedContext;
+		public static $passedContext;
 
-    public function initialize(ExecutionContextInterface $context)
-    {
-        parent::initialize($context);
+		public function initialize(ExecutionContextInterface $context)
+		{
+				parent::initialize($context);
 
-        self::$passedContext = $context;
-    }
+				self::$passedContext = $context;
+		}
 
-    public function validate($value, Constraint $constraint)
-    {
-        if ('VALID' != $value) {
-            $this->context->addViolation('message', array('param' => 'value'));
+		public function validate($value, Constraint $constraint)
+		{
+				if ('VALID' != $value) {
+						$this->context->addViolation('message', array('param' => 'value'));
 
-            return;
-        }
+						return;
+				}
 
-        return;
-    }
+				return;
+		}
 }

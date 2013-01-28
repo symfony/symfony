@@ -15,9 +15,9 @@ use Symfony\Component\Security\Core\Util\StringUtils;
 
 class StringUtilsTest extends \PHPUnit_Framework_TestCase
 {
-    public function testEquals()
-    {
-        $this->assertTrue(StringUtils::equals('password', 'password'));
-        $this->assertFalse(StringUtils::equals('password', 'foo'));
-    }
+		public function testEquals()
+		{
+				$this->assertTrue(StringUtils::equals('password', 'password'));
+				$this->assertFalse(StringUtils::equals('password', 'foo'));
+		}
 }

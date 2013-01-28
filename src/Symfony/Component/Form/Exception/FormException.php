@@ -17,7 +17,7 @@ namespace Symfony\Component\Form\Exception;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated This interface was deprecated and will be removed in Symfony 2.3.
- *             You should code against {@link ExceptionInterface} instead.
+ *						 You should code against {@link ExceptionInterface} instead.
  */
 interface FormException
 {

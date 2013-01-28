@@ -18,11 +18,11 @@ use Symfony\Component\Validator\Constraints\Valid;
  */
 class ValidTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
-    public function testRejectGroupsOption()
-    {
-        new Valid(array('groups' => 'foo'));
-    }
+		/**
+		 * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+		 */
+		public function testRejectGroupsOption()
+		{
+				new Valid(array('groups' => 'foo'));
+		}
 }

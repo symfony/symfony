@@ -18,23 +18,23 @@ namespace Symfony\Component\Validator;
  */
 interface MetadataFactoryInterface
 {
-    /**
-     * Returns the metadata for the given value.
-     *
-     * @param mixed $value Some value.
-     *
-     * @return MetadataInterface The metadata for the value.
-     *
-     * @throws Exception\NoSuchMetadataException If no metadata exists for the value.
-     */
-    public function getMetadataFor($value);
+		/**
+		 * Returns the metadata for the given value.
+		 *
+		 * @param mixed $value Some value.
+		 *
+		 * @return MetadataInterface The metadata for the value.
+		 *
+		 * @throws Exception\NoSuchMetadataException If no metadata exists for the value.
+		 */
+		public function getMetadataFor($value);
 
-    /**
-     * Returns whether metadata exists for the given value.
-     *
-     * @param mixed $value Some value.
-     *
-     * @return Boolean Whether metadata exists for the value.
-     */
-    public function hasMetadataFor($value);
+		/**
+		 * Returns whether metadata exists for the given value.
+		 *
+		 * @param mixed $value Some value.
+		 *
+		 * @return Boolean Whether metadata exists for the value.
+		 */
+		public function hasMetadataFor($value);
 }

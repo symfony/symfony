@@ -4,5 +4,5 @@ namespace ClassesWithParents;
 
 class E extends D
 {
-    use CTrait;
+		use CTrait;
 }

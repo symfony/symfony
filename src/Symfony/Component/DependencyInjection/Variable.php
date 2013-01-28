@@ -14,11 +14,11 @@ namespace Symfony\Component\DependencyInjection;
 /**
  * Represents a variable.
  *
- *     $var = new Variable('a');
+ *		 $var = new Variable('a');
  *
  * will be dumped as
  *
- *     $a
+ *		 $a
  *
  * by the PHP dumper.
  *
@@ -26,25 +26,25 @@ namespace Symfony\Component\DependencyInjection;
  */
 class Variable
 {
-    private $name;
+		private $name;
 
-    /**
-     * Constructor
-     *
-     * @param string $name
-     */
-    public function __construct($name)
-    {
-        $this->name = $name;
-    }
+		/**
+		 * Constructor
+		 *
+		 * @param string $name
+		 */
+		public function __construct($name)
+		{
+				$this->name = $name;
+		}
 
-    /**
-     * Converts the object to a string
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->name;
-    }
+		/**
+		 * Converts the object to a string
+		 *
+		 * @return string
+		 */
+		public function __toString()
+		{
+				return $this->name;
+		}
 }

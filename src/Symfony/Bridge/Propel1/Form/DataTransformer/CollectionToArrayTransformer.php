@@ -23,33 +23,33 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class CollectionToArrayTransformer implements DataTransformerInterface
 {
-    public function transform($collection)
-    {
-        if (null === $collection) {
-            return array();
-        }
+		public function transform($collection)
+		{
+				if (null === $collection) {
+						return array();
+				}
 
-        if (!$collection instanceof PropelObjectCollection) {
-            throw new UnexpectedTypeException($collection, '\PropelObjectCollection');
-        }
+				if (!$collection instanceof PropelObjectCollection) {
+						throw new UnexpectedTypeException($collection, '\PropelObjectCollection');
+				}
 
-        return $collection->getData();
-    }
+				return $collection->getData();
+		}
 
-    public function reverseTransform($array)
-    {
-        $collection = new PropelObjectCollection();
+		public function reverseTransform($array)
+		{
+				$collection = new PropelObjectCollection();
 
-        if ('' === $array || null === $array) {
-            return $collection;
-        }
+				if ('' === $array || null === $array) {
+						return $collection;
+				}
 
-        if (!is_array($array)) {
-            throw new UnexpectedTypeException($array, 'array');
-        }
+				if (!is_array($array)) {
+						throw new UnexpectedTypeException($array, 'array');
+				}
 
-        $collection->setData($array);
+				$collection->setData($array);
 
-        return $collection;
-    }
+				return $collection;
+		}
 }

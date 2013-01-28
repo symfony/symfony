@@ -21,13 +21,13 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class NotBlankValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (false === $value || (empty($value) && '0' != $value)) {
-            $this->context->addViolation($constraint->message);
-        }
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (false === $value || (empty($value) && '0' != $value)) {
+						$this->context->addViolation($constraint->message);
+				}
+		}
 }

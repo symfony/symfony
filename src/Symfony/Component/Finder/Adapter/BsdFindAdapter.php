@@ -23,79 +23,79 @@ use Symfony\Component\Finder\Expression\Expression;
  */
 class BsdFindAdapter extends AbstractFindAdapter
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'bsd_find';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'bsd_find';
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function canBeUsed()
-    {
-        return in_array($this->shell->getType(), array(Shell::TYPE_BSD, Shell::TYPE_DARWIN)) && parent::canBeUsed();
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		protected function canBeUsed()
+		{
+				return in_array($this->shell->getType(), array(Shell::TYPE_BSD, Shell::TYPE_DARWIN)) && parent::canBeUsed();
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function buildFormatSorting(Command $command, $sort)
-    {
-        switch ($sort) {
-            case SortableIterator::SORT_BY_NAME:
-                $command->ins('sort')->add('| sort');
+		/**
+		 * {@inheritdoc}
+		 */
+		protected function buildFormatSorting(Command $command, $sort)
+		{
+				switch ($sort) {
+						case SortableIterator::SORT_BY_NAME:
+								$command->ins('sort')->add('| sort');
 
-                return;
-            case SortableIterator::SORT_BY_TYPE:
-                $format = '%HT';
-                break;
-            case SortableIterator::SORT_BY_ACCESSED_TIME:
-                $format = '%a';
-                break;
-            case SortableIterator::SORT_BY_CHANGED_TIME:
-                $format = '%c';
-                break;
-            case SortableIterator::SORT_BY_MODIFIED_TIME:
-                $format = '%m';
-                break;
-            default:
-                throw new \InvalidArgumentException('Unknown sort options: '.$sort.'.');
-        }
+								return;
+						case SortableIterator::SORT_BY_TYPE:
+								$format = '%HT';
+								break;
+						case SortableIterator::SORT_BY_ACCESSED_TIME:
+								$format = '%a';
+								break;
+						case SortableIterator::SORT_BY_CHANGED_TIME:
+								$format = '%c';
+								break;
+						case SortableIterator::SORT_BY_MODIFIED_TIME:
+								$format = '%m';
+								break;
+						default:
+								throw new \InvalidArgumentException('Unknown sort options: '.$sort.'.');
+				}
 
-        $command
-            ->add('-print0 | xargs -0 stat -f')
-            ->arg($format.'%t%N')
-            ->add('| sort | cut -f 2');
-    }
+				$command
+						->add('-print0 | xargs -0 stat -f')
+						->arg($format.'%t%N')
+						->add('| sort | cut -f 2');
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function buildFindCommand(Command $command, $dir)
-    {
-        parent::buildFindCommand($command, $dir)->addAtIndex('-E', 1);
+		/**
+		 * {@inheritdoc}
+		 */
+		protected function buildFindCommand(Command $command, $dir)
+		{
+				parent::buildFindCommand($command, $dir)->addAtIndex('-E', 1);
 
-        return $command;
-    }
+				return $command;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function buildContentFiltering(Command $command, array $contains, $not = false)
-    {
-        foreach ($contains as $contain) {
-            $expr = Expression::create($contain);
+		/**
+		 * {@inheritdoc}
+		 */
+		protected function buildContentFiltering(Command $command, array $contains, $not = false)
+		{
+				foreach ($contains as $contain) {
+						$expr = Expression::create($contain);
 
-            // todo: avoid forking process for each $pattern by using multiple -e options
-            $command
-                ->add('| grep -v \'^$\'')
-                ->add('| xargs grep -I')
-                ->add($expr->isCaseSensitive() ? null : '-i')
-                ->add($not ? '-L' : '-l')
-                ->add('-Ee')->arg($expr->renderPattern());
-        }
-    }
+						// todo: avoid forking process for each $pattern by using multiple -e options
+						$command
+								->add('| grep -v \'^$\'')
+								->add('| xargs grep -I')
+								->add($expr->isCaseSensitive() ? null : '-i')
+								->add($not ? '-L' : '-l')
+								->add('-Ee')->arg($expr->renderPattern());
+				}
+		}
 }

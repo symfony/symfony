@@ -36,299 +36,299 @@ use Doctrine\Common\Cache\ArrayCache;
  */
 class ValidatorBuilder implements ValidatorBuilderInterface
 {
-    /**
-     * @var array
-     */
-    private $initializers = array();
+		/**
+		 * @var array
+		 */
+		private $initializers = array();
 
-    /**
-     * @var array
-     */
-    private $xmlMappings = array();
+		/**
+		 * @var array
+		 */
+		private $xmlMappings = array();
 
-    /**
-     * @var array
-     */
-    private $yamlMappings = array();
+		/**
+		 * @var array
+		 */
+		private $yamlMappings = array();
 
-    /**
-     * @var array
-     */
-    private $methodMappings = array();
+		/**
+		 * @var array
+		 */
+		private $methodMappings = array();
 
-    /**
-     * @var Reader
-     */
-    private $annotationReader = null;
+		/**
+		 * @var Reader
+		 */
+		private $annotationReader = null;
 
-    /**
-     * @var MetadataFactoryInterface
-     */
-    private $metadataFactory;
+		/**
+		 * @var MetadataFactoryInterface
+		 */
+		private $metadataFactory;
 
-    /**
-     * @var ConstraintValidatorFactoryInterface
-     */
-    private $validatorFactory;
+		/**
+		 * @var ConstraintValidatorFactoryInterface
+		 */
+		private $validatorFactory;
 
-    /**
-     * @var CacheInterface
-     */
-    private $metadataCache;
+		/**
+		 * @var CacheInterface
+		 */
+		private $metadataCache;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+		/**
+		 * @var TranslatorInterface
+		 */
+		private $translator;
 
-    /**
-     * @var null|string
-     */
-    private $translationDomain;
+		/**
+		 * @var null|string
+		 */
+		private $translationDomain;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addObjectInitializer(ObjectInitializerInterface $initializer)
-    {
-        $this->initializers[] = $initializer;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function addObjectInitializer(ObjectInitializerInterface $initializer)
+		{
+				$this->initializers[] = $initializer;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addObjectInitializers(array $initializers)
-    {
-        $this->initializers = array_merge($this->initializers, $initializers);
+		/**
+		 * {@inheritdoc}
+		 */
+		public function addObjectInitializers(array $initializers)
+		{
+				$this->initializers = array_merge($this->initializers, $initializers);
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addXmlMapping($path)
-    {
-        if (null !== $this->metadataFactory) {
-            throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function addXmlMapping($path)
+		{
+				if (null !== $this->metadataFactory) {
+						throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
+				}
 
-        $this->xmlMappings[] = $path;
+				$this->xmlMappings[] = $path;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addXmlMappings(array $paths)
-    {
-        if (null !== $this->metadataFactory) {
-            throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function addXmlMappings(array $paths)
+		{
+				if (null !== $this->metadataFactory) {
+						throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
+				}
 
-        $this->xmlMappings = array_merge($this->xmlMappings, $paths);
+				$this->xmlMappings = array_merge($this->xmlMappings, $paths);
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addYamlMapping($path)
-    {
-        if (null !== $this->metadataFactory) {
-            throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function addYamlMapping($path)
+		{
+				if (null !== $this->metadataFactory) {
+						throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
+				}
 
-        $this->yamlMappings[] = $path;
+				$this->yamlMappings[] = $path;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addYamlMappings(array $paths)
-    {
-        if (null !== $this->metadataFactory) {
-            throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function addYamlMappings(array $paths)
+		{
+				if (null !== $this->metadataFactory) {
+						throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
+				}
 
-        $this->yamlMappings = array_merge($this->yamlMappings, $paths);
+				$this->yamlMappings = array_merge($this->yamlMappings, $paths);
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addMethodMapping($methodName)
-    {
-        if (null !== $this->metadataFactory) {
-            throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function addMethodMapping($methodName)
+		{
+				if (null !== $this->metadataFactory) {
+						throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
+				}
 
-        $this->methodMappings[] = $methodName;
+				$this->methodMappings[] = $methodName;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addMethodMappings(array $methodNames)
-    {
-        if (null !== $this->metadataFactory) {
-            throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function addMethodMappings(array $methodNames)
+		{
+				if (null !== $this->metadataFactory) {
+						throw new ValidatorException('You cannot add custom mappings after setting a custom metadata factory. Configure your metadata factory instead.');
+				}
 
-        $this->methodMappings = array_merge($this->methodMappings, $methodNames);
+				$this->methodMappings = array_merge($this->methodMappings, $methodNames);
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function enableAnnotationMapping(Reader $annotationReader = null)
-    {
-        if (null !== $this->metadataFactory) {
-            throw new ValidatorException('You cannot enable annotation mapping after setting a custom metadata factory. Configure your metadata factory instead.');
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function enableAnnotationMapping(Reader $annotationReader = null)
+		{
+				if (null !== $this->metadataFactory) {
+						throw new ValidatorException('You cannot enable annotation mapping after setting a custom metadata factory. Configure your metadata factory instead.');
+				}
 
-        if (null === $annotationReader) {
-            if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-                throw new \RuntimeException('Requested a ValidatorFactory with an AnnotationLoader, but the AnnotationReader was not found. You should add Doctrine Common to your project.');
-            }
+				if (null === $annotationReader) {
+						if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
+								throw new \RuntimeException('Requested a ValidatorFactory with an AnnotationLoader, but the AnnotationReader was not found. You should add Doctrine Common to your project.');
+						}
 
-            $annotationReader = new CachedReader(new AnnotationReader(), new ArrayCache());
-        }
+						$annotationReader = new CachedReader(new AnnotationReader(), new ArrayCache());
+				}
 
-        $this->annotationReader = $annotationReader;
+				$this->annotationReader = $annotationReader;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function disableAnnotationMapping()
-    {
-        $this->annotationReader = null;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function disableAnnotationMapping()
+		{
+				$this->annotationReader = null;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setMetadataFactory($metadataFactory)
-    {
-        if (count($this->xmlMappings) > 0 || count($this->yamlMappings) > 0 || count($this->methodMappings) > 0 || null !== $this->annotationReader) {
-            throw new ValidatorException('You cannot set a custom metadata factory after adding custom mappings. You should do either of both.');
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setMetadataFactory($metadataFactory)
+		{
+				if (count($this->xmlMappings) > 0 || count($this->yamlMappings) > 0 || count($this->methodMappings) > 0 || null !== $this->annotationReader) {
+						throw new ValidatorException('You cannot set a custom metadata factory after adding custom mappings. You should do either of both.');
+				}
 
-        if ($metadataFactory instanceof ClassMetadataFactoryInterface
-                && !$metadataFactory instanceof MetadataFactoryInterface) {
-            $metadataFactory = new ClassMetadataFactoryAdapter($metadataFactory);
-        }
+				if ($metadataFactory instanceof ClassMetadataFactoryInterface
+								&& !$metadataFactory instanceof MetadataFactoryInterface) {
+						$metadataFactory = new ClassMetadataFactoryAdapter($metadataFactory);
+				}
 
-        $this->metadataFactory = $metadataFactory;
+				$this->metadataFactory = $metadataFactory;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setMetadataCache(CacheInterface $cache)
-    {
-        if (null !== $this->metadataFactory) {
-            throw new ValidatorException('You cannot set a custom metadata cache after setting a custom metadata factory. Configure your metadata factory instead.');
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setMetadataCache(CacheInterface $cache)
+		{
+				if (null !== $this->metadataFactory) {
+						throw new ValidatorException('You cannot set a custom metadata cache after setting a custom metadata factory. Configure your metadata factory instead.');
+				}
 
-        $this->metadataCache = $cache;
+				$this->metadataCache = $cache;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
-    {
-        $this->validatorFactory = $validatorFactory;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
+		{
+				$this->validatorFactory = $validatorFactory;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setTranslator(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setTranslator(TranslatorInterface $translator)
+		{
+				$this->translator = $translator;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setTranslationDomain($translationDomain)
-    {
-        $this->translationDomain = $translationDomain;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setTranslationDomain($translationDomain)
+		{
+				$this->translationDomain = $translationDomain;
 
-        return $this;
-    }
+				return $this;
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getValidator()
-    {
-        $metadataFactory = $this->metadataFactory;
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getValidator()
+		{
+				$metadataFactory = $this->metadataFactory;
 
-        if (!$metadataFactory) {
-            $loaders = array();
+				if (!$metadataFactory) {
+						$loaders = array();
 
-            if (count($this->xmlMappings) > 1) {
-                $loaders[] = new XmlFilesLoader($this->xmlMappings);
-            } elseif (1 === count($this->xmlMappings)) {
-                $loaders[] = new XmlFileLoader($this->xmlMappings[0]);
-            }
+						if (count($this->xmlMappings) > 1) {
+								$loaders[] = new XmlFilesLoader($this->xmlMappings);
+						} elseif (1 === count($this->xmlMappings)) {
+								$loaders[] = new XmlFileLoader($this->xmlMappings[0]);
+						}
 
-            if (count($this->yamlMappings) > 1) {
-                $loaders[] = new YamlFilesLoader($this->yamlMappings);
-            } elseif (1 === count($this->yamlMappings)) {
-                $loaders[] = new YamlFileLoader($this->yamlMappings[0]);
-            }
+						if (count($this->yamlMappings) > 1) {
+								$loaders[] = new YamlFilesLoader($this->yamlMappings);
+						} elseif (1 === count($this->yamlMappings)) {
+								$loaders[] = new YamlFileLoader($this->yamlMappings[0]);
+						}
 
-            foreach ($this->methodMappings as $methodName) {
-                $loaders[] = new StaticMethodLoader($methodName);
-            }
+						foreach ($this->methodMappings as $methodName) {
+								$loaders[] = new StaticMethodLoader($methodName);
+						}
 
-            if ($this->annotationReader) {
-                $loaders[] = new AnnotationLoader($this->annotationReader);
-            }
+						if ($this->annotationReader) {
+								$loaders[] = new AnnotationLoader($this->annotationReader);
+						}
 
-            $loader = null;
+						$loader = null;
 
-            if (count($loaders) > 1) {
-                $loader = new LoaderChain($loaders);
-            } elseif (1 === count($loaders)) {
-                $loader = $loaders[0];
-            }
+						if (count($loaders) > 1) {
+								$loader = new LoaderChain($loaders);
+						} elseif (1 === count($loaders)) {
+								$loader = $loaders[0];
+						}
 
-            $metadataFactory = new ClassMetadataFactory($loader, $this->metadataCache);
-        }
+						$metadataFactory = new ClassMetadataFactory($loader, $this->metadataCache);
+				}
 
-        $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory();
-        $translator = $this->translator ?: new DefaultTranslator();
+				$validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory();
+				$translator = $this->translator ?: new DefaultTranslator();
 
-        return new Validator($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);
-    }
+				return new Validator($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);
+		}
 }

@@ -17,29 +17,29 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class LocaleType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'choices' => Locale::getDisplayLocales(\Locale::getDefault()),
-        ));
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				$resolver->setDefaults(array(
+						'choices' => Locale::getDisplayLocales(\Locale::getDefault()),
+				));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'choice';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getParent()
+		{
+				return 'choice';
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'locale';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'locale';
+		}
 }

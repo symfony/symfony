@@ -7,8 +7,8 @@ the ICU binaries. Both arguments are optional, if not provided, the script will
 try to build the latest available ICU data using the binaries available in the
 environment path:
 
-   $ php build-data.php 49
-   $ php build-data.php 49 /path/to/icu/bin
+	 $ php build-data.php 49
+	 $ php build-data.php 49 /path/to/icu/bin
 
 It is recommended to use the ICU binaries in the same version of the desired
 version to build the data files.
@@ -33,11 +33,11 @@ Once it is, the following steps have to be followed to build the .dat-file:
 
 3. Package the resource bundles into a single file
 
-   $ find . -name *.res | sed -e "s/\.\///g" > packagelist.txt
-   $ pkgdata -p region -T build -d . packagelist.txt
+	 $ find . -name *.res | sed -e "s/\.\///g" > packagelist.txt
+	 $ pkgdata -p region -T build -d . packagelist.txt
 
 4. Clean up
 
-   $ rm -rf build packagelist.txt
+	 $ rm -rf build packagelist.txt
 
 5. You can now move region.dat to replace the version bundled with Symfony2.

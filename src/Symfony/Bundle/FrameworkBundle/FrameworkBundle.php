@@ -39,38 +39,38 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class FrameworkBundle extends Bundle
 {
-    public function boot()
-    {
-        if ($trustedProxies = $this->container->getParameter('kernel.trusted_proxies')) {
-            Request::setTrustedProxies($trustedProxies);
-        } elseif ($this->container->getParameter('kernel.trust_proxy_headers')) {
-            Request::trustProxyData(); // @deprecated, to be removed in 2.3
-        }
-    }
+		public function boot()
+		{
+				if ($trustedProxies = $this->container->getParameter('kernel.trusted_proxies')) {
+						Request::setTrustedProxies($trustedProxies);
+				} elseif ($this->container->getParameter('kernel.trust_proxy_headers')) {
+						Request::trustProxyData(); // @deprecated, to be removed in 2.3
+				}
+		}
 
-    public function build(ContainerBuilder $container)
-    {
-        parent::build($container);
+		public function build(ContainerBuilder $container)
+		{
+				parent::build($container);
 
-        $container->addScope(new Scope('request'));
+				$container->addScope(new Scope('request'));
 
-        $container->addCompilerPass(new RoutingResolverPass());
-        $container->addCompilerPass(new ProfilerPass());
-        $container->addCompilerPass(new RegisterKernelListenersPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new TemplatingPass());
-        $container->addCompilerPass(new AddConstraintValidatorsPass());
-        $container->addCompilerPass(new AddValidatorInitializersPass());
-        $container->addCompilerPass(new FormPass());
-        $container->addCompilerPass(new TranslatorPass());
-        $container->addCompilerPass(new AddCacheWarmerPass());
-        $container->addCompilerPass(new AddCacheClearerPass());
-        $container->addCompilerPass(new TranslationExtractorPass());
-        $container->addCompilerPass(new TranslationDumperPass());
-        $container->addCompilerPass(new HttpRenderingStrategyPass(), PassConfig::TYPE_AFTER_REMOVING);
+				$container->addCompilerPass(new RoutingResolverPass());
+				$container->addCompilerPass(new ProfilerPass());
+				$container->addCompilerPass(new RegisterKernelListenersPass(), PassConfig::TYPE_AFTER_REMOVING);
+				$container->addCompilerPass(new TemplatingPass());
+				$container->addCompilerPass(new AddConstraintValidatorsPass());
+				$container->addCompilerPass(new AddValidatorInitializersPass());
+				$container->addCompilerPass(new FormPass());
+				$container->addCompilerPass(new TranslatorPass());
+				$container->addCompilerPass(new AddCacheWarmerPass());
+				$container->addCompilerPass(new AddCacheClearerPass());
+				$container->addCompilerPass(new TranslationExtractorPass());
+				$container->addCompilerPass(new TranslationDumperPass());
+				$container->addCompilerPass(new HttpRenderingStrategyPass(), PassConfig::TYPE_AFTER_REMOVING);
 
-        if ($container->getParameter('kernel.debug')) {
-            $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);
-            $container->addCompilerPass(new CompilerDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);
-        }
-    }
+				if ($container->getParameter('kernel.debug')) {
+						$container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);
+						$container->addCompilerPass(new CompilerDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);
+				}
+		}
 }

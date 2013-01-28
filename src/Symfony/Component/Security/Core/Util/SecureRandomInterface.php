@@ -18,12 +18,12 @@ namespace Symfony\Component\Security\Core\Util;
  */
 interface SecureRandomInterface
 {
-    /**
-     * Generates the specified number of secure random bytes.
-     *
-     * @param integer $nbBytes
-     *
-     * @return string
-     */
-    public function nextBytes($nbBytes);
+		/**
+		 * Generates the specified number of secure random bytes.
+		 *
+		 * @param integer $nbBytes
+		 *
+		 * @return string
+		 */
+		public function nextBytes($nbBytes);
 }

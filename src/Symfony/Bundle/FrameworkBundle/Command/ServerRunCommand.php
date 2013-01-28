@@ -24,75 +24,75 @@ use Symfony\Component\Process\ProcessBuilder;
  */
 class ServerRunCommand extends ContainerAwareCommand
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function isEnabled()
-    {
-        if (version_compare(phpversion(), '5.4.0', '<')) {
-            return false;
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function isEnabled()
+		{
+				if (version_compare(phpversion(), '5.4.0', '<')) {
+						return false;
+				}
 
-        return parent::isEnabled();
-    }
+				return parent::isEnabled();
+		}
 
-    /**
-     * @see Command
-     */
-    protected function configure()
-    {
-        $this
-            ->setDefinition(array(
-                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', 'localhost:8000'),
-                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', 'web/'),
-                new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
-            ))
-            ->setName('server:run')
-            ->setDescription('Runs PHP built-in web server')
-            ->setHelp(<<<EOF
+		/**
+		 * @see Command
+		 */
+		protected function configure()
+		{
+				$this
+						->setDefinition(array(
+								new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', 'localhost:8000'),
+								new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', 'web/'),
+								new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
+						))
+						->setName('server:run')
+						->setDescription('Runs PHP built-in web server')
+						->setHelp(<<<EOF
 The <info>%command.name%</info> runs PHP built-in web server:
 
-  <info>%command.full_name%</info>
+	<info>%command.full_name%</info>
 
 To change default bind address and port use the <info>address</info> argument:
 
-  <info>%command.full_name% 127.0.0.1:8080</info>
+	<info>%command.full_name% 127.0.0.1:8080</info>
 
 To change default docroot directory use the <info>--docroot</info> option:
 
-  <info>%command.full_name% --docroot=htdocs/</info>
+	<info>%command.full_name% --docroot=htdocs/</info>
 
 If you have custom docroot directory layout, you can specify your own
 router script using <info>--router</info> option:
 
-  <info>%command.full_name% --router=app/config/router.php</info>
+	<info>%command.full_name% --router=app/config/router.php</info>
 
 See also: http://www.php.net/manual/en/features.commandline.webserver.php
 EOF
-            )
-        ;
-    }
+						)
+				;
+		}
 
-    /**
-     * @see Command
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $router = $input->getOption('router') ?: $this
-            ->getContainer()
-            ->get('kernel')
-            ->locateResource('@FrameworkBundle/Resources/config/router.php')
-        ;
+		/**
+		 * @see Command
+		 */
+		protected function execute(InputInterface $input, OutputInterface $output)
+		{
+				$router = $input->getOption('router') ?: $this
+						->getContainer()
+						->get('kernel')
+						->locateResource('@FrameworkBundle/Resources/config/router.php')
+				;
 
-        $output->writeln(sprintf("Server running on <info>%s</info>\n", $input->getArgument('address')));
+				$output->writeln(sprintf("Server running on <info>%s</info>\n", $input->getArgument('address')));
 
-        $builder = new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
-        $builder->setWorkingDirectory($input->getOption('docroot'));
-        $builder->setTimeout(null);
-        $builder->getProcess()->run(function ($type, $buffer) use ($output) {
-            if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) {
-                $output->write($buffer);
-            }
-        });
-    }
+				$builder = new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
+				$builder->setWorkingDirectory($input->getOption('docroot'));
+				$builder->setTimeout(null);
+				$builder->getProcess()->run(function ($type, $buffer) use ($output) {
+						if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) {
+								$output->write($buffer);
+						}
+				});
+		}
 }

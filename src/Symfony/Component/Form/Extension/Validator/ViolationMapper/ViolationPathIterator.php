@@ -18,13 +18,13 @@ use Symfony\Component\PropertyAccess\PropertyPathIterator;
  */
 class ViolationPathIterator extends PropertyPathIterator
 {
-    public function __construct(ViolationPath $violationPath)
-    {
-        parent::__construct($violationPath);
-    }
+		public function __construct(ViolationPath $violationPath)
+		{
+				parent::__construct($violationPath);
+		}
 
-    public function mapsForm()
-    {
-        return $this->path->mapsForm($this->key());
-    }
+		public function mapsForm()
+		{
+				return $this->path->mapsForm($this->key());
+		}
 }

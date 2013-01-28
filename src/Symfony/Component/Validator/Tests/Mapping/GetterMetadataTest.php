@@ -16,23 +16,23 @@ use Symfony\Component\Validator\Tests\Fixtures\Entity;
 
 class GetterMetadataTest extends \PHPUnit_Framework_TestCase
 {
-    const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
+		const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
 
-    public function testInvalidPropertyName()
-    {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ValidatorException');
+		public function testInvalidPropertyName()
+		{
+				$this->setExpectedException('Symfony\Component\Validator\Exception\ValidatorException');
 
-        new GetterMetadata(self::CLASSNAME, 'foobar');
-    }
+				new GetterMetadata(self::CLASSNAME, 'foobar');
+		}
 
-    public function testGetPropertyValueFromPublicGetter()
-    {
-        // private getters don't work yet because ReflectionMethod::setAccessible()
-        // does not exists yet in a stable PHP release
+		public function testGetPropertyValueFromPublicGetter()
+		{
+				// private getters don't work yet because ReflectionMethod::setAccessible()
+				// does not exists yet in a stable PHP release
 
-        $entity = new Entity('foobar');
-        $metadata = new GetterMetadata(self::CLASSNAME, 'internal');
+				$entity = new Entity('foobar');
+				$metadata = new GetterMetadata(self::CLASSNAME, 'internal');
 
-        $this->assertEquals('foobar from getter', $metadata->getPropertyValue($entity));
-    }
+				$this->assertEquals('foobar from getter', $metadata->getPropertyValue($entity));
+		}
 }

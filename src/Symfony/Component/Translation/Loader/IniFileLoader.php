@@ -22,24 +22,24 @@ use Symfony\Component\Config\Resource\FileResource;
  */
 class IniFileLoader extends ArrayLoader implements LoaderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function load($resource, $locale, $domain = 'messages')
-    {
-        if (!stream_is_local($resource)) {
-            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
-        }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function load($resource, $locale, $domain = 'messages')
+		{
+				if (!stream_is_local($resource)) {
+						throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
+				}
 
-        if (!file_exists($resource)) {
-            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
-        }
+				if (!file_exists($resource)) {
+						throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
+				}
 
-        $messages = parse_ini_file($resource, true);
+				$messages = parse_ini_file($resource, true);
 
-        $catalogue = parent::load($messages, $locale, $domain);
-        $catalogue->addResource(new FileResource($resource));
+				$catalogue = parent::load($messages, $locale, $domain);
+				$catalogue->addResource(new FileResource($resource));
 
-        return $catalogue;
-    }
+				return $catalogue;
+		}
 }

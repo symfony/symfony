@@ -18,21 +18,21 @@ use Symfony\Component\Form\Tests\FormPerformanceTestCase;
  */
 class ChoiceTypePerformanceTest extends FormPerformanceTestCase
 {
-    /**
-     * This test case is realistic in collection forms where each
-     * row contains the same choice field.
-     *
-     * @group benchmark
-     */
-    public function testSameChoiceFieldCreatedMultipleTimes()
-    {
-        $this->setMaxRunningTime(1);
-        $choices = range(1, 300);
+		/**
+		 * This test case is realistic in collection forms where each
+		 * row contains the same choice field.
+		 *
+		 * @group benchmark
+		 */
+		public function testSameChoiceFieldCreatedMultipleTimes()
+		{
+				$this->setMaxRunningTime(1);
+				$choices = range(1, 300);
 
-        for ($i = 0; $i < 100; ++$i) {
-            $this->factory->create('choice', rand(1, 400), array(
-                'choices' => $choices,
-            ));
-        }
-    }
+				for ($i = 0; $i < 100; ++$i) {
+						$this->factory->create('choice', rand(1, 400), array(
+								'choices' => $choices,
+						));
+				}
+		}
 }

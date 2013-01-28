@@ -21,13 +21,13 @@ namespace Symfony\Component\Form\Util;
  */
 class VirtualFormAwareIterator extends \ArrayIterator implements \RecursiveIterator
 {
-    public function getChildren()
-    {
-        return new self($this->current()->all());
-    }
+		public function getChildren()
+		{
+				return new self($this->current()->all());
+		}
 
-    public function hasChildren()
-    {
-        return $this->current()->getConfig()->getVirtual();
-    }
+		public function hasChildren()
+		{
+				return $this->current()->getConfig()->getVirtual();
+		}
 }

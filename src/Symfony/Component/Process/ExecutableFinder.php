@@ -19,72 +19,72 @@ namespace Symfony\Component\Process;
  */
 class ExecutableFinder
 {
-    private $suffixes = array('.exe', '.bat', '.cmd', '.com');
+		private $suffixes = array('.exe', '.bat', '.cmd', '.com');
 
-    /**
-     * Replaces default suffixes of executable.
-     *
-     * @param array $suffixes
-     */
-    public function setSuffixes(array $suffixes)
-    {
-        $this->suffixes = $suffixes;
-    }
+		/**
+		 * Replaces default suffixes of executable.
+		 *
+		 * @param array $suffixes
+		 */
+		public function setSuffixes(array $suffixes)
+		{
+				$this->suffixes = $suffixes;
+		}
 
-    /**
-     * Adds new possible suffix to check for executable.
-     *
-     * @param string $suffix
-     */
-    public function addSuffix($suffix)
-    {
-        $this->suffixes[] = $suffix;
-    }
+		/**
+		 * Adds new possible suffix to check for executable.
+		 *
+		 * @param string $suffix
+		 */
+		public function addSuffix($suffix)
+		{
+				$this->suffixes[] = $suffix;
+		}
 
-    /**
-     * Finds an executable by name.
-     *
-     * @param string $name      The executable name (without the extension)
-     * @param string $default   The default to return if no executable is found
-     * @param array  $extraDirs Additional dirs to check into
-     *
-     * @return string The executable path or default value
-     */
-    public function find($name, $default = null, array $extraDirs = array())
-    {
-        if (ini_get('open_basedir')) {
-            $searchPath = explode(PATH_SEPARATOR, getenv('open_basedir'));
-            $dirs = array();
-            foreach ($searchPath as $path) {
-                if (is_dir($path)) {
-                    $dirs[] = $path;
-                } else {
-                    $file = str_replace(dirname($path), '', $path);
-                    if ($file == $name && is_executable($path)) {
-                        return $path;
-                    }
-                }
-            }
-        } else {
-            $dirs = array_merge(
-                explode(PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
-                $extraDirs
-            );
-        }
+		/**
+		 * Finds an executable by name.
+		 *
+		 * @param string $name			The executable name (without the extension)
+		 * @param string $default	 The default to return if no executable is found
+		 * @param array	$extraDirs Additional dirs to check into
+		 *
+		 * @return string The executable path or default value
+		 */
+		public function find($name, $default = null, array $extraDirs = array())
+		{
+				if (ini_get('open_basedir')) {
+						$searchPath = explode(PATH_SEPARATOR, getenv('open_basedir'));
+						$dirs = array();
+						foreach ($searchPath as $path) {
+								if (is_dir($path)) {
+										$dirs[] = $path;
+								} else {
+										$file = str_replace(dirname($path), '', $path);
+										if ($file == $name && is_executable($path)) {
+												return $path;
+										}
+								}
+						}
+				} else {
+						$dirs = array_merge(
+								explode(PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
+								$extraDirs
+						);
+				}
 
-        $suffixes = array('');
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $pathExt = getenv('PATHEXT');
-            $suffixes = $pathExt ? explode(PATH_SEPARATOR, $pathExt) : $this->suffixes;
-        }
-        foreach ($suffixes as $suffix) {
-            foreach ($dirs as $dir) {
-                if (is_file($file = $dir.DIRECTORY_SEPARATOR.$name.$suffix) && (defined('PHP_WINDOWS_VERSION_BUILD') || is_executable($file))) {
-                    return $file;
-                }
-            }
-        }
+				$suffixes = array('');
+				if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+						$pathExt = getenv('PATHEXT');
+						$suffixes = $pathExt ? explode(PATH_SEPARATOR, $pathExt) : $this->suffixes;
+				}
+				foreach ($suffixes as $suffix) {
+						foreach ($dirs as $dir) {
+								if (is_file($file = $dir.DIRECTORY_SEPARATOR.$name.$suffix) && (defined('PHP_WINDOWS_VERSION_BUILD') || is_executable($file))) {
+										return $file;
+								}
+						}
+				}
 
-        return $default;
-    }
+				return $default;
+		}
 }

@@ -19,18 +19,18 @@ use Symfony\Component\Validator\GroupSequenceProviderInterface;
  */
 class GroupSequenceProviderEntity implements GroupSequenceProviderInterface
 {
-    public $firstName;
-    public $lastName;
+		public $firstName;
+		public $lastName;
 
-    protected $groups = array();
+		protected $groups = array();
 
-    public function setGroups($groups)
-    {
-        $this->groups = $groups;
-    }
+		public function setGroups($groups)
+		{
+				$this->groups = $groups;
+		}
 
-    public function getGroupSequence()
-    {
-        return $this->groups;
-    }
+		public function getGroupSequence()
+		{
+				return $this->groups;
+		}
 }

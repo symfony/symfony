@@ -16,34 +16,34 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 
 abstract class TypeTestCase extends BaseTestCase
 {
-    protected $validator;
+		protected $validator;
 
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Validator\Constraint')) {
-            $this->markTestSkipped('The "Validator" component is not available');
-        }
+		protected function setUp()
+		{
+				if (!class_exists('Symfony\Component\Validator\Constraint')) {
+						$this->markTestSkipped('The "Validator" component is not available');
+				}
 
-        $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
-        $metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
-        $this->validator->expects($this->once())->method('getMetadataFactory')->will($this->returnValue($metadataFactory));
-        $metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
-        $metadataFactory->expects($this->once())->method('getMetadataFor')->will($this->returnValue($metadata));
+				$this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
+				$metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
+				$this->validator->expects($this->once())->method('getMetadataFactory')->will($this->returnValue($metadataFactory));
+				$metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
+				$metadataFactory->expects($this->once())->method('getMetadataFor')->will($this->returnValue($metadata));
 
-        parent::setUp();
-    }
+				parent::setUp();
+		}
 
-    protected function tearDown()
-    {
-        $this->validator = null;
+		protected function tearDown()
+		{
+				$this->validator = null;
 
-        parent::tearDown();
-    }
+				parent::tearDown();
+		}
 
-    protected function getExtensions()
-    {
-        return array_merge(parent::getExtensions(), array(
-            new ValidatorExtension($this->validator),
-        ));
-    }
+		protected function getExtensions()
+		{
+				return array_merge(parent::getExtensions(), array(
+						new ValidatorExtension($this->validator),
+				));
+		}
 }

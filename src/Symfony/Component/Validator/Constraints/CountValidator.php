@@ -20,44 +20,44 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class CountValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (null === $value) {
-            return;
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (null === $value) {
+						return;
+				}
 
-        if (!is_array($value) && !$value instanceof \Countable) {
-            throw new UnexpectedTypeException($value, 'array or \Countable');
-        }
+				if (!is_array($value) && !$value instanceof \Countable) {
+						throw new UnexpectedTypeException($value, 'array or \Countable');
+				}
 
-        $count = count($value);
+				$count = count($value);
 
-        if ($constraint->min == $constraint->max && $count != $constraint->min) {
-            $this->context->addViolation($constraint->exactMessage, array(
-                '{{ count }}' => $count,
-                '{{ limit }}' => $constraint->min,
-            ), $value, (int) $constraint->min);
+				if ($constraint->min == $constraint->max && $count != $constraint->min) {
+						$this->context->addViolation($constraint->exactMessage, array(
+								'{{ count }}' => $count,
+								'{{ limit }}' => $constraint->min,
+						), $value, (int) $constraint->min);
 
-            return;
-        }
+						return;
+				}
 
-        if (null !== $constraint->max && $count > $constraint->max) {
-            $this->context->addViolation($constraint->maxMessage, array(
-                '{{ count }}' => $count,
-                '{{ limit }}' => $constraint->max,
-            ), $value, (int) $constraint->max);
+				if (null !== $constraint->max && $count > $constraint->max) {
+						$this->context->addViolation($constraint->maxMessage, array(
+								'{{ count }}' => $count,
+								'{{ limit }}' => $constraint->max,
+						), $value, (int) $constraint->max);
 
-            return;
-        }
+						return;
+				}
 
-        if (null !== $constraint->min && $count < $constraint->min) {
-            $this->context->addViolation($constraint->minMessage, array(
-                '{{ count }}' => $count,
-                '{{ limit }}' => $constraint->min,
-            ), $value, (int) $constraint->min);
-        }
-    }
+				if (null !== $constraint->min && $count < $constraint->min) {
+						$this->context->addViolation($constraint->minMessage, array(
+								'{{ count }}' => $count,
+								'{{ limit }}' => $constraint->min,
+						), $value, (int) $constraint->min);
+				}
+		}
 }

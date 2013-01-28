@@ -24,79 +24,79 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  */
 interface BundleInterface extends ContainerAwareInterface
 {
-    /**
-     * Boots the Bundle.
-     *
-     * @api
-     */
-    public function boot();
+		/**
+		 * Boots the Bundle.
+		 *
+		 * @api
+		 */
+		public function boot();
 
-    /**
-     * Shutdowns the Bundle.
-     *
-     * @api
-     */
-    public function shutdown();
+		/**
+		 * Shutdowns the Bundle.
+		 *
+		 * @api
+		 */
+		public function shutdown();
 
-    /**
-     * Builds the bundle.
-     *
-     * It is only ever called once when the cache is empty.
-     *
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     *
-     * @api
-     */
-    public function build(ContainerBuilder $container);
+		/**
+		 * Builds the bundle.
+		 *
+		 * It is only ever called once when the cache is empty.
+		 *
+		 * @param ContainerBuilder $container A ContainerBuilder instance
+		 *
+		 * @api
+		 */
+		public function build(ContainerBuilder $container);
 
-    /**
-     * Returns the container extension that should be implicitly loaded.
-     *
-     * @return ExtensionInterface|null The default extension or null if there is none
-     *
-     * @api
-     */
-    public function getContainerExtension();
+		/**
+		 * Returns the container extension that should be implicitly loaded.
+		 *
+		 * @return ExtensionInterface|null The default extension or null if there is none
+		 *
+		 * @api
+		 */
+		public function getContainerExtension();
 
-    /**
-     * Returns the bundle name that this bundle overrides.
-     *
-     * Despite its name, this method does not imply any parent/child relationship
-     * between the bundles, just a way to extend and override an existing
-     * bundle.
-     *
-     * @return string The Bundle name it overrides or null if no parent
-     *
-     * @api
-     */
-    public function getParent();
+		/**
+		 * Returns the bundle name that this bundle overrides.
+		 *
+		 * Despite its name, this method does not imply any parent/child relationship
+		 * between the bundles, just a way to extend and override an existing
+		 * bundle.
+		 *
+		 * @return string The Bundle name it overrides or null if no parent
+		 *
+		 * @api
+		 */
+		public function getParent();
 
-    /**
-     * Returns the bundle name (the class short name).
-     *
-     * @return string The Bundle name
-     *
-     * @api
-     */
-    public function getName();
+		/**
+		 * Returns the bundle name (the class short name).
+		 *
+		 * @return string The Bundle name
+		 *
+		 * @api
+		 */
+		public function getName();
 
-    /**
-     * Gets the Bundle namespace.
-     *
-     * @return string The Bundle namespace
-     *
-     * @api
-     */
-    public function getNamespace();
+		/**
+		 * Gets the Bundle namespace.
+		 *
+		 * @return string The Bundle namespace
+		 *
+		 * @api
+		 */
+		public function getNamespace();
 
-    /**
-     * Gets the Bundle directory path.
-     *
-     * The path should always be returned as a Unix path (with /).
-     *
-     * @return string The Bundle absolute path
-     *
-     * @api
-     */
-    public function getPath();
+		/**
+		 * Gets the Bundle directory path.
+		 *
+		 * The path should always be returned as a Unix path (with /).
+		 *
+		 * @return string The Bundle absolute path
+		 *
+		 * @api
+		 */
+		public function getPath();
 }

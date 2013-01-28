@@ -16,45 +16,45 @@ namespace Symfony\Component\Finder\Expression;
  */
 interface ValueInterface
 {
-    /**
-     * Renders string representation of expression.
-     *
-     * @return string
-     */
-    public function render();
+		/**
+		 * Renders string representation of expression.
+		 *
+		 * @return string
+		 */
+		public function render();
 
-    /**
-     * Renders string representation of pattern.
-     *
-     * @return string
-     */
-    public function renderPattern();
+		/**
+		 * Renders string representation of pattern.
+		 *
+		 * @return string
+		 */
+		public function renderPattern();
 
-    /**
-     * Returns value case sensitivity.
-     *
-     * @return bool
-     */
-    public function isCaseSensitive();
+		/**
+		 * Returns value case sensitivity.
+		 *
+		 * @return bool
+		 */
+		public function isCaseSensitive();
 
-    /**
-     * Returns expression type.
-     *
-     * @return int
-     */
-    public function getType();
+		/**
+		 * Returns expression type.
+		 *
+		 * @return int
+		 */
+		public function getType();
 
-    /**
-     * @param string $expr
-     *
-     * @return ValueInterface
-     */
-    public function prepend($expr);
+		/**
+		 * @param string $expr
+		 *
+		 * @return ValueInterface
+		 */
+		public function prepend($expr);
 
-    /**
-     * @param string $expr
-     *
-     * @return ValueInterface
-     */
-    public function append($expr);
+		/**
+		 * @param string $expr
+		 *
+		 * @return ValueInterface
+		 */
+		public function append($expr);
 }

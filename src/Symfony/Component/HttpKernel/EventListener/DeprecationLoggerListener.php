@@ -23,22 +23,22 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class DeprecationLoggerListener implements EventSubscriberInterface
 {
-    private $logger;
+		private $logger;
 
-    public function __construct(LoggerInterface $logger = null)
-    {
-        $this->logger = $logger;
-    }
+		public function __construct(LoggerInterface $logger = null)
+		{
+				$this->logger = $logger;
+		}
 
-    public function injectLogger()
-    {
-        if (null !== $this->logger) {
-            ErrorHandler::setLogger($this->logger);
-        }
-    }
+		public function injectLogger()
+		{
+				if (null !== $this->logger) {
+						ErrorHandler::setLogger($this->logger);
+				}
+		}
 
-    public static function getSubscribedEvents()
-    {
-        return array(KernelEvents::REQUEST => 'injectLogger');
-    }
+		public static function getSubscribedEvents()
+		{
+				return array(KernelEvents::REQUEST => 'injectLogger');
+		}
 }

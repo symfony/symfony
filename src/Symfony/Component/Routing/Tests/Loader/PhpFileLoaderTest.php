@@ -16,37 +16,37 @@ use Symfony\Component\Routing\Loader\PhpFileLoader;
 
 class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\FileLocator')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
+		protected function setUp()
+		{
+				if (!class_exists('Symfony\Component\Config\FileLocator')) {
+						$this->markTestSkipped('The "Config" component is not available');
+				}
+		}
 
-    public function testSupports()
-    {
-        $loader = new PhpFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
+		public function testSupports()
+		{
+				$loader = new PhpFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
 
-        $this->assertTrue($loader->supports('foo.php'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+				$this->assertTrue($loader->supports('foo.php'), '->supports() returns true if the resource is loadable');
+				$this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
 
-        $this->assertTrue($loader->supports('foo.php', 'php'), '->supports() checks the resource type if specified');
-        $this->assertFalse($loader->supports('foo.php', 'foo'), '->supports() checks the resource type if specified');
-    }
+				$this->assertTrue($loader->supports('foo.php', 'php'), '->supports() checks the resource type if specified');
+				$this->assertFalse($loader->supports('foo.php', 'foo'), '->supports() checks the resource type if specified');
+		}
 
-    public function testLoadWithRoute()
-    {
-        $loader = new PhpFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $routeCollection = $loader->load('validpattern.php');
-        $routes = $routeCollection->all();
+		public function testLoadWithRoute()
+		{
+				$loader = new PhpFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+				$routeCollection = $loader->load('validpattern.php');
+				$routes = $routeCollection->all();
 
-        $this->assertEquals(1, count($routes), 'One route is loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-        $route = $routes['blog_show'];
-        $this->assertEquals('/blog/{slug}', $route->getPath());
-        $this->assertEquals('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
-        $this->assertEquals('GET', $route->getRequirement('_method'));
-        $this->assertEquals('{locale}.example.com', $route->getHost());
-        $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
-    }
+				$this->assertEquals(1, count($routes), 'One route is loaded');
+				$this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+				$route = $routes['blog_show'];
+				$this->assertEquals('/blog/{slug}', $route->getPath());
+				$this->assertEquals('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
+				$this->assertEquals('GET', $route->getRequirement('_method'));
+				$this->assertEquals('{locale}.example.com', $route->getHost());
+				$this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
+		}
 }

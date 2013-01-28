@@ -20,98 +20,98 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DefaultRenderingStrategyTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
+		protected function setUp()
+		{
+				if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
+						$this->markTestSkipped('The "EventDispatcher" component is not available');
+				}
 
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
+				if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
+						$this->markTestSkipped('The "HttpFoundation" component is not available');
+				}
+		}
 
-    public function testRender()
-    {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
+		public function testRender()
+		{
+				$strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
 
-        $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
-    }
+				$this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
+		}
 
-    public function testRenderWithControllerReference()
-    {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
+		public function testRenderWithControllerReference()
+		{
+				$strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
 
-        $this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
-    }
+				$this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
+		}
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testRenderExceptionNoIgnoreErrors()
-    {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
+		/**
+		 * @expectedException \RuntimeException
+		 */
+		public function testRenderExceptionNoIgnoreErrors()
+		{
+				$strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
 
-        $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
-    }
+				$this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
+		}
 
-    public function testRenderExceptionIgnoreErrors()
-    {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
+		public function testRenderExceptionIgnoreErrors()
+		{
+				$strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
 
-        $this->assertEmpty($strategy->render('/', Request::create('/'), array('ignore_errors' => true))->getContent());
-    }
+				$this->assertEmpty($strategy->render('/', Request::create('/'), array('ignore_errors' => true))->getContent());
+		}
 
-    public function testRenderExceptionIgnoreErrorsWithAlt()
-    {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->onConsecutiveCalls(
-            $this->throwException(new \RuntimeException('foo')),
-            $this->returnValue(new Response('bar'))
-        )));
+		public function testRenderExceptionIgnoreErrorsWithAlt()
+		{
+				$strategy = new DefaultRenderingStrategy($this->getKernel($this->onConsecutiveCalls(
+						$this->throwException(new \RuntimeException('foo')),
+						$this->returnValue(new Response('bar'))
+				)));
 
-        $this->assertEquals('bar', $strategy->render('/', Request::create('/'), array('ignore_errors' => true, 'alt' => '/foo'))->getContent());
-    }
+				$this->assertEquals('bar', $strategy->render('/', Request::create('/'), array('ignore_errors' => true, 'alt' => '/foo'))->getContent());
+		}
 
-    private function getKernel($returnValue)
-    {
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-        $kernel
-            ->expects($this->any())
-            ->method('handle')
-            ->will($returnValue)
-        ;
+		private function getKernel($returnValue)
+		{
+				$kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+				$kernel
+						->expects($this->any())
+						->method('handle')
+						->will($returnValue)
+				;
 
-        return $kernel;
-    }
+				return $kernel;
+		}
 
-    public function testExceptionInSubRequestsDoesNotMangleOutputBuffers()
-    {
-        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $resolver
-            ->expects($this->once())
-            ->method('getController')
-            ->will($this->returnValue(function () {
-                ob_start();
-                echo 'bar';
-                throw new \RuntimeException();
-            }))
-        ;
-        $resolver
-            ->expects($this->once())
-            ->method('getArguments')
-            ->will($this->returnValue(array()))
-        ;
+		public function testExceptionInSubRequestsDoesNotMangleOutputBuffers()
+		{
+				$resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
+				$resolver
+						->expects($this->once())
+						->method('getController')
+						->will($this->returnValue(function () {
+								ob_start();
+								echo 'bar';
+								throw new \RuntimeException();
+						}))
+				;
+				$resolver
+						->expects($this->once())
+						->method('getArguments')
+						->will($this->returnValue(array()))
+				;
 
-        $kernel = new HttpKernel(new EventDispatcher(), $resolver);
-        $renderer = new DefaultRenderingStrategy($kernel);
+				$kernel = new HttpKernel(new EventDispatcher(), $resolver);
+				$renderer = new DefaultRenderingStrategy($kernel);
 
-        // simulate a main request with output buffering
-        ob_start();
-        echo 'Foo';
+				// simulate a main request with output buffering
+				ob_start();
+				echo 'Foo';
 
-        // simulate a sub-request with output buffering and an exception
-        $renderer->render('/', Request::create('/'), array('ignore_errors' => true));
+				// simulate a sub-request with output buffering and an exception
+				$renderer->render('/', Request::create('/'), array('ignore_errors' => true));
 
-        $this->assertEquals('Foo', ob_get_clean());
-    }
+				$this->assertEquals('Foo', ob_get_clean());
+		}
 }

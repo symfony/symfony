@@ -20,28 +20,28 @@ use Symfony\Component\Process\Process;
  */
 class ProcessFailedException extends RuntimeException
 {
-    private $process;
+		private $process;
 
-    public function __construct(Process $process)
-    {
-        if ($process->isSuccessful()) {
-            throw new InvalidArgumentException('Expected a failed process, but the given process was successful.');
-        }
+		public function __construct(Process $process)
+		{
+				if ($process->isSuccessful()) {
+						throw new InvalidArgumentException('Expected a failed process, but the given process was successful.');
+				}
 
-        parent::__construct(
-            sprintf(
-                'The command "%s" failed.'."\n\nOutput:\n================\n%s\n\nError Output:\n================\n%s",
-                $process->getCommandLine(),
-                $process->getOutput(),
-                $process->getErrorOutput()
-            )
-        );
+				parent::__construct(
+						sprintf(
+								'The command "%s" failed.'."\n\nOutput:\n================\n%s\n\nError Output:\n================\n%s",
+								$process->getCommandLine(),
+								$process->getOutput(),
+								$process->getErrorOutput()
+						)
+				);
 
-        $this->process = $process;
-    }
+				$this->process = $process;
+		}
 
-    public function getProcess()
-    {
-        return $this->process;
-    }
+		public function getProcess()
+		{
+				return $this->process;
+		}
 }

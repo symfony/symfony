@@ -18,37 +18,37 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class UrlType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+				$builder->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'default_protocol' => 'http',
-        ));
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				$resolver->setDefaults(array(
+						'default_protocol' => 'http',
+				));
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'text';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getParent()
+		{
+				return 'text';
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'url';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'url';
+		}
 }

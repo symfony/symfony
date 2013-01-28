@@ -18,16 +18,16 @@ use Symfony\Component\Validator\Constraint;
  */
 class Form extends Constraint
 {
-    /**
-     * Violation code marking an invalid form.
-     */
-    const ERR_INVALID = 1;
+		/**
+		 * Violation code marking an invalid form.
+		 */
+		const ERR_INVALID = 1;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTargets()
-    {
-        return self::CLASS_CONSTRAINT;
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getTargets()
+		{
+				return self::CLASS_CONSTRAINT;
+		}
 }

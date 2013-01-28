@@ -21,53 +21,53 @@ use Symfony\Component\Validator\Constraints\Valid;
  */
 class CollectionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
-    public function testRejectInvalidFieldsOption()
-    {
-        new Collection(array(
-            'fields' => 'foo',
-        ));
-    }
+		/**
+		 * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+		 */
+		public function testRejectInvalidFieldsOption()
+		{
+				new Collection(array(
+						'fields' => 'foo',
+				));
+		}
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
-    public function testRejectNonConstraints()
-    {
-        new Collection(array(
-            'foo' => 'bar',
-        ));
-    }
+		/**
+		 * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+		 */
+		public function testRejectNonConstraints()
+		{
+				new Collection(array(
+						'foo' => 'bar',
+				));
+		}
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
-    public function testRejectValidConstraint()
-    {
-        new Collection(array(
-            'foo' => new Valid(),
-        ));
-    }
+		/**
+		 * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+		 */
+		public function testRejectValidConstraint()
+		{
+				new Collection(array(
+						'foo' => new Valid(),
+				));
+		}
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
-    public function testRejectValidConstraintWithinOptional()
-    {
-        new Collection(array(
-            'foo' => new Optional(new Valid()),
-        ));
-    }
+		/**
+		 * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+		 */
+		public function testRejectValidConstraintWithinOptional()
+		{
+				new Collection(array(
+						'foo' => new Optional(new Valid()),
+				));
+		}
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
-    public function testRejectValidConstraintWithinRequired()
-    {
-        new Collection(array(
-            'foo' => new Required(new Valid()),
-        ));
-    }
+		/**
+		 * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+		 */
+		public function testRejectValidConstraintWithinRequired()
+		{
+				new Collection(array(
+						'foo' => new Required(new Valid()),
+				));
+		}
 }

@@ -21,17 +21,17 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  */
 class PropelExtension extends AbstractExtension
 {
-    protected function loadTypes()
-    {
-        return array(
-            new Type\ModelType(PropertyAccess::getPropertyAccessor()),
-            new Type\TranslationCollectionType(),
-            new Type\TranslationType()
-        );
-    }
+		protected function loadTypes()
+		{
+				return array(
+						new Type\ModelType(PropertyAccess::getPropertyAccessor()),
+						new Type\TranslationCollectionType(),
+						new Type\TranslationType()
+				);
+		}
 
-    protected function loadTypeGuesser()
-    {
-        return new PropelTypeGuesser();
-    }
+		protected function loadTypeGuesser()
+		{
+				return new PropelTypeGuesser();
+		}
 }

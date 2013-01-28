@@ -1,50 +1,50 @@
 {
-    "name": "symfony/security",
-    "type": "library",
-    "description": "Symfony Security Component",
-    "keywords": [],
-    "homepage": "http://symfony.com",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Fabien Potencier",
-            "email": "fabien@symfony.com"
-        },
-        {
-            "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
-        }
-    ],
-    "require": {
-        "php": ">=5.3.3",
-        "symfony/event-dispatcher": "2.2.*",
-        "symfony/http-foundation": "2.2.*",
-        "symfony/http-kernel": "2.2.*"
-    },
-    "require-dev": {
-        "symfony/form": "2.2.*",
-        "symfony/routing": "2.2.*",
-        "symfony/validator": "2.2.*",
-        "doctrine/common": ">=2.2,<2.4-dev",
-        "doctrine/dbal": ">=2.2,<2.4-dev",
-        "psr/log": "~1.0"
-    },
-    "suggest": {
-        "symfony/class-loader": "2.2.*",
-        "symfony/finder": "2.2.*",
-        "symfony/form": "2.2.*",
-        "symfony/validator": "2.2.*",
-        "symfony/routing": "2.2.*",
-        "doctrine/dbal": "to use the built-in ACL implementation"
-    },
-    "autoload": {
-        "psr-0": { "Symfony\\Component\\Security\\": "" }
-    },
-    "target-dir": "Symfony/Component/Security",
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.2-dev"
-        }
-    }
+		"name": "symfony/security",
+		"type": "library",
+		"description": "Symfony Security Component",
+		"keywords": [],
+		"homepage": "http://symfony.com",
+		"license": "MIT",
+		"authors": [
+				{
+						"name": "Fabien Potencier",
+						"email": "fabien@symfony.com"
+				},
+				{
+						"name": "Symfony Community",
+						"homepage": "http://symfony.com/contributors"
+				}
+		],
+		"require": {
+				"php": ">=5.3.3",
+				"symfony/event-dispatcher": "2.2.*",
+				"symfony/http-foundation": "2.2.*",
+				"symfony/http-kernel": "2.2.*"
+		},
+		"require-dev": {
+				"symfony/form": "2.2.*",
+				"symfony/routing": "2.2.*",
+				"symfony/validator": "2.2.*",
+				"doctrine/common": ">=2.2,<2.4-dev",
+				"doctrine/dbal": ">=2.2,<2.4-dev",
+				"psr/log": "~1.0"
+		},
+		"suggest": {
+				"symfony/class-loader": "2.2.*",
+				"symfony/finder": "2.2.*",
+				"symfony/form": "2.2.*",
+				"symfony/validator": "2.2.*",
+				"symfony/routing": "2.2.*",
+				"doctrine/dbal": "to use the built-in ACL implementation"
+		},
+		"autoload": {
+				"psr-0": { "Symfony\\Component\\Security\\": "" }
+		},
+		"target-dir": "Symfony/Component/Security",
+		"minimum-stability": "dev",
+		"extra": {
+				"branch-alias": {
+						"dev-master": "2.2-dev"
+				}
+		}
 }

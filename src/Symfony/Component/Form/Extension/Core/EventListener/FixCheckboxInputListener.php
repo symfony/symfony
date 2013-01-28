@@ -24,28 +24,28 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
  */
 class FixCheckboxInputListener implements EventSubscriberInterface
 {
-    private $choiceList;
+		private $choiceList;
 
-    /**
-     * Constructor.
-     *
-     * @param ChoiceListInterface $choiceList
-     */
-    public function __construct(ChoiceListInterface $choiceList)
-    {
-        $this->choiceList = $choiceList;
-    }
+		/**
+		 * Constructor.
+		 *
+		 * @param ChoiceListInterface $choiceList
+		 */
+		public function __construct(ChoiceListInterface $choiceList)
+		{
+				$this->choiceList = $choiceList;
+		}
 
-    public function preBind(FormEvent $event)
-    {
-        $values = (array) $event->getData();
-        $indices = $this->choiceList->getIndicesForValues($values);
+		public function preBind(FormEvent $event)
+		{
+				$values = (array) $event->getData();
+				$indices = $this->choiceList->getIndicesForValues($values);
 
-        $event->setData(count($indices) > 0 ? array_combine($indices, $values) : array());
-    }
+				$event->setData(count($indices) > 0 ? array_combine($indices, $values) : array());
+		}
 
-    public static function getSubscribedEvents()
-    {
-        return array(FormEvents::PRE_BIND => 'preBind');
-    }
+		public static function getSubscribedEvents()
+		{
+				return array(FormEvents::PRE_BIND => 'preBind');
+		}
 }

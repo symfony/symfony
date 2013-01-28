@@ -24,50 +24,50 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
  */
 class RouterController
 {
-    private $profiler;
-    private $twig;
-    private $matcher;
-    private $routes;
+		private $profiler;
+		private $twig;
+		private $matcher;
+		private $routes;
 
-    public function __construct(Profiler $profiler, \Twig_Environment $twig, UrlMatcherInterface $matcher = null, $routes = null)
-    {
-        $this->profiler = $profiler;
-        $this->twig = $twig;
-        $this->matcher = $matcher;
-        $this->routes = $routes;
+		public function __construct(Profiler $profiler, \Twig_Environment $twig, UrlMatcherInterface $matcher = null, $routes = null)
+		{
+				$this->profiler = $profiler;
+				$this->twig = $twig;
+				$this->matcher = $matcher;
+				$this->routes = $routes;
 
-        if (null === $this->routes && null !== $this->matcher && $this->matcher instanceof RouterInterface) {
-            $this->routes = $matcher->getRouteCollection();
-        }
-    }
+				if (null === $this->routes && null !== $this->matcher && $this->matcher instanceof RouterInterface) {
+						$this->routes = $matcher->getRouteCollection();
+				}
+		}
 
-    /**
-     * Renders the profiler panel for the given token.
-     *
-     * @param string $token The profiler token
-     *
-     * @return Response A Response instance
-     */
-    public function panelAction($token)
-    {
-        $this->profiler->disable();
+		/**
+		 * Renders the profiler panel for the given token.
+		 *
+		 * @param string $token The profiler token
+		 *
+		 * @return Response A Response instance
+		 */
+		public function panelAction($token)
+		{
+				$this->profiler->disable();
 
-        if (null === $this->matcher || null === $this->routes) {
-            return new Response('The Router is not enabled.');
-        }
+				if (null === $this->matcher || null === $this->routes) {
+						return new Response('The Router is not enabled.');
+				}
 
-        $profile = $this->profiler->loadProfile($token);
+				$profile = $this->profiler->loadProfile($token);
 
-        $context = $this->matcher->getContext();
-        $context->setMethod($profile->getMethod());
-        $matcher = new TraceableUrlMatcher($this->routes, $context);
+				$context = $this->matcher->getContext();
+				$context->setMethod($profile->getMethod());
+				$matcher = new TraceableUrlMatcher($this->routes, $context);
 
-        $request = $profile->getCollector('request');
+				$request = $profile->getCollector('request');
 
-        return new Response($this->twig->render('@WebProfiler/Router/panel.html.twig', array(
-            'request' => $request,
-            'router'  => $profile->getCollector('router'),
-            'traces'  => $matcher->getTraces($request->getPathInfo()),
-        )));
-    }
+				return new Response($this->twig->render('@WebProfiler/Router/panel.html.twig', array(
+						'request' => $request,
+						'router'	=> $profile->getCollector('router'),
+						'traces'	=> $matcher->getTraces($request->getPathInfo()),
+				)));
+		}
 }

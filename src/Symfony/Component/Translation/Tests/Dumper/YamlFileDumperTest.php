@@ -16,24 +16,24 @@ use Symfony\Component\Translation\Dumper\YamlFileDumper;
 
 class YamlFileDumperTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Yaml\Yaml')) {
-            $this->markTestSkipped('The "Yaml" component is not available');
-        }
-    }
+		protected function setUp()
+		{
+				if (!class_exists('Symfony\Component\Yaml\Yaml')) {
+						$this->markTestSkipped('The "Yaml" component is not available');
+				}
+		}
 
-    public function testDump()
-    {
-        $catalogue = new MessageCatalogue('en');
-        $catalogue->add(array('foo' => 'bar'));
+		public function testDump()
+		{
+				$catalogue = new MessageCatalogue('en');
+				$catalogue->add(array('foo' => 'bar'));
 
-        $tempDir = sys_get_temp_dir();
-        $dumper = new YamlFileDumper();
-        $dumper->dump($catalogue, array('path' => $tempDir));
+				$tempDir = sys_get_temp_dir();
+				$dumper = new YamlFileDumper();
+				$dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.yml'), file_get_contents($tempDir.'/messages.en.yml'));
+				$this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.yml'), file_get_contents($tempDir.'/messages.en.yml'));
 
-        unlink($tempDir.'/messages.en.yml');
-    }
+				unlink($tempDir.'/messages.en.yml');
+		}
 }

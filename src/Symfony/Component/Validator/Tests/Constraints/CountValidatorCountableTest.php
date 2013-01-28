@@ -13,17 +13,17 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 class CountValidatorCountableTest_Countable implements \Countable
 {
-    private $content;
+		private $content;
 
-    public function __construct(array $content)
-    {
-        $this->content = $content;
-    }
+		public function __construct(array $content)
+		{
+				$this->content = $content;
+		}
 
-    public function count()
-    {
-        return count($this->content);
-    }
+		public function count()
+		{
+				return count($this->content);
+		}
 }
 
 /**
@@ -31,8 +31,8 @@ class CountValidatorCountableTest_Countable implements \Countable
  */
 class CountValidatorCountableTest extends CountValidatorTest
 {
-    protected function createCollection(array $content)
-    {
-        return new CountValidatorCountableTest_Countable($content);
-    }
+		protected function createCollection(array $content)
+		{
+				return new CountValidatorCountableTest_Countable($content);
+		}
 }

@@ -18,26 +18,26 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class Dummy implements NormalizableInterface, DenormalizableInterface
 {
-    public $foo;
-    public $bar;
-    public $baz;
-    public $qux;
+		public $foo;
+		public $bar;
+		public $baz;
+		public $qux;
 
-    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array())
-    {
-        return array(
-            'foo' => $this->foo,
-            'bar' => $this->bar,
-            'baz' => $this->baz,
-            'qux' => $this->qux,
-        );
-    }
+		public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array())
+		{
+				return array(
+						'foo' => $this->foo,
+						'bar' => $this->bar,
+						'baz' => $this->baz,
+						'qux' => $this->qux,
+				);
+		}
 
-    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array())
-    {
-        $this->foo = $data['foo'];
-        $this->bar = $data['bar'];
-        $this->baz = $data['baz'];
-        $this->qux = $data['qux'];
-    }
+		public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array())
+		{
+				$this->foo = $data['foo'];
+				$this->bar = $data['bar'];
+				$this->baz = $data['baz'];
+				$this->qux = $data['qux'];
+		}
 }

@@ -17,66 +17,66 @@ use Symfony\Bundle\TwigBundle\Node\RenderNode;
 
 class RenderTokenParserTest extends TestCase
 {
-    /**
-     * @dataProvider getTestsForRender
-     */
-    public function testCompile($source, $expected)
-    {
-        $env = new \Twig_Environment(new \Twig_Loader_String(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
-        $env->addTokenParser(new RenderTokenParser());
-        $stream = $env->tokenize($source);
-        $parser = new \Twig_Parser($env);
+		/**
+		 * @dataProvider getTestsForRender
+		 */
+		public function testCompile($source, $expected)
+		{
+				$env = new \Twig_Environment(new \Twig_Loader_String(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
+				$env->addTokenParser(new RenderTokenParser());
+				$stream = $env->tokenize($source);
+				$parser = new \Twig_Parser($env);
 
-        $this->assertEquals($expected, $parser->parse($stream)->getNode('body')->getNode(0));
-    }
+				$this->assertEquals($expected, $parser->parse($stream)->getNode('body')->getNode(0));
+		}
 
-    public function getTestsForRender()
-    {
-        return array(
-            array(
-                '{% render "foo" %}',
-                new RenderNode(
-                    new \Twig_Node_Expression_Constant('foo', 1),
-                    new \Twig_Node_Expression_Array(array(), 1),
-                    1,
-                    'render'
-                )
-            ),
-            array(
-                '{% render "foo", {foo: 1} %}',
-                new RenderNode(
-                    new \Twig_Node_Expression_Constant('foo', 1),
-                    new \Twig_Node_Expression_Array(array(
-                        new \Twig_Node_Expression_Constant('foo', 1),
-                        new \Twig_Node_Expression_Constant('1', 1),
-                    ), 1),
-                    1,
-                    'render'
-                )
-            ),
-            // deprecated in 2.2
-            array(
-                '{% render "foo" with {foo: 2} %}',
-                new RenderNode(
-                    new \Twig_Node_Expression_Constant('foo', 1),
-                    new \Twig_Node_Expression_Array(array(), 1),
-                    1,
-                    'render'
-                )
-            ),
-            // deprecated in 2.2
-            array(
-                '{% render "foo" with {foo: 2}, {foo: 1} %}',
-                new RenderNode(
-                    new \Twig_Node_Expression_Constant('foo', 1),
-                    new \Twig_Node_Expression_Array(array(
-                        new \Twig_Node_Expression_Constant('foo', 1),
-                        new \Twig_Node_Expression_Constant('1', 1),
-                    ), 1),
-                    1,
-                    'render'
-                )
-            ),
-        );
-    }
+		public function getTestsForRender()
+		{
+				return array(
+						array(
+								'{% render "foo" %}',
+								new RenderNode(
+										new \Twig_Node_Expression_Constant('foo', 1),
+										new \Twig_Node_Expression_Array(array(), 1),
+										1,
+										'render'
+								)
+						),
+						array(
+								'{% render "foo", {foo: 1} %}',
+								new RenderNode(
+										new \Twig_Node_Expression_Constant('foo', 1),
+										new \Twig_Node_Expression_Array(array(
+												new \Twig_Node_Expression_Constant('foo', 1),
+												new \Twig_Node_Expression_Constant('1', 1),
+										), 1),
+										1,
+										'render'
+								)
+						),
+						// deprecated in 2.2
+						array(
+								'{% render "foo" with {foo: 2} %}',
+								new RenderNode(
+										new \Twig_Node_Expression_Constant('foo', 1),
+										new \Twig_Node_Expression_Array(array(), 1),
+										1,
+										'render'
+								)
+						),
+						// deprecated in 2.2
+						array(
+								'{% render "foo" with {foo: 2}, {foo: 1} %}',
+								new RenderNode(
+										new \Twig_Node_Expression_Constant('foo', 1),
+										new \Twig_Node_Expression_Array(array(
+												new \Twig_Node_Expression_Constant('foo', 1),
+												new \Twig_Node_Expression_Constant('1', 1),
+										), 1),
+										1,
+										'render'
+								)
+						),
+				);
+		}
 }

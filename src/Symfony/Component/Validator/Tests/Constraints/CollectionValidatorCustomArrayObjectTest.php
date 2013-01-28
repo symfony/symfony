@@ -17,62 +17,62 @@ namespace Symfony\Component\Validator\Tests\Constraints;
  */
 class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable, \Serializable
 {
-    private $array;
+		private $array;
 
-    public function __construct(array $array = null)
-    {
-        $this->array = $array ?: array();
-    }
+		public function __construct(array $array = null)
+		{
+				$this->array = $array ?: array();
+		}
 
-    public function offsetExists($offset)
-    {
-        return array_key_exists($offset, $this->array);
-    }
+		public function offsetExists($offset)
+		{
+				return array_key_exists($offset, $this->array);
+		}
 
-    public function offsetGet($offset)
-    {
-        return $this->array[$offset];
-    }
+		public function offsetGet($offset)
+		{
+				return $this->array[$offset];
+		}
 
-    public function offsetSet($offset, $value)
-    {
-        if (null === $offset) {
-            $this->array[] = $value;
-        } else {
-            $this->array[$offset] = $value;
-        }
-    }
+		public function offsetSet($offset, $value)
+		{
+				if (null === $offset) {
+						$this->array[] = $value;
+				} else {
+						$this->array[$offset] = $value;
+				}
+		}
 
-    public function offsetUnset($offset)
-    {
-        unset($this->array[$offset]);
-    }
+		public function offsetUnset($offset)
+		{
+				unset($this->array[$offset]);
+		}
 
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->array);
-    }
+		public function getIterator()
+		{
+				return new \ArrayIterator($this->array);
+		}
 
-    public function count()
-    {
-        return count($this->array);
-    }
+		public function count()
+		{
+				return count($this->array);
+		}
 
-    public function serialize()
-    {
-        return serialize($this->array);
-    }
+		public function serialize()
+		{
+				return serialize($this->array);
+		}
 
-    public function unserialize($serialized)
-    {
-        $this->array = (array) unserialize((string) $serialized);
-    }
+		public function unserialize($serialized)
+		{
+				$this->array = (array) unserialize((string) $serialized);
+		}
 }
 
 class CollectionValidatorCustomArrayObjectTest extends CollectionValidatorTest
 {
-    public function prepareTestData(array $contents)
-    {
-        return new CustomArrayObject($contents);
-    }
+		public function prepareTestData(array $contents)
+		{
+				return new CustomArrayObject($contents);
+		}
 }

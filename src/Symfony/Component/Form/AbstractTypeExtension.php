@@ -18,71 +18,71 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 abstract class AbstractTypeExtension implements FormTypeExtensionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    {
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function buildView(FormView $view, FormInterface $form, array $options)
+		{
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
-    {
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function finishView(FormView $view, FormInterface $form, array $options)
+		{
+		}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $defaults = $this->getDefaultOptions(array());
-        $allowedTypes = $this->getAllowedOptionValues(array());
+		/**
+		 * {@inheritdoc}
+		 */
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+				$defaults = $this->getDefaultOptions(array());
+				$allowedTypes = $this->getAllowedOptionValues(array());
 
-        if (!empty($defaults)) {
-            trigger_error('getDefaultOptions() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
+				if (!empty($defaults)) {
+						trigger_error('getDefaultOptions() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
 
-            $resolver->setDefaults($defaults);
-        }
+						$resolver->setDefaults($defaults);
+				}
 
-        if (!empty($allowedTypes)) {
-            trigger_error('getAllowedOptionValues() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
+				if (!empty($allowedTypes)) {
+						trigger_error('getAllowedOptionValues() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
 
-            $resolver->addAllowedValues($allowedTypes);
-        }
-    }
+						$resolver->addAllowedValues($allowedTypes);
+				}
+		}
 
-    /**
-     * Overrides the default options form the extended type.
-     *
-     * @return array
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     *             Use {@link setDefaultOptions()} instead.
-     */
-    public function getDefaultOptions()
-    {
-        return array();
-    }
+		/**
+		 * Overrides the default options form the extended type.
+		 *
+		 * @return array
+		 *
+		 * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+		 *						 Use {@link setDefaultOptions()} instead.
+		 */
+		public function getDefaultOptions()
+		{
+				return array();
+		}
 
-    /**
-     * Returns the allowed option values for each option (if any).
-     *
-     * @return array The allowed option values
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     *             Use {@link setDefaultOptions()} instead.
-     */
-    public function getAllowedOptionValues()
-    {
-        return array();
-    }
+		/**
+		 * Returns the allowed option values for each option (if any).
+		 *
+		 * @return array The allowed option values
+		 *
+		 * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+		 *						 Use {@link setDefaultOptions()} instead.
+		 */
+		public function getAllowedOptionValues()
+		{
+				return array();
+		}
 }

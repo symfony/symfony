@@ -19,94 +19,94 @@ use Symfony\Component\Validator\Constraints\AllValidator;
 
 class AllValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    protected $context;
-    protected $validator;
+		protected $context;
+		protected $validator;
 
-    protected function setUp()
-    {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new AllValidator();
-        $this->validator->initialize($this->context);
+		protected function setUp()
+		{
+				$this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
+				$this->validator = new AllValidator();
+				$this->validator->initialize($this->context);
 
-        $this->context->expects($this->any())
-            ->method('getGroup')
-            ->will($this->returnValue('MyGroup'));
-    }
+				$this->context->expects($this->any())
+						->method('getGroup')
+						->will($this->returnValue('MyGroup'));
+		}
 
-    protected function tearDown()
-    {
-        $this->validator = null;
-        $this->context = null;
-    }
+		protected function tearDown()
+		{
+				$this->validator = null;
+				$this->context = null;
+		}
 
-    public function testNullIsValid()
-    {
-        $this->context->expects($this->never())
-            ->method('addViolation');
+		public function testNullIsValid()
+		{
+				$this->context->expects($this->never())
+						->method('addViolation');
 
-        $this->validator->validate(null, new All(new Range(array('min' => 4))));
-    }
+				$this->validator->validate(null, new All(new Range(array('min' => 4))));
+		}
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     */
-    public function testThrowsExceptionIfNotTraversable()
-    {
-        $this->validator->validate('foo.barbar', new All(new Range(array('min' => 4))));
-    }
+		/**
+		 * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+		 */
+		public function testThrowsExceptionIfNotTraversable()
+		{
+				$this->validator->validate('foo.barbar', new All(new Range(array('min' => 4))));
+		}
 
-    /**
-     * @dataProvider getValidArguments
-     */
-    public function testWalkSingleConstraint($array)
-    {
-        $constraint = new Range(array('min' => 4));
+		/**
+		 * @dataProvider getValidArguments
+		 */
+		public function testWalkSingleConstraint($array)
+		{
+				$constraint = new Range(array('min' => 4));
 
-        $i = 1;
+				$i = 1;
 
-        foreach ($array as $key => $value) {
-            $this->context->expects($this->at($i++))
-                ->method('validateValue')
-                ->with($value, $constraint, '['.$key.']', 'MyGroup');
-        }
+				foreach ($array as $key => $value) {
+						$this->context->expects($this->at($i++))
+								->method('validateValue')
+								->with($value, $constraint, '['.$key.']', 'MyGroup');
+				}
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
+				$this->context->expects($this->never())
+						->method('addViolation');
 
-        $this->validator->validate($array, new All($constraint));
-    }
+				$this->validator->validate($array, new All($constraint));
+		}
 
-    /**
-     * @dataProvider getValidArguments
-     */
-    public function testWalkMultipleConstraints($array)
-    {
-        $constraint1 = new Range(array('min' => 4));
-        $constraint2 = new NotNull();
+		/**
+		 * @dataProvider getValidArguments
+		 */
+		public function testWalkMultipleConstraints($array)
+		{
+				$constraint1 = new Range(array('min' => 4));
+				$constraint2 = new NotNull();
 
-        $constraints = array($constraint1, $constraint2);
-        $i = 1;
+				$constraints = array($constraint1, $constraint2);
+				$i = 1;
 
-        foreach ($array as $key => $value) {
-            $this->context->expects($this->at($i++))
-                ->method('validateValue')
-                ->with($value, $constraint1, '['.$key.']', 'MyGroup');
-            $this->context->expects($this->at($i++))
-                ->method('validateValue')
-                ->with($value, $constraint2, '['.$key.']', 'MyGroup');
-        }
+				foreach ($array as $key => $value) {
+						$this->context->expects($this->at($i++))
+								->method('validateValue')
+								->with($value, $constraint1, '['.$key.']', 'MyGroup');
+						$this->context->expects($this->at($i++))
+								->method('validateValue')
+								->with($value, $constraint2, '['.$key.']', 'MyGroup');
+				}
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
+				$this->context->expects($this->never())
+						->method('addViolation');
 
-        $this->validator->validate($array, new All($constraints));
-    }
+				$this->validator->validate($array, new All($constraints));
+		}
 
-    public function getValidArguments()
-    {
-        return array(
-            array(array(5, 6, 7)),
-            array(new \ArrayObject(array(5, 6, 7))),
-        );
-    }
+		public function getValidArguments()
+		{
+				return array(
+						array(array(5, 6, 7)),
+						array(new \ArrayObject(array(5, 6, 7))),
+				);
+		}
 }

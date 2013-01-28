@@ -20,25 +20,25 @@ use Symfony\Component\Form\AbstractExtension;
  */
 class CsrfExtension extends AbstractExtension
 {
-    private $csrfProvider;
+		private $csrfProvider;
 
-    /**
-     * Constructor.
-     *
-     * @param CsrfProviderInterface $csrfProvider The CSRF provider
-     */
-    public function __construct(CsrfProviderInterface $csrfProvider)
-    {
-        $this->csrfProvider = $csrfProvider;
-    }
+		/**
+		 * Constructor.
+		 *
+		 * @param CsrfProviderInterface $csrfProvider The CSRF provider
+		 */
+		public function __construct(CsrfProviderInterface $csrfProvider)
+		{
+				$this->csrfProvider = $csrfProvider;
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function loadTypeExtensions()
-    {
-        return array(
-            new Type\FormTypeCsrfExtension($this->csrfProvider),
-        );
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		protected function loadTypeExtensions()
+		{
+				return array(
+						new Type\FormTypeCsrfExtension($this->csrfProvider),
+				);
+		}
 }

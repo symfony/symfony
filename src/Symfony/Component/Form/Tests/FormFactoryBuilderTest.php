@@ -16,44 +16,44 @@ use Symfony\Component\Form\Tests\Fixtures\FooType;
 
 class FormFactoryBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    private $registry;
-    private $guesser;
-    private $type;
+		private $registry;
+		private $guesser;
+		private $type;
 
-    protected function setUp()
-    {
-        $factory = new \ReflectionClass('Symfony\Component\Form\FormFactory');
-        $this->registry = $factory->getProperty('registry');
-        $this->registry->setAccessible(true);
+		protected function setUp()
+		{
+				$factory = new \ReflectionClass('Symfony\Component\Form\FormFactory');
+				$this->registry = $factory->getProperty('registry');
+				$this->registry->setAccessible(true);
 
-        $this->guesser = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
-        $this->type = new FooType;
-    }
+				$this->guesser = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
+				$this->type = new FooType;
+		}
 
-    public function testAddType()
-    {
-        $factoryBuilder = new FormFactoryBuilder;
-        $factoryBuilder->addType($this->type);
+		public function testAddType()
+		{
+				$factoryBuilder = new FormFactoryBuilder;
+				$factoryBuilder->addType($this->type);
 
-        $factory = $factoryBuilder->getFormFactory();
-        $registry = $this->registry->getValue($factory);
-        $extensions = $registry->getExtensions();
+				$factory = $factoryBuilder->getFormFactory();
+				$registry = $this->registry->getValue($factory);
+				$extensions = $registry->getExtensions();
 
-        $this->assertCount(1, $extensions);
-        $this->assertTrue($extensions[0]->hasType($this->type->getName()));
-        $this->assertNull($extensions[0]->getTypeGuesser());
-    }
+				$this->assertCount(1, $extensions);
+				$this->assertTrue($extensions[0]->hasType($this->type->getName()));
+				$this->assertNull($extensions[0]->getTypeGuesser());
+		}
 
-    public function testAddTypeGuesser()
-    {
-        $factoryBuilder = new FormFactoryBuilder;
-        $factoryBuilder->addTypeGuesser($this->guesser);
+		public function testAddTypeGuesser()
+		{
+				$factoryBuilder = new FormFactoryBuilder;
+				$factoryBuilder->addTypeGuesser($this->guesser);
 
-        $factory = $factoryBuilder->getFormFactory();
-        $registry = $this->registry->getValue($factory);
-        $extensions = $registry->getExtensions();
+				$factory = $factoryBuilder->getFormFactory();
+				$registry = $this->registry->getValue($factory);
+				$extensions = $registry->getExtensions();
 
-        $this->assertCount(1, $extensions);
-        $this->assertNotNull($extensions[0]->getTypeGuesser());
-    }
+				$this->assertCount(1, $extensions);
+				$this->assertNotNull($extensions[0]->getTypeGuesser());
+		}
 }

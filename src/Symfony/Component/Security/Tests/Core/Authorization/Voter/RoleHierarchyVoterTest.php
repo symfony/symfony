@@ -17,20 +17,20 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
 class RoleHierarchyVoterTest extends RoleVoterTest
 {
-    /**
-     * @dataProvider getVoteTests
-     */
-    public function testVote($roles, $attributes, $expected)
-    {
-        $voter = new RoleHierarchyVoter(new RoleHierarchy(array('ROLE_FOO' => array('ROLE_FOOBAR'))));
+		/**
+		 * @dataProvider getVoteTests
+		 */
+		public function testVote($roles, $attributes, $expected)
+		{
+				$voter = new RoleHierarchyVoter(new RoleHierarchy(array('ROLE_FOO' => array('ROLE_FOOBAR'))));
 
-        $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
-    }
+				$this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
+		}
 
-    public function getVoteTests()
-    {
-        return array_merge(parent::getVoteTests(), array(
-            array(array('ROLE_FOO'), array('ROLE_FOOBAR'), VoterInterface::ACCESS_GRANTED),
-        ));
-    }
+		public function getVoteTests()
+		{
+				return array_merge(parent::getVoteTests(), array(
+						array(array('ROLE_FOO'), array('ROLE_FOOBAR'), VoterInterface::ACCESS_GRANTED),
+				));
+		}
 }

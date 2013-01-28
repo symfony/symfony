@@ -22,64 +22,64 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class EmailValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (null === $value || '' === $value) {
-            return;
-        }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				if (null === $value || '' === $value) {
+						return;
+				}
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedTypeException($value, 'string');
-        }
+				if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+						throw new UnexpectedTypeException($value, 'string');
+				}
 
-        $value = (string) $value;
-        $valid = filter_var($value, FILTER_VALIDATE_EMAIL);
+				$value = (string) $value;
+				$valid = filter_var($value, FILTER_VALIDATE_EMAIL);
 
-        if ($valid) {
-            $host = substr($value, strpos($value, '@') + 1);
+				if ($valid) {
+						$host = substr($value, strpos($value, '@') + 1);
 
-            if (version_compare(PHP_VERSION, '5.3.3', '<') && strpos($host, '.') === false) {
-                // Likely not a FQDN, bug in PHP FILTER_VALIDATE_EMAIL prior to PHP 5.3.3
-                $valid = false;
-            }
+						if (version_compare(PHP_VERSION, '5.3.3', '<') && strpos($host, '.') === false) {
+								// Likely not a FQDN, bug in PHP FILTER_VALIDATE_EMAIL prior to PHP 5.3.3
+								$valid = false;
+						}
 
-            // Check for host DNS resource records
-            if ($valid && $constraint->checkMX) {
-                $valid = $this->checkMX($host);
-            } elseif ($valid && $constraint->checkHost) {
-                $valid = $this->checkHost($host);
-            }
-        }
+						// Check for host DNS resource records
+						if ($valid && $constraint->checkMX) {
+								$valid = $this->checkMX($host);
+						} elseif ($valid && $constraint->checkHost) {
+								$valid = $this->checkHost($host);
+						}
+				}
 
-        if (!$valid) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
-        }
-    }
+				if (!$valid) {
+						$this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+				}
+		}
 
-    /**
-     * Check DNS Records for MX type.
-     *
-     * @param string $host Host
-     *
-     * @return Boolean
-     */
-    private function checkMX($host)
-    {
-        return checkdnsrr($host, 'MX');
-    }
+		/**
+		 * Check DNS Records for MX type.
+		 *
+		 * @param string $host Host
+		 *
+		 * @return Boolean
+		 */
+		private function checkMX($host)
+		{
+				return checkdnsrr($host, 'MX');
+		}
 
-    /**
-     * Check if one of MX, A or AAAA DNS RR exists.
-     *
-     * @param string $host Host
-     *
-     * @return Boolean
-     */
-    private function checkHost($host)
-    {
-        return $this->checkMX($host) || (checkdnsrr($host, "A") || checkdnsrr($host, "AAAA"));
-    }
+		/**
+		 * Check if one of MX, A or AAAA DNS RR exists.
+		 *
+		 * @param string $host Host
+		 *
+		 * @return Boolean
+		 */
+		private function checkHost($host)
+		{
+				return $this->checkMX($host) || (checkdnsrr($host, "A") || checkdnsrr($host, "AAAA"));
+		}
 }

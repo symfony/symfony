@@ -24,21 +24,21 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  * $formFactory = Forms::createFormFactory();
  *
  * $form = $formFactory->createBuilder()
- *     ->add('firstName', 'text')
- *     ->add('lastName', 'text')
- *     ->add('age', 'integer')
- *     ->add('gender', 'choice', array(
- *         'choices' => array('m' => 'Male', 'f' => 'Female'),
- *     ))
- *     ->getForm();
+ *		 ->add('firstName', 'text')
+ *		 ->add('lastName', 'text')
+ *		 ->add('age', 'integer')
+ *		 ->add('gender', 'choice', array(
+ *				 'choices' => array('m' => 'Male', 'f' => 'Female'),
+ *		 ))
+ *		 ->getForm();
  * </code>
  *
  * You can also add custom extensions to the form factory:
  *
  * <code>
  * $formFactory = Forms::createFormFactoryBuilder()
- *     ->addExtension(new AcmeExtension())
- *     ->getFormFactory();
+ *		 ->addExtension(new AcmeExtension())
+ *		 ->getFormFactory();
  * </code>
  *
  * If you create custom form types or type extensions, it is
@@ -49,10 +49,10 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  *
  * <code>
  * $formFactory = Forms::createFormFactoryBuilder()
- *     ->addType(new PersonType())
- *     ->addType(new PhoneNumberType())
- *     ->addTypeExtension(new FormTypeHelpTextExtension())
- *     ->getFormFactory();
+ *		 ->addType(new PersonType())
+ *		 ->addType(new PhoneNumberType())
+ *		 ->addTypeExtension(new FormTypeHelpTextExtension())
+ *		 ->getFormFactory();
  * </code>
  *
  * Support for CSRF protection is provided by the CsrfExtension.
@@ -66,8 +66,8 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  *
  * $secret = 'V8a5Z97e...';
  * $formFactory = Forms::createFormFactoryBuilder()
- *     ->addExtension(new CsrfExtension(new DefaultCsrfProvider($secret)))
- *     ->getFormFactory();
+ *		 ->addExtension(new CsrfExtension(new DefaultCsrfProvider($secret)))
+ *		 ->getFormFactory();
  * </code>
  *
  * Support for the HttpFoundation is provided by the
@@ -83,9 +83,9 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  * $session = new Session();
  * $secret = 'V8a5Z97e...';
  * $formFactory = Forms::createFormFactoryBuilder()
- *     ->addExtension(new HttpFoundationExtension())
- *     ->addExtension(new CsrfExtension(new SessionCsrfProvider($session, $secret)))
- *     ->getFormFactory();
+ *		 ->addExtension(new HttpFoundationExtension())
+ *		 ->addExtension(new CsrfExtension(new SessionCsrfProvider($session, $secret)))
+ *		 ->getFormFactory();
  * </code>
  *
  * Support for the Validator component is provided by ValidatorExtension.
@@ -97,8 +97,8 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  *
  * $validator = Validation::createValidator();
  * $formFactory = Forms::createFormFactoryBuilder()
- *     ->addExtension(new ValidatorExtension($validator))
- *     ->getFormFactory();
+ *		 ->addExtension(new ValidatorExtension($validator))
+ *		 ->getFormFactory();
  * </code>
  *
  * Support for the Templating component is provided by TemplatingExtension.
@@ -110,10 +110,10 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  * use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
  *
  * $formFactory = Forms::createFormFactoryBuilder()
- *     ->addExtension(new TemplatingExtension($engine, null, array(
- *         'FrameworkBundle:Form',
- *     )))
- *     ->getFormFactory();
+ *		 ->addExtension(new TemplatingExtension($engine, null, array(
+ *				 'FrameworkBundle:Form',
+ *		 )))
+ *		 ->getFormFactory();
  * </code>
  *
  * The next example shows how to include the "<table>" layout:
@@ -122,11 +122,11 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  * use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
  *
  * $formFactory = Forms::createFormFactoryBuilder()
- *     ->addExtension(new TemplatingExtension($engine, null, array(
- *         'FrameworkBundle:Form',
- *         'FrameworkBundle:FormTable',
- *     )))
- *     ->getFormFactory();
+ *		 ->addExtension(new TemplatingExtension($engine, null, array(
+ *				 'FrameworkBundle:Form',
+ *				 'FrameworkBundle:FormTable',
+ *		 )))
+ *		 ->getFormFactory();
  * </code>
  *
  * If you also loaded the CsrfExtension, you should pass the CSRF provider
@@ -142,44 +142,44 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  * $secret = 'V8a5Z97e...';
  * $csrfProvider = new DefaultCsrfProvider($secret);
  * $formFactory = Forms::createFormFactoryBuilder()
- *     ->addExtension(new CsrfExtension($csrfProvider))
- *     ->addExtension(new TemplatingExtension($engine, $csrfProvider, array(
- *         'FrameworkBundle:Form',
- *     )))
- *     ->getFormFactory();
+ *		 ->addExtension(new CsrfExtension($csrfProvider))
+ *		 ->addExtension(new TemplatingExtension($engine, $csrfProvider, array(
+ *				 'FrameworkBundle:Form',
+ *		 )))
+ *		 ->getFormFactory();
  * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 final class Forms
 {
-    /**
-     * Creates a form factory with the default configuration.
-     *
-     * @return FormFactoryInterface The form factory.
-     */
-    public static function createFormFactory()
-    {
-        return self::createFormFactoryBuilder()->getFormFactory();
-    }
+		/**
+		 * Creates a form factory with the default configuration.
+		 *
+		 * @return FormFactoryInterface The form factory.
+		 */
+		public static function createFormFactory()
+		{
+				return self::createFormFactoryBuilder()->getFormFactory();
+		}
 
-    /**
-     * Creates a form factory builder with the default configuration.
-     *
-     * @return FormFactoryBuilderInterface The form factory builder.
-     */
-    public static function createFormFactoryBuilder()
-    {
-        $builder = new FormFactoryBuilder();
-        $builder->addExtension(new CoreExtension());
+		/**
+		 * Creates a form factory builder with the default configuration.
+		 *
+		 * @return FormFactoryBuilderInterface The form factory builder.
+		 */
+		public static function createFormFactoryBuilder()
+		{
+				$builder = new FormFactoryBuilder();
+				$builder->addExtension(new CoreExtension());
 
-        return $builder;
-    }
+				return $builder;
+		}
 
-    /**
-     * This class cannot be instantiated.
-     */
-    private function __construct()
-    {
-    }
+		/**
+		 * This class cannot be instantiated.
+		 */
+		private function __construct()
+		{
+		}
 }

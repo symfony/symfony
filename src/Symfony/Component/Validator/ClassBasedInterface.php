@@ -18,10 +18,10 @@ namespace Symfony\Component\Validator;
  */
 interface ClassBasedInterface
 {
-    /**
-     * Returns the name of the backing PHP class.
-     *
-     * @return string The name of the backing class.
-     */
-    public function getClassName();
+		/**
+		 * Returns the name of the backing PHP class.
+		 *
+		 * @return string The name of the backing class.
+		 */
+		public function getClassName();
 }

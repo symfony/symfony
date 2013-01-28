@@ -15,90 +15,90 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTra
 
 class DateTimeToTimestampTransformerTest extends DateTimeTestCase
 {
-    public function testTransform()
-    {
-        $transformer = new DateTimeToTimestampTransformer('UTC', 'UTC');
+		public function testTransform()
+		{
+				$transformer = new DateTimeToTimestampTransformer('UTC', 'UTC');
 
-        $input = new \DateTime('2010-02-03 04:05:06 UTC');
-        $output = $input->format('U');
+				$input = new \DateTime('2010-02-03 04:05:06 UTC');
+				$output = $input->format('U');
 
-        $this->assertEquals($output, $transformer->transform($input));
-    }
+				$this->assertEquals($output, $transformer->transform($input));
+		}
 
-    public function testTransformEmpty()
-    {
-        $transformer = new DateTimeToTimestampTransformer();
+		public function testTransformEmpty()
+		{
+				$transformer = new DateTimeToTimestampTransformer();
 
-        $this->assertNull($transformer->transform(null));
-    }
+				$this->assertNull($transformer->transform(null));
+		}
 
-    public function testTransformWithDifferentTimezones()
-    {
-        $transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'America/New_York');
+		public function testTransformWithDifferentTimezones()
+		{
+				$transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'America/New_York');
 
-        $input = new \DateTime('2010-02-03 04:05:06 America/New_York');
-        $output = $input->format('U');
-        $input->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
+				$input = new \DateTime('2010-02-03 04:05:06 America/New_York');
+				$output = $input->format('U');
+				$input->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
-        $this->assertEquals($output, $transformer->transform($input));
-    }
+				$this->assertEquals($output, $transformer->transform($input));
+		}
 
-    public function testTransformFromDifferentTimezone()
-    {
-        $transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'UTC');
+		public function testTransformFromDifferentTimezone()
+		{
+				$transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'UTC');
 
-        $input = new \DateTime('2010-02-03 04:05:06 Asia/Hong_Kong');
+				$input = new \DateTime('2010-02-03 04:05:06 Asia/Hong_Kong');
 
-        $dateTime = clone $input;
-        $dateTime->setTimezone(new \DateTimeZone('UTC'));
-        $output = $dateTime->format('U');
+				$dateTime = clone $input;
+				$dateTime->setTimezone(new \DateTimeZone('UTC'));
+				$output = $dateTime->format('U');
 
-        $this->assertEquals($output, $transformer->transform($input));
-    }
+				$this->assertEquals($output, $transformer->transform($input));
+		}
 
-    public function testTransformExpectsDateTime()
-    {
-        $transformer = new DateTimeToTimestampTransformer();
+		public function testTransformExpectsDateTime()
+		{
+				$transformer = new DateTimeToTimestampTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+				$this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
-        $transformer->transform('1234');
-    }
+				$transformer->transform('1234');
+		}
 
-    public function testReverseTransform()
-    {
-        $reverseTransformer = new DateTimeToTimestampTransformer('UTC', 'UTC');
+		public function testReverseTransform()
+		{
+				$reverseTransformer = new DateTimeToTimestampTransformer('UTC', 'UTC');
 
-        $output = new \DateTime('2010-02-03 04:05:06 UTC');
-        $input = $output->format('U');
+				$output = new \DateTime('2010-02-03 04:05:06 UTC');
+				$input = $output->format('U');
 
-        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
-    }
+				$this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
+		}
 
-    public function testReverseTransformEmpty()
-    {
-        $reverseTransformer = new DateTimeToTimestampTransformer();
+		public function testReverseTransformEmpty()
+		{
+				$reverseTransformer = new DateTimeToTimestampTransformer();
 
-        $this->assertNull($reverseTransformer->reverseTransform(null));
-    }
+				$this->assertNull($reverseTransformer->reverseTransform(null));
+		}
 
-    public function testReverseTransformWithDifferentTimezones()
-    {
-        $reverseTransformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'America/New_York');
+		public function testReverseTransformWithDifferentTimezones()
+		{
+				$reverseTransformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'America/New_York');
 
-        $output = new \DateTime('2010-02-03 04:05:06 America/New_York');
-        $input = $output->format('U');
-        $output->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
+				$output = new \DateTime('2010-02-03 04:05:06 America/New_York');
+				$input = $output->format('U');
+				$output->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
-        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
-    }
+				$this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
+		}
 
-    public function testReverseTransformExpectsValidTimestamp()
-    {
-        $reverseTransformer = new DateTimeToTimestampTransformer();
+		public function testReverseTransformExpectsValidTimestamp()
+		{
+				$reverseTransformer = new DateTimeToTimestampTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+				$this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
 
-        $reverseTransformer->reverseTransform('2010-2010-2010');
-    }
+				$reverseTransformer->reverseTransform('2010-2010-2010');
+		}
 }

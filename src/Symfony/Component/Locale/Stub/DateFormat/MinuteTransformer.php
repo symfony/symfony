@@ -18,31 +18,31 @@ namespace Symfony\Component\Locale\Stub\DateFormat;
  */
 class MinuteTransformer extends Transformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(\DateTime $dateTime, $length)
-    {
-        $minuteOfHour = (int) $dateTime->format('i');
+		/**
+		 * {@inheritDoc}
+		 */
+		public function format(\DateTime $dateTime, $length)
+		{
+				$minuteOfHour = (int) $dateTime->format('i');
 
-        return $this->padLeft($minuteOfHour, $length);
-    }
+				return $this->padLeft($minuteOfHour, $length);
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getReverseMatchingRegExp($length)
-    {
-        return 1 === $length ? '\d{1,2}' : '\d{'.$length.'}';
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function getReverseMatchingRegExp($length)
+		{
+				return 1 === $length ? '\d{1,2}' : '\d{'.$length.'}';
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function extractDateOptions($matched, $length)
-    {
-        return array(
-            'minute' => (int) $matched,
-        );
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function extractDateOptions($matched, $length)
+		{
+				return array(
+						'minute' => (int) $matched,
+				);
+		}
 }

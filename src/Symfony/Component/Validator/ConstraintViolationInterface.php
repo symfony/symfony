@@ -21,8 +21,8 @@ namespace Symfony\Component\Validator;
  *
  * <pre>
  * (Person)---(firstName: string)
- *      \
- *   (address: Address)---(street: string)
+ *			\
+ *	 (address: Address)---(street: string)
  * </pre>
  *
  * If the <tt>Person</tt> object is validated and validation fails for the
@@ -37,100 +37,100 @@ namespace Symfony\Component\Validator;
  */
 interface ConstraintViolationInterface
 {
-    /**
-     * Returns the violation message.
-     *
-     * @return string The violation message.
-     *
-     * @api
-     */
-    public function getMessage();
+		/**
+		 * Returns the violation message.
+		 *
+		 * @return string The violation message.
+		 *
+		 * @api
+		 */
+		public function getMessage();
 
-    /**
-     * Returns the raw violation message.
-     *
-     * The raw violation message contains placeholders for the parameters
-     * returned by {@link getMessageParameters}. Typically you'll pass the
-     * message template and parameters to a translation engine.
-     *
-     * @return string The raw violation message.
-     *
-     * @api
-     */
-    public function getMessageTemplate();
+		/**
+		 * Returns the raw violation message.
+		 *
+		 * The raw violation message contains placeholders for the parameters
+		 * returned by {@link getMessageParameters}. Typically you'll pass the
+		 * message template and parameters to a translation engine.
+		 *
+		 * @return string The raw violation message.
+		 *
+		 * @api
+		 */
+		public function getMessageTemplate();
 
-    /**
-     * Returns the parameters to be inserted into the raw violation message.
-     *
-     * @return array A possibly empty list of parameters indexed by the names
-     *               that appear in the message template.
-     *
-     * @see getMessageTemplate
-     *
-     * @api
-     */
-    public function getMessageParameters();
+		/**
+		 * Returns the parameters to be inserted into the raw violation message.
+		 *
+		 * @return array A possibly empty list of parameters indexed by the names
+		 *							 that appear in the message template.
+		 *
+		 * @see getMessageTemplate
+		 *
+		 * @api
+		 */
+		public function getMessageParameters();
 
-    /**
-     * Returns a number for pluralizing the violation message.
-     *
-     * For example, the message template could have different translation based
-     * on a parameter "choices":
-     *
-     * <ul>
-     * <li>Please select exactly one entry. (choices=1)</li>
-     * <li>Please select two entries. (choices=2)</li>
-     * </ul>
-     *
-     * This method returns the value of the parameter for choosing the right
-     * pluralization form (in this case "choices").
-     *
-     * @return integer|null The number to use to pluralize of the message.
-     */
-    public function getMessagePluralization();
+		/**
+		 * Returns a number for pluralizing the violation message.
+		 *
+		 * For example, the message template could have different translation based
+		 * on a parameter "choices":
+		 *
+		 * <ul>
+		 * <li>Please select exactly one entry. (choices=1)</li>
+		 * <li>Please select two entries. (choices=2)</li>
+		 * </ul>
+		 *
+		 * This method returns the value of the parameter for choosing the right
+		 * pluralization form (in this case "choices").
+		 *
+		 * @return integer|null The number to use to pluralize of the message.
+		 */
+		public function getMessagePluralization();
 
-    /**
-     * Returns the root element of the validation.
-     *
-     * @return mixed The value that was passed originally to the validator when
-     *               the validation was started. Because the validator traverses
-     *               the object graph, the value at which the violation occurs
-     *               is not necessarily the value that was originally validated.
-     *
-     * @api
-     */
-    public function getRoot();
+		/**
+		 * Returns the root element of the validation.
+		 *
+		 * @return mixed The value that was passed originally to the validator when
+		 *							 the validation was started. Because the validator traverses
+		 *							 the object graph, the value at which the violation occurs
+		 *							 is not necessarily the value that was originally validated.
+		 *
+		 * @api
+		 */
+		public function getRoot();
 
-    /**
-     * Returns the property path from the root element to the violation.
-     *
-     * @return string The property path indicates how the validator reached
-     *                the invalid value from the root element. If the root
-     *                element is a <tt>Person</tt> instance with a property
-     *                "address" that contains an <tt>Address</tt> instance
-     *                with an invalid property "street", the generated property
-     *                path is "address.street". Property access is denoted by
-     *                dots, while array access is denoted by square brackets,
-     *                for example "addresses[1].street".
-     *
-     * @api
-     */
-    public function getPropertyPath();
+		/**
+		 * Returns the property path from the root element to the violation.
+		 *
+		 * @return string The property path indicates how the validator reached
+		 *								the invalid value from the root element. If the root
+		 *								element is a <tt>Person</tt> instance with a property
+		 *								"address" that contains an <tt>Address</tt> instance
+		 *								with an invalid property "street", the generated property
+		 *								path is "address.street". Property access is denoted by
+		 *								dots, while array access is denoted by square brackets,
+		 *								for example "addresses[1].street".
+		 *
+		 * @api
+		 */
+		public function getPropertyPath();
 
-    /**
-     * Returns the value that caused the violation.
-     *
-     * @return mixed The invalid value that caused the validated constraint to
-     *               fail.
-     *
-     * @api
-     */
-    public function getInvalidValue();
+		/**
+		 * Returns the value that caused the violation.
+		 *
+		 * @return mixed The invalid value that caused the validated constraint to
+		 *							 fail.
+		 *
+		 * @api
+		 */
+		public function getInvalidValue();
 
-    /**
-     * Returns a machine-digestible error code for the violation.
-     *
-     * @return mixed The error code.
-     */
-    public function getCode();
+		/**
+		 * Returns a machine-digestible error code for the violation.
+		 *
+		 * @return mixed The error code.
+		 */
+		public function getCode();
 }

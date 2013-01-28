@@ -11,6 +11,6 @@
 
 class Pearlike_WithComments
 {
-    /** @Boolean */
-    public static $loaded = true;
+		/** @Boolean */
+		public static $loaded = true;
 }

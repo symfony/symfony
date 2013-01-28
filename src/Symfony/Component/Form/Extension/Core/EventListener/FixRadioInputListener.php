@@ -24,28 +24,28 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
  */
 class FixRadioInputListener implements EventSubscriberInterface
 {
-    private $choiceList;
+		private $choiceList;
 
-    /**
-     * Constructor.
-     *
-     * @param ChoiceListInterface $choiceList
-     */
-    public function __construct(ChoiceListInterface $choiceList)
-    {
-        $this->choiceList = $choiceList;
-    }
+		/**
+		 * Constructor.
+		 *
+		 * @param ChoiceListInterface $choiceList
+		 */
+		public function __construct(ChoiceListInterface $choiceList)
+		{
+				$this->choiceList = $choiceList;
+		}
 
-    public function preBind(FormEvent $event)
-    {
-        $value = $event->getData();
-        $index = current($this->choiceList->getIndicesForValues(array($value)));
+		public function preBind(FormEvent $event)
+		{
+				$value = $event->getData();
+				$index = current($this->choiceList->getIndicesForValues(array($value)));
 
-        $event->setData(false !== $index ? array($index => $value) : array());
-    }
+				$event->setData(false !== $index ? array($index => $value) : array());
+		}
 
-    public static function getSubscribedEvents()
-    {
-        return array(FormEvents::PRE_BIND => 'preBind');
-    }
+		public static function getSubscribedEvents()
+		{
+				return array(FormEvents::PRE_BIND => 'preBind');
+		}
 }

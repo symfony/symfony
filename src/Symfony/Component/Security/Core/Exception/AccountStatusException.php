@@ -22,46 +22,46 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 abstract class AccountStatusException extends AuthenticationException
 {
-    private $user;
+		private $user;
 
-    /**
-     * Get the user.
-     *
-     * @return UserInterface
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
+		/**
+		 * Get the user.
+		 *
+		 * @return UserInterface
+		 */
+		public function getUser()
+		{
+				return $this->user;
+		}
 
-    /**
-     * Set the user.
-     *
-     * @param UserInterface $user
-     */
-    public function setUser(UserInterface $user)
-    {
-        $this->user = $user;
-    }
+		/**
+		 * Set the user.
+		 *
+		 * @param UserInterface $user
+		 */
+		public function setUser(UserInterface $user)
+		{
+				$this->user = $user;
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function serialize()
-    {
-        return serialize(array(
-            $this->user,
-            parent::serialize(),
-        ));
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function serialize()
+		{
+				return serialize(array(
+						$this->user,
+						parent::serialize(),
+				));
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function unserialize($str)
-    {
-        list($this->user, $parentData) = unserialize($str);
+		/**
+		 * {@inheritDoc}
+		 */
+		public function unserialize($str)
+		{
+				list($this->user, $parentData) = unserialize($str);
 
-        parent::unserialize($parentData);
-    }
+				parent::unserialize($parentData);
+		}
 }

@@ -18,16 +18,16 @@ namespace Symfony\Component\Validator;
  */
 interface PropertyMetadataContainerInterface
 {
-    /**
-     * Returns all metadata instances for the given named property.
-     *
-     * If your implementation does not support properties, simply throw an
-     * exception in this method (for example a <tt>BadMethodCallException</tt>).
-     *
-     * @param string $property The property name.
-     *
-     * @return PropertyMetadataInterface[] A list of metadata instances. Empty if
-     *                                     no metadata exists for the property.
-     */
-    public function getPropertyMetadata($property);
+		/**
+		 * Returns all metadata instances for the given named property.
+		 *
+		 * If your implementation does not support properties, simply throw an
+		 * exception in this method (for example a <tt>BadMethodCallException</tt>).
+		 *
+		 * @param string $property The property name.
+		 *
+		 * @return PropertyMetadataInterface[] A list of metadata instances. Empty if
+		 *																		 no metadata exists for the property.
+		 */
+		public function getPropertyMetadata($property);
 }

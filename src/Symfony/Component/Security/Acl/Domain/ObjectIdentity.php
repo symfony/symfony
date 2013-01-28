@@ -23,90 +23,90 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
  */
 final class ObjectIdentity implements ObjectIdentityInterface
 {
-    private $identifier;
-    private $type;
+		private $identifier;
+		private $type;
 
-    /**
-     * Constructor.
-     *
-     * @param string $identifier
-     * @param string $type
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function __construct($identifier, $type)
-    {
-        if (empty($identifier)) {
-            throw new \InvalidArgumentException('$identifier cannot be empty.');
-        }
-        if (empty($type)) {
-            throw new \InvalidArgumentException('$type cannot be empty.');
-        }
+		/**
+		 * Constructor.
+		 *
+		 * @param string $identifier
+		 * @param string $type
+		 *
+		 * @throws \InvalidArgumentException
+		 */
+		public function __construct($identifier, $type)
+		{
+				if (empty($identifier)) {
+						throw new \InvalidArgumentException('$identifier cannot be empty.');
+				}
+				if (empty($type)) {
+						throw new \InvalidArgumentException('$type cannot be empty.');
+				}
 
-        $this->identifier = $identifier;
-        $this->type = $type;
-    }
+				$this->identifier = $identifier;
+				$this->type = $type;
+		}
 
-    /**
-     * Constructs an ObjectIdentity for the given domain object
-     *
-     * @param object $domainObject
-     * @throws InvalidDomainObjectException
-     * @return ObjectIdentity
-     */
-    public static function fromDomainObject($domainObject)
-    {
-        if (!is_object($domainObject)) {
-            throw new InvalidDomainObjectException('$domainObject must be an object.');
-        }
+		/**
+		 * Constructs an ObjectIdentity for the given domain object
+		 *
+		 * @param object $domainObject
+		 * @throws InvalidDomainObjectException
+		 * @return ObjectIdentity
+		 */
+		public static function fromDomainObject($domainObject)
+		{
+				if (!is_object($domainObject)) {
+						throw new InvalidDomainObjectException('$domainObject must be an object.');
+				}
 
-        try {
-            if ($domainObject instanceof DomainObjectInterface) {
-                return new self($domainObject->getObjectIdentifier(), ClassUtils::getRealClass($domainObject));
-            } elseif (method_exists($domainObject, 'getId')) {
-                return new self($domainObject->getId(), ClassUtils::getRealClass($domainObject));
-            }
-        } catch (\InvalidArgumentException $invalid) {
-            throw new InvalidDomainObjectException($invalid->getMessage(), 0, $invalid);
-        }
+				try {
+						if ($domainObject instanceof DomainObjectInterface) {
+								return new self($domainObject->getObjectIdentifier(), ClassUtils::getRealClass($domainObject));
+						} elseif (method_exists($domainObject, 'getId')) {
+								return new self($domainObject->getId(), ClassUtils::getRealClass($domainObject));
+						}
+				} catch (\InvalidArgumentException $invalid) {
+						throw new InvalidDomainObjectException($invalid->getMessage(), 0, $invalid);
+				}
 
-        throw new InvalidDomainObjectException('$domainObject must either implement the DomainObjectInterface, or have a method named "getId".');
-    }
+				throw new InvalidDomainObjectException('$domainObject must either implement the DomainObjectInterface, or have a method named "getId".');
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getIdentifier()
-    {
-        return $this->identifier;
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function getIdentifier()
+		{
+				return $this->identifier;
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function getType()
+		{
+				return $this->type;
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    public function equals(ObjectIdentityInterface $identity)
-    {
-        // comparing the identifier with === might lead to problems, so we
-        // waive this restriction
-        return $this->identifier == $identity->getIdentifier()
-               && $this->type === $identity->getType();
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function equals(ObjectIdentityInterface $identity)
+		{
+				// comparing the identifier with === might lead to problems, so we
+				// waive this restriction
+				return $this->identifier == $identity->getIdentifier()
+							 && $this->type === $identity->getType();
+		}
 
-    /**
-     * Returns a textual representation of this object identity
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return sprintf('ObjectIdentity(%s, %s)', $this->identifier, $this->type);
-    }
+		/**
+		 * Returns a textual representation of this object identity
+		 *
+		 * @return string
+		 */
+		public function __toString()
+		{
+				return sprintf('ObjectIdentity(%s, %s)', $this->identifier, $this->type);
+		}
 }

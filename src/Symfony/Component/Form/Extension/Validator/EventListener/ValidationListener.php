@@ -23,46 +23,46 @@ use Symfony\Component\Form\Extension\Validator\Constraints\Form;
  */
 class ValidationListener implements EventSubscriberInterface
 {
-    private $validator;
+		private $validator;
 
-    private $violationMapper;
+		private $violationMapper;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
-    {
-        return array(FormEvents::POST_BIND => 'validateForm');
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public static function getSubscribedEvents()
+		{
+				return array(FormEvents::POST_BIND => 'validateForm');
+		}
 
-    public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper)
-    {
-        $this->validator = $validator;
-        $this->violationMapper = $violationMapper;
-    }
+		public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper)
+		{
+				$this->validator = $validator;
+				$this->violationMapper = $violationMapper;
+		}
 
-    /**
-     * Validates the form and its domain object.
-     *
-     * @param FormEvent $event The event object
-     */
-    public function validateForm(FormEvent $event)
-    {
-        $form = $event->getForm();
+		/**
+		 * Validates the form and its domain object.
+		 *
+		 * @param FormEvent $event The event object
+		 */
+		public function validateForm(FormEvent $event)
+		{
+				$form = $event->getForm();
 
-        if ($form->isRoot()) {
-            // Validate the form in group "Default"
-            $violations = $this->validator->validate($form);
+				if ($form->isRoot()) {
+						// Validate the form in group "Default"
+						$violations = $this->validator->validate($form);
 
-            if (count($violations) > 0) {
-                foreach ($violations as $violation) {
-                    // Allow the "invalid" constraint to be put onto
-                    // non-synchronized forms
-                    $allowNonSynchronized = Form::ERR_INVALID === $violation->getCode();
+						if (count($violations) > 0) {
+								foreach ($violations as $violation) {
+										// Allow the "invalid" constraint to be put onto
+										// non-synchronized forms
+										$allowNonSynchronized = Form::ERR_INVALID === $violation->getCode();
 
-                    $this->violationMapper->mapViolation($violation, $form, $allowNonSynchronized);
-                }
-            }
-        }
-    }
+										$this->violationMapper->mapViolation($violation, $form, $allowNonSynchronized);
+								}
+						}
+				}
+		}
 }

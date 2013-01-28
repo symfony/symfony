@@ -18,36 +18,36 @@ use Doctrine\Common\Persistence\AbstractManagerRegistry;
 /**
  * References Doctrine connections and entity/document managers.
  *
- * @author  Lukas Kahwe Smith <smith@pooteeweet.org>
+ * @author	Lukas Kahwe Smith <smith@pooteeweet.org>
  */
 abstract class ManagerRegistry extends AbstractManagerRegistry implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+		/**
+		 * @var ContainerInterface
+		 */
+		protected $container;
 
-    /**
-     * @inheritdoc
-     */
-    protected function getService($name)
-    {
-        return $this->container->get($name);
-    }
+		/**
+		 * @inheritdoc
+		 */
+		protected function getService($name)
+		{
+				return $this->container->get($name);
+		}
 
-    /**
-     * @inheritdoc
-     */
-    protected function resetService($name)
-    {
-        $this->container->set($name, null);
-    }
+		/**
+		 * @inheritdoc
+		 */
+		protected function resetService($name)
+		{
+				$this->container->set($name, null);
+		}
 
-    /**
-     * @inheritdoc
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
+		/**
+		 * @inheritdoc
+		 */
+		public function setContainer(ContainerInterface $container = null)
+		{
+				$this->container = $container;
+		}
 }

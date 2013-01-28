@@ -27,113 +27,113 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var TestSessionListener
-     */
-    private $listener;
+		/**
+		 * @var TestSessionListener
+		 */
+		private $listener;
 
-    /**
-     * @var SessionInterface
-     */
-    private $session;
+		/**
+		 * @var SessionInterface
+		 */
+		private $session;
 
-    protected function setUp()
-    {
-        $this->listener = new TestSessionListener($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'));
-        $this->session  = $this->getSession();
-    }
+		protected function setUp()
+		{
+				$this->listener = new TestSessionListener($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'));
+				$this->session	= $this->getSession();
+		}
 
-    protected function tearDown()
-    {
-        $this->listener = null;
-        $this->session = null;
-    }
+		protected function tearDown()
+		{
+				$this->listener = null;
+				$this->session = null;
+		}
 
-    public function testShouldSaveMasterRequestSession()
-    {
-        $this->sessionHasBeenStarted();
-        $this->sessionMustBeSaved();
+		public function testShouldSaveMasterRequestSession()
+		{
+				$this->sessionHasBeenStarted();
+				$this->sessionMustBeSaved();
 
-        $this->filterResponse(new Request());
-    }
+				$this->filterResponse(new Request());
+		}
 
-    public function testShouldNotSaveSubRequestSession()
-    {
-        $this->sessionMustNotBeSaved();
+		public function testShouldNotSaveSubRequestSession()
+		{
+				$this->sessionMustNotBeSaved();
 
-        $this->filterResponse(new Request(), HttpKernelInterface::SUB_REQUEST);
-    }
+				$this->filterResponse(new Request(), HttpKernelInterface::SUB_REQUEST);
+		}
 
-    public function testDoesNotDeleteCookieIfUsingSessionLifetime()
-    {
-        $this->sessionHasBeenStarted();
+		public function testDoesNotDeleteCookieIfUsingSessionLifetime()
+		{
+				$this->sessionHasBeenStarted();
 
-        $params = session_get_cookie_params();
-        session_set_cookie_params(0, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+				$params = session_get_cookie_params();
+				session_set_cookie_params(0, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
 
-        $response = $this->filterResponse(new Request(), HttpKernelInterface::MASTER_REQUEST);
-        $cookies = $response->headers->getCookies();
+				$response = $this->filterResponse(new Request(), HttpKernelInterface::MASTER_REQUEST);
+				$cookies = $response->headers->getCookies();
 
-        $this->assertEquals(0, reset($cookies)->getExpiresTime());
-    }
+				$this->assertEquals(0, reset($cookies)->getExpiresTime());
+		}
 
-    public function testUnstartedSessionIsNotSave()
-    {
-        $this->sessionHasNotBeenStarted();
-        $this->sessionMustNotBeSaved();
+		public function testUnstartedSessionIsNotSave()
+		{
+				$this->sessionHasNotBeenStarted();
+				$this->sessionMustNotBeSaved();
 
-        $this->filterResponse(new Request());
-    }
+				$this->filterResponse(new Request());
+		}
 
-    private function filterResponse(Request $request, $type = HttpKernelInterface::MASTER_REQUEST)
-    {
-        $request->setSession($this->session);
-        $response = new Response();
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-        $event = new FilterResponseEvent($kernel, $request, $type, $response);
+		private function filterResponse(Request $request, $type = HttpKernelInterface::MASTER_REQUEST)
+		{
+				$request->setSession($this->session);
+				$response = new Response();
+				$kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+				$event = new FilterResponseEvent($kernel, $request, $type, $response);
 
-        $this->listener->onKernelResponse($event);
+				$this->listener->onKernelResponse($event);
 
-        $this->assertSame($response, $event->getResponse());
+				$this->assertSame($response, $event->getResponse());
 
-        return $response;
-    }
+				return $response;
+		}
 
-    private function sessionMustNotBeSaved()
-    {
-        $this->session->expects($this->never())
-            ->method('save');
-    }
+		private function sessionMustNotBeSaved()
+		{
+				$this->session->expects($this->never())
+						->method('save');
+		}
 
-    private function sessionMustBeSaved()
-    {
-        $this->session->expects($this->once())
-            ->method('save');
-    }
+		private function sessionMustBeSaved()
+		{
+				$this->session->expects($this->once())
+						->method('save');
+		}
 
-    private function sessionHasBeenStarted()
-    {
-        $this->session->expects($this->once())
-            ->method('isStarted')
-            ->will($this->returnValue(true));
-    }
+		private function sessionHasBeenStarted()
+		{
+				$this->session->expects($this->once())
+						->method('isStarted')
+						->will($this->returnValue(true));
+		}
 
-    private function sessionHasNotBeenStarted()
-    {
-        $this->session->expects($this->once())
-            ->method('isStarted')
-            ->will($this->returnValue(false));
-    }
+		private function sessionHasNotBeenStarted()
+		{
+				$this->session->expects($this->once())
+						->method('isStarted')
+						->will($this->returnValue(false));
+		}
 
-    private function getSession()
-    {
-        $mock = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')
-            ->disableOriginalConstructor()
-            ->getMock();
+		private function getSession()
+		{
+				$mock = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')
+						->disableOriginalConstructor()
+						->getMock();
 
-        // set return value for getName()
-        $mock->expects($this->any())->method('getName')->will($this->returnValue('MOCKSESSID'));
+				// set return value for getName()
+				$mock->expects($this->any())->method('getName')->will($this->returnValue('MOCKSESSID'));
 
-        return $mock;
-    }
+				return $mock;
+		}
 }

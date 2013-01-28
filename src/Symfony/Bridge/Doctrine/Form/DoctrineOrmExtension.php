@@ -17,22 +17,22 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class DoctrineOrmExtension extends AbstractExtension
 {
-    protected $registry;
+		protected $registry;
 
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
-    }
+		public function __construct(ManagerRegistry $registry)
+		{
+				$this->registry = $registry;
+		}
 
-    protected function loadTypes()
-    {
-        return array(
-            new Type\EntityType($this->registry, PropertyAccess::getPropertyAccessor()),
-        );
-    }
+		protected function loadTypes()
+		{
+				return array(
+						new Type\EntityType($this->registry, PropertyAccess::getPropertyAccessor()),
+				);
+		}
 
-    protected function loadTypeGuesser()
-    {
-        return new DoctrineOrmTypeGuesser($this->registry);
-    }
+		protected function loadTypeGuesser()
+		{
+				return new DoctrineOrmTypeGuesser($this->registry);
+		}
 }

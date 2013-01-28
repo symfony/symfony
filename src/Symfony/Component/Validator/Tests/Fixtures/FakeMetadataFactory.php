@@ -17,40 +17,40 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class FakeMetadataFactory implements MetadataFactoryInterface
 {
-    protected $metadatas = array();
+		protected $metadatas = array();
 
-    public function getMetadataFor($class)
-    {
-        if (is_object($class)) {
-            $class = get_class($class);
-        }
+		public function getMetadataFor($class)
+		{
+				if (is_object($class)) {
+						$class = get_class($class);
+				}
 
-        if (!is_string($class)) {
-            throw new NoSuchMetadataException('No metadata for type ' . gettype($class));
-        }
+				if (!is_string($class)) {
+						throw new NoSuchMetadataException('No metadata for type ' . gettype($class));
+				}
 
-        if (!isset($this->metadatas[$class])) {
-            throw new NoSuchMetadataException('No metadata for "' . $class . '"');
-        }
+				if (!isset($this->metadatas[$class])) {
+						throw new NoSuchMetadataException('No metadata for "' . $class . '"');
+				}
 
-        return $this->metadatas[$class];
-    }
+				return $this->metadatas[$class];
+		}
 
-    public function hasMetadataFor($class)
-    {
-        if (is_object($class)) {
-            $class = get_class($class);
-        }
+		public function hasMetadataFor($class)
+		{
+				if (is_object($class)) {
+						$class = get_class($class);
+				}
 
-        if (!is_string($class)) {
-            return false;
-        }
+				if (!is_string($class)) {
+						return false;
+				}
 
-        return isset($this->metadatas[$class]);
-    }
+				return isset($this->metadatas[$class]);
+		}
 
-    public function addMetadata(ClassMetadata $metadata)
-    {
-        $this->metadatas[$metadata->getClassName()] = $metadata;
-    }
+		public function addMetadata(ClassMetadata $metadata)
+		{
+				$this->metadatas[$metadata->getClassName()] = $metadata;
+		}
 }

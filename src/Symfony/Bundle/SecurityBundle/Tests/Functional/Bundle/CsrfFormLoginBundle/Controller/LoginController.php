@@ -17,27 +17,27 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class LoginController extends ContainerAware
 {
-    public function loginAction()
-    {
-        $form = $this->container->get('form.factory')->create('user_login');
+		public function loginAction()
+		{
+				$form = $this->container->get('form.factory')->create('user_login');
 
-        return $this->container->get('templating')->renderResponse('CsrfFormLoginBundle:Login:login.html.twig', array(
-            'form'  => $form->createView(),
-        ));
-    }
+				return $this->container->get('templating')->renderResponse('CsrfFormLoginBundle:Login:login.html.twig', array(
+						'form'	=> $form->createView(),
+				));
+		}
 
-    public function afterLoginAction()
-    {
-        return $this->container->get('templating')->renderResponse('CsrfFormLoginBundle:Login:after_login.html.twig');
-    }
+		public function afterLoginAction()
+		{
+				return $this->container->get('templating')->renderResponse('CsrfFormLoginBundle:Login:after_login.html.twig');
+		}
 
-    public function loginCheckAction()
-    {
-        return new Response('', 400);
-    }
+		public function loginCheckAction()
+		{
+				return new Response('', 400);
+		}
 
-    public function secureAction()
-    {
-        throw new \Exception('Wrapper', 0, new \Exception('Another Wrapper', 0, new AccessDeniedException()));
-    }
+		public function secureAction()
+		{
+				throw new \Exception('Wrapper', 0, new \Exception('Another Wrapper', 0, new AccessDeniedException()));
+		}
 }

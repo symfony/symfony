@@ -22,98 +22,98 @@ use Symfony\Component\Validator\Exception\ValidatorException;
  */
 abstract class ConstraintValidator implements ConstraintValidatorInterface
 {
-    /**
-     * @var ExecutionContextInterface
-     */
-    protected $context;
+		/**
+		 * @var ExecutionContextInterface
+		 */
+		protected $context;
 
-    /**
-     * @var string
-     *
-     * @deprecated
-     */
-    private $messageTemplate;
+		/**
+		 * @var string
+		 *
+		 * @deprecated
+		 */
+		private $messageTemplate;
 
-    /**
-     * @var array
-     *
-     * @deprecated
-     */
-    private $messageParameters;
+		/**
+		 * @var array
+		 *
+		 * @deprecated
+		 */
+		private $messageParameters;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function initialize(ExecutionContextInterface $context)
-    {
-        $this->context = $context;
-        $this->messageTemplate = '';
-        $this->messageParameters = array();
-    }
+		/**
+		 * {@inheritDoc}
+		 */
+		public function initialize(ExecutionContextInterface $context)
+		{
+				$this->context = $context;
+				$this->messageTemplate = '';
+				$this->messageParameters = array();
+		}
 
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function getMessageTemplate()
-    {
-        trigger_error('getMessageTemplate() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+		/**
+		 * {@inheritDoc}
+		 *
+		 * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+		 */
+		public function getMessageTemplate()
+		{
+				trigger_error('getMessageTemplate() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
 
-        return $this->messageTemplate;
-    }
+				return $this->messageTemplate;
+		}
 
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function getMessageParameters()
-    {
-        trigger_error('getMessageParameters() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+		/**
+		 * {@inheritDoc}
+		 *
+		 * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+		 */
+		public function getMessageParameters()
+		{
+				trigger_error('getMessageParameters() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
 
-        return $this->messageParameters;
-    }
+				return $this->messageParameters;
+		}
 
-    /**
-     * Wrapper for $this->context->addViolation()
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    protected function setMessage($template, array $parameters = array())
-    {
-        trigger_error('setMessage() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+		/**
+		 * Wrapper for $this->context->addViolation()
+		 *
+		 * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+		 */
+		protected function setMessage($template, array $parameters = array())
+		{
+				trigger_error('setMessage() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
 
-        $this->messageTemplate = $template;
-        $this->messageParameters = $parameters;
+				$this->messageTemplate = $template;
+				$this->messageParameters = $parameters;
 
-        if (!$this->context instanceof ExecutionContext) {
-            throw new ValidatorException('ConstraintValidator::initialize() must be called before setting violation messages');
-        }
+				if (!$this->context instanceof ExecutionContext) {
+						throw new ValidatorException('ConstraintValidator::initialize() must be called before setting violation messages');
+				}
 
-        $this->context->addViolation($template, $parameters);
-    }
+				$this->context->addViolation($template, $parameters);
+		}
 
-    /**
-     * Stub implementation delegating to the deprecated isValid method.
-     *
-     * This stub exists for BC and will be dropped in Symfony 2.3.
-     *
-     * @see ConstraintValidatorInterface::validate
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        trigger_error('isValid() is deprecated since version 2.1 and will be removed in 2.3. Implement validate() instead.', E_USER_DEPRECATED);
+		/**
+		 * Stub implementation delegating to the deprecated isValid method.
+		 *
+		 * This stub exists for BC and will be dropped in Symfony 2.3.
+		 *
+		 * @see ConstraintValidatorInterface::validate
+		 */
+		public function validate($value, Constraint $constraint)
+		{
+				trigger_error('isValid() is deprecated since version 2.1 and will be removed in 2.3. Implement validate() instead.', E_USER_DEPRECATED);
 
-        return $this->isValid($value, $constraint);
-    }
+				return $this->isValid($value, $constraint);
+		}
 
-    /**
-     * BC variant of validate.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    protected function isValid($value, Constraint $constraint)
-    {
-    }
+		/**
+		 * BC variant of validate.
+		 *
+		 * @deprecated Deprecated since version 2.1, to be removed in 2.3.
+		 */
+		protected function isValid($value, Constraint $constraint)
+		{
+		}
 }

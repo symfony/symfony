@@ -31,88 +31,88 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class RouterListener implements EventSubscriberInterface
 {
-    private $matcher;
-    private $context;
-    private $logger;
+		private $matcher;
+		private $context;
+		private $logger;
 
-    /**
-     * Constructor.
-     *
-     * @param UrlMatcherInterface|RequestMatcherInterface $matcher The Url or Request matcher
-     * @param RequestContext|null                         $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
-     * @param LoggerInterface|null                        $logger  The logger
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null)
-    {
-        if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
-            throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
-        }
+		/**
+		 * Constructor.
+		 *
+		 * @param UrlMatcherInterface|RequestMatcherInterface $matcher The Url or Request matcher
+		 * @param RequestContext|null												 $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
+		 * @param LoggerInterface|null												$logger	The logger
+		 *
+		 * @throws \InvalidArgumentException
+		 */
+		public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null)
+		{
+				if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
+						throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
+				}
 
-        if (null === $context && !$matcher instanceof RequestContextAwareInterface) {
-            throw new \InvalidArgumentException('You must either pass a RequestContext or the matcher must implement RequestContextAwareInterface.');
-        }
+				if (null === $context && !$matcher instanceof RequestContextAwareInterface) {
+						throw new \InvalidArgumentException('You must either pass a RequestContext or the matcher must implement RequestContextAwareInterface.');
+				}
 
-        $this->matcher = $matcher;
-        $this->context = $context ?: $matcher->getContext();
-        $this->logger = $logger;
-    }
+				$this->matcher = $matcher;
+				$this->context = $context ?: $matcher->getContext();
+				$this->logger = $logger;
+		}
 
-    public function onKernelRequest(GetResponseEvent $event)
-    {
-        $request = $event->getRequest();
+		public function onKernelRequest(GetResponseEvent $event)
+		{
+				$request = $event->getRequest();
 
-        // initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
-        $this->context->fromRequest($request);
+				// initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
+				$this->context->fromRequest($request);
 
-        if ($request->attributes->has('_controller')) {
-            // routing is already done
-            return;
-        }
+				if ($request->attributes->has('_controller')) {
+						// routing is already done
+						return;
+				}
 
-        // add attributes based on the request (routing)
-        try {
-            // matching a request is more powerful than matching a URL path + context, so try that first
-            if ($this->matcher instanceof RequestMatcherInterface) {
-                $parameters = $this->matcher->matchRequest($request);
-            } else {
-                $parameters = $this->matcher->match($request->getPathInfo());
-            }
+				// add attributes based on the request (routing)
+				try {
+						// matching a request is more powerful than matching a URL path + context, so try that first
+						if ($this->matcher instanceof RequestMatcherInterface) {
+								$parameters = $this->matcher->matchRequest($request);
+						} else {
+								$parameters = $this->matcher->match($request->getPathInfo());
+						}
 
-            if (null !== $this->logger) {
-                $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], $this->parametersToString($parameters)));
-            }
+						if (null !== $this->logger) {
+								$this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], $this->parametersToString($parameters)));
+						}
 
-            $request->attributes->add($parameters);
-            unset($parameters['_route']);
-            unset($parameters['_controller']);
-            $request->attributes->set('_route_params', $parameters);
-        } catch (ResourceNotFoundException $e) {
-            $message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getPathInfo());
+						$request->attributes->add($parameters);
+						unset($parameters['_route']);
+						unset($parameters['_controller']);
+						$request->attributes->set('_route_params', $parameters);
+				} catch (ResourceNotFoundException $e) {
+						$message = sprintf('No route found for "%s %s"', $request->getMethod(), $request->getPathInfo());
 
-            throw new NotFoundHttpException($message, $e);
-        } catch (MethodNotAllowedException $e) {
-            $message = sprintf('No route found for "%s %s": Method Not Allowed (Allow: %s)', $request->getMethod(), $request->getPathInfo(), strtoupper(implode(', ', $e->getAllowedMethods())));
+						throw new NotFoundHttpException($message, $e);
+				} catch (MethodNotAllowedException $e) {
+						$message = sprintf('No route found for "%s %s": Method Not Allowed (Allow: %s)', $request->getMethod(), $request->getPathInfo(), strtoupper(implode(', ', $e->getAllowedMethods())));
 
-            throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
-        }
-    }
+						throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
+				}
+		}
 
-    private function parametersToString(array $parameters)
-    {
-        $pieces = array();
-        foreach ($parameters as $key => $val) {
-            $pieces[] = sprintf('"%s": "%s"', $key, (is_string($val) ? $val : json_encode($val)));
-        }
+		private function parametersToString(array $parameters)
+		{
+				$pieces = array();
+				foreach ($parameters as $key => $val) {
+						$pieces[] = sprintf('"%s": "%s"', $key, (is_string($val) ? $val : json_encode($val)));
+				}
 
-        return implode(', ', $pieces);
-    }
+				return implode(', ', $pieces);
+		}
 
-    public static function getSubscribedEvents()
-    {
-        return array(
-            KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
-        );
-    }
+		public static function getSubscribedEvents()
+		{
+				return array(
+						KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
+				);
+		}
 }

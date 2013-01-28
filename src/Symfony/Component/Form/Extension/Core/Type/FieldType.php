@@ -22,11 +22,11 @@ use Symfony\Component\Form\AbstractType;
  */
 class FieldType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'field';
-    }
+		/**
+		 * {@inheritdoc}
+		 */
+		public function getName()
+		{
+				return 'field';
+		}
 }

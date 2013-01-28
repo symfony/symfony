@@ -15,10 +15,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 interface PrependExtensionInterface
 {
-    /**
-     * Allow an extension to prepend the extension configurations.
-     *
-     * @param ContainerBuilder $container
-     */
-    public function prepend(ContainerBuilder $container);
+		/**
+		 * Allow an extension to prepend the extension configurations.
+		 *
+		 * @param ContainerBuilder $container
+		 */
+		public function prepend(ContainerBuilder $container);
 }

@@ -22,90 +22,90 @@ namespace Symfony\Component\Form\Guess;
  */
 abstract class Guess
 {
-    /**
-     * Marks an instance with a value that is extremely likely to be correct
-     * @var integer
-     */
-    const VERY_HIGH_CONFIDENCE = 3;
+		/**
+		 * Marks an instance with a value that is extremely likely to be correct
+		 * @var integer
+		 */
+		const VERY_HIGH_CONFIDENCE = 3;
 
-    /**
-     * Marks an instance with a value that is very likely to be correct
-     * @var integer
-     */
-    const HIGH_CONFIDENCE = 2;
+		/**
+		 * Marks an instance with a value that is very likely to be correct
+		 * @var integer
+		 */
+		const HIGH_CONFIDENCE = 2;
 
-    /**
-     * Marks an instance with a value that is likely to be correct
-     * @var integer
-     */
-    const MEDIUM_CONFIDENCE = 1;
+		/**
+		 * Marks an instance with a value that is likely to be correct
+		 * @var integer
+		 */
+		const MEDIUM_CONFIDENCE = 1;
 
-    /**
-     * Marks an instance with a value that may be correct
-     * @var integer
-     */
-    const LOW_CONFIDENCE = 0;
+		/**
+		 * Marks an instance with a value that may be correct
+		 * @var integer
+		 */
+		const LOW_CONFIDENCE = 0;
 
-    /**
-     * The confidence about the correctness of the value
-     *
-     * One of VERY_HIGH_CONFIDENCE, HIGH_CONFIDENCE, MEDIUM_CONFIDENCE
-     * and LOW_CONFIDENCE.
-     *
-     * @var integer
-     */
-    private $confidence;
+		/**
+		 * The confidence about the correctness of the value
+		 *
+		 * One of VERY_HIGH_CONFIDENCE, HIGH_CONFIDENCE, MEDIUM_CONFIDENCE
+		 * and LOW_CONFIDENCE.
+		 *
+		 * @var integer
+		 */
+		private $confidence;
 
-    /**
-     * Returns the guess most likely to be correct from a list of guesses
-     *
-     * If there are multiple guesses with the same, highest confidence, the
-     * returned guess is any of them.
-     *
-     * @param array $guesses A list of guesses
-     *
-     * @return Guess The guess with the highest confidence
-     */
-    public static function getBestGuess(array $guesses)
-    {
-        $result = null;
-        $maxConfidence = -1;
+		/**
+		 * Returns the guess most likely to be correct from a list of guesses
+		 *
+		 * If there are multiple guesses with the same, highest confidence, the
+		 * returned guess is any of them.
+		 *
+		 * @param array $guesses A list of guesses
+		 *
+		 * @return Guess The guess with the highest confidence
+		 */
+		public static function getBestGuess(array $guesses)
+		{
+				$result = null;
+				$maxConfidence = -1;
 
-        foreach ($guesses as $guess) {
-            if ($maxConfidence < $confidence = $guess->getConfidence()) {
-                $maxConfidence = $confidence;
-                $result = $guess;
-            }
-        }
+				foreach ($guesses as $guess) {
+						if ($maxConfidence < $confidence = $guess->getConfidence()) {
+								$maxConfidence = $confidence;
+								$result = $guess;
+						}
+				}
 
-        return $result;
-    }
+				return $result;
+		}
 
-    /**
-     * Constructor
-     *
-     * @param integer $confidence The confidence
-     *
-     * @throws \InvalidArgumentException if the given value of confidence is unknown
-     */
-    public function __construct($confidence)
-    {
-        if (self::VERY_HIGH_CONFIDENCE !== $confidence && self::HIGH_CONFIDENCE !== $confidence &&
-            self::MEDIUM_CONFIDENCE !== $confidence && self::LOW_CONFIDENCE !== $confidence) {
-            throw new \InvalidArgumentException('The confidence should be one of the constants defined in Guess.');
-        }
+		/**
+		 * Constructor
+		 *
+		 * @param integer $confidence The confidence
+		 *
+		 * @throws \InvalidArgumentException if the given value of confidence is unknown
+		 */
+		public function __construct($confidence)
+		{
+				if (self::VERY_HIGH_CONFIDENCE !== $confidence && self::HIGH_CONFIDENCE !== $confidence &&
+						self::MEDIUM_CONFIDENCE !== $confidence && self::LOW_CONFIDENCE !== $confidence) {
+						throw new \InvalidArgumentException('The confidence should be one of the constants defined in Guess.');
+				}
 
-        $this->confidence = $confidence;
-    }
+				$this->confidence = $confidence;
+		}
 
-    /**
-     * Returns the confidence that the guessed value is correct
-     *
-     * @return integer One of the constants VERY_HIGH_CONFIDENCE,
-     *                 HIGH_CONFIDENCE, MEDIUM_CONFIDENCE and LOW_CONFIDENCE
-     */
-    public function getConfidence()
-    {
-        return $this->confidence;
-    }
+		/**
+		 * Returns the confidence that the guessed value is correct
+		 *
+		 * @return integer One of the constants VERY_HIGH_CONFIDENCE,
+		 *								 HIGH_CONFIDENCE, MEDIUM_CONFIDENCE and LOW_CONFIDENCE
+		 */
+		public function getConfidence()
+		{
+				return $this->confidence;
+		}
 }

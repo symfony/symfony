@@ -25,9 +25,9 @@ CHANGELOG
  * improved `ValidatorInterface::validateValue` to accept arrays of constraints
  * changed `ValidatorInterface::getMetadataFactory` to return a `MetadataFactoryInterface` instead of a `ClassMetadataFactoryInterface`
  * removed `ClassMetadataFactoryInterface` type hint from `ValidatorBuilderInterface::setMetadataFactory`.
-   As of Symfony 2.3, this method will be typed against `MetadataFactoryInterface` instead.
+	 As of Symfony 2.3, this method will be typed against `MetadataFactoryInterface` instead.
  * [BC BREAK] the switches `traverse` and `deep` in the `Valid` constraint and in `GraphWalker::walkReference`
-   are ignored for arrays now. Arrays are always traversed recursively.
+	 are ignored for arrays now. Arrays are always traversed recursively.
  * added dependency to Translation component
  * violation messages are now translated with a TranslatorInterface implementation
  * [BC BREAK] inserted argument `$message` in the constructor of `ConstraintViolation`
@@ -47,19 +47,19 @@ CHANGELOG
  * improved the ImageValidator with min width, max width, min height, and max height constraints
  * added support for MIME with wildcard in FileValidator
  * changed Collection validator to add "missing" and "extra" errors to
-   individual fields
+	 individual fields
  * changed default value for `extraFieldsMessage` and `missingFieldsMessage`
-   in Collection constraint
+	 in Collection constraint
  * made ExecutionContext immutable
  * deprecated Constraint methods `setMessage`, `getMessageTemplate` and
-   `getMessageParameters`
+	 `getMessageParameters`
  * added support for dynamic group sequences with the GroupSequenceProvider pattern
  * [BC BREAK] ConstraintValidatorInterface method `isValid` has been renamed to
-   `validate`, its return value was dropped. ConstraintValidator still contains
-   `isValid` for BC
+	 `validate`, its return value was dropped. ConstraintValidator still contains
+	 `isValid` for BC
  * [BC BREAK] collections in fields annotated with `Valid` are not traversed
-   recursively anymore by default. `Valid` contains a new property `deep`
-   which enables the BC behavior.
+	 recursively anymore by default. `Valid` contains a new property `deep`
+	 which enables the BC behavior.
  * added Count constraint
  * added Length constraint
  * added Range constraint

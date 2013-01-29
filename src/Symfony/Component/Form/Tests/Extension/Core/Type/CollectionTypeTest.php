@@ -197,4 +197,16 @@ class CollectionTypeTest extends TypeTestCase
 
         $this->assertSame('__test__label__', $form->createView()->vars['prototype']->vars['label']);
     }
+
+    public function testPrototypeData()
+    {
+        $form = $this->factory->create('collection', array(), array(
+            'type'      => 'form',
+            'allow_add' => true,
+            'prototype' => true,
+            'prototype_data' => $data = 'foobar',
+        ));
+
+        $this->assertEquals($data, $form->getConfig()->getAttribute('prototype')->getData());
+    }
 }

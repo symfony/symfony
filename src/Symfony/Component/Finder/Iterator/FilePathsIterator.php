@@ -41,6 +41,11 @@ class FilePathsIterator extends \ArrayIterator
     private $subPathname;
 
     /**
+     * @var SplFileInfo
+     */
+    private $current;
+
+    /**
      * @param array  $paths   List of paths returned by shell command
      * @param string $baseDir Base dir for relative path building
      */
@@ -70,21 +75,27 @@ class FilePathsIterator extends \ArrayIterator
      */
     public function current()
     {
-        return new SplFileInfo(parent::current(), $this->subPath, $this->subPathname);
+        return $this->current;
+    }
+
+    /**
+     * @return string
+     */
+    public function key()
+    {
+        return $this->current->getPathname();
     }
 
     public function next()
     {
         parent::next();
-
-        $this->buildSubPath();
+        $this->buildProperties();
     }
 
     public function rewind()
     {
         parent::rewind();
-
-        $this->buildSubPath();
+        $this->buildProperties();
     }
 
     /**
@@ -103,7 +114,7 @@ class FilePathsIterator extends \ArrayIterator
         return $this->subPathname;
     }
 
-    private function buildSubPath()
+    private function buildProperties()
     {
         $absolutePath = parent::current();
 
@@ -114,5 +125,7 @@ class FilePathsIterator extends \ArrayIterator
         } else {
             $this->subPath = $this->subPathname = '';
         }
+
+        $this->current = new SplFileInfo(parent::current(), $this->subPath, $this->subPathname);
     }
 }

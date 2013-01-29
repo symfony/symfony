@@ -576,6 +576,19 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertEquals(1, count($finder));
     }
 
+    /**
+     * Iterator keys must be the file pathname.
+     *
+     * @dataProvider getAdaptersTestData
+     */
+    public function testIteratorKeys(Adapter\AdapterInterface $adapter)
+    {
+        $finder = $this->buildFinder($adapter)->in(self::$tmpDir);
+        foreach ($finder as $key => $file) {
+            $this->assertEquals($file->getPathname(), $key);
+        }
+    }
+
     public function testAdaptersOrdering()
     {
         $finder = Finder::create()

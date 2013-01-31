@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @see Symfony\Component\HttpKernel\HttpContentRenderer
+ * @see Symfony\Component\HttpKernel\SubRequestRenderer
  */
 interface RenderingStrategyInterface
 {

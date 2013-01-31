@@ -52,7 +52,7 @@ class EsiRenderingStrategyTest extends \PHPUnit_Framework_TestCase
 
     private function getDefaultStrategy($called = false)
     {
-        $default = $this->getMockBuilder('Symfony\Component\HttpKernel\RenderingStrategy\DefaultRenderingStrategy')->disableOriginalConstructor()->getMock();
+        $default = $this->getMockBuilder('Symfony\Component\HttpKernel\RenderingStrategy\InlineRenderingStrategy')->disableOriginalConstructor()->getMock();
 
         if ($called) {
             $default->expects($this->once())->method('render');

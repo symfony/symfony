@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\HttpKernel\HttpContentRenderer;
+use Symfony\Component\HttpKernel\SubRequestRenderer;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
@@ -27,9 +27,9 @@ class ActionsHelper extends Helper
     /**
      * Constructor.
      *
-     * @param HttpContentRenderer $renderer A HttpContentRenderer instance
+     * @param SubRequestRenderer $renderer A SubRequestRenderer instance
      */
-    public function __construct(HttpContentRenderer $renderer)
+    public function __construct(SubRequestRenderer $renderer)
     {
         $this->renderer = $renderer;
     }
@@ -42,7 +42,7 @@ class ActionsHelper extends Helper
      *
      * @return string
      *
-     * @see Symfony\Component\HttpKernel\HttpContentRenderer::render()
+     * @see Symfony\Component\HttpKernel\SubRequestRenderer::render()
      */
     public function render($uri, array $options = array())
     {

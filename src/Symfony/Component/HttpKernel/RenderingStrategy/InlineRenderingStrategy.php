@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DefaultRenderingStrategy extends ProxyAwareRenderingStrategy
+class InlineRenderingStrategy extends ProxyAwareRenderingStrategy
 {
     private $kernel;
 
@@ -95,6 +95,6 @@ class DefaultRenderingStrategy extends ProxyAwareRenderingStrategy
      */
     public function getName()
     {
-        return 'default';
+        return 'inline';
     }
 }

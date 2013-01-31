@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\HttpKernel\HttpContentRenderer;
+use Symfony\Component\HttpKernel\SubRequestRenderer;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
@@ -26,9 +26,9 @@ class HttpKernelExtension extends \Twig_Extension
     /**
      * Constructor.
      *
-     * @param HttpContentRenderer $renderer A HttpContentRenderer instance
+     * @param SubRequestRenderer $renderer A SubRequestRenderer instance
      */
-    public function __construct(HttpContentRenderer $renderer)
+    public function __construct(SubRequestRenderer $renderer)
     {
         $this->renderer = $renderer;
     }
@@ -50,7 +50,7 @@ class HttpKernelExtension extends \Twig_Extension
      *
      * @return string The Response content
      *
-     * @see Symfony\Component\HttpKernel\HttpContentRenderer::render()
+     * @see Symfony\Component\HttpKernel\SubRequestRenderer::render()
      */
     public function render($uri, $options = array())
     {

@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="sub_request_renderer.class">Symfony\Component\HttpKernel\SubRequestRenderer</parameter>
+        <parameter key="sub_request_renderer.strategy.inline.class">Symfony\Component\HttpKernel\RenderingStrategy\InlineRenderingStrategy</parameter>
+        <parameter key="sub_request_renderer.strategy.hinclude.class">Symfony\Bundle\FrameworkBundle\RenderingStrategy\ContainerAwareHIncludeRenderingStrategy</parameter>
+        <parameter key="sub_request_renderer.strategy.hinclude.global_template"></parameter>
+        <parameter key="sub_request_renderer.proxy_path">/_proxy</parameter>
+    </parameters>
+
+    <services>
+        <service id="sub_request_renderer" class="%sub_request_renderer.class%">
+            <tag name="kernel.event_subscriber" />
+            <argument type="collection" />
+            <argument>%kernel.debug%</argument>
+        </service>
+
+        <service id="sub_request_renderer.strategy.inline" class="%sub_request_renderer.strategy.inline.class%">
+            <tag name="kernel.content_renderer_strategy" />
+            <argument type="service" id="http_kernel" />
+            <call method="setProxyPath"><argument>%sub_request_renderer.proxy_path%</argument></call>
+        </service>
+
+        <service id="sub_request_renderer.strategy.hinclude" class="%sub_request_renderer.strategy.hinclude.class%">
+            <tag name="kernel.content_renderer_strategy" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="uri_signer" />
+            <argument>%sub_request_renderer.strategy.hinclude.global_template%</argument>
+            <call method="setProxyPath"><argument>%sub_request_renderer.proxy_path%</argument></call>
+        </service>
+
+    </services>
+</container>

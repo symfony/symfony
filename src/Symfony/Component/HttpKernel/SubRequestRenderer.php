@@ -31,7 +31,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @see RenderingStrategyInterface
  */
-class HttpContentRenderer implements EventSubscriberInterface
+class SubRequestRenderer implements EventSubscriberInterface
 {
     private $debug;
     private $strategies;

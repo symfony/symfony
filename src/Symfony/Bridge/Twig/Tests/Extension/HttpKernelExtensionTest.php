@@ -15,7 +15,7 @@ use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\HttpContentRenderer;
+use Symfony\Component\HttpKernel\SubRequestRenderer;
 
 class HttpKernelExtensionTest extends TestCase
 {
@@ -35,7 +35,7 @@ class HttpKernelExtensionTest extends TestCase
      */
     public function testRenderWithError()
     {
-        $kernel = $this->getHttpContentRenderer($this->throwException(new \Exception('foo')));
+        $kernel = $this->getSubRequestRenderer($this->throwException(new \Exception('foo')));
 
         $loader = new \Twig_Loader_Array(array('index' => '{{ render("foo") }}'));
         $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
@@ -44,7 +44,7 @@ class HttpKernelExtensionTest extends TestCase
         $this->renderTemplate($kernel);
     }
 
-    protected function getHttpContentRenderer($return)
+    protected function getSubRequestRenderer($return)
     {
         $strategy = $this->getMock('Symfony\\Component\\HttpKernel\\RenderingStrategy\\RenderingStrategyInterface');
         $strategy->expects($this->once())->method('getName')->will($this->returnValue('default'));
@@ -58,13 +58,13 @@ class HttpKernelExtensionTest extends TestCase
             ->will($this->returnValue(Request::create('/')))
         ;
 
-        $renderer = new HttpContentRenderer(array($strategy));
+        $renderer = new SubRequestRenderer(array($strategy));
         $renderer->onKernelRequest($event);
 
         return $renderer;
     }
 
-    protected function renderTemplate(HttpContentRenderer $renderer, $template = '{{ render("foo") }}')
+    protected function renderTemplate(SubRequestRenderer $renderer, $template = '{{ render("foo") }}')
     {
         $loader = new \Twig_Loader_Array(array('index' => $template));
         $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));

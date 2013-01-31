@@ -13,12 +13,12 @@ namespace Symfony\Component\HttpKernel\Tests\RenderingStrategy;
 
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\HttpKernel;
-use Symfony\Component\HttpKernel\RenderingStrategy\DefaultRenderingStrategy;
+use Symfony\Component\HttpKernel\RenderingStrategy\InlineRenderingStrategy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class DefaultRenderingStrategyTest extends \PHPUnit_Framework_TestCase
+class InlineRenderingStrategyTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -33,14 +33,14 @@ class DefaultRenderingStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testRender()
     {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
+        $strategy = new InlineRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
 
         $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
     public function testRenderWithControllerReference()
     {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
+        $strategy = new InlineRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
 
         $this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
     }
@@ -50,21 +50,21 @@ class DefaultRenderingStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderExceptionNoIgnoreErrors()
     {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
+        $strategy = new InlineRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
 
         $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
     public function testRenderExceptionIgnoreErrors()
     {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
+        $strategy = new InlineRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
 
         $this->assertEmpty($strategy->render('/', Request::create('/'), array('ignore_errors' => true))->getContent());
     }
 
     public function testRenderExceptionIgnoreErrorsWithAlt()
     {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->onConsecutiveCalls(
+        $strategy = new InlineRenderingStrategy($this->getKernel($this->onConsecutiveCalls(
             $this->throwException(new \RuntimeException('foo')),
             $this->returnValue(new Response('bar'))
         )));
@@ -103,7 +103,7 @@ class DefaultRenderingStrategyTest extends \PHPUnit_Framework_TestCase
         ;
 
         $kernel = new HttpKernel(new EventDispatcher(), $resolver);
-        $renderer = new DefaultRenderingStrategy($kernel);
+        $renderer = new InlineRenderingStrategy($kernel);
 
         // simulate a main request with output buffering
         ob_start();

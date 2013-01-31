@@ -30,7 +30,7 @@ class EsiRenderingStrategy extends ProxyAwareRenderingStrategy
      * Constructor.
      *
      * The "fallback" strategy when ESI is not available should always be an
-     * instance of DefaultRenderingStrategy (or a class you are using for the
+     * instance of InlineRenderingStrategy (or a class you are using for the
      * default strategy).
      *
      * @param Esi                        $esi             An Esi instance

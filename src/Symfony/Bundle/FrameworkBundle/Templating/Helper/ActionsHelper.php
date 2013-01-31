@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\HttpKernel\HttpContentRenderer;
+use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
@@ -22,36 +22,36 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
  */
 class ActionsHelper extends Helper
 {
-    private $renderer;
+    private $handler;
 
     /**
      * Constructor.
      *
-     * @param HttpContentRenderer $renderer A HttpContentRenderer instance
+     * @param FragmentHandler $handler A FragmentHandler instance
      */
-    public function __construct(HttpContentRenderer $renderer)
+    public function __construct(FragmentHandler $handler)
     {
-        $this->renderer = $renderer;
+        $this->handler = $handler;
     }
 
     /**
-     * Returns the Response content for a given URI.
+     * Returns the fragment content for a given URI.
      *
      * @param string $uri     A URI
      * @param array  $options An array of options
      *
-     * @return string
+     * @return string The fragment content
      *
-     * @see Symfony\Component\HttpKernel\HttpContentRenderer::render()
+     * @see Symfony\Component\HttpKernel\Fragment\FragmentHandler::render()
      */
     public function render($uri, array $options = array())
     {
-        $options = $this->renderer->fixOptions($options);
+        $options = $this->handler->fixOptions($options);
 
         $strategy = isset($options['strategy']) ? $options['strategy'] : 'default';
         unset($options['strategy']);
 
-        return $this->renderer->render($uri, $strategy, $options);
+        return $this->handler->render($uri, $strategy, $options);
     }
 
     public function controller($controller, $attributes = array(), $query = array())

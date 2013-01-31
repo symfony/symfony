@@ -20,8 +20,8 @@ namespace Symfony\Component\HttpKernel\Controller;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @see Symfony\Component\HttpKernel\HttpContentRenderer
- * @see Symfony\Component\HttpKernel\RenderingStrategy\RenderingStrategyInterface
+ * @see Symfony\Component\HttpKernel\FragmentRenderer
+ * @see Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface
  */
 class ControllerReference
 {

@@ -8,11 +8,11 @@ CHANGELOG
  * deprecated `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` and `Symfony\Bundle\FrameworkBundle\HttpKernel::forward()`
  * deprecated the `Symfony\Bundle\FrameworkBundle\HttpKernel` class in favor of `Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel`
  * added support for adding new HTTP content rendering strategies (like ESI and Hinclude)
-   in the DIC via the `kernel.content_renderer_strategy` tag
+   in the DIC via the `kernel.fragment_renderer` tag
  * [BC BREAK] restricted the `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` method to only accept URIs or ControllerReference instances
    * `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` method signature changed and the first argument
      must now be a URI or a ControllerReference instance (the `generateInternalUri()` method was removed)
-   * The internal routes (`Resources/config/routing/internal.xml`) have been removed and replaced with a listener (`Symfony\Component\HttpKernel\EventListener\RouterProxyListener`)
+   * The internal routes (`Resources/config/routing/internal.xml`) have been removed and replaced with a listener (`Symfony\Component\HttpKernel\EventListener\FragmentListener`)
    * The `render` method of the `actions` templating helper signature and arguments changed
  * replaced Symfony\Bundle\FrameworkBundle\Controller\TraceableControllerResolver by Symfony\Component\HttpKernel\Controller\TraceableControllerResolver
  * replaced Symfony\Component\HttpKernel\Debug\ContainerAwareTraceableEventDispatcher by Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher

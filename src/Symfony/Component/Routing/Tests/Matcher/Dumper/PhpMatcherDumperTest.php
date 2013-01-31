@@ -135,8 +135,8 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection3 = new RouteCollection();
         $collection3->add('overridden2', new Route('/new'));
         $collection3->add('hey', new Route('/hey/'));
-        $collection1->addCollection($collection2);
         $collection2->addCollection($collection3);
+        $collection1->addCollection($collection2);
         $collection->addCollection($collection1, '/multi');
 
         // "dynamic" prefix
@@ -155,7 +155,7 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection1->add('foo4', new Route('/{foo}'));
         $collection->addCollection($collection1, '/aba');
 
-        // prefix and hostname
+        // prefix and host
 
         $collection1 = new RouteCollection();
 
@@ -181,7 +181,7 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 
         $collection->addCollection($collection1);
 
-        // hostname and variables
+        // host and variables
 
         $collection1 = new RouteCollection();
 
@@ -216,8 +216,8 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection3 = new RouteCollection();
         $collection3->add('c', new Route('/{var}'));
 
-        $collection1->addCollection($collection2, '/b');
         $collection2->addCollection($collection3, '/c');
+        $collection1->addCollection($collection2, '/b');
         $collection->addCollection($collection1, '/a');
 
         /* test case 2 */

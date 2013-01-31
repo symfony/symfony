@@ -69,7 +69,7 @@
 {% spaceless %}
     <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
         {% if empty_value is not none %}
-            <option value="">{{ empty_value|trans({}, translation_domain) }}</option>
+            <option value=""{% if required %} disabled="disabled"{% if value is empty %} selected="selected"{% endif %}{% endif %}>{{ empty_value|trans({}, translation_domain) }}</option>
         {% endif %}
         {% if preferred_choices|length > 0 %}
             {% set options = preferred_choices %}
@@ -148,7 +148,7 @@
         {{ block('form_widget_simple') }}
     {% else %}
         <div {{ block('widget_container_attributes') }}>
-            {{ form_widget(form.hour, { 'attr': { 'size': '1' } }) }}:{{ form_widget(form.minute, { 'attr': { 'size': '1' } }) }}{% if with_seconds %}:{{ form_widget(form.second, { 'attr': { 'size': '1' } }) }}{% endif %}
+            {{ form_widget(form.hour, { 'attr': { 'size': '1' } }) }}{% if with_minutes %}:{{ form_widget(form.minute, { 'attr': { 'size': '1' } }) }}{% endif %}{% if with_seconds %}:{{ form_widget(form.second, { 'attr': { 'size': '1' } }) }}{% endif %}
         </div>
     {% endif %}
 {% endspaceless %}
@@ -221,16 +221,18 @@
 
 {% block form_label %}
 {% spaceless %}
-    {% if not compound %}
-        {% set label_attr = label_attr|merge({'for': id}) %}
+    {% if label is not sameas(false) %}
+        {% if not compound %}
+            {% set label_attr = label_attr|merge({'for': id}) %}
+        {% endif %}
+        {% if required %}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        {% endif %}
+        {% if label is empty %}
+            {% set label = name|humanize %}
+        {% endif %}
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ label|trans({}, translation_domain) }}</label>
     {% endif %}
-    {% if required %}
-        {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
-    {% endif %}
-    {% if label is empty %}
-        {% set label = name|humanize %}
-    {% endif %}
-    <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ label|trans({}, translation_domain) }}</label>
 {% endspaceless %}
 {% endblock form_label %}
 
@@ -273,11 +275,7 @@
     {% if errors|length > 0 %}
     <ul>
         {% for error in errors %}
-            <li>{{
-                error.messagePluralization is null
-                    ? error.messageTemplate|trans(error.messageParameters, 'validators')
-                    : error.messageTemplate|transchoice(error.messagePluralization, error.messageParameters, 'validators')
-            }}</li>
+            <li>{{ error.message }}</li>
         {% endfor %}
     </ul>
     {% endif %}

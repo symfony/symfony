@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
  * An implementation of BundleInterface that adds a few conventions
@@ -63,6 +64,8 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      * Returns the bundle's container extension.
      *
      * @return ExtensionInterface|null The container extension
+     *
+     * @throws \LogicException
      *
      * @api
      */
@@ -172,7 +175,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      */
     public function registerCommands(Application $application)
     {
-        if (!$dir = realpath($this->getPath().'/Command')) {
+        if (!is_dir($dir = $this->getPath().'/Command')) {
             return;
         }
 

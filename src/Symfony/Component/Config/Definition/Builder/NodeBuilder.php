@@ -181,6 +181,8 @@ class NodeBuilder implements NodeParentInterface
      *         ->end()
      *     ;
      *
+     * @param NodeDefinition $node
+     *
      * @return NodeBuilder This node builder
      */
     public function append(NodeDefinition $node)

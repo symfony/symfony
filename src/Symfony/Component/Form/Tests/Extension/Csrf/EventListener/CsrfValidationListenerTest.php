@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Csrf\EventListener;
 
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 
 class CsrfValidationListenerTest extends \PHPUnit_Framework_TestCase
@@ -60,7 +60,7 @@ class CsrfValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockForm()
     {
-        return $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
     }
 
     // https://github.com/symfony/symfony/pull/5838

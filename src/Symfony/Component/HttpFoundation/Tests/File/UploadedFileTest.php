@@ -102,9 +102,8 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('gif', $file->getClientOriginalExtension());
     }
 
-
     /**
-     * @expectedException Symfony\Component\HttpFoundation\File\Exception\FileException
+     * @expectedException \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
     public function testMoveLocalFileIsNotAllowed()
     {

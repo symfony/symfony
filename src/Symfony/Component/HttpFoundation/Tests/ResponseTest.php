@@ -165,6 +165,11 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3600, $response->getMaxAge(), '->getMaxAge() falls back to Expires when no max-age or s-maxage directive present');
 
         $response = new Response();
+        $response->headers->set('Cache-Control', 'must-revalidate');
+        $response->headers->set('Expires', -1);
+        $this->assertEquals('Sat, 01 Jan 00 00:00:00 +0000', $response->getExpires()->format(DATE_RFC822));
+
+        $response = new Response();
         $this->assertNull($response->getMaxAge(), '->getMaxAge() returns null if no freshness information available');
     }
 
@@ -214,6 +219,11 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $response->expire();
         $this->assertFalse($response->headers->has('Age'), '->expire() does nothing when the response does not include freshness information');
+
+        $response = new Response();
+        $response->headers->set('Expires', -1);
+        $response->expire();
+        $this->assertNull($response->headers->get('Age'), '->expire() does not set the Age when the response is expired');
     }
 
     public function testGetTtl()
@@ -227,7 +237,12 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
         $response = new Response();
         $response->headers->set('Expires', $this->createDateTimeOneHourAgo()->format(DATE_RFC2822));
-        $this->assertLessThan(0, $response->getTtl(), '->getTtl() returns negative values when Expires is in part');
+        $this->assertLessThan(0, $response->getTtl(), '->getTtl() returns negative values when Expires is in past');
+
+        $response = new Response();
+        $response->headers->set('Expires', $response->getDate()->format(DATE_RFC2822));
+        $response->headers->set('Age', 0);
+        $this->assertSame(0, $response->getTtl(), '->getTtl() correctly handles zero');
 
         $response = new Response();
         $response->headers->set('Cache-Control', 'max-age=60');
@@ -349,6 +364,23 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response->prepare($request);
 
         $this->assertEquals('', $response->getContent());
+    }
+
+    public function testPrepareSetsPragmaOnHttp10Only()
+    {
+        $request = Request::create('/', 'GET');
+        $request->server->set('SERVER_PROTOCOL', 'HTTP/1.0');
+
+        $response = new Response('foo');
+        $response->prepare($request);
+        $this->assertEquals('no-cache', $response->headers->get('pragma'));
+        $this->assertEquals('-1', $response->headers->get('expires'));
+
+        $request->server->set('SERVER_PROTOCOL', 'HTTP/1.1');
+        $response = new Response('foo');
+        $response->prepare($request);
+        $this->assertFalse($response->headers->has('pragma'));
+        $this->assertFalse($response->headers->has('expires'));
     }
 
     public function testSetCache()

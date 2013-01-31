@@ -35,9 +35,9 @@ class ChainEncoder implements EncoderInterface
     /**
      * {@inheritdoc}
      */
-    final public function encode($data, $format)
+    final public function encode($data, $format, array $context = array())
     {
-        return $this->getEncoder($format)->encode($data, $format);
+        return $this->getEncoder($format)->encode($data, $format, $context);
     }
 
     /**

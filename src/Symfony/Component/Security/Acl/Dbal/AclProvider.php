@@ -258,16 +258,40 @@ SELECTCLAUSE;
                WHERE (
 SELECTCLAUSE;
 
-        $where = '(o.object_identifier = %s AND c.class_type = %s)';
-        for ($i=0,$c=count($batch); $i<$c; $i++) {
-            $sql .= sprintf(
-                $where,
-                $this->connection->quote($batch[$i]->getIdentifier()),
-                $this->connection->quote($batch[$i]->getType())
-            );
+        $types = array();
+        $count = count($batch);
+        for ($i = 0; $i < $count; $i++) {
+            if (!isset($types[$batch[$i]->getType()])) {
+                $types[$batch[$i]->getType()] = true;
+                if ($count > 1) {
+                    break;
+                }
+            }
+        }
 
-            if ($i+1 < $c) {
-                $sql .= ' OR ';
+        if (1 === count($types)) {
+            $ids = array();
+            for ($i = 0; $i < $count; $i++) {
+                $ids[] = $this->connection->quote($batch[$i]->getIdentifier());
+            }
+
+            $sql .= sprintf(
+                '(o.object_identifier IN (%s) AND c.class_type = %s)',
+                implode(',', $ids),
+                $this->connection->quote($batch[0]->getType())
+            );
+        } else {
+            $where = '(o.object_identifier = %s AND c.class_type = %s)';
+            for ($i = 0; $i < $count; $i++) {
+                $sql .= sprintf(
+                    $where,
+                    $this->connection->quote($batch[$i]->getIdentifier()),
+                    $this->connection->quote($batch[$i]->getType())
+                );
+
+                if ($i+1 < $count) {
+                    $sql .= ' OR ';
+                }
             }
         }
 
@@ -417,6 +441,8 @@ QUERY;
      * @param array $oidLookup
      *
      * @return \SplObjectStorage mapping object identities to ACL instances
+     *
+     * @throws AclNotFoundException
      */
     private function lookupObjectIdentities(array $batch, array $sids, array $oidLookup)
     {

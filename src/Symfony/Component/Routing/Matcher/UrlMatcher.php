@@ -105,18 +105,6 @@ class UrlMatcher implements UrlMatcherInterface
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
         foreach ($routes as $name => $route) {
-            if ($route instanceof RouteCollection) {
-                if (false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
-                    continue;
-                }
-
-                if (!$ret = $this->matchCollection($pathinfo, $route)) {
-                    continue;
-                }
-
-                return $ret;
-            }
-
             $compiledRoute = $route->compile();
 
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
@@ -128,8 +116,8 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
-            $hostnameMatches = array();
-            if ($compiledRoute->getHostnameRegex() && !preg_match($compiledRoute->getHostnameRegex(), $this->context->getHost(), $hostnameMatches)) {
+            $hostMatches = array();
+            if ($compiledRoute->getHostRegex() && !preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches)) {
                 continue;
             }
 
@@ -157,7 +145,7 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
-            return $this->getAttributes($route, $name, array_replace($matches, $hostnameMatches));
+            return $this->getAttributes($route, $name, array_replace($matches, $hostMatches));
         }
     }
 

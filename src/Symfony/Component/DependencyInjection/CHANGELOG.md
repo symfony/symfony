@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+2.2.0
+-----
+
+ * added Extension::isConfigEnabled() to ease working with enableable configurations
+ * added an Extension base class with sensible defaults to be used in conjunction
+   with the Config component.
+ * added PrependExtensionInterface (to be able to allow extensions to prepend
+   application configuration settings for any Bundle)
+
 2.1.0
 -----
 
@@ -12,4 +21,3 @@ CHANGELOG
    (this includes dumped containers)
  * [BC BREAK] fixed unescaping of class arguments, method
    ParameterBag::unescapeValue() was made public
-

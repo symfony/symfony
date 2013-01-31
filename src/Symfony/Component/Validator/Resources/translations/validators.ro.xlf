@@ -23,11 +23,11 @@
                 <target>Valoarea selectată nu este o opțiune validă.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choices.</source>
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
                 <target>Trebuie să selectați cel puțin {{ limit }} opțiuni.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choices.</source>
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
                 <target>Trebuie să selectați cel mult {{ limit }} opțiuni.</target>
             </trans-unit>
             <trans-unit id="8">
@@ -75,7 +75,7 @@
                 <target>Această valoare ar trebui să fie cel mult {{ limit }}.</target>
             </trans-unit>
             <trans-unit id="19">
-                <source>This value is too long. It should have {{ limit }} characters or less.</source>
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
                 <target>Această valoare este prea lungă. Ar trebui să aibă maxim {{ limit }} caracter.|Această valoare este prea lungă. Ar trebui să aibă maxim {{ limit }} caractere.</target>
             </trans-unit>
             <trans-unit id="20">
@@ -83,7 +83,7 @@
                 <target>Această valoare ar trebui să fie cel puțin {{ limit }}.</target>
             </trans-unit>
             <trans-unit id="21">
-                <source>This value is too short. It should have {{ limit }} characters or more.</source>
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
                 <target>Această valoare este prea scurtă. Ar trebui să aibă minim {{ limit }} caracter.|Această valoare este prea scurtă. Ar trebui să aibă minim {{ limit }} caractere.</target>
             </trans-unit>
             <trans-unit id="22">
@@ -179,7 +179,7 @@
                 <target>Această valoare trebuie să fie parola curentă a utilizatorului.</target>
             </trans-unit>
             <trans-unit id="48">
-                <source>This value should have exactly {{ limit }} characters.</source>
+                <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
                 <target>Această valoare trebuie să conțină exact {{ limit }} caracter.|Această valoare trebuie să conțină exact {{ limit }} caractere.</target>
             </trans-unit>
             <trans-unit id="49">
@@ -203,16 +203,24 @@
                 <target>O extensie PHP a prevenit încărcarea cu succes a fișierului.</target>
             </trans-unit>
             <trans-unit id="54">
-                <source>This collection should contain {{ limit }} elements or more.</source>
+                <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
                 <target>Această colecție trebuie să conțină cel puțin {{ limit }} elemente.</target>
             </trans-unit>
             <trans-unit id="55">
-                <source>This collection should contain {{ limit }} elements or less.</source>
+                <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
                 <target>Această colecție trebuie să conțină cel mult {{ limit }} elemente.</target>
             </trans-unit>
             <trans-unit id="56">
-                <source>This collection should contain exactly {{ limit }} elements.</source>
+                <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
                 <target>Această colecție trebuie să conțină {{ limit }} elemente.</target>
+            </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>Numărul card invalid.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>Tipul sau numărul cardului nu sunt valide.</target>
             </trans-unit>
         </body>
     </file>

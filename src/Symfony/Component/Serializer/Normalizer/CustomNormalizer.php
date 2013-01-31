@@ -19,18 +19,18 @@ class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerIn
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null)
+    public function normalize($object, $format = null, array $context = array())
     {
-        return $object->normalize($this->serializer, $format);
+        return $object->normalize($this->serializer, $format, $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null)
+    public function denormalize($data, $class, $format = null, array $context = array())
     {
         $object = new $class;
-        $object->denormalize($this->serializer, $data, $format);
+        $object->denormalize($this->serializer, $data, $format, $context);
 
         return $object;
     }

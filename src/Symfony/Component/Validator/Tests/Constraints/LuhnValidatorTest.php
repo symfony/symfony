@@ -102,6 +102,8 @@ class LuhnValidatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array('1234567812345678'),
             array('4222222222222222'),
+            array('0000000000000000'),
+            array(0),
         );
     }
 }

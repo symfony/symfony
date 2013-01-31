@@ -69,6 +69,8 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
     protected function tearDown()
     {
         $this->engine = null;
+
+        parent::tearDown();
     }
 
     protected function renderEnctype(FormView $view)

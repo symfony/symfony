@@ -82,7 +82,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
             $this->defaultGroup = $class;
         }
     }
-    
+
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
     {
         if (null === $propagatedGroup && Constraint::DEFAULT_GROUP === $group
@@ -111,7 +111,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
 
             foreach ($this->getConstrainedProperties() as $property) {
                 foreach ($this->getMemberMetadatas($property) as $member) {
-                    $member->accept($visitor, $member->getValue($value), $group, $pathPrefix.$property, $propagatedGroup);
+                    $member->accept($visitor, $member->getPropertyValue($value), $group, $pathPrefix.$property, $propagatedGroup);
                 }
             }
         }
@@ -323,6 +323,10 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Sets the default group sequence for this class.
      *
      * @param array $groups An array of group names
+     *
+     * @return ClassMetadata
+     *
+     * @throws GroupDefinitionException
      */
     public function setGroupSequence(array $groups)
     {
@@ -381,6 +385,8 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * Sets whether a group sequence provider should be used.
      *
      * @param Boolean $active
+     *
+     * @throws GroupDefinitionException
      */
     public function setGroupSequenceProvider($active)
     {

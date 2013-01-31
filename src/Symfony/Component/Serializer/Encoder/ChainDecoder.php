@@ -34,9 +34,9 @@ class ChainDecoder implements DecoderInterface
     /**
      * {@inheritdoc}
      */
-    final public function decode($data, $format)
+    final public function decode($data, $format, array $context = array())
     {
-        return $this->getDecoder($format)->decode($data, $format);
+        return $this->getDecoder($format)->decode($data, $format, $context);
     }
 
     /**

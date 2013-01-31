@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationPro
 class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\AuthenticationServiceException
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationServiceException
      */
     public function testRetrieveUserWhenProviderDoesNotReturnAnUserInterface()
     {
@@ -30,7 +30,7 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\UsernameNotFoundException
+     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
      */
     public function testRetrieveUserWhenUsernameIsNotFound()
     {
@@ -48,7 +48,7 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\AuthenticationServiceException
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationServiceException
      */
     public function testRetrieveUserWhenAnExceptionOccurs()
     {
@@ -105,7 +105,7 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
     public function testCheckAuthenticationWhenCredentialsAreEmpty()
     {
@@ -161,7 +161,7 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
     public function testCheckAuthenticationWhenCredentialsAreNotValid()
     {
@@ -185,7 +185,7 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
     public function testCheckAuthenticationDoesNotReauthenticateWhenPasswordHasChanged()
     {

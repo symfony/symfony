@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Default implementation of {@link ValidationVisitorInterface} and
@@ -36,6 +37,16 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
      * @var ConstraintValidatorFactoryInterface
      */
     private $validatorFactory;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var null|string
+     */
+    private $translationDomain;
 
     /**
      * @var array
@@ -65,11 +76,13 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
      * @param mixed                               $root               The value passed to the validator.
      * @param MetadataFactoryInterface            $metadataFactory    The factory for obtaining metadata instances.
      * @param ConstraintValidatorFactoryInterface $validatorFactory   The factory for creating constraint validators.
+     * @param TranslatorInterface                 $translator         The translator for translating violation messages.
+     * @param string|null                         $translationDomain  The domain of the translation messages.
      * @param ObjectInitializerInterface[]        $objectInitializers The initializers for preparing objects before validation.
      *
      * @throws UnexpectedTypeException If any of the object initializers is not an instance of ObjectInitializerInterface
      */
-    public function __construct($root, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = array())
+    public function __construct($root, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, TranslatorInterface $translator, $translationDomain = null, array $objectInitializers = array())
     {
         foreach ($objectInitializers as $initializer) {
             if (!$initializer instanceof ObjectInitializerInterface) {
@@ -80,6 +93,8 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
         $this->root = $root;
         $this->metadataFactory = $metadataFactory;
         $this->validatorFactory = $validatorFactory;
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
         $this->objectInitializers = $objectInitializers;
         $this->violations = new ConstraintViolationList();
     }
@@ -91,6 +106,8 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
     {
         $context = new ExecutionContext(
             $this,
+            $this->translator,
+            $this->translationDomain,
             $metadata,
             $value,
             $group,
@@ -129,7 +146,10 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
             }
         }
 
-        if ($traverse && (is_array($value) || $value instanceof \Traversable)) {
+        // Validate arrays recursively by default, otherwise every driver needs
+        // to implement special handling for arrays.
+        // https://github.com/symfony/symfony/issues/6246
+        if (is_array($value) || ($traverse && $value instanceof \Traversable)) {
             foreach ($value as $key => $element) {
                 // Ignore any scalar values in the collection
                 if (is_object($element) || is_array($element)) {
@@ -155,8 +175,10 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
      */
     public function getGraphWalker()
     {
+        trigger_error('getGraphWalker() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         if (null === $this->graphWalker) {
-            $this->graphWalker = new GraphWalker($this, $this->metadataFactory, $this->validatedObjects);
+            $this->graphWalker = new GraphWalker($this, $this->metadataFactory, $this->translator, $this->translationDomain, $this->validatedObjects);
         }
 
         return $this->graphWalker;

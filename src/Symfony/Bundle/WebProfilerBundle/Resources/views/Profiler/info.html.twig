@@ -34,7 +34,7 @@
                     </div>
                 </div>
                 <div id="navigation">
-                    {% render 'web_profiler.controller.profiler:searchBarAction' %}
+                    {{ render(path('_profiler_search_bar')) }}
                     {% include '@WebProfiler/Profiler/admin.html.twig' with { 'token': '' } only %}
                 </div>
             </div>

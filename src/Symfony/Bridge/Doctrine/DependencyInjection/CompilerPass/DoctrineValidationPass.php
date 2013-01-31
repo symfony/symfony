@@ -47,7 +47,7 @@ class DoctrineValidationPass implements CompilerPassInterface
      *
      * @param ContainerBuilder $container
      * @param string           $mapping
-     * @param type             $extension
+     * @param string           $extension
      */
     private function updateValidatorMappingFiles(ContainerBuilder $container, $mapping, $extension)
     {

@@ -114,7 +114,7 @@ class Profile
 
     /**
      * Sets the IP.
-     * 
+     *
      * @param string $ip
      */
     public function setIp($ip)
@@ -159,6 +159,10 @@ class Profile
      */
     public function getTime()
     {
+        if (null === $this->time) {
+            return 0;
+        }
+
         return $this->time;
     }
 
@@ -179,7 +183,7 @@ class Profile
 
     /**
      * Sets children profiler.
-     * 
+     *
      * @param Profile[] $children An array of Profile
      */
     public function setChildren(array $children)
@@ -221,7 +225,7 @@ class Profile
 
     /**
      * Gets the Collectors associated with this profile.
-     * 
+     *
      * @return DataCollectorInterface[]
      */
     public function getCollectors()
@@ -231,7 +235,7 @@ class Profile
 
     /**
      * Sets the Collectors associated with this profile.
-     * 
+     *
      * @param DataCollectorInterface[] $collectors
      */
     public function setCollectors(array $collectors)

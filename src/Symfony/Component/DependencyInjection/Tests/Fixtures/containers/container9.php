@@ -14,9 +14,8 @@ $container->
     addTag('foo', array('bar' => 'bar'))->
     setFactoryClass('FooClass')->
     setFactoryMethod('getInstance')->
-    setArguments(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'bar' => '%foo%'), true, new Reference('service_container')))->
+    setArguments(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'foobar' => '%foo%'), true, new Reference('service_container')))->
     setProperties(array('foo' => 'bar', 'moo' => new Reference('foo.baz')))->
-    setScope('prototype')->
     addMethodCall('setBar', array(new Reference('bar')))->
     addMethodCall('initialize')->
     setConfigurator('sc_configure')
@@ -33,7 +32,10 @@ $container->
     setFactoryMethod('getInstance')->
     setConfigurator(array('%baz_class%', 'configureStatic1'))
 ;
-$container->register('foo_bar', '%foo_class%');
+$container->
+    register('foo_bar', '%foo_class%')->
+    setScope('prototype')
+;
 $container->getParameterBag()->clear();
 $container->getParameterBag()->add(array(
     'baz_class' => 'BazClass',
@@ -50,9 +52,24 @@ $container->
     addMethodCall('setBar', array(new Reference('foobaz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))
 ;
 $container->
-    register('factory_service')->
+    register('factory_service', 'Bar')->
     setFactoryService('foo.baz')->
     setFactoryMethod('getInstance')
+;
+
+$container
+    ->register('foo_with_inline', 'Foo')
+    ->addMethodCall('setBar', array(new Reference('inlined')))
+;
+$container
+    ->register('inlined', 'Bar')
+    ->setProperty('pub', 'pub')
+    ->addMethodCall('setBaz', array(new Reference('baz')))
+    ->setPublic(false)
+;
+$container
+    ->register('baz', 'Baz')
+    ->addMethodCall('setFoo', array(new Reference('foo_with_inline')))
 ;
 
 return $container;

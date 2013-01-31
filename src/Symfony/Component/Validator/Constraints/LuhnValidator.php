@@ -51,7 +51,7 @@ class LuhnValidator extends ConstraintValidator
             $sum += (($i % 2) === $oddLength) ? array_sum(str_split($digit * 2)) : $digit;
         }
 
-        if (($sum % 10) !== 0) {
+        if ($sum === 0 || ($sum % 10) !== 0) {
             $this->context->addViolation($constraint->message);
         }
     }

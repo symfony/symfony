@@ -63,6 +63,31 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private $compiler;
 
+    private $trackResources = true;
+
+    /**
+     * Sets the track resources flag.
+     *
+     * If you are not using the loaders and therefore don't want
+     * to depend on the Config component, set this flag to false.
+     *
+     * @param Boolean $track true if you want to track resources, false otherwise
+     */
+    public function setResourceTracking($track)
+    {
+        $this->trackResources = (Boolean) $track;
+    }
+
+    /**
+     * Checks if resources are tracked.
+     *
+     * @return Boolean true if resources are tracked, false otherwise
+     */
+    public function isTrackingResources()
+    {
+        return $this->trackResources;
+    }
+
     /**
      * Registers an extension.
      *
@@ -86,7 +111,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return ExtensionInterface An extension instance
      *
-     * @throws \LogicException if the extension is not registered
+     * @throws LogicException if the extension is not registered
      *
      * @api
      */
@@ -152,6 +177,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function addResource(ResourceInterface $resource)
     {
+        if (!$this->trackResources) {
+            return $this;
+        }
+
         $this->resources[] = $resource;
 
         return $this;
@@ -159,15 +188,19 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Sets the resources for this configuration.
-     * 
+     *
      * @param ResourceInterface[] $resources An array of resources
-     * 
+     *
      * @return ContainerBuilder The current instance
-     * 
+     *
      * @api
      */
     public function setResources(array $resources)
     {
+        if (!$this->trackResources) {
+            return $this;
+        }
+
         $this->resources = $resources;
 
         return $this;
@@ -184,6 +217,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function addObjectResource($object)
     {
+        if (!$this->trackResources) {
+            return $this;
+        }
+
         $parent = new \ReflectionObject($object);
         do {
             $this->addResource(new FileResource($parent->getFileName()));
@@ -311,7 +348,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
         if ($this->isFrozen()) {
-            throw new BadMethodCallException('Setting service on a frozen container is not allowed');
+            // setting a synthetic service on a frozen container is alright
+            if (!isset($this->definitions[$id]) || !$this->definitions[$id]->isSynthetic()) {
+                throw new BadMethodCallException('Setting service on a frozen container is not allowed');
+            }
         }
 
         $id = strtolower($id);
@@ -434,8 +474,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $this->addAliases($container->getAliases());
         $this->getParameterBag()->add($container->getParameterBag()->all());
 
-        foreach ($container->getResources() as $resource) {
-            $this->addResource($resource);
+        if ($this->trackResources) {
+            foreach ($container->getResources() as $resource) {
+                $this->addResource($resource);
+            }
         }
 
         foreach ($this->extensions as $name => $extension) {
@@ -466,6 +508,21 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Prepends a config array to the configs of the given extension.
+     *
+     * @param string $name    The name of the extension
+     * @param array  $config  The config to set
+     */
+    public function prependExtensionConfig($name, array $config)
+    {
+        if (!isset($this->extensionConfigs[$name])) {
+            $this->extensionConfigs[$name] = array();
+        }
+
+        array_unshift($this->extensionConfigs[$name], $config);
+    }
+
+    /**
      * Compiles the container.
      *
      * This method passes the container to compiler
@@ -487,8 +544,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $this->compiler = new Compiler();
         }
 
-        foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
-            $this->addObjectResource($pass);
+        if ($this->trackResources) {
+            foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
+                $this->addObjectResource($pass);
+            }
         }
 
         $this->compiler->compile($this);
@@ -541,8 +600,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string        $alias The alias to create
      * @param string|Alias  $id    The service to alias
      *
-     * @throws \InvalidArgumentException if the id is not a string or an Alias
-     * @throws \InvalidArgumentException if the alias is for itself
+     * @throws InvalidArgumentException if the id is not a string or an Alias
+     * @throws InvalidArgumentException if the alias is for itself
      *
      * @api
      */
@@ -775,19 +834,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @throws RuntimeException When the scope is inactive
      * @throws RuntimeException When the factory definition is incomplete
+     * @throws RuntimeException When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
      */
     private function createService(Definition $definition, $id)
     {
+        if ($definition->isSynthetic()) {
+            throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The DIC does not know how to construct this service.', $id));
+        }
+
         $parameterBag = $this->getParameterBag();
 
         if (null !== $definition->getFile()) {
             require_once $parameterBag->resolveValue($definition->getFile());
         }
 
-        $arguments = $this->resolveServices(
-            $parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments()))
-        );
+        $arguments = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())));
 
         if (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryClass()) {

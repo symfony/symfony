@@ -295,7 +295,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
     public function testDefaultRequirementOfVariableDisallowsSlash()
     {
@@ -307,7 +307,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
     public function testDefaultRequirementOfVariableDisallowsNextSeparator()
     {
@@ -319,7 +319,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
     public function testSchemeRequirement()
     {
@@ -338,7 +338,23 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar%23', '_route' => 'foo'), $matcher->match('/foo/bar%2523'));
     }
 
-    public function testWithHostname()
+    public function testCannotRelyOnPrefix()
+    {
+        $coll = new RouteCollection();
+
+        $subColl = new RouteCollection();
+        $subColl->add('bar', new Route('/bar'));
+        $subColl->addPrefix('/prefix');
+        // overwrite the pattern, so the prefix is not valid anymore for this route in the collection
+        $subColl->get('bar')->setPattern('/new');
+
+        $coll->addCollection($subColl);
+
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $this->assertEquals(array('_route' => 'bar'), $matcher->match('/new'));
+    }
+
+    public function testWithHost()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}', array(), array(), array(), '{locale}.example.com'));
@@ -347,12 +363,12 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar', '_route' => 'foo', 'locale' => 'en'), $matcher->match('/foo/bar'));
     }
 
-    public function testWithHostnameOnRouteCollection()
+    public function testWithHostOnRouteCollection()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}'));
         $coll->add('bar', new Route('/bar/{foo}', array(), array(), array(), '{locale}.example.net'));
-        $coll->setHostnamePattern('{locale}.example.com');
+        $coll->setHost('{locale}.example.com');
 
         $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'));
         $this->assertEquals(array('foo' => 'bar', '_route' => 'foo', 'locale' => 'en'), $matcher->match('/foo/bar'));
@@ -362,9 +378,9 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
-    public function testWithOutHostnameHostnameDoesNotMatch()
+    public function testWithOutHostHostDoesNotMatch()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}', array(), array(), array(), '{locale}.example.com'));

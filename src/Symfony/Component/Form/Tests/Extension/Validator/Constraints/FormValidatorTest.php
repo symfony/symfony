@@ -12,13 +12,11 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Constraints;
 
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\Constraints\FormValidator;
-use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;

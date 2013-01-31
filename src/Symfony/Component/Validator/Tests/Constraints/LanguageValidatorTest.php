@@ -51,7 +51,7 @@ class LanguageValidatorTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
     public function testExpectsStringCompatibleType()
     {

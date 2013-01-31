@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests;
 
 use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryAdapter;
 use Symfony\Component\Validator\ValidatorContext;
 
@@ -21,12 +22,25 @@ class ValidatorContextTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
+
         $this->context = new ValidatorContext();
     }
 
     protected function tearDown()
     {
+        restore_error_handler();
+
         $this->context = null;
+    }
+
+    public function deprecationErrorHandler($errorNumber, $message, $file, $line, $context)
+    {
+        if ($errorNumber & E_USER_DEPRECATED) {
+            return true;
+        }
+
+        return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
     }
 
     public function testSetClassMetadataFactory()
@@ -57,6 +71,6 @@ class ValidatorContextTest extends \PHPUnit_Framework_TestCase
             ->setConstraintValidatorFactory($validatorFactory)
             ->getValidator();
 
-        $this->assertEquals(new Validator(new ClassMetadataFactoryAdapter($metadataFactory), $validatorFactory), $validator);
+        $this->assertEquals(new Validator(new ClassMetadataFactoryAdapter($metadataFactory), $validatorFactory, new DefaultTranslator()), $validator);
     }
 }

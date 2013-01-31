@@ -184,6 +184,23 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($source, $this->encoder->encode($obj, 'xml'));
     }
 
+    public function testEncodeSerializerXmlRootNodeNameOption()
+    {
+        $options = array('xml_root_node_name' => 'test');
+        $this->encoder = new XmlEncoder;
+        $serializer = new Serializer(array(), array('xml' => new XmlEncoder()));
+        $this->encoder->setSerializer($serializer);
+
+        $array = array(
+            'person' => array('@gender' => 'M', '#' => 'Peter'),
+        );
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<test><person gender="M">Peter</person></test>'."\n";
+
+        $this->assertEquals($expected, $serializer->serialize($array, 'xml', $options));
+    }
+
     public function testDecode()
     {
         $source = $this->getXmlSource();
@@ -249,6 +266,39 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+    }
+
+    public function testDecodeWithoutItemHash()
+    {
+        $obj = new ScalarDummy;
+        $obj->xmlFoo = array(
+            'foo-bar' => array(
+                '@key' => "value",
+                'item' => array("@key" => 'key', "key-val" => 'val')
+            ),
+            'Foo' => array(
+                'Bar' => "Test",
+                '@Type' => 'test'
+            ),
+            'föo_bär' => 'a',
+            "Bar" => array(1,2,3),
+            'a' => 'b',
+        );
+        $expected = array(
+            'foo-bar' => array(
+                '@key' => "value",
+                'key' => array('@key' => 'key', "key-val" => 'val')
+            ),
+            'Foo' => array(
+                'Bar' => "Test",
+                '@Type' => 'test'
+            ),
+            'föo_bär' => 'a',
+            "Bar" => array(1,2,3),
+            'a' => 'b',
+        );
+        $xml = $this->encoder->encode($obj, 'xml');
+        $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
     }
 
     public function testPreventsComplexExternalEntities()

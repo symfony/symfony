@@ -2,7 +2,7 @@
 
 {% block body %}
 
-    {% render 'web_profiler.controller.profiler:toolbarAction' with { 'token': token, 'position': 'normal' } %}
+    {{ render(path('_wdt', { 'token': token, 'position': 'normal' })) }}
 
     <div id="content">
         {% include '@WebProfiler/Profiler/header.html.twig' only %}
@@ -13,7 +13,7 @@
                 <div id="collector-wrapper">
                     {% if profile %}
                         <div id="resume">
-                            <a id="resume-view-all" href="{{ path('_profiler_search', {limit: 10}) }}">View all</a>
+                            <a id="resume-view-all" href="{{ path('_profiler_search', {limit: 10}) }}">View last 10</a>
                             <strong>Profile for:</strong>
                             {{ profile.method|upper }}
                             {% if profile.method|upper in ['GET', 'HEAD'] %}
@@ -53,7 +53,7 @@
                             </li>
                         </ul>
                     {% endif %}
-                    {% render 'web_profiler.controller.profiler:searchBarAction' %}
+                    {{ render(path('_profiler_search_bar')) }}
                     {% include '@WebProfiler/Profiler/admin.html.twig' with { 'token': token } only %}
                 </div>
             </div>
@@ -107,6 +107,10 @@
         }
 
         window.setTimeout(function() {
+            if (document.getElementById('menu-profiler') == null) {
+                return;
+            }
+
             var menuItems = document.getElementById('menu-profiler').getElementsByTagName('LI'),
                 elem, value, child, displayState = Sfjs.getPreference('menu/displayState');
 

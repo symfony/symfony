@@ -85,6 +85,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $this->rootDir = $this->getRootDir();
         $this->name = $this->getName();
         $this->classes = array();
+        $this->bundles = array();
 
         if ($this->debug) {
             $this->startTime = microtime(true);
@@ -95,17 +96,18 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     public function init()
     {
+        ini_set('display_errors', 0);
+
         if ($this->debug) {
-            ini_set('display_errors', 1);
             error_reporting(-1);
 
             DebugClassLoader::enable();
             ErrorHandler::register($this->errorReportingLevel);
             if ('cli' !== php_sapi_name()) {
                 ExceptionHandler::register();
+            } else {
+                ini_set('display_errors', 1);
             }
-        } else {
-            ini_set('display_errors', 0);
         }
     }
 
@@ -207,7 +209,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     * 
+     *
      * @api
      */
     public function getBundles()
@@ -618,6 +620,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * Builds the service container.
      *
      * @return ContainerBuilder The compiled service container
+     *
+     * @throws \RuntimeException
      */
     protected function buildContainer()
     {
@@ -729,17 +733,26 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             return $source;
         }
 
+        $rawChunk = '';
         $output = '';
-        foreach (token_get_all($source) as $token) {
+        $tokens = token_get_all($source);
+        for (reset($tokens); false !== $token = current($tokens); next($tokens)) {
             if (is_string($token)) {
-                $output .= $token;
+                $rawChunk .= $token;
+            } elseif (T_START_HEREDOC === $token[0]) {
+                $output .= preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $rawChunk) . $token[1];
+                do {
+                    $token = next($tokens);
+                    $output .= $token[1];
+                } while ($token[0] !== T_END_HEREDOC);
+                $rawChunk = '';
             } elseif (!in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
-                $output .= $token[1];
+                $rawChunk .= $token[1];
             }
         }
 
         // replace multiple new lines with a single newline
-        $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
+        $output .= preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $rawChunk);
 
         return $output;
     }

@@ -4,12 +4,23 @@ CHANGELOG
 2.2.0
 -----
 
+ * added a new `uri_signer` service to help sign URIs
+ * deprecated `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` and `Symfony\Bundle\FrameworkBundle\HttpKernel::forward()`
+ * deprecated the `Symfony\Bundle\FrameworkBundle\HttpKernel` class in favor of `Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel`
+ * added support for adding new HTTP content rendering strategies (like ESI and Hinclude)
+   in the DIC via the `kernel.content_renderer_strategy` tag
+ * [BC BREAK] restricted the `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` method to only accept URIs or ControllerReference instances
+   * `Symfony\Bundle\FrameworkBundle\HttpKernel::render()` method signature changed and the first argument
+     must now be a URI or a ControllerReference instance (the `generateInternalUri()` method was removed)
+   * The internal routes (`Resources/config/routing/internal.xml`) have been removed and replaced with a listener (`Symfony\Component\HttpKernel\EventListener\RouterProxyListener`)
+   * The `render` method of the `actions` templating helper signature and arguments changed
  * replaced Symfony\Bundle\FrameworkBundle\Controller\TraceableControllerResolver by Symfony\Component\HttpKernel\Controller\TraceableControllerResolver
  * replaced Symfony\Component\HttpKernel\Debug\ContainerAwareTraceableEventDispatcher by Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher
  * added Client::enableProfiler()
  * A new parameter has been added to the DIC: `router.request_context.base_url`
    You can customize it for your functional tests or for generating urls with
    the right base url when your are in the cli context.
+ * Added support for default templates per render tag
 
 2.1.0
 -----

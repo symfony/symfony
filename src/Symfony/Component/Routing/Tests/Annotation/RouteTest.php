@@ -36,11 +36,14 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     {
         return array(
            array('value', '/Blog', 'getPattern'),
+           array('value', '/Blog', 'getPath'),
            array('requirements', array('_method' => 'GET'), 'getRequirements'),
            array('options', array('compiler_class' => 'RouteCompiler'), 'getOptions'),
            array('name', 'blog_index', 'getName'),
            array('defaults', array('_controller' => 'MyBlogBundle:Blog:index'), 'getDefaults'),
-           array('hostname_pattern', array('{locale}.example.com'), 'getHostnamePattern')
+           array('schemes', array('https'), 'getSchemes'),
+           array('methods', array('GET', 'POST'), 'getMethods'),
+           array('host', array('{locale}.example.com'), 'getHost')
         );
     }
 }

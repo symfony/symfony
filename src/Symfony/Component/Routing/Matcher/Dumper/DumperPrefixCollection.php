@@ -49,6 +49,8 @@ class DumperPrefixCollection extends DumperCollection
      * @param DumperRoute $route The route
      *
      * @return DumperPrefixCollection The node the route was added to
+     *
+     * @throws \LogicException
      */
     public function addPrefixRoute(DumperRoute $route)
     {

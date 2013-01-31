@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\HttpKernel\Exception\FatalErrorException;
+use Psr\Log\LoggerInterface;
 
 /**
  * ErrorHandler.
@@ -20,6 +21,8 @@ use Symfony\Component\HttpKernel\Exception\FatalErrorException;
  */
 class ErrorHandler
 {
+    const TYPE_DEPRECATION = -100;
+
     private $levels = array(
         E_WARNING           => 'Warning',
         E_NOTICE            => 'Notice',
@@ -39,6 +42,9 @@ class ErrorHandler
     private $level;
 
     private $reservedMemory;
+
+    /** @var LoggerInterface */
+    private static $logger;
 
     /**
      * Register the error handler.
@@ -64,6 +70,11 @@ class ErrorHandler
         $this->level = null === $level ? error_reporting() : $level;
     }
 
+    public static function setLogger(LoggerInterface $logger)
+    {
+        self::$logger = $logger;
+    }
+
     /**
      * @throws \ErrorException When error_reporting returns error
      */
@@ -71,6 +82,16 @@ class ErrorHandler
     {
         if (0 === $this->level) {
             return false;
+        }
+
+        if ($level & (E_USER_DEPRECATED | E_DEPRECATED)) {
+            if (null !== self::$logger) {
+                $stack = version_compare(PHP_VERSION, '5.4', '<') ? array_slice(debug_backtrace(false), 0, 10) : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+
+                self::$logger->warning($message, array('type' => self::TYPE_DEPRECATION, 'stack' => $stack));
+            }
+
+            return true;
         }
 
         if (error_reporting() & $level && $this->level & $level) {

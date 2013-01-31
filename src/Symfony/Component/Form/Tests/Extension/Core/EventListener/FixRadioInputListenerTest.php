@@ -41,7 +41,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
     public function testFixRadio()
     {
         $data = '1';
-        $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = new FormEvent($form, $data);
 
         $this->listener->preBind($event);
@@ -52,7 +52,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
     public function testFixZero()
     {
         $data = '0';
-        $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = new FormEvent($form, $data);
 
         $this->listener->preBind($event);
@@ -63,7 +63,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
     public function testIgnoreEmptyString()
     {
         $data = '';
-        $form = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = new FormEvent($form, $data);
 
         $this->listener->preBind($event);

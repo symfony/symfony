@@ -50,6 +50,8 @@ class InMemoryUserProvider implements UserProviderInterface
      * Adds a new User to the provider.
      *
      * @param UserInterface $user A UserInterface instance
+     *
+     * @throws \LogicException
      */
     public function createUser(UserInterface $user)
     {
@@ -66,7 +68,10 @@ class InMemoryUserProvider implements UserProviderInterface
     public function loadUserByUsername($username)
     {
         if (!isset($this->users[strtolower($username)])) {
-            throw new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $username));
+            $ex = new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $username));
+            $ex->setUsername($username);
+
+            throw $ex;
         }
 
         $user = $this->users[strtolower($username)];

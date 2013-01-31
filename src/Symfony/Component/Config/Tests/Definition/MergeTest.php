@@ -16,7 +16,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 class MergeTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException
+     * @expectedException \Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException
      */
     public function testForbiddenOverwrite()
     {
@@ -92,7 +92,7 @@ class MergeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testDoesNotAllowNewKeysInSubsequentConfigs()
     {

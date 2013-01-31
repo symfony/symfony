@@ -25,6 +25,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilder
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtractorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\HttpRenderingStrategyPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Scope;
@@ -40,8 +41,10 @@ class FrameworkBundle extends Bundle
 {
     public function boot()
     {
-        if ($this->container->getParameter('kernel.trust_proxy_headers')) {
-            Request::trustProxyData();
+        if ($trustedProxies = $this->container->getParameter('kernel.trusted_proxies')) {
+            Request::setTrustedProxies($trustedProxies);
+        } elseif ($this->container->getParameter('kernel.trust_proxy_headers')) {
+            Request::trustProxyData(); // @deprecated, to be removed in 2.3
         }
     }
 
@@ -63,6 +66,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddCacheClearerPass());
         $container->addCompilerPass(new TranslationExtractorPass());
         $container->addCompilerPass(new TranslationDumperPass());
+        $container->addCompilerPass(new HttpRenderingStrategyPass(), PassConfig::TYPE_AFTER_REMOVING);
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);

@@ -21,12 +21,12 @@ class Entity extends EntityParent implements EntityInterface
 {
     /**
      * @Assert\NotNull
-     * @Assert\Min(3)
-     * @Assert\All({@Assert\NotNull, @Assert\Min(3)}),
-     * @Assert\All(constraints={@Assert\NotNull, @Assert\Min(3)})
+     * @Assert\Range(min=3)
+     * @Assert\All({@Assert\NotNull, @Assert\Range(min=3)}),
+     * @Assert\All(constraints={@Assert\NotNull, @Assert\Range(min=3)})
      * @Assert\Collection(fields={
-     *   "foo" = {@Assert\NotNull, @Assert\Min(3)},
-     *   "bar" = @Assert\Min(5)
+     *   "foo" = {@Assert\NotNull, @Assert\Range(min=3)},
+     *   "bar" = @Assert\Range(min=5)
      * })
      * @Assert\Choice(choices={"A", "B"}, message="Must be one of %choices%")
      */

@@ -15,14 +15,14 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
+use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Constraint;
 
 class ValidatorTypeGuesser implements FormTypeGuesserInterface
 {
     private $metadataFactory;
 
-    public function __construct(ClassMetadataFactoryInterface $metadataFactory)
+    public function __construct(MetadataFactoryInterface $metadataFactory)
     {
         $this->metadataFactory = $metadataFactory;
     }
@@ -70,6 +70,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessMinLength($class, $property)
     {
+        trigger_error('guessMinLength() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
     }
 
     /**
@@ -164,12 +165,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\MinCount':
             case 'Symfony\Component\Validator\Constraints\MaxCount':
                 return new TypeGuess('collection', array(), Guess::LOW_CONFIDENCE);
-
-            case 'Symfony\Component\Validator\Constraints\Time':
-                return new TypeGuess('time', array('input'=>'string'), Guess::HIGH_CONFIDENCE);
-
-            case 'Symfony\Component\Validator\Constraints\Url':
-                return new TypeGuess('url', array(), Guess::HIGH_CONFIDENCE);
 
             case 'Symfony\Component\Validator\Constraints\True':
             case 'Symfony\Component\Validator\Constraints\False':
@@ -274,7 +269,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     protected function guess($class, $property, \Closure $closure, $defaultValue = null)
     {
         $guesses = array();
-        $classMetadata = $this->metadataFactory->getClassMetadata($class);
+        $classMetadata = $this->metadataFactory->getMetadataFor($class);
 
         if ($classMetadata->hasMemberMetadatas($property)) {
             $memberMetadatas = $classMetadata->getMemberMetadatas($property);

@@ -135,6 +135,7 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\HttpFoundation\Session\Flash\FlashBag::count
+     * @expectedException \PHPUnit_Framework_Error_Deprecated
      */
     public function testCount()
     {
@@ -163,6 +164,6 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals(count($flashes), $i);
-        $this->assertEquals(0, count($this->bag));
+        $this->assertEquals(0, count($this->bag->all()));
     }
 }

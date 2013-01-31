@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Symfony\Component\Console\Tests\Formatter;
 
 use Symfony\Component\Console\Formatter\OutputFormatter;
@@ -71,6 +70,26 @@ class FormatterStyleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             "\033[37;41msome \033[0m\033[32msome info\033[0m\033[37;41m error\033[0m",
             $formatter->format('<error>some <info>some info</info> error</error>')
+        );
+    }
+
+    public function testStyleMatchingNotGreedy()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertEquals(
+            "(\033[32m>=2.0,<2.3\033[0m)",
+            $formatter->format('(<info>>=2.0,<2.3</info>)')
+        );
+    }
+
+    public function testStyleEscaping()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertEquals(
+            "(\033[32mz>=2.0,<a2.3\033[0m)",
+            $formatter->format('(<info>'.$formatter->escape('z>=2.0,<a2.3').'</info>)')
         );
     }
 

@@ -100,10 +100,48 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
     {
         $this->setMaxRunningTime(1);
 
-        for ($i = 0; $i < 20; ++$i) {
+        for ($i = 0; $i < 40; ++$i) {
             $form = $this->factory->create('entity', null, array(
                 'class' => self::ENTITY_CLASS,
             ));
+
+            // force loading of the choice list
+            $form->createView();
+        }
+    }
+
+    /**
+     * @group benchmark
+     */
+    public function testCollapsedEntityFieldWithChoices()
+    {
+        $choices = $this->em->createQuery('SELECT c FROM ' . self::ENTITY_CLASS . ' c')->getResult();
+        $this->setMaxRunningTime(1);
+
+        for ($i = 0; $i < 40; ++$i) {
+            $form = $this->factory->create('entity', null, array(
+                'class' => self::ENTITY_CLASS,
+                'choices' => $choices,
+            ));
+
+            // force loading of the choice list
+            $form->createView();
+        }
+    }
+
+    /**
+     * @group benchmark
+     */
+    public function testCollapsedEntityFieldWithPreferredChoices()
+    {
+        $choices = $this->em->createQuery('SELECT c FROM ' . self::ENTITY_CLASS . ' c')->getResult();
+        $this->setMaxRunningTime(1);
+
+        for ($i = 0; $i < 40; ++$i) {
+            $form = $this->factory->create('entity', null, array(
+                    'class' => self::ENTITY_CLASS,
+                    'preferred_choices' => $choices,
+                ));
 
             // force loading of the choice list
             $form->createView();

@@ -59,11 +59,11 @@ abstract class AbstractFindAdapter extends AbstractAdapter
             $find->add('-follow');
         }
 
-        $find->add('-mindepth')->add($this->minDepth+1);
+        $find->add('-mindepth')->add($this->minDepth + 1);
         // warning! INF < INF => true ; INF == INF => false ; INF === INF => true
         // https://bugs.php.net/bug.php?id=9118
         if (INF !== $this->maxDepth) {
-            $find->add('-maxdepth')->add($this->maxDepth+1);
+            $find->add('-maxdepth')->add($this->maxDepth + 1);
         }
 
         if (Iterator\FileTypeFilterIterator::ONLY_DIRECTORIES === $this->mode) {
@@ -118,13 +118,14 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function isSupported()
+    protected function canBeUsed()
     {
         return $this->shell->testCommand('find');
     }
 
     /**
      * @param Command $command
+     * @param string  $dir
      *
      * @return Command
      */
@@ -140,7 +141,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     /**
      * @param Command  $command
      * @param string[] $names
-     * @param bool     $not
+     * @param Boolean  $not
      */
     private function buildNamesFiltering(Command $command, array $names, $not = false)
     {
@@ -183,8 +184,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
      * @param Command  $command
      * @param string   $dir
      * @param string[] $paths
-     * @param bool     $not
-     * @return void
+     * @param Boolean  $not
      */
     private function buildPathsFiltering(Command $command, $dir, array $paths, $not = false)
     {
@@ -226,33 +226,23 @@ abstract class AbstractFindAdapter extends AbstractAdapter
         foreach ($sizes as $i => $size) {
             $command->add($i > 0 ? '-and' : null);
 
-            if ('<=' === $size->getOperator()) {
-                $command->add('-size -'.($size->getTarget()+1).'c');
-                continue;
+            switch ($size->getOperator()) {
+                case '<=':
+                    $command->add('-size -' . ($size->getTarget() + 1) . 'c');
+                    break;
+                case '>=':
+                    $command->add('-size +'. ($size->getTarget() - 1) . 'c');
+                    break;
+                case '>':
+                    $command->add('-size +' . $size->getTarget() . 'c');
+                    break;
+                case '!=':
+                    $command->add('-size -' . $size->getTarget() . 'c');
+                    $command->add('-size +' . $size->getTarget() . 'c');
+                case '<':
+                default:
+                    $command->add('-size -' . $size->getTarget() . 'c');
             }
-
-            if ('<' === $size->getOperator()) {
-                $command->add('-size -'.$size->getTarget().'c');
-                continue;
-            }
-
-            if ('>=' === $size->getOperator()) {
-                $command->add('-size +'.($size->getTarget()-1).'c');
-                continue;
-            }
-
-            if ('>' === $size->getOperator()) {
-                $command->add('-size +'.$size->getTarget().'c');
-                continue;
-            }
-
-            if ('!=' === $size->getOperator()) {
-                $command->add('-size -'.$size->getTarget().'c');
-                $command->add('-size +'.$size->getTarget().'c');
-                continue;
-            }
-
-            $command->add('-size '.$size->getTarget().'c');
         }
     }
 
@@ -265,7 +255,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
         foreach ($dates as $i => $date) {
             $command->add($i > 0 ? '-and' : null);
 
-            $mins = (int) round((time()-$date->getTarget())/60);
+            $mins = (int) round((time()-$date->getTarget()) / 60);
 
             if (0 > $mins) {
                 // mtime is in the future
@@ -274,87 +264,47 @@ abstract class AbstractFindAdapter extends AbstractAdapter
                 return;
             }
 
-            if ('<=' === $date->getOperator()) {
-                $command->add('-mmin +'.($mins-1));
-                continue;
+            switch ($date->getOperator()) {
+                case '<=':
+                    $command->add('-mmin +' . ($mins - 1));
+                    break;
+                case '>=':
+                    $command->add('-mmin -' . ($mins + 1));
+                    break;
+                case '>':
+                    $command->add('-mmin -' . $mins);
+                    break;
+                case '!=':
+                    $command->add('-mmin +' . $mins.' -or -mmin -' . $mins);
+                    break;
+                case '<':
+                default:
+                    $command->add('-mmin +' . $mins);
             }
-
-            if ('<' === $date->getOperator()) {
-                $command->add('-mmin +'.$mins);
-                continue;
-            }
-
-            if ('>=' === $date->getOperator()) {
-                $command->add('-mmin -'.($mins+1));
-                continue;
-            }
-
-            if ('>' === $date->getOperator()) {
-                $command->add('-mmin -'.$mins);
-                continue;
-            }
-
-            if ('!=' === $date->getOperator()) {
-                $command->add('-mmin +'.$mins.' -or -mmin -'.$mins);
-                continue;
-            }
-
-            $command->add('-mmin '.$mins);
         }
     }
 
     /**
      * @param Command $command
-     * @param array   $contains
-     * @param bool    $not
-     */
-    private function buildContentFiltering(Command $command, array $contains, $not = false)
-    {
-        foreach ($contains as $contain) {
-            $expr = Expression::create($contain);
-
-            // todo: avoid forking process for each $pattern by using multiple -e options
-            $command
-                ->add('| xargs -r grep -I')
-                ->add($expr->isCaseSensitive() ? null : '-i')
-                ->add($not ? '-L' : '-l')
-                ->add('-Ee')->arg($expr->renderPattern());
-        }
-    }
-
-    /**
-     * @param \Symfony\Component\Finder\Shell\Command $command
-     * @param string        $sort
+     * @param string  $sort
+     *
      * @throws \InvalidArgumentException
      */
     private function buildSorting(Command $command, $sort)
     {
-        switch ($sort) {
-            case SortableIterator::SORT_BY_NAME:
-                $command->ins('sort')->add('| sort');
-                return;
-            case SortableIterator::SORT_BY_TYPE:
-                $format = '%y';
-                break;
-            case SortableIterator::SORT_BY_ACCESSED_TIME:
-                $format = '%A@';
-                break;
-            case SortableIterator::SORT_BY_CHANGED_TIME:
-                $format = '%C@';
-                break;
-            case SortableIterator::SORT_BY_MODIFIED_TIME:
-                $format = '%T@';
-                break;
-            default:
-                throw new \InvalidArgumentException('Unknown sort options: '.$sort.'.');
-        }
-
-        $this->buildFormatSorting($command, $format);
+        $this->buildFormatSorting($command, $sort);
     }
 
     /**
      * @param Command $command
-     * @param string  $format
+     * @param string  $sort
      */
-    abstract protected function buildFormatSorting(Command $command, $format);
+    abstract protected function buildFormatSorting(Command $command, $sort);
+
+    /**
+     * @param Command $command
+     * @param array   $contains
+     * @param Boolean $not
+     */
+    abstract protected function buildContentFiltering(Command $command, array $contains, $not = false);
 }

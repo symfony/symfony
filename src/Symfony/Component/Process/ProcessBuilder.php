@@ -48,10 +48,24 @@ class ProcessBuilder
      * Adds an unescaped argument to the command string.
      *
      * @param string $argument A command argument
+     *
+     * @return ProcessBuilder
      */
     public function add($argument)
     {
         $this->arguments[] = $argument;
+
+        return $this;
+    }
+
+    /**
+     * @param array $arguments
+     *
+     * @return ProcessBuilder
+     */
+    public function setArguments(array $arguments)
+    {
+        $this->arguments = $arguments;
 
         return $this;
     }
@@ -90,6 +104,10 @@ class ProcessBuilder
      * To disable the timeout, set this value to null.
      *
      * @param integer|null
+     *
+     * @return ProcessBuilder
+     *
+     * @throws InvalidArgumentException
      */
     public function setTimeout($timeout)
     {

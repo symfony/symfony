@@ -22,22 +22,12 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    private $debug;
-
-    /**
-     * Constructor
-     *
-     * @param Boolean $debug Whether to use the debug mode
-     */
-    public function  __construct($debug)
-    {
-        $this->debug = (Boolean) $debug;
-    }
-
     /**
      * Generates the configuration tree builder.
      *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     * @return TreeBuilder The tree builder
+     *
+     * @throws \RuntimeException When using the deprecated 'charset' setting
      */
     public function getConfigTreeBuilder()
     {
@@ -54,15 +44,27 @@ class Configuration implements ConfigurationInterface
                             $message = 'The charset setting is deprecated. Just remove it from your configuration file.';
 
                             if ('UTF-8' !== $v) {
-                                $message .= sprintf(' You need to define a getCharset() method in your Application Kernel class that returns "%s".', $v);
+                                $message .= sprintf('You need to define a getCharset() method in your Application Kernel class that returns "%s".', $v);
                             }
 
                             throw new \RuntimeException($message);
                         })
                     ->end()
                 ->end()
-                ->scalarNode('trust_proxy_headers')->defaultFalse()->end()
                 ->scalarNode('secret')->end()
+                ->scalarNode('trust_proxy_headers')->defaultFalse()->end() // @deprecated, to be removed in 2.3
+                ->arrayNode('trusted_proxies')
+                    ->beforeNormalization()
+                        ->ifTrue(function($v) { return !is_array($v) && !is_null($v); })
+                        ->then(function($v) { return is_bool($v) ? array() : preg_split('/\s*,\s*/', $v); })
+                    ->end()
+                    ->prototype('scalar')
+                        ->validate()
+                            ->ifTrue(function($v) { return !empty($v) && !filter_var($v, FILTER_VALIDATE_IP); })
+                            ->thenInvalid('Invalid proxy IP "%s"')
+                        ->end()
+                    ->end()
+                ->end()
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()
@@ -71,6 +73,7 @@ class Configuration implements ConfigurationInterface
 
         $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
+        $this->addRouterProxySection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
@@ -88,10 +91,10 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('form')
                     ->info('form configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                 ->end()
                 ->arrayNode('csrf_protection')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->children()
                         ->scalarNode('field_name')->defaultValue('_token')->end()
                     ->end()
@@ -106,7 +109,22 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('esi')
                     ->info('esi configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addRouterProxySection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('router_proxy')
+                    ->info('proxy configuration for the HTTP content renderer')
+                    ->canBeEnabled()
+                    ->children()
+                        ->scalarNode('path')->defaultValue('/_proxy')->end()
+                    ->end()
                 ->end()
             ->end()
         ;
@@ -118,7 +136,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('profiler')
                     ->info('profiler configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->children()
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_master_requests')->defaultFalse()->end()
@@ -158,8 +176,10 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('https_port')->defaultValue(443)->end()
                         ->scalarNode('strict_requirements')
                             ->info(
-                                'set to false to disable exceptions when a route is '.
-                                'generated with invalid parameters (and return null instead)'
+                                "set to true to throw an exception when a parameter does not match the requirements\n".
+                                "set to false to disable exceptions when a parameter does not match the requirements (and return null instead)\n".
+                                "set to null to disable parameter checks against requirements\n".
+                                "'true' is the preferred configuration in development mode, while 'false' or 'null' might be preferred in production"
                             )
                             ->defaultTrue()
                         ->end()
@@ -179,7 +199,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode('auto_start')
                             ->info('DEPRECATED! Session starts on demand')
-                            ->defaultNull()
+                            ->defaultFalse()
                             ->beforeNormalization()
                                 ->ifTrue(function($v) { return null !== $v; })
                                 ->then(function($v) {
@@ -349,7 +369,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('translator')
                     ->info('translator configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->children()
                         ->scalarNode('fallback')->defaultValue('en')->end()
                     ->end()
@@ -364,10 +384,11 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('validation')
                     ->info('validation configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->children()
                         ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
+                        ->scalarNode('translation_domain')->defaultValue('validators')->end()
                     ->end()
                 ->end()
             ->end()
@@ -384,7 +405,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('cache')->defaultValue('file')->end()
                         ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
-                        ->booleanNode('debug')->defaultValue($this->debug)->end()
+                        ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                     ->end()
                 ->end()
             ->end()

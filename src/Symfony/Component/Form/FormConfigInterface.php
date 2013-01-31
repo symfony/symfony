@@ -35,7 +35,7 @@ interface FormConfigInterface
     /**
      * Returns the property path that the form should be mapped to.
      *
-     * @return null|Util\PropertyPathInterface The property path.
+     * @return null|\Symfony\Component\PropertyAccess\PropertyPathInterface The property path.
      */
     public function getPropertyPath();
 
@@ -191,6 +191,13 @@ interface FormConfigInterface
      * @return Boolean Whether the data is locked.
      */
     public function getDataLocked();
+
+    /**
+     * Returns the form factory used for creating new forms.
+     *
+     * @return FormFactoryInterface The form factory.
+     */
+    public function getFormFactory();
 
     /**
      * Returns all options passed during the construction of the form.

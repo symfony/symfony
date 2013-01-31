@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
@@ -40,6 +41,16 @@ class GraphWalker
     private $metadataFactory;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var null|string
+     */
+    private $translationDomain;
+
+    /**
      * @var array
      */
     private $validatedObjects;
@@ -49,14 +60,20 @@ class GraphWalker
      *
      * @param ValidationVisitor        $visitor
      * @param MetadataFactoryInterface $metadataFactory
+     * @param TranslatorInterface      $translator
+     * @param null|string              $translationDomain
      * @param array                    $validatedObjects
      *
      * @deprecated Deprecated since version 2.2, to be removed in 2.3.
      */
-    public function __construct(ValidationVisitor $visitor, MetadataFactoryInterface $metadataFactory, array &$validatedObjects = array())
+    public function __construct(ValidationVisitor $visitor, MetadataFactoryInterface $metadataFactory, TranslatorInterface $translator, $translationDomain = null, array &$validatedObjects = array())
     {
+        trigger_error('GraphWalker is deprecated since version 2.2 and will be removed in 2.3. This class has been replaced by ValidationVisitorInterface and MetadataInterface.', E_USER_DEPRECATED);
+
         $this->visitor = $visitor;
         $this->metadataFactory = $metadataFactory;
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
         $this->validatedObjects = &$validatedObjects;
     }
 
@@ -67,6 +84,8 @@ class GraphWalker
      */
     public function getViolations()
     {
+        trigger_error('getViolations() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         return $this->visitor->getViolations();
     }
 
@@ -83,6 +102,8 @@ class GraphWalker
      */
     public function walkObject(ClassMetadata $metadata, $object, $group, $propertyPath)
     {
+        trigger_error('walkObject() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         $hash = spl_object_hash($object);
 
         // Exit, if the object is already validated for the current group
@@ -118,6 +139,8 @@ class GraphWalker
      */
     public function walkProperty(ClassMetadata $metadata, $property, $object, $group, $propertyPath, $propagatedGroup = null)
     {
+        trigger_error('walkProperty() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         if (!is_object($object)) {
             throw new UnexpectedTypeException($object, 'object');
         }
@@ -140,6 +163,8 @@ class GraphWalker
      */
     public function walkPropertyValue(ClassMetadata $metadata, $property, $value, $group, $propertyPath)
     {
+        trigger_error('walkPropertyValue() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         foreach ($metadata->getMemberMetadatas($property) as $member) {
             $member->accept($this->visitor, $value, $group, $propertyPath);
         }
@@ -163,6 +188,8 @@ class GraphWalker
      */
     public function walkReference($value, $group, $propertyPath, $traverse, $deep = false)
     {
+        trigger_error('walkReference() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         $this->visitor->validate($value, $group, $propertyPath, $traverse, $deep);
     }
 
@@ -180,6 +207,8 @@ class GraphWalker
      */
     public function walkConstraint(Constraint $constraint, $value, $group, $propertyPath, $currentClass = null, $currentProperty = null)
     {
+        trigger_error('walkConstraint() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         $metadata = null;
 
         // BC code to make getCurrentClass() and getCurrentProperty() work when
@@ -194,6 +223,8 @@ class GraphWalker
 
         $context = new ExecutionContext(
             $this->visitor,
+            $this->translator,
+            $this->translationDomain,
             $metadata,
             $value,
             $group,

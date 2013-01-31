@@ -13,8 +13,8 @@ namespace Symfony\Bridge\Propel1\Tests\Fixtures;
 
 use PropelPDO;
 
-class TranslatableItemI18n implements \Persistent {
-
+class TranslatableItemI18n implements \Persistent
+{
     private $id;
 
     private $locale;
@@ -100,7 +100,6 @@ class TranslatableItemI18n implements \Persistent {
 
     public function getLocale()
     {
-
         return $this->locale;
     }
 
@@ -122,7 +121,6 @@ class TranslatableItemI18n implements \Persistent {
 
     public function getValue()
     {
-
         return $this->value;
     }
 
@@ -134,7 +132,6 @@ class TranslatableItemI18n implements \Persistent {
 
     public function getValue2()
     {
-
         return $this->value2;
     }
 }

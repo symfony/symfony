@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Collectionator\Tests\Constraints;
+namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Collection\Required;
@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints\Valid;
 class CollectionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testRejectInvalidFieldsOption()
     {
@@ -32,7 +32,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testRejectNonConstraints()
     {
@@ -42,7 +42,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testRejectValidConstraint()
     {
@@ -52,7 +52,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testRejectValidConstraintWithinOptional()
     {
@@ -62,7 +62,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testRejectValidConstraintWithinRequired()
     {

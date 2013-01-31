@@ -15,12 +15,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\HttpRenderingStrategyPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FragmentRendererPass;
 
-class HttpRenderingStrategyPassTest extends \PHPUnit_Framework_TestCase
+class FragmentRendererPassTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Tests that content rendering not implementing RenderingStrategyInterface
+     * Tests that content rendering not implementing FragmentRendererInterface
      * trigger an exception.
      *
      * @expectedException \InvalidArgumentException
@@ -42,7 +42,7 @@ class HttpRenderingStrategyPassTest extends \PHPUnit_Framework_TestCase
             ->method('hasDefinition')
             ->will($this->returnValue(true));
 
-        // We don't test kernel.content_renderer_strategy here
+        // We don't test kernel.fragment_renderer here
         $builder->expects($this->atLeastOnce())
             ->method('findTaggedServiceIds')
             ->will($this->returnValue($services));
@@ -51,7 +51,7 @@ class HttpRenderingStrategyPassTest extends \PHPUnit_Framework_TestCase
             ->method('getDefinition')
             ->will($this->returnValue($definition));
 
-        $pass = new HttpRenderingStrategyPass();
+        $pass = new FragmentRendererPass();
         $pass->process($builder);
     }
 
@@ -65,20 +65,20 @@ class HttpRenderingStrategyPassTest extends \PHPUnit_Framework_TestCase
         $renderer
             ->expects($this->once())
             ->method('addMethodCall')
-            ->with('addStrategy', array(new Reference('my_content_renderer')))
+            ->with('addRenderer', array(new Reference('my_content_renderer')))
         ;
 
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
         $definition->expects($this->atLeastOnce())
             ->method('getClass')
-            ->will($this->returnValue('Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\RenderingStrategyService'));
+            ->will($this->returnValue('Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\RendererService'));
 
         $builder = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $builder->expects($this->any())
             ->method('hasDefinition')
             ->will($this->returnValue(true));
 
-        // We don't test kernel.content_renderer_strategy here
+        // We don't test kernel.fragment_renderer here
         $builder->expects($this->atLeastOnce())
             ->method('findTaggedServiceIds')
             ->will($this->returnValue($services));
@@ -87,12 +87,12 @@ class HttpRenderingStrategyPassTest extends \PHPUnit_Framework_TestCase
             ->method('getDefinition')
             ->will($this->onConsecutiveCalls($renderer, $definition));
 
-        $pass = new HttpRenderingStrategyPass();
+        $pass = new FragmentRendererPass();
         $pass->process($builder);
     }
 }
 
-class RenderingStrategyService implements \Symfony\Component\HttpKernel\RenderingStrategy\RenderingStrategyInterface
+class RendererService implements \Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface
 {
     public function render($uri, Request $request = null, array $options = array())
     {

@@ -9,42 +9,42 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\RenderingStrategy;
+namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\EventListener\RouterProxyListener;
+use Symfony\Component\HttpKernel\EventListener\FragmentListener;
 
 /**
- * Adds the possibility to generate a proxy URI for a given Controller.
+ * Adds the possibility to generate a fragment URI for a given Controller.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class ProxyAwareRenderingStrategy implements RenderingStrategyInterface
+abstract class RoutableFragmentRenderer implements FragmentRendererInterface
 {
-    private $proxyPath = '/_proxy';
+    private $fragmentPath = '/_fragment';
 
     /**
-     * Sets the proxy path that triggers the proxy listener
+     * Sets the fragment path that triggers the fragment listener.
      *
      * @param string $path The path
      *
-     * @see RouterProxyListener
+     * @see FragmentListener
      */
-    public function setProxyPath($path)
+    public function setFragmentPath($path)
     {
-        $this->proxyPath = $path;
+        $this->fragmentPath = $path;
     }
 
     /**
-     * Generates a proxy URI for a given controller.
+     * Generates a fragment URI for a given controller.
      *
      * @param ControllerReference  $reference A ControllerReference instance
      * @param Request              $request    A Request instance
      *
-     * @return string A proxy URI
+     * @return string A fragment URI
      */
-    protected function generateProxyUri(ControllerReference $reference, Request $request)
+    protected function generateFragmentUri(ControllerReference $reference, Request $request)
     {
         if (!isset($reference->attributes['_format'])) {
             $reference->attributes['_format'] = $request->getRequestFormat();
@@ -54,6 +54,6 @@ abstract class ProxyAwareRenderingStrategy implements RenderingStrategyInterface
 
         $reference->query['_path'] = http_build_query($reference->attributes, '', '&');
 
-        return $request->getUriForPath($this->proxyPath.'?'.http_build_query($reference->query, '', '&'));
+        return $request->getUriForPath($this->fragmentPath.'?'.http_build_query($reference->query, '', '&'));
     }
 }

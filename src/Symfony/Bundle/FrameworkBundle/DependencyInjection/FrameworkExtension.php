@@ -41,7 +41,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('web.xml');
         $loader->load('services.xml');
-        $loader->load('content_generator.xml');
+        $loader->load('fragment_renderer.xml');
 
         // A translator must always be registered (as support is included by
         // default in the Form component). If disabled, an identity translator
@@ -92,7 +92,7 @@ class FrameworkExtension extends Extension
 
         $this->registerValidationConfiguration($config['validation'], $container, $loader);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
-        $this->registerRouterProxyConfiguration($config['router_proxy'], $container, $loader);
+        $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container);
 
@@ -166,9 +166,9 @@ class FrameworkExtension extends Extension
     /**
      * Loads the ESI configuration.
      *
-     * @param array            $config A proxy configuration array
+     * @param array            $config    An ESI configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader An XmlFileLoader instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
     private function registerEsiConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
@@ -180,20 +180,20 @@ class FrameworkExtension extends Extension
     }
 
     /**
-     * Loads the router proxy configuration.
+     * Loads the fragments configuration.
      *
-     * @param array            $config A proxy configuration array
+     * @param array            $config    A fragments configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader An XmlFileLoader instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
-    private function registerRouterProxyConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerFragmentsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
             return;
         }
 
-        $loader->load('proxy.xml');
-        $container->setParameter('http_content_renderer.proxy_path', $config['path']);
+        $loader->load('fragment_listener.xml');
+        $container->setParameter('fragment.path', $config['path']);
     }
 
     /**

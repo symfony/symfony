@@ -20,7 +20,7 @@ use Psr\Log\NullLogger as PsrNullLogger;
  *
  * @api
  */
-class NullLogger extends PsrNullLogger
+class NullLogger extends PsrNullLogger implements LoggerInterface
 {
     /**
      * @api

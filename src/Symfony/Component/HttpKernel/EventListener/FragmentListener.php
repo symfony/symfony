@@ -20,32 +20,35 @@ use Symfony\Component\HttpKernel\UriSigner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Proxies URIs when the current route name is "_proxy".
+ * Handles content fragments represented by special URIs.
+ *
+ * All URL paths starting with /_fragment are handled as
+ * content fragments by this listener.
  *
  * If the request does not come from a trusted IP, it throws an
  * AccessDeniedHttpException exception.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RouterProxyListener implements EventSubscriberInterface
+class FragmentListener implements EventSubscriberInterface
 {
     private $signer;
-    private $proxyPath;
+    private $fragmentPath;
 
     /**
      * Constructor.
      *
-     * @param UriSigner $signer    A UriSigner instance
-     * @param string    $proxyPath The path that triggers this listener
+     * @param UriSigner $signer       A UriSigner instance
+     * @param string    $fragmentPath The path that triggers this listener
      */
-    public function __construct(UriSigner $signer, $proxyPath = '/_proxy')
+    public function __construct(UriSigner $signer, $fragmentPath = '/_fragment')
     {
         $this->signer = $signer;
-        $this->proxyPath = $proxyPath;
+        $this->fragmentPath = $fragmentPath;
     }
 
     /**
-     * Fixes request attributes when the route is '_proxy'.
+     * Fixes request attributes when the path is '/_fragment'.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
      *
@@ -55,7 +58,7 @@ class RouterProxyListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if ($this->proxyPath !== rawurldecode($request->getPathInfo())) {
+        if ($this->fragmentPath !== rawurldecode($request->getPathInfo())) {
             return;
         }
 

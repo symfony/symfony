@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\RenderingStrategy;
+namespace Symfony\Bundle\FrameworkBundle\Fragment;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\UriSigner;
-use Symfony\Component\HttpKernel\RenderingStrategy\HIncludeRenderingStrategy;
+use Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer;
 
 /**
  * Implements the Hinclude rendering strategy.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ContainerAwareHIncludeRenderingStrategy extends HIncludeRenderingStrategy
+class ContainerAwareHIncludeFragmentRenderer extends HIncludeFragmentRenderer
 {
     private $container;
 

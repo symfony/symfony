@@ -73,7 +73,7 @@ class Configuration implements ConfigurationInterface
 
         $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
-        $this->addRouterProxySection($rootNode);
+        $this->addFragmentsSection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
@@ -115,15 +115,15 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addRouterProxySection(ArrayNodeDefinition $rootNode)
+    private function addFragmentsSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
             ->children()
-                ->arrayNode('router_proxy')
-                    ->info('proxy configuration for the HTTP content renderer')
+                ->arrayNode('fragments')
+                    ->info('fragments configuration')
                     ->canBeEnabled()
                     ->children()
-                        ->scalarNode('path')->defaultValue('/_proxy')->end()
+                        ->scalarNode('path')->defaultValue('/_fragment')->end()
                     ->end()
                 ->end()
             ->end()

@@ -61,4 +61,13 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue((bool) preg_match('/'.addSlashes(DIRECTORY_SEPARATOR).'php\.(exe|bat|cmd|com)$/i', $current), '::find() returns the executable php with suffixes');
         }
     }
+
+    public function testCreateAlwaysReturnsTheSameInstance()
+    {
+        $finder = PhpExecutableFinder::create();
+
+        $this->assertInstanceOf('Symfony\Component\Process\PhpExecutableFinder', $finder);
+
+        $this->assertSame($finder, PhpExecutableFinder::create());
+    }
 }

@@ -37,28 +37,28 @@ class FilePathsIteratorTest extends RealIteratorTestCase
             array(
                 $tmpDir,
                 array( // paths
-                    $tmpDir.DIRECTORY_SEPARATOR.'.git',
-                    $tmpDir.DIRECTORY_SEPARATOR.'test.py',
-                    $tmpDir.DIRECTORY_SEPARATOR.'foo',
-                    $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp',
-                    $tmpDir.DIRECTORY_SEPARATOR.'test.php',
-                    $tmpDir.DIRECTORY_SEPARATOR.'toto'
+                    $tmpDir.DIRECTORY_SEPARATOR.'.git' => $tmpDir.DIRECTORY_SEPARATOR.'.git',
+                    $tmpDir.DIRECTORY_SEPARATOR.'test.py' => $tmpDir.DIRECTORY_SEPARATOR.'test.py',
+                    $tmpDir.DIRECTORY_SEPARATOR.'foo' => $tmpDir.DIRECTORY_SEPARATOR.'foo',
+                    $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp' => $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp',
+                    $tmpDir.DIRECTORY_SEPARATOR.'test.php' => $tmpDir.DIRECTORY_SEPARATOR.'test.php',
+                    $tmpDir.DIRECTORY_SEPARATOR.'toto' => $tmpDir.DIRECTORY_SEPARATOR.'toto'
                 ),
                 array( // subPaths
-                    '',
-                    '',
-                    '',
-                    'foo',
-                    '',
-                    ''
+                    $tmpDir.DIRECTORY_SEPARATOR.'.git' => '',
+                    $tmpDir.DIRECTORY_SEPARATOR.'test.py' => '',
+                    $tmpDir.DIRECTORY_SEPARATOR.'foo' => '',
+                    $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp' => 'foo',
+                    $tmpDir.DIRECTORY_SEPARATOR.'test.php' => '',
+                    $tmpDir.DIRECTORY_SEPARATOR.'toto' => ''
                 ),
                 array( // subPathnames
-                    '.git',
-                    'test.py',
-                    'foo',
-                    'foo'.DIRECTORY_SEPARATOR.'bar.tmp',
-                    'test.php',
-                    'toto'
+                    $tmpDir.DIRECTORY_SEPARATOR.'.git' => '.git',
+                    $tmpDir.DIRECTORY_SEPARATOR.'test.py' => 'test.py',
+                    $tmpDir.DIRECTORY_SEPARATOR.'foo' => 'foo',
+                    $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp' => 'foo'.DIRECTORY_SEPARATOR.'bar.tmp',
+                    $tmpDir.DIRECTORY_SEPARATOR.'test.php' => 'test.php',
+                    $tmpDir.DIRECTORY_SEPARATOR.'toto' => 'toto'
                 ),
             ),
         );

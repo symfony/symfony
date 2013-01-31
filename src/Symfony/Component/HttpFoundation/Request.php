@@ -1309,6 +1309,9 @@ class Request
                     for ($i = 0, $max = count($codes); $i < $max; $i++) {
                         if ($i == 0) {
                             $lang = strtolower($codes[0]);
+                            if(!in_array($lang, $this->languages) {
+                                $this->languages[] = $lang;
+                            }
                         } else {
                             $lang .= '_'.strtoupper($codes[$i]);
                         }

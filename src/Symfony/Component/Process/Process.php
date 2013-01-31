@@ -136,8 +136,6 @@ class Process
             foreach ($env as $key => $value) {
                 $this->env[(binary) $key] = (binary) $value;
             }
-        } else {
-            $this->env = null;
         }
         $this->stdin = $stdin;
         $this->setTimeout($timeout);
@@ -340,15 +338,15 @@ class Process
      *
      * @return Process The new process
      *
-     * @throws \RuntimeException When process can't be launch or is stopped
-     * @throws \RuntimeException When process is already running
+     * @throws RuntimeException When process can't be launch or is stopped
+     * @throws RuntimeException When process is already running
      *
      * @see start()
      */
     public function restart($callback = null)
     {
         if ($this->isRunning()) {
-            throw new \RuntimeException('Process is already running');
+            throw new RuntimeException('Process is already running');
         }
 
         $process = clone $this;

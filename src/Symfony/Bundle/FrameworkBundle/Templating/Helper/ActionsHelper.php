@@ -48,7 +48,7 @@ class ActionsHelper extends Helper
     {
         $options = $this->handler->fixOptions($options);
 
-        $strategy = isset($options['strategy']) ? $options['strategy'] : 'default';
+        $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
         unset($options['strategy']);
 
         return $this->handler->render($uri, $strategy, $options);

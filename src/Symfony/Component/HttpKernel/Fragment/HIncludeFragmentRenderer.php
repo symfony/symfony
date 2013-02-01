@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\RenderingStrategy;
+namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\UriSigner;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HIncludeRenderingStrategy extends ProxyAwareRenderingStrategy
+class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 {
     protected $templating;
 
@@ -61,7 +61,7 @@ class HIncludeRenderingStrategy extends ProxyAwareRenderingStrategy
                 throw new \LogicException('You must use a proper URI when using the Hinclude rendering strategy or set a URL signer.');
             }
 
-            $uri = $this->signer->sign($this->generateProxyUri($uri, $request));
+            $uri = $this->signer->sign($this->generateFragmentUri($uri, $request));
         }
 
         $template = isset($options['default']) ? $options['default'] : $this->globalDefaultTemplate;

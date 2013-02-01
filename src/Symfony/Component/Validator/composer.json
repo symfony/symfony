@@ -26,8 +26,9 @@
         "symfony/config": "2.2.*"
     },
     "suggest": {
-        "doctrine/common": ">=2.1,<2.4-dev",
+        "doctrine/common": "~2.2",
         "symfony/http-foundation": "2.2.*",
+        "symfony/locale": "2.2.*",
         "symfony/yaml": "2.2.*",
         "symfony/config": "2.2.*"
     },

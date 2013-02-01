@@ -451,7 +451,7 @@ class InputDefinition
                     $default = '';
                 }
 
-                $multiple = $option->isMultiple() ? '<comment> (multiple values allowed)</comment>' : '';
+                $multiple = $option->isValueMultiple() ? '<comment> (multiple values allowed)</comment>' : '';
                 $description = str_replace("\n", "\n".str_repeat(' ', $max + 2), $option->getDescription());
 
                 $optionMax = $max - strlen($option->getName()) - 2;
@@ -507,7 +507,7 @@ class InputDefinition
             $optionXML->setAttribute('shortcut', $option->getShortcut() ? '-'.$option->getShortcut() : '');
             $optionXML->setAttribute('accept_value', $option->acceptValue() ? 1 : 0);
             $optionXML->setAttribute('is_value_required', $option->isValueRequired() ? 1 : 0);
-            $optionXML->setAttribute('is_multiple', $option->isMultiple() ? 1 : 0);
+            $optionXML->setAttribute('is_multiple', $option->isValueMultiple() ? 1 : 0);
             $optionXML->appendChild($descriptionXML = $dom->createElement('description'));
             $descriptionXML->appendChild($dom->createTextNode($option->getDescription()));
 

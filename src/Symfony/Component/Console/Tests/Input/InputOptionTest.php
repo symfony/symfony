@@ -107,9 +107,9 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
     public function testIsValueMultiple()
     {
         $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_MULTIPLE);
-        $this->assertTrue($option->isMultiple(), '->isMultiple() returns true if the option can be an array');
+        $this->assertTrue($option->isValueMultiple(), '->isValueMultiple() returns true if the option can be an array');
         $option = new InputOption('foo', null, InputOption::VALUE_NONE);
-        $this->assertFalse($option->isMultiple(), '->isValueMultiple() returns false if the option can not be an array');
+        $this->assertFalse($option->isValueMultiple(), '->isValueMultiple() returns false if the option can not be an array');
     }
 
     public function testGetDescription()

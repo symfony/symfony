@@ -4,7 +4,7 @@ CHANGELOG
 2.2.0
 -----
  * deprecated isArray() from both InputOption and InputArgument, replaced by
-   isMultiple().
+   isValueMultiple() and isMultiple().
  * deprecated InputOption::VALUE_IS_ARRAY in favor of InputOption::VALUE_MULTIPLE
  * deprecated InputArgument::IS_ARRAY in favor of InputArgument::MULTIPLE
  * added support for colorization on Windows via ConEmu

@@ -79,7 +79,7 @@ class InputOption
         $this->mode        = $mode;
         $this->description = $description;
 
-        if ($this->isMultiple() && !$this->acceptValue()) {
+        if ($this->isValueMultiple() && !$this->acceptValue()) {
             throw new \InvalidArgumentException('Impossible to have an option mode VALUE_IS_ARRAY if the option does not accept a value.');
         }
 
@@ -133,7 +133,7 @@ class InputOption
     /**
      * @return Boolean true if the option can have multiple values
      */
-    public function isMultiple()
+    public function isValueMultiple()
     {
         return (Boolean) (self::VALUE_MULTIPLE & $this->mode);
     }
@@ -141,13 +141,13 @@ class InputOption
     /**
      * @return Boolean true if the option can have multiple values
      *
-     * @deprecated since 2.2 to be removed in 3.0, use isMultiple() instead.
+     * @deprecated since 2.2 to be removed in 3.0, use isValueMultiple() instead.
      */
     public function isArray()
     {
-        trigger_error('isArray() is deprecated since version 2.2 and will be removed in 3.0. Use isMultiple() instead.', E_USER_DEPRECATED);
+        trigger_error('isArray() is deprecated since version 2.2 and will be removed in 3.0. Use isValueMultiple() instead.', E_USER_DEPRECATED);
 
-        return $this->isMultiple();
+        return $this->isValueMultiple();
     }
 
     /**
@@ -163,7 +163,7 @@ class InputOption
             throw new \LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');
         }
 
-        if ($this->isMultiple()) {
+        if ($this->isValueMultiple()) {
             if (null === $default) {
                 $default = array();
             } elseif (!is_array($default)) {
@@ -205,7 +205,7 @@ class InputOption
         return $option->getName() === $this->getName()
             && $option->getShortcut() === $this->getShortcut()
             && $option->getDefault() === $this->getDefault()
-            && $option->isMultiple() === $this->isMultiple()
+            && $option->isValueMultiple() === $this->isValueMultiple()
             && $option->isValueRequired() === $this->isValueRequired()
             && $option->isValueOptional() === $this->isValueOptional()
         ;

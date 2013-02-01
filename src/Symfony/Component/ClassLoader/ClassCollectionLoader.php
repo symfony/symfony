@@ -144,45 +144,78 @@ class ClassCollectionLoader
             return $source;
         }
 
+        $rawChunk = '';
         $output = '';
         $inNamespace = false;
         $tokens = token_get_all($source);
 
-        for ($i = 0, $max = count($tokens); $i < $max; $i++) {
-            $token = $tokens[$i];
+        for (reset($tokens); false !== $token = current($tokens); next($tokens)) {
             if (is_string($token)) {
-                $output .= $token;
+                $rawChunk .= $token;
             } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
                 // strip comments
                 continue;
             } elseif (T_NAMESPACE === $token[0]) {
                 if ($inNamespace) {
-                    $output .= "}\n";
+                    $rawChunk .= "}\n";
                 }
-                $output .= $token[1];
+                $rawChunk .= $token[1];
 
                 // namespace name and whitespaces
-                while (($t = $tokens[++$i]) && is_array($t) && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
-                    $output .= $t[1];
+                while (($t = next($tokens)) && is_array($t) && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
+                    $rawChunk .= $t[1];
                 }
-                if (is_string($t) && '{' === $t) {
+                if ('{' === $t) {
                     $inNamespace = false;
-                    --$i;
+                    prev($tokens);
                 } else {
-                    $output = rtrim($output);
-                    $output .= "\n{";
+                    $rawChunk = rtrim($rawChunk) . "\n{";
                     $inNamespace = true;
                 }
+            } elseif (T_START_HEREDOC === $token[0]) {
+                $output .= self::compressCode($rawChunk) . $token[1];
+                do {
+                    $token = next($tokens);
+                    $output .= $token[1];
+                } while ($token[0] !== T_END_HEREDOC);
+                $rawChunk = '';
+            } elseif (T_CONSTANT_ENCAPSED_STRING === $token[0]) {
+                $output .= self::compressCode($rawChunk) . $token[1];
+                $rawChunk = '';
             } else {
-                $output .= $token[1];
+                $rawChunk .= $token[1];
             }
         }
 
         if ($inNamespace) {
-            $output .= "}\n";
+            $rawChunk .= "}\n";
         }
 
-        return $output;
+        return $output . self::compressCode($rawChunk);
+    }
+
+    /**
+     * This method is only useful for testing.
+     */
+    public static function enableTokenizer($bool)
+    {
+        self::$useTokenizer = (Boolean) $bool;
+    }
+
+    /**
+     * Strips leading & trailing ws, multiple EOL, multiple ws.
+     *
+     * @param string $code Original PHP code
+     *
+     * @return string compressed code
+     */
+    private static function compressCode($code)
+    {
+        return preg_replace(
+            array('/^\s+/m', '/\s+$/m', '/([\n\r]+ *[\n\r]+)+/', '/[ \t]+/'),
+            array('', '', "\n", ' '),
+            $code
+        );
     }
 
     /**
@@ -247,17 +280,19 @@ class ClassCollectionLoader
             array_unshift($classes, $parent);
         }
 
+        $traits = array();
+
         if (function_exists('get_declared_traits')) {
             foreach ($classes as $c) {
-                foreach (self::getTraits($c) as $trait) {
-                    self::$seen[$trait->getName()] = true;
-
-                    array_unshift($classes, $trait);
+                foreach (self::resolveDependencies(self::computeTraitDeps($c), $c) as $trait) {
+                    if ($trait !== $c) {
+                        $traits[] = $trait;
+                    }
                 }
             }
         }
 
-        return array_merge(self::getInterfaces($class), $classes);
+        return array_merge(self::getInterfaces($class), $traits, $classes);
     }
 
     private static function getInterfaces(\ReflectionClass $class)
@@ -277,26 +312,54 @@ class ClassCollectionLoader
         return $classes;
     }
 
-    private static function getTraits(\ReflectionClass $class)
+    private static function computeTraitDeps(\ReflectionClass $class)
     {
         $traits = $class->getTraits();
-        $classes = array();
+        $deps = array($class->getName() => $traits);
         while ($trait = array_pop($traits)) {
             if ($trait->isUserDefined() && !isset(self::$seen[$trait->getName()])) {
-                $classes[] = $trait;
-
-                $traits = array_merge($traits, $trait->getTraits());
+                self::$seen[$trait->getName()] = true;
+                $traitDeps = $trait->getTraits();
+                $deps[$trait->getName()] = $traitDeps;
+                $traits = array_merge($traits, $traitDeps);
             }
         }
 
-        return $classes;
+        return $deps;
     }
 
     /**
-     * This method is only useful for testing.
+     * Dependencies resolution.
+     *
+     * This function does not check for circular dependencies as it should never
+     * occur with PHP traits.
+     *
+     * @param array             $tree       The dependency tree
+     * @param \ReflectionClass  $node       The node
+     * @param \ArrayObject      $resolved   An array of already resolved dependencies
+     * @param \ArrayObject      $unresolved An array of dependencies to be resolved
+     *
+     * @return \ArrayObject The dependencies for the given node
+     *
+     * @throws \RuntimeException if a circular dependency is detected
      */
-    public static function enableTokenizer($bool)
+    private static function resolveDependencies(array $tree, $node, \ArrayObject $resolved = null, \ArrayObject $unresolved = null)
     {
-        self::$useTokenizer = (Boolean) $bool;
+        if (null === $resolved) {
+            $resolved = new \ArrayObject();
+        }
+        if (null === $unresolved) {
+            $unresolved = new \ArrayObject();
+        }
+        $nodeName = $node->getName();
+        $unresolved[$nodeName] = $node;
+        foreach ($tree[$nodeName] as $dependency) {
+            if (!$resolved->offsetExists($dependency->getName())) {
+                self::resolveDependencies($tree, $dependency, $resolved, $unresolved);
+            }
+        }
+        $resolved[$nodeName] = $node;
+        unset($unresolved[$nodeName]);
+        return $resolved;
     }
 }

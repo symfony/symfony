@@ -9,58 +9,57 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel;
+namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\RenderingStrategy\RenderingStrategyInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Renders a URI using different strategies.
+ * Renders a URI that represents a resource fragment.
  *
- * This class handles sub-requests. The response content from the sub-request
- * is then embedded into a master request. The handling of the sub-request
- * is managed by rendering strategies.
+ * This class handles the rendering of resource fragments that are included into
+ * a main resource. The handling of the rendering is managed by specialized renderers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @see RenderingStrategyInterface
+ * @see FragmentRendererInterface
  */
-class HttpContentRenderer implements EventSubscriberInterface
+class FragmentHandler implements EventSubscriberInterface
 {
     private $debug;
-    private $strategies;
+    private $renderers;
     private $requests;
 
     /**
      * Constructor.
      *
-     * @param RenderingStrategyInterface[] $strategies An array of RenderingStrategyInterface instances
-     * @param Boolean                      $debug      Whether the debug mode is enabled or not
+     * @param FragmentRendererInterface[] $renderers An array of FragmentRendererInterface instances
+     * @param Boolean                     $debug     Whether the debug mode is enabled or not
      */
-    public function __construct(array $strategies = array(), $debug = false)
+    public function __construct(array $renderers = array(), $debug = false)
     {
-        $this->strategies = array();
-        foreach ($strategies as $strategy) {
-            $this->addStrategy($strategy);
+        $this->renderers = array();
+        foreach ($renderers as $renderer) {
+            $this->addRenderer($renderer);
         }
         $this->debug = $debug;
         $this->requests = array();
     }
 
     /**
-     * Adds a rendering strategy.
+     * Adds a renderer.
      *
-     * @param RenderingStrategyInterface $strategy A RenderingStrategyInterface instance
+     * @param FragmentRendererInterface $strategy A FragmentRendererInterface instance
      */
-    public function addStrategy(RenderingStrategyInterface $strategy)
+    public function addRenderer(FragmentRendererInterface $renderer)
     {
-        $this->strategies[$strategy->getName()] = $strategy;
+        $this->renderers[$renderer->getName()] = $renderer;
     }
 
     /**
@@ -91,25 +90,25 @@ class HttpContentRenderer implements EventSubscriberInterface
      *  * ignore_errors: true to return an empty string in case of an error
      *
      * @param string|ControllerReference $uri      A URI as a string or a ControllerReference instance
-     * @param string                     $strategy The strategy to use for the rendering
+     * @param string                     $renderer The renderer name
      * @param array                      $options  An array of options
      *
      * @return string|null The Response content or null when the Response is streamed
      *
-     * @throws \InvalidArgumentException when the strategy does not exist
+     * @throws \InvalidArgumentException when the renderer does not exist
      * @throws \RuntimeException         when the Response is not successful
      */
-    public function render($uri, $strategy = 'default', array $options = array())
+    public function render($uri, $renderer = 'inline', array $options = array())
     {
         if (!isset($options['ignore_errors'])) {
             $options['ignore_errors'] = !$this->debug;
         }
 
-        if (!isset($this->strategies[$strategy])) {
-            throw new \InvalidArgumentException(sprintf('The "%s" rendering strategy does not exist.', $strategy));
+        if (!isset($this->renderers[$renderer])) {
+            throw new \InvalidArgumentException(sprintf('The "%s" renderer does not exist.', $renderer));
         }
 
-        return $this->deliver($this->strategies[$strategy]->render($uri, $this->requests[0], $options));
+        return $this->deliver($this->renderers[$renderer]->render($uri, $this->requests[0], $options));
     }
 
     /**
@@ -148,9 +147,9 @@ class HttpContentRenderer implements EventSubscriberInterface
     // to be removed in 2.3
     public function fixOptions(array $options)
     {
-        // support for the standalone option is @deprecated in 2.2 and replaced with the strategy option
+        // support for the standalone option is @deprecated in 2.2 and replaced with the renderer option
         if (isset($options['standalone'])) {
-            trigger_error('The "standalone" option is deprecated in version 2.2 and replaced with the "strategy" option.', E_USER_DEPRECATED);
+            trigger_error('The "standalone" option is deprecated in version 2.2 and replaced with the "renderer" option.', E_USER_DEPRECATED);
 
             // support for the true value is @deprecated in 2.2, will be removed in 2.3
             if (true === $options['standalone']) {
@@ -158,16 +157,16 @@ class HttpContentRenderer implements EventSubscriberInterface
 
                 $options['standalone'] = 'esi';
             } elseif (false === $options['standalone']) {
-                trigger_error('The "false" value for the "standalone" option is deprecated in version 2.2 and replaced with the "default" value.', E_USER_DEPRECATED);
+                trigger_error('The "false" value for the "standalone" option is deprecated in version 2.2 and replaced with the "inline" value.', E_USER_DEPRECATED);
 
-                $options['standalone'] = 'default';
+                $options['standalone'] = 'inline';
             } elseif ('js' === $options['standalone']) {
                 trigger_error('The "js" value for the "standalone" option is deprecated in version 2.2 and replaced with the "hinclude" value.', E_USER_DEPRECATED);
 
                 $options['standalone'] = 'hinclude';
             }
 
-            $options['strategy'] = $options['standalone'];
+            $options['renderer'] = $options['standalone'];
             unset($options['standalone']);
         }
 

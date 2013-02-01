@@ -98,9 +98,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'field_name' => '_token',
             ),
             'esi'                 => array('enabled' => false),
-            'router_proxy'        => array(
+            'fragments'           => array(
                 'enabled' => false,
-                'path'    => '/_proxy',
+                'path'    => '/_fragment',
             ),
             'profiler'            => array(
                 'enabled'              => false,

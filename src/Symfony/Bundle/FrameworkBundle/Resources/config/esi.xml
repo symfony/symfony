@@ -7,7 +7,7 @@
     <parameters>
         <parameter key="esi.class">Symfony\Component\HttpKernel\HttpCache\Esi</parameter>
         <parameter key="esi_listener.class">Symfony\Component\HttpKernel\EventListener\EsiListener</parameter>
-        <parameter key="http_content_renderer.strategy.esi.class">Symfony\Component\HttpKernel\RenderingStrategy\EsiRenderingStrategy</parameter>
+        <parameter key="fragment.renderer.esi.class">Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer</parameter>
     </parameters>
 
     <services>
@@ -18,11 +18,11 @@
             <argument type="service" id="esi" on-invalid="ignore" />
         </service>
 
-        <service id="http_content_renderer.strategy.esi" class="%http_content_renderer.strategy.esi.class%">
-            <tag name="kernel.content_renderer_strategy" />
+        <service id="fragment.renderer.esi" class="%fragment.renderer.esi.class%">
+            <tag name="kernel.fragment_renderer" />
             <argument type="service" id="esi" />
-            <argument type="service" id="http_content_renderer.strategy.default" />
-            <call method="setProxyPath"><argument>%http_content_renderer.proxy_path%</argument></call>
+            <argument type="service" id="fragment.renderer.inline" />
+            <call method="setFragmentPath"><argument>%fragment.path%</argument></call>
         </service>
     </services>
 </container>

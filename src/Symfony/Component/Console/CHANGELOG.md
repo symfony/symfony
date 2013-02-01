@@ -3,9 +3,12 @@ CHANGELOG
 
 2.2.0
 -----
-
+ * deprecated isArray() from both InputOption and InputArgument, replaced by
+   isValueMultiple() and isMultiple().
+ * deprecated InputOption::VALUE_IS_ARRAY in favor of InputOption::VALUE_MULTIPLE
+ * deprecated InputArgument::IS_ARRAY in favor of InputArgument::MULTIPLE
  * added support for colorization on Windows via ConEmu
- * add a method to Dialog Helper to ask for a question and hide the response
+ * added a method to Dialog Helper to ask for a question and hide the response
  * added support for interactive selections in console (DialogHelper::select())
  * added support for autocompletion as you type in Dialog Helper
 

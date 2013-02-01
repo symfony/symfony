@@ -281,8 +281,8 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
             new InputOption('foo3', null, InputOption::VALUE_REQUIRED, '', 'default'),
             new InputOption('foo4', null, InputOption::VALUE_OPTIONAL),
             new InputOption('foo5', null, InputOption::VALUE_OPTIONAL, '', 'default'),
-            new InputOption('foo6', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY),
-            new InputOption('foo7', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, '', array(1, 2)),
+            new InputOption('foo6', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_MULTIPLE),
+            new InputOption('foo7', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_MULTIPLE, '', array(1, 2)),
         ));
         $defaults = array(
             'foo1' => null,

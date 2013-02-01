@@ -161,7 +161,7 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         }
 
         $input = new ArgvInput(array('cli.php', '--name=foo', '--name=bar', '--name=baz'));
-        $input->bind(new InputDefinition(array(new InputOption('name', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY))));
+        $input->bind(new InputDefinition(array(new InputOption('name', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_MULTIPLE))));
         $this->assertEquals(array('name' => array('foo', 'bar', 'baz')), $input->getOptions());
 
         try {

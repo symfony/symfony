@@ -58,7 +58,7 @@ class InputOption
 
         if (empty($shortcut)) {
             $shortcut = null;
-        } else if (null !== $shortcut) {
+        } elseif (null !== $shortcut) {
             if ('-' === $shortcut[0]) {
                 $shortcut = substr($shortcut, 1);
             }

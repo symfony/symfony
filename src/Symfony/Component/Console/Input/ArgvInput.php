@@ -169,10 +169,10 @@ class ArgvInput extends Input
         // if input is expecting another argument, add it
         if ($this->definition->hasArgument($c)) {
             $arg = $this->definition->getArgument($c);
-            $this->arguments[$arg->getName()] = $arg->isArray()? array($token) : $token;
+            $this->arguments[$arg->getName()] = $arg->isMultiple()? array($token) : $token;
 
         // if last argument isArray(), append token to last argument
-        } elseif ($this->definition->hasArgument($c - 1) && $this->definition->getArgument($c - 1)->isArray()) {
+        } elseif ($this->definition->hasArgument($c - 1) && $this->definition->getArgument($c - 1)->isMultiple()) {
             $arg = $this->definition->getArgument($c - 1);
             $this->arguments[$arg->getName()][] = $token;
 
@@ -236,7 +236,7 @@ class ArgvInput extends Input
             $value = $option->isValueOptional() ? $option->getDefault() : true;
         }
 
-        if ($option->isArray()) {
+        if ($option->isMultiple()) {
             $this->options[$name][] = $value;
         } else {
             $this->options[$name] = $value;

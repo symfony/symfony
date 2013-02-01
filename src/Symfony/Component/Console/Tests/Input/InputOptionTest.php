@@ -23,7 +23,7 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $option->getName(), '__construct() removes the leading -- of the option name');
 
         try {
-            $option = new InputOption('foo', 'f', InputOption::VALUE_IS_ARRAY);
+            new InputOption('foo', 'f', InputOption::VALUE_MULTIPLE);
             $this->fail('__construct() throws an \InvalidArgumentException if VALUE_IS_ARRAY option is used when an option does not accept a value');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if VALUE_IS_ARRAY option is used when an option does not accept a value');
@@ -65,14 +65,14 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($option->isValueOptional(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
 
         try {
-            $option = new InputOption('foo', 'f', 'ANOTHER_ONE');
+            new InputOption('foo', 'f', 'ANOTHER_ONE');
             $this->fail('__construct() throws an \InvalidArgumentException if the mode is not valid');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the mode is not valid');
             $this->assertEquals('Option mode "ANOTHER_ONE" is not valid.', $e->getMessage());
         }
         try {
-            $option = new InputOption('foo', 'f', -1);
+            new InputOption('foo', 'f', -1);
             $this->fail('__construct() throws an \InvalidArgumentException if the mode is not valid');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the mode is not valid');
@@ -104,12 +104,12 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         new InputOption('foo', '-');
     }
 
-    public function testIsArray()
+    public function testIsValueMultiple()
     {
-        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
-        $this->assertTrue($option->isArray(), '->isArray() returns true if the option can be an array');
+        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_MULTIPLE);
+        $this->assertTrue($option->isMultiple(), '->isMultiple() returns true if the option can be an array');
         $option = new InputOption('foo', null, InputOption::VALUE_NONE);
-        $this->assertFalse($option->isArray(), '->isArray() returns false if the option can not be an array');
+        $this->assertFalse($option->isMultiple(), '->isValueMultiple() returns false if the option can not be an array');
     }
 
     public function testGetDescription()
@@ -129,7 +129,7 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $option = new InputOption('foo', null, InputOption::VALUE_REQUIRED);
         $this->assertNull($option->getDefault(), '->getDefault() returns null if no default value is configured');
 
-        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
+        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_MULTIPLE);
         $this->assertEquals(array(), $option->getDefault(), '->getDefault() returns an empty array if option is an array');
 
         $option = new InputOption('foo', null, InputOption::VALUE_NONE);
@@ -144,7 +144,7 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $option->setDefault('another');
         $this->assertEquals('another', $option->getDefault(), '->setDefault() changes the default value');
 
-        $option = new InputOption('foo', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
+        $option = new InputOption('foo', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_MULTIPLE);
         $option->setDefault(array(1, 2));
         $this->assertEquals(array(1, 2), $option->getDefault(), '->setDefault() changes the default value');
 
@@ -157,13 +157,13 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('Cannot set a default value when using InputOption::VALUE_NONE mode.', $e->getMessage());
         }
 
-        $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
+        $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_MULTIPLE);
         try {
             $option->setDefault('default');
-            $this->fail('->setDefault() throws a \LogicException if you give a default value which is not an array for a VALUE_IS_ARRAY option');
+            $this->fail('->setDefault() throws a \LogicException if you give a default value which is not an array for a VALUE_MULTIPLE option');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '->setDefault() throws a \LogicException if you give a default value which is not an array for a VALUE_IS_ARRAY option');
-            $this->assertEquals('A default value for an array option must be an array.', $e->getMessage());
+            $this->assertInstanceOf('\LogicException', $e, '->setDefault() throws a \LogicException if you give a default value which is not an array for a VALUE_MULTIPLE option');
+            $this->assertEquals('A default value for a multiple option must be an array.', $e->getMessage());
         }
     }
 

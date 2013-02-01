@@ -23,7 +23,9 @@ class InputOption
     const VALUE_NONE     = 1;
     const VALUE_REQUIRED = 2;
     const VALUE_OPTIONAL = 4;
-    const VALUE_IS_ARRAY = 8;
+    const VALUE_MULTIPLE = 8;
+    /* @deprecated in 2.2, to be removed in 3.0 */
+    const VALUE_IS_ARRAY = self::VALUE_MULTIPLE;
 
     private $name;
     private $shortcut;
@@ -36,7 +38,7 @@ class InputOption
      *
      * @param string  $name        The option name
      * @param string  $shortcut    The shortcut (can be null)
-     * @param integer $mode        The option mode: One of the VALUE_* constants
+     * @param integer $mode        The option mode: A combination of some VALUE_* constants
      * @param string  $description A description text
      * @param mixed   $default     The default value (must be null for self::VALUE_REQUIRED or self::VALUE_NONE)
      *
@@ -56,9 +58,7 @@ class InputOption
 
         if (empty($shortcut)) {
             $shortcut = null;
-        }
-
-        if (null !== $shortcut) {
+        } else if (null !== $shortcut) {
             if ('-' === $shortcut[0]) {
                 $shortcut = substr($shortcut, 1);
             }
@@ -79,7 +79,7 @@ class InputOption
         $this->mode        = $mode;
         $this->description = $description;
 
-        if ($this->isArray() && !$this->acceptValue()) {
+        if ($this->isMultiple() && !$this->acceptValue()) {
             throw new \InvalidArgumentException('Impossible to have an option mode VALUE_IS_ARRAY if the option does not accept a value.');
         }
 
@@ -107,9 +107,7 @@ class InputOption
     }
 
     /**
-     * Returns true if the option accepts a value.
-     *
-     * @return Boolean true if value mode is not self::VALUE_NONE, false otherwise
+     * @return Boolean true if the option can have a value
      */
     public function acceptValue()
     {
@@ -117,33 +115,39 @@ class InputOption
     }
 
     /**
-     * Returns true if the option requires a value.
-     *
-     * @return Boolean true if value mode is self::VALUE_REQUIRED, false otherwise
+     * @return Boolean true if the option requires a value.
      */
     public function isValueRequired()
     {
-        return self::VALUE_REQUIRED === (self::VALUE_REQUIRED & $this->mode);
+        return (Boolean) (self::VALUE_REQUIRED & $this->mode);
     }
 
     /**
-     * Returns true if the option takes an optional value.
-     *
-     * @return Boolean true if value mode is self::VALUE_OPTIONAL, false otherwise
+     * @return Boolean true if the option value can optionally be provided.
      */
     public function isValueOptional()
     {
-        return self::VALUE_OPTIONAL === (self::VALUE_OPTIONAL & $this->mode);
+        return (Boolean) (self::VALUE_OPTIONAL & $this->mode);
     }
 
     /**
-     * Returns true if the option can take multiple values.
+     * @return Boolean true if the option can have multiple values
+     */
+    public function isMultiple()
+    {
+        return (Boolean) (self::VALUE_MULTIPLE & $this->mode);
+    }
+
+    /**
+     * @return Boolean true if the option can have multiple values
      *
-     * @return Boolean true if mode is self::VALUE_IS_ARRAY, false otherwise
+     * @deprecated since 2.2 to be removed in 3.0, use isMultiple() instead.
      */
     public function isArray()
     {
-        return self::VALUE_IS_ARRAY === (self::VALUE_IS_ARRAY & $this->mode);
+        trigger_error('isArray() is deprecated since version 2.2 and will be removed in 3.0. Use isMultiple() instead.', E_USER_DEPRECATED);
+
+        return $this->isMultiple();
     }
 
     /**
@@ -159,11 +163,11 @@ class InputOption
             throw new \LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');
         }
 
-        if ($this->isArray()) {
+        if ($this->isMultiple()) {
             if (null === $default) {
                 $default = array();
             } elseif (!is_array($default)) {
-                throw new \LogicException('A default value for an array option must be an array.');
+                throw new \LogicException('A default value for a multiple option must be an array.');
             }
         }
 
@@ -201,7 +205,7 @@ class InputOption
         return $option->getName() === $this->getName()
             && $option->getShortcut() === $this->getShortcut()
             && $option->getDefault() === $this->getDefault()
-            && $option->isArray() === $this->isArray()
+            && $option->isMultiple() === $this->isMultiple()
             && $option->isValueRequired() === $this->isValueRequired()
             && $option->isValueOptional() === $this->isValueOptional()
         ;

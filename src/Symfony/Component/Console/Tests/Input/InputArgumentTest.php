@@ -49,14 +49,14 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testIsArray()
+    public function testisMultiple()
     {
-        $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
-        $this->assertTrue($argument->isArray(), '->isArray() returns true if the argument can be an array');
-        $argument = new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
-        $this->assertTrue($argument->isArray(), '->isArray() returns true if the argument can be an array');
+        $argument = new InputArgument('foo', InputArgument::MULTIPLE);
+        $this->assertTrue($argument->isMultiple(), '->isMultiple() returns true if the argument can be an array');
+        $argument = new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::MULTIPLE);
+        $this->assertTrue($argument->isMultiple(), '->isMultiple() returns true if the argument can be an array');
         $argument = new InputArgument('foo', InputArgument::OPTIONAL);
-        $this->assertFalse($argument->isArray(), '->isArray() returns false if the argument can not be an array');
+        $this->assertFalse($argument->isMultiple(), '->isMultiple() returns false if the argument can not be an array');
     }
 
     public function testGetDescription()
@@ -79,7 +79,7 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
         $argument->setDefault('another');
         $this->assertEquals('another', $argument->getDefault(), '->setDefault() changes the default value');
 
-        $argument = new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
+        $argument = new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::MULTIPLE);
         $argument->setDefault(array(1, 2));
         $this->assertEquals(array(1, 2), $argument->getDefault(), '->setDefault() changes the default value');
 
@@ -93,12 +93,12 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
         }
 
         try {
-            $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
+            $argument = new InputArgument('foo', InputArgument::MULTIPLE);
             $argument->setDefault('default');
-            $this->fail('->setDefault() throws a \LogicException if you give a default value which is not an array for a IS_ARRAY option');
+            $this->fail('->setDefault() throws a \LogicException if you give a default value which is not an array for a MULTIPLE option');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '->setDefault() throws a \LogicException if you give a default value which is not an array for a IS_ARRAY option');
-            $this->assertEquals('A default value for an array argument must be an array.', $e->getMessage());
+            $this->assertInstanceOf('\LogicException', $e, '->setDefault() throws a \LogicException if you give a default value which is not an array for a MULTIPLE option');
+            $this->assertEquals('A default value for a multiple argument must be an array.', $e->getMessage());
         }
     }
 }

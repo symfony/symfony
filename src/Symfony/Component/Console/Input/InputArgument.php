@@ -20,9 +20,11 @@ namespace Symfony\Component\Console\Input;
  */
 class InputArgument
 {
+    const OPTIONAL = 0;
     const REQUIRED = 1;
-    const OPTIONAL = 2;
-    const IS_ARRAY = 4;
+    const MULTIPLE = 2;
+    /* @deprecated in 2.2, to be removed in 3.0 */
+    const IS_ARRAY = self::MULTIPLE;
 
     private $name;
     private $mode;
@@ -45,7 +47,7 @@ class InputArgument
     {
         if (null === $mode) {
             $mode = self::OPTIONAL;
-        } elseif (!is_int($mode) || $mode > 7 || $mode < 1) {
+        } elseif (!is_int($mode) || $mode > 3 || $mode < 0) {
             throw new \InvalidArgumentException(sprintf('Argument mode "%s" is not valid.', $mode));
         }
 
@@ -67,23 +69,31 @@ class InputArgument
     }
 
     /**
-     * Returns true if the argument is required.
-     *
-     * @return Boolean true if parameter mode is self::REQUIRED, false otherwise
+     * @return Boolean true if the argument is required.
      */
     public function isRequired()
     {
-        return self::REQUIRED === (self::REQUIRED & $this->mode);
+        return (Boolean) (self::REQUIRED & $this->mode);
     }
 
     /**
-     * Returns true if the argument can take multiple values.
+     * @return Boolean true if the argument can take multiple values.
+     */
+    public function isMultiple()
+    {
+        return (Boolean) (self::MULTIPLE & $this->mode);
+    }
+
+    /**
+     * @return Boolean true if the argument can take multiple values.
      *
-     * @return Boolean true if mode is self::IS_ARRAY, false otherwise
+     * @deprecated since 2.2, to be removed in 3.0. Use isMultiple() instead.
      */
     public function isArray()
     {
-        return self::IS_ARRAY === (self::IS_ARRAY & $this->mode);
+        trigger_error('isArray() is deprecated since version 2.2 and will be removed in 3.0. Use isMultiple() instead.', E_USER_DEPRECATED);
+
+        return $this->isMultiple();
     }
 
     /**
@@ -95,15 +105,15 @@ class InputArgument
      */
     public function setDefault($default = null)
     {
-        if (self::REQUIRED === $this->mode && null !== $default) {
+        if ($this->isRequired() && null !== $default) {
             throw new \LogicException('Cannot set a default value except for InputArgument::OPTIONAL mode.');
         }
 
-        if ($this->isArray()) {
+        if ($this->isMultiple()) {
             if (null === $default) {
                 $default = array();
             } elseif (!is_array($default)) {
-                throw new \LogicException('A default value for an array argument must be an array.');
+                throw new \LogicException('A default value for a multiple argument must be an array.');
             }
         }
 

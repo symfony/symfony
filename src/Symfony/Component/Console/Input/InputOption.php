@@ -205,9 +205,15 @@ class InputOption
         return $option->getName() === $this->getName()
             && $option->getShortcut() === $this->getShortcut()
             && $option->getDefault() === $this->getDefault()
-            && $option->isValueMultiple() === $this->isValueMultiple()
-            && $option->isValueRequired() === $this->isValueRequired()
-            && $option->isValueOptional() === $this->isValueOptional()
+            && $option->getMode() === $this->getMode()
         ;
+    }
+
+    /**
+     * @return integer The option mode
+     */
+    protected function getMode()
+    {
+        return $this->mode;
     }
 }

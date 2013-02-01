@@ -58,7 +58,7 @@ class UriSigner
      */
     public function check($uri)
     {
-        if (!preg_match('/(.*)(?:\?|&)_hash=(.+?)$/', $uri, $matches)) {
+        if (!preg_match('/^(.*)(?:\?|&)_hash=(.+?)$/', $uri, $matches)) {
             return false;
         }
 

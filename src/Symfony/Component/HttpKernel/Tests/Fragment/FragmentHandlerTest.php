@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Tests;
+namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
-use Symfony\Component\HttpKernel\HttpContentRenderer;
+use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
+class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -27,21 +27,20 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testRenderWhenStrategyDoesNotExist()
+    public function testRenderWhenRendererDoesNotExist()
     {
-        $renderer = new HttpContentRenderer();
-        $renderer->render('/', 'foo');
+        $handler = new FragmentHandler();
+        $handler->render('/', 'foo');
     }
 
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testRenderWithUnknownStrategy()
+    public function testRenderWithUnknownRenderer()
     {
-        $strategy = $this->getStrategy($this->returnValue(new Response('foo')));
-        $renderer = $this->getRenderer($strategy);
+        $handler = $this->getHandler($this->returnValue(new Response('foo')));
 
-        $renderer->render('/', 'bar');
+        $handler->render('/', 'bar');
     }
 
     /**
@@ -50,18 +49,16 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function testDeliverWithUnsuccessfulResponse()
     {
-        $strategy = $this->getStrategy($this->returnValue(new Response('foo', 404)));
-        $renderer = $this->getRenderer($strategy);
+        $handler = $this->getHandler($this->returnValue(new Response('foo', 404)));
 
-        $renderer->render('/', 'foo');
+        $handler->render('/', 'foo');
     }
 
     public function testRender()
     {
-        $strategy = $this->getStrategy($this->returnValue(new Response('foo')), array('/', Request::create('/'), array('foo' => 'foo', 'ignore_errors' => true)));
-        $renderer = $this->getRenderer($strategy);
+        $handler = $this->getHandler($this->returnValue(new Response('foo')), array('/', Request::create('/'), array('foo' => 'foo', 'ignore_errors' => true)));
 
-        $this->assertEquals('foo', $renderer->render('/', 'foo', array('foo' => 'foo')));
+        $this->assertEquals('foo', $handler->render('/', 'foo', array('foo' => 'foo')));
     }
 
     /**
@@ -69,31 +66,31 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function testFixOptions($expected, $options)
     {
-        $renderer = new HttpContentRenderer();
+        $handler = new FragmentHandler();
 
         set_error_handler(function ($errorNumber, $message, $file, $line, $context) { return $errorNumber & E_USER_DEPRECATED; });
-        $this->assertEquals($expected, $renderer->fixOptions($options));
+        $this->assertEquals($expected, $handler->fixOptions($options));
         restore_error_handler();
     }
 
     public function getFixOptionsData()
     {
         return array(
-            array(array('strategy' => 'esi'), array('standalone' => true)),
-            array(array('strategy' => 'esi'), array('standalone' => 'esi')),
-            array(array('strategy' => 'hinclude'), array('standalone' => 'js')),
+            array(array('renderer' => 'esi'), array('standalone' => true)),
+            array(array('renderer' => 'esi'), array('standalone' => 'esi')),
+            array(array('renderer' => 'hinclude'), array('standalone' => 'js')),
         );
     }
 
-    protected function getStrategy($returnValue, $arguments = array())
+    protected function getHandler($returnValue, $arguments = array())
     {
-        $strategy = $this->getMock('Symfony\Component\HttpKernel\RenderingStrategy\RenderingStrategyInterface');
-        $strategy
+        $renderer = $this->getMock('Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface');
+        $renderer
             ->expects($this->any())
             ->method('getName')
             ->will($this->returnValue('foo'))
         ;
-        $e = $strategy
+        $e = $renderer
             ->expects($this->any())
             ->method('render')
             ->will($returnValue)
@@ -103,13 +100,8 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
             call_user_func_array(array($e, 'with'), $arguments);
         }
 
-        return $strategy;
-    }
-
-    protected function getRenderer($strategy)
-    {
-        $renderer = new HttpContentRenderer();
-        $renderer->addStrategy($strategy);
+        $handler = new FragmentHandler();
+        $handler->addRenderer($renderer);
 
         $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
         $event
@@ -117,8 +109,8 @@ class HttpContentRendererTest extends \PHPUnit_Framework_TestCase
             ->method('getRequest')
             ->will($this->returnValue(Request::create('/')))
         ;
-        $renderer->onKernelRequest($event);
+        $handler->onKernelRequest($event);
 
-        return $renderer;
+        return $handler;
     }
 }

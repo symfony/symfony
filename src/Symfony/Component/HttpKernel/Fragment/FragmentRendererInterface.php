@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\RenderingStrategy;
+namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
@@ -19,9 +19,9 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @see Symfony\Component\HttpKernel\HttpContentRenderer
+ * @see Symfony\Component\HttpKernel\FragmentRenderer
  */
-interface RenderingStrategyInterface
+interface FragmentRendererInterface
 {
     /**
      * Renders a URI and returns the Response content.

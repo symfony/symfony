@@ -176,17 +176,17 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         ClassCollectionLoader::enableTokenizer(true);
     }
 
-     public function getFixNamespaceDeclarationsDataWithoutTokenizer()
-     {
-         return array(
+    public function getFixNamespaceDeclarationsDataWithoutTokenizer()
+    {
+        return array(
             array("namespace;\nclass Foo {}\n", "namespace\n{\nclass Foo {}\n}\n"),
             array("namespace Foo;\nclass Foo {}\n", "namespace Foo\n{\nclass Foo {}\n}\n"),
             array("namespace   Bar ;\nclass Foo {}\n", "namespace   Bar\n{\nclass Foo {}\n}\n"),
             array("namespace Foo\Bar;\nclass Foo {}\n", "namespace Foo\Bar\n{\nclass Foo {}\n}\n"),
             array("namespace Foo\Bar\Bar\n{\nclass Foo {}\n}\n", "namespace Foo\Bar\Bar\n{\nclass Foo {}\n}\n"),
             array("namespace\n{\nclass Foo {}\n}\n", "namespace\n{\nclass Foo {}\n}\n"),
-         );
-     }
+        );
+    }
 
     /**
      * @expectedException InvalidArgumentException

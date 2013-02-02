@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
 
@@ -76,6 +77,11 @@ EOF
                 $output->writeln(sprintf('<fg=yellow>Route "%s" almost matches but %s</>', $trace['name'], lcfirst($trace['log'])));
             } elseif (TraceableUrlMatcher::ROUTE_MATCHES == $trace['level']) {
                 $output->writeln(sprintf('<fg=green>Route "%s" matches</>', $trace['name']));
+
+                $routerDebugcommand = $this->getApplication()->find('router:debug');
+                $output->writeln('');
+                $routerDebugcommand->run(new ArrayInput(array('name' => $trace['name'])), $output);
+
                 $matches = true;
             } elseif ($input->getOption('verbose')) {
                 $output->writeln(sprintf('Route "%s" does not match: %s', $trace['name'], $trace['log']));

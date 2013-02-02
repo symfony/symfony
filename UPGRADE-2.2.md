@@ -523,6 +523,52 @@
    }
    ```
 
+### Security
+
+  * The existing ``UserPassword`` validator constraint class has been modified
+    to make it decoupled from the ``SecurityBundle``. It's no more validated by
+    the ``security.validator.user_password`` service and its namespace has been
+    changed to better fit the Symfony coding convention.
+
+    Before:
+
+    ```
+    use Symfony\Component\Security\Core\Validator\Constraint\UserPassword;
+    ```
+
+    After: (note the `s` at the end of `Constraint`)
+
+    ```
+    use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
+    ```
+
+  * If you were using the ``UserPassword`` validator constraint class in your
+    Symfony Standard Edition based application to validate the current logged-in
+    user's password, you must now use the new extended ``UserPassword``
+    validator constraint class from the ``SecurityBundle`` instead. This is
+    because the original ``UserPassword`` constraint class from the ``Security``
+    component is no more validated by the ``security.validator.user_password``
+    service of the ``SecurityBundle``.
+
+    Before:
+
+    ```
+    use Symfony\Component\Security\Core\Validator\Constraint\UserPassword;
+    ```
+
+    After: (note the `s` at the end of `Constraint`)
+
+    ```
+    use Symfony\Bundle\SecurityBundle\Validator\Constraints\UserPassword;
+    ```
+
+### Serializer
+
+ * All serializer interfaces (Serializer, Normalizer, Encoder) have been
+   extended with an optional `$context` array. This was necessary to allow for
+   more complex use-cases that require context information during the
+   (de)normalization and en-/decoding steps.
+
 ### FrameworkBundle
 
  * The `render` method of the `actions` templating helper signature and arguments changed:
@@ -567,9 +613,36 @@
       trusted_proxies: ['127.0.0.1', '10.0.0.1'] # a list of proxy IPs you trust
    ```
 
-### Serializer
+### SecurityBundle
 
- * All serializer interfaces (Serializer, Normalizer, Encoder) have been
-   extended with an optional `$context` array. This was necessary to allow for
-   more complex use-cases that require context information during the
-   (de)normalization and en-/decoding steps.
+  * A ``UserPassword`` validator constraint class has been reintroduced in the
+    ``SecurityBundle``. It extends the base ``UserPassword`` validator
+    constraint class located in the ``Security`` component.
+
+    This is the validator constraint class you should now use to validate the
+    current logged-in user's password while securing your application with the
+    ``SecurityBundle``.
+
+    Before:
+
+    ```
+    use Symfony\Component\Security\Core\Validator\Constraint\UserPassword;
+    ```
+
+    After:
+
+    ```
+    use Symfony\Bundle\SecurityBundle\Validator\Constraints\UserPassword;
+    ```
+
+  * The new ``UserPassword`` validator constraint class now accepts a new
+    ``service`` option, which allows to specify a custom validator service name
+    instead to validate the current logged-in user's password.
+
+    ```
+    use Symfony\Bundle\SecurityBundle\Validator\Constraints\UserPassword;
+
+    $constraint = new UserPassword(array(
+        'service' => 'my.custom.validator.user_password',
+    ));
+    ```

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Core\Validator\Constraint;
+namespace Symfony\Component\Security\Core\Validator\Constraints;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
@@ -34,7 +34,7 @@ class UserPasswordValidator extends ConstraintValidator
         $user = $this->securityContext->getToken()->getUser();
 
         if (!$user instanceof UserInterface) {
-            throw new ConstraintDefinitionException('The User must extend UserInterface');
+            throw new ConstraintDefinitionException('The User must be an instance of the UserInterface interface.');
         }
 
         $encoder = $this->encoderFactory->getEncoder($user);

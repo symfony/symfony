@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Tests\Core\Validator\Constraint;
+namespace Symfony\Component\Security\Tests\Core\Validator\Constraints;
 
-use Symfony\Component\Security\Core\Validator\Constraint\UserPassword;
-use Symfony\Component\Security\Core\Validator\Constraint\UserPasswordValidator;
+use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
+use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 
 class UserPasswordValidatorTest extends \PHPUnit_Framework_TestCase
 {

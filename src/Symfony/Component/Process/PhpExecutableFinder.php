@@ -49,8 +49,6 @@ class PhpExecutableFinder
     /**
      * Finds The PHP executable.
      *
-     * @FIXME Symfony3: return null instead of false
-     *
      * @return string|false The PHP executable path or false if it cannot be found
      */
     public function find()

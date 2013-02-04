@@ -567,6 +567,55 @@
       trusted_proxies: ['127.0.0.1', '10.0.0.1'] # a list of proxy IPs you trust
    ```
 
+### Security
+
+  * The existing ``UserPassword`` validator constraint class has been modified.
+    Its namespace has been changed to better fit the Symfony coding conventions.
+
+    Before:
+
+    ```
+    use Symfony\Component\Security\Core\Validator\Constraint\UserPassword;
+    ```
+
+    After: (note the `s` at the end of `Constraint`)
+
+    ```
+    use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
+    ```
+
+  * The new ``UserPassword`` validator constraint class now accepts a new
+    ``service`` option that allows to specify a custom validator service name in
+    order to validate the current logged-in user's password.
+
+    ```
+    use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
+
+    $constraint = new UserPassword(array(
+        'service' => 'my.custom.validator.user_password',
+    ));
+    ```
+
+#### Deprecations
+
+  * The two previous ``UserPassword`` and ``UserPasswordValidator`` classes in
+    the ``Symfony\Component\Security\Core\Validator\Constraint`` namespace have
+    been deprecated and will be removed in 2.3.
+
+    Before:
+
+    ```
+    use Symfony\Component\Security\Core\Validator\Constraint\UserPassword;
+    use Symfony\Component\Security\Core\Validator\Constraint\UserPasswordValidator;
+    ```
+
+    After:
+
+    ```
+    use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
+    use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
+    ```
+
 ### Serializer
 
  * All serializer interfaces (Serializer, Normalizer, Encoder) have been

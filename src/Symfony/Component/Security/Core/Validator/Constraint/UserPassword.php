@@ -19,9 +19,10 @@ use Symfony\Component\Validator\Constraint;
 class UserPassword extends Constraint
 {
     public $message = 'This value should be the user current password.';
+    public $service = 'security.validator.user_password';
 
     public function validatedBy()
     {
-        return 'security.validator.user_password';
+        return $this->service;
     }
 }

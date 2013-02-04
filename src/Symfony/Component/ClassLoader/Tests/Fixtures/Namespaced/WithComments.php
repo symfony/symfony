@@ -16,3 +16,22 @@ class WithComments
     /** @Boolean */
     public static $loaded = true;
 }
+
+$string = 'string shoult not be   modified';
+
+
+$heredoc = <<<HD
+
+
+Heredoc should not be   modified
+
+
+HD;
+
+$nowdoc = <<<'ND'
+
+
+Nowdoc should not be   modified
+
+
+ND;

@@ -58,14 +58,11 @@ class UriSigner
      */
     public function check($uri)
     {
-        if (!preg_match('/(\?|&)_hash=(.+?)$/', $uri, $matches, PREG_OFFSET_CAPTURE)) {
+        if (!preg_match('/^(.*)(?:\?|&)_hash=(.+?)$/', $uri, $matches)) {
             return false;
         }
 
-        // the naked URI is the URI without the _hash parameter (we need to keep the ? if there is some other parameters after)
-        $nakedUri = substr($uri, 0, $matches[0][1]).substr($uri, $matches[0][1] + strlen($matches[0][0]));
-
-        return $this->computeHash($nakedUri) === $matches[2][0];
+        return $this->computeHash($matches[1]) === $matches[2];
     }
 
     private function computeHash($uri)

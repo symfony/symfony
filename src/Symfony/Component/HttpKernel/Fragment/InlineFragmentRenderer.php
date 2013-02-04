@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\RenderingStrategy;
+namespace Symfony\Component\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,11 +17,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
- * Implements the default rendering strategy where the Request is rendered by the current HTTP kernel.
+ * Implements the inline rendering strategy where the Request is rendered by the current HTTP kernel.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DefaultRenderingStrategy extends ProxyAwareRenderingStrategy
+class InlineFragmentRenderer extends RoutableFragmentRenderer
 {
     private $kernel;
 
@@ -44,11 +44,18 @@ class DefaultRenderingStrategy extends ProxyAwareRenderingStrategy
      */
     public function render($uri, Request $request, array $options = array())
     {
+        $reference = null;
         if ($uri instanceof ControllerReference) {
-            $uri = $this->generateProxyUri($uri, $request);
+            $reference = $uri;
+            $uri = $this->generateFragmentUri($uri, $request);
         }
 
         $subRequest = $this->createSubRequest($uri, $request);
+
+        // override Request attributes as they can be objects (which are not supported by the generated URI)
+        if (null !== $reference) {
+            $subRequest->attributes->add($reference->attributes);
+        }
 
         $level = ob_get_level();
         try {
@@ -95,6 +102,6 @@ class DefaultRenderingStrategy extends ProxyAwareRenderingStrategy
      */
     public function getName()
     {
-        return 'default';
+        return 'inline';
     }
 }

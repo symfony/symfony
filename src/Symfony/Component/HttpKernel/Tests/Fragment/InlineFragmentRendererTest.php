@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Tests\RenderingStrategy;
+namespace Symfony\Component\HttpKernel\Fragment\Tests\FragmentRenderer;
 
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\HttpKernel;
-use Symfony\Component\HttpKernel\RenderingStrategy\DefaultRenderingStrategy;
+use Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class DefaultRenderingStrategyTest extends \PHPUnit_Framework_TestCase
+class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -33,16 +33,39 @@ class DefaultRenderingStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testRender()
     {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
+        $strategy = new InlineFragmentRenderer($this->getKernel($this->returnValue(new Response('foo'))));
 
         $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
     public function testRenderWithControllerReference()
     {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->returnValue(new Response('foo'))));
+        $strategy = new InlineFragmentRenderer($this->getKernel($this->returnValue(new Response('foo'))));
 
         $this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
+    }
+
+    public function testRenderWithObjectsAsAttributes()
+    {
+        $object = new \stdClass();
+
+        $subRequest = Request::create('/_fragment?_path=_format%3Dhtml%26_controller%3Dmain_controller');
+        $subRequest->attributes->replace(array(
+            'object'      => $object,
+            '_format'     => 'html',
+            '_controller' => 'main_controller',
+        ));
+
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel
+            ->expects($this->any())
+            ->method('handle')
+            ->with($subRequest)
+        ;
+
+        $strategy = new InlineFragmentRenderer($kernel);
+
+        $strategy->render(new ControllerReference('main_controller', array('object' => $object), array()), Request::create('/'));
     }
 
     /**
@@ -50,21 +73,21 @@ class DefaultRenderingStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderExceptionNoIgnoreErrors()
     {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
+        $strategy = new InlineFragmentRenderer($this->getKernel($this->throwException(new \RuntimeException('foo'))));
 
         $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
     public function testRenderExceptionIgnoreErrors()
     {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->throwException(new \RuntimeException('foo'))));
+        $strategy = new InlineFragmentRenderer($this->getKernel($this->throwException(new \RuntimeException('foo'))));
 
         $this->assertEmpty($strategy->render('/', Request::create('/'), array('ignore_errors' => true))->getContent());
     }
 
     public function testRenderExceptionIgnoreErrorsWithAlt()
     {
-        $strategy = new DefaultRenderingStrategy($this->getKernel($this->onConsecutiveCalls(
+        $strategy = new InlineFragmentRenderer($this->getKernel($this->onConsecutiveCalls(
             $this->throwException(new \RuntimeException('foo')),
             $this->returnValue(new Response('bar'))
         )));
@@ -103,7 +126,7 @@ class DefaultRenderingStrategyTest extends \PHPUnit_Framework_TestCase
         ;
 
         $kernel = new HttpKernel(new EventDispatcher(), $resolver);
-        $renderer = new DefaultRenderingStrategy($kernel);
+        $renderer = new InlineFragmentRenderer($kernel);
 
         // simulate a main request with output buffering
         ob_start();

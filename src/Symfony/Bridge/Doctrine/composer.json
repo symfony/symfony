@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "doctrine/common": ">=2.2,<2.4-dev"
+        "doctrine/common": "~2.2"
     },
     "require-dev": {
         "symfony/stopwatch": "2.2.*",
@@ -27,15 +27,15 @@
         "symfony/security": "2.2.*",
         "symfony/validator": "2.2.*",
         "doctrine/data-fixtures": "1.0.*",
-        "doctrine/dbal": ">=2.2,<2.4-dev",
-        "doctrine/orm": ">=2.2.3,<2.4-dev"
+        "doctrine/dbal": "~2.2",
+        "doctrine/orm": "~2.2,>=2.2.3"
     },
     "suggest": {
         "symfony/form": "2.2.*",
         "symfony/validator": "2.2.*",
         "doctrine/data-fixtures": "1.0.*",
-        "doctrine/dbal": ">=2.2,<2.4-dev",
-        "doctrine/orm": ">=2.2.3,<2.4-dev"
+        "doctrine/dbal": "~2.2",
+        "doctrine/orm": "~2.2,>=2.2.3"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Doctrine\\": "" }

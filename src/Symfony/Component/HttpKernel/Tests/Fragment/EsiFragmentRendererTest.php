@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Tests\RenderingStrategy;
+namespace Symfony\Component\HttpKernel\Tests\Fragment\FragmentRenderer;
 
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
-use Symfony\Component\HttpKernel\RenderingStrategy\EsiRenderingStrategy;
+use Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpFoundation\Request;
 
-class EsiRenderingStrategyTest extends \PHPUnit_Framework_TestCase
+class EsiFragmentRendererTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -25,21 +25,21 @@ class EsiRenderingStrategyTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testRenderFallbackToDefaultStrategyIfNoRequest()
+    public function testRenderFallbackToInlineStrategyIfNoRequest()
     {
-        $strategy = new EsiRenderingStrategy(new Esi(), $this->getDefaultStrategy(true));
+        $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true));
         $strategy->render('/', Request::create('/'));
     }
 
-    public function testRenderFallbackToDefaultStrategyIfEsiNotSupported()
+    public function testRenderFallbackToInlineStrategyIfEsiNotSupported()
     {
-        $strategy = new EsiRenderingStrategy(new Esi(), $this->getDefaultStrategy(true));
+        $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true));
         $strategy->render('/', Request::create('/'));
     }
 
     public function testRender()
     {
-        $strategy = new EsiRenderingStrategy(new Esi(), $this->getDefaultStrategy());
+        $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
         $request = Request::create('/');
         $request->headers->set('Surrogate-Capability', 'ESI/1.0');
@@ -47,17 +47,17 @@ class EsiRenderingStrategyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('<esi:include src="/" />', $strategy->render('/', $request)->getContent());
         $this->assertEquals("<esi:comment text=\"This is a comment\" />\n<esi:include src=\"/\" />", $strategy->render('/', $request, array('comment' => 'This is a comment'))->getContent());
         $this->assertEquals('<esi:include src="/" alt="foo" />', $strategy->render('/', $request, array('alt' => 'foo'))->getContent());
-        $this->assertEquals('<esi:include src="http://localhost/_proxy?_path=_format%3Dhtml%26_controller%3Dmain_controller" alt="http://localhost/_proxy?_path=_format%3Dhtml%26_controller%3Dalt_controller" />', $strategy->render(new ControllerReference('main_controller', array(), array()), $request, array('alt' => new ControllerReference('alt_controller', array(), array())))->getContent());
+        $this->assertEquals('<esi:include src="http://localhost/_fragment?_path=_format%3Dhtml%26_controller%3Dmain_controller" alt="http://localhost/_fragment?_path=_format%3Dhtml%26_controller%3Dalt_controller" />', $strategy->render(new ControllerReference('main_controller', array(), array()), $request, array('alt' => new ControllerReference('alt_controller', array(), array())))->getContent());
     }
 
-    private function getDefaultStrategy($called = false)
+    private function getInlineStrategy($called = false)
     {
-        $default = $this->getMockBuilder('Symfony\Component\HttpKernel\RenderingStrategy\DefaultRenderingStrategy')->disableOriginalConstructor()->getMock();
+        $inline = $this->getMockBuilder('Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer')->disableOriginalConstructor()->getMock();
 
         if ($called) {
-            $default->expects($this->once())->method('render');
+            $inline->expects($this->once())->method('render');
         }
 
-        return $default;
+        return $inline;
     }
 }

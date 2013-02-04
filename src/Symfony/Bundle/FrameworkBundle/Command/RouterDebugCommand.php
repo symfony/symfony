@@ -128,10 +128,10 @@ EOF
 
         $output->writeln($this->getHelper('formatter')->formatSection('router', sprintf('Route "%s"', $name)));
 
-        $output->writeln(sprintf('<comment>Name</comment>      %s', $name));
-        $output->writeln(sprintf('<comment>Pattern</comment>   %s', $route->getPath()));
-        $output->writeln(sprintf('<comment>Host</comment>      %s', $host));
-        $output->writeln(sprintf('<comment>Class</comment>     %s', get_class($route)));
+        $output->writeln(sprintf('<comment>Name</comment>             %s', $name));
+        $output->writeln(sprintf('<comment>Pattern</comment>          %s', $route->getPath()));
+        $output->writeln(sprintf('<comment>Host</comment>             %s', $host));
+        $output->writeln(sprintf('<comment>Class</comment>            %s', get_class($route)));
 
         $defaults = '';
         $d = $route->getDefaults();

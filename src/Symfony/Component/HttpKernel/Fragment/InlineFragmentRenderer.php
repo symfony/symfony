@@ -44,11 +44,18 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
      */
     public function render($uri, Request $request, array $options = array())
     {
+        $reference = null;
         if ($uri instanceof ControllerReference) {
+            $reference = $uri;
             $uri = $this->generateFragmentUri($uri, $request);
         }
 
         $subRequest = $this->createSubRequest($uri, $request);
+
+        // override Request attributes as they can be objects (which are not supported by the generated URI)
+        if (null !== $reference) {
+            $subRequest->attributes->add($reference->attributes);
+        }
 
         $level = ob_get_level();
         try {

@@ -45,6 +45,29 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
     }
 
+    public function testRenderWithObjectsAsAttributes()
+    {
+        $object = new \stdClass();
+
+        $subRequest = Request::create('/_fragment?_path=_format%3Dhtml%26_controller%3Dmain_controller');
+        $subRequest->attributes->replace(array(
+            'object'      => $object,
+            '_format'     => 'html',
+            '_controller' => 'main_controller',
+        ));
+
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel
+            ->expects($this->any())
+            ->method('handle')
+            ->with($subRequest)
+        ;
+
+        $strategy = new InlineFragmentRenderer($kernel);
+
+        $strategy->render(new ControllerReference('main_controller', array('object' => $object), array()), Request::create('/'));
+    }
+
     /**
      * @expectedException \RuntimeException
      */

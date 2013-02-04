@@ -1,2 +1,0 @@
-# Make sure we treat this file as binary
-Resources/magic.mgc -crlf -diff

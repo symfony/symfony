@@ -173,4 +173,24 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('"\u003C\u003E\u0027\u0026\u0022"', $response->getContent());
     }
+
+    public function testPrefixJsonPrependADefaultPrefix()
+    {
+        $response = JsonResponse::create(array())->prefixJson();
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
+        $this->assertEquals('while(1);[]', $response->getContent());
+    }
+
+    public function testPrefixJsonCanSetACustomPrefix()
+    {
+        $response = JsonResponse::create(array())->prefixJson('for(;;);');
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
+        $this->assertEquals('for(;;);[]', $response->getContent());
+    }
+
+    public function testPrefixJsonDoNoAffectJsonP()
+    {
+        $response = JsonResponse::create(array())->setCallback('cb')->prefixJson();
+        $this->assertEquals('cb([]);', $response->getContent());
+    }
 }

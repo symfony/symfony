@@ -20,6 +20,7 @@ class JsonResponse extends Response
 {
     protected $data;
     protected $callback;
+    protected $prefix = '';
 
     /**
      * Constructor.
@@ -89,6 +90,22 @@ class JsonResponse extends Response
     }
 
     /**
+     * Mitigates CSRF attack by prepending a prefix to the generated JSON.
+     *
+     * @see http://stackoverflow.com/questions/2669690
+     *
+     * @param string $prefix The prefix to prepend to the generated JSON
+     *
+     * @return JsonResponse
+     */
+    public function prefixJson($prefix = 'while(1);')
+    {
+        $this->prefix = $prefix;
+
+        return $this->update();
+    }
+
+    /**
      * Updates the content and headers according to the json data and callback.
      *
      * @return JsonResponse
@@ -108,6 +125,6 @@ class JsonResponse extends Response
             $this->headers->set('Content-Type', 'application/json');
         }
 
-        return $this->setContent($this->data);
+        return $this->setContent($this->prefix . $this->data);
     }
 }

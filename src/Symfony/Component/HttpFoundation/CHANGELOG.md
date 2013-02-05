@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added JsonResponse::prefixJson() to mitigate CRSF attacks by prepending a prefix
+   to the generated JSON
+
 2.2.0
 -----
 

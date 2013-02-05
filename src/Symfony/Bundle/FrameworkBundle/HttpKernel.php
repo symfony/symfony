@@ -67,7 +67,7 @@ class HttpKernel extends ContainerAwareHttpKernel
      * @throws \RuntimeException
      * @throws \Exception
      *
-     * @deprecated in 2.2, will be removed in 2.3 (use Symfony\Component\HttpKernel\FragmentRenderer::render() instead)
+     * @deprecated in 2.2, will be removed in 2.3 (use Symfony\Component\HttpKernel\Fragment\FragmentHandler::render() instead)
      */
     public function render($uri, array $options = array())
     {

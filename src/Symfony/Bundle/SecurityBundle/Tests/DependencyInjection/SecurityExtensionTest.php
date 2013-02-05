@@ -158,6 +158,7 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
                 'class' => new Parameter('security.encoder.pbkdf2.class'),
                 'arguments' => array('sha1', false, 5, 30),
             ),
+            'JMS\FooBundle\Entity\User6' => new Reference('security.encoder.bcrypt'),
         )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 

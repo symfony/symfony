@@ -57,7 +57,7 @@ class FormType extends AbstractType
         ;
 
         if (false === $options['property_path']) {
-            trigger_error('\'property_path\' => false is deprecated since version 2.1 and will be removed in 2.3. Use \'mapped\' => false instead.', E_USER_DEPRECATED);
+            trigger_error('Setting "property_path" to "false" is deprecated since version 2.1 and will be removed in 2.3. Set "mapped" to "false" instead.', E_USER_DEPRECATED);
         }
 
         if ($options['trim']) {

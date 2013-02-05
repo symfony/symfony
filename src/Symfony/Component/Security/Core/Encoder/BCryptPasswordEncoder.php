@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Util\SecureRandomInterface;
 
 /**
  * @author Elnur Abdurrakhimov <elnur@elnur.pro>
- * @author Terje Bråten <terje@braten.be>
+ * @author Terje Bråten <terje@braten.be>
  */
 class BCryptPasswordEncoder extends BasePasswordEncoder
 {
@@ -33,8 +33,10 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
     private static $prefix = null;
 
     /**
-     * @param SecureRandomInterface $secureRandom
-     * @param int                   $cost
+     * Constructor.
+     *
+     * @param SecureRandomInterface $secureRandom A SecureRandomInterface instance
+     * @param integer               $cost         The algorithmic cost that should be used
      *
      * @throws \InvalidArgumentException if cost is out of range
      */
@@ -44,13 +46,12 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
 
         $cost = (int) $cost;
         if ($cost < 4 || $cost > 31) {
-            throw new \InvalidArgumentException('Cost must be in the range of 4-31');
+            throw new \InvalidArgumentException('Cost must be in the range of 4-31.');
         }
-        $this->cost = sprintf("%02d", $cost);
+        $this->cost = sprintf('%02d', $cost);
 
         if (!self::$prefix) {
-            self::$prefix = '$'.(version_compare(phpversion(), '5.3.7', '>=')
-                                 ? '2y' : '2a').'$';
+            self::$prefix = '$'.(version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a').'$';
         }
     }
 
@@ -63,8 +64,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
             return password_hash($raw, PASSWORD_BCRYPT, array('cost' => $this->cost));
         }
 
-        $salt = self::$prefix.$this->cost.'$'.
-            $this->encodeSalt($this->getRawSalt());
+        $salt = self::$prefix.$this->cost.'$'.$this->encodeSalt($this->getRawSalt());
         $encoded = crypt($raw, $salt);
         if (!is_string($encoded) || strlen($encoded) <= 13) {
             return false;
@@ -91,7 +91,8 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
     }
 
     /**
-     * Correctly encode the salt to be used by Bcrypt.
+     * Encodes the salt to be used by Bcrypt.
+     *
      * The blowfish/bcrypt algorithm used by PHP crypt expects a different
      * set and order of characters than the usual base64_encode function.
      * Regular b64: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
@@ -104,6 +105,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
      * of entropy.
      *
      * @param  bytes  $random a string of 16 random bytes
+     *
      * @return string Properly encoded salt to use with php crypt function
      *
      * @throws \InvalidArgumentException if string of random bytes is too short
@@ -112,7 +114,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
     {
         $len = strlen($random);
         if ($len < 16) {
-            throw new \InvalidArgumentException('The bcrypt salt needs 16 random bytes');
+            throw new \InvalidArgumentException('The bcrypt salt needs 16 random bytes.');
         }
         if ($len > 16) {
             $random = substr($random, 0, 16);
@@ -121,7 +123,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
         $base64raw = str_replace('+', '.', base64_encode($random));
         $salt128bit = substr($base64raw, 0, 21);
         $lastchar = substr($base64raw, 21, 1);
-        $lastchar = strtr($lastchar, 'AQgw','.Oeu');
+        $lastchar = strtr($lastchar, 'AQgw', '.Oeu');
         $salt128bit .= $lastchar;
 
         return $salt128bit;

@@ -37,43 +37,69 @@ class OutputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '->setVerbosity() sets the verbosity');
     }
 
-    public function testWrite()
+    public function testWriteWithVerbosityQuiet()
     {
-        $fooStyle = new OutputFormatterStyle('yellow', 'red', array('blink'));
         $output = new TestOutput(Output::VERBOSITY_QUIET);
         $output->writeln('foo');
         $this->assertEquals('', $output->output, '->writeln() outputs nothing if verbosity is set to VERBOSITY_QUIET');
+    }
 
+    public function testWriteAnArrayOfMessages()
+    {
         $output = new TestOutput();
         $output->writeln(array('foo', 'bar'));
         $this->assertEquals("foo\nbar\n", $output->output, '->writeln() can take an array of messages to output');
+    }
 
+    /**
+     * @dataProvider provideWriteArguments
+     */
+    public function testWriteRawMessage($message, $type, $expectedOutput)
+    {
         $output = new TestOutput();
-        $output->writeln('<info>foo</info>', Output::OUTPUT_RAW);
-        $this->assertEquals("<info>foo</info>\n", $output->output, '->writeln() outputs the raw message if OUTPUT_RAW is specified');
+        $output->writeln($message, $type);
+        $this->assertEquals($expectedOutput, $output->output);
+    }
 
-        $output = new TestOutput();
-        $output->writeln('<info>foo</info>', Output::OUTPUT_PLAIN);
-        $this->assertEquals("foo\n", $output->output, '->writeln() strips decoration tags if OUTPUT_PLAIN is specified');
+    public function provideWriteArguments()
+    {
+        return array(
+            array('<info>foo</info>', Output::OUTPUT_RAW, "<info>foo</info>\n"),
+            array('<info>foo</info>', Output::OUTPUT_PLAIN, "foo\n"),
+        );
+    }
 
+    public function testWriteWithDecorationTurnedOff()
+    {
         $output = new TestOutput();
         $output->setDecorated(false);
         $output->writeln('<info>foo</info>');
         $this->assertEquals("foo\n", $output->output, '->writeln() strips decoration tags if decoration is set to false');
+    }
 
+    public function testWriteDecoratedMessage()
+    {
+        $fooStyle = new OutputFormatterStyle('yellow', 'red', array('blink'));
         $output = new TestOutput();
         $output->getFormatter()->setStyle('FOO', $fooStyle);
         $output->setDecorated(true);
         $output->writeln('<foo>foo</foo>');
         $this->assertEquals("\033[33;41;5mfoo\033[0m\n", $output->output, '->writeln() decorates the output');
+    }
 
-        try {
-            $output->writeln('<foo>foo</foo>', 24);
-            $this->fail('->writeln() throws an \InvalidArgumentException when the type does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->writeln() throws an \InvalidArgumentException when the type does not exist');
-            $this->assertEquals('Unknown output type given (24)', $e->getMessage());
-        }
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Unknown output type given (24)
+     */
+    public function testWriteWithInvalidOutputType()
+    {
+        $output = new TestOutput();
+        $output->writeln('<foo>foo</foo>', 24);
+    }
+
+    public function testWriteWithInvalidStyle()
+    {
+        $output = new TestOutput();
 
         $output->clear();
         $output->write('<bar>foo</bar>');

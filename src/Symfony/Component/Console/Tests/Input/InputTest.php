@@ -36,22 +36,26 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $input = new ArrayInput(array('--name' => 'foo'), new InputDefinition(array(new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default'))));
         $this->assertEquals('default', $input->getOption('bar'), '->getOption() returns the default value for optional options');
         $this->assertEquals(array('name' => 'foo', 'bar' => 'default'), $input->getOptions(), '->getOptions() returns all option values, even optional ones');
+    }
 
-        try {
-            $input->setOption('foo', 'bar');
-            $this->fail('->setOption() throws a \InvalidArgumentException if the option does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
-            $this->assertEquals('The "foo" option does not exist.', $e->getMessage());
-        }
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage The "foo" option does not exist.
+     */
+    public function testSetInvalidOption()
+    {
+        $input = new ArrayInput(array('--name' => 'foo'), new InputDefinition(array(new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default'))));
+        $input->setOption('foo', 'bar');
+    }
 
-        try {
-            $input->getOption('foo');
-            $this->fail('->getOption() throws a \InvalidArgumentException if the option does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
-            $this->assertEquals('The "foo" option does not exist.', $e->getMessage());
-        }
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage The "foo" option does not exist.
+     */
+    public function testGetInvalidOption()
+    {
+        $input = new ArrayInput(array('--name' => 'foo'), new InputDefinition(array(new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default'))));
+        $input->getOption('foo');
     }
 
     public function testArguments()
@@ -66,45 +70,45 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'), new InputArgument('bar', InputArgument::OPTIONAL, '', 'default'))));
         $this->assertEquals('default', $input->getArgument('bar'), '->getArgument() returns the default value for optional arguments');
         $this->assertEquals(array('name' => 'foo', 'bar' => 'default'), $input->getArguments(), '->getArguments() returns all argument values, even optional ones');
+    }
 
-        try {
-            $input->setArgument('foo', 'bar');
-            $this->fail('->setArgument() throws a \InvalidArgumentException if the argument does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
-            $this->assertEquals('The "foo" argument does not exist.', $e->getMessage());
-        }
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage The "foo" argument does not exist.
+     */
+    public function testSetInvalidArgument()
+    {
+        $input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'), new InputArgument('bar', InputArgument::OPTIONAL, '', 'default'))));
+        $input->setArgument('foo', 'bar');
+    }
 
-        try {
-            $input->getArgument('foo');
-            $this->fail('->getArgument() throws a \InvalidArgumentException if the argument does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->setOption() throws a \InvalidArgumentException if the option does not exist');
-            $this->assertEquals('The "foo" argument does not exist.', $e->getMessage());
-        }
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage The "foo" argument does not exist.
+     */
+    public function testGetInvalidArgument()
+    {
+        $input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'), new InputArgument('bar', InputArgument::OPTIONAL, '', 'default'))));
+        $input->getArgument('foo');
+    }
+
+    /**
+     * @expectedException        \RuntimeException
+     * @expectedExceptionMessage Not enough arguments.
+     */
+    public function testValidateWithMissingArguments()
+    {
+        $input = new ArrayInput(array());
+        $input->bind(new InputDefinition(array(new InputArgument('name', InputArgument::REQUIRED))));
+        $input->validate();
     }
 
     public function testValidate()
     {
-        $input = new ArrayInput(array());
-        $input->bind(new InputDefinition(array(new InputArgument('name', InputArgument::REQUIRED))));
-
-        try {
-            $input->validate();
-            $this->fail('->validate() throws a \RuntimeException if not enough arguments are given');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\RuntimeException', $e, '->validate() throws a \RuntimeException if not enough arguments are given');
-            $this->assertEquals('Not enough arguments.', $e->getMessage());
-        }
-
         $input = new ArrayInput(array('name' => 'foo'));
         $input->bind(new InputDefinition(array(new InputArgument('name', InputArgument::REQUIRED))));
 
-        try {
-            $input->validate();
-        } catch (\RuntimeException $e) {
-            $this->fail('->validate() does not throw a \RuntimeException if enough arguments are given');
-        }
+        $this->assertNull($input->validate());
     }
 
     public function testSetGetInteractive()

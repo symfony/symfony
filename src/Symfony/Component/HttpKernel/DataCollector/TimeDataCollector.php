@@ -35,8 +35,12 @@ class TimeDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        if (null === $this->kernel) {
+            $requestTime = $request->server->get('REQUEST_TIME_FLOAT', $request->server->get('REQUEST_TIME'));
+        }
+
         $this->data = array(
-            'start_time' => (null !== $this->kernel ? $this->kernel->getStartTime() : $_SERVER['REQUEST_TIME']) * 1000,
+            'start_time' => (isset($requestTime) ? $requestTime : $this->kernel->getStartTime()) * 1000,
             'events'     => array(),
         );
     }

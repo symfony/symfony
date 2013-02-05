@@ -56,6 +56,10 @@ class FormType extends AbstractType
             ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
         ;
 
+        if (false === $options['property_path']) {
+            trigger_error('\'property_path\' => false is deprecated since version 2.1 and will be removed in 2.3. Use \'mapped\' => false instead.', E_USER_DEPRECATED);
+        }
+
         if ($options['trim']) {
             $builder->addEventSubscriber(new TrimListener());
         }

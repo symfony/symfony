@@ -66,16 +66,16 @@ class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
     public function testResultLength()
     {
         $encoder = new BCryptPasswordEncoder($this->secureRandom, self::VALID_COST);
-        $result = $encoder->encodePassword(self::PASSWORD);
+        $result = $encoder->encodePassword(self::PASSWORD, null);
         $this->assertEquals(60, strlen($result));
     }
 
     public function testValidation()
     {
         $encoder = new BCryptPasswordEncoder($this->secureRandom, self::VALID_COST);
-        $result = $encoder->encodePassword(self::PASSWORD);
-        $this->assertTrue($encoder->isPasswordValid($result, self::PASSWORD));
-        $this->assertFalse($encoder->isPasswordValid($result, 'anotherPassword'));
+        $result = $encoder->encodePassword(self::PASSWORD, null);
+        $this->assertTrue($encoder->isPasswordValid($result, self::PASSWORD, null));
+        $this->assertFalse($encoder->isPasswordValid($result, 'anotherPassword', null));
     }
 
     public function testValidationKnownPassword()
@@ -85,7 +85,7 @@ class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
                        ? '2y' : '2a').'$';
 
         $encrypted = $prefix.'04$ABCDEFGHIJKLMNOPQRSTU.uTmwd4KMSHxbUsG7bng8x7YdA0PM1iq';
-        $this->assertTrue($encoder->isPasswordValid($encrypted, self::PASSWORD));
+        $this->assertTrue($encoder->isPasswordValid($encrypted, self::PASSWORD, null));
     }
 
     public function testSecureRandomIsUsed()
@@ -100,7 +100,7 @@ class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
         ;
 
         $encoder = new BCryptPasswordEncoder($this->secureRandom, self::VALID_COST);
-        $result = $encoder->encodePassword(self::PASSWORD);
+        $result = $encoder->encodePassword(self::PASSWORD, null);
 
         $prefix = '$'.(version_compare(phpversion(), '5.3.7', '>=')
                        ? '2y' : '2a').'$';

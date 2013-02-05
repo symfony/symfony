@@ -58,7 +58,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
     /**
      * {@inheritdoc}
      */
-    public function encodePassword($raw, $salt = null)
+    public function encodePassword($raw, $salt)
     {
         if (function_exists('password_hash')) {
             return password_hash($raw, PASSWORD_BCRYPT, array('cost' => $this->cost));
@@ -76,7 +76,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
     /**
      * {@inheritdoc}
      */
-    public function isPasswordValid($encoded, $raw, $salt = null)
+    public function isPasswordValid($encoded, $raw, $salt)
     {
         if (function_exists('password_verify')) {
             return password_verify($raw, $encoded);

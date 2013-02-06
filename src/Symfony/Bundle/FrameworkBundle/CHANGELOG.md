@@ -21,6 +21,7 @@ CHANGELOG
    You can customize it for your functional tests or for generating urls with
    the right base url when your are in the cli context.
  * Added support for default templates per render tag
+ * added an init and terminate event dispatched by CLI commands
 
 2.1.0
 -----

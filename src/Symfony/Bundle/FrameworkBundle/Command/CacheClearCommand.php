@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,9 +24,11 @@ use Symfony\Component\Finder\Finder;
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class CacheClearCommand extends ContainerAwareCommand
+class CacheClearCommand extends Command
 {
     protected $name;
+
+    private $container;
 
     /**
      * @see Command
@@ -173,5 +176,17 @@ EOF;
         $class = "$namespace\\$class$suffix";
 
         return new $class($parent->getEnvironment(), $parent->isDebug());
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer()
+    {
+        if (null === $this->container) {
+            $this->container = $this->getApplication()->getKernel()->getContainer();
+        }
+
+        return $this->container;
     }
 }

@@ -113,13 +113,25 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseRoute(RouteCollection $collection, \DOMElement $node, $path)
     {
-        if ('' === ($id = $node->getAttribute('id')) || !$node->hasAttribute('pattern')) {
-            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" and a "pattern" attribute.', $path));
+        if ('' === ($id = $node->getAttribute('id')) || (!$node->hasAttribute('pattern') && !$node->hasAttribute('path'))) {
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" and a "path" attribute.', $path));
         }
+
+        if ($node->hasAttribute('pattern')) {
+            if ($node->hasAttribute('path')) {
+                throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" cannot define both a "path" and a "pattern" attribute. Use only "path".', $path));
+            }
+
+            $node->setAttribute('path', $node->getAttribute('pattern'));
+            $node->removeAttribute('pattern');
+        }
+
+        $schemes = array_filter(explode(' ', $node->getAttribute('schemes')));
+        $methods = array_filter(explode(' ', $node->getAttribute('methods')));
 
         list($defaults, $requirements, $options) = $this->parseConfigs($node, $path);
 
-        $route = new Route($node->getAttribute('pattern'), $defaults, $requirements, $options, $node->getAttribute('hostname-pattern'));
+        $route = new Route($node->getAttribute('path'), $defaults, $requirements, $options, $node->getAttribute('host'), $schemes, $methods);
         $collection->add($id, $route);
     }
 
@@ -141,7 +153,9 @@ class XmlFileLoader extends FileLoader
 
         $type = $node->getAttribute('type');
         $prefix = $node->getAttribute('prefix');
-        $hostnamePattern = $node->hasAttribute('hostname-pattern') ? $node->getAttribute('hostname-pattern') : null;
+        $host = $node->hasAttribute('host') ? $node->getAttribute('host') : null;
+        $schemes = $node->hasAttribute('schemes') ? array_filter(explode(' ', $node->getAttribute('schemes'))) : null;
+        $methods = $node->hasAttribute('methods') ? array_filter(explode(' ', $node->getAttribute('methods'))) : null;
 
         list($defaults, $requirements, $options) = $this->parseConfigs($node, $path);
 
@@ -150,8 +164,14 @@ class XmlFileLoader extends FileLoader
         $subCollection = $this->import($resource, ('' !== $type ? $type : null), false, $file);
         /* @var $subCollection RouteCollection */
         $subCollection->addPrefix($prefix);
-        if (null !== $hostnamePattern) {
-            $subCollection->setHostnamePattern($hostnamePattern);
+        if (null !== $host) {
+            $subCollection->setHost($host);
+        }
+        if (null !== $schemes) {
+            $subCollection->setSchemes($schemes);
+        }
+        if (null !== $methods) {
+            $subCollection->setMethods($methods);
         }
         $subCollection->addDefaults($defaults);
         $subCollection->addRequirements($requirements);

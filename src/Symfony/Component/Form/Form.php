@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\Exception;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Util\FormUtil;
-use Symfony\Component\Form\Util\PropertyPath;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
  * Form represents a form.
@@ -152,7 +152,7 @@ class Form implements \IteratorAggregate, FormInterface
         // `setData` and `add` will not lead to the correct population of
         // the child forms.
         if ($config->getCompound() && !$config->getDataMapper()) {
-            throw new FormException('Compound forms need a data mapper');
+            throw new Exception('Compound forms need a data mapper');
         }
 
         $this->config = $config;
@@ -256,7 +256,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (null !== $parent && '' === $this->config->getName()) {
-            throw new FormException('A form with an empty name cannot have a parent form.');
+            throw new Exception('A form with an empty name cannot have a parent form.');
         }
 
         $this->parent = $parent;
@@ -359,7 +359,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if ($this->lockSetData) {
-            throw new FormException('A cycle was detected. Listeners to the PRE_SET_DATA event must not call setData(). You should call setData() on the FormEvent object instead.');
+            throw new Exception('A cycle was detected. Listeners to the PRE_SET_DATA event must not call setData(). You should call setData() on the FormEvent object instead.');
         }
 
         $this->lockSetData = true;
@@ -367,11 +367,12 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Hook to change content of the data
         if ($dispatcher->hasListeners(FormEvents::PRE_SET_DATA) || $dispatcher->hasListeners(FormEvents::SET_DATA)) {
-            set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
             $event = new FormEvent($this, $modelData);
-            restore_error_handler();
             $dispatcher->dispatch(FormEvents::PRE_SET_DATA, $event);
             // BC until 2.3
+            if ($dispatcher->hasListeners(FormEvents::SET_DATA)) {
+                trigger_error('The FormEvents::SET_DATA event is deprecated since 2.1 and will be removed in 2.3. Use the FormEvents::PRE_SET_DATA event instead.', E_USER_DEPRECATED);
+            }
             $dispatcher->dispatch(FormEvents::SET_DATA, $event);
             $modelData = $event->getData();
         }
@@ -394,7 +395,7 @@ class Form implements \IteratorAggregate, FormInterface
             if (null === $dataClass && is_object($viewData) && !$viewData instanceof \ArrayAccess) {
                 $expectedType = 'scalar, array or an instance of \ArrayAccess';
 
-                throw new FormException(
+                throw new Exception(
                     'The form\'s view data is expected to be of type ' . $expectedType . ', ' .
                     'but is ' . $actualType . '. You ' .
                     'can avoid this error by setting the "data_class" option to ' .
@@ -404,7 +405,7 @@ class Form implements \IteratorAggregate, FormInterface
             }
 
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
-                throw new FormException(
+                throw new Exception(
                     'The form\'s view data is expected to be an instance of class ' .
                     $dataClass . ', but is '. $actualType . '. You can avoid this error ' .
                     'by setting the "data_class" option to null or by adding a view ' .
@@ -532,17 +533,18 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Hook to change content of the data bound by the browser
         if ($dispatcher->hasListeners(FormEvents::PRE_BIND) || $dispatcher->hasListeners(FormEvents::BIND_CLIENT_DATA)) {
-            set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
             $event = new FormEvent($this, $submittedData);
-            restore_error_handler();
             $dispatcher->dispatch(FormEvents::PRE_BIND, $event);
             // BC until 2.3
+            if ($dispatcher->hasListeners(FormEvents::BIND_CLIENT_DATA)) {
+                trigger_error('The FormEvents::BIND_CLIENT_DATA event is deprecated since 2.1 and will be removed in 2.3. Use the FormEvents::PRE_BIND event instead.', E_USER_DEPRECATED);
+            }
             $dispatcher->dispatch(FormEvents::BIND_CLIENT_DATA, $event);
             $submittedData = $event->getData();
         }
 
         // Check whether the form is compound.
-        // This check is preferrable over checking the number of children,
+        // This check is preferable over checking the number of children,
         // since forms without children may also be compound.
         // (think of empty collection forms)
         if ($this->config->getCompound()) {
@@ -594,11 +596,12 @@ class Form implements \IteratorAggregate, FormInterface
             // Hook to change content of the data into the normalized
             // representation
             if ($dispatcher->hasListeners(FormEvents::BIND) || $dispatcher->hasListeners(FormEvents::BIND_NORM_DATA)) {
-                set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
                 $event = new FormEvent($this, $normData);
-                restore_error_handler();
                 $dispatcher->dispatch(FormEvents::BIND, $event);
                 // BC until 2.3
+                if ($dispatcher->hasListeners(FormEvents::BIND_NORM_DATA)) {
+                    trigger_error('The FormEvents::BIND_NORM_DATA event is deprecated since 2.1 and will be removed in 2.3. Use the FormEvents::BIND event instead.', E_USER_DEPRECATED);
+                }
                 $dispatcher->dispatch(FormEvents::BIND_NORM_DATA, $event);
                 $normData = $event->getData();
             }
@@ -621,10 +624,14 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
-        foreach ($this->config->getValidators() as $validator) {
+        $validators = $this->config->getValidators();
+        restore_error_handler();
+
+        foreach ($validators as $validator) {
+            trigger_error(sprintf('FormConfigInterface::getValidators() is deprecated since 2.1 and will be removed in 2.3. Convert your %s class to a listener on the FormEvents::POST_BIND event.', get_class($validator)), E_USER_DEPRECATED);
+
             $validator->validate($this);
         }
-        restore_error_handler();
 
         return $this;
     }
@@ -837,7 +844,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getChildren()
     {
-        trigger_error('getChilren() is deprecated since version 2.1 and will be removed in 2.3. Use all() instead.', E_USER_DEPRECATED);
+        trigger_error('getChildren() is deprecated since version 2.1 and will be removed in 2.3. Use all() instead.', E_USER_DEPRECATED);
 
         return $this->all();
     }
@@ -867,7 +874,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (!$this->config->getCompound()) {
-            throw new FormException('You cannot add children to a simple form. Maybe you should set the option "compound" to true?');
+            throw new Exception('You cannot add children to a simple form. Maybe you should set the option "compound" to true?');
         }
 
         // Obtain the view data

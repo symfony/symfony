@@ -11,54 +11,20 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\HttpKernel as BaseHttpKernel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel;
 
 /**
  * This HttpKernel is used to manage scope changes of the DI container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated This class is deprecated in 2.2 and will be removed in 2.3
  */
-class HttpKernel extends BaseHttpKernel
+class HttpKernel extends ContainerAwareHttpKernel
 {
-    protected $container;
-
-    private $esiSupport;
-
-    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
-    {
-        parent::__construct($dispatcher, $controllerResolver);
-
-        $this->container = $container;
-    }
-
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
-    {
-        $request->headers->set('X-Php-Ob-Level', ob_get_level());
-
-        $this->container->enterScope('request');
-        $this->container->set('request', $request, 'request');
-
-        try {
-            $response = parent::handle($request, $type, $catch);
-        } catch (\Exception $e) {
-            $this->container->leaveScope('request');
-
-            throw $e;
-        }
-
-        $this->container->leaveScope('request');
-
-        return $response;
-    }
-
     /**
      * Forwards the request to another controller.
      *
@@ -67,9 +33,13 @@ class HttpKernel extends BaseHttpKernel
      * @param array  $query      An array of request query parameters
      *
      * @return Response A Response instance
+     *
+     * @deprecated in 2.2, will be removed in 2.3
      */
     public function forward($controller, array $attributes = array(), array $query = array())
     {
+        trigger_error('forward() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
+
         $attributes['_controller'] = $controller;
         $subRequest = $this->container->get('request')->duplicate($query, null, $attributes);
 
@@ -96,97 +66,18 @@ class HttpKernel extends BaseHttpKernel
      *
      * @throws \RuntimeException
      * @throws \Exception
+     *
+     * @deprecated in 2.2, will be removed in 2.3 (use Symfony\Component\HttpKernel\HttpContentRenderer::render() instead)
      */
     public function render($uri, array $options = array())
     {
-        $request = $this->container->get('request');
+        trigger_error('render() is deprecated since version 2.2 and will be removed in 2.3. Use Symfony\Component\HttpKernel\HttpContentRenderer::render() instead.', E_USER_DEPRECATED);
 
-        $options = array_merge(array(
-            'ignore_errors' => !$this->container->getParameter('kernel.debug'),
-            'alt'           => null,
-            'standalone'    => false,
-            'comment'       => '',
-            'default'       => null,
-        ), $options);
+        $options = $this->renderer->fixOptions($options);
 
-        if (null === $this->esiSupport) {
-            $this->esiSupport = $this->container->has('esi') && $this->container->get('esi')->hasSurrogateEsiCapability($request);
-        }
+        $strategy = isset($options['strategy']) ? $options['strategy'] : 'default';
+        unset($options['strategy']);
 
-        if ($this->esiSupport && (true === $options['standalone'] || 'esi' === $options['standalone'])) {
-            return $this->container->get('esi')->renderIncludeTag($uri, $options['alt'], $options['ignore_errors'], $options['comment']);
-        }
-
-        if ('js' === $options['standalone']) {
-            $defaultContent = null;
-
-            $templating = $this->container->get('templating');
-
-            if ($options['default']) {
-                if ($templating->exists($options['default'])) {
-                    $defaultContent = $templating->render($options['default']);
-                } else {
-                    $defaultContent = $options['default'];
-                }
-            } elseif ($template = $this->container->getParameter('templating.hinclude.default_template')) {
-                $defaultContent = $templating->render($template);
-            }
-
-            return $this->renderHIncludeTag($uri, $defaultContent);
-        }
-
-        $subRequest = Request::create($uri, 'get', array(), $request->cookies->all(), array(), $request->server->all());
-        if ($session = $request->getSession()) {
-            $subRequest->setSession($session);
-        }
-
-        $level = ob_get_level();
-        try {
-            $response = $this->handle($subRequest, HttpKernelInterface::SUB_REQUEST, false);
-
-            if (!$response->isSuccessful()) {
-                throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
-            }
-
-            if (!$response instanceof StreamedResponse) {
-                return $response->getContent();
-            }
-
-            $response->sendContent();
-        } catch (\Exception $e) {
-            if ($options['alt']) {
-                $alt = $options['alt'];
-                unset($options['alt']);
-
-                return $this->render($alt, $options);
-            }
-
-            if (!$options['ignore_errors']) {
-                throw $e;
-            }
-
-            // let's clean up the output buffers that were created by the sub-request
-            while (ob_get_level() > $level) {
-                ob_get_clean();
-            }
-        }
-    }
-
-    /**
-     * Renders an HInclude tag.
-     *
-     * @param string $uri            A URI
-     * @param string $defaultContent Default content
-     *
-     * @return string
-     */
-    public function renderHIncludeTag($uri, $defaultContent = null)
-    {
-        return sprintf('<hx:include src="%s">%s</hx:include>', $uri, $defaultContent);
-    }
-
-    public function hasEsiSupport()
-    {
-        return $this->esiSupport;
+        $this->container->get('http_content_renderer')->render($uri, $strategy, $options);
     }
 }

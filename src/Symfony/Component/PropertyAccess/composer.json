@@ -1,0 +1,31 @@
+{
+    "name": "symfony/property-access",
+    "type": "library",
+    "description": "Symfony PropertyAccess Component",
+    "keywords": ["property", "index", "access", "object", "array", "extraction", "injection", "reflection", "property path"],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\PropertyAccess\\": "" }
+    },
+    "target-dir": "Symfony/Component/PropertyAccess",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.3-dev"
+        }
+    }
+}

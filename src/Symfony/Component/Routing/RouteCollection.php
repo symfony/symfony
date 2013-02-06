@@ -235,7 +235,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
         $options = func_num_args() > 3 ? func_get_arg(3) : array();
 
         foreach ($this->routes as $route) {
-            $route->setPattern('/' . $prefix . $route->getPattern());
+            $route->setPath('/' . $prefix . $route->getPath());
             $route->addDefaults($defaults);
             $route->addRequirements($requirements);
             $route->addOptions($options);
@@ -255,16 +255,16 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Sets the hostname pattern on all routes.
+     * Sets the host pattern on all routes.
      *
      * @param string $pattern      The pattern
      * @param array  $defaults     An array of default values
      * @param array  $requirements An array of requirements
      */
-    public function setHostnamePattern($pattern, array $defaults = array(), array $requirements = array())
+    public function setHost($pattern, array $defaults = array(), array $requirements = array())
     {
         foreach ($this->routes as $route) {
-            $route->setHostnamePattern($pattern);
+            $route->setHost($pattern);
             $route->addDefaults($defaults);
             $route->addRequirements($requirements);
         }
@@ -315,6 +315,30 @@ class RouteCollection implements \IteratorAggregate, \Countable
             foreach ($this->routes as $route) {
                 $route->addOptions($options);
             }
+        }
+    }
+
+    /**
+     * Sets the schemes (e.g. 'https') all child routes are restricted to.
+     *
+     * @param string|array $schemes The scheme or an array of schemes
+     */
+    public function setSchemes($schemes)
+    {
+        foreach ($this->routes as $route) {
+            $route->setSchemes($schemes);
+        }
+    }
+
+    /**
+     * Sets the HTTP methods (e.g. 'POST') all child routes are restricted to.
+     *
+     * @param string|array $methods The method or an array of methods
+     */
+    public function setMethods($methods)
+    {
+        foreach ($this->routes as $route) {
+            $route->setMethods($methods);
         }
     }
 

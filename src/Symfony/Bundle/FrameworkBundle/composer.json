@@ -29,7 +29,8 @@
         "doctrine/common": ">=2.2,<2.4-dev"
     },
     "require-dev": {
-        "symfony/finder": "2.2.*"
+        "symfony/finder": "2.2.*",
+        "symfony/security": "2.2.*"
     },
     "suggest": {
         "symfony/console": "2.2.*",
@@ -44,7 +45,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.2-dev"
+            "dev-master": "2.3-dev"
         }
     }
 }

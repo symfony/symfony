@@ -314,6 +314,27 @@ class FinderTest extends Iterator\RealIteratorTestCase
     /**
      * @dataProvider getAdaptersTestData
      */
+    public function testInWithGlob($adapter)
+    {
+        $finder = $this->buildFinder($adapter);
+        $finder->in(array(__DIR__.'/Fixtures/*/B/C', __DIR__.'/Fixtures/*/*/B/C'))->getIterator();
+
+        $this->assertIterator($this->toAbsoluteFixtures(array('A/B/C/abc.dat', 'copy/A/B/C/abc.dat.copy')), $finder);
+    }
+
+    /**
+     * @dataProvider getAdaptersTestData
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInWithNonDirectoryGlob($adapter)
+    {
+        $finder = $this->buildFinder($adapter);
+        $finder->in(__DIR__.'/Fixtures/A/a*');
+    }
+
+    /**
+     * @dataProvider getAdaptersTestData
+     */
     public function testGetIterator($adapter)
     {
         $finder = $this->buildFinder($adapter);
@@ -553,6 +574,19 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->in($locations)->depth('< 1')->name('test.php');
 
         $this->assertEquals(1, count($finder));
+    }
+
+    /**
+     * Iterator keys must be the file pathname.
+     *
+     * @dataProvider getAdaptersTestData
+     */
+    public function testIteratorKeys(Adapter\AdapterInterface $adapter)
+    {
+        $finder = $this->buildFinder($adapter)->in(self::$tmpDir);
+        foreach ($finder as $key => $file) {
+            $this->assertEquals($file->getPathname(), $key);
+        }
     }
 
     public function testAdaptersOrdering()

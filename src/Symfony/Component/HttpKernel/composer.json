@@ -18,7 +18,8 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/event-dispatcher": "2.2.*",
-        "symfony/http-foundation": "2.2.*"
+        "symfony/http-foundation": "2.2.*",
+        "psr/log": "~1.0"
     },
     "require-dev": {
         "symfony/browser-kit": "2.2.*",
@@ -46,7 +47,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.2-dev"
+            "dev-master": "2.3-dev"
         }
     }
 }

@@ -1,10 +1,11 @@
 CHANGELOG
 =========
 
-2.1.5
+2.2.0
 -----
 
- * fixed caching of choice lists when EntityType is used with the "query_builder" option
+ * added an optional PropertyAccessorInterface parameter to DoctrineType,
+   EntityType and EntityChoiceList
 
 2.1.0
 -----

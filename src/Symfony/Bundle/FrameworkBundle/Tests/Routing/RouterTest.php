@@ -113,16 +113,16 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             '/before/foo/after/%unescaped%',
-            $route->getPattern()
+            $route->getPath()
         );
     }
 
-    public function testHostnamePatternPlaceholders()
+    public function testHostPlaceholders()
     {
         $routes = new RouteCollection();
 
         $route = new Route('foo');
-        $route->setHostnamePattern('/before/%parameter.foo%/after/%%unescaped%%');
+        $route->setHost('/before/%parameter.foo%/after/%%unescaped%%');
 
         $routes->add('foo', $route);
 
@@ -136,7 +136,7 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             '/before/foo/after/%unescaped%',
-            $route->getHostnamePattern()
+            $route->getHost()
         );
     }
 

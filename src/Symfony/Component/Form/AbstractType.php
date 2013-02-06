@@ -51,10 +51,20 @@ abstract class AbstractType implements FormTypeInterface
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
-        $resolver->setDefaults($this->getDefaultOptions(array()));
-        $resolver->addAllowedValues($this->getAllowedOptionValues(array()));
-        restore_error_handler();
+        $defaults = $this->getDefaultOptions(array());
+        $allowedTypes = $this->getAllowedOptionValues(array());
+
+        if (!empty($defaults)) {
+            trigger_error('getDefaultOptions() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
+
+            $resolver->setDefaults($defaults);
+        }
+
+        if (!empty($allowedTypes)) {
+            trigger_error('getAllowedOptionValues() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
+
+            $resolver->addAllowedValues($allowedTypes);
+        }
     }
 
     /**
@@ -69,8 +79,6 @@ abstract class AbstractType implements FormTypeInterface
      */
     public function getDefaultOptions(array $options)
     {
-        trigger_error('getDefaultOptions() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
-
         return array();
     }
 
@@ -86,8 +94,6 @@ abstract class AbstractType implements FormTypeInterface
      */
     public function getAllowedOptionValues(array $options)
     {
-        trigger_error('getAllowedOptionValues() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
-
         return array();
     }
 

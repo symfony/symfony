@@ -23,11 +23,11 @@
                 <target>Väärtus peaks olema üks etteantud valikutest.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choices.</source>
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
                 <target>Valima peaks vähemalt {{ limit }} valikut.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choices.</source>
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
                 <target>Valima peaks mitte rohkem kui  {{ limit }} valikut.</target>
             </trans-unit>
             <trans-unit id="8">
@@ -75,7 +75,7 @@
                 <target>Väärtus peaks olema {{ limit }} või vähem.</target>
             </trans-unit>
             <trans-unit id="19">
-                <source>This value is too long. It should have {{ limit }} characters or less.</source>
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
                 <target>Väärtus on liiga pikk. Pikkus peaks olema {{ limit }} tähemärki või vähem.</target>
             </trans-unit>
             <trans-unit id="20">
@@ -83,7 +83,7 @@
                 <target>Väärtus peaks olema {{ limit }} või rohkem.</target>
             </trans-unit>
             <trans-unit id="21">
-                <source>This value is too short. It should have {{ limit }} characters or more.</source>
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
                 <target>Väärtus on liiga lühike. Pikkus peaks  olema {{ limit }} tähemärki või rohkem.</target>
             </trans-unit>
             <trans-unit id="22">

@@ -108,7 +108,7 @@ class Client extends BaseClient
             $this->kernel->getContainer()->get('profiler')->enable();
         }
 
-        return $this->kernel->handle($request);
+        return parent::doRequest($request);
     }
 
     /**

@@ -163,7 +163,7 @@ class ApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
 
         $collection->addCollection($collection1);
 
-        // hostname and variables
+        // host and variables
 
         $collection1 = new RouteCollection();
 

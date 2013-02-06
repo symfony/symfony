@@ -4,6 +4,49 @@ CHANGELOG
 2.2.0
 -----
 
+ * [DEPRECATION] Several route settings have been renamed (the old ones will be removed in 3.0):
+
+    * The `pattern` setting for a route has been deprecated in favor of `path`
+    * The `_scheme` and `_method` requirements have been moved to the `schemes` and `methods` settings
+
+   Before:
+
+   ```
+   article_edit:
+       pattern: /article/{id}
+       requirements: { '_method': 'POST|PUT', '_scheme': 'https', 'id': '\d+' }
+
+   <route id="article_edit" pattern="/article/{id}">
+       <requirement key="_method">POST|PUT</requirement>
+       <requirement key="_scheme">https</requirement>
+       <requirement key="id">\d+</requirement>
+   </route>
+
+   $route = new Route();
+   $route->setPattern('/article/{id}');
+   $route->setRequirement('_method', 'POST|PUT');
+   $route->setRequirement('_scheme', 'https');
+   ```
+
+   After:
+
+   ```
+   article_edit:
+       path: /article/{id}
+       methods: [POST, PUT]
+       schemes: https
+       requirements: { 'id': '\d+' }
+
+   <route id="article_edit" pattern="/article/{id}" methods="POST PUT" schemes="https">
+       <requirement key="id">\d+</requirement>
+   </route>
+
+   $route = new Route();
+   $route->setPath('/article/{id}');
+   $route->setMethods(array('POST', 'PUT'));
+   $route->setSchemes('https');
+   ```
+
  * [BC BREAK] RouteCollection does not behave like a tree structure anymore but as
    a flat array of Routes. So when using PHP to build the RouteCollection, you must
    make sure to add routes to the sub-collection before adding it to the parent
@@ -79,6 +122,14 @@ CHANGELOG
    pass the requirements (otherwise it would break your link anyway).
  * There is no restriction on the route name anymore. So non-alphanumeric characters
    are now also allowed.
+ * [BC BREAK] `RouteCompilerInterface::compile(Route $route)` was made static
+   (only relevant if you implemented your own RouteCompiler).
+ * Added possibility to generate relative paths and network paths in the UrlGenerator, e.g.
+   "../parent-file" and "//example.com/dir/file". The third parameter in
+   `UrlGeneratorInterface::generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)`
+   now accepts more values and you should use the constants defined in `UrlGeneratorInterface` for
+   claritiy. The old method calls with a Boolean parameter will continue to work because they
+   equal the signature using the constants.
 
 2.1.0
 -----

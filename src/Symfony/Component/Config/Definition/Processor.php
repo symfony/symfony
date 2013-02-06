@@ -79,18 +79,19 @@ class Processor
             $plural = $key.'s';
         }
 
-        $values = array();
         if (isset($config[$plural])) {
-            $values = $config[$plural];
-        } elseif (isset($config[$key])) {
-            if (is_string($config[$key]) || !is_int(key($config[$key]))) {
-                // only one
-                $values = array($config[$key]);
-            } else {
-                $values = $config[$key];
-            }
+            return $config[$plural];
         }
 
-        return $values;
+        if (isset($config[$key])) {
+            if (is_string($config[$key]) || !is_int(key($config[$key]))) {
+                // only one
+                return  array($config[$key]);
+            }
+
+            return  $config[$key];
+        }
+
+        return array();
     }
 }

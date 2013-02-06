@@ -198,7 +198,7 @@ class Command
     public function end()
     {
         if (null === $this->parent) {
-            throw new \RuntimeException('Calling end on root command dont makes sense.');
+            throw new \RuntimeException('Calling end on root command doesn\'t make sense.');
         }
 
         return $this->parent;
@@ -251,6 +251,7 @@ class Command
      * Insert a string or a Command instance before the bit at given position $index (index starts from 0).
      *
      * @param string|Command $bit
+     * @param integer        $index
      *
      * @return Command The current Command instance
      */

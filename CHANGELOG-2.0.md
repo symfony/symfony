@@ -7,6 +7,27 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.22 (2013-01-17)
+
+ * 3c87e2e: Added Yaml\Dumper::setIndentation() method to allow a custom indentation level of nested nodes.
+ * ba6e315: added a way to enable/disable object support when parsing/dumping
+ * ac756bf: added a way to enable/disable PHP support when parsing a YAML input via Yaml::parse()
+ * dc2cc6b: [Console] fixed input bug when the value of an option is empty (closes #6649, closes #6689)
+ * 880da01: [Process] In edge cases `getcwd()` can return `false`, then `proc_open()` should get `null` to use default value (the working dir of the current PHP process)
+ * 1d362b8: [DependencyInjection] fixed a bug where the strict flag on references were lost (closes #6607)
+ * 3195122: [HttpFoundation] Check if required shell functions for `FileBinaryMimeTypeGuesser` are not disabled
+ * dbafc2c: [CssSelector] added css selector with empty string
+ * ba2d035: Restrict Monolog version to be in version <1.3
+ * e0923ae: [DependencyInjection] fixed PhpDumper optimizations when an inlined service depends on the current one indirectly
+ * cd15390: [DependencyInjection] fixed PhpDumper when an inlined service definition has some properties
+ * 73d9cef: [Locale] Adjust `StubIntlDateFormatter` to have new methods added in PHP 5.5
+ * 913b564: [Locale] Fix failing `StubIntlDateFormatter` in PHP 5.5
+ * 8ae773b: [Form] Fix failing `MonthChoiceList` in PHP 5.5
+
+* 2.0.21 (2012-12-21)
+
+ * b8e5689: [FrameworkBundle] fixed ESI calls
+
 * 2.0.20 (2012-12-20)
 
  * 532cc9a: [FrameworkBundle] added support for URIs as an argument to HttpKernel::render()

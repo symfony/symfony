@@ -15,7 +15,15 @@ namespace Symfony\Component\Security\Core\Exception;
  * CredentialsExpiredException is thrown when the user account credentials have expired.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexander <iam.asm89@gmail.com>
  */
 class CredentialsExpiredException extends AccountStatusException
 {
+    /**
+     * {@inheritDoc}
+     */
+    public function getMessageKey()
+    {
+        return 'Credentials have expired.';
+    }
 }

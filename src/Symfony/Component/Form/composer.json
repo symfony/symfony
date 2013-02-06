@@ -17,18 +17,18 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/event-dispatcher": "2.2.*",
-        "symfony/locale": "2.2.*",
-        "symfony/options-resolver": "2.2.*",
-        "symfony/property-access": "2.2.*"
+        "symfony/event-dispatcher": "2.3.*",
+        "symfony/locale": "2.3.*",
+        "symfony/options-resolver": "2.3.*",
+        "symfony/property-access": "2.3.*"
     },
     "require-dev": {
-        "symfony/validator": "2.2.*",
-        "symfony/http-foundation": "2.2.*"
+        "symfony/validator": "2.3.*",
+        "symfony/http-foundation": "2.3.*"
     },
     "suggest": {
-        "symfony/validator": "2.2.*",
-        "symfony/http-foundation": "2.2.*"
+        "symfony/validator": "2.3.*",
+        "symfony/http-foundation": "2.3.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Form\\": "" }

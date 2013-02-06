@@ -17,14 +17,14 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/dom-crawler": "2.2.*"
+        "symfony/dom-crawler": "2.3.*"
     },
     "require-dev": {
-        "symfony/process": "2.2.*",
-        "symfony/css-selector": "2.2.*"
+        "symfony/process": "2.3.*",
+        "symfony/css-selector": "2.3.*"
     },
     "suggest": {
-        "symfony/process": "2.2.*"
+        "symfony/process": "2.3.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\BrowserKit\\": "" }

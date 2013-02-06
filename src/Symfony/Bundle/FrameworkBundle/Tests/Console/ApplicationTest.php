@@ -13,8 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Console;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Tests\Console\Fixtures\FooCommand;
-use Symfony\Bundle\FrameworkBundle\Tests\Console\Fixtures\SilentCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Console\ConsoleEvents;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
@@ -51,16 +51,6 @@ class ApplicationTest extends TestCase
         $application->doRun(new ArrayInput(array('foo')), new NullOutput());
     }
 
-    public function testSilentCommand()
-    {
-        $kernel = $this->getKernel(array(), $this->never());
-
-        $application = new Application($kernel);
-        $application->add(new SilentCommand('chut'));
-
-        $application->doRun(new ArrayInput(array('chut')), new NullOutput());
-    }
-
     private function getKernel(array $bundles, $dispatcherExpected = null)
     {
         $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
@@ -80,8 +70,19 @@ class ApplicationTest extends TestCase
         } else {
             $eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
             $eventDispatcher
-                ->expects($this->atLeastOnce())
-                ->method('dispatch');
+                ->expects($this->at(0))
+                ->method('dispatch')
+                ->with(
+                    $this->equalTo(ConsoleEvents::INIT),
+                    $this->isInstanceOf('Symfony\Bundle\FrameworkBundle\Event\ConsoleEvent')
+                );
+            $eventDispatcher
+                ->expects($this->at(1))
+                ->method('dispatch')
+                ->with(
+                    $this->equalTo(ConsoleEvents::TERMINATE),
+                    $this->isInstanceOf('Symfony\Bundle\FrameworkBundle\Event\ConsoleTerminateEvent')
+                );
             $container
                 ->expects($dispatcherExpected)
                 ->method('get')

@@ -38,13 +38,16 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
     public function run(InputInterface $input, OutputInterface $output)
     {
         $dispatcher = $this->getContainer()->get('event_dispatcher');
+        $helperSet = $this->getHelperSet();
 
         $initEvent = new ConsoleEvent($input, $output);
+        $initEvent->setHelperSet($helperSet);
         $dispatcher->dispatch(ConsoleEvents::INIT, $initEvent);
 
         $exitCode = parent::run($input, $output);
 
         $terminateEvent = new ConsoleTerminateEvent($input, $output, $exitCode);
+        $terminateEvent->setHelperSet($helperSet);
         $dispatcher->dispatch(ConsoleEvents::TERMINATE, $terminateEvent);
 
         return $exitCode;

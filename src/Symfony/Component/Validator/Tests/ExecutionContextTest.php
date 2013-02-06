@@ -376,6 +376,19 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         )), $this->context->getViolations());
     }
 
+    public function testAddViolationPluralTranslationError()
+    {
+        $this->translator->expects($this->once())
+            ->method('transChoice')
+            ->with('foo')
+            ->will($this->throwException(new \InvalidArgumentException()));
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('foo');
+
+        $this->context->addViolation('foo', array(), null, 2);
+    }
+
     public function testGetPropertyPath()
     {
         $this->assertEquals('foo.bar', $this->context->getPropertyPath());

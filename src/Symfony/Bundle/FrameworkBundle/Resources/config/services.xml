@@ -40,7 +40,7 @@
             This service definition only defines the scope of the request.
             It is used to check references scope.
         -->
-        <service id="request" scope="request" synthetic="true" />
+        <service id="request" scope="request" synthetic="true" synchronized="true" />
 
         <service id="service_container" synthetic="true" />
 

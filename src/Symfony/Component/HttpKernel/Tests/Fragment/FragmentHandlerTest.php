@@ -17,13 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-    }
-
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -102,14 +95,7 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
 
         $handler = new FragmentHandler();
         $handler->addRenderer($renderer);
-
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->will($this->returnValue(Request::create('/')))
-        ;
-        $handler->onKernelRequest($event);
+        $handler->setRequest(Request::create('/'));
 
         return $handler;
     }

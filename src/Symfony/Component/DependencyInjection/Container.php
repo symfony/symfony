@@ -206,6 +206,10 @@ class Container implements IntrospectableContainerInterface
         }
 
         $this->services[$id] = $service;
+
+        if (method_exists($this, $method = 'synchronize'.strtr($id, array('_' => '', '.' => '_')).'Service')) {
+            $this->$method();
+        }
     }
 
     /**
@@ -221,7 +225,7 @@ class Container implements IntrospectableContainerInterface
     {
         $id = strtolower($id);
 
-        return isset($this->services[$id]) || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service');
+        return array_key_exists($id, $this->services) || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_')).'Service');
     }
 
     /**
@@ -247,7 +251,7 @@ class Container implements IntrospectableContainerInterface
     {
         $id = strtolower($id);
 
-        if (isset($this->services[$id])) {
+        if (array_key_exists($id, $this->services)) {
             return $this->services[$id];
         }
 
@@ -263,7 +267,7 @@ class Container implements IntrospectableContainerInterface
             } catch (\Exception $e) {
                 unset($this->loading[$id]);
 
-                if (isset($this->services[$id])) {
+                if (array_key_exists($id, $this->services)) {
                     unset($this->services[$id]);
                 }
 
@@ -289,7 +293,7 @@ class Container implements IntrospectableContainerInterface
      */
     public function initialized($id)
     {
-        return isset($this->services[strtolower($id)]);
+        return array_key_exists(strtolower($id), $this->services);
     }
 
     /**
@@ -393,8 +397,11 @@ class Container implements IntrospectableContainerInterface
             $services = $this->scopeStacks[$name]->pop();
             $this->scopedServices += $services;
 
-            array_unshift($services, $this->services);
-            $this->services = call_user_func_array('array_merge', $services);
+            foreach ($services as $array) {
+                foreach ($array as $id => $service) {
+                    $this->set($id, $service, $name);
+                }
+            }
         }
     }
 

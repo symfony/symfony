@@ -128,6 +128,9 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(array('setBar', array('foo', new Reference('foo'), array(true, false)))), $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals('baz_factory', $services['factory_service']->getFactoryService());
 
+        $this->assertTrue($services['request']->isSynthetic(), '->load() parses the synthetic flag');
+        $this->assertTrue($services['request']->isSynchronized(), '->load() parses the synchronized flag');
+
         $aliases = $container->getAliases();
         $this->assertTrue(isset($aliases['alias_for_foo']), '->load() parses aliases');
         $this->assertEquals('foo', (string) $aliases['alias_for_foo'], '->load() parses aliases');

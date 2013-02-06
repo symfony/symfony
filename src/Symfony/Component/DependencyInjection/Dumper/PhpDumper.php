@@ -567,7 +567,7 @@ EOF;
      */
     private function addServices()
     {
-        $publicServices = $privateServices = $aliasServices = '';
+        $publicServices = $privateServices = $aliasServices = $synchronizers = '';
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
@@ -576,6 +576,8 @@ EOF;
             } else {
                 $privateServices .= $this->addService($id, $definition);
             }
+
+            $synchronizers .= $this->addServiceSynchronizer($id, $definition);
         }
 
         $aliases = $this->container->getAliases();
@@ -584,7 +586,60 @@ EOF;
             $aliasServices .= $this->addServiceAlias($alias, $id);
         }
 
-        return $publicServices.$aliasServices.$privateServices;
+        return $publicServices.$aliasServices.$synchronizers.$privateServices;
+    }
+
+    /**
+     * Adds synchronizer methods.
+     *
+     * @param string     $id         A service identifier
+     * @param Definition $definition A Definition instance
+     */
+    private function addServiceSynchronizer($id, Definition $definition)
+    {
+        if (!$definition->isSynchronized()) {
+            return;
+        }
+
+        $code = '';
+        foreach ($this->container->getDefinitions() as $definitionId => $definition) {
+            foreach ($definition->getMethodCalls() as $call) {
+                foreach ($call[1] as $argument) {
+                    if ($argument instanceof Reference && $id == (string) $argument) {
+                        $arguments = array();
+                        foreach ($call[1] as $value) {
+                            $arguments[] = $this->dumpValue($value);
+                        }
+
+                        $call = $this->wrapServiceConditionals($call[1], sprintf("\$this->get('%s')->%s(%s);", $definitionId, $call[0], implode(', ', $arguments)));
+
+                        $code .= <<<EOF
+        if (\$this->initialized('$definitionId')) {
+            $call
+        }
+
+EOF;
+                    }
+                }
+            }
+        }
+
+        if (!$code) {
+            return;
+        }
+
+        $name = Container::camelize($id);
+
+        return <<<EOF
+
+    /**
+     * Updates the '$id' service.
+     */
+    protected function synchronize{$name}Service()
+    {
+$code    }
+
+EOF;
     }
 
     private function addNewInstance($id, Definition $definition, $return, $instantiation)

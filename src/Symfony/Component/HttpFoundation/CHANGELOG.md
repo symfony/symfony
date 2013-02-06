@@ -4,6 +4,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * fixed the Request::create() precedence (URI information always take precedence now)
  * added Request::getTrustedProxies()
  * deprecated Request::isProxyTrusted()
  * [BC BREAK] JsonResponse does not turn a top level empty array to an object anymore, use an ArrayObject to enforce objects

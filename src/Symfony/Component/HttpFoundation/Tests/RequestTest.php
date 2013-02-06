@@ -223,6 +223,41 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\HttpFoundation\Request::create
+     */
+    public function testCreateCheckPrecedence()
+    {
+        // server is used by default
+        $request = Request::create('/', 'GET', array(), array(), array(), array(
+            'HTTP_HOST'     => 'example.com',
+            'HTTPS'         => 'on',
+            'SERVER_PORT'   => 443,
+            'PHP_AUTH_USER' => 'fabien',
+            'PHP_AUTH_PW'   => 'pa$$',
+            'QUERY_STRING'  => 'foo=bar',
+        ));
+        $this->assertEquals('example.com', $request->getHost());
+        $this->assertEquals(443, $request->getPort());
+        $this->assertTrue($request->isSecure());
+        $this->assertEquals('fabien', $request->getUser());
+        $this->assertEquals('pa$$', $request->getPassword());
+        $this->assertEquals('', $request->getQueryString());
+
+        // URI has precedence over server
+        $request = Request::create('http://thomas:pokemon@example.net:8080/?foo=bar', 'GET', array(), array(), array(), array(
+            'HTTP_HOST'   => 'example.com',
+            'HTTPS'       => 'on',
+            'SERVER_PORT' => 443,
+        ));
+        $this->assertEquals('example.net', $request->getHost());
+        $this->assertEquals(8080, $request->getPort());
+        $this->assertFalse($request->isSecure());
+        $this->assertEquals('thomas', $request->getUser());
+        $this->assertEquals('pokemon', $request->getPassword());
+        $this->assertEquals('foo=bar', $request->getQueryString());
+    }
+
+    /**
      * @covers Symfony\Component\HttpFoundation\Request::duplicate
      */
     public function testDuplicate()

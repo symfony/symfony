@@ -857,7 +857,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             } elseif (null !== $definition->getFactoryService()) {
                 $factory = $this->get($parameterBag->resolveValue($definition->getFactoryService()));
             } else {
-                throw new RuntimeException('Cannot create service from factory method without a factory service or factory class.');
+                throw new RuntimeException(sprintf('Cannot create service "%s" from factory method without a factory service or factory class.', $id));
             }
 
             $service = call_user_func_array(array($factory, $definition->getFactoryMethod()), $arguments);
@@ -869,7 +869,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if (self::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
             if (self::SCOPE_CONTAINER !== $scope && !isset($this->scopedServices[$scope])) {
-                throw new RuntimeException('You tried to create a service of an inactive scope.');
+                throw new RuntimeException(sprintf('You tried to create the "%s" service of an inactive scope.', $id));
             }
 
             $this->services[$lowerId = strtolower($id)] = $service;

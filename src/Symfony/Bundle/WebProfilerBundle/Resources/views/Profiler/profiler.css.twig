@@ -125,6 +125,7 @@ abbr {
     text-transform: uppercase;
     text-decoration: none;
     cursor: pointer;
+    height: 51px;
 }
 #menu-profiler li a span.label {
     display: block;
@@ -390,9 +391,16 @@ td.main, td.menu {
 .collapsed-menu {
     width: 60px !important;
 }
-.collapsed-menu span :not(.icon) {
+.collapsed-menu span > * {
     display: none !important;
+}
+.collapsed-menu span > .icon,
+.collapsed-menu span > .icon-font {
+    display: block !important;
 }
 .collapsed-menu span.icon img {
     display: inline !important;
+}
+.collapsed-menu #menu-profiler li a span.label {
+    padding-left: 10px;
 }

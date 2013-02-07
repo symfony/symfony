@@ -192,6 +192,7 @@ class GraphvizDumper extends Dumper
         $container = new ContainerBuilder($parameterBag);
         $container->setDefinitions($this->container->getDefinitions());
         $container->setAliases($this->container->getAliases());
+        $container->setResources($this->container->getResources());
         foreach ($this->container->getScopes() as $scope) {
             $container->addScope($scope);
         }

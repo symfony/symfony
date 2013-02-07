@@ -73,7 +73,7 @@ class TraceableUrlMatcher extends UrlMatcher
             // check host requirement
             $hostMatches = array();
             if ($compiledRoute->getHostRegex() && !preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches)) {
-                $this->addTrace(sprintf('Host "%s" does not match the required ("%s")', $route->getHost(), $this->context->getHost()), self::ROUTE_ALMOST_MATCHES, $name, $route);
+                $this->addTrace(sprintf('Host "%s" does not match the requirement ("%s")', $this->context->getHost(), $route->getHost()), self::ROUTE_ALMOST_MATCHES, $name, $route);
 
                 return true;
             }

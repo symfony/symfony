@@ -172,6 +172,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     {
         // FIXME: catch exceptions and implement a 500 error page here? -> in Varnish, there is a built-in error page mechanism
         if (HttpKernelInterface::MASTER_REQUEST === $type) {
+            $this->updateRequest($request);
             $this->traces = array();
             $this->request = $request;
             if (null !== $this->esi) {
@@ -656,5 +657,21 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $path .= '?'.$qs;
         }
         $this->traces[$request->getMethod().' '.$path][] = $event;
+    }
+
+    /**
+     * Set a Request to the same state it'd be with real reverse proxy.
+     *
+     * @param Request $request A Request instance
+     */
+    private function updateRequest(Request $request)
+    {
+        $forwardedFor = $request->server->get('REMOTE_ADDR');
+        if (in_array($forwardedFor, array('127.0.0.1', 'fe80::1', '::1'))) {
+            return;
+        }
+
+        $request->headers->set('X_FORWARDED_FOR', $forwardedFor);
+        $request->server->set('REMOTE_ADDR', '127.0.0.1');
     }
 }

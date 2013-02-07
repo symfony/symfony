@@ -128,10 +128,10 @@ EOF
 
         $output->writeln($this->getHelper('formatter')->formatSection('router', sprintf('Route "%s"', $name)));
 
-        $output->writeln(sprintf('<comment>Name</comment>      %s', $name));
-        $output->writeln(sprintf('<comment>Pattern</comment>   %s', $route->getPath()));
-        $output->writeln(sprintf('<comment>Host</comment>      %s', $host));
-        $output->writeln(sprintf('<comment>Class</comment>     %s', get_class($route)));
+        $output->writeln(sprintf('<comment>Name</comment>         %s', $name));
+        $output->writeln(sprintf('<comment>Pattern</comment>      %s', $route->getPath()));
+        $output->writeln(sprintf('<comment>Host</comment>         %s', $host));
+        $output->writeln(sprintf('<comment>Class</comment>        %s', get_class($route)));
 
         $defaults = '';
         $d = $route->getDefaults();
@@ -139,7 +139,7 @@ EOF
         foreach ($d as $name => $value) {
             $defaults .= ($defaults ? "\n".str_repeat(' ', 13) : '').$name.': '.$this->formatValue($value);
         }
-        $output->writeln(sprintf('<comment>Defaults</comment>         %s', $defaults));
+        $output->writeln(sprintf('<comment>Defaults</comment>     %s', $defaults));
 
         $requirements = '';
         $r = $route->getRequirements();
@@ -148,7 +148,7 @@ EOF
             $requirements .= ($requirements ? "\n".str_repeat(' ', 13) : '').$name.': '.$this->formatValue($value);
         }
         $requirements = '' !== $requirements ? $requirements : 'NONE';
-        $output->writeln(sprintf('<comment>Requirements</comment>     %s', $requirements));
+        $output->writeln(sprintf('<comment>Requirements</comment> %s', $requirements));
 
         $options = '';
         $o = $route->getOptions();
@@ -156,8 +156,8 @@ EOF
         foreach ($o as $name => $value) {
             $options .= ($options ? "\n".str_repeat(' ', 13) : '').$name.': '.$this->formatValue($value);
         }
-        $output->writeln(sprintf('<comment>Options</comment>          %s', $options));
-        $output->write('<comment>Regex</comment>            ');
+        $output->writeln(sprintf('<comment>Options</comment>      %s', $options));
+        $output->write('<comment>Regex</comment>        ');
         $output->writeln(preg_replace('/^             /', '', preg_replace('/^/m', '             ', $route->compile()->getRegex())), OutputInterface::OUTPUT_RAW);
     }
 

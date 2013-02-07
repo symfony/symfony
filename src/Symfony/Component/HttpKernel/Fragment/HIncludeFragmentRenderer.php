@@ -65,7 +65,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
 
         $template = isset($options['default']) ? $options['default'] : $this->globalDefaultTemplate;
-        if (null !== $this->templating && $this->templateExists($template)) {
+        if (null !== $this->templating && $template && $this->templateExists($template)) {
             $content = $this->templating->render($template);
         } else {
             $content = $template;

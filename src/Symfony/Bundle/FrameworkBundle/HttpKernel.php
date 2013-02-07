@@ -67,11 +67,11 @@ class HttpKernel extends ContainerAwareHttpKernel
      * @throws \RuntimeException
      * @throws \Exception
      *
-     * @deprecated in 2.2, will be removed in 2.3 (use Symfony\Component\HttpKernel\FragmentRenderer::render() instead)
+     * @deprecated in 2.2, will be removed in 2.3 (use Symfony\Component\HttpKernel\Fragment\FragmentHandler::render() instead)
      */
     public function render($uri, array $options = array())
     {
-        trigger_error('render() is deprecated since version 2.2 and will be removed in 2.3. Use Symfony\Component\HttpKernel\FragmentRenderer::render() instead.', E_USER_DEPRECATED);
+        trigger_error('render() is deprecated since version 2.2 and will be removed in 2.3. Use Symfony\Component\HttpKernel\Fragment\FragmentHandler::render() instead.', E_USER_DEPRECATED);
 
         $options = $this->renderer->fixOptions($options);
 

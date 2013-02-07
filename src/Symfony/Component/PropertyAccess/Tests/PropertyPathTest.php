@@ -27,7 +27,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      */
-    public function testInvalidPropertyPath_noDotBeforeProperty()
+    public function testDotIsRequiredBeforeProperty()
     {
         new PropertyPath('[index]property');
     }
@@ -35,7 +35,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      */
-    public function testInvalidPropertyPath_dotAtTheBeginning()
+    public function testDotCannotBePresentAtTheBeginning()
     {
         new PropertyPath('.property');
     }
@@ -43,7 +43,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      */
-    public function testInvalidPropertyPath_unexpectedCharacters()
+    public function testUnexpectedCharacters()
     {
         new PropertyPath('property.$foo');
     }
@@ -51,7 +51,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      */
-    public function testInvalidPropertyPath_empty()
+    public function testPathCannotBeEmpty()
     {
         new PropertyPath('');
     }
@@ -59,7 +59,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
      */
-    public function testInvalidPropertyPath_null()
+    public function testPathCannotBeNull()
     {
         new PropertyPath(null);
     }
@@ -67,31 +67,31 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
      */
-    public function testInvalidPropertyPath_false()
+    public function testPathCannotBeFalse()
     {
         new PropertyPath(false);
     }
 
-    public function testValidPropertyPath_zero()
+    public function testZeroIsValidPropertyPath()
     {
         new PropertyPath('0');
     }
 
-    public function testGetParent_dot()
+    public function testGetParentWithDot()
     {
         $propertyPath = new PropertyPath('grandpa.parent.child');
 
         $this->assertEquals(new PropertyPath('grandpa.parent'), $propertyPath->getParent());
     }
 
-    public function testGetParent_index()
+    public function testGetParentWithIndex()
     {
         $propertyPath = new PropertyPath('grandpa.parent[child]');
 
         $this->assertEquals(new PropertyPath('grandpa.parent'), $propertyPath->getParent());
     }
 
-    public function testGetParent_noParent()
+    public function testGetParentWhenThereIsNoParent()
     {
         $propertyPath = new PropertyPath('path');
 

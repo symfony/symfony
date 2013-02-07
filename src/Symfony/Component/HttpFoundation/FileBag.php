@@ -38,8 +38,7 @@ class FileBag extends ParameterBag
     }
 
     /**
-     * (non-PHPdoc)
-     * @see Symfony\Component\HttpFoundation\ParameterBag::replace()
+     * {@inheritdoc}
      *
      * @api
      */
@@ -50,23 +49,21 @@ class FileBag extends ParameterBag
     }
 
     /**
-     * (non-PHPdoc)
-     * @see Symfony\Component\HttpFoundation\ParameterBag::set()
+     * {@inheritdoc}
      *
      * @api
      */
     public function set($key, $value)
     {
-        if (is_array($value) || $value instanceof UploadedFile) {
-            parent::set($key, $this->convertFileInformation($value));
-        } else {
+        if (!is_array($value) && !$value instanceof UploadedFile) {
             throw new \InvalidArgumentException('An uploaded file must be an array or an instance of UploadedFile.');
         }
+
+        parent::set($key, $this->convertFileInformation($value));
     }
 
     /**
-     * (non-PHPdoc)
-     * @see Symfony\Component\HttpFoundation\ParameterBag::add()
+     * {@inheritdoc}
      *
      * @api
      */

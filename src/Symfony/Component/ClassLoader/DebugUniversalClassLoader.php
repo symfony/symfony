@@ -38,6 +38,7 @@ class DebugUniversalClassLoader extends UniversalClassLoader
                 $loader->registerPrefixFallbacks($function[0]->getPrefixFallbacks());
                 $loader->registerNamespaces($function[0]->getNamespaces());
                 $loader->registerPrefixes($function[0]->getPrefixes());
+                $loader->useIncludePath($function[0]->getUseIncludePath());
 
                 $function[0] = $loader;
             }

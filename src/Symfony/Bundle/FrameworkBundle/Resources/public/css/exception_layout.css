@@ -3,7 +3,7 @@ html {
 }
 
 body {
-    font: 11px Verdana, Arial, sans-serif; 
+    font: 11px Verdana, Arial, sans-serif;
     color: #333;
 }
 
@@ -53,15 +53,15 @@ img {
 }
 
 .search label {
-    line-height: 28px; 
+    line-height: 28px;
     vertical-align: middle;
 }
 
 .search input {
-    width: 188px; 
-    margin-right: 10px; 
-    font-size: 12px; 
-    border: 1px solid #dadada; 
+    width: 188px;
+    margin-right: 10px;
+    font-size: 12px;
+    border: 1px solid #dadada;
     background: #FFFFFF url(../images/input_bg.gif) repeat-x left top;
     padding: 5px 6px;
     color: #565656;
@@ -128,4 +128,14 @@ img {
 #content {
     width: 970px;
     margin: 0 auto;
+}
+
+pre {
+    white-space: normal;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+pre.xdebug-var-dump{
+    white-space: pre;
+    font-family: monospace;
 }

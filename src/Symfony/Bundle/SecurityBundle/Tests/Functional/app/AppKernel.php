@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
@@ -17,12 +17,12 @@ $lastDir = null;
 while ($dir !== $lastDir) {
     $lastDir = $dir;
 
-    if (file_exists($dir.'/autoload.php')) {
+    if (is_file($dir.'/autoload.php')) {
         require_once $dir.'/autoload.php';
         break;
     }
 
-    if (file_exists($dir.'/autoload.php.dist')) {
+    if (is_file($dir.'/autoload.php.dist')) {
         require_once $dir.'/autoload.php.dist';
         break;
     }
@@ -30,8 +30,8 @@ while ($dir !== $lastDir) {
     $dir = dirname($dir);
 }
 
-use Symfony\Component\HttpKernel\Util\Filesystem;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
@@ -52,7 +52,7 @@ class AppKernel extends Kernel
         $this->testCase = $testCase;
 
         $fs = new Filesystem();
-        if (!$fs->isAbsolutePath($rootConfig) && !file_exists($rootConfig = __DIR__.'/'.$testCase.'/'.$rootConfig)) {
+        if (!$fs->isAbsolutePath($rootConfig) && !is_file($rootConfig = __DIR__.'/'.$testCase.'/'.$rootConfig)) {
             throw new \InvalidArgumentException(sprintf('The root config "%s" does not exist.', $rootConfig));
         }
         $this->rootConfig = $rootConfig;
@@ -62,7 +62,7 @@ class AppKernel extends Kernel
 
     public function registerBundles()
     {
-        if (!file_exists($filename = $this->getRootDir().'/'.$this->testCase.'/bundles.php')) {
+        if (!is_file($filename = $this->getRootDir().'/'.$this->testCase.'/bundles.php')) {
             throw new \RuntimeException(sprintf('The bundles file "%s" does not exist.', $filename));
         }
 

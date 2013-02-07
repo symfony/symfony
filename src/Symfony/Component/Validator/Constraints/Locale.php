@@ -20,5 +20,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class Locale extends Constraint
 {
-    public $message = 'This value is not a valid locale';
+    public $message = 'This value is not a valid locale.';
 }

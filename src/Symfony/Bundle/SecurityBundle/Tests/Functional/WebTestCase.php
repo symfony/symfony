@@ -1,25 +1,25 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-use Symfony\Component\HttpKernel\Util\Filesystem;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
 class WebTestCase extends BaseWebTestCase
 {
     public static function assertRedirect($response, $location)
     {
-        self::assertTrue($response->isRedirect(), 'Response is not a redirect, got status code: '.$response->getStatusCode());
+        self::assertTrue($response->isRedirect(), 'Response is not a redirect, got status code: '.substr($response, 0, 2000));
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));
     }
 
@@ -60,7 +60,7 @@ class WebTestCase extends BaseWebTestCase
         return new $class(
             $options['test_case'],
             isset($options['root_config']) ? $options['root_config'] : 'config.yml',
-            isset($options['environment']) ? $options['environment'] : 'securitybundletest',
+            isset($options['environment']) ? $options['environment'] : 'securitybundletest' . strtolower($options['test_case']),
             isset($options['debug']) ? $options['debug'] : true
         );
     }

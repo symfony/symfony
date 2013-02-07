@@ -24,7 +24,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     protected static $minimalConfig = array(
         'providers' => array(
-            'stub' => array(),
+            'stub' => array(
+                'id' => 'foo',
+            ),
         ),
         'firewalls' => array(
             'stub' => array(),
@@ -32,21 +34,37 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     );
 
     /**
-     * Test that the main tree is OK to be passed a factory or factories
-     * key, without throwing any validation errors.
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
-    public function testMainConfigTreeWithFactories()
+    public function testNoConfigForProvider()
     {
-        $config = array_merge(self::$minimalConfig, array(
-            'factory'   => array('foo' => 'bar'),
-            'factories' => array('lorem' => 'ipsum'),
-        ));
+        $config = array(
+            'providers' => array(
+                'stub' => array(),
+            ),
+        );
 
         $processor = new Processor();
-        $configuration = new MainConfiguration(array());
+        $configuration = new MainConfiguration(array(), array());
         $config = $processor->processConfiguration($configuration, array($config));
+    }
 
-        $this->assertFalse(array_key_exists('factory', $config), 'The factory key is silently removed without an exception');
-        $this->assertEquals(array(), $config['factories'], 'The factories key is just an empty array');
+    /**
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     */
+    public function testManyConfigForProvider()
+    {
+        $config = array(
+            'providers' => array(
+                'stub' => array(
+                    'id' => 'foo',
+                    'chain' => array(),
+                ),
+            ),
+        );
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration(array(), array());
+        $config = $processor->processConfiguration($configuration, array($config));
     }
 }

@@ -43,12 +43,8 @@ abstract class Output implements OutputInterface
      */
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
-        if (null === $formatter) {
-            $formatter = new OutputFormatter();
-        }
-
         $this->verbosity = null === $verbosity ? self::VERBOSITY_NORMAL : $verbosity;
-        $this->formatter = $formatter;
+        $this->formatter = null === $formatter ? new OutputFormatter() : $formatter;
         $this->formatter->setDecorated((Boolean) $decorated);
     }
 
@@ -180,5 +176,5 @@ abstract class Output implements OutputInterface
      * @param string  $message A message to write to the output
      * @param Boolean $newline Whether to add a newline or not
      */
-    abstract public function doWrite($message, $newline);
+    abstract protected function doWrite($message, $newline);
 }

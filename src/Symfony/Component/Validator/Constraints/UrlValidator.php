@@ -16,6 +16,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 class UrlValidator extends ConstraintValidator
@@ -36,19 +38,12 @@ class UrlValidator extends ConstraintValidator
         $~ixu';
 
     /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @return Boolean Whether or not the value is valid
-     *
-     * @api
+     * {@inheritDoc}
      */
-    public function isValid($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
-            return true;
+            return;
         }
 
         if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
@@ -60,11 +55,7 @@ class UrlValidator extends ConstraintValidator
         $pattern = sprintf(static::PATTERN, implode('|', $constraint->protocols));
 
         if (!preg_match($pattern, $value)) {
-            $this->setMessage($constraint->message, array('{{ value }}' => $value));
-
-            return false;
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
         }
-
-        return true;
     }
 }

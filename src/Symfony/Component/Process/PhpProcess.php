@@ -55,16 +55,9 @@ class PhpProcess extends Process
     }
 
     /**
-     * Runs the process.
-     *
-     * @param Closure|string|array $callback A PHP callback to run whenever there is some
-     *                                       output available on STDOUT or STDERR
-     *
-     * @return integer The exit status code
-     *
-     * @api
+     * {@inheritdoc}
      */
-    public function run($callback = null)
+    public function start($callback = null)
     {
         if (null === $this->getCommandLine()) {
             if (false === $php = $this->executableFinder->find()) {
@@ -73,6 +66,6 @@ class PhpProcess extends Process
             $this->setCommandLine($php);
         }
 
-        return parent::run($callback);
+        parent::start($callback);
     }
 }

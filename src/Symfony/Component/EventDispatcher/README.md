@@ -18,6 +18,11 @@ pattern.
 Resources
 ---------
 
-Unit tests:
+You can run the unit tests with the following command:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/EventDispatcher
+    phpunit
+
+If you also want to run the unit tests that depend on other Symfony
+Components, install dev dependencies before running PHPUnit:
+
+    php composer.phar install --dev

@@ -12,5 +12,7 @@
         </twig:form>
         <twig:global key="foo" id="bar" type="service" />
         <twig:global key="pi">3.14</twig:global>
+        <twig:path>path1</twig:path>
+        <twig:path>path2</twig:path>
     </twig:config>
 </container>

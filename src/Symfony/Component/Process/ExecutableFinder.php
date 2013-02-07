@@ -19,22 +19,23 @@ namespace Symfony\Component\Process;
  */
 class ExecutableFinder
 {
-    private static $isWindows;
-
     private $suffixes = array('.exe', '.bat', '.cmd', '.com');
 
-    public function __construct()
-    {
-        if (null === self::$isWindows) {
-            self::$isWindows = 0 === stripos(PHP_OS, 'win');
-        }
-    }
-
+    /**
+     * Replaces default suffixes of executable.
+     *
+     * @param array $suffixes
+     */
     public function setSuffixes(array $suffixes)
     {
         $this->suffixes = $suffixes;
     }
 
+    /**
+     * Adds new possible suffix to check for executable.
+     *
+     * @param string $suffix
+     */
     public function addSuffix($suffix)
     {
         $this->suffixes[] = $suffix;
@@ -43,12 +44,13 @@ class ExecutableFinder
     /**
      * Finds an executable by name.
      *
-     * @param string $name    The executable name (without the extension)
-     * @param string $default The default to return if no executable is found
+     * @param string $name      The executable name (without the extension)
+     * @param string $default   The default to return if no executable is found
+     * @param array  $extraDirs Additional dirs to check into
      *
      * @return string The executable path or default value
      */
-    public function find($name, $default = null)
+    public function find($name, $default = null, array $extraDirs = array())
     {
         if (ini_get('open_basedir')) {
             $searchPath = explode(PATH_SEPARATOR, getenv('open_basedir'));
@@ -64,13 +66,20 @@ class ExecutableFinder
                 }
             }
         } else {
-            $dirs = explode(PATH_SEPARATOR, getenv('PATH') ? getenv('PATH') : getenv('Path'));
+            $dirs = array_merge(
+                explode(PATH_SEPARATOR, getenv('PATH') ?: getenv('Path')),
+                $extraDirs
+            );
         }
 
-        $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ? explode(PATH_SEPARATOR, getenv('PATHEXT')) : $this->suffixes) : array('');
+        $suffixes = array('');
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $pathExt = getenv('PATHEXT');
+            $suffixes = $pathExt ? explode(PATH_SEPARATOR, $pathExt) : $this->suffixes;
+        }
         foreach ($suffixes as $suffix) {
             foreach ($dirs as $dir) {
-                if (is_file($file = $dir.DIRECTORY_SEPARATOR.$name.$suffix) && (self::$isWindows || is_executable($file))) {
+                if (is_file($file = $dir.DIRECTORY_SEPARATOR.$name.$suffix) && (defined('PHP_WINDOWS_VERSION_BUILD') || is_executable($file))) {
                     return $file;
                 }
             }

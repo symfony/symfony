@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Exception;
 /**
  * Indicates a value transformation error.
  *
- * @author     Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author     Bernhard Schussek <bschussek@gmail.com>
  */
 class TransformationFailedException extends \RuntimeException
 {

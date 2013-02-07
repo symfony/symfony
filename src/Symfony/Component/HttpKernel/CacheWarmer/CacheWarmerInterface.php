@@ -16,15 +16,8 @@ namespace Symfony\Component\HttpKernel\CacheWarmer;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface CacheWarmerInterface
+interface CacheWarmerInterface extends WarmableInterface
 {
-    /**
-     * Warms up the cache.
-     *
-     * @param string $cacheDir The cache directory
-     */
-    public function warmUp($cacheDir);
-
     /**
      * Checks whether this warmer is optional or not.
      *

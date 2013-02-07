@@ -13,23 +13,24 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Locale\Locale;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class LocaleType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
-    public function getDefaultOptions(array $options)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        return array(
+        $resolver->setDefaults(array(
             'choices' => Locale::getDisplayLocales(\Locale::getDefault()),
-        );
+        ));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getParent(array $options)
+    public function getParent()
     {
         return 'choice';
     }

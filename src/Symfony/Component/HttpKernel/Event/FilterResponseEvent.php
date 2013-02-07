@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
  * setResponse() you can set a new response that will be returned to the
  * browser.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */

@@ -47,6 +47,16 @@ class RequestHelper extends Helper
     }
 
     /**
+     * Returns the locale
+     *
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->request->getLocale();
+    }
+
+    /**
      * Returns the canonical name of this helper.
      *
      * @return string The canonical name

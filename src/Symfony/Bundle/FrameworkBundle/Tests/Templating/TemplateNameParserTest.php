@@ -84,30 +84,4 @@ class TemplateNameParserTest extends TestCase
             array('FooBundle:Post:foo:bar'),
         );
     }
-
-    /**
-     * @dataProvider getFilenameToTemplateProvider
-     */
-    public function testParseFromFilename($file, $ref)
-    {
-        $template = $this->parser->parseFromFilename($file);
-
-        if ($ref === false) {
-            $this->assertFalse($template);
-        } else {
-            $this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
-        }
-    }
-
-    public function getFilenameToTemplateProvider()
-    {
-        return array(
-            array('/path/to/section/name.format.engine', new TemplateReference('', '/path/to/section', 'name', 'format', 'engine')),
-            array('\\path\\to\\section\\name.format.engine', new TemplateReference('', '/path/to/section', 'name', 'format', 'engine')),
-            array('name.format.engine', new TemplateReference('', '', 'name', 'format', 'engine')),
-            array('name.format', false),
-            array('name', false),
-        );
-    }
-
 }

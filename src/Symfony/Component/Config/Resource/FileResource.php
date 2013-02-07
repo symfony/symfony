@@ -14,9 +14,11 @@ namespace Symfony\Component\Config\Resource;
 /**
  * FileResource represents a resource stored on the filesystem.
  *
+ * The resource can be a file or a directory.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FileResource implements ResourceInterface
+class FileResource implements ResourceInterface, \Serializable
 {
     private $resource;
 
@@ -64,5 +66,15 @@ class FileResource implements ResourceInterface
         }
 
         return filemtime($this->resource) < $timestamp;
+    }
+
+    public function serialize()
+    {
+        return serialize($this->resource);
+    }
+
+    public function unserialize($serialized)
+    {
+        $this->resource = unserialize($serialized);
     }
 }

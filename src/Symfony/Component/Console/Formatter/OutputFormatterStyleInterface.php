@@ -50,7 +50,7 @@ interface OutputFormatterStyleInterface
     /**
      * Unsets some specific style option.
      *
-     * @param string $option Theoption name
+     * @param string $option The option name
      */
     public function unsetOption($option);
 

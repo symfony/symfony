@@ -11,15 +11,12 @@
 
 namespace Symfony\Component\Form\Event;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.1, to be removed in 2.3. Code against
+ *             {@link \Symfony\Component\Form\FormEvent} instead.
+ */
 class FilterDataEvent extends DataEvent
 {
-    /**
-     * Allows updating with some filtered data
-     *
-     * @param mixed $data
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-    }
 }

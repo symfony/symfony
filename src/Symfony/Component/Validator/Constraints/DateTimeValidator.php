@@ -12,6 +12,8 @@
 namespace Symfony\Component\Validator\Constraints;
 
 /**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 class DateTimeValidator extends DateValidator

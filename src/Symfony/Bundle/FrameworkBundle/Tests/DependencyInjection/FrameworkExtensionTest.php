@@ -27,9 +27,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $def = $container->getDefinition('form.type_extension.csrf');
 
         $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
-        $this->assertEquals('%form.type_extension.csrf.enabled%', $def->getArgument(0));
+        $this->assertEquals('%form.type_extension.csrf.enabled%', $def->getArgument(1));
         $this->assertEquals('_csrf', $container->getParameter('form.type_extension.csrf.field_name'));
-        $this->assertEquals('%form.type_extension.csrf.field_name%', $def->getArgument(1));
+        $this->assertEquals('%form.type_extension.csrf.field_name%', $def->getArgument(2));
         $this->assertEquals('s3cr3t', $container->getParameterBag()->resolveValue($container->findDefinition('form.csrf_provider')->getArgument(1)));
     }
 
@@ -84,18 +84,52 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
-        $this->assertEquals('fr', $container->getParameter('session.default_locale'));
-        $this->assertEquals('%session.default_locale%', $container->getDefinition('session')->getArgument(1));
-        $this->assertTrue($container->getDefinition('session_listener')->getArgument(1));
+        $this->assertEquals('fr', $container->getParameter('kernel.default_locale'));
         $this->assertEquals('session.storage.native', (string) $container->getAlias('session.storage'));
+        $this->assertEquals('session.handler.native_file', (string) $container->getAlias('session.handler'));
 
         $options = $container->getParameter('session.storage.options');
         $this->assertEquals('_SYMFONY', $options['name']);
-        $this->assertEquals(86400, $options['lifetime']);
-        $this->assertEquals('/', $options['path']);
-        $this->assertEquals('example.com', $options['domain']);
-        $this->assertTrue($options['secure']);
-        $this->assertTrue($options['httponly']);
+        $this->assertEquals(86400, $options['cookie_lifetime']);
+        $this->assertEquals('/', $options['cookie_path']);
+        $this->assertEquals('example.com', $options['cookie_domain']);
+        $this->assertTrue($options['cookie_secure']);
+        $this->assertTrue($options['cookie_httponly']);
+        $this->assertEquals(108, $options['gc_divisor']);
+        $this->assertEquals(1, $options['gc_probability']);
+        $this->assertEquals(90000, $options['gc_maxlifetime']);
+
+        $this->assertEquals('/path/to/sessions', $container->getParameter('session.save_path'));
+    }
+
+    public function testSessionDeprecatedMergeFull()
+    {
+        $container = $this->createContainerFromFile('deprecated_merge_full');
+
+        $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
+
+        $options = $container->getParameter('session.storage.options');
+        $this->assertEquals('_SYMFONY', $options['name']);
+        $this->assertEquals(86400, $options['cookie_lifetime']);
+        $this->assertEquals('/', $options['cookie_path']);
+        $this->assertEquals('example.com', $options['cookie_domain']);
+        $this->assertTrue($options['cookie_secure']);
+        $this->assertTrue($options['cookie_httponly']);
+    }
+
+    public function testSessionDeprecatedMergePartial()
+    {
+        $container = $this->createContainerFromFile('deprecated_merge_partial');
+
+        $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
+
+        $options = $container->getParameter('session.storage.options');
+        $this->assertEquals('_SYMFONY', $options['name']);
+        $this->assertEquals(86400, $options['cookie_lifetime']);
+        $this->assertEquals('/', $options['cookie_path']);
+        $this->assertEquals('sf2.example.com', $options['cookie_domain']);
+        $this->assertFalse($options['cookie_secure']);
+        $this->assertTrue($options['cookie_httponly']);
     }
 
     public function testTemplating()
@@ -114,7 +148,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $arguments = array_values($package->getArguments());
         $this->assertEquals(array('http://cdn.example.com'), $arguments[0]);
         $this->assertEquals('SomeVersionScheme', $arguments[1]);
-        $this->assertNull($arguments[2]);
+        $this->assertEquals('%%s?%%s', $arguments[2]);
 
         $this->assertTrue($container->hasDefinition('templating.asset.default_package.ssl'));
         $package = $container->getDefinition('templating.asset.default_package.ssl');
@@ -156,10 +190,17 @@ abstract class FrameworkExtensionTest extends TestCase
             }
         }
 
+        $rootDirectory = str_replace('/', DIRECTORY_SEPARATOR, realpath(__DIR__.'/../../../../..').'/');
+        $files = array_map(function($resource) use ($rootDirectory, $resources) { return str_replace($rootDirectory, '', realpath($resource[1])); }, $resources);
         $this->assertContains(
-            realpath(__DIR__.'/../../Resources/translations/validators.fr.xliff'),
-            array_map(function($resource) use ($resources) { return realpath($resource[1]); }, $resources),
-            '->registerTranslatorConfiguration() finds FrameworkExtension translation resources'
+            str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Validator/Resources/translations/validators.en.xlf'),
+            $files,
+            '->registerTranslatorConfiguration() finds Validator translation resources'
+        );
+        $this->assertContains(
+            str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Form/Resources/translations/validators.en.xlf'),
+            $files,
+            '->registerTranslatorConfiguration() finds Form translation resources'
         );
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
@@ -235,11 +276,11 @@ abstract class FrameworkExtensionTest extends TestCase
         ));
 
         $yamlArgs = $container->getParameter('validator.mapping.loader.yaml_files_loader.mapping_files');
-        $this->assertEquals(1, count($yamlArgs));
+        $this->assertCount(1, $yamlArgs);
         $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.yml', $yamlArgs[0]);
 
         $xmlArgs = $container->getParameter('validator.mapping.loader.xml_files_loader.mapping_files');
-        $this->assertEquals(2, count($xmlArgs));
+        $this->assertCount(2, $xmlArgs);
         $this->assertStringEndsWith('Component'.DIRECTORY_SEPARATOR.'Form/Resources/config/validation.xml', $xmlArgs[0]);
         $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.xml', $xmlArgs[1]);
     }

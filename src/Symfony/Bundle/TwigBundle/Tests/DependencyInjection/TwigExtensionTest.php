@@ -37,7 +37,7 @@ class TwigExtensionTest extends TestCase
         $options = $container->getParameter('twig.options');
         $this->assertEquals(__DIR__.'/twig', $options['cache'], '->load() sets default value for cache option');
         $this->assertEquals('UTF-8', $options['charset'], '->load() sets default value for charset option');
-        $this->assertEquals(false, $options['debug'], '->load() sets default value for debug option');
+        $this->assertFalse($options['debug'], '->load() sets default value for debug option');
     }
 
     /**

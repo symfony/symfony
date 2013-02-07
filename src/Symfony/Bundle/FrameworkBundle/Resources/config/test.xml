@@ -26,8 +26,7 @@
 
         <service id="test.session.listener" class="%test.session.listener.class%">
             <argument type="service" id="service_container" />
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="192" />
-            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="-128" />
+            <tag name="kernel.event_subscriber" />
         </service>
     </services>
 </container>

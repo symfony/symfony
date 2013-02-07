@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="28">
+                <source>This form should not contain extra fields.</source>
+                <target>Tato skupina polí nesmí obsahovat další pole.</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>The uploaded file was too large. Please try to upload a smaller file.</source>
+                <target>Nahraný soubor je příliš velký. Nahrajte prosím menší soubor.</target>
+            </trans-unit>
+            <trans-unit id="30">
+                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
+                <target>CSRF token je neplatný. Zkuste prosím znovu odeslat formulář.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  *
  * Constraint instances are immutable and serializable.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */

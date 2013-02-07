@@ -32,11 +32,12 @@ class NodeBuilder implements NodeParentInterface
             'scalar'      => __NAMESPACE__.'\\ScalarNodeDefinition',
             'boolean'     => __NAMESPACE__.'\\BooleanNodeDefinition',
             'array'       => __NAMESPACE__.'\\ArrayNodeDefinition',
+            'enum'        => __NAMESPACE__.'\\EnumNodeDefinition',
         );
     }
 
     /**
-     * Set the parent node
+     * Set the parent node.
      *
      * @param ParentNodeDefinitionInterface $parent The parent node
      *
@@ -50,7 +51,7 @@ class NodeBuilder implements NodeParentInterface
     }
 
     /**
-     * Creates a child array node
+     * Creates a child array node.
      *
      * @param string $name The name of the node
      *
@@ -83,6 +84,18 @@ class NodeBuilder implements NodeParentInterface
     public function booleanNode($name)
     {
         return $this->node($name, 'boolean');
+    }
+
+    /**
+     * Creates a child EnumNode.
+     *
+     * @param string $name
+     *
+     * @return EnumNodeDefinition
+     */
+    public function enumNode($name)
+    {
+        return $this->node($name, 'enum');
     }
 
     /**
@@ -124,6 +137,28 @@ class NodeBuilder implements NodeParentInterface
 
         $node = new $class($name);
 
+        $this->append($node);
+
+        return $node;
+    }
+
+    /**
+     * Appends a node definition.
+     *
+     * Usage:
+     *
+     *     $node = new ArrayNodeDefinition('name')
+     *         ->children()
+     *             ->scalarNode('foo')->end()
+     *             ->scalarNode('baz')->end()
+     *             ->append($this->getBarNodeDefinition())
+     *         ->end()
+     *     ;
+     *
+     * @return NodeBuilder This node builder
+     */
+    public function append(NodeDefinition $node)
+    {
         if ($node instanceof ParentNodeDefinitionInterface) {
             $builder = clone $this;
             $builder->setParent(null);
@@ -136,11 +171,11 @@ class NodeBuilder implements NodeParentInterface
             $node->setParent($this);
         }
 
-        return $node;
+        return $this;
     }
 
     /**
-     * Add or override a node Type
+     * Adds or overrides a node Type.
      *
      * @param string $type  The name of the type
      * @param string $class The fully qualified name the node definition class
@@ -155,7 +190,7 @@ class NodeBuilder implements NodeParentInterface
     }
 
     /**
-     * Returns the class name of the node definition
+     * Returns the class name of the node definition.
      *
      * @param string $type The node type
      *

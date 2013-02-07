@@ -14,20 +14,26 @@ namespace Symfony\Component\Console;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * A Shell wraps an Application to add shell capabilities to it.
  *
- * This class only works with a PHP compiled with readline support
- * (either --with-readline or --with-libedit)
+ * Support for history and completion only works with a PHP compiled
+ * with readline support (either --with-readline or --with-libedit)
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Martin Hasoň <martin.hason@gmail.com>
  */
 class Shell
 {
     private $application;
     private $history;
     private $output;
+    private $hasReadline;
+    private $prompt;
+    private $processIsolation;
 
     /**
      * Constructor.
@@ -36,18 +42,15 @@ class Shell
      * a \RuntimeException exception is thrown.
      *
      * @param Application $application An application instance
-     *
-     * @throws \RuntimeException When Readline extension is not enabled
      */
     public function __construct(Application $application)
     {
-        if (!function_exists('readline')) {
-            throw new \RuntimeException('Unable to start the shell as the Readline extension is not enabled.');
-        }
-
+        $this->hasReadline = function_exists('readline');
         $this->application = $application;
         $this->history = getenv('HOME').'/.history_'.$application->getName();
         $this->output = new ConsoleOutput();
+        $this->prompt = $application->getName().' > ';
+        $this->processIsolation = false;
     }
 
     /**
@@ -58,12 +61,28 @@ class Shell
         $this->application->setAutoExit(false);
         $this->application->setCatchExceptions(true);
 
-        readline_read_history($this->history);
-        readline_completion_function(array($this, 'autocompleter'));
+        if ($this->hasReadline) {
+            readline_read_history($this->history);
+            readline_completion_function(array($this, 'autocompleter'));
+        }
 
         $this->output->writeln($this->getHeader());
+        $php = null;
+        if ($this->processIsolation) {
+            $finder = new PhpExecutableFinder();
+            $php = $finder->find();
+            $this->output->writeln(<<<EOF
+<info>Running with process isolation, you should consider this:</info>
+  * each command is executed as separate process,
+  * commands don't support interactivity, all params must be passed explicitly,
+  * commands output is not colorized.
+
+EOF
+            );
+        }
+
         while (true) {
-            $command = readline($this->application->getName().' > ');
+            $command = $this->readline();
 
             if (false === $command) {
                 $this->output->writeln("\n");
@@ -71,24 +90,65 @@ class Shell
                 break;
             }
 
-            readline_add_history($command);
-            readline_write_history($this->history);
+            if ($this->hasReadline) {
+                readline_add_history($command);
+                readline_write_history($this->history);
+            }
 
-            if (0 !== $ret = $this->application->run(new StringInput($command), $this->output)) {
+            if ($this->processIsolation) {
+                $pb = new ProcessBuilder();
+
+                $process = $pb
+                    ->add($php)
+                    ->add($_SERVER['argv'][0])
+                    ->add($command)
+                    ->inheritEnvironmentVariables(true)
+                    ->getProcess()
+                ;
+
+                $output = $this->output;
+                $process->run(function($type, $data) use ($output) {
+                    $output->writeln($data);
+                });
+
+                $ret = $process->getExitCode();
+            } else {
+                $ret = $this->application->run(new StringInput($command), $this->output);
+            }
+
+            if (0 !== $ret) {
                 $this->output->writeln(sprintf('<error>The command terminated with an error status (%s)</error>', $ret));
             }
         }
     }
 
     /**
+     * Returns the shell header.
+     *
+     * @return string The header string
+     */
+    protected function getHeader()
+    {
+        return <<<EOF
+
+Welcome to the <info>{$this->application->getName()}</info> shell (<comment>{$this->application->getVersion()}</comment>).
+
+At the prompt, type <comment>help</comment> for some help,
+or <comment>list</comment> to get a list of available commands.
+
+To exit the shell, type <comment>^D</comment>.
+
+EOF;
+    }
+
+    /**
      * Tries to return autocompletion for the current entered text.
      *
-     * @param string  $text     The last segment of the entered text
-     * @param integer $position The current position
+     * @param string $text The last segment of the entered text
      *
-     * @return array An array of possibilities for the entered text
+     * @return Boolean|array A list of guessed strings or true
      */
-    private function autocompleter($text, $position)
+    private function autocompleter($text)
     {
         $info = readline_info();
         $text = substr($info['line_buffer'], 0, $info['end']);
@@ -118,21 +178,30 @@ class Shell
     }
 
     /**
-     * Returns the shell header.
+     * Reads a single line from standard input.
      *
-     * @return string The header string
+     * @return string The single line from standard input
      */
-    protected function getHeader()
+    private function readline()
     {
-        return <<<EOF
+        if ($this->hasReadline) {
+            $line = readline($this->prompt);
+        } else {
+            $this->output->write($this->prompt);
+            $line = fgets(STDIN, 1024);
+            $line = (!$line && strlen($line) == 0) ? false : rtrim($line);
+        }
 
-Welcome to the <info>{$this->application->getName()}</info> shell (<comment>{$this->application->getVersion()}</comment>).
+        return $line;
+    }
 
-At the prompt, type <comment>help</comment> for some help,
-or <comment>list</comment> to get a list of available commands.
+    public function getProcessIsolation()
+    {
+        return $this->processIsolation;
+    }
 
-To exit the shell, type <comment>^D</comment>.
-
-EOF;
+    public function setProcessIsolation($processIsolation)
+    {
+        $this->processIsolation = (Boolean) $processIsolation;
     }
 }

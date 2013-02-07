@@ -12,6 +12,10 @@
         <default key="_controller">WebProfilerBundle:Profiler:purge</default>
     </route>
 
+    <route id="_profiler_info" pattern="/info/{about}">
+        <default key="_controller">WebProfilerBundle:Profiler:info</default>
+    </route>
+
     <route id="_profiler_import" pattern="/import">
         <default key="_controller">WebProfilerBundle:Profiler:import</default>
     </route>
@@ -20,12 +24,26 @@
         <default key="_controller">WebProfilerBundle:Profiler:export</default>
     </route>
 
+    <route id="_profiler_phpinfo" pattern="/phpinfo">
+        <default key="_controller">WebProfilerBundle:Profiler:phpinfo</default>
+    </route>
+
     <route id="_profiler_search_results" pattern="/{token}/search/results">
         <default key="_controller">WebProfilerBundle:Profiler:searchResults</default>
     </route>
 
     <route id="_profiler" pattern="/{token}">
         <default key="_controller">WebProfilerBundle:Profiler:panel</default>
+    </route>
+
+    <route id="_profiler_redirect" pattern="/">
+        <default key="_controller">FrameworkBundle:Redirect:redirect</default>
+        <default key="route">_profiler_search_results</default>
+        <default key="token">empty</default>
+        <default key="ip"></default>
+        <default key="url"></default>
+        <default key="method"></default>
+        <default key="limit">10</default>
     </route>
 
 </routes>

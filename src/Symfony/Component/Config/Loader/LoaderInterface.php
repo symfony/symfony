@@ -39,15 +39,15 @@ interface LoaderInterface
     /**
      * Gets the loader resolver.
      *
-     * @return LoaderResolver A LoaderResolver instance
+     * @return LoaderResolverInterface A LoaderResolverInterface instance
      */
     public function getResolver();
 
     /**
      * Sets the loader resolver.
      *
-     * @param LoaderResolver $resolver A LoaderResolver instance
+     * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
-    public function setResolver(LoaderResolver $resolver);
+    public function setResolver(LoaderResolverInterface $resolver);
 
 }

@@ -12,13 +12,14 @@
 namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * XmlFileLoader loads XML files service definitions.
@@ -43,7 +44,7 @@ class XmlFileLoader extends FileLoader
         $this->container->addResource(new FileResource($path));
 
         // anonymous services
-        $xml = $this->processAnonymousServices($xml, $path);
+        $this->processAnonymousServices($xml, $path);
 
         // imports
         $this->parseImports($xml, $path);
@@ -76,8 +77,6 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      * @param string           $file
-     *
-     * @return void
      */
     private function parseParameters(SimpleXMLElement $xml, $file)
     {
@@ -205,7 +204,7 @@ class XmlFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException When loading of XML file returns error
      */
-    private function parseFile($file)
+    protected function parseFile($file)
     {
         $internalErrors = libxml_use_internal_errors(true);
         $disableEntities = libxml_disable_entity_loader(true);
@@ -239,36 +238,32 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      * @param string           $file
-     *
-     * @return array An array of anonymous services
      */
     private function processAnonymousServices(SimpleXMLElement $xml, $file)
     {
         $definitions = array();
         $count = 0;
 
-        // anonymous services as arguments
-        if (false === $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]')) {
-            return $xml;
-        }
-        foreach ($nodes as $node) {
-            // give it a unique name
-            $node['id'] = sprintf('%s_%d', md5($file), ++$count);
+        // anonymous services as arguments/properties
+        if (false !== $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]')) {
+            foreach ($nodes as $node) {
+                // give it a unique name
+                $node['id'] = sprintf('%s_%d', md5($file), ++$count);
 
-            $definitions[(string) $node['id']] = array($node->service, $file, false);
-            $node->service['id'] = (string) $node['id'];
+                $definitions[(string) $node['id']] = array($node->service, $file, false);
+                $node->service['id'] = (string) $node['id'];
+            }
         }
 
         // anonymous services "in the wild"
-        if (false === $nodes = $xml->xpath('//container:services/container:service[not(@id)]')) {
-            return $xml;
-        }
-        foreach ($nodes as $node) {
-            // give it a unique name
-            $node['id'] = sprintf('%s_%d', md5($file), ++$count);
+        if (false !== $nodes = $xml->xpath('//container:services/container:service[not(@id)]')) {
+            foreach ($nodes as $node) {
+                // give it a unique name
+                $node['id'] = sprintf('%s_%d', md5($file), ++$count);
 
-            $definitions[(string) $node['id']] = array($node, $file, true);
-            $node->service['id'] = (string) $node['id'];
+                $definitions[(string) $node['id']] = array($node, $file, true);
+                $node->service['id'] = (string) $node['id'];
+            }
         }
 
         // resolve definitions
@@ -288,8 +283,6 @@ class XmlFileLoader extends FileLoader
                 $oNode->parentNode->removeChild($oNode);
             }
         }
-
-        return $xml;
     }
 
     /**
@@ -310,8 +303,8 @@ class XmlFileLoader extends FileLoader
      * @param \DOMDocument $dom
      * @param string       $file
      *
-     * @throws \RuntimeException         When extension references a non-existent XSD file
-     * @throws \InvalidArgumentException When xml doesn't validate its xsd schema
+     * @throws RuntimeException         When extension references a non-existent XSD file
+     * @throws InvalidArgumentException When xml doesn't validate its xsd schema
      */
     private function validateSchema(\DOMDocument $dom, $file)
     {
@@ -327,8 +320,8 @@ class XmlFileLoader extends FileLoader
                 if (($extension = $this->container->getExtension($items[$i])) && false !== $extension->getXsdValidationBasePath()) {
                     $path = str_replace($extension->getNamespace(), str_replace('\\', '/', $extension->getXsdValidationBasePath()).'/', $items[$i + 1]);
 
-                    if (!file_exists($path)) {
-                        throw new \RuntimeException(sprintf('Extension "%s" references a non-existent XSD file "%s"', get_class($extension), $path));
+                    if (!is_file($path)) {
+                        throw new RuntimeException(sprintf('Extension "%s" references a non-existent XSD file "%s"', get_class($extension), $path));
                     }
 
                     $schemaLocations[$items[$i]] = $path;
@@ -370,12 +363,13 @@ EOF
         $current = libxml_use_internal_errors(true);
         libxml_clear_errors();
 
-        $valid = $dom->schemaValidateSource($source);
+        $valid = @$dom->schemaValidateSource($source);
+
         foreach ($tmpfiles as $tmpfile) {
             @unlink($tmpfile);
         }
         if (!$valid) {
-            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($current)));
+            throw new InvalidArgumentException(implode("\n", $this->getXmlErrors($current)));
         }
         libxml_use_internal_errors($current);
     }
@@ -386,7 +380,7 @@ EOF
      * @param \DOMDocument $dom
      * @param string       $file
      *
-     * @throws  \InvalidArgumentException When non valid tag are found or no extension are found
+     * @throws InvalidArgumentException When no extension is found corresponding to a tag
      */
     private function validateExtensions(\DOMDocument $dom, $file)
     {
@@ -398,7 +392,7 @@ EOF
             // can it be handled by an extension?
             if (!$this->container->hasExtension($node->namespaceURI)) {
                 $extensionNamespaces = array_filter(array_map(function ($ext) { return $ext->getNamespace(); }, $this->container->getExtensions()));
-                throw new \InvalidArgumentException(sprintf(
+                throw new InvalidArgumentException(sprintf(
                     'There is no extension able to load the configuration for "%s" (in %s). Looked for namespace "%s", found %s',
                     $node->tagName,
                     $file,
@@ -440,8 +434,6 @@ EOF
      * Loads from an extension.
      *
      * @param SimpleXMLElement $xml
-     *
-     * @return void
      */
     private function loadFromExtensions(SimpleXMLElement $xml)
     {

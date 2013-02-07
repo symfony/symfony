@@ -56,7 +56,7 @@ class DelegatingLoader extends BaseDelegatingLoader
     {
         $collection = parent::load($resource, $type);
 
-        foreach ($collection->all() as $name => $route) {
+        foreach ($collection->all() as $route) {
             if ($controller = $route->getDefault('_controller')) {
                 try {
                     $controller = $this->parser->parse($controller);

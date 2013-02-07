@@ -1,0 +1,75 @@
+# skip "real" requests
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule .* - [QSA,L]
+
+# foo
+RewriteCond %{REQUEST_URI} ^/foo/(baz|symfony)$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:foo,E=_ROUTING_bar:%1,E=_ROUTING_DEFAULTS_def:test]
+
+# foobar
+RewriteCond %{REQUEST_URI} ^/foo(?:/([^/]+))?$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:foobar,E=_ROUTING_bar:%1,E=_ROUTING_DEFAULTS_bar:toto]
+
+# bar
+RewriteCond %{REQUEST_URI} ^/bar/([^/]+)$
+RewriteCond %{REQUEST_METHOD} !^(GET|HEAD)$ [NC]
+RewriteRule .* - [S=1,E=_ROUTING__allow_GET:1,E=_ROUTING__allow_HEAD:1]
+RewriteCond %{REQUEST_URI} ^/bar/([^/]+)$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:bar,E=_ROUTING_foo:%1]
+
+# baragain
+RewriteCond %{REQUEST_URI} ^/baragain/([^/]+)$
+RewriteCond %{REQUEST_METHOD} !^(GET|POST|HEAD)$ [NC]
+RewriteRule .* - [S=1,E=_ROUTING__allow_GET:1,E=_ROUTING__allow_POST:1,E=_ROUTING__allow_HEAD:1]
+RewriteCond %{REQUEST_URI} ^/baragain/([^/]+)$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baragain,E=_ROUTING_foo:%1]
+
+# baz
+RewriteCond %{REQUEST_URI} ^/test/baz$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz]
+
+# baz2
+RewriteCond %{REQUEST_URI} ^/test/baz\.html$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz2]
+
+# baz3
+RewriteCond %{REQUEST_URI} ^/test/baz3$
+RewriteRule .* $0/ [QSA,L,R=301]
+RewriteCond %{REQUEST_URI} ^/test/baz3/$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz3]
+
+# baz4
+RewriteCond %{REQUEST_URI} ^/test/([^/]+)$
+RewriteRule .* $0/ [QSA,L,R=301]
+RewriteCond %{REQUEST_URI} ^/test/([^/]+)/$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz4,E=_ROUTING_foo:%1]
+
+# baz5
+RewriteCond %{REQUEST_URI} ^/test/([^/]+)/$
+RewriteCond %{REQUEST_METHOD} !^(GET|HEAD)$ [NC]
+RewriteRule .* - [S=2,E=_ROUTING__allow_GET:1,E=_ROUTING__allow_HEAD:1]
+RewriteCond %{REQUEST_URI} ^/test/([^/]+)$
+RewriteRule .* $0/ [QSA,L,R=301]
+RewriteCond %{REQUEST_URI} ^/test/([^/]+)/$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz5,E=_ROUTING_foo:%1]
+
+# baz5unsafe
+RewriteCond %{REQUEST_URI} ^/testunsafe/([^/]+)/$
+RewriteCond %{REQUEST_METHOD} !^(POST)$ [NC]
+RewriteRule .* - [S=1,E=_ROUTING__allow_POST:1]
+RewriteCond %{REQUEST_URI} ^/testunsafe/([^/]+)/$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz5unsafe,E=_ROUTING_foo:%1]
+
+# baz6
+RewriteCond %{REQUEST_URI} ^/test/baz$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz6,E=_ROUTING_DEFAULTS_foo:bar\ baz]
+
+# baz7
+RewriteCond %{REQUEST_URI} ^/te\ st/baz$
+RewriteRule .* app.php [QSA,L,E=_ROUTING__route:baz7]
+
+# 405 Method Not Allowed
+RewriteCond %{_ROUTING__allow_GET} !-z [OR]
+RewriteCond %{_ROUTING__allow_HEAD} !-z [OR]
+RewriteCond %{_ROUTING__allow_POST} !-z
+RewriteRule .* app.php [QSA,L]

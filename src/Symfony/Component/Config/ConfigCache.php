@@ -56,7 +56,7 @@ class ConfigCache
      */
     public function isFresh()
     {
-        if (!file_exists($this->file)) {
+        if (!is_file($this->file)) {
             return false;
         }
 
@@ -65,7 +65,7 @@ class ConfigCache
         }
 
         $metadata = $this->file.'.meta';
-        if (!file_exists($metadata)) {
+        if (!is_file($metadata)) {
             return false;
         }
 
@@ -101,7 +101,7 @@ class ConfigCache
 
         $tmpFile = tempnam(dirname($this->file), basename($this->file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $this->file)) {
-            chmod($this->file, 0666);
+            @chmod($this->file, 0666 & ~umask());
         } else {
             throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $this->file));
         }
@@ -110,7 +110,7 @@ class ConfigCache
             $file = $this->file.'.meta';
             $tmpFile = tempnam(dirname($file), basename($file));
             if (false !== @file_put_contents($tmpFile, serialize($metadata)) && @rename($tmpFile, $file)) {
-                chmod($file, 0666);
+                @chmod($file, 0666 & ~umask());
             }
         }
     }

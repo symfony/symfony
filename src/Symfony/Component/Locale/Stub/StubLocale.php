@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Locale\Stub;
 
+use Symfony\Component\Locale\Locale;
 use Symfony\Component\Locale\Exception\NotImplementedException;
 use Symfony\Component\Locale\Exception\MethodNotImplementedException;
 
@@ -78,7 +79,7 @@ class StubLocale
      *
      * @return array                     The country names with their codes as keys
      *
-     * @throws InvalidArgumentException  When the locale is different than 'en'
+     * @throws \InvalidArgumentException  When the locale is different than 'en'
      */
     public static function getDisplayCountries($locale)
     {
@@ -102,7 +103,7 @@ class StubLocale
      *
      * @return array                     The language names with their codes as keys
      *
-     * @throws InvalidArgumentException  When the locale is different than 'en'
+     * @throws \InvalidArgumentException  When the locale is different than 'en'
      */
     public static function getDisplayLanguages($locale)
     {
@@ -126,7 +127,7 @@ class StubLocale
      *
      * @return array                     The locale names with their codes as keys
      *
-     * @throws InvalidArgumentException  When the locale is different than 'en'
+     * @throws \InvalidArgumentException  When the locale is different than 'en'
      */
     public static function getDisplayLocales($locale)
     {
@@ -162,7 +163,7 @@ class StubLocale
      *
      * @return array                     The currencies names with their codes as keys
      *
-     * @throws InvalidArgumentException  When the locale is different than 'en'
+     * @throws \InvalidArgumentException  When the locale is different than 'en'
      */
     public static function getDisplayCurrencies($locale)
     {
@@ -428,7 +429,7 @@ class StubLocale
      *
      * @see    http://www.php.net/manual/en/locale.lookup.php
      *
-     * @throws RuntimeException       When the intl extension is not loaded
+     * @throws \RuntimeException       When the intl extension is not loaded
      */
     public static function lookup(array $langtag, $locale, $canonicalize = false, $default = null)
     {
@@ -467,6 +468,23 @@ class StubLocale
         throw new MethodNotImplementedException(__METHOD__);
     }
 
+    public static function getDataDirectory()
+    {
+        static $dataDirectory;
+
+        if (null === $dataDirectory) {
+            $dataDirectory = 'current';
+
+            if (getenv('ICU_DATA_VERSION')) {
+                $dataDirectory = getenv('ICU_DATA_VERSION');
+            } elseif (file_exists(__DIR__.'/../Resources/data/data-version.php')) {
+                $dataDirectory = include __DIR__.'/../Resources/data/data-version.php';
+            }
+        }
+
+        return __DIR__.'/../Resources/data/'.$dataDirectory;
+    }
+
     /**
      * Returns the stub ICU data
      *
@@ -476,16 +494,18 @@ class StubLocale
      *
      * @return array
      *
-     * @throws InvalidArgumentException  When the locale is different than 'en'
+     * @throws \InvalidArgumentException  When the locale is different than 'en'
      */
     private static function getStubData($locale, $cacheVariable, $stubDataDir)
     {
+        $dataDirectory = Locale::getIcuDataDirectory();
+
         if ('en' !== $locale) {
             throw new \InvalidArgumentException(sprintf('Only the \'en\' locale is supported. %s', NotImplementedException::INTL_INSTALL_MESSAGE));
         }
 
         if (empty(self::${$cacheVariable})) {
-            self::${$cacheVariable} = include __DIR__.'/../Resources/data/stub/'.$stubDataDir.'/en.php';
+            self::${$cacheVariable} = include $dataDirectory.'/stub/'.$stubDataDir.'/en.php';
         }
 
         return self::${$cacheVariable};

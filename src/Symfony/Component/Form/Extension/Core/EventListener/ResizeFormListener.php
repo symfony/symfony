@@ -12,8 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Event\DataEvent;
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -21,36 +20,36 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Resize a collection form element based on the data sent from the client.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony-project.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ResizeFormListener implements EventSubscriberInterface
 {
     /**
      * @var FormFactoryInterface
      */
-    private $factory;
+    protected $factory;
 
     /**
      * @var string
      */
-    private $type;
+    protected $type;
 
     /**
      * @var array
      */
-    private $options;
+    protected $options;
 
     /**
      * Whether children could be added to the group
      * @var Boolean
      */
-    private $allowAdd;
+    protected $allowAdd;
 
     /**
      * Whether children could be removed from the group
      * @var Boolean
      */
-    private $allowDelete;
+    protected $allowDelete;
 
     public function __construct(FormFactoryInterface $factory, $type, array $options = array(), $allowAdd = false, $allowDelete = false)
     {
@@ -66,11 +65,12 @@ class ResizeFormListener implements EventSubscriberInterface
         return array(
             FormEvents::PRE_SET_DATA => 'preSetData',
             FormEvents::PRE_BIND => 'preBind',
-            FormEvents::BIND_NORM_DATA => 'onBindNormData',
+            // (MergeCollectionListener, MergeDoctrineCollectionListener)
+            FormEvents::BIND => array('onBind', 50),
         );
     }
 
-    public function preSetData(DataEvent $event)
+    public function preSetData(FormEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -90,13 +90,13 @@ class ResizeFormListener implements EventSubscriberInterface
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
-            $form->add($this->factory->createNamed($this->type, $name, null, array_replace(array(
+            $form->add($this->factory->createNamed($name, $this->type, null, array_replace(array(
                 'property_path' => '['.$name.']',
             ), $this->options)));
         }
     }
 
-    public function preBind(DataEvent $event)
+    public function preBind(FormEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -122,7 +122,7 @@ class ResizeFormListener implements EventSubscriberInterface
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
                 if (!$form->has($name)) {
-                    $form->add($this->factory->createNamed($this->type, $name, null, array_replace(array(
+                    $form->add($this->factory->createNamed($name, $this->type, null, array_replace(array(
                         'property_path' => '['.$name.']',
                     ), $this->options)));
                 }
@@ -130,7 +130,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
     }
 
-    public function onBindNormData(FilterDataEvent $event)
+    public function onBind(FormEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -143,6 +143,8 @@ class ResizeFormListener implements EventSubscriberInterface
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
+        // The data mapper only adds, but does not remove items, so do this
+        // here
         if ($this->allowDelete) {
             foreach ($data as $name => $child) {
                 if (!$form->has($name)) {

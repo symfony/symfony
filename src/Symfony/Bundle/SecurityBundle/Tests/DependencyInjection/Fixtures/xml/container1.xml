@@ -17,25 +17,29 @@
         <encoder class="JMS\FooBundle\Entity\User4" id="security.encoder.foo" />
 
         <provider name="default">
-            <user name="foo" password="foo" roles="ROLE_USER" />
+            <memory>
+                <user name="foo" password="foo" roles="ROLE_USER" />
+            </memory>
         </provider>
 
         <provider name="digest">
-            <user name="foo" password="foo" roles="ROLE_USER, ROLE_ADMIN" />
+            <memory>
+                <user name="foo" password="foo" roles="ROLE_USER, ROLE_ADMIN" />
+            </memory>
         </provider>
 
         <provider name="basic">
-            <user name="foo" password="0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" roles="ROLE_SUPER_ADMIN" />
-            <user name="bar" password="0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" roles="ROLE_USER, ROLE_ADMIN" />
-        </provider>
-
-        <provider name="doctrine">
-            <entity class="SecurityBundle:User" property="username" />
+            <memory>
+                <user name="foo" password="0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" roles="ROLE_SUPER_ADMIN" />
+                <user name="bar" password="0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" roles="ROLE_USER, ROLE_ADMIN" />
+            </memory>
         </provider>
 
         <provider name="service" id="user.manager" />
 
-        <provider name="chain" providers="service, doctrine, basic" />
+        <provider name="chain">
+            <chain providers="service, basic" />
+        </provider>
 
         <firewall name="simple" pattern="/login" security="false" />
 

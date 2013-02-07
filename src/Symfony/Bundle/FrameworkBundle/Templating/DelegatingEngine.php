@@ -84,12 +84,6 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
      */
     public function renderResponse($view, array $parameters = array(), Response $response = null)
     {
-        if (null === $response) {
-            $response = new Response();
-        }
-
-        $response->setContent($this->render($view, $parameters));
-
-        return $response;
+        return $this->getEngine($view)->renderResponse($view, $parameters, $response);
     }
 }

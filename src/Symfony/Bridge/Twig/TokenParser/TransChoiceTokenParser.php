@@ -36,7 +36,7 @@ class TransChoiceTokenParser extends TransTokenParser
 
         $count = $this->parser->getExpressionParser()->parseExpression();
 
-        $domain = new \Twig_Node_Expression_Constant('messages', $lineno);
+        $domain = null;
         $locale = null;
 
         if ($stream->test('with')) {

@@ -17,10 +17,12 @@ use Symfony\Component\Validator\Constraint;
  * @Annotation
  *
  * @api
+ *
+ * @deprecated Deprecated since version 2.1, to be removed in 2.3.
  */
 class MinLength extends Constraint
 {
-    public $message = 'This value is too short. It should have {{ limit }} characters or more';
+    public $message = 'This value is too short. It should have {{ limit }} characters or more.';
     public $limit;
     public $charset = 'UTF-8';
 

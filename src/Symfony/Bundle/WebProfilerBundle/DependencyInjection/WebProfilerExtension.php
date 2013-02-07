@@ -39,7 +39,7 @@ class WebProfilerExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
+        $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
@@ -49,12 +49,12 @@ class WebProfilerExtension extends Extension
 
         if (!$config['toolbar']) {
             $mode = WebDebugToolbarListener::DISABLED;
-        } elseif ($config['verbose']) {
-            $mode = WebDebugToolbarListener::ENABLED;
         } else {
-            $mode = WebDebugToolbarListener::ENABLED_MINIMAL;
+            $mode = WebDebugToolbarListener::ENABLED;
         }
+
         $container->setParameter('web_profiler.debug_toolbar.mode', $mode);
+        $container->setParameter('web_profiler.debug_toolbar.position', $config['position']);
     }
 
     /**

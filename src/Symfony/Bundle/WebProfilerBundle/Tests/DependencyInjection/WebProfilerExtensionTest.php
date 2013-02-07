@@ -58,11 +58,15 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->register('templating.engine.twig', $this->getMockClass('Symfony\\Bundle\\TwigBundle\\TwigEngine'))
             ->addArgument(new Definition($this->getMockClass('Twig_Environment')))
             ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\Templating\\TemplateNameParserInterface')))
+            ->addArgument(new Definition($this->getMockClass('Symfony\Component\Config\FileLocatorInterface')))
             ->addArgument(new Definition($this->getMockClass('Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables'), array(new Definition($this->getMockClass('Symfony\\Component\\DependencyInjection\\Container')))));
         $this->container->setParameter('kernel.bundles', array());
         $this->container->setParameter('kernel.cache_dir', __DIR__);
         $this->container->setParameter('kernel.debug', false);
         $this->container->setParameter('kernel.root_dir', __DIR__);
+        $this->container->register('profiler', $this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\Profiler'))
+            ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\ProfilerStorageInterface')));
+        $this->container->setParameter('data_collector.templates', array());
         $this->container->set('kernel', $this->kernel);
     }
 
@@ -92,13 +96,12 @@ class WebProfilerExtensionTest extends TestCase
     /**
      * @dataProvider getDebugModes
      */
-    public function testToolbarConfig($enabled, $verbose)
+    public function testToolbarConfig($enabled)
     {
         $extension = new WebProfilerExtension();
-        $extension->load(array(array('toolbar' => $enabled, 'verbose' => $verbose)), $this->container);
+        $extension->load(array(array('toolbar' => $enabled)), $this->container);
 
         $this->assertSame($enabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
-        $this->assertSame($enabled && $verbose, $this->container->get('web_profiler.debug_toolbar')->isVerbose());
 
         $this->assertSaneContainer($this->getDumpedContainer());
     }
@@ -106,10 +109,8 @@ class WebProfilerExtensionTest extends TestCase
     public function getDebugModes()
     {
         return array(
-            array(true, true),
-            array(true, false),
-            array(false, false),
-            array(false, true),
+            array(true),
+            array(false),
         );
     }
 

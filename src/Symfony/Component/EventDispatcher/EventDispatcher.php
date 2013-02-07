@@ -23,6 +23,7 @@ namespace Symfony\Component\EventDispatcher;
  * @author  Bernhard Schussek <bschussek@gmail.com>
  * @author  Fabien Potencier <fabien@symfony.com>
  * @author  Jordi Boggiano <j.boggiano@seld.be>
+ * @author  Jordan Alliot <jordan.alliot@gmail.com>
  *
  * @api
  */
@@ -38,15 +39,20 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function dispatch($eventName, Event $event = null)
     {
-        if (!isset($this->listeners[$eventName])) {
-            return;
-        }
-
         if (null === $event) {
             $event = new Event();
         }
 
+        $event->setDispatcher($this);
+        $event->setName($eventName);
+
+        if (!isset($this->listeners[$eventName])) {
+            return $event;
+        }
+
         $this->doDispatch($this->getListeners($eventName), $eventName, $event);
+
+        return $event;
     }
 
     /**
@@ -116,8 +122,12 @@ class EventDispatcher implements EventDispatcherInterface
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
             if (is_string($params)) {
                 $this->addListener($eventName, array($subscriber, $params));
-            } else {
+            } elseif (is_string($params[0])) {
                 $this->addListener($eventName, array($subscriber, $params[0]), isset($params[1]) ? $params[1] : 0);
+            } else {
+                foreach ($params as $listener) {
+                    $this->addListener($eventName, array($subscriber, $listener[0]), isset($listener[1]) ? $listener[1] : 0);
+                }
             }
         }
     }
@@ -128,7 +138,13 @@ class EventDispatcher implements EventDispatcherInterface
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
-            $this->removeListener($eventName, array($subscriber, is_string($params) ? $params : $params[0]));
+            if (is_array($params) && is_array($params[0])) {
+                foreach ($params as $listener) {
+                    $this->removeListener($eventName, array($subscriber, $listener[0]));
+                }
+            } else {
+                $this->removeListener($eventName, array($subscriber, is_string($params) ? $params : $params[0]));
+            }
         }
     }
 

@@ -45,7 +45,7 @@ class InputArgument
     {
         if (null === $mode) {
             $mode = self::OPTIONAL;
-        } elseif (is_string($mode) || $mode > 7) {
+        } elseif (!is_int($mode) || $mode > 7 || $mode < 1) {
             throw new \InvalidArgumentException(sprintf('Argument mode "%s" is not valid.', $mode));
         }
 

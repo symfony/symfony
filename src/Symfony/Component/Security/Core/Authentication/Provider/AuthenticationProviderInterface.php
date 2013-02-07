@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 
 /**
- * AuthenticationProviderInterface is the interface for for all authentication
+ * AuthenticationProviderInterface is the interface for all authentication
  * providers.
  *
  * Concrete implementations processes specific Token instances.

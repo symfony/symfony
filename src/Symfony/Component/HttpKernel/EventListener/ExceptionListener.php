@@ -14,16 +14,18 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * ExceptionListener.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExceptionListener
+class ExceptionListener implements EventSubscriberInterface
 {
     private $controller;
     private $logger;
@@ -60,15 +62,9 @@ class ExceptionListener
 
         $logger = $this->logger instanceof DebugLoggerInterface ? $this->logger : null;
 
-        $flattenException = FlattenException::create($exception);
-        if ($exception instanceof HttpExceptionInterface) {
-            $flattenException->setStatusCode($exception->getStatusCode());
-            $flattenException->setHeaders($exception->getHeaders());
-        }
-
         $attributes = array(
             '_controller' => $this->controller,
-            'exception'   => $flattenException,
+            'exception'   => FlattenException::create($exception),
             'logger'      => $logger,
             'format'      => $request->getRequestFormat(),
         );
@@ -93,12 +89,19 @@ class ExceptionListener
             // set handling to false otherwise it wont be able to handle further more
             $handling = false;
 
-            // re-throw the exception as this is a catch-all
-            throw $exception;
+            // re-throw the exception from within HttpKernel as this is a catch-all
+            return;
         }
 
         $event->setResponse($response);
 
         $handling = false;
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::EXCEPTION => array('onKernelException', -128),
+        );
     }
 }

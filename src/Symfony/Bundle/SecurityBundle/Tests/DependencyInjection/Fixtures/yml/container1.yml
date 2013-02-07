@@ -13,21 +13,23 @@ security:
 
     providers:
         default:
-            users:
-                foo: { password: foo, roles: ROLE_USER }
+            memory:
+                users:
+                    foo: { password: foo, roles: ROLE_USER }
         digest:
-            users:
-                foo: { password: foo, roles: 'ROLE_USER, ROLE_ADMIN' }
+            memory:
+                users:
+                    foo: { password: foo, roles: 'ROLE_USER, ROLE_ADMIN' }
         basic:
-            users:
-                foo: { password: 0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33, roles: ROLE_SUPER_ADMIN }
-                bar: { password: 0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33, roles: [ROLE_USER, ROLE_ADMIN] }
-        doctrine:
-            entity: { class: SecurityBundle:User, property: username }
+            memory:
+                users:
+                    foo: { password: 0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33, roles: ROLE_SUPER_ADMIN }
+                    bar: { password: 0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33, roles: [ROLE_USER, ROLE_ADMIN] }
         service:
             id: user.manager
         chain:
-            providers: [service, doctrine, basic]
+            chain:
+                providers: [service, basic]
 
 
     firewalls:

@@ -49,7 +49,8 @@ class TwigExtension extends Extension
             }
         }
 
-        $configuration = new Configuration();
+        $configuration = $this->getConfiguration($configs, $container);
+
         $config = $this->processConfiguration($configuration, $configs);
 
         $container->setParameter('twig.exception_listener.controller', $config['exception_controller']);
@@ -58,6 +59,12 @@ class TwigExtension extends Extension
 
         $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
         $container->getDefinition('twig.loader')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
+
+        if (!empty($config['paths'])) {
+            foreach ($config['paths'] as $path) {
+                $container->getDefinition('twig.loader')->addMethodCall('addPath', array($path));
+            }
+        }
 
         if (!empty($config['globals'])) {
             $def = $container->getDefinition('twig');
@@ -78,16 +85,25 @@ class TwigExtension extends Extension
 
         $container->setParameter('twig.options', $config);
 
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('debug.xml');
+
+            $container->setDefinition('templating.engine.twig', $container->findDefinition('debug.templating.engine.twig'));
+            $container->setAlias('debug.templating.engine.twig', 'templating.engine.twig');
+        }
+
+        if (!isset($config['autoescape'])) {
+            $container->findDefinition('templating.engine.twig')->addMethodCall('setDefaultEscapingStrategy', array(array(new Reference('templating.engine.twig'), 'guessDefaultEscapingStrategy')));
+        }
+
         $this->addClassesToCompile(array(
             'Twig_Environment',
-            'Twig_ExtensionInterface',
             'Twig_Extension',
             'Twig_Extension_Core',
             'Twig_Extension_Escaper',
             'Twig_Extension_Optimizer',
             'Twig_LoaderInterface',
             'Twig_Markup',
-            'Twig_TemplateInterface',
             'Twig_Template',
         ));
     }

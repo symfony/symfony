@@ -106,6 +106,8 @@ class Profiler
     /**
      * Exports the current profiler data.
      *
+     * @param Profile $profile A Profile instance
+     *
      * @return string The exported data
      */
     public function export(Profile $profile)
@@ -136,15 +138,16 @@ class Profiler
     /**
      * Finds profiler tokens for the given criteria.
      *
-     * @param string $ip    The IP
-     * @param string $url   The URL
-     * @param string $limit The maximum number of tokens to return
+     * @param string $ip     The IP
+     * @param string $url    The URL
+     * @param string $limit  The maximum number of tokens to return
+     * @param string $method The request method
      *
      * @return array An array of tokens
      */
-    public function find($ip, $url, $limit)
+    public function find($ip, $url, $limit, $method)
     {
-        return $this->storage->find($ip, $url, $limit);
+        return $this->storage->find($ip, $url, $limit, $method);
     }
 
     /**
@@ -154,7 +157,7 @@ class Profiler
      * @param Response   $response  A Response instance
      * @param \Exception $exception An exception instance if the request threw one
      *
-     * @return Profile|false A Profile instance or false if the profiler is disabled
+     * @return Profile|null A Profile instance or null if the profiler is disabled
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -166,11 +169,11 @@ class Profiler
         $profile->setTime(time());
         $profile->setUrl($request->getUri());
         $profile->setIp($request->getClientIp());
+        $profile->setMethod($request->getMethod());
 
         $response->headers->set('X-Debug-Token', $profile->getToken());
 
-        $collectors = array();
-        foreach ($this->collectors as $name => $collector) {
+        foreach ($this->collectors as $collector) {
             $collector->collect($request, $response, $exception);
 
             // forces collectors to become "read/only" (they loose their object dependencies)
@@ -217,6 +220,8 @@ class Profiler
      * Returns true if a Collector for the given name exists.
      *
      * @param string $name A collector name
+     *
+     * @return Boolean
      */
     public function has($name)
     {

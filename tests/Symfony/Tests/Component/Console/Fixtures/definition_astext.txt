@@ -1,9 +1,0 @@
-<comment>Arguments:</comment>
- <info>foo       </info> The foo argument
- <info>baz       </info> The baz argument<comment> (default: true)</comment>
- <info>bar       </info> The bar argument<comment> (default: array (  0 => 'bar',))</comment>
-
-<comment>Options:</comment>
- <info>--foo</info> (-f) The foo option
- <info>--baz</info>      The baz option<comment> (default: false)</comment>
- <info>--bar</info> (-b) The bar option<comment> (default: bar)</comment>

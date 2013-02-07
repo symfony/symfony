@@ -29,11 +29,13 @@ class RedirectControllerTest extends TestCase
         $controller = new RedirectController();
         $controller->setContainer($container);
 
-        $returnResponse = $controller->redirectAction('');
-
+        $returnResponse = $controller->redirectAction('', true);
         $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
-
         $this->assertEquals(410, $returnResponse->getStatusCode());
+
+        $returnResponse = $controller->redirectAction('', false);
+        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
+        $this->assertEquals(404, $returnResponse->getStatusCode());
     }
 
     /**
@@ -46,8 +48,18 @@ class RedirectControllerTest extends TestCase
         $route = 'new-route';
         $url = '/redirect-url';
         $params = array('additional-parameter' => 'value');
+        $attributes = array(
+            'route' => $route,
+            'permanent' => $permanent,
+            '_route' => 'current-route',
+            '_route_params' => array(
+                'route' => $route,
+                'permanent' => $permanent,
+            ),
+        );
+        $attributes['_route_params'] = $attributes['_route_params'] + $params;
 
-        $request->attributes = new ParameterBag(array('route' => $route, '_route' => 'current-route', 'permanent' => $permanent) + $params);
+        $request->attributes = new ParameterBag($attributes);
 
         $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
         $router
@@ -90,11 +102,14 @@ class RedirectControllerTest extends TestCase
     public function testEmptyPath()
     {
         $controller = new RedirectController();
-        $returnResponse = $controller->urlRedirectAction('');
 
+        $returnResponse = $controller->urlRedirectAction('', true);
         $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
-
         $this->assertEquals(410, $returnResponse->getStatusCode());
+
+        $returnResponse = $controller->urlRedirectAction('', false);
+        $this->assertInstanceOf('\Symfony\Component\HttpFoundation\Response', $returnResponse);
+        $this->assertEquals(404, $returnResponse->getStatusCode());
     }
 
     public function testFullURL()

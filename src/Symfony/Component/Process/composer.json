@@ -16,10 +16,11 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2"
+        "php": ">=5.3.3"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Process": "" }
     },
-    "target-dir": "Symfony/Component/Process"
+    "target-dir": "Symfony/Component/Process",
+    "minimum-stability": "dev"
 }

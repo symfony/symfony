@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Bundle;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
  * BundleInterface.
@@ -20,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @api
  */
-interface BundleInterface
+interface BundleInterface extends ContainerAwareInterface
 {
     /**
      * Boots the Bundle.
@@ -57,9 +59,13 @@ interface BundleInterface
     public function getContainerExtension();
 
     /**
-     * Returns the bundle parent name.
+     * Returns the bundle name that this bundle overrides.
      *
-     * @return string The Bundle parent name it overrides or null if no parent
+     * Despite its name, this method does not imply any parent/child relationship
+     * between the bundles, just a way to extend and override an existing
+     * bundle.
+     *
+     * @return string The Bundle name it overrides or null if no parent
      *
      * @api
      */

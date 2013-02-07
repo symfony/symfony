@@ -1,1 +1,1 @@
-<?php echo $view['form']->renderBlock('field_widget', array('type' => isset($type) ? $type : 'email')) ?>
+<?php echo $view['form']->block($form, 'form_widget_simple', array('type' => isset($type) ? $type : 'email')) ?>

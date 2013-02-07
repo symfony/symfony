@@ -127,6 +127,18 @@ class ParameterBag implements ParameterBagInterface
     }
 
     /**
+     * Removes a parameter.
+     *
+     * @param string $name The parameter name
+     *
+     * @api
+     */
+    public function remove($name)
+    {
+        unset($this->parameters[strtolower($name)]);
+    }
+
+    /**
      * Replaces parameter placeholders (%name%) by their values for all parameters.
      */
     public function resolve()
@@ -241,7 +253,28 @@ class ParameterBag implements ParameterBagInterface
         return $this->resolved;
     }
 
-    private function unescapeValue($value)
+    /**
+     * {@inheritDoc}
+     */
+    public function escapeValue($value)
+    {
+        if (is_string($value)) {
+            return str_replace('%', '%%', $value);
+        }
+
+        if (is_array($value)) {
+            $result = array();
+            foreach ($value as $k => $v) {
+                $result[$k] = $this->escapeValue($v);
+            }
+
+            return $result;
+        }
+
+        return $value;
+    }
+
+    public function unescapeValue($value)
     {
         if (is_string($value)) {
             return str_replace('%%', '%', $value);

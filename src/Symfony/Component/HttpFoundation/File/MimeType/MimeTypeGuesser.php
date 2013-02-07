@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\File\MimeType;
 
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 
@@ -28,18 +29,20 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
  *
  * The last registered guesser is preferred over previously registered ones.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class MimeTypeGuesser implements MimeTypeGuesserInterface
 {
     /**
      * The singleton instance
+     *
      * @var MimeTypeGuesser
      */
     private static $instance = null;
 
     /**
      * All registered MimeTypeGuesserInterface instances
+     *
      * @var array
      */
     protected $guessers = array();
@@ -65,10 +68,6 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
     {
         if (FileBinaryMimeTypeGuesser::isSupported()) {
             $this->register(new FileBinaryMimeTypeGuesser());
-        }
-
-        if (ContentTypeMimeTypeGuesser::isSupported()) {
-            $this->register(new ContentTypeMimeTypeGuesser());
         }
 
         if (FileinfoMimeTypeGuesser::isSupported()) {

@@ -1,15 +1,18 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\DependencyInjection;
+
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 
 /**
  * This definition decorates another definition.
@@ -169,7 +172,7 @@ class DefinitionDecorator extends Definition
         $lastIndex = count(array_filter(array_keys($this->arguments), 'is_int')) - 1;
 
         if ($index < 0 || $index > $lastIndex) {
-            throw new \OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, $lastIndex));
+            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, $lastIndex));
         }
 
         return $this->arguments[$index];
@@ -187,14 +190,14 @@ class DefinitionDecorator extends Definition
      * @param mixed   $value
      *
      * @return DefinitionDecorator the current instance
-     * @throws \InvalidArgumentException when $index isn't an integer
+     * @throws InvalidArgumentException when $index isn't an integer
      *
      * @api
      */
     public function replaceArgument($index, $value)
     {
         if (!is_int($index)) {
-            throw new \InvalidArgumentException('$index must be an integer.');
+            throw new InvalidArgumentException('$index must be an integer.');
         }
 
         $this->arguments['index_'.$index] = $value;

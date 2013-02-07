@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\HttpFoundation\File\MimeType;
 
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
+
 /**
  * Guesses the mime type of a file
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface MimeTypeGuesserInterface
 {

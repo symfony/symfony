@@ -42,7 +42,7 @@ class CallbackTransformer implements DataTransformerInterface
      *
      * @param mixed $data The value in the original representation
      *
-     * @return mixed                     The value in the transformed representation
+     * @return mixed The value in the transformed representation
      *
      * @throws UnexpectedTypeException   when the argument is not a string
      * @throws TransformationFailedException  when the transformation fails
@@ -58,7 +58,7 @@ class CallbackTransformer implements DataTransformerInterface
      *
      * @param mixed $data The value in the transformed representation
      *
-     * @return mixed                     The value in the original representation
+     * @return mixed The value in the original representation
      *
      * @throws UnexpectedTypeException   when the argument is not of the expected type
      * @throws TransformationFailedException  when the transformation fails

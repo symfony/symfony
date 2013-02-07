@@ -25,7 +25,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
     {
         if (null === $this->db) {
             if (0 !== strpos($this->dsn, 'mysql')) {
-                throw new \RuntimeException('Please check your configuration. You are trying to use Mysql with a wrong dsn. "'.$this->dsn.'"');
+                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Mysql with an invalid dsn "%s". The expected format is "mysql:dbname=database_name;host=host_name".', $this->dsn));
             }
 
             if (!class_exists('PDO') || !in_array('mysql', \PDO::getAvailableDrivers(), true)) {
@@ -33,7 +33,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
             }
 
             $db = new \PDO($this->dsn, $this->username, $this->password);
-            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token VARCHAR(255) PRIMARY KEY, data LONGTEXT, ip VARCHAR(64), url VARCHAR(255), time INTEGER UNSIGNED, parent VARCHAR(255), created_at INTEGER UNSIGNED, KEY (created_at), KEY (ip), KEY (url), KEY (parent))');
+            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token VARCHAR(255) PRIMARY KEY, data LONGTEXT, ip VARCHAR(64), method VARCHAR(6), url VARCHAR(255), time INTEGER UNSIGNED, parent VARCHAR(255), created_at INTEGER UNSIGNED, KEY (created_at), KEY (ip), KEY (method), KEY (url), KEY (parent))');
 
             $this->db = $db;
         }
@@ -44,7 +44,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
     /**
      * {@inheritdoc}
      */
-    protected function buildCriteria($ip, $url, $limit)
+    protected function buildCriteria($ip, $url, $limit, $method)
     {
         $criteria = array();
         $args = array();
@@ -57,6 +57,11 @@ class MysqlProfilerStorage extends PdoProfilerStorage
         if ($url) {
             $criteria[] = 'url LIKE :url';
             $args[':url'] = '%'.addcslashes($url, '%_\\').'%';
+        }
+
+        if ($method) {
+            $criteria[] = 'method = :method';
+            $args[':method'] = $method;
         }
 
         return array($criteria, $args);

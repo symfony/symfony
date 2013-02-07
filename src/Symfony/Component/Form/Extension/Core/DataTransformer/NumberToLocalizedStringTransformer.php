@@ -19,7 +19,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * Transforms between a number type and a localized number with grouping
  * (each thousand) and comma separators.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
 class NumberToLocalizedStringTransformer implements DataTransformerInterface
@@ -103,6 +103,10 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             return null;
         }
 
+        if ('NaN' === $value) {
+            throw new TransformationFailedException('"NaN" is not a valid number');
+        }
+
         $formatter = $this->getNumberFormatter();
         $groupSep = $formatter->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
         $decSep = $formatter->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
@@ -121,6 +125,10 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException($formatter->getErrorMessage());
         }
 
+        if ($value >= INF || $value <= -INF) {
+            throw new TransformationFailedException('I don\'t have a clear idea what infinity looks like');
+        }
+
         return $value;
     }
 
@@ -133,7 +141,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     {
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
 
-        if ($this->precision !== null) {
+        if (null !== $this->precision) {
             $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->precision);
             $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
         }

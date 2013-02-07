@@ -14,16 +14,17 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * EsiListener adds a Surrogate-Control HTTP header when the Response needs to be parsed for ESI.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class EsiListener
+class EsiListener implements EventSubscriberInterface
 {
-    private $i;
     private $esi;
 
     /**
@@ -48,5 +49,12 @@ class EsiListener
         }
 
         $this->esi->addSurrogateControl($event->getResponse());
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::RESPONSE => 'onKernelResponse',
+        );
     }
 }

@@ -25,7 +25,7 @@ namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
  * be bound to pages that are designed to handle the form, that is, that use
  * the same intention string to validate the CSRF token with isCsrfTokenValid().
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface CsrfProviderInterface
 {

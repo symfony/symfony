@@ -18,7 +18,7 @@ namespace Symfony\Component\Templating;
  *
  * @api
  */
-class DelegatingEngine implements EngineInterface
+class DelegatingEngine implements EngineInterface, StreamingEngineInterface
 {
     protected $engines;
 
@@ -53,6 +53,26 @@ class DelegatingEngine implements EngineInterface
     public function render($name, array $parameters = array())
     {
         return $this->getEngine($name)->render($name, $parameters);
+    }
+
+    /**
+     * Streams a template.
+     *
+     * @param mixed $name       A template name or a TemplateReferenceInterface instance
+     * @param array $parameters An array of parameters to pass to the template
+     *
+     * @throws \RuntimeException if the template cannot be rendered
+     *
+     * @api
+     */
+    public function stream($name, array $parameters = array())
+    {
+        $engine = $this->getEngine($name);
+        if (!$engine instanceof StreamingEngineInterface) {
+            throw new \LogicException(sprintf('Template "%s" cannot be streamed as the engine supporting it does not implement StreamingEngineInterface.', $name));
+        }
+
+        $engine->stream($name, $parameters);
     }
 
     /**

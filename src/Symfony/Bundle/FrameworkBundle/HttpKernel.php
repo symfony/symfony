@@ -1,18 +1,19 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -22,11 +23,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * This HttpKernel is used to manage scope changes of the DI container.
  *
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class HttpKernel extends BaseHttpKernel
 {
-    private $container;
+    protected $container;
+
     private $esiSupport;
 
     public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
@@ -112,7 +115,7 @@ class HttpKernel extends BaseHttpKernel
             $this->esiSupport = $this->container->has('esi') && $this->container->get('esi')->hasSurrogateEsiCapability($this->container->get('request'));
         }
 
-        if ($this->esiSupport && $options['standalone']) {
+        if ($this->esiSupport && (true === $options['standalone'] || 'esi' === $options['standalone'])) {
             if (0 === strpos($controller, 'http://') || 0 === strpos($controller, 'https://')) {
                 $uri = $controller;
             } else {
@@ -129,6 +132,21 @@ class HttpKernel extends BaseHttpKernel
             }
 
             return $this->container->get('esi')->renderIncludeTag($uri, $alt, $options['ignore_errors'], $options['comment']);
+        }
+
+        if ('js' === $options['standalone']) {
+            if (0 === strpos($controller, 'http://') || 0 === strpos($controller, 'https://')) {
+                $uri = $controller;
+            } else {
+                $uri = $this->generateInternalUri($controller, $options['attributes'], $options['query'], false);
+            }
+            $defaultContent = null;
+
+            if ($template = $this->container->getParameter('templating.hinclude.default_template')) {
+                $defaultContent = $this->container->get('templating')->render($template);
+            }
+
+            return $this->renderHIncludeTag($uri, $defaultContent);
         }
 
         $request = $this->container->get('request');
@@ -164,7 +182,11 @@ class HttpKernel extends BaseHttpKernel
                 throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
             }
 
-            return $response->getContent();
+            if (!$response instanceof StreamedResponse) {
+                return $response->getContent();
+            }
+
+            $response->sendContent();
         } catch (\Exception $e) {
             if ($options['alt']) {
                 $alt = $options['alt'];
@@ -191,20 +213,21 @@ class HttpKernel extends BaseHttpKernel
      *
      * This method uses the "_internal" route, which should be available.
      *
-     * @param string $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
-     * @param array  $attributes An array of request attributes
-     * @param array  $query      An array of request query parameters
+     * @param string  $controller A controller name to execute (a string like BlogBundle:Post:index), or a relative URI
+     * @param array   $attributes An array of request attributes
+     * @param array   $query      An array of request query parameters
+     * @param boolean $secure
      *
      * @return string An internal URI
      */
-    public function generateInternalUri($controller, array $attributes = array(), array $query = array())
+    public function generateInternalUri($controller, array $attributes = array(), array $query = array(), $secure = true)
     {
         if (0 === strpos($controller, '/')) {
             return $controller;
         }
 
         $path = http_build_query($attributes, '', '&');
-        $uri = $this->container->get('router')->generate('_internal', array(
+        $uri = $this->container->get('router')->generate($secure ? '_internal' : '_internal_public', array(
             'controller' => $controller,
             'path'       => $path ?: 'none',
             '_format'    => $this->container->get('request')->getRequestFormat(),
@@ -215,5 +238,21 @@ class HttpKernel extends BaseHttpKernel
         }
 
         return $uri;
+    }
+
+    /**
+     * Renders an HInclude tag.
+     *
+     * @param string $uri A URI
+     * @param string $defaultContent Default content
+     */
+    public function renderHIncludeTag($uri, $defaultContent = null)
+    {
+        return sprintf('<hx:include src="%s">%s</hx:include>', $uri, $defaultContent);
+    }
+
+    public function hasEsiSupport()
+    {
+        return $this->esiSupport;
     }
 }

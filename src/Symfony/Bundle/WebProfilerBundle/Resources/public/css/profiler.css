@@ -160,7 +160,7 @@ abbr {
 
 #menu_profiler li.selected a,
 #menu_profiler li a:hover {
-    background: #d1d1d1 url(../images/profiler/bg_submenu.gif) repeat-x 0 0;
+    background: #d1d1d1 url(../images/profiler/bg_submenu.png) repeat-x 0 0;
 }
 
 #navigation div:first-child,
@@ -213,7 +213,7 @@ li {
 
 }
 
-#main, #resume {
+#main {
     -moz-border-radius: 16px;
     -webkit-border-radius: 16px;
     border-radius: 16px;
@@ -227,24 +227,32 @@ li {
     -webkit-border-radius: 6px;
     border-radius: 6px;
     padding: 4px;
-    color: white;
+    color: #fff;
     margin-right: 2px;
     font-size: 11px;
 }
 
 #resume {
     background-color: #f6f6f6;
-    border: 1px solid #dfdfdf;
-    padding: 16px 28px;
-}
-
-#resume p {
+    border-bottom: 1px solid #dfdfdf;
+    padding: 10px 50px;
+    margin-left: 210px;
     color: #313131;
     font-size: 12px;
+    -moz-border-radius-topright: 16px;
+    -webkit-border-top-right-radius: 16px;
+    border-top-right-radius: 16px;
 }
 
-#resume .date {
-    display: block;
+a#resume-view-all {
+    display: inline-block;
+    padding: 0.2em 0.7em;
+    margin-right: 0.5em;
+    background-color: #666;
+    border-radius: 16px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
 }
 
 table th.value {
@@ -298,6 +306,11 @@ ul.alt li.even {
 
 ul.alt li.error {
     background-color: #f66;
+    margin-bottom: 1px;
+}
+
+ul.alt li.warning {
+    background-color: #ffcc00;
     margin-bottom: 1px;
 }
 
@@ -387,7 +400,7 @@ td.main, td.menu {
 #navigation .search {
     padding-top: 15px;
     float: none;
-    background: #f6f6f6;
+    background: none repeat scroll 0 0 #f6f6f6;
     color: #333;
     margin: 20px 0;
     border: 1px solid #dfdfdf;
@@ -437,6 +450,41 @@ td.main, td.menu {
 }
 
 #navigation .import input {
-    margin: 5px 0;
-    width: 210px;
+    width: 100px;
+}
+
+.timeline {
+    background-color: #fbfbfb;
+    margin-bottom: 15px;
+    margin-top: 5px;
+}
+
+#collector_content .routing tr.matches td {
+    background-color: #0e0;
+}
+
+#collector_content .routing tr.almost td {
+    background-color: #fa0;
+}
+
+.loading {
+    background: transparent url(../images/profiler/spinner.gif) scroll no-repeat 50% 50%;
+    height: 30px;
+    display: none;
+}
+
+.sf-profiler-timeline .legends {
+    font-size: 12px;
+    line-height: 1.5em;
+}
+
+.sf-profiler-timeline .legends span {
+    border-left-width: 10px;
+    border-left-style: solid;
+    padding: 0 10px 0 5px;
+}
+
+.sf-profiler-timeline canvas {
+    border: 1px solid #999;
+    border-width: 1px 0;
 }

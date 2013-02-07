@@ -15,32 +15,21 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 class FalseValidator extends ConstraintValidator
 {
     /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @return Boolean Whether or not the value is valid
-     *
-     * @api
+     * {@inheritDoc}
      */
-    public function isValid($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
-        if (null === $value) {
-            return true;
+        if (null === $value || false === $value || 0 === $value || '0' === $value) {
+            return;
         }
 
-        if (false === $value || 0 === $value || '0' === $value) {
-            return true;
-        }
-
-        $this->setMessage($constraint->message);
-
-        return false;
+        $this->context->addViolation($constraint->message);
     }
 }

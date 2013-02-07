@@ -11,14 +11,12 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\Config\Loader\DelegatingLoader;
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -35,7 +33,15 @@ class SecurityExtension extends Extension
     private $requestMatchers = array();
     private $contextListeners = array();
     private $listenerPositions = array('pre_auth', 'form', 'http', 'remember_me');
-    private $factories;
+    private $factories = array();
+    private $userProviderFactories = array();
+
+    public function __construct()
+    {
+        foreach ($this->listenerPositions as $position) {
+            $this->factories[$position] = array();
+        }
+    }
 
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -43,13 +49,8 @@ class SecurityExtension extends Extension
             return;
         }
 
-        // first assemble the factories
-        $factoriesConfig = new FactoryConfiguration();
-        $config = $this->processConfiguration($factoriesConfig, $configs);
-        $factories = $this->createListenerFactories($container, $config);
+        $mainConfig = $this->getConfiguration($configs, $container);
 
-        // normalize and merge the actual configuration
-        $mainConfig = new MainConfiguration($factories);
         $config = $this->processConfiguration($mainConfig, $configs);
 
         // load services
@@ -63,6 +64,7 @@ class SecurityExtension extends Extension
 
         // set some global scalars
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
+        $container->setParameter('security.authentication.manager.erase_credentials', $config['erase_credentials']);
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
         $container
             ->getDefinition('security.access.decision_manager')
@@ -89,21 +91,14 @@ class SecurityExtension extends Extension
         // add some required classes for compilation
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Security\\Http\\Firewall',
-            'Symfony\\Component\\Security\\Http\\FirewallMapInterface',
             'Symfony\\Component\\Security\\Core\\SecurityContext',
-            'Symfony\\Component\\Security\\Core\\SecurityContextInterface',
             'Symfony\\Component\\Security\\Core\\User\\UserProviderInterface',
             'Symfony\\Component\\Security\\Core\\Authentication\\AuthenticationProviderManager',
-            'Symfony\\Component\\Security\\Core\\Authentication\\AuthenticationManagerInterface',
             'Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManager',
-            'Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManagerInterface',
             'Symfony\\Component\\Security\\Core\\Authorization\\Voter\\VoterInterface',
-
             'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallMap',
             'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallContext',
-
             'Symfony\\Component\\HttpFoundation\\RequestMatcher',
-            'Symfony\\Component\\HttpFoundation\\RequestMatcherInterface',
         ));
     }
 
@@ -131,9 +126,19 @@ class SecurityExtension extends Extension
     {
         $loader->load('security_acl_dbal.xml');
 
-        if (isset($config['connection'])) {
+        if (null !== $config['connection']) {
             $container->setAlias('security.acl.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
         }
+
+        $container
+            ->getDefinition('security.acl.dbal.schema_listener')
+            ->addTag('doctrine.event_listener', array(
+                'connection' => $config['connection'],
+                'event'      => 'postGenerateSchema',
+                'lazy'       => true
+            ))
+        ;
+
         $container->getDefinition('security.acl.cache.doctrine')->addArgument($config['cache']['prefix']);
 
         $container->setParameter('security.acl.dbal.class_table_name', $config['tables']['class']);
@@ -205,14 +210,11 @@ class SecurityExtension extends Extension
         $arguments[1] = $userProviders;
         $definition->setArguments($arguments);
 
-        // create security listener factories
-        $factories = $this->createListenerFactories($container, $config);
-
         // load firewall map
         $mapDef = $container->getDefinition('security.firewall.map');
         $map = $authenticationProviders = array();
         foreach ($firewalls as $name => $firewall) {
-            list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $factories);
+            list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds);
 
             $contextId = 'security.firewall.map.context.'.$name;
             $context = $container->setDefinition($contextId, new DefinitionDecorator('security.firewall.context'));
@@ -234,7 +236,7 @@ class SecurityExtension extends Extension
         ;
     }
 
-    private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds, array $factories)
+    private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds)
     {
         // Matcher
         $i = 0;
@@ -277,13 +279,26 @@ class SecurityExtension extends Extension
         if (isset($firewall['logout'])) {
             $listenerId = 'security.logout_listener.'.$id;
             $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
-            $listener->replaceArgument(2, $firewall['logout']['path']);
-            $listener->replaceArgument(3, $firewall['logout']['target']);
+            $listener->replaceArgument(3, array(
+                'csrf_parameter' => $firewall['logout']['csrf_parameter'],
+                'intention'      => $firewall['logout']['intention'],
+                'logout_path'    => $firewall['logout']['path'],
+            ));
             $listeners[] = new Reference($listenerId);
 
             // add logout success handler
             if (isset($firewall['logout']['success_handler'])) {
-                $listener->replaceArgument(4, new Reference($firewall['logout']['success_handler']));
+                $logoutSuccessHandlerId = $firewall['logout']['success_handler'];
+            } else {
+                $logoutSuccessHandlerId = 'security.logout.success_handler.'.$id;
+                $logoutSuccessHandler = $container->setDefinition($logoutSuccessHandlerId, new DefinitionDecorator('security.logout.success_handler'));
+                $logoutSuccessHandler->replaceArgument(1, $firewall['logout']['target']);
+            }
+            $listener->replaceArgument(2, new Reference($logoutSuccessHandlerId));
+
+            // add CSRF provider
+            if (isset($firewall['logout']['csrf_provider'])) {
+                $listener->addArgument(new Reference($firewall['logout']['csrf_provider']));
             }
 
             // add session logout handler
@@ -304,10 +319,22 @@ class SecurityExtension extends Extension
             foreach ($firewall['logout']['handlers'] as $handlerId) {
                 $listener->addMethodCall('addHandler', array(new Reference($handlerId)));
             }
+
+            // register with LogoutUrlHelper
+            $container
+                ->getDefinition('templating.helper.logout_url')
+                ->addMethodCall('registerListener', array(
+                    $id,
+                    $firewall['logout']['path'],
+                    $firewall['logout']['intention'],
+                    $firewall['logout']['csrf_parameter'],
+                    isset($firewall['logout']['csrf_provider']) ? new Reference($firewall['logout']['csrf_provider']) : null,
+                ))
+            ;
         }
 
         // Authentication listeners
-        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $factories);
+        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider);
 
         $listeners = array_merge($listeners, $authListeners);
 
@@ -343,14 +370,14 @@ class SecurityExtension extends Extension
         return $this->contextListeners[$contextKey] = $listenerId;
     }
 
-    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider, array $factories)
+    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider)
     {
         $listeners = array();
         $hasListeners = false;
         $defaultEntryPoint = null;
 
         foreach ($this->listenerPositions as $position) {
-            foreach ($factories[$position] as $factory) {
+            foreach ($this->factories[$position] as $factory) {
                 $key = str_replace('-', '_', $factory->getKey());
 
                 if (isset($firewall[$key])) {
@@ -452,6 +479,16 @@ class SecurityExtension extends Extension
     {
         $name = $this->getUserProviderId(strtolower($name));
 
+        foreach ($this->userProviderFactories as $factory) {
+            $key = str_replace('-', '_', $factory->getKey());
+
+            if (!empty($provider[$key])) {
+                $factory->create($container, $name, $provider[$key]);
+
+                return $name;
+            }
+        }
+
         // Existing DAO service provider
         if (isset($provider['id'])) {
             $container->setAlias($name, new Alias($provider['id'], false));
@@ -460,9 +497,9 @@ class SecurityExtension extends Extension
         }
 
         // Chain provider
-        if ($provider['providers']) {
+        if (isset($provider['chain'])) {
             $providers = array();
-            foreach ($provider['providers'] as $providerName) {
+            foreach ($provider['chain']['providers'] as $providerName) {
                 $providers[] = new Reference($this->getUserProviderId(strtolower($providerName)));
             }
 
@@ -510,13 +547,14 @@ class SecurityExtension extends Extension
     {
         $exceptionListenerId = 'security.exception_listener.'.$id;
         $listener = $container->setDefinition($exceptionListenerId, new DefinitionDecorator('security.exception_listener'));
-        $listener->replaceArgument(3, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
+        $listener->replaceArgument(3, $id);
+        $listener->replaceArgument(4, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
 
         // access denied handler setup
         if (isset($config['access_denied_handler'])) {
-            $listener->replaceArgument(5, new Reference($config['access_denied_handler']));
+            $listener->replaceArgument(6, new Reference($config['access_denied_handler']));
         } elseif (isset($config['access_denied_url'])) {
-            $listener->replaceArgument(4, $config['access_denied_url']);
+            $listener->replaceArgument(5, $config['access_denied_url']);
         }
 
         return $exceptionListenerId;
@@ -564,44 +602,14 @@ class SecurityExtension extends Extension
         return $this->requestMatchers[$id] = new Reference($id);
     }
 
-    private function createListenerFactories(ContainerBuilder $container, $config)
+    public function addSecurityListenerFactory(SecurityFactoryInterface $factory)
     {
-        if (null !== $this->factories) {
-            return $this->factories;
-        }
+        $this->factories[$factory->getPosition()][] = $factory;
+    }
 
-        // load service templates
-        $c = new ContainerBuilder();
-        $parameterBag = $container->getParameterBag();
-
-        $locator = new FileLocator(__DIR__.'/../Resources/config');
-        $resolver = new LoaderResolver(array(
-            new XmlFileLoader($c, $locator),
-            new YamlFileLoader($c, $locator),
-            new PhpFileLoader($c, $locator),
-        ));
-        $loader = new DelegatingLoader($resolver);
-
-        $loader->load('security_factories.xml');
-
-        // load user-created listener factories
-        foreach ($config['factories'] as $factory) {
-            $loader->load($parameterBag->resolveValue($factory));
-        }
-
-        $tags = $c->findTaggedServiceIds('security.listener.factory');
-
-        $factories = array();
-        foreach ($this->listenerPositions as $position) {
-            $factories[$position] = array();
-        }
-
-        foreach (array_keys($tags) as $tag) {
-            $factory = $c->get($tag);
-            $factories[$factory->getPosition()][] = $factory;
-        }
-
-        return $this->factories = $factories;
+    public function addUserProviderFactory(UserProviderFactoryInterface $factory)
+    {
+        $this->userProviderFactories[] = $factory;
     }
 
     /**
@@ -617,5 +625,11 @@ class SecurityExtension extends Extension
     public function getNamespace()
     {
         return 'http://symfony.com/schema/dic/security';
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        // first assemble the factories
+        return new MainConfiguration($this->factories, $this->userProviderFactories);
     }
 }

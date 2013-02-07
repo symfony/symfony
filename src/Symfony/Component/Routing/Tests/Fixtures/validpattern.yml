@@ -1,0 +1,5 @@
+blog_show:
+    pattern:   /blog/{slug}
+    defaults:  { _controller: MyBlogBundle:Blog:show }
+    options:
+        compiler_class: RouteCompiler

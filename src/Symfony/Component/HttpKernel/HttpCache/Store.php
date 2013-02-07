@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Store implements StoreInterface
 {
-    private $root;
+    protected $root;
     private $keyCache;
     private $locks;
 
@@ -126,7 +126,7 @@ class Store implements StoreInterface
         }
 
         list($req, $headers) = $match;
-        if (file_exists($body = $this->getPath($headers['x-content-digest'][0]))) {
+        if (is_file($body = $this->getPath($headers['x-content-digest'][0]))) {
             return $this->restoreResponse($headers, $body);
         }
 
@@ -154,7 +154,7 @@ class Store implements StoreInterface
 
         // write the response body to the entity store if this is the original response
         if (!$response->headers->has('X-Content-Digest')) {
-            $digest = 'en'.sha1($response->getContent());
+            $digest = $this->generateContentDigest($response);
 
             if (false === $this->save($digest, $response->getContent())) {
                 throw new \RuntimeException('Unable to store the entity.');
@@ -190,6 +190,18 @@ class Store implements StoreInterface
         }
 
         return $key;
+    }
+
+    /**
+     * Returns content digest for $response.
+     *
+     * @param Response $response
+     *
+     * @return string
+     */
+    protected function generateContentDigest(Response $response)
+    {
+        return 'en'.sha1($response->getContent());
     }
 
     /**
@@ -285,7 +297,7 @@ class Store implements StoreInterface
      */
     public function purge($url)
     {
-        if (file_exists($path = $this->getPath($this->getCacheKey(Request::create($url))))) {
+        if (is_file($path = $this->getPath($this->getCacheKey(Request::create($url))))) {
             unlink($path);
 
             return true;
@@ -305,7 +317,7 @@ class Store implements StoreInterface
     {
         $path = $this->getPath($key);
 
-        return file_exists($path) ? file_get_contents($path) : false;
+        return is_file($path) ? file_get_contents($path) : false;
     }
 
     /**
@@ -336,7 +348,7 @@ class Store implements StoreInterface
             return false;
         }
 
-        chmod($path, 0644);
+        @chmod($path, 0666 & ~umask());
     }
 
     public function getPath($key)

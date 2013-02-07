@@ -53,12 +53,7 @@ class DelegatingLoader extends Loader
     }
 
     /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return Boolean true if this class supports the given resource, false otherwise
+     * {@inheritdoc}
      */
     public function supports($resource, $type = null)
     {

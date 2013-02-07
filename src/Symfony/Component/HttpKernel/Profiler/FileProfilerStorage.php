@@ -39,7 +39,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $this->folder = substr($dsn, 5);
 
         if (!is_dir($this->folder)) {
-            mkdir($this->folder);
+            mkdir($this->folder, 0777, true);
         }
     }
 

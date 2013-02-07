@@ -24,21 +24,27 @@ class TraceableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll->add('foo', new Route('/foo', array(), array('_method' => 'POST')));
         $coll->add('bar', new Route('/bar/{id}', array(), array('id' => '\d+')));
         $coll->add('bar1', new Route('/bar/{name}', array(), array('id' => '\w+', '_method' => 'POST')));
+        $coll->add('bar2', new Route('/foo', array(), array(), array(), 'baz'));
+        $coll->add('bar3', new Route('/foo1', array(), array(), array(), 'baz'));
 
         $context = new RequestContext();
+        $context->setHost('baz');
 
         $matcher = new TraceableUrlMatcher($coll, $context);
         $traces = $matcher->getTraces('/babar');
-        $this->assertEquals(array(0, 0, 0), $this->getLevels($traces));
+        $this->assertEquals(array(0, 0, 0, 0, 0), $this->getLevels($traces));
 
         $traces = $matcher->getTraces('/foo');
-        $this->assertEquals(array(1, 0, 0), $this->getLevels($traces));
+        $this->assertEquals(array(1, 0, 0, 2), $this->getLevels($traces));
 
         $traces = $matcher->getTraces('/bar/12');
         $this->assertEquals(array(0, 2), $this->getLevels($traces));
 
         $traces = $matcher->getTraces('/bar/dd');
-        $this->assertEquals(array(0, 1, 1), $this->getLevels($traces));
+        $this->assertEquals(array(0, 1, 1, 0, 0), $this->getLevels($traces));
+
+        $traces = $matcher->getTraces('/foo1');
+        $this->assertEquals(array(0, 0, 0, 0, 2), $this->getLevels($traces));
 
         $context->setMethod('POST');
         $traces = $matcher->getTraces('/foo');

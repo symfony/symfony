@@ -192,14 +192,14 @@ class Container implements IntrospectableContainerInterface
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
         if (self::SCOPE_PROTOTYPE === $scope) {
-            throw new InvalidArgumentException('You cannot set services of scope "prototype".');
+            throw new InvalidArgumentException(sprintf('You cannot set service "%s" of scope "prototype".', $id));
         }
 
         $id = strtolower($id);
 
         if (self::SCOPE_CONTAINER !== $scope) {
             if (!isset($this->scopedServices[$scope])) {
-                throw new RuntimeException('You cannot set services of inactive scopes.');
+                throw new RuntimeException(sprintf('You cannot set service "%s" of inactive scope.', $id));
             }
 
             $this->scopedServices[$scope][$id] = $service;

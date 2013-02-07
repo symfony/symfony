@@ -117,14 +117,16 @@ class ContextListener implements ListenerInterface
         }
 
         $request = $event->getRequest();
-        $session = $request->hasPreviousSession() ? $request->getSession() : null;
+        $session = $request->getSession();
 
         if (null === $session) {
             return;
         }
 
         if ((null === $token = $this->context->getToken()) || ($token instanceof AnonymousToken)) {
-            $session->remove('_security_'.$this->contextKey);
+            if ($request->hasPreviousSession()) {
+                $session->remove('_security_'.$this->contextKey);
+            }
         } else {
             $session->set('_security_'.$this->contextKey, serialize($token));
         }

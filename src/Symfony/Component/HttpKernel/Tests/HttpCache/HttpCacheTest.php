@@ -1034,4 +1034,24 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Hello World!', $this->response->getContent());
         $this->assertEquals(12, $this->response->headers->get('Content-Length'));
     }
+
+    /**
+     * @dataProvider getIpForwardedForData
+     */
+    public function testRequestIpForwardedFor($ip, $forwardedFor = null, $expectedForwardedFor = null)
+    {
+        $this->setNextResponse(200);
+        $this->request('GET', '/', array('REMOTE_ADDR' => $ip, 'HTTP_X_FORWARDED_FOR' => $forwardedFor));
+        $this->assertEquals('127.0.0.1', $this->request->server->get('REMOTE_ADDR'));
+        $this->assertEquals($expectedForwardedFor, $this->request->headers->get('X_FORWARDED_FOR'));
+    }
+
+    public function getIpForwardedForData()
+    {
+        return array(
+            array('10.20.30.40', null, '10.20.30.40'),
+            array('10.20.30.40', '11.22.33.44', '11.22.33.44, 10.20.30.40'),
+            array('127.0.0.1', null, null),
+        );
+    }
 }

@@ -48,4 +48,18 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
             'node.missing' => array('fillcolor' => 'red', 'style' => 'empty'),
         )), str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/services10-1.dot')), '->dump() dumps services');
     }
+
+    public function testDumpWithFrozenContainer()
+    {
+        $container = include self::$fixturesPath.'/containers/container13.php';
+        $dumper = new GraphvizDumper($container);
+        $this->assertEquals(str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/services13.dot')), $dumper->dump(), '->dump() dumps services');
+    }
+
+    public function testDumpWithFrozenCustomClassContainer()
+    {
+        $container = include self::$fixturesPath.'/containers/container14.php';
+        $dumper = new GraphvizDumper($container);
+        $this->assertEquals(str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/services14.dot')), $dumper->dump(), '->dump() dumps services');
+    }
 }

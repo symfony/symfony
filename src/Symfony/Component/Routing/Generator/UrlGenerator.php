@@ -262,6 +262,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
         // add a query string if needed
         $extra = array_diff_key($parameters, $variables);
+        $extra = array_diff_assoc($extra, $defaults);
         if ($extra && $query = http_build_query($extra, '', '&')) {
             $url .= '?'.$query;
         }

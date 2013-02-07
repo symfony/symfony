@@ -677,7 +677,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->setMethod('POST');
         $request->request->set('_method', 'purge');
+
+        $this->assertFalse(Request::getHttpMethodParameterOverride(), 'httpMethodParameterOverride should be disabled by default');
+
         Request::enableHttpMethodParameterOverride();
+
+        $this->assertTrue(Request::getHttpMethodParameterOverride(), 'httpMethodParameterOverride should be enabled now but it is not');
+
         $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
         $this->disableHttpMethodParameterOverride();
 

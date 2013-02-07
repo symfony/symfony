@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+
+2.3.0
+------
+
+ * changed FormRenderer::humanize() to humanize also camel cased field name
+
 2.2.0
 -----
 

@@ -70,7 +70,6 @@ class ContextListener implements ListenerInterface
         }
 
         $request = $event->getRequest();
-
         $session = $request->hasPreviousSession() ? $request->getSession() : null;
 
         if (null === $session || null === $token = $session->get('_security_'.$this->contextKey)) {
@@ -117,7 +116,10 @@ class ContextListener implements ListenerInterface
             $this->logger->debug('Write SecurityContext in the session');
         }
 
-        if (null === $session = $event->getRequest()->getSession()) {
+        $request = $event->getRequest();
+        $session = $request->hasPreviousSession() ? $request->getSession() : null;
+
+        if (null === $session) {
             return;
         }
 

@@ -81,6 +81,7 @@ class Configuration implements ConfigurationInterface
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
         $this->addAnnotationsSection($rootNode);
+        $this->addContainerCleanerSection($rootNode);
 
         return $treeBuilder;
     }
@@ -406,6 +407,24 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('cache')->defaultValue('file')->end()
                         ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
                         ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addContainerCleanerSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('container_cleaner')
+                    ->info('list of services to remove before dumping container')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('services_to_remove')
+                            ->defaultValue(array())
+                            ->prototype('scalar')->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

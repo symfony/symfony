@@ -101,6 +101,7 @@ class FrameworkExtension extends Extension
         }
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
+        $this->registerContainerCleanerConfiguration($config['container_cleaner'], $container);
 
         $this->addClassesToCompile(array(
             'Symfony\\Component\\HttpFoundation\\ParameterBag',
@@ -677,6 +678,11 @@ class FrameworkExtension extends Extension
             ;
             $container->setAlias('annotation_reader', 'annotations.cached_reader');
         }
+    }
+
+    public function registerContainerCleanerConfiguration(array $config, ContainerBuilder $container)
+    {
+        $container->setParameter('framework.services_to_remove', implode('|', $config['services_to_remove']));
     }
 
     /**

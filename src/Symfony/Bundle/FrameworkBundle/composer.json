@@ -23,7 +23,7 @@
         "symfony/http-kernel": "2.2.*",
         "symfony/filesystem": ">=2.1,<2.3-dev",
         "symfony/routing": "2.2.*",
-        "symfony/stopwatch": "2.2.*",
+        "symfony/stopwatch": ">=2.2,<2.3-dev",
         "symfony/templating": "2.2.*",
         "symfony/translation": "2.2.*",
         "doctrine/common": "~2.2"

@@ -23,7 +23,7 @@
         "propel/propel1": "1.6.*"
     },
     "require-dev": {
-        "symfony/stopwatch": "2.2.*"
+        "symfony/stopwatch": ">=2.2,<2.3-dev"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Propel1\\": "" }

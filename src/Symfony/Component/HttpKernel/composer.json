@@ -24,7 +24,7 @@
     "require-dev": {
         "symfony/browser-kit": "2.2.*",
         "symfony/class-loader": "~2.1",
-        "symfony/config": "2.2.*",
+        "symfony/config": "~2.0",
         "symfony/console": "2.2.*",
         "symfony/dependency-injection": "~2.0",
         "symfony/finder": "~2.0",

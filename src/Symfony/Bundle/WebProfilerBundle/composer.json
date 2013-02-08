@@ -22,7 +22,7 @@
         "symfony/twig-bridge": "2.2.*"
     },
     "require-dev": {
-        "symfony/config": "2.2.*",
+        "symfony/config": ">=2.2,<2.3-dev",
         "symfony/dependency-injection": "~2.0",
         "symfony/stopwatch": ">=2.2,<2.3-dev"
     },

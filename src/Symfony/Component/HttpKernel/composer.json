@@ -23,7 +23,7 @@
     },
     "require-dev": {
         "symfony/browser-kit": "2.2.*",
-        "symfony/class-loader": "2.2.*",
+        "symfony/class-loader": "~2.1",
         "symfony/config": "2.2.*",
         "symfony/console": "2.2.*",
         "symfony/dependency-injection": "2.2.*",

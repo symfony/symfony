@@ -23,7 +23,7 @@
         "symfony/property-access": ">=2.2,<2.3-dev"
     },
     "require-dev": {
-        "symfony/validator": "2.2.*",
+        "symfony/validator": ">=2.2,<2.3-dev",
         "symfony/http-foundation": "2.2.*"
     },
     "suggest": {

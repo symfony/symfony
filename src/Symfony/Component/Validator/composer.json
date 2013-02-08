@@ -22,7 +22,7 @@
     "require-dev": {
         "symfony/http-foundation": "2.2.*",
         "symfony/locale": "2.2.*",
-        "symfony/yaml": "2.2.*",
+        "symfony/yaml": "~2.0",
         "symfony/config": "2.2.*"
     },
     "suggest": {

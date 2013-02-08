@@ -20,7 +20,7 @@
     },
     "require-dev": {
         "symfony/config": "2.2.*",
-        "symfony/yaml": "2.2.*",
+        "symfony/yaml": "~2.0",
         "symfony/http-kernel": "2.2.*",
         "doctrine/common": "~2.2",
         "psr/log": "~1.0"

@@ -24,7 +24,7 @@
         "symfony/http-kernel": "2.2.*",
         "symfony/routing": ">=2.2,<2.3-dev",
         "symfony/templating": "~2.1",
-        "symfony/translation": "2.2.*",
+        "symfony/translation": ">=2.0,<2.3-dev",
         "symfony/yaml": "~2.0",
         "symfony/security": ">=2.0,<2.3-dev"
     },

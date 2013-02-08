@@ -325,7 +325,9 @@ class Request
             case 'POST':
             case 'PUT':
             case 'DELETE':
-                $server['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
+                if (!isset($server['CONTENT_TYPE'])) {
+                    $server['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
+                }
             case 'PATCH':
                 $request = $parameters;
                 $query = array();

@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/dependency-injection" : "2.2.*",
+        "symfony/dependency-injection" : "~2.0",
         "symfony/config" : "2.2.*",
         "symfony/event-dispatcher": "~2.1",
         "symfony/http-kernel": "2.2.*",

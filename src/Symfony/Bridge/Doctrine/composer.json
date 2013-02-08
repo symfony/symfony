@@ -23,7 +23,7 @@
         "symfony/stopwatch": ">=2.2,<2.3-dev",
         "symfony/dependency-injection": "~2.0",
         "symfony/form": ">=2.2,<2.3-dev",
-        "symfony/http-kernel": "2.2.*",
+        "symfony/http-kernel": ">=2.2,<2.3-dev",
         "symfony/security": ">=2.2,<2.3-dev",
         "symfony/validator": ">=2.2,<2.3-dev",
         "doctrine/data-fixtures": "1.0.*",

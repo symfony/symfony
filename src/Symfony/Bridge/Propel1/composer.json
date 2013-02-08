@@ -19,7 +19,7 @@
         "php": ">=5.3.3",
         "symfony/http-foundation": "2.2.*",
         "symfony/http-kernel": "2.2.*",
-        "symfony/form": "2.2.*",
+        "symfony/form": ">=2.2,<2.3-dev",
         "propel/propel1": "1.6.*"
     },
     "require-dev": {

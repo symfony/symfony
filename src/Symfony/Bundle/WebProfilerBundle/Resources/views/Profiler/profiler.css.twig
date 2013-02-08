@@ -125,19 +125,35 @@ abbr {
     text-transform: uppercase;
     text-decoration: none;
     cursor: pointer;
+    height: 51px;
 }
 #menu-profiler li a span.label {
     display: block;
-    padding: 20px 0px 16px 65px;
+    padding: 13px 0px 7px 15px;
     min-height: 16px;
     overflow: hidden;
 }
+#menu-profiler li a span.label strong {
+    display: inline-block;
+    vertical-align: top;
+    line-height: 28px;
+    position: relative;
+    top: 0px;
+    left: 5px;
+}
 #menu-profiler li a span.icon {
-    display: block;
-    position: absolute;
+    display: inline-block;
+    position: relative;
     left: 0;
-    top: 12px;
-    width: 60px;
+    top: -2px;
+    width: 40px;
+    text-align: center;
+    vertical-align: middle;
+}
+#menu-profiler li a span.icon-font {
+    display: inline-block;
+    font: 58px/28px "entypo";
+    width: 40px;
     text-align: center;
 }
 #menu-profiler li.selected a,
@@ -156,7 +172,7 @@ abbr {
     padding: 0;
     position: absolute;
     right: 10px;
-    top: 20px;
+    top: 17px;
 }
 #collector-wrapper {
     float: left;
@@ -205,7 +221,7 @@ li {
 #resume {
     background-color: #f6f6f6;
     border-bottom: 1px solid #dfdfdf;
-    padding: 18px 10px 0px;
+    padding: 17px 10px 0px;
     margin-left: 250px;
     height: 34px;
     color: #313131;
@@ -216,7 +232,7 @@ li {
 }
 a#resume-view-all {
     display: inline-block;
-    padding: 0.2em 0.7em;
+    padding: 3px 8px;
     margin-right: 0.5em;
     background-color: #666;
     border-radius: 16px;
@@ -389,9 +405,16 @@ td.main, td.menu {
 .collapsed-menu {
     width: 60px !important;
 }
-.collapsed-menu span :not(.icon) {
+.collapsed-menu span > * {
     display: none !important;
+}
+.collapsed-menu span > .icon,
+.collapsed-menu span > .icon-font {
+    display: block !important;
 }
 .collapsed-menu span.icon img {
     display: inline !important;
+}
+.collapsed-menu #menu-profiler li a span.label {
+    padding-left: 10px;
 }

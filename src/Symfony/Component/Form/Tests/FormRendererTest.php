@@ -2,10 +2,6 @@
 
 namespace Symfony\Component\Form\Test;
 
-use Symfony\Component\Templating\PhpEngine;
-use Symfony\Component\Templating\TemplateNameParser;
-use Symfony\Component\Templating\Loader\FilesystemLoader;
-use Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine;
 use Symfony\Component\Form\FormRenderer;
 
 class FormRendererTest extends \PHPUnit_Framework_TestCase
@@ -14,10 +10,7 @@ class FormRendererTest extends \PHPUnit_Framework_TestCase
     
     public function setUp()
     {
-        $parser = new TemplateNameParser();
-        $loader = new FilesystemLoader(array());
-        $phpEngine = new PhpEngine($parser, $loader);
-        $engine = new TemplatingRendererEngine($phpEngine);
+        $engine = $this->getMock('Symfony\Component\Form\FormRendererEngineInterface');
         $this->renderer = new FormRenderer($engine);
     }
     

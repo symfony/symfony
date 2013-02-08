@@ -50,7 +50,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('The "Process" component is not available');
         }
 
-        if (!class_exists('Symfony\Component\ClassLoader\UniversalClassLoader')) {
+        if (!class_exists('Symfony\Component\ClassLoader\ClassLoader')) {
             $this->markTestSkipped('The "ClassLoader" component is not available');
         }
 

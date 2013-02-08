@@ -21,7 +21,7 @@
     },
     "require-dev": {
         "symfony/process": "2.2.*",
-        "symfony/css-selector": "2.2.*"
+        "symfony/css-selector": "~2.0"
     },
     "suggest": {
         "symfony/process": "2.2.*"

@@ -20,7 +20,7 @@
         "doctrine/common": "~2.2"
     },
     "require-dev": {
-        "symfony/stopwatch": "2.2.*",
+        "symfony/stopwatch": ">=2.2,<2.3-dev",
         "symfony/dependency-injection": "2.2.*",
         "symfony/form": "2.2.*",
         "symfony/http-kernel": "2.2.*",

@@ -24,7 +24,7 @@
     "require-dev": {
         "symfony/config": "2.2.*",
         "symfony/dependency-injection": "2.2.*",
-        "symfony/stopwatch": "2.2.*"
+        "symfony/stopwatch": ">=2.2,<2.3-dev"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\WebProfilerBundle\\": "" }

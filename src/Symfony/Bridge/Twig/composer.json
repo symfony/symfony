@@ -26,7 +26,7 @@
         "symfony/templating": "~2.1",
         "symfony/translation": "2.2.*",
         "symfony/yaml": "~2.0",
-        "symfony/security": "2.2.*"
+        "symfony/security": ">=2.0,<2.3-dev"
     },
     "suggest": {
         "symfony/form": "2.2.*",

@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/security": "2.2.*"
+        "symfony/security": ">=2.2,<2.3-dev"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\SecurityBundle\\": "" }

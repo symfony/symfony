@@ -22,7 +22,7 @@
         "symfony/event-dispatcher": "~2.1",
         "symfony/http-kernel": "2.2.*",
         "symfony/filesystem": ">=2.1,<2.3-dev",
-        "symfony/routing": "2.2.*",
+        "symfony/routing": ">=2.2,<2.3-dev",
         "symfony/stopwatch": ">=2.2,<2.3-dev",
         "symfony/templating": "~2.1",
         "symfony/translation": "2.2.*",

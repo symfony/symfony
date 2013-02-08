@@ -27,8 +27,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ExceptionListener implements EventSubscriberInterface
 {
-    private $controller;
-    private $logger;
+    protected $controller;
+    protected $logger;
 
     public function __construct($controller, LoggerInterface $logger = null)
     {

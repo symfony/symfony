@@ -30,7 +30,7 @@
     },
     "require-dev": {
         "symfony/finder": "~2.0",
-        "symfony/security": "2.2.*"
+        "symfony/security": ">=2.2,<2.3-dev"
     },
     "suggest": {
         "symfony/console": "2.2.*",

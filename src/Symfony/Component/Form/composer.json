@@ -24,7 +24,7 @@
     },
     "require-dev": {
         "symfony/validator": ">=2.2,<2.3-dev",
-        "symfony/http-foundation": "2.2.*"
+        "symfony/http-foundation": ">=2.1,<2.3-dev"
     },
     "suggest": {
         "symfony/validator": "2.2.*",

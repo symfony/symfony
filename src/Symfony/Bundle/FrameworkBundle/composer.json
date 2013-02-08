@@ -25,8 +25,8 @@
         "symfony/routing": ">=2.2,<2.3-dev",
         "symfony/stopwatch": ">=2.2,<2.3-dev",
         "symfony/templating": "~2.1",
-        "symfony/translation": "2.2.*",
-        "doctrine/common": "~2.2"
+        "symfony/translation": ">=2.2,<2.3-dev",
+        "doctrine/common": ">=2.2,<2.4-dev"
     },
     "require-dev": {
         "symfony/finder": "~2.0",

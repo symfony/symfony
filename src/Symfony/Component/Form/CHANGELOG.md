@@ -22,6 +22,7 @@ CHANGELOG
  * added an optional PropertyAccessorInterface parameter to FormType,
    ObjectChoiceList and PropertyPathMapper
  * [BC BREAK] PropertyPathMapper and FormType now have a constructor
+ * FormRenderer::humanize() also humanizes camel cased field name
 
 2.1.0
 -----

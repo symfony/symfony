@@ -413,6 +413,10 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         $subRequest->headers->remove('if_modified_since');
         $subRequest->headers->remove('if_none_match');
 
+        // fix the client IP address by setting it to 127.0.0.1 as HttpCache
+        // is always called from the same process as the backend.
+        $subRequest->server->set('REMOTE_ADDR', '127.0.0.1');
+
         $response = $this->forward($subRequest, $catch);
 
         if ($this->isPrivateRequest($request) && !$response->headers->hasCacheControlDirective('public')) {

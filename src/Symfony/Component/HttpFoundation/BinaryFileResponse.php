@@ -199,7 +199,7 @@ class BinaryFileResponse extends Response
                 list($start, $end) = array_map('intval', explode('-', substr($range, 6), 2)) + array(0);
 
                 if ('' !== $end) {
-                    $this->maxlen = $end - $start;
+                    $this->maxlen = $end - $start + 1;
                 } else {
                     $end = $this->file->getSize() - 1;
                 }

@@ -61,7 +61,7 @@ class BinaryFileResponseTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('If-Range', $etag);
         $request->headers->set('Range', 'bytes=1-4');
 
-        $this->expectOutputString('IF8');
+        $this->expectOutputString('IF87');
         $response = clone $response;
         $response->prepare($request);
         $response->sendContent();

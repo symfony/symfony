@@ -17,10 +17,10 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/twig-bridge": "2.2.*"
+        "symfony/twig-bridge": "2.3.*"
     },
     "require-dev": {
-        "symfony/stopwatch": "2.2.*"
+        "symfony/stopwatch": "2.3.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\TwigBundle\\": "" }

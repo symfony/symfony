@@ -20,7 +20,7 @@
         "swiftmailer/swiftmailer": ">=4.2.0,<4.4-dev"
     },
     "suggest": {
-        "symfony/http-kernel": "2.2.*"
+        "symfony/http-kernel": "2.3.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Swiftmailer\\": "" }

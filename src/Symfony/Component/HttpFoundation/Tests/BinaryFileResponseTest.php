@@ -47,7 +47,10 @@ class BinaryFileResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($response->getContent());
     }
 
-    public function testRequests()
+    /**
+     * @dataProvider provideRanges
+     */
+    public function testRequests($requestRange, $offset, $length, $responseRange)
     {
         $response = BinaryFileResponse::create(__DIR__.'/File/Fixtures/test.gif')->setAutoEtag();
 
@@ -59,14 +62,35 @@ class BinaryFileResponseTest extends \PHPUnit_Framework_TestCase
         // prepare a request for a range of the testing file
         $request = Request::create('/');
         $request->headers->set('If-Range', $etag);
-        $request->headers->set('Range', 'bytes=1-4');
+        $request->headers->set('Range', $requestRange);
 
-        $this->expectOutputString('IF8');
+        $file = fopen(__DIR__.'/File/Fixtures/test.gif', 'r');
+        fseek($file, $offset);
+        $data = fread($file, $length);
+        fclose($file);
+
+        $this->expectOutputString($data);
         $response = clone $response;
         $response->prepare($request);
         $response->sendContent();
 
+        $this->assertEquals(206, $response->getStatusCode());
         $this->assertEquals('binary', $response->headers->get('Content-Transfer-Encoding'));
+        $this->assertEquals($responseRange, $response->headers->get('Content-Range'));
+    }
+
+    public function provideRanges()
+    {
+        return array(
+            array('bytes=1-4', 1, 4, 'bytes 1-4/35'),
+            array('bytes=-5', 30, 5, 'bytes 30-34/35'),
+            array('bytes=-35', 0, 35, 'bytes 0-34/35'),
+            array('bytes=-40', 0, 35, 'bytes 0-34/35'),
+            array('bytes=30-', 30, 5, 'bytes 30-34/35'),
+            array('bytes=30-30', 30, 1, 'bytes 30-30/35'),
+            array('bytes=30-34', 30, 5, 'bytes 30-34/35'),
+            array('bytes=30-40', 30, 5, 'bytes 30-34/35')
+        );
     }
 
     public function testXSendfile()

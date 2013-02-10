@@ -10,7 +10,7 @@
     {% set text %}
         <div class="sf-toolbar-info-piece">
             <b>Memory usage</b>
-            <span>{{ '%.1f'|format(collector.memory / 1024 / 1024) }} MB</span>
+            <span>{{ '%.1f'|format(collector.memory / 1024 / 1024) }} / {{ collector.memoryLimit == -1 ? '&infin;' : collector.memoryLimit }} MB</span>
         </div>
     {% endset %}
     {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': false } %}

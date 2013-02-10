@@ -23,7 +23,10 @@ class MemoryDataCollector extends DataCollector
 {
     public function __construct()
     {
-        $this->data = array('memory' => 0);
+        $this->data = array(
+            'memory' => 0,
+            'memory_limit' => rtrim(ini_get('memory_limit'), 'M')
+        );
     }
 
     /**
@@ -42,6 +45,16 @@ class MemoryDataCollector extends DataCollector
     public function getMemory()
     {
         return $this->data['memory'];
+    }
+
+    /**
+     * Gets the PHP memory limit.
+     *
+     * @return integer The memory limit
+     */
+    public function getMemoryLimit()
+    {
+        return $this->data['memory_limit'];
     }
 
     /**

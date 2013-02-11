@@ -187,6 +187,10 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $result = $this->validator->validateProperty($entity, 'firstName');
 
         $this->assertCount(1, $result);
+
+        $result = $this->validator->validateProperty($entity, 'lastName');
+
+        $this->assertCount(0, $result);
     }
 
     public function testValidatePropertyValue()

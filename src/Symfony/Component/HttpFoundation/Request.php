@@ -155,7 +155,7 @@ class Request
     protected $format;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
+     * @var SessionInterface
      */
     protected $session;
 
@@ -1463,33 +1463,43 @@ class Request
 
     protected function prepareRequestUri()
     {
-        $requestUri = '';
-
         if ($this->headers->has('X_ORIGINAL_URL') && false !== stripos(PHP_OS, 'WIN')) {
             // IIS with Microsoft Rewrite Module
-            $requestUri = $this->headers->get('X_ORIGINAL_URL');
-        } elseif ($this->headers->has('X_REWRITE_URL') && false !== stripos(PHP_OS, 'WIN')) {
+            return $this->headers->get('X_ORIGINAL_URL');
+        }
+
+        if ($this->headers->has('X_REWRITE_URL') && false !== stripos(PHP_OS, 'WIN')) {
             // IIS with ISAPI_Rewrite
-            $requestUri = $this->headers->get('X_REWRITE_URL');
-        } elseif ($this->server->get('IIS_WasUrlRewritten') == '1' && $this->server->get('UNENCODED_URL') != '') {
+            return $this->headers->get('X_REWRITE_URL');
+        }
+
+        if ($this->server->get('IIS_WasUrlRewritten') == '1' && $this->server->get('UNENCODED_URL') != '') {
             // IIS7 with URL Rewrite: make sure we get the unencoded url (double slash problem)
-            $requestUri = $this->server->get('UNENCODED_URL');
-        } elseif ($this->server->has('REQUEST_URI')) {
+            return $this->server->get('UNENCODED_URL');
+        }
+
+        if ($this->server->has('REQUEST_URI')) {
             $requestUri = $this->server->get('REQUEST_URI');
             // HTTP proxy reqs setup request uri with scheme and host [and port] + the url path, only use url path
             $schemeAndHttpHost = $this->getSchemeAndHttpHost();
             if (strpos($requestUri, $schemeAndHttpHost) === 0) {
-                $requestUri = substr($requestUri, strlen($schemeAndHttpHost));
+                return substr($requestUri, strlen($schemeAndHttpHost));
             }
-        } elseif ($this->server->has('ORIG_PATH_INFO')) {
+
+            return $requestUri;
+        }
+
+        if ($this->server->has('ORIG_PATH_INFO')) {
             // IIS 5.0, PHP as CGI
             $requestUri = $this->server->get('ORIG_PATH_INFO');
             if ('' != $this->server->get('QUERY_STRING')) {
                 $requestUri .= '?'.$this->server->get('QUERY_STRING');
             }
+
+            return $requestUri;
         }
 
-        return $requestUri;
+        return '';
     }
 
     /**
@@ -1527,12 +1537,12 @@ class Request
         // Does the baseUrl have anything in common with the request_uri?
         $requestUri = $this->getRequestUri();
 
-        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) {
+        if ($baseUrl && null !== $prefix = $this->getUrlencodedPrefix($requestUri, $baseUrl)) {
             // full $baseUrl matches
             return $prefix;
         }
 
-        if ($baseUrl && false !== $prefix = $this->getUrlencodedPrefix($requestUri, dirname($baseUrl))) {
+        if ($baseUrl && null !== $prefix = $this->getUrlencodedPrefix($requestUri, dirname($baseUrl))) {
             // directory portion of $baseUrl matches
             return rtrim($prefix, '/');
         }
@@ -1591,27 +1601,21 @@ class Request
      */
     protected function preparePathInfo()
     {
-        $baseUrl = $this->getBaseUrl();
-
         if (null === ($requestUri = $this->getRequestUri())) {
             return '/';
         }
 
-        $pathInfo = '/';
-
         // Remove the query string from REQUEST_URI
-        if ($pos = strpos($requestUri, '?')) {
-            $requestUri = substr($requestUri, 0, $pos);
-        }
+        list($requestUri) = explode('?', $requestUri);
 
-        if ((null !== $baseUrl) && (false === ($pathInfo = substr($requestUri, strlen($baseUrl))))) {
-            // If substr() returns false then PATH_INFO is set to an empty string
-            return '/';
-        } elseif (null === $baseUrl) {
+        if (null === ($baseUrl = $this->getBaseUrl())) {
             return $requestUri;
         }
 
-        return (string) $pathInfo;
+        $pathInfo = substr($requestUri, strlen($baseUrl));
+
+        // If substr() returns false then PATH_INFO is set to an empty string
+        return false === $pathInfo ? '/' : $pathInfo;
     }
 
     /**
@@ -1657,12 +1661,12 @@ class Request
      * @param string $string The urlencoded string
      * @param string $prefix The prefix not encoded
      *
-     * @return string|false The prefix as it is encoded in $string, or false
+     * @return string|null The prefix as it is encoded in $string, or null
      */
     private function getUrlencodedPrefix($string, $prefix)
     {
         if (0 !== strpos(rawurldecode($string), $prefix)) {
-            return false;
+            return null;
         }
 
         $len = strlen($prefix);
@@ -1671,6 +1675,6 @@ class Request
             return $match[0];
         }
 
-        return false;
+        return null;
     }
 }

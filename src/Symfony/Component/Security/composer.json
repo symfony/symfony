@@ -18,13 +18,13 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/event-dispatcher": "~2.1",
-        "symfony/http-foundation": ">=2.1,<2.3-dev",
+        "symfony/http-foundation": ">=2.1,<2.4-dev",
         "symfony/http-kernel": ">=2.1,<=2.3-dev"
     },
     "require-dev": {
         "symfony/form": "~2.0",
-        "symfony/routing": ">=2.2,<2.3-dev",
-        "symfony/validator": ">=2.2,<2.3-dev",
+        "symfony/routing": ">=2.2,<2.4-dev",
+        "symfony/validator": ">=2.2,<2.4-dev",
         "doctrine/common": ">=2.2,<2.4-dev",
         "doctrine/dbal": "~2.2",
         "psr/log": "~1.0"

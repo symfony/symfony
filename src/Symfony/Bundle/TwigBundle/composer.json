@@ -20,7 +20,7 @@
         "symfony/twig-bridge": "2.2.*"
     },
     "require-dev": {
-        "symfony/stopwatch": ">=2.2,<2.3-dev"
+        "symfony/stopwatch": ">=2.2,<2.4-dev"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\TwigBundle\\": "" }

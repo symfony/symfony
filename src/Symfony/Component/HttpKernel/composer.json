@@ -18,7 +18,7 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/event-dispatcher": "~2.1",
-        "symfony/http-foundation": ">=2.2,<2.3-dev",
+        "symfony/http-foundation": ">=2.2,<2.4-dev",
         "psr/log": "~1.0"
     },
     "require-dev": {
@@ -29,8 +29,8 @@
         "symfony/dependency-injection": "~2.0",
         "symfony/finder": "~2.0",
         "symfony/process": "~2.0",
-        "symfony/routing": ">=2.2,<2.3-dev",
-        "symfony/stopwatch": ">=2.2,<2.3-dev"
+        "symfony/routing": ">=2.2,<2.4-dev",
+        "symfony/stopwatch": ">=2.2,<2.4-dev"
     },
     "suggest": {
         "symfony/browser-kit": "2.2.*",

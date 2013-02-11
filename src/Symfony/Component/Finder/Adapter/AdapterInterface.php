@@ -21,117 +21,117 @@ interface AdapterInterface
      *
      * @return AdapterInterface Current instance
      */
-    public function setFollowLinks($followLinks);
+    function setFollowLinks($followLinks);
 
     /**
      * @param integer $mode
      *
      * @return AdapterInterface Current instance
      */
-    public function setMode($mode);
+    function setMode($mode);
 
     /**
      * @param array $exclude
      *
      * @return AdapterInterface Current instance
      */
-    public function setExclude(array $exclude);
+    function setExclude(array $exclude);
 
     /**
      * @param array $depths
      *
      * @return AdapterInterface Current instance
      */
-    public function setDepths(array $depths);
+    function setDepths(array $depths);
 
     /**
      * @param array $names
      *
      * @return AdapterInterface Current instance
      */
-    public function setNames(array $names);
+    function setNames(array $names);
 
     /**
      * @param array $notNames
      *
      * @return AdapterInterface Current instance
      */
-    public function setNotNames(array $notNames);
+    function setNotNames(array $notNames);
 
     /**
      * @param array $contains
      *
      * @return AdapterInterface Current instance
      */
-    public function setContains(array $contains);
+    function setContains(array $contains);
 
     /**
      * @param array $notContains
      *
      * @return AdapterInterface Current instance
      */
-    public function setNotContains(array $notContains);
+    function setNotContains(array $notContains);
 
     /**
      * @param array $sizes
      *
      * @return AdapterInterface Current instance
      */
-    public function setSizes(array $sizes);
+    function setSizes(array $sizes);
 
     /**
      * @param array $dates
      *
      * @return AdapterInterface Current instance
      */
-    public function setDates(array $dates);
+    function setDates(array $dates);
 
     /**
      * @param array $filters
      *
      * @return AdapterInterface Current instance
      */
-    public function setFilters(array $filters);
+    function setFilters(array $filters);
 
     /**
      * @param \Closure|integer $sort
      *
      * @return AdapterInterface Current instance
      */
-    public function setSort($sort);
+    function setSort($sort);
 
     /**
      * @param array $paths
      *
      * @return AdapterInterface Current instance
      */
-    public function setPath(array $paths);
+    function setPath(array $paths);
 
     /**
      * @param array $notPaths
      *
      * @return AdapterInterface Current instance
      */
-    public function setNotPath(array $notPaths);
+    function setNotPath(array $notPaths);
 
     /**
      * @param string $dir
      *
      * @return \Iterator Result iterator
      */
-    public function searchInDirectory($dir);
+    function searchInDirectory($dir);
 
     /**
      * Tests adapter support for current platform.
      *
      * @return Boolean
      */
-    public function isSupported();
+    function isSupported();
 
     /**
      * Returns adapter name.
      *
      * @return string
      */
-    public function getName();
+    function getName();
 }

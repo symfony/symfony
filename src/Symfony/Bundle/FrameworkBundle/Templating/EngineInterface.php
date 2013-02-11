@@ -30,5 +30,5 @@ interface EngineInterface extends BaseEngineInterface
      *
      * @return Response A Response instance
      */
-    public function renderResponse($view, array $parameters = array(), Response $response = null);
+    function renderResponse($view, array $parameters = array(), Response $response = null);
 }

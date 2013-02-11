@@ -23,14 +23,14 @@ interface PropertyPathInterface extends \Traversable
      *
      * @return string The path as string.
      */
-    public function __toString();
+    function __toString();
 
     /**
      * Returns the length of the property path, i.e. the number of elements.
      *
      * @return integer The path length.
      */
-    public function getLength();
+    function getLength();
 
     /**
      * Returns the parent property path.
@@ -42,14 +42,14 @@ interface PropertyPathInterface extends \Traversable
      *
      * @return PropertyPath The parent path or null.
      */
-    public function getParent();
+    function getParent();
 
     /**
      * Returns the elements of the property path as array
      *
      * @return array An array of property/index names
      */
-    public function getElements();
+    function getElements();
 
     /**
      * Returns the element at the given index in the property path
@@ -60,7 +60,7 @@ interface PropertyPathInterface extends \Traversable
      *
      * @throws Exception\OutOfBoundsException If the offset is invalid.
      */
-    public function getElement($index);
+    function getElement($index);
 
     /**
      * Returns whether the element at the given index is a property
@@ -71,7 +71,7 @@ interface PropertyPathInterface extends \Traversable
      *
      * @throws Exception\OutOfBoundsException If the offset is invalid.
      */
-    public function isProperty($index);
+    function isProperty($index);
 
     /**
      * Returns whether the element at the given index is an array index
@@ -82,5 +82,5 @@ interface PropertyPathInterface extends \Traversable
      *
      * @throws Exception\OutOfBoundsException If the offset is invalid.
      */
-    public function isIndex($index);
+    function isIndex($index);
 }

@@ -27,7 +27,7 @@ interface HelperInterface
      *
      * @api
      */
-    public function getName();
+    function getName();
 
     /**
      * Sets the default charset.
@@ -36,7 +36,7 @@ interface HelperInterface
      *
      * @api
      */
-    public function setCharset($charset);
+    function setCharset($charset);
 
     /**
      * Gets the default charset.
@@ -45,5 +45,5 @@ interface HelperInterface
      *
      * @api
      */
-    public function getCharset();
+    function getCharset();
 }

@@ -44,7 +44,7 @@ interface ConstraintViolationInterface
      *
      * @api
      */
-    public function getMessage();
+    function getMessage();
 
     /**
      * Returns the raw violation message.
@@ -57,7 +57,7 @@ interface ConstraintViolationInterface
      *
      * @api
      */
-    public function getMessageTemplate();
+    function getMessageTemplate();
 
     /**
      * Returns the parameters to be inserted into the raw violation message.
@@ -69,7 +69,7 @@ interface ConstraintViolationInterface
      *
      * @api
      */
-    public function getMessageParameters();
+    function getMessageParameters();
 
     /**
      * Returns a number for pluralizing the violation message.
@@ -87,7 +87,7 @@ interface ConstraintViolationInterface
      *
      * @return integer|null The number to use to pluralize of the message.
      */
-    public function getMessagePluralization();
+    function getMessagePluralization();
 
     /**
      * Returns the root element of the validation.
@@ -99,7 +99,7 @@ interface ConstraintViolationInterface
      *
      * @api
      */
-    public function getRoot();
+    function getRoot();
 
     /**
      * Returns the property path from the root element to the violation.
@@ -115,7 +115,7 @@ interface ConstraintViolationInterface
      *
      * @api
      */
-    public function getPropertyPath();
+    function getPropertyPath();
 
     /**
      * Returns the value that caused the violation.
@@ -125,12 +125,12 @@ interface ConstraintViolationInterface
      *
      * @api
      */
-    public function getInvalidValue();
+    function getInvalidValue();
 
     /**
      * Returns a machine-digestible error code for the violation.
      *
      * @return mixed The error code.
      */
-    public function getCode();
+    function getCode();
 }

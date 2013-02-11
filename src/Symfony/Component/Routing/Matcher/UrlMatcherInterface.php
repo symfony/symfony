@@ -39,5 +39,5 @@ interface UrlMatcherInterface extends RequestContextAwareInterface
      *
      * @api
      */
-    public function match($pathinfo);
+    function match($pathinfo);
 }

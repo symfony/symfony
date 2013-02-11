@@ -40,7 +40,7 @@ interface ContainerInterface
      *
      * @api
      */
-    public function set($id, $service, $scope = self::SCOPE_CONTAINER);
+    function set($id, $service, $scope = self::SCOPE_CONTAINER);
 
     /**
      * Gets a service.
@@ -58,7 +58,7 @@ interface ContainerInterface
      *
      * @api
      */
-    public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
+    function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
 
     /**
      * Returns true if the given service is defined.
@@ -69,7 +69,7 @@ interface ContainerInterface
      *
      * @api
      */
-    public function has($id);
+    function has($id);
 
     /**
      * Gets a parameter.
@@ -82,7 +82,7 @@ interface ContainerInterface
      *
      * @api
      */
-    public function getParameter($name);
+    function getParameter($name);
 
     /**
      * Checks if a parameter exists.
@@ -93,7 +93,7 @@ interface ContainerInterface
      *
      * @api
      */
-    public function hasParameter($name);
+    function hasParameter($name);
 
     /**
      * Sets a parameter.
@@ -103,7 +103,7 @@ interface ContainerInterface
      *
      * @api
      */
-    public function setParameter($name, $value);
+    function setParameter($name, $value);
 
     /**
      * Enters the given scope
@@ -112,7 +112,7 @@ interface ContainerInterface
      *
      * @api
      */
-    public function enterScope($name);
+    function enterScope($name);
 
     /**
      * Leaves the current scope, and re-enters the parent scope
@@ -121,7 +121,7 @@ interface ContainerInterface
      *
      * @api
      */
-    public function leaveScope($name);
+    function leaveScope($name);
 
     /**
      * Adds a scope to the container
@@ -130,7 +130,7 @@ interface ContainerInterface
      *
      * @api
      */
-    public function addScope(ScopeInterface $scope);
+    function addScope(ScopeInterface $scope);
 
     /**
      * Whether this container has the given scope
@@ -141,7 +141,7 @@ interface ContainerInterface
      *
      * @api
      */
-    public function hasScope($name);
+    function hasScope($name);
 
     /**
      * Determines whether the given scope is currently active.
@@ -154,5 +154,5 @@ interface ContainerInterface
      *
      * @api
      */
-    public function isScopeActive($name);
+    function isScopeActive($name);
 }

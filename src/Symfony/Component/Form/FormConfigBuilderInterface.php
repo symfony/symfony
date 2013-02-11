@@ -29,7 +29,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function addEventListener($eventName, $listener, $priority = 0);
+    function addEventListener($eventName, $listener, $priority = 0);
 
     /**
      * Adds an event subscriber for events on this form.
@@ -38,7 +38,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function addEventSubscriber(EventSubscriberInterface $subscriber);
+    function addEventSubscriber(EventSubscriberInterface $subscriber);
 
     /**
      * Adds a validator to the form.
@@ -49,7 +49,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @deprecated Deprecated since version 2.1, to be removed in 2.3.
      */
-    public function addValidator(FormValidatorInterface $validator);
+    function addValidator(FormValidatorInterface $validator);
 
     /**
      * Appends / prepends a transformer to the view transformer chain.
@@ -64,14 +64,14 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function addViewTransformer(DataTransformerInterface $viewTransformer, $forcePrepend = false);
+    function addViewTransformer(DataTransformerInterface $viewTransformer, $forcePrepend = false);
 
     /**
      * Clears the view transformers.
      *
      * @return self The configuration object.
      */
-    public function resetViewTransformers();
+    function resetViewTransformers();
 
     /**
      * Prepends / appends a transformer to the normalization transformer chain.
@@ -86,14 +86,14 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function addModelTransformer(DataTransformerInterface $modelTransformer, $forceAppend = false);
+    function addModelTransformer(DataTransformerInterface $modelTransformer, $forceAppend = false);
 
     /**
      * Clears the normalization transformers.
      *
      * @return self The configuration object.
      */
-    public function resetModelTransformers();
+    function resetModelTransformers();
 
     /**
      * Sets the value for an attribute.
@@ -103,7 +103,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setAttribute($name, $value);
+    function setAttribute($name, $value);
 
     /**
      * Sets the attributes.
@@ -112,7 +112,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setAttributes(array $attributes);
+    function setAttributes(array $attributes);
 
     /**
      * Sets the data mapper used by the form.
@@ -121,7 +121,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setDataMapper(DataMapperInterface $dataMapper = null);
+    function setDataMapper(DataMapperInterface $dataMapper = null);
 
     /**
      * Set whether the form is disabled.
@@ -130,7 +130,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setDisabled($disabled);
+    function setDisabled($disabled);
 
     /**
      * Sets the data used for the client data when no value is bound.
@@ -139,7 +139,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setEmptyData($emptyData);
+    function setEmptyData($emptyData);
 
     /**
      * Sets whether errors bubble up to the parent.
@@ -148,7 +148,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setErrorBubbling($errorBubbling);
+    function setErrorBubbling($errorBubbling);
 
     /**
      * Sets whether this field is required to be filled out when bound.
@@ -157,7 +157,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setRequired($required);
+    function setRequired($required);
 
     /**
      * Sets the property path that the form should be mapped to.
@@ -168,7 +168,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setPropertyPath($propertyPath);
+    function setPropertyPath($propertyPath);
 
     /**
      * Sets whether the form should be mapped to an element of its
@@ -178,7 +178,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setMapped($mapped);
+    function setMapped($mapped);
 
     /**
      * Sets whether the form's data should be modified by reference.
@@ -188,7 +188,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setByReference($byReference);
+    function setByReference($byReference);
 
     /**
      * Sets whether the form should be virtual.
@@ -197,7 +197,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setVirtual($virtual);
+    function setVirtual($virtual);
 
     /**
      * Sets whether the form should be compound.
@@ -208,7 +208,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @see FormConfigInterface::getCompound()
      */
-    public function setCompound($compound);
+    function setCompound($compound);
 
     /**
      * Set the types.
@@ -217,7 +217,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setType(ResolvedFormTypeInterface $type);
+    function setType(ResolvedFormTypeInterface $type);
 
     /**
      * Sets the initial data of the form.
@@ -226,7 +226,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setData($data);
+    function setData($data);
 
     /**
      * Locks the form's data to the data passed in the configuration.
@@ -239,19 +239,19 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @return self The configuration object.
      */
-    public function setDataLocked($locked);
+    function setDataLocked($locked);
 
     /**
      * Sets the form factory used for creating new forms.
      *
      * @param FormFactoryInterface $formFactory The form factory.
      */
-    public function setFormFactory(FormFactoryInterface $formFactory);
+    function setFormFactory(FormFactoryInterface $formFactory);
 
     /**
      * Builds and returns the form configuration.
      *
      * @return FormConfigInterface
      */
-    public function getFormConfig();
+    function getFormConfig();
 }

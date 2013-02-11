@@ -25,7 +25,7 @@ interface FormRendererEngineInterface
      * @param mixed    $themes The theme(s). The type of these themes
      *                         is open to the implementation.
      */
-    public function setTheme(FormView $view, $themes);
+    function setTheme(FormView $view, $themes);
 
     /**
      * Returns the resource for a block name.
@@ -44,7 +44,7 @@ interface FormRendererEngineInterface
      *
      * @return mixed The renderer resource or false, if none was found.
      */
-    public function getResourceForBlockName(FormView $view, $blockName);
+    function getResourceForBlockName(FormView $view, $blockName);
 
     /**
      * Returns the resource for a block hierarchy.
@@ -86,7 +86,7 @@ interface FormRendererEngineInterface
      *
      * @return mixed The renderer resource or false, if none was found.
      */
-    public function getResourceForBlockNameHierarchy(FormView $view, array $blockNameHierarchy, $hierarchyLevel);
+    function getResourceForBlockNameHierarchy(FormView $view, array $blockNameHierarchy, $hierarchyLevel);
 
     /**
      * Returns the hierarchy level at which a resource can be found.
@@ -130,7 +130,7 @@ interface FormRendererEngineInterface
      *
      * @return integer|Boolean The hierarchy level or false, if no resource was found.
      */
-    public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, $hierarchyLevel);
+    function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, $hierarchyLevel);
 
     /**
      * Renders a block in the given renderer resource.
@@ -146,5 +146,5 @@ interface FormRendererEngineInterface
      *
      * @return string The HTML markup.
      */
-    public function renderBlock(FormView $view, $resource, $blockName, array $variables = array());
+    function renderBlock(FormView $view, $resource, $blockName, array $variables = array());
 }

@@ -23,5 +23,5 @@ interface TwigRendererEngineInterface extends FormRendererEngineInterface
      *
      * @param \Twig_Environment $environment
      */
-    public function setEnvironment(\Twig_Environment $environment);
+    function setEnvironment(\Twig_Environment $environment);
 }

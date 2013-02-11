@@ -27,7 +27,7 @@ interface EncoderInterface
      *
      * @return scalar
      */
-    public function encode($data, $format, array $context = array());
+    function encode($data, $format, array $context = array());
 
     /**
      * Checks whether the serializer can encode to given format
@@ -36,5 +36,5 @@ interface EncoderInterface
      *
      * @return Boolean
      */
-    public function supportsEncoding($format);
+    function supportsEncoding($format);
 }

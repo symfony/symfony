@@ -63,7 +63,7 @@ interface ValidationVisitorInterface
      * @throws Exception\NoSuchMetadataException If no metadata can be found for
      *                                           the given value.
      */
-    public function validate($value, $group, $propertyPath, $traverse = false, $deep = false);
+    function validate($value, $group, $propertyPath, $traverse = false, $deep = false);
 
     /**
      * Validates a value against the constraints defined in some metadata.
@@ -76,7 +76,7 @@ interface ValidationVisitorInterface
      * @param string            $group        The validation group to validate.
      * @param string            $propertyPath The current property path in the validation graph.
      */
-    public function visit(MetadataInterface $metadata, $value, $group, $propertyPath);
+    function visit(MetadataInterface $metadata, $value, $group, $propertyPath);
 
     /**
      * Returns a graph walker with an alternative, deprecated API of the
@@ -86,5 +86,5 @@ interface ValidationVisitorInterface
      *
      * @deprecated Deprecated since version 2.2, to be removed in 2.3.
      */
-    public function getGraphWalker();
+    function getGraphWalker();
 }

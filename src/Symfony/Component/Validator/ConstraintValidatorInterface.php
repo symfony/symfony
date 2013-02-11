@@ -23,7 +23,7 @@ interface ConstraintValidatorInterface
      *
      * @param ExecutionContextInterface $context The current validation context
      */
-    public function initialize(ExecutionContextInterface $context);
+    function initialize(ExecutionContextInterface $context);
 
     /**
      * Checks if the passed value is valid.
@@ -33,5 +33,5 @@ interface ConstraintValidatorInterface
      *
      * @api
      */
-    public function validate($value, Constraint $constraint);
+    function validate($value, Constraint $constraint);
 }

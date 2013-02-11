@@ -55,7 +55,7 @@ interface MetadataInterface
      * @param string|string[]            $group        The validation group to validate in.
      * @param string                     $propertyPath The current property path in the validation graph.
      */
-    public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath);
+    function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath);
 
     /**
      * Returns all constraints for a given validation group.
@@ -64,5 +64,5 @@ interface MetadataInterface
      *
      * @return Constraint[] A list of constraint instances.
      */
-    public function findConstraints($group);
+    function findConstraints($group);
 }

@@ -27,7 +27,7 @@ interface HelperInterface
      *
      * @api
      */
-    public function setHelperSet(HelperSet $helperSet = null);
+    function setHelperSet(HelperSet $helperSet = null);
 
     /**
      * Gets the helper set associated with this helper.
@@ -36,7 +36,7 @@ interface HelperInterface
      *
      * @api
      */
-    public function getHelperSet();
+    function getHelperSet();
 
     /**
      * Returns the canonical name of this helper.
@@ -45,5 +45,5 @@ interface HelperInterface
      *
      * @api
      */
-    public function getName();
+    function getName();
 }

@@ -27,7 +27,7 @@ interface ParameterBagInterface
      *
      * @api
      */
-    public function clear();
+    function clear();
 
     /**
      * Adds parameters to the service container parameters.
@@ -36,7 +36,7 @@ interface ParameterBagInterface
      *
      * @api
      */
-    public function add(array $parameters);
+    function add(array $parameters);
 
     /**
      * Gets the service container parameters.
@@ -45,7 +45,7 @@ interface ParameterBagInterface
      *
      * @api
      */
-    public function all();
+    function all();
 
     /**
      * Gets a service container parameter.
@@ -58,7 +58,7 @@ interface ParameterBagInterface
      *
      * @api
      */
-    public function get($name);
+    function get($name);
 
     /**
      * Sets a service container parameter.
@@ -68,7 +68,7 @@ interface ParameterBagInterface
      *
      * @api
      */
-    public function set($name, $value);
+    function set($name, $value);
 
     /**
      * Returns true if a parameter name is defined.
@@ -79,12 +79,12 @@ interface ParameterBagInterface
      *
      * @api
      */
-    public function has($name);
+    function has($name);
 
     /**
      * Replaces parameter placeholders (%name%) by their values for all parameters.
      */
-    public function resolve();
+    function resolve();
 
     /**
      * Replaces parameter placeholders (%name%) by their values.
@@ -93,7 +93,7 @@ interface ParameterBagInterface
      *
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
      */
-    public function resolveValue($value);
+    function resolveValue($value);
 
     /**
      * Escape parameter placeholders %
@@ -102,7 +102,7 @@ interface ParameterBagInterface
      *
      * @return mixed
      */
-    public function escapeValue($value);
+    function escapeValue($value);
 
     /**
      * Unescape parameter placeholders %
@@ -111,5 +111,5 @@ interface ParameterBagInterface
      *
      * @return mixed
      */
-    public function unescapeValue($value);
+    function unescapeValue($value);
 }

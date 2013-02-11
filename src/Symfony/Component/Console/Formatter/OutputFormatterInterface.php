@@ -27,7 +27,7 @@ interface OutputFormatterInterface
      *
      * @api
      */
-    public function setDecorated($decorated);
+    function setDecorated($decorated);
 
     /**
      * Gets the decorated flag.
@@ -36,7 +36,7 @@ interface OutputFormatterInterface
      *
      * @api
      */
-    public function isDecorated();
+    function isDecorated();
 
     /**
      * Sets a new style.
@@ -46,7 +46,7 @@ interface OutputFormatterInterface
      *
      * @api
      */
-    public function setStyle($name, OutputFormatterStyleInterface $style);
+    function setStyle($name, OutputFormatterStyleInterface $style);
 
     /**
      * Checks if output formatter has style with specified name.
@@ -57,7 +57,7 @@ interface OutputFormatterInterface
      *
      * @api
      */
-    public function hasStyle($name);
+    function hasStyle($name);
 
     /**
      * Gets style options from style with specified name.
@@ -68,7 +68,7 @@ interface OutputFormatterInterface
      *
      * @api
      */
-    public function getStyle($name);
+    function getStyle($name);
 
     /**
      * Formats a message according to the given styles.
@@ -79,5 +79,5 @@ interface OutputFormatterInterface
      *
      * @api
      */
-    public function format($message);
+    function format($message);
 }

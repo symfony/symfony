@@ -31,7 +31,7 @@ interface LoaderInterface
      *
      * @api
      */
-    public function load(TemplateReferenceInterface $template);
+    function load(TemplateReferenceInterface $template);
 
     /**
      * Returns true if the template is still fresh.
@@ -43,5 +43,5 @@ interface LoaderInterface
      *
      * @api
      */
-    public function isFresh(TemplateReferenceInterface $template, $time);
+    function isFresh(TemplateReferenceInterface $template, $time);
 }

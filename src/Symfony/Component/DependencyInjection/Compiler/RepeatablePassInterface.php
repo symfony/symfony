@@ -24,5 +24,5 @@ interface RepeatablePassInterface extends CompilerPassInterface
      *
      * @param RepeatedPass $repeatedPass
      */
-    public function setRepeatedPass(RepeatedPass $repeatedPass);
+    function setRepeatedPass(RepeatedPass $repeatedPass);
 }

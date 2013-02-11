@@ -23,7 +23,7 @@ interface AclCacheInterface
      *
      * @param string $primaryKey a serialized primary key
      */
-    public function evictFromCacheById($primaryKey);
+    function evictFromCacheById($primaryKey);
 
     /**
      * Removes an ACL from the cache
@@ -32,7 +32,7 @@ interface AclCacheInterface
      *
      * @param ObjectIdentityInterface $oid
      */
-    public function evictFromCacheByIdentity(ObjectIdentityInterface $oid);
+    function evictFromCacheByIdentity(ObjectIdentityInterface $oid);
 
     /**
      * Retrieves an ACL for the given object identity primary key from the cache
@@ -40,7 +40,7 @@ interface AclCacheInterface
      * @param integer $primaryKey
      * @return AclInterface
      */
-    public function getFromCacheById($primaryKey);
+    function getFromCacheById($primaryKey);
 
     /**
      * Retrieves an ACL for the given object identity from the cache
@@ -48,17 +48,17 @@ interface AclCacheInterface
      * @param ObjectIdentityInterface $oid
      * @return AclInterface
      */
-    public function getFromCacheByIdentity(ObjectIdentityInterface $oid);
+    function getFromCacheByIdentity(ObjectIdentityInterface $oid);
 
     /**
      * Stores a new ACL in the cache
      *
      * @param AclInterface $acl
      */
-    public function putInCache(AclInterface $acl);
+    function putInCache(AclInterface $acl);
 
     /**
      * Removes all ACLs from the cache
      */
-    public function clearCache();
+    function clearCache();
 }

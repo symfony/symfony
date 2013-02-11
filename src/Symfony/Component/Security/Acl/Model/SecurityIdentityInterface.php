@@ -26,5 +26,5 @@ interface SecurityIdentityInterface
      *
      * @param SecurityIdentityInterface $identity
      */
-    public function equals(SecurityIdentityInterface $identity);
+    function equals(SecurityIdentityInterface $identity);
 }

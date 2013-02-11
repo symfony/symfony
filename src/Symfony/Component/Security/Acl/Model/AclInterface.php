@@ -28,7 +28,7 @@ interface AclInterface extends \Serializable
      *
      * @return array
      */
-    public function getClassAces();
+    function getClassAces();
 
     /**
      * Returns all class-field-based ACEs associated with this ACL
@@ -36,14 +36,14 @@ interface AclInterface extends \Serializable
      * @param string $field
      * @return array
      */
-    public function getClassFieldAces($field);
+    function getClassFieldAces($field);
 
     /**
      * Returns all object-based ACEs associated with this ACL
      *
      * @return array
      */
-    public function getObjectAces();
+    function getObjectAces();
 
     /**
      * Returns all object-field-based ACEs associated with this ACL
@@ -51,28 +51,28 @@ interface AclInterface extends \Serializable
      * @param string $field
      * @return array
      */
-    public function getObjectFieldAces($field);
+    function getObjectFieldAces($field);
 
     /**
      * Returns the object identity associated with this ACL
      *
      * @return ObjectIdentityInterface
      */
-    public function getObjectIdentity();
+    function getObjectIdentity();
 
     /**
      * Returns the parent ACL, or null if there is none.
      *
      * @return AclInterface|null
      */
-    public function getParentAcl();
+    function getParentAcl();
 
     /**
      * Whether this ACL is inheriting ACEs from a parent ACL.
      *
      * @return Boolean
      */
-    public function isEntriesInheriting();
+    function isEntriesInheriting();
 
     /**
      * Determines whether field access is granted
@@ -83,7 +83,7 @@ interface AclInterface extends \Serializable
      * @param Boolean $administrativeMode
      * @return Boolean
      */
-    public function isFieldGranted($field, array $masks, array $securityIdentities, $administrativeMode = false);
+    function isFieldGranted($field, array $masks, array $securityIdentities, $administrativeMode = false);
 
     /**
      * Determines whether access is granted
@@ -94,7 +94,7 @@ interface AclInterface extends \Serializable
      * @param Boolean $administrativeMode
      * @return Boolean
      */
-    public function isGranted(array $masks, array $securityIdentities, $administrativeMode = false);
+    function isGranted(array $masks, array $securityIdentities, $administrativeMode = false);
 
     /**
      * Whether the ACL has loaded ACEs for all of the passed security identities
@@ -102,5 +102,5 @@ interface AclInterface extends \Serializable
      * @param mixed $securityIdentities an implementation of SecurityIdentityInterface, or an array thereof
      * @return Boolean
      */
-    public function isSidLoaded($securityIdentities);
+    function isSidLoaded($securityIdentities);
 }

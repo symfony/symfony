@@ -30,5 +30,5 @@ interface AccessDeniedHandlerInterface
      *
      * @return Response may return null
      */
-    public function handle(Request $request, AccessDeniedException $accessDeniedException);
+    function handle(Request $request, AccessDeniedException $accessDeniedException);
 }

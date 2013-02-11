@@ -32,7 +32,7 @@ interface DataCollectorInterface
      *
      * @api
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null);
+    function collect(Request $request, Response $response, \Exception $exception = null);
 
     /**
      * Returns the name of the collector.
@@ -41,5 +41,5 @@ interface DataCollectorInterface
      *
      * @api
      */
-    public function getName();
+    function getName();
 }

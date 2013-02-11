@@ -27,14 +27,14 @@ interface TokenProviderInterface
      *
      * @return PersistentTokenInterface
      */
-    public function loadTokenBySeries($series);
+    function loadTokenBySeries($series);
 
     /**
      * Deletes all tokens belonging to series.
      *
      * @param string $series
      */
-    public function deleteTokenBySeries($series);
+    function deleteTokenBySeries($series);
 
     /**
      * Updates the token according to this data.
@@ -43,12 +43,12 @@ interface TokenProviderInterface
      * @param string    $tokenValue
      * @param \DateTime $lastUsed
      */
-    public function updateToken($series, $tokenValue, \DateTime $lastUsed);
+    function updateToken($series, $tokenValue, \DateTime $lastUsed);
 
     /**
      * Creates a new token.
      *
      * @param PersistentTokenInterface $token
      */
-    public function createNewToken(PersistentTokenInterface $token);
+    function createNewToken(PersistentTokenInterface $token);
 }

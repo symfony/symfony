@@ -41,7 +41,7 @@ interface ValidatorContextInterface
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link Validation::createValidatorBuilder()} instead.
      */
-    public function setClassMetadataFactory(ClassMetadataFactoryInterface $classMetadataFactory);
+    function setClassMetadataFactory(ClassMetadataFactoryInterface $classMetadataFactory);
 
     /**
      * Sets the constraint validator factory used in the new validator
@@ -51,7 +51,7 @@ interface ValidatorContextInterface
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link Validation::createValidatorBuilder()} instead.
      */
-    public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $constraintValidatorFactory);
+    function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $constraintValidatorFactory);
 
     /**
      * Creates a new validator with the settings stored in this context
@@ -61,5 +61,5 @@ interface ValidatorContextInterface
      * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
      *             {@link Validation::createValidator()} instead.
      */
-    public function getValidator();
+    function getValidator();
 }

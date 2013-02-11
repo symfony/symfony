@@ -28,7 +28,7 @@ interface DenormalizerInterface
      *
      * @return object
      */
-    public function denormalize($data, $class, $format = null, array $context = array());
+    function denormalize($data, $class, $format = null, array $context = array());
 
     /**
      * Checks whether the given class is supported for denormalization by this normalizer
@@ -39,5 +39,5 @@ interface DenormalizerInterface
      *
      * @return Boolean
      */
-    public function supportsDenormalization($data, $type, $format = null);
+    function supportsDenormalization($data, $type, $format = null);
 }

@@ -38,7 +38,7 @@ interface ValidatorInterface
      *
      * @api
      */
-    public function validate($value, $groups = null, $traverse = false, $deep = false);
+    function validate($value, $groups = null, $traverse = false, $deep = false);
 
     /**
      * Validates a property of a value against its current value.
@@ -55,7 +55,7 @@ interface ValidatorInterface
      *
      * @api
      */
-    public function validateProperty($containingValue, $property, $groups = null);
+    function validateProperty($containingValue, $property, $groups = null);
 
     /**
      * Validate a property of a value against a potential value.
@@ -74,7 +74,7 @@ interface ValidatorInterface
      *
      * @api
      */
-    public function validatePropertyValue($containingValue, $property, $value, $groups = null);
+    function validatePropertyValue($containingValue, $property, $value, $groups = null);
 
     /**
      * Validates a value against a constraint or a list of constraints.
@@ -88,7 +88,7 @@ interface ValidatorInterface
      *
      * @api
      */
-    public function validateValue($value, $constraints, $groups = null);
+    function validateValue($value, $constraints, $groups = null);
 
     /**
      * Returns the factory for metadata instances.
@@ -97,5 +97,5 @@ interface ValidatorInterface
      *
      * @api
      */
-    public function getMetadataFactory();
+    function getMetadataFactory();
 }

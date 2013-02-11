@@ -48,7 +48,7 @@ interface UserProviderInterface
      * @throws UsernameNotFoundException if the user is not found
      *
      */
-    public function loadUserByUsername($username);
+    function loadUserByUsername($username);
 
     /**
      * Refreshes the user for the account interface.
@@ -63,7 +63,7 @@ interface UserProviderInterface
      *
      * @throws UnsupportedUserException if the account is not supported
      */
-    public function refreshUser(UserInterface $user);
+    function refreshUser(UserInterface $user);
 
     /**
      * Whether this provider supports the given user class
@@ -72,5 +72,5 @@ interface UserProviderInterface
      *
      * @return Boolean
      */
-    public function supportsClass($class);
+    function supportsClass($class);
 }

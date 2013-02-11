@@ -26,12 +26,12 @@ interface NodeInterface
      *
      * @return string The string representation
      */
-    public function __toString();
+    function __toString();
 
     /**
      * @return XPathExpr The XPath expression
      *
      * @throws ParseException When unknown operator is found
      */
-    public function toXpath();
+    function toXpath();
 }

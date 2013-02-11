@@ -99,6 +99,25 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new ContextListener($this->securityContext, array(), 'session');
         $listener->onKernelResponse($event);
 
+        $this->assertTrue($session->isStarted());
+    }
+
+    public function testOnKernelResponseWithoutSessionNorToken()
+    {
+        $request = new Request();
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+
+        $event = new FilterResponseEvent(
+            $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
+
+        $listener = new ContextListener($this->securityContext, array(), 'session');
+        $listener->onKernelResponse($event);
+
         $this->assertFalse($session->isStarted());
     }
 

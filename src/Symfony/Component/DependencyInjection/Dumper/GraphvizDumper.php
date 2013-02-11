@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
  * GraphvizDumper dumps a service container as a graphviz file.
@@ -159,7 +161,7 @@ class GraphvizDumper extends Dumper
     {
         $nodes = array();
 
-        $container = clone $this->container;
+        $container = $this->cloneContainer();
 
         foreach ($container->getDefinitions() as $id => $definition) {
             $nodes[$id] = array('class' => str_replace('\\', '\\\\', $this->container->getParameterBag()->resolveValue($definition->getClass())), 'attributes' => array_merge($this->options['node.definition'], array('style' => ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope() ? 'filled' : 'dotted')));
@@ -175,11 +177,30 @@ class GraphvizDumper extends Dumper
             }
 
             if (!$container->hasDefinition($id)) {
-                $nodes[$id] = array('class' => str_replace('\\', '\\\\', get_class($service)), 'attributes' => $this->options['node.instance']);
+                $class = ('service_container' === $id) ? get_class($this->container) : get_class($service);
+                $nodes[$id] = array('class' => str_replace('\\', '\\\\', $class), 'attributes' => $this->options['node.instance']);
             }
         }
 
         return $nodes;
+    }
+
+    private function cloneContainer()
+    {
+        $parameterBag = new ParameterBag($this->container->getParameterBag()->all());
+
+        $container = new ContainerBuilder($parameterBag);
+        $container->setDefinitions($this->container->getDefinitions());
+        $container->setAliases($this->container->getAliases());
+        $container->setResources($this->container->getResources());
+        foreach ($this->container->getScopes() as $scope) {
+            $container->addScope($scope);
+        }
+        foreach ($this->container->getExtensions() as $extension) {
+            $container->registerExtension($extension);
+        }
+
+        return $container;
     }
 
     /**

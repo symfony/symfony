@@ -304,6 +304,14 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     /**
      * {@inheritdoc}
      */
+    public function hasPropertyMetadata($property)
+    {
+        return array_key_exists($property, $this->members);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getPropertyMetadata($property)
     {
         return $this->members[$property];

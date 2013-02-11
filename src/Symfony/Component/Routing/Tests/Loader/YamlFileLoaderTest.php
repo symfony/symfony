@@ -79,15 +79,18 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $routeCollection = $loader->load('validpattern.yml');
         $routes = $routeCollection->all();
 
-        $this->assertEquals(1, count($routes), 'One route is loaded');
+        $this->assertCount(2, $routes, 'Two routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-        $route = $routes['blog_show'];
-        $this->assertEquals('/blog/{slug}', $route->getPath());
-        $this->assertEquals('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
-        $this->assertEquals('GET', $route->getRequirement('_method'));
-        $this->assertEquals('\w+', $route->getRequirement('locale'));
-        $this->assertEquals('{locale}.example.com', $route->getHost());
-        $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
+
+        foreach ($routes as $route) {
+            $this->assertEquals('/blog/{slug}', $route->getPath());
+            $this->assertEquals('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
+            $this->assertEquals('GET', $route->getRequirement('_method'));
+            $this->assertEquals('https', $route->getRequirement('_scheme'));
+            $this->assertEquals('\w+', $route->getRequirement('locale'));
+            $this->assertEquals('{locale}.example.com', $route->getHost());
+            $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
+        }
     }
 
     public function testLoadWithResource()
@@ -96,7 +99,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $routeCollection = $loader->load('validresource.yml');
         $routes = $routeCollection->all();
 
-        $this->assertEquals(1, count($routes), 'One route is loaded');
+        $this->assertCount(2, $routes, 'Two routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
         $this->assertEquals('/{foo}/blog/{slug}', $routes['blog_show']->getPath());
         $this->assertEquals('MyBlogBundle:Blog:show', $routes['blog_show']->getDefault('_controller'));

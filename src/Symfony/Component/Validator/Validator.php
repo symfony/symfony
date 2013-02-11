@@ -112,6 +112,10 @@ class Validator implements ValidatorInterface
         }
 
         foreach ($this->resolveGroups($groups) as $group) {
+            if (!$metadata->hasPropertyMetadata($property)) {
+                continue;
+            }
+
             foreach ($metadata->getPropertyMetadata($property) as $propMeta) {
                 $propMeta->accept($visitor, $propMeta->getPropertyValue($containingValue), $group, $property);
             }
@@ -139,6 +143,10 @@ class Validator implements ValidatorInterface
         }
 
         foreach ($this->resolveGroups($groups) as $group) {
+            if (!$metadata->hasPropertyMetadata($property)) {
+                continue;
+            }
+
             foreach ($metadata->getPropertyMetadata($property) as $propMeta) {
                 $propMeta->accept($visitor, $value, $group, $property);
             }

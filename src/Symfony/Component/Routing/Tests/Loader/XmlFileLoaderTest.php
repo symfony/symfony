@@ -41,12 +41,13 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $routeCollection = $loader->load('validpattern.xml');
         $routes = $routeCollection->all();
 
-        $this->assertEquals(1, count($routes), 'One route is loaded');
+        $this->assertCount(2, $routes, 'Two routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
         $route = $routes['blog_show'];
         $this->assertEquals('/blog/{slug}', $route->getPath());
         $this->assertEquals('MyBundle:Blog:show', $route->getDefault('_controller'));
         $this->assertEquals('GET', $route->getRequirement('_method'));
+        $this->assertEquals('https', $route->getRequirement('_scheme'));
         $this->assertEquals('\w+', $route->getRequirement('locale'));
         $this->assertEquals('{locale}.example.com', $route->getHost());
         $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
@@ -57,7 +58,8 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('namespaceprefix.xml');
 
-        $this->assertCount(1, $routeCollection, 'One route is loaded');
+        $this->assertCount(1, $routeCollection->all(), 'One route is loaded');
+
         $route = $routeCollection->get('blog_show');
         $this->assertEquals('/blog/{slug}', $route->getPath());
         $this->assertEquals('MyBundle:Blog:show', $route->getDefault('_controller'));
@@ -73,14 +75,17 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $routeCollection = $loader->load('validresource.xml');
         $routes = $routeCollection->all();
 
-        $this->assertEquals(1, count($routes), 'One route is loaded');
+        $this->assertCount(2, $routes, 'Two routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-        $this->assertEquals('/{foo}/blog/{slug}', $routes['blog_show']->getPath());
-        $this->assertEquals('MyBundle:Blog:show', $routes['blog_show']->getDefault('_controller'));
-        $this->assertEquals('123', $routes['blog_show']->getDefault('foo'));
-        $this->assertEquals('\d+', $routes['blog_show']->getRequirement('foo'));
-        $this->assertEquals('bar', $routes['blog_show']->getOption('foo'));
-        $this->assertEquals('{locale}.example.com', $routes['blog_show']->getHost());
+
+        foreach ($routes as $route) {
+            $this->assertEquals('/{foo}/blog/{slug}', $routes['blog_show']->getPath());
+            $this->assertEquals('MyBundle:Blog:show', $routes['blog_show']->getDefault('_controller'));
+            $this->assertEquals('123', $routes['blog_show']->getDefault('foo'));
+            $this->assertEquals('\d+', $routes['blog_show']->getRequirement('foo'));
+            $this->assertEquals('bar', $routes['blog_show']->getOption('foo'));
+            $this->assertEquals('{locale}.example.com', $routes['blog_show']->getHost());
+        }
     }
 
     /**

@@ -35,5 +35,5 @@ interface NormalizableInterface
      *
      * @return array|scalar
      */
-    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array());
+    function normalize(NormalizerInterface $normalizer, $format = null, array $context = array());
 }

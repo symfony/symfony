@@ -27,7 +27,7 @@ interface NormalizerInterface
      *
      * @return array|scalar
      */
-    public function normalize($object, $format = null, array $context = array());
+    function normalize($object, $format = null, array $context = array());
 
     /**
      * Checks whether the given class is supported for normalization by this normalizer
@@ -37,5 +37,5 @@ interface NormalizerInterface
      *
      * @return Boolean
      */
-    public function supportsNormalization($data, $format = null);
+    function supportsNormalization($data, $format = null);
 }

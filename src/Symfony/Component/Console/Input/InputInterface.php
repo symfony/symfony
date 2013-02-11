@@ -23,7 +23,7 @@ interface InputInterface
      *
      * @return string The value of the first argument or null otherwise
      */
-    public function getFirstArgument();
+    function getFirstArgument();
 
     /**
      * Returns true if the raw parameters (not parsed) contain a value.
@@ -35,7 +35,7 @@ interface InputInterface
      *
      * @return Boolean true if the value is contained in the raw parameters
      */
-    public function hasParameterOption($values);
+    function hasParameterOption($values);
 
     /**
      * Returns the value of a raw option (not parsed).
@@ -48,14 +48,14 @@ interface InputInterface
      *
      * @return mixed The option value
      */
-    public function getParameterOption($values, $default = false);
+    function getParameterOption($values, $default = false);
 
     /**
      * Binds the current Input instance with the given arguments and options.
      *
      * @param InputDefinition $definition A InputDefinition instance
      */
-    public function bind(InputDefinition $definition);
+    function bind(InputDefinition $definition);
 
     /**
      * Validates if arguments given are correct.
@@ -64,14 +64,14 @@ interface InputInterface
      *
      * @throws \RuntimeException
      */
-    public function validate();
+    function validate();
 
     /**
      * Returns all the given arguments merged with the default values.
      *
      * @return array
      */
-    public function getArguments();
+    function getArguments();
 
     /**
      * Gets argument by name.
@@ -80,7 +80,7 @@ interface InputInterface
      *
      * @return mixed
      */
-    public function getArgument($name);
+    function getArgument($name);
 
     /**
      * Sets an argument value by name.
@@ -90,7 +90,7 @@ interface InputInterface
      *
      * @throws \InvalidArgumentException When argument given doesn't exist
      */
-    public function setArgument($name, $value);
+    function setArgument($name, $value);
 
     /**
      * Returns true if an InputArgument object exists by name or position.
@@ -99,14 +99,14 @@ interface InputInterface
      *
      * @return Boolean true if the InputArgument object exists, false otherwise
      */
-    public function hasArgument($name);
+    function hasArgument($name);
 
     /**
      * Returns all the given options merged with the default values.
      *
      * @return array
      */
-    public function getOptions();
+    function getOptions();
 
     /**
      * Gets an option by name.
@@ -115,7 +115,7 @@ interface InputInterface
      *
      * @return mixed
      */
-    public function getOption($name);
+    function getOption($name);
 
     /**
      * Sets an option value by name.
@@ -125,7 +125,7 @@ interface InputInterface
      *
      * @throws \InvalidArgumentException When option given doesn't exist
      */
-    public function setOption($name, $value);
+    function setOption($name, $value);
 
     /**
      * Returns true if an InputOption object exists by name.
@@ -134,19 +134,19 @@ interface InputInterface
      *
      * @return Boolean true if the InputOption object exists, false otherwise
      */
-    public function hasOption($name);
+    function hasOption($name);
 
     /**
      * Is this input means interactive?
      *
      * @return Boolean
      */
-    public function isInteractive();
+    function isInteractive();
 
     /**
      * Sets the input interactivity.
      *
      * @param Boolean $interactive If the input should be interactive
      */
-    public function setInteractive($interactive);
+    function setInteractive($interactive);
 }

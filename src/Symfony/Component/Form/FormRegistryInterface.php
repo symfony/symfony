@@ -27,7 +27,7 @@ interface FormRegistryInterface
      *             form extensions or type registration in the Dependency
      *             Injection Container instead.
      */
-    public function addType(ResolvedFormTypeInterface $type);
+    function addType(ResolvedFormTypeInterface $type);
 
     /**
      * Returns a form type by name.
@@ -41,7 +41,7 @@ interface FormRegistryInterface
      * @throws Exception\UnexpectedTypeException if the passed name is not a string
      * @throws Exception\FormException           if the type can not be retrieved from any extension
      */
-    public function getType($name);
+    function getType($name);
 
     /**
      * Returns whether the given form type is supported.
@@ -50,19 +50,19 @@ interface FormRegistryInterface
      *
      * @return Boolean Whether the type is supported
      */
-    public function hasType($name);
+    function hasType($name);
 
     /**
      * Returns the guesser responsible for guessing types.
      *
      * @return FormTypeGuesserInterface|null
      */
-    public function getTypeGuesser();
+    function getTypeGuesser();
 
     /**
      * Returns the extensions loaded by the framework.
      *
      * @return array
      */
-    public function getExtensions();
+    function getExtensions();
 }

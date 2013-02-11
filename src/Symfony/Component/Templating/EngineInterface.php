@@ -44,7 +44,7 @@ interface EngineInterface
      *
      * @api
      */
-    public function render($name, array $parameters = array());
+    function render($name, array $parameters = array());
 
     /**
      * Returns true if the template exists.
@@ -55,7 +55,7 @@ interface EngineInterface
      *
      * @api
      */
-    public function exists($name);
+    function exists($name);
 
     /**
      * Returns true if this class is able to render the given template.
@@ -66,5 +66,5 @@ interface EngineInterface
      *
      * @api
      */
-    public function supports($name);
+    function supports($name);
 }

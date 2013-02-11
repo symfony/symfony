@@ -29,14 +29,14 @@ interface SecurityContextInterface
      *
      * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
      */
-    public function getToken();
+    function getToken();
 
     /**
      * Sets the authentication token.
      *
      * @param TokenInterface $token
      */
-    public function setToken(TokenInterface $token = null);
+    function setToken(TokenInterface $token = null);
 
     /**
      * Checks if the attributes are granted against the current authentication token and optionally supplied object.
@@ -46,5 +46,5 @@ interface SecurityContextInterface
      *
      * @return Boolean
      */
-    public function isGranted($attributes, $object = null);
+    function isGranted($attributes, $object = null);
 }

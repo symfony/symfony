@@ -26,5 +26,5 @@ interface LoaderResolverInterface
      *
      * @return LoaderInterface A LoaderInterface instance
      */
-    public function resolve($resource, $type = null);
+    function resolve($resource, $type = null);
 }

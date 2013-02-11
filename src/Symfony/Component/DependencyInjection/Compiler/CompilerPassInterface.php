@@ -29,5 +29,5 @@ interface CompilerPassInterface
      *
      * @api
      */
-    public function process(ContainerBuilder $container);
+    function process(ContainerBuilder $container);
 }

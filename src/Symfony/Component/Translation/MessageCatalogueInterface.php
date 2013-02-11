@@ -29,7 +29,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function getLocale();
+    function getLocale();
 
     /**
      * Gets the domains.
@@ -38,7 +38,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function getDomains();
+    function getDomains();
 
     /**
      * Gets the messages within a given domain.
@@ -51,7 +51,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function all($domain = null);
+    function all($domain = null);
 
     /**
      * Sets a message translation.
@@ -62,7 +62,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function set($id, $translation, $domain = 'messages');
+    function set($id, $translation, $domain = 'messages');
 
     /**
      * Checks if a message has a translation.
@@ -74,7 +74,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function has($id, $domain = 'messages');
+    function has($id, $domain = 'messages');
 
     /**
      * Checks if a message has a translation (it does not take into account the fallback mechanism).
@@ -86,7 +86,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function defines($id, $domain = 'messages');
+    function defines($id, $domain = 'messages');
 
     /**
      * Gets a message translation.
@@ -98,7 +98,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function get($id, $domain = 'messages');
+    function get($id, $domain = 'messages');
 
     /**
      * Sets translations for a given domain.
@@ -108,7 +108,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function replace($messages, $domain = 'messages');
+    function replace($messages, $domain = 'messages');
 
     /**
      * Adds translations for a given domain.
@@ -118,7 +118,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function add($messages, $domain = 'messages');
+    function add($messages, $domain = 'messages');
 
     /**
      * Merges translations from the given Catalogue into the current one.
@@ -129,7 +129,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function addCatalogue(MessageCatalogueInterface $catalogue);
+    function addCatalogue(MessageCatalogueInterface $catalogue);
 
     /**
      * Merges translations from the given Catalogue into the current one
@@ -141,7 +141,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function addFallbackCatalogue(MessageCatalogueInterface $catalogue);
+    function addFallbackCatalogue(MessageCatalogueInterface $catalogue);
 
     /**
      * Gets the fallback catalogue.
@@ -150,7 +150,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function getFallbackCatalogue();
+    function getFallbackCatalogue();
 
     /**
      * Returns an array of resources loaded to build this collection.
@@ -159,7 +159,7 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function getResources();
+    function getResources();
 
     /**
      * Adds a resource for this collection.
@@ -168,5 +168,5 @@ interface MessageCatalogueInterface
      *
      * @api
      */
-    public function addResource(ResourceInterface $resource);
+    function addResource(ResourceInterface $resource);
 }

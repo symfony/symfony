@@ -23,5 +23,5 @@ interface FieldEntryInterface extends EntryInterface
      *
      * @return string
      */
-    public function getField();
+    function getField();
 }

@@ -34,7 +34,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function registerBundles();
+    function registerBundles();
 
     /**
      * Loads the container configuration
@@ -43,14 +43,14 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function registerContainerConfiguration(LoaderInterface $loader);
+    function registerContainerConfiguration(LoaderInterface $loader);
 
     /**
      * Boots the current kernel.
      *
      * @api
      */
-    public function boot();
+    function boot();
 
     /**
      * Shutdowns the kernel.
@@ -59,7 +59,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function shutdown();
+    function shutdown();
 
     /**
      * Gets the registered bundle instances.
@@ -68,7 +68,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function getBundles();
+    function getBundles();
 
     /**
      * Checks if a given class name belongs to an active bundle.
@@ -79,7 +79,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function isClassInActiveBundle($class);
+    function isClassInActiveBundle($class);
 
     /**
      * Returns a bundle and optionally its descendants by its name.
@@ -93,7 +93,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function getBundle($name, $first = true);
+    function getBundle($name, $first = true);
 
     /**
      * Returns the file path for a given resource.
@@ -123,7 +123,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function locateResource($name, $dir = null, $first = true);
+    function locateResource($name, $dir = null, $first = true);
 
     /**
      * Gets the name of the kernel
@@ -132,7 +132,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function getName();
+    function getName();
 
     /**
      * Gets the environment.
@@ -141,7 +141,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function getEnvironment();
+    function getEnvironment();
 
     /**
      * Checks if debug mode is enabled.
@@ -150,7 +150,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function isDebug();
+    function isDebug();
 
     /**
      * Gets the application root dir.
@@ -159,7 +159,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function getRootDir();
+    function getRootDir();
 
     /**
      * Gets the current container.
@@ -168,7 +168,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function getContainer();
+    function getContainer();
 
     /**
      * Gets the request start time (not available if debug is disabled).
@@ -177,7 +177,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function getStartTime();
+    function getStartTime();
 
     /**
      * Gets the cache directory.
@@ -186,7 +186,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function getCacheDir();
+    function getCacheDir();
 
     /**
      * Gets the log directory.
@@ -195,7 +195,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function getLogDir();
+    function getLogDir();
 
     /**
      * Gets the charset of the application.
@@ -204,5 +204,5 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @api
      */
-    public function getCharset();
+    function getCharset();
 }

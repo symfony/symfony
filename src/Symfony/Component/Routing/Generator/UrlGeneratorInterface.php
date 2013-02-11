@@ -83,5 +83,5 @@ interface UrlGeneratorInterface extends RequestContextAwareInterface
      *
      * @api
      */
-    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH);
+    function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH);
 }

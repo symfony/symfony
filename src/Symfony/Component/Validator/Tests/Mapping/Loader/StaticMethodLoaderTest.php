@@ -69,7 +69,7 @@ class StaticMethodLoaderTest extends \PHPUnit_Framework_TestCase
 
 interface StaticLoaderInterface
 {
-    public static function loadMetadata(ClassMetadata $metadata);
+    static function loadMetadata(ClassMetadata $metadata);
 }
 
 class StaticLoaderEntity

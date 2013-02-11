@@ -25,7 +25,7 @@ interface FormFactoryBuilderInterface
      *
      * @return FormFactoryBuilderInterface The builder.
      */
-    public function setResolvedTypeFactory(ResolvedFormTypeFactoryInterface $resolvedTypeFactory);
+    function setResolvedTypeFactory(ResolvedFormTypeFactoryInterface $resolvedTypeFactory);
 
     /**
      * Adds an extension to be loaded by the factory.
@@ -34,7 +34,7 @@ interface FormFactoryBuilderInterface
      *
      * @return FormFactoryBuilderInterface The builder.
      */
-    public function addExtension(FormExtensionInterface $extension);
+    function addExtension(FormExtensionInterface $extension);
 
     /**
      * Adds a list of extensions to be loaded by the factory.
@@ -43,7 +43,7 @@ interface FormFactoryBuilderInterface
      *
      * @return FormFactoryBuilderInterface The builder.
      */
-    public function addExtensions(array $extensions);
+    function addExtensions(array $extensions);
 
     /**
      * Adds a form type to the factory.
@@ -52,7 +52,7 @@ interface FormFactoryBuilderInterface
      *
      * @return FormFactoryBuilderInterface The builder.
      */
-    public function addType(FormTypeInterface $type);
+    function addType(FormTypeInterface $type);
 
     /**
      * Adds a list of form types to the factory.
@@ -61,7 +61,7 @@ interface FormFactoryBuilderInterface
      *
      * @return FormFactoryBuilderInterface The builder.
      */
-    public function addTypes(array $types);
+    function addTypes(array $types);
 
     /**
      * Adds a form type extension to the factory.
@@ -70,7 +70,7 @@ interface FormFactoryBuilderInterface
      *
      * @return FormFactoryBuilderInterface The builder.
      */
-    public function addTypeExtension(FormTypeExtensionInterface $typeExtension);
+    function addTypeExtension(FormTypeExtensionInterface $typeExtension);
 
     /**
      * Adds a list of form type extensions to the factory.
@@ -79,7 +79,7 @@ interface FormFactoryBuilderInterface
      *
      * @return FormFactoryBuilderInterface The builder.
      */
-    public function addTypeExtensions(array $typeExtensions);
+    function addTypeExtensions(array $typeExtensions);
 
     /**
      * Adds a type guesser to the factory.
@@ -88,7 +88,7 @@ interface FormFactoryBuilderInterface
      *
      * @return FormFactoryBuilderInterface The builder.
      */
-    public function addTypeGuesser(FormTypeGuesserInterface $typeGuesser);
+    function addTypeGuesser(FormTypeGuesserInterface $typeGuesser);
 
     /**
      * Adds a list of type guessers to the factory.
@@ -97,12 +97,12 @@ interface FormFactoryBuilderInterface
      *
      * @return FormFactoryBuilderInterface The builder.
      */
-    public function addTypeGuessers(array $typeGuessers);
+    function addTypeGuessers(array $typeGuessers);
 
     /**
      * Builds and returns the factory.
      *
      * @return FormFactoryInterface The form factory.
      */
-    public function getFormFactory();
+    function getFormFactory();
 }

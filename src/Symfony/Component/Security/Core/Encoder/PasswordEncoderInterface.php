@@ -26,7 +26,7 @@ interface PasswordEncoderInterface
      *
      * @return string The encoded password
      */
-    public function encodePassword($raw, $salt);
+    function encodePassword($raw, $salt);
 
     /**
      * Checks a raw password against an encoded password.
@@ -37,5 +37,5 @@ interface PasswordEncoderInterface
      *
      * @return Boolean true if the password is valid, false otherwise
      */
-    public function isPasswordValid($encoded, $raw, $salt);
+    function isPasswordValid($encoded, $raw, $salt);
 }

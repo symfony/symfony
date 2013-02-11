@@ -27,7 +27,7 @@ interface DecoderInterface
      *
      * @return mixed
      */
-    public function decode($data, $format, array $context = array());
+    function decode($data, $format, array $context = array());
 
     /**
      * Checks whether the serializer can decode from given format
@@ -36,5 +36,5 @@ interface DecoderInterface
      *
      * @return Boolean
      */
-    public function supportsDecoding($format);
+    function supportsDecoding($format);
 }

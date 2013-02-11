@@ -30,5 +30,5 @@ interface TemplateNameParserInterface
      *
      * @api
      */
-    public function parse($name);
+    function parse($name);
 }

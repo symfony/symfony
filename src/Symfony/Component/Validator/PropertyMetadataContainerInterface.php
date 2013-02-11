@@ -29,5 +29,5 @@ interface PropertyMetadataContainerInterface
      * @return PropertyMetadataInterface[] A list of metadata instances. Empty if
      *                                     no metadata exists for the property.
      */
-    public function getPropertyMetadata($property);
+    function getPropertyMetadata($property);
 }

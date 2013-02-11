@@ -20,5 +20,5 @@ interface PrependExtensionInterface
      *
      * @param ContainerBuilder $container
      */
-    public function prepend(ContainerBuilder $container);
+    function prepend(ContainerBuilder $container);
 }

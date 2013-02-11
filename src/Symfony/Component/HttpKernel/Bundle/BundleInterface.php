@@ -29,14 +29,14 @@ interface BundleInterface extends ContainerAwareInterface
      *
      * @api
      */
-    public function boot();
+    function boot();
 
     /**
      * Shutdowns the Bundle.
      *
      * @api
      */
-    public function shutdown();
+    function shutdown();
 
     /**
      * Builds the bundle.
@@ -47,7 +47,7 @@ interface BundleInterface extends ContainerAwareInterface
      *
      * @api
      */
-    public function build(ContainerBuilder $container);
+    function build(ContainerBuilder $container);
 
     /**
      * Returns the container extension that should be implicitly loaded.
@@ -56,7 +56,7 @@ interface BundleInterface extends ContainerAwareInterface
      *
      * @api
      */
-    public function getContainerExtension();
+    function getContainerExtension();
 
     /**
      * Returns the bundle name that this bundle overrides.
@@ -69,7 +69,7 @@ interface BundleInterface extends ContainerAwareInterface
      *
      * @api
      */
-    public function getParent();
+    function getParent();
 
     /**
      * Returns the bundle name (the class short name).
@@ -78,7 +78,7 @@ interface BundleInterface extends ContainerAwareInterface
      *
      * @api
      */
-    public function getName();
+    function getName();
 
     /**
      * Gets the Bundle namespace.
@@ -87,7 +87,7 @@ interface BundleInterface extends ContainerAwareInterface
      *
      * @api
      */
-    public function getNamespace();
+    function getNamespace();
 
     /**
      * Gets the Bundle directory path.
@@ -98,5 +98,5 @@ interface BundleInterface extends ContainerAwareInterface
      *
      * @api
      */
-    public function getPath();
+    function getPath();
 }

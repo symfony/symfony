@@ -29,7 +29,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @return FormBuilderInterface The builder object.
      */
-    public function add($child, $type = null, array $options = array());
+    function add($child, $type = null, array $options = array());
 
     /**
      * Creates a form builder.
@@ -40,7 +40,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @return FormBuilderInterface The created builder.
      */
-    public function create($name, $type = null, array $options = array());
+    function create($name, $type = null, array $options = array());
 
     /**
      * Returns a child by name.
@@ -51,7 +51,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @throws Exception\FormException if the given child does not exist
      */
-    public function get($name);
+    function get($name);
 
     /**
      * Removes the field with the given name.
@@ -60,7 +60,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @return FormBuilderInterface The builder object.
      */
-    public function remove($name);
+    function remove($name);
 
     /**
      * Returns whether a field with the given name exists.
@@ -69,21 +69,21 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @return Boolean
      */
-    public function has($name);
+    function has($name);
 
     /**
      * Returns the children.
      *
      * @return array
      */
-    public function all();
+    function all();
 
     /**
      * Creates the form.
      *
      * @return Form The form
      */
-    public function getForm();
+    function getForm();
 
     /**
      * Sets the parent builder.
@@ -97,7 +97,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *             likely that the parent is only set after turning the builder
      *             into a form.
      */
-    public function setParent(FormBuilderInterface $parent = null);
+    function setParent(FormBuilderInterface $parent = null);
 
     /**
      * Returns the parent builder.
@@ -109,7 +109,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *             likely that the parent is only set after turning the builder
      *             into a form.
      */
-    public function getParent();
+    function getParent();
 
     /**
      * Returns whether the builder has a parent.
@@ -121,5 +121,5 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *             likely that the parent is only set after turning the builder
      *             into a form.
      */
-    public function hasParent();
+    function hasParent();
 }

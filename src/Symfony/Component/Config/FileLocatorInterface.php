@@ -27,5 +27,5 @@ interface FileLocatorInterface
      *
      * @throws \InvalidArgumentException When file is not found
      */
-    public function locate($name, $currentPath = null, $first = true);
+    function locate($name, $currentPath = null, $first = true);
 }

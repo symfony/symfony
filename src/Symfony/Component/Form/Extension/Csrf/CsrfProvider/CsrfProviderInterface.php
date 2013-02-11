@@ -35,7 +35,7 @@ interface CsrfProviderInterface
      * @param string $intention Some value that identifies the action intention
      *                          (i.e. "authenticate"). Doesn't have to be a secret value.
      */
-    public function generateCsrfToken($intention);
+    function generateCsrfToken($intention);
 
     /**
      * Validates a CSRF token.
@@ -45,5 +45,5 @@ interface CsrfProviderInterface
      *
      * @return Boolean Whether the token supplied by the browser is correct
      */
-    public function isCsrfTokenValid($intention, $token);
+    function isCsrfTokenValid($intention, $token);
 }

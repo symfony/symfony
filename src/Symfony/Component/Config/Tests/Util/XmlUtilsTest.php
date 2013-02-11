@@ -125,5 +125,5 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
 
 interface Validator
 {
-    public function validate();
+    function validate();
 }

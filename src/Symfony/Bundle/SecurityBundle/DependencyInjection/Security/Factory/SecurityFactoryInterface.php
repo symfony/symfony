@@ -21,11 +21,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 interface SecurityFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint);
+    function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint);
 
-    public function getPosition();
+    function getPosition();
 
-    public function getKey();
+    function getKey();
 
-    public function addConfiguration(NodeDefinition $builder);
+    function addConfiguration(NodeDefinition $builder);
 }

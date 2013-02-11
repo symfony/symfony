@@ -23,7 +23,7 @@ interface ResourceInterface
      *
      * @return string A string representation of the Resource
      */
-    public function __toString();
+    function __toString();
 
     /**
      * Returns true if the resource has not been updated since the given timestamp.
@@ -32,12 +32,12 @@ interface ResourceInterface
      *
      * @return Boolean true if the resource has not been updated, false otherwise
      */
-    public function isFresh($timestamp);
+    function isFresh($timestamp);
 
     /**
      * Returns the resource tied to this Resource.
      *
      * @return mixed The resource
      */
-    public function getResource();
+    function getResource();
 }

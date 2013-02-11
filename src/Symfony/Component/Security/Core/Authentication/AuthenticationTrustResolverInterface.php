@@ -30,7 +30,7 @@ interface AuthenticationTrustResolverInterface
      *
      * @return Boolean
      */
-    public function isAnonymous(TokenInterface $token = null);
+    function isAnonymous(TokenInterface $token = null);
 
     /**
      * Resolves whether the passed token implementation is authenticated
@@ -40,7 +40,7 @@ interface AuthenticationTrustResolverInterface
      *
      * @return Boolean
      */
-    public function isRememberMe(TokenInterface $token = null);
+    function isRememberMe(TokenInterface $token = null);
 
     /**
      * Resolves whether the passed token implementation is fully authenticated.
@@ -49,5 +49,5 @@ interface AuthenticationTrustResolverInterface
      *
      * @return Boolean
      */
-    public function isFullFledged(TokenInterface $token = null);
+    function isFullFledged(TokenInterface $token = null);
 }

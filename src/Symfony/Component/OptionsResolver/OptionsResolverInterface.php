@@ -39,7 +39,7 @@ interface OptionsResolverInterface
      *
      * @return OptionsResolverInterface The resolver instance.
      */
-    public function setDefaults(array $defaultValues);
+    function setDefaults(array $defaultValues);
 
     /**
      * Replaces default option values.
@@ -54,7 +54,7 @@ interface OptionsResolverInterface
      *
      * @return OptionsResolverInterface The resolver instance.
      */
-    public function replaceDefaults(array $defaultValues);
+    function replaceDefaults(array $defaultValues);
 
     /**
      * Sets optional options.
@@ -71,7 +71,7 @@ interface OptionsResolverInterface
      *
      * @throws Exception\OptionDefinitionException When trying to pass default values.
      */
-    public function setOptional(array $optionNames);
+    function setOptional(array $optionNames);
 
     /**
      * Sets required options.
@@ -85,7 +85,7 @@ interface OptionsResolverInterface
      *
      * @throws Exception\OptionDefinitionException When trying to pass default values.
      */
-    public function setRequired(array $optionNames);
+    function setRequired(array $optionNames);
 
     /**
      * Sets allowed values for a list of options.
@@ -100,7 +100,7 @@ interface OptionsResolverInterface
      *                                 (see {@link isKnown()}) for which
      *                                 an allowed value is set.
      */
-    public function setAllowedValues(array $allowedValues);
+    function setAllowedValues(array $allowedValues);
 
     /**
      * Adds allowed values for a list of options.
@@ -117,7 +117,7 @@ interface OptionsResolverInterface
      *                                 (see {@link isKnown()}) for which
      *                                 an allowed value is set.
      */
-    public function addAllowedValues(array $allowedValues);
+    function addAllowedValues(array $allowedValues);
 
     /**
      * Sets allowed types for a list of options.
@@ -130,7 +130,7 @@ interface OptionsResolverInterface
      * @throws Exception\InvalidOptionsException If an option has not been defined for
      *                                           which an allowed type is set.
      */
-    public function setAllowedTypes(array $allowedTypes);
+    function setAllowedTypes(array $allowedTypes);
 
     /**
      * Adds allowed types for a list of options.
@@ -145,7 +145,7 @@ interface OptionsResolverInterface
      * @throws Exception\InvalidOptionsException If an option has not been defined for
      *                                           which an allowed type is set.
      */
-    public function addAllowedTypes(array $allowedTypes);
+    function addAllowedTypes(array $allowedTypes);
 
     /**
      * Sets normalizers that are applied on resolved options.
@@ -165,7 +165,7 @@ interface OptionsResolverInterface
      *
      * @return OptionsResolverInterface The resolver instance.
      */
-    public function setNormalizers(array $normalizers);
+    function setNormalizers(array $normalizers);
 
     /**
      * Returns whether an option is known.
@@ -177,7 +177,7 @@ interface OptionsResolverInterface
      *
      * @return Boolean Whether the option is known.
      */
-    public function isKnown($option);
+    function isKnown($option);
 
     /**
      * Returns whether an option is required.
@@ -190,7 +190,7 @@ interface OptionsResolverInterface
      *
      * @return Boolean Whether the option is required.
      */
-    public function isRequired($option);
+    function isRequired($option);
 
     /**
      * Returns the combination of the default and the passed options.
@@ -206,5 +206,5 @@ interface OptionsResolverInterface
      * @throws Exception\OptionDefinitionException If a cyclic dependency is detected
      *                                             between two lazy options.
      */
-    public function resolve(array $options = array());
+    function resolve(array $options = array());
 }

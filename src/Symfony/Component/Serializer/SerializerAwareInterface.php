@@ -25,5 +25,5 @@ interface SerializerAwareInterface
      *
      * @param SerializerInterface $serializer
      */
-    public function setSerializer(SerializerInterface $serializer);
+    function setSerializer(SerializerInterface $serializer);
 }

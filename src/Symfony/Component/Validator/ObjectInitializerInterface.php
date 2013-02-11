@@ -31,5 +31,5 @@ interface ObjectInitializerInterface
      *
      * @api
      */
-    public function initialize($object);
+    function initialize($object);
 }

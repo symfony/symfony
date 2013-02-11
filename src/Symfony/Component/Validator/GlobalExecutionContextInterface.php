@@ -34,7 +34,7 @@ interface GlobalExecutionContextInterface
      *
      * @return ConstraintViolationListInterface A list of constraint violations.
      */
-    public function getViolations();
+    function getViolations();
 
     /**
      * Returns the value at which validation was started in the object graph.
@@ -43,26 +43,26 @@ interface GlobalExecutionContextInterface
      *
      * @see ExecutionContextInterface::getRoot
      */
-    public function getRoot();
+    function getRoot();
 
     /**
      * Returns the visitor instance used to validate the object graph nodes.
      *
      * @return ValidationVisitorInterface The validation visitor.
      */
-    public function getVisitor();
+    function getVisitor();
 
     /**
      * Returns the factory for constraint validators.
      *
      * @return ConstraintValidatorFactoryInterface The constraint validator factory.
      */
-    public function getValidatorFactory();
+    function getValidatorFactory();
 
     /**
      * Returns the factory for validation metadata objects.
      *
      * @return MetadataFactoryInterface The metadata factory.
      */
-    public function getMetadataFactory();
+    function getMetadataFactory();
 }

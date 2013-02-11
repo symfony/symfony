@@ -32,7 +32,7 @@ interface TranslatorInterface
      *
      * @api
      */
-    public function trans($id, array $parameters = array(), $domain = null, $locale = null);
+    function trans($id, array $parameters = array(), $domain = null, $locale = null);
 
     /**
      * Translates the given choice message by choosing a translation according to a number.
@@ -47,7 +47,7 @@ interface TranslatorInterface
      *
      * @api
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null);
+    function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null);
 
     /**
      * Sets the current locale.
@@ -56,7 +56,7 @@ interface TranslatorInterface
      *
      * @api
      */
-    public function setLocale($locale);
+    function setLocale($locale);
 
     /**
      * Returns the current locale.
@@ -65,5 +65,5 @@ interface TranslatorInterface
      *
      * @api
      */
-    public function getLocale();
+    function getLocale();
 }

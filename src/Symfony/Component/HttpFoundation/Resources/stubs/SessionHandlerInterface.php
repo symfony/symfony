@@ -36,7 +36,7 @@ interface SessionHandlerInterface
      *
      * @return boolean
      */
-    public function open($savePath, $sessionName);
+    function open($savePath, $sessionName);
 
     /**
      * Close session.
@@ -45,7 +45,7 @@ interface SessionHandlerInterface
      *
      * @return boolean
      */
-    public function close();
+    function close();
 
     /**
      * Read session.
@@ -58,7 +58,7 @@ interface SessionHandlerInterface
      *
      * @return string String as stored in persistent storage or empty string in all other cases.
      */
-    public function read($sessionId);
+    function read($sessionId);
 
     /**
      * Commit session to storage.
@@ -70,7 +70,7 @@ interface SessionHandlerInterface
      *
      * @return boolean
      */
-    public function write($sessionId, $data);
+    function write($sessionId, $data);
 
     /**
      * Destroys this session.
@@ -83,7 +83,7 @@ interface SessionHandlerInterface
      *
      * @return boolean
      */
-    public function destroy($sessionId);
+    function destroy($sessionId);
 
     /**
      * Garbage collection for storage.
@@ -96,5 +96,5 @@ interface SessionHandlerInterface
      *
      * @return boolean
      */
-    public function gc($lifetime);
+    function gc($lifetime);
 }

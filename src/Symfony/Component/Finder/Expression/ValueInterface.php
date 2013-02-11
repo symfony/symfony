@@ -21,40 +21,40 @@ interface ValueInterface
      *
      * @return string
      */
-    public function render();
+    function render();
 
     /**
      * Renders string representation of pattern.
      *
      * @return string
      */
-    public function renderPattern();
+    function renderPattern();
 
     /**
      * Returns value case sensitivity.
      *
      * @return bool
      */
-    public function isCaseSensitive();
+    function isCaseSensitive();
 
     /**
      * Returns expression type.
      *
      * @return int
      */
-    public function getType();
+    function getType();
 
     /**
      * @param string $expr
      *
      * @return ValueInterface
      */
-    public function prepend($expr);
+    function prepend($expr);
 
     /**
      * @param string $expr
      *
      * @return ValueInterface
      */
-    public function append($expr);
+    function append($expr);
 }

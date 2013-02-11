@@ -23,5 +23,5 @@ interface ClassBasedInterface
      *
      * @return string The name of the backing class.
      */
-    public function getClassName();
+    function getClassName();
 }

@@ -24,5 +24,5 @@ interface DebuggerInterface
      *
      * @param string $message A message to log
      */
-    public function log($message);
+    function log($message);
 }

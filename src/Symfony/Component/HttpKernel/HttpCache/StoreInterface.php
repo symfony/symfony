@@ -31,7 +31,7 @@ interface StoreInterface
      *
      * @return Response|null A Response instance, or null if no cache entry was found
      */
-    public function lookup(Request $request);
+    function lookup(Request $request);
 
     /**
      * Writes a cache entry to the store for the given Request and Response.
@@ -44,14 +44,14 @@ interface StoreInterface
      *
      * @return string The key under which the response is stored
      */
-    public function write(Request $request, Response $response);
+    function write(Request $request, Response $response);
 
     /**
      * Invalidates all cache entries that match the request.
      *
      * @param Request $request A Request instance
      */
-    public function invalidate(Request $request);
+    function invalidate(Request $request);
 
     /**
      * Locks the cache for a given Request.
@@ -60,7 +60,7 @@ interface StoreInterface
      *
      * @return Boolean|string true if the lock is acquired, the path to the current lock otherwise
      */
-    public function lock(Request $request);
+    function lock(Request $request);
 
     /**
      * Releases the lock for the given Request.
@@ -69,7 +69,7 @@ interface StoreInterface
      *
      * @return Boolean False if the lock file does not exist or cannot be unlocked, true otherwise
      */
-    public function unlock(Request $request);
+    function unlock(Request $request);
 
     /**
      * Returns whether or not a lock exists.
@@ -78,7 +78,7 @@ interface StoreInterface
      *
      * @return Boolean true if lock exists, false otherwise
      */
-    public function isLocked(Request $request);
+    function isLocked(Request $request);
 
     /**
      * Purges data for the given URL.
@@ -87,10 +87,10 @@ interface StoreInterface
      *
      * @return Boolean true if the URL exists and has been purged, false otherwise
      */
-    public function purge($url);
+    function purge($url);
 
     /**
      * Cleanups storage.
      */
-    public function cleanup();
+    function cleanup();
 }

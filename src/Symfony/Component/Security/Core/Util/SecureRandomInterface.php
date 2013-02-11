@@ -25,5 +25,5 @@ interface SecureRandomInterface
      *
      * @return string
      */
-    public function nextBytes($nbBytes);
+    function nextBytes($nbBytes);
 }

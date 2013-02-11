@@ -26,5 +26,5 @@ interface ClassMetadataFactoryInterface
      *
      * @return ClassMetadata The class metadata instance.
      */
-    public function getClassMetadata($class);
+    function getClassMetadata($class);
 }

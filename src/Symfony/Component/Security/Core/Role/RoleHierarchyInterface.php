@@ -28,5 +28,5 @@ interface RoleHierarchyInterface
      *
      * @return RoleInterface[] An array of all reachable roles
      */
-    public function getReachableRoles(array $roles);
+    function getReachableRoles(array $roles);
 }

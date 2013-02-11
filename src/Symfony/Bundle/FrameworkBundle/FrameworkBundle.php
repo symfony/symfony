@@ -26,6 +26,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDum
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtractorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FragmentRendererPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ServiceReplacementsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Scope;
@@ -54,6 +55,7 @@ class FrameworkBundle extends Bundle
 
         $container->addScope(new Scope('request'));
 
+        $container->addCompilerPass(new ServiceReplacementsPass());
         $container->addCompilerPass(new RoutingResolverPass());
         $container->addCompilerPass(new ProfilerPass());
         $container->addCompilerPass(new RegisterKernelListenersPass(), PassConfig::TYPE_AFTER_REMOVING);

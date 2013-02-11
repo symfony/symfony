@@ -244,6 +244,29 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->dispatch('test');
         $this->assertSame($this->dispatcher, $dispatcher);
     }
+
+    /**
+     * @see https://bugs.php.net/bug.php?id=62976
+     *
+     * This bug affects:
+     *  - The PHP 5.3 branch for versions < 5.3.18
+     *  - The PHP 5.4 branch for versions < 5.4.8
+     *  - The PHP 5.5 branch is not affected
+     */
+    public function testWorkaroundForPhpBug62976()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener('bug.62976', new CallableClass());
+        $dispatcher->removeListener('bug.62976', function() {});
+        $this->assertTrue($dispatcher->hasListeners('bug.62976'));
+    }
+}
+
+class CallableClass
+{
+    public function __invoke()
+    {
+    }
 }
 
 class TestEventListener

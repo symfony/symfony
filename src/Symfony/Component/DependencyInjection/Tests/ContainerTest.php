@@ -261,6 +261,38 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->has('a'));
     }
 
+    public function testEnterScopeRecursivelyWithInactiveChildScopes()
+    {
+        $container = new Container();
+        $container->addScope(new Scope('foo'));
+        $container->addScope(new Scope('bar', 'foo'));
+
+        $this->assertFalse($container->isScopeActive('foo'));
+
+        $container->enterScope('foo');
+
+        $this->assertTrue($container->isScopeActive('foo'));
+        $this->assertFalse($container->isScopeActive('bar'));
+        $this->assertFalse($container->has('a'));
+
+        $a = new \stdClass();
+        $container->set('a', $a, 'foo');
+
+        $services = $this->getField($container, 'scopedServices');
+        $this->assertTrue(isset($services['foo']['a']));
+        $this->assertSame($a, $services['foo']['a']);
+
+        $this->assertTrue($container->has('a'));
+        $container->enterScope('foo');
+
+        $services = $this->getField($container, 'scopedServices');
+        $this->assertFalse(isset($services['a']));
+
+        $this->assertTrue($container->isScopeActive('foo'));
+        $this->assertFalse($container->isScopeActive('bar'));
+        $this->assertFalse($container->has('a'));
+    }
+
     public function testLeaveScopeNotActive()
     {
         $container = new Container();

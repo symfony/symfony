@@ -106,7 +106,7 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         foreach ($this->listeners[$eventName] as $priority => $listeners) {
-            if (false !== ($key = array_search($listener, $listeners))) {
+            if (false !== ($key = array_search($listener, $listeners, true))) {
                 unset($this->listeners[$eventName][$priority][$key], $this->sorted[$eventName]);
             }
         }

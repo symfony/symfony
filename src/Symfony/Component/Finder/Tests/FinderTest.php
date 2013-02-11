@@ -309,6 +309,33 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $iterator = $finder->files()->name('*.php')->depth('< 1')->in(array(self::$tmpDir, __DIR__))->getIterator();
 
         $this->assertIterator(array(self::$tmpDir.DIRECTORY_SEPARATOR.'test.php', __DIR__.DIRECTORY_SEPARATOR.'FinderTest.php'), $iterator);
+
+        try {
+            $finder = $this->buildFinder($adapter);
+            $iterator = $finder->files()->name('*.txt')->in('phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar');
+
+            $this->assertIterator(array(
+                'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'dolor.txt',
+                'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'ipsum.txt',
+                'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'lorem.txt',
+            ), $iterator);
+        } catch (\Exception $e) {
+            if ($adapter instanceof \Symfony\Component\Finder\Adapter\PhpAdapter) {
+                $this->fail('->in() should not fail on PHP streams');
+            }
+        }
+    }
+
+    public function testInDefaultChain()
+    {
+        $finder = Finder::create();
+        $iterator = $finder->files()->name('*.txt')->in('phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar');
+
+        $this->assertIterator(array(
+            'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'dolor.txt',
+            'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'ipsum.txt',
+            'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'lorem.txt',
+        ), $iterator);
     }
 
     /**

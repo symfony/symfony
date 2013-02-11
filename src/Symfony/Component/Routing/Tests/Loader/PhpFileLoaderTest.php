@@ -40,13 +40,16 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         $routeCollection = $loader->load('validpattern.php');
         $routes = $routeCollection->all();
 
-        $this->assertEquals(1, count($routes), 'One route is loaded');
+        $this->assertCount(2, $routes, 'Two routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-        $route = $routes['blog_show'];
-        $this->assertEquals('/blog/{slug}', $route->getPath());
-        $this->assertEquals('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
-        $this->assertEquals('GET', $route->getRequirement('_method'));
-        $this->assertEquals('{locale}.example.com', $route->getHost());
-        $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
+
+        foreach ($routes as $route) {
+            $this->assertEquals('/blog/{slug}', $route->getPath());
+            $this->assertEquals('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
+            $this->assertEquals('GET', $route->getRequirement('_method'));
+            $this->assertEquals('https', $route->getRequirement('_scheme'));
+            $this->assertEquals('{locale}.example.com', $route->getHost());
+            $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
+        }
     }
 }

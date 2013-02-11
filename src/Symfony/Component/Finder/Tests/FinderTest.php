@@ -321,7 +321,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             ), $iterator);
         } catch (\Exception $e) {
             if ($adapter instanceof \Symfony\Component\Finder\Adapter\PhpAdapter) {
-                $this->fail('->in() should not fail on PHP streams');
+                $this->fail('->in() should not fail on PHP streams if we use the PhpAdapter');
             }
         }
     }

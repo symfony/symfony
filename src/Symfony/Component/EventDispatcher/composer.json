@@ -19,7 +19,7 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/dependency-injection": "2.2.*"
+        "symfony/dependency-injection": "~2.0"
     },
     "suggest": {
         "symfony/dependency-injection": "2.2.*",

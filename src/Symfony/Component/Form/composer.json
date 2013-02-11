@@ -17,14 +17,14 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/event-dispatcher": "2.2.*",
-        "symfony/locale": "2.2.*",
-        "symfony/options-resolver": "2.2.*",
-        "symfony/property-access": "2.2.*"
+        "symfony/event-dispatcher": "~2.1",
+        "symfony/locale": "~2.0",
+        "symfony/options-resolver": ">=2.1,<2.3-dev",
+        "symfony/property-access": ">=2.2,<2.3-dev"
     },
     "require-dev": {
-        "symfony/validator": "2.2.*",
-        "symfony/http-foundation": "2.2.*"
+        "symfony/validator": ">=2.2,<2.3-dev",
+        "symfony/http-foundation": ">=2.1,<2.3-dev"
     },
     "suggest": {
         "symfony/validator": "2.2.*",

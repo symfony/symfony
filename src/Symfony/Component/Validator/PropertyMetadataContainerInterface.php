@@ -19,6 +19,15 @@ namespace Symfony\Component\Validator;
 interface PropertyMetadataContainerInterface
 {
     /**
+     * Check if there's any metadata attached to the given named property.
+     *
+     * @param string $property The property name.
+     *
+     * @return Boolean
+     */
+    public function hasPropertyMetadata($property);
+
+    /**
      * Returns all metadata instances for the given named property.
      *
      * If your implementation does not support properties, simply throw an

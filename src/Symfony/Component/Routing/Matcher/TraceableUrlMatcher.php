@@ -70,6 +70,14 @@ class TraceableUrlMatcher extends UrlMatcher
                 continue;
             }
 
+            // check host requirement
+            $hostMatches = array();
+            if ($compiledRoute->getHostRegex() && !preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches)) {
+                $this->addTrace(sprintf('Host "%s" does not match the requirement ("%s")', $this->context->getHost(), $route->getHost()), self::ROUTE_ALMOST_MATCHES, $name, $route);
+
+                return true;
+            }
+
             // check HTTP method requirement
             if ($req = $route->getRequirement('_method')) {
                 // HEAD and GET are equivalent as per RFC

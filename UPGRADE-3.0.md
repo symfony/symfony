@@ -1,6 +1,23 @@
 UPGRADE FROM 2.x to 3.0
 =======================
 
+### ClassLoader
+
+ * The `UniversalClassLoader` class has been removed in favor of `ClassLoader`. The only difference is that some method
+    names are different:
+
+      * `registerNamespaces()` -> `addPrefixes()`
+      * `registerPrefixes()` -> `addPrefixes()`
+      * `registerNamespaces()` -> `addPrefix()`
+      * `registerPrefixes()` -> `addPrefix()`
+      * `getNamespaces()` -> `getPrefixes()`
+      * `getNamespaceFallbacks()` -> `getFallbackDirs()`
+      * `getPrefixFallbacks()` -> `getFallbackDirs()`
+
+ * The `DebugUniversalClassLoader` class has been removed in favor of
+   `DebugClassLoader`. The difference is that the constructor now takes a
+   loader to wrap.
+
 ### HttpKernel
 
  * The `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed in

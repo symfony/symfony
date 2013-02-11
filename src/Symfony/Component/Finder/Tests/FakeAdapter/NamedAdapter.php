@@ -54,4 +54,12 @@ class NamedAdapter extends AbstractAdapter
     {
         return true;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function canBeUsedOnPath($path)
+    {
+        return true;
+    }
 }

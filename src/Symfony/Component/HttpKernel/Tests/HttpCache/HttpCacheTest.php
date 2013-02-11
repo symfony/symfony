@@ -1034,4 +1034,32 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Hello World!', $this->response->getContent());
         $this->assertEquals(12, $this->response->headers->get('Content-Length'));
     }
+
+    public function testEsiCacheRemoveValidationHeadersIfEmbeddedResponses()
+    {
+        $time = new \DateTime;
+
+        $responses = array(
+            array(
+                'status'  => 200,
+                'body'    => '<esi:include src="/hey" />',
+                'headers' => array(
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'ETag' => 'hey',
+                    'Last-Modified' => $time->format(DATE_RFC2822),
+                ),
+            ),
+            array(
+                'status'  => 200,
+                'body'    => 'Hey!',
+                'headers' => array(),
+            ),
+        );
+
+        $this->setNextResponses($responses);
+
+        $this->request('GET', '/', array(), array(), true);
+        $this->assertNull($this->response->getETag());
+        $this->assertNull($this->response->getLastModified());
+    }
 }

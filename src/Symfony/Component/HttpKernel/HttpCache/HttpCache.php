@@ -205,10 +205,10 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         }
 
         if (null !== $this->esi) {
-            $this->esiCacheStrategy->add($response);
-
             if (HttpKernelInterface::MASTER_REQUEST === $type) {
                 $this->esiCacheStrategy->update($response);
+            } else {
+                $this->esiCacheStrategy->add($response);
             }
         }
 

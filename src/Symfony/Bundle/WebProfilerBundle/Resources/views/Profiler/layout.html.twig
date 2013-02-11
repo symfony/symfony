@@ -29,7 +29,9 @@
 
                     <div id="collector-content">
                         {% include '@WebProfiler/Profiler/base_js.html.twig' %}
-                        {% block panel '' %}
+                        <div id="panel-content">
+                            {% block panel '' %}
+                        </div>
                     </div>
                 </div>
                 <div id="navigation">
@@ -38,7 +40,7 @@
                             {% for name, template in templates %}
                                 {% set menu %}{{ template.renderBlock('menu', { 'collector': profile.getcollector(name)}) }}{% endset %}
                                 {% if menu != '' %}
-                                    <li class="{{ name }}{% if name == panel %} selected{% endif %}">
+                                    <li class="{{ name }}{% if name == panel %} selected{% endif %}" id="panel-link-{{ name }}">
                                         <a href="{{ path('_profiler', { 'token': token, 'panel': name }) }}">{{ menu|raw }}</a>
                                     </li>
                                 {% endif %}
@@ -131,6 +133,49 @@
                 }
             }
         }, 25);
+
+        var selectedPanel = document.getElementById('panel-link-{{ panel }}');
+
+        Sfjs.request(
+            '{{ path("_profiler_panels", { "token": token }) }}',
+            function(xhr, el) {
+                history.replaceState({ panel: '{{ panel }}' }, 'Profiler', window.location.href);
+
+                window.onpopstate = function(event) {
+                    if (event.state === null) {
+                        return true;
+                    }
+
+                    var link = document.getElementById('panel-link-' + event.state['panel']);
+                    switchContent.call(link);
+                };
+
+                function switchContent() {
+                    Sfjs.removeClass(selectedPanel, 'selected');
+                    selectedPanel = this;
+                    Sfjs.addClass(selectedPanel, 'selected');
+
+                    panelContent.innerHTML = panels[this.panelName];
+                }
+
+                function linkHandler() {
+                    switchContent.call(this);
+                    history.pushState({ panel: this.panelName }, 'Profiler', this.firstElementChild.href);
+                    return false;
+                }
+
+                var panels = JSON.parse(xhr.responseText);
+                var panelContent = document.getElementById('panel-content');
+
+                for (var name in panels) {
+                    var link = document.getElementById('panel-link-' + name);
+                    console.log(name);
+                    link.panelName = name;
+
+                    link.onclick = linkHandler;
+                }
+            }
+        );
 
     //]]></script>
 {% endblock %}

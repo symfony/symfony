@@ -64,15 +64,22 @@ class MockArraySessionStorage implements SessionStorageInterface
     protected $bags;
 
     /**
+     * @var Boolean
+     */
+    protected $autoStart;
+
+    /**
      * Constructor.
      *
-     * @param string      $name    Session name
-     * @param MetadataBag $metaBag MetadataBag instance.
+     * @param string      $name      Session name.
+     * @param MetadataBag $metaBag   MetadataBag instance.
+     * @param Boolean     $autoStart Autostart flag.
      */
-    public function __construct($name = 'MOCKSESSID', MetadataBag $metaBag = null)
+    public function __construct($name = 'MOCKSESSID', MetadataBag $metaBag = null, $autoStart = true)
     {
         $this->name = $name;
         $this->setMetadataBag($metaBag);
+        $this->autoStart = $autoStart;
     }
 
     /**
@@ -200,8 +207,10 @@ class MockArraySessionStorage implements SessionStorageInterface
             throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered.', $name));
         }
 
-        if (!$this->started) {
+        if (!$this->started && $this->autoStart) {
             $this->start();
+        } elseif (!$this->started && !$this->autoStart) {
+            throw new \RuntimeException('The session has not been started yet.');
         }
 
         return $this->bags[$name];

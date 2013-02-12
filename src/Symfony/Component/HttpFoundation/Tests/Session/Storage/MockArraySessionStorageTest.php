@@ -97,10 +97,29 @@ class MockArraySessionStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testUnstartedSave()
     {
         $this->storage->save();
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testAutoStartException()
+    {
+        $storage = new MockArraySessionStorage('MOCKSESSID', null, false);
+        $storage->registerBag(new AttributeBag);
+        $this->assertFalse($storage->isStarted());
+        $storage->getBag('attributes');
+    }
+
+    public function testAutoStart()
+    {
+        $storage = new MockArraySessionStorage();
+        $storage->registerBag(new AttributeBag);
+        $storage->getBag('attributes');
+        $this->assertTrue($storage->isStarted());
     }
 }

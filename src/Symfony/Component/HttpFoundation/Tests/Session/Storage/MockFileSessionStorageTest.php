@@ -28,7 +28,7 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
     private $sessionDir;
 
     /**
-     * @var FileMockSessionStorage
+     * @var MockFileSessionStorage
      */
     protected $storage;
 
@@ -107,7 +107,7 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testSaveWithoutStart()
     {
@@ -122,5 +122,24 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage->registerBag(new AttributeBag());
 
         return $storage;
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testAutoStartException()
+    {
+        $storage = new MockFileSessionStorage($this->sessionDir, 'MOCKSESSID', null, false);
+        $storage->registerBag(new AttributeBag);
+        $this->assertFalse($storage->isStarted());
+        $storage->getBag('attributes');
+    }
+
+    public function testAutoStart()
+    {
+        $storage = new MockFileSessionStorage($this->sessionDir);
+        $storage->registerBag(new AttributeBag);
+        $storage->getBag('attributes');
+        $this->assertTrue($storage->isStarted());
     }
 }

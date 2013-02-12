@@ -154,4 +154,23 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage->setSaveHandler(new NullSessionHandler());
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
     }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testAutoStartException()
+    {
+        $storage = new NativeSessionStorage(array(), null, null, false);
+        $storage->registerBag(new AttributeBag);
+        $this->assertFalse($storage->isStarted());
+        $storage->getBag('attributes');
+    }
+
+    public function testAutoStart()
+    {
+        $storage = new NativeSessionStorage();
+        $storage->registerBag(new AttributeBag);
+        $storage->getBag('attributes');
+        $this->assertTrue($storage->isStarted());
+    }
 }

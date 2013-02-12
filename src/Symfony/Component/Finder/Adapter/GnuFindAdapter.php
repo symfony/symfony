@@ -70,9 +70,9 @@ class GnuFindAdapter extends AbstractFindAdapter
     /**
      * {@inheritdoc}
      */
-    protected function canBeUsed()
+    protected function canBeUsed($dir)
     {
-        return $this->shell->getType() === Shell::TYPE_UNIX && parent::canBeUsed();
+        return $this->shell->getType() === Shell::TYPE_UNIX && parent::canBeUsed($dir);
     }
 
     /**

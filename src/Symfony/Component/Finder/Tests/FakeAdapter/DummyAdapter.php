@@ -50,7 +50,7 @@ class DummyAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function canBeUsed()
+    protected function canBeUsed($dir)
     {
         return true;
     }

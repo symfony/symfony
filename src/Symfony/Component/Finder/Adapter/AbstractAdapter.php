@@ -43,6 +43,7 @@ abstract class AbstractAdapter implements AdapterInterface
     public function isSupported($dir)
     {
         $name = $this->getName();
+        $dir  = (string) $dir;
 
         if (!array_key_exists($name, self::$areSupportedAdapters)) {
             self::$areSupportedAdapters[$name] = $this->canBeUsed();

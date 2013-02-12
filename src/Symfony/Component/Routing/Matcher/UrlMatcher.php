@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * UrlMatcher matches URL based on a set of routes.
@@ -24,14 +26,25 @@ use Symfony\Component\Routing\Route;
  *
  * @api
  */
-class UrlMatcher implements UrlMatcherInterface
+class UrlMatcher implements RequestMatcherInterface, RequestContextAwareInterface
 {
     const REQUIREMENT_MATCH     = 0;
     const REQUIREMENT_MISMATCH  = 1;
     const ROUTE_MATCH           = 2;
 
     /**
-     * @var RequestContext
+     * @var RouteCollection
+     */
+    private $routes;
+
+    /**
+     * The current Request that is matched. When not given, use the RequestContext to access metadata like the HTTP method.
+     * @var Request|null
+     */
+    protected $request;
+
+    /**
+     * @var RequestContext|null
      */
     protected $context;
 
@@ -41,19 +54,14 @@ class UrlMatcher implements UrlMatcherInterface
     protected $allow = array();
 
     /**
-     * @var RouteCollection
-     */
-    protected $routes;
-
-    /**
      * Constructor.
      *
-     * @param RouteCollection $routes  A RouteCollection instance
-     * @param RequestContext  $context The context
+     * @param RouteCollection     $routes  A RouteCollection instance
+     * @param RequestContext|null $context An optional RequestContext used when matching a path only
      *
      * @api
      */
-    public function __construct(RouteCollection $routes, RequestContext $context)
+    public function __construct(RouteCollection $routes, RequestContext $context = null)
     {
         $this->routes = $routes;
         $this->context = $context;
@@ -82,7 +90,19 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $this->allow = array();
 
-        if ($ret = $this->matchCollection(rawurldecode($pathinfo), $this->routes)) {
+        if ($pathinfo instanceof Request) {
+            $this->request = $pathinfo;
+            $ret = $this->matchCollection(rawurldecode($this->request->getPathInfo()), $this->routes);
+        } else {
+            if (null === $this->context) {
+                throw new \LogicException('When matching a path, the request context must be set.');
+            }
+
+            $this->request = null;
+            $ret = $this->matchCollection(rawurldecode($pathinfo), $this->routes);
+        }
+
+        if ($ret) {
             return $ret;
         }
 
@@ -124,7 +144,8 @@ class UrlMatcher implements UrlMatcherInterface
             // check HTTP method requirement
             if ($req = $route->getRequirement('_method')) {
                 // HEAD and GET are equivalent as per RFC
-                if ('HEAD' === $method = $this->context->getMethod()) {
+                $method = $this->request ? $this->request->getMethod() : $this->context->getMethod();
+                if ('HEAD' === $method) {
                     $method = 'GET';
                 }
 
@@ -181,8 +202,9 @@ class UrlMatcher implements UrlMatcherInterface
     protected function handleRouteRequirements($pathinfo, $name, Route $route)
     {
         // check HTTP scheme requirement
-        $scheme = $route->getRequirement('_scheme');
-        $status = $scheme && $scheme !== $this->context->getScheme() ? self::REQUIREMENT_MISMATCH : self::REQUIREMENT_MATCH;
+        $schemeRequirement = $route->getRequirement('_scheme');
+        $scheme = $this->request ? $this->request->getScheme() : $this->context->getScheme();
+        $status = $schemeRequirement && $schemeRequirement !== $scheme ? self::REQUIREMENT_MISMATCH : self::REQUIREMENT_MATCH;
 
         return array($status, null);
     }

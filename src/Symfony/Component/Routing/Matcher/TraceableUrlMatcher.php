@@ -29,6 +29,13 @@ class TraceableUrlMatcher extends UrlMatcher
 
     protected $traces;
 
+    /**
+     * Returns traces about the matching process.
+     *
+     * @param string|Request $pathinfo The pathinfo or a Request instance
+     *
+     * @return array The traces
+     */
     public function getTraces($pathinfo)
     {
         $this->traces = array();

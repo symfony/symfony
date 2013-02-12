@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -69,16 +70,13 @@ EOF
         if ($name) {
             $this->outputRoute($output, $name);
         } else {
-            $this->outputRoutes($output);
+            $this->outputRoutes($output, $this->getContainer()->get('router')->getRouteCollection());
         }
     }
 
-    protected function outputRoutes(OutputInterface $output, $routes = null)
+    protected function outputRoutes(OutputInterface $output, RouteCollection $routes)
     {
-        if (null === $routes) {
-            $routes = $this->getContainer()->get('router')->getRouteCollection()->all();
-        }
-
+        $routes = $routes->all();
         $output->writeln($this->getHelper('formatter')->formatSection('router', 'Current routes'));
 
         $maxName = strlen('name');

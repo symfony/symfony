@@ -22,15 +22,7 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 class ApacheUrlMatcher extends UrlMatcher
 {
     /**
-     * Tries to match a URL based on Apache mod_rewrite matching.
-     *
-     * Returns false if no route matches the URL.
-     *
-     * @param string $pathinfo The pathinfo to be parsed
-     *
-     * @return array An array of parameters
-     *
-     * @throws MethodNotAllowedException If the current method is not allowed
+     * {@inheritdoc}
      */
     public function match($pathinfo)
     {

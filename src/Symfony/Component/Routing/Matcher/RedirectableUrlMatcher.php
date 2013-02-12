@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -34,6 +36,17 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
             }
 
             try {
+                if ($pathinfo instanceof Request) {
+                    // there is no way to change the path of the Request, so we need to
+                    // make a context of it and use path matching
+                    if (null === $context = $this->getContext()) {
+                        $context = new RequestContext();
+                        $this->setContext($context);
+                    }
+                    $context->fromRequest($pathinfo);
+                    $pathinfo = $pathinfo->getPathInfo();
+                }
+
                 parent::match($pathinfo.'/');
 
                 return $this->redirect($pathinfo.'/', null);

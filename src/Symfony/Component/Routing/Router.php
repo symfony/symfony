@@ -16,7 +16,9 @@ use Symfony\Component\Config\ConfigCache;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
+use Symfony\Component\Routing\RequestContextAwareInterface;
 
 /**
  * The Router class is an example of the integration of all pieces of the
@@ -24,7 +26,7 @@ use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Router implements RouterInterface
+class Router implements RouterInterface, RequestMatcherInterface, RequestContextAwareInterface
 {
     /**
      * @var UrlMatcherInterface|null
@@ -69,11 +71,11 @@ class Router implements RouterInterface
     /**
      * Constructor.
      *
-     * @param LoaderInterface $loader   A LoaderInterface instance
-     * @param mixed           $resource The main resource to load
-     * @param array           $options  An array of options
-     * @param RequestContext  $context  The context
-     * @param LoggerInterface $logger   A logger instance
+     * @param LoaderInterface      $loader   A LoaderInterface instance
+     * @param mixed                $resource The main resource to load
+     * @param array                $options  An array of options
+     * @param RequestContext|null  $context  The context
+     * @param LoggerInterface|null $logger   A logger instance
      */
     public function __construct(LoaderInterface $loader, $resource, array $options = array(), RequestContext $context = null, LoggerInterface $logger = null)
     {

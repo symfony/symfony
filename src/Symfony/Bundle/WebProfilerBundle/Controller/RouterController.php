@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
-use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * RouterController.
@@ -26,18 +26,18 @@ class RouterController
 {
     private $profiler;
     private $twig;
-    private $matcher;
+    private $router;
     private $routes;
 
-    public function __construct(Profiler $profiler, \Twig_Environment $twig, UrlMatcherInterface $matcher = null, $routes = null)
+    public function __construct(Profiler $profiler, \Twig_Environment $twig, RouterInterface $router = null, RouteCollection $routes = null)
     {
         $this->profiler = $profiler;
         $this->twig = $twig;
-        $this->matcher = $matcher;
+        $this->router = $router;
         $this->routes = $routes;
 
-        if (null === $this->routes && null !== $this->matcher && $this->matcher instanceof RouterInterface) {
-            $this->routes = $matcher->getRouteCollection();
+        if (null === $this->routes && null !== $this->router) {
+            $this->routes = $this->router->getRouteCollection();
         }
     }
 
@@ -58,16 +58,13 @@ class RouterController
 
         $profile = $this->profiler->loadProfile($token);
 
-        $context = $this->matcher->getContext();
-        $context->setMethod($profile->getMethod());
-        $matcher = new TraceableUrlMatcher($this->routes, $context);
-
+        $matcher = new TraceableUrlMatcher($this->routes);
         $request = $profile->getCollector('request');
 
         return new Response($this->twig->render('@WebProfiler/Router/panel.html.twig', array(
             'request' => $request,
             'router'  => $profile->getCollector('router'),
-            'traces'  => $matcher->getTraces($request->getPathInfo()),
+            'traces'  => $matcher->getTraces($request),
         )));
     }
 }

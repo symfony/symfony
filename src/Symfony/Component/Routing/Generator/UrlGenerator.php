@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\Routing\Generator;
 
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Exception\InvalidParameterException;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * UrlGenerator can generate a URL or a path for any route in the RouteCollection
@@ -27,7 +31,7 @@ use Psr\Log\LoggerInterface;
  *
  * @api
  */
-class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
+class UrlGenerator implements UrlGeneratorInterface, RequestContextAwareInterface, ConfigurableRequirementsInterface
 {
     /**
      * @var RouteCollection
@@ -35,7 +39,14 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     protected $routes;
 
     /**
-     * @var RequestContext
+     * The current Request on which the generated URL is based. When not given,
+     * use the RequestContext to access metadata like the host.
+     * @var Request|null
+     */
+    protected $request;
+
+    /**
+     * @var RequestContext|null
      */
     protected $context;
 
@@ -80,16 +91,20 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     /**
      * Constructor.
      *
-     * @param RouteCollection      $routes  A RouteCollection instance
-     * @param RequestContext       $context The context
-     * @param LoggerInterface|null $logger  A logger instance
+     * @param RouteCollection        $routes  A RouteCollection instance
+     * @param Request|RequestContext $context The context
+     * @param LoggerInterface|null   $logger  A logger instance
      *
      * @api
      */
-    public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null)
+    public function __construct(RouteCollection $routes, $context, LoggerInterface $logger = null)
     {
         $this->routes = $routes;
-        $this->context = $context;
+        if ($context instanceof Request) {
+            $this->request = $context;
+        } else {
+            $this->context = $context;
+        }
         $this->logger = $logger;
     }
 
@@ -107,6 +122,26 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     public function getContext()
     {
         return $this->context;
+    }
+
+    /**
+     * Sets the request.
+     *
+     * @param Request $request The Request
+     */
+    public function setRequest(Request $request)
+    {
+        $this->request = $request;
+    }
+
+    /**
+     * Gets the request.
+     *
+     * @return Request|null The Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 
     /**
@@ -148,7 +183,11 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     protected function doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens)
     {
         $variables = array_flip($variables);
-        $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
+        if (null !== $this->context) {
+            $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
+        } else {
+            $mergedParams = array_replace($defaults, $parameters);
+        }
 
         // all params must be given
         if ($diff = array_diff_key($variables, $mergedParams)) {
@@ -202,8 +241,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         $schemeAuthority = '';
-        if ($host = $this->context->getHost()) {
-            $scheme = $this->context->getScheme();
+        $host = $this->request ? $this->request->getHost() : $this->context->getHost();
+        if ($host) {
+            $scheme = $this->request ? $this->request->getScheme() : $this->context->getScheme();
             if (isset($requirements['_scheme']) && ($req = strtolower($requirements['_scheme'])) && $scheme !== $req) {
                 $referenceType = self::ABSOLUTE_URL;
                 $scheme = $req;
@@ -243,10 +283,17 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
             if (self::ABSOLUTE_URL === $referenceType || self::NETWORK_PATH === $referenceType) {
                 $port = '';
-                if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
-                    $port = ':'.$this->context->getHttpPort();
-                } elseif ('https' === $scheme && 443 != $this->context->getHttpsPort()) {
-                    $port = ':'.$this->context->getHttpsPort();
+
+                if ('http' === $scheme) {
+                    $httpPort = $this->request && !$this->request->isSecure() ? $this->request->getPort() : ($this->context ? $this->context->getHttpPort() : 80);
+                    if (80 != $httpPort) {
+                        $port = ':'.$httpPort;
+                    }
+                } elseif ('https' === $scheme) {
+                    $httpsPort = $this->request && $this->request->isSecure() ? $this->request->getPort() : ($this->context ? $this->context->getHttpsPort() : 443);
+                    if (443 != $httpsPort) {
+                        $port = ':'.$httpsPort;
+                    }
                 }
 
                 $schemeAuthority = self::NETWORK_PATH === $referenceType ? '//' : "$scheme://";
@@ -255,9 +302,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         if (self::RELATIVE_PATH === $referenceType) {
-            $url = self::getRelativePath($this->context->getPathInfo(), $url);
+            $url = self::getRelativePath($this->request ? $this->request->getPathInfo() : $this->context->getPathInfo(), $url);
         } else {
-            $url = $schemeAuthority.$this->context->getBaseUrl().$url;
+            $url = $schemeAuthority . ($this->request ? $this->request->getBaseUrl() : $this->context->getBaseUrl()) . $url;
         }
 
         // add a query string if needed

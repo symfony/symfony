@@ -31,31 +31,25 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class RouterListener implements EventSubscriberInterface
 {
+    /**
+     * @var UrlMatcherInterface
+     */
     private $matcher;
-    private $context;
+
+    /**
+     * @var LoggerInterface|null
+     */
     private $logger;
 
     /**
      * Constructor.
      *
-     * @param UrlMatcherInterface|RequestMatcherInterface $matcher The Url or Request matcher
-     * @param RequestContext|null                         $context The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
-     * @param LoggerInterface|null                        $logger  The logger
-     *
-     * @throws \InvalidArgumentException
+     * @param UrlMatcherInterface  $matcher The Url or Request matcher
+     * @param LoggerInterface|null $logger  The logger
      */
-    public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null)
+    public function __construct(UrlMatcherInterface $matcher, LoggerInterface $logger = null)
     {
-        if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
-            throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
-        }
-
-        if (null === $context && !$matcher instanceof RequestContextAwareInterface) {
-            throw new \InvalidArgumentException('You must either pass a RequestContext or the matcher must implement RequestContextAwareInterface.');
-        }
-
         $this->matcher = $matcher;
-        $this->context = $context ?: $matcher->getContext();
         $this->logger = $logger;
     }
 
@@ -63,8 +57,10 @@ class RouterListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        // initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
-        $this->context->fromRequest($request);
+        if ($this->matcher instanceof RequestContextAwareInterface && null !== $context = $this->matcher->getContext()) {
+            // initialize the context that might also be used by the generator (assuming matcher and generator share the same context instance)
+            $context->fromRequest($request);
+        }
 
         if ($request->attributes->has('_controller')) {
             // routing is already done
@@ -75,7 +71,7 @@ class RouterListener implements EventSubscriberInterface
         try {
             // matching a request is more powerful than matching a URL path + context, so try that first
             if ($this->matcher instanceof RequestMatcherInterface) {
-                $parameters = $this->matcher->matchRequest($request);
+                $parameters = $this->matcher->match($request);
             } else {
                 $parameters = $this->matcher->match($request->getPathInfo());
             }

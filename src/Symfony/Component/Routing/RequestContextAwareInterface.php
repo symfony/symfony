@@ -28,7 +28,7 @@ interface RequestContextAwareInterface
     /**
      * Gets the request context.
      *
-     * @return RequestContext The context
+     * @return RequestContext|null The context or null when no context has been set
      *
      * @api
      */

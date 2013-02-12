@@ -16,6 +16,7 @@ use Symfony\Component\Finder\Adapter;
 use Symfony\Component\Finder\Tests\FakeAdapter;
 use Symfony\Component\Finder\Adapter\AbstractFindAdapter;
 use Symfony\Component\Finder\Adapter\PhpAdapter;
+use Symfony\Component\Finder\Adapter\GnuFindAdapter;
 
 class FinderTest extends Iterator\RealIteratorTestCase
 {
@@ -311,47 +312,42 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $iterator = $finder->files()->name('*.php')->depth('< 1')->in(array(self::$tmpDir, __DIR__))->getIterator();
 
         $this->assertIterator(array(self::$tmpDir.DIRECTORY_SEPARATOR.'test.php', __DIR__.DIRECTORY_SEPARATOR.'FinderTest.php'), $iterator);
-
-        if ($adapter instanceof AbstractFindAdapter) {
-            $this->assertFalse($adapter->isSupported('phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'));
-            $this->assertTrue($adapter->isSupported(self::$tmpDir.DIRECTORY_SEPARATOR.'foo'));
-        }
-
-        if ($adapter instanceof PhpAdapter) {
-            $this->assertTrue($adapter->isSupported('phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'));
-            $this->assertTrue($adapter->isSupported(self::$tmpDir.DIRECTORY_SEPARATOR.'foo'));
-        }
     }
 
-    public function testInPhpStreamWithDefaultAdapterChain()
+    /**
+     * @dataProvider getMixedAdapterChainFinderTestData
+     */
+    public function testInWithStreamsAndRealpaths($finder)
     {
-        $finder = Finder::create();
-        $iterator = $finder->files()->name('*.txt')->in('phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar');
-
-        $this->assertIterator(array(
-            'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'dolor.txt',
-            'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'ipsum.txt',
-            'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'lorem.txt',
-        ), $iterator);
-    }
-
-    public function testInWithMixedSources()
-    {
-        $finder = Finder::create();
         $iterator = $finder->files()
             ->name('*.txt')
             ->name('*.dat')
-            ->in('phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar')
-            ->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'A');
+            ->in($this->toAbsoluteFixtures(array('test.phar', 'A')));
 
-        $this->assertIterator(array(
-            __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
-            __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'ab.dat',
-            __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'a.dat',
-            'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'dolor.txt',
-            'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'ipsum.txt',
-            'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'lorem.txt',
-        ), $iterator);
+        try {
+            $this->assertIterator($this->toAbsoluteFixtures(array(
+                'A/B/C/abc.dat',
+                'A/B/ab.dat',
+                'A/a.dat',
+                'test.phar/dolor.txt',
+                'test.phar/ipsum.txt',
+                'test.phar/lorem.txt'
+            )), $iterator);
+
+        } catch(\Exception $e) {
+            $this->assertInstanceOf('RuntimeException', $e, 'No supported adapter found.');
+
+            // No supported adapter found, its an native one
+            $adapters = $finder->getAdapters();
+            $adapter  = array_shift($adapters);
+            $source   = $this->toAbsoluteFixtures(array(
+                'test.phar/dolor.txt',
+                'A/B/ab.dat'
+            ));
+
+            $this->assertFalse($adapter->isSupported($source[0]));
+            $this->assertTrue($adapter->isSupported($source[1]));
+        }
     }
 
     /**
@@ -550,7 +546,11 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $f = array();
         foreach ($files as $file) {
-            $f[] = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$file;
+            $prefix = '';
+            if (false !== strpos($file, 'phar')) {
+                $prefix = 'phar://';
+            }
+            $f[] = $prefix.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$file;
         }
 
         return $f;
@@ -665,6 +665,21 @@ class FinderTest extends Iterator\RealIteratorTestCase
             ->addAdapter(new FakeAdapter\DummyAdapter($iterator), 1);
 
         $this->assertIterator($filenames, $finder->in(sys_get_temp_dir())->getIterator());
+    }
+
+    public function getMixedAdapterChainFinderTestData()
+    {
+        return array_map(
+            function ($finder) { return array($finder); },
+            array(
+                // Default adapter chain
+                Finder::create(),
+                // PHP adapter only
+                $this->buildFinder(new PhpAdapter()),
+                // Native adapters only
+                $this->buildFinder(new GnuFindAdapter())
+            )
+        );
     }
 
     public function getAdaptersTestData()

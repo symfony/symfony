@@ -123,9 +123,17 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function canBeUsed($dir)
+    protected function canBeUsed()
     {
-        return $this->shell->testCommand('find') && (false !== realpath($dir));
+        return $this->shell->testCommand('find');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function canBeUsedOnPath($dir)
+    {
+        return false !== realpath($dir);
     }
 
     /**

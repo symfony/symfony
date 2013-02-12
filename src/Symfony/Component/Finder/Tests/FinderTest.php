@@ -764,8 +764,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 new Adapter\GnuFindAdapter(),
                 new Adapter\PhpAdapter()
             ),
-            function (Adapter\AdapterInterface $adapter)  {
-                return $adapter->isSupported(self::$tmpDir);
+            function (Adapter\AdapterInterface $adapter) {
+                return $adapter->isSupported(realpath(sys_get_temp_dir().'/symfony2_finder'));
             }
         );
     }

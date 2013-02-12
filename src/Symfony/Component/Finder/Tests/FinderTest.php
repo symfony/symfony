@@ -333,6 +333,25 @@ class FinderTest extends Iterator\RealIteratorTestCase
         ), $iterator);
     }
 
+    public function testInWithMixedSources()
+    {
+        $finder = Finder::create();
+        $iterator = $finder->files()
+            ->name('*.txt')
+            ->name('*.dat')
+            ->in('phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar')
+            ->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'A');
+
+        $this->assertIterator(array(
+            __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
+            __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'ab.dat',
+            __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'a.dat',
+            'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'dolor.txt',
+            'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'ipsum.txt',
+            'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'lorem.txt',
+        ), $iterator);
+    }
+
     /**
      * @dataProvider getAdaptersTestData
      */

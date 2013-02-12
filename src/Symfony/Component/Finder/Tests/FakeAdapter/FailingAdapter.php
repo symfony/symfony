@@ -38,7 +38,15 @@ class FailingAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function canBeUsed($dir)
+    protected function canBeUsed()
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function canBeUsedOnPath($dir)
     {
         return true;
     }

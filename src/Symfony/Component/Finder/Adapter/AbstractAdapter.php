@@ -34,7 +34,8 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $paths       = array();
     protected $notPaths    = array();
 
-    private static $areSupported = array();
+    private static $areSupportedAdapters = array();
+    private static $areSupportedPaths    = array();
 
     /**
      * {@inheritDoc}
@@ -43,15 +44,24 @@ abstract class AbstractAdapter implements AdapterInterface
     {
         $name = $this->getName();
 
-        if (!array_key_exists($dir, self::$areSupported)) {
-            self::$areSupported[$dir] = array();
+        if (!array_key_exists($name, self::$areSupportedAdapters)) {
+            self::$areSupportedAdapters[$name] = $this->canBeUsed();
         }
 
-        if (!array_key_exists($name, self::$areSupported[$dir])) {
-            self::$areSupported[$dir][$name] = $this->canBeUsed($dir);
+        if (true === self::$areSupportedAdapters[$name]) {
+
+            if (!array_key_exists($dir, self::$areSupportedPaths)) {
+                self::$areSupportedPaths[$dir] = array();
+            }
+
+            if (!array_key_exists($name, self::$areSupportedPaths[$dir])) {
+                self::$areSupportedPaths[$dir][$name] = $this->canBeUsedOnPath($dir);
+            }
+
+            return self::$areSupportedPaths[$dir][$name];
         }
 
-        return self::$areSupported[$dir][$name];
+        return false;
     }
 
     /**
@@ -225,5 +235,16 @@ abstract class AbstractAdapter implements AdapterInterface
      *
      * @return Boolean Whether the adapter is supported
      */
-    abstract protected function canBeUsed($dir);
+    abstract protected function canBeUsed();
+
+    /**
+     * Returns whether the adapter supports a given path.
+     *
+     * This method should be implemented in all adapters.
+     *
+     * @see isSupported
+     *
+     * @return Boolean Whether the adapter supports the given path
+     */
+    abstract protected function canBeUsedOnPath($dir);
 }

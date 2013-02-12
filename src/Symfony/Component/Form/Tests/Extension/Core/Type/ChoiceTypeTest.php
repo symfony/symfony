@@ -86,10 +86,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
     }
 
-    /**
-     * expectedException \Symfony\Component\Form\Exception\Exception
-     */
-    public function testEitherChoiceListOrChoicesMustBeSet()
+    public function testChoiceListAndChoicesCanBeEmpty()
     {
         $this->factory->create('choice', null, array(
         ));

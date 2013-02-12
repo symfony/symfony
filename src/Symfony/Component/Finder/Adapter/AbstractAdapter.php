@@ -39,15 +39,19 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * {@inheritDoc}
      */
-    public function isSupported()
+    public function isSupported($dir)
     {
         $name = $this->getName();
 
-        if (!array_key_exists($name, self::$areSupported)) {
-            self::$areSupported[$name] = $this->canBeUsed();
+        if (!array_key_exists($dir, self::$areSupported)) {
+            self::$areSupported[$dir] = array();
         }
 
-        return self::$areSupported[$name];
+        if (!array_key_exists($name, self::$areSupported[$dir])) {
+            self::$areSupported[$dir][$name] = $this->canBeUsed($dir);
+        }
+
+        return self::$areSupported[$dir][$name];
     }
 
     /**
@@ -221,5 +225,5 @@ abstract class AbstractAdapter implements AdapterInterface
      *
      * @return Boolean Whether the adapter is supported
      */
-    abstract protected function canBeUsed();
+    abstract protected function canBeUsed($dir);
 }

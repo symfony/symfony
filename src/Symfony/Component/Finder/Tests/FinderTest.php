@@ -310,23 +310,18 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         $this->assertIterator(array(self::$tmpDir.DIRECTORY_SEPARATOR.'test.php', __DIR__.DIRECTORY_SEPARATOR.'FinderTest.php'), $iterator);
 
-        try {
-            $finder = $this->buildFinder($adapter);
-            $iterator = $finder->files()->name('*.txt')->in('phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar');
+        if ($adapter instanceof \Symfony\Component\Finder\Adapter\AbstractFindAdapter) {
+            $this->assertFalse($adapter->isSupported('phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'));
+            $this->assertTrue($adapter->isSupported(self::$tmpDir.DIRECTORY_SEPARATOR.'foo'));
+        }
 
-            $this->assertIterator(array(
-                'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'dolor.txt',
-                'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'ipsum.txt',
-                'phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'.DIRECTORY_SEPARATOR.'lorem.txt',
-            ), $iterator);
-        } catch (\Exception $e) {
-            if ($adapter instanceof \Symfony\Component\Finder\Adapter\PhpAdapter) {
-                $this->fail('->in() should not fail on PHP streams if we use the PhpAdapter');
-            }
+        if ($adapter instanceof \Symfony\Component\Finder\Adapter\PhpAdapter) {
+            $this->assertTrue($adapter->isSupported('phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar'));
+            $this->assertTrue($adapter->isSupported(self::$tmpDir.DIRECTORY_SEPARATOR.'foo'));
         }
     }
 
-    public function testInDefaultChain()
+    public function testInPhpStreamWithDefaultAdapterChain()
     {
         $finder = Finder::create();
         $iterator = $finder->files()->name('*.txt')->in('phar://'.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'test.phar');
@@ -770,7 +765,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 new Adapter\PhpAdapter()
             ),
             function (Adapter\AdapterInterface $adapter)  {
-                return $adapter->isSupported();
+                return $adapter->isSupported(self::$tmpDir);
             }
         );
     }

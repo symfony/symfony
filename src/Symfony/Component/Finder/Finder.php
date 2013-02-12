@@ -722,7 +722,7 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         foreach ($this->adapters as $adapter) {
-            if ($adapter['adapter']->isSupported()) {
+            if ($adapter['adapter']->isSupported($dir)) {
                 try {
                     return $this
                         ->buildAdapter($adapter['adapter'])

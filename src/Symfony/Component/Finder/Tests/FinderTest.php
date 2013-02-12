@@ -717,6 +717,27 @@ class FinderTest extends Iterator\RealIteratorTestCase
         return $this->buildTestData($tests);
     }
 
+    /**
+     * @dataProvider getAdaptersTestData
+     */
+    public function testAccessDeniedException(Adapter\AdapterInterface $adapter)
+    {
+        $finder = $this->buildFinder($adapter);
+        $finder->files()->in(self::$tmpDir);
+
+        // make 'foo' directory non-openable
+        chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0333);
+
+        try {
+            $this->assertIterator($this->toAbsolute(array('test.php', 'test.py')), $finder->getIterator());
+            $this->fail('Finder should throw an exception when opening a non-readable directory.');
+        } catch (\Exception $e) {
+            $this->assertEquals('Symfony\\Component\\Finder\\Exception\\AccessDeniedException', get_class($e));
+        }
+
+        chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0777);
+    }
+
     private function buildTestData(array $tests)
     {
         $data = array();

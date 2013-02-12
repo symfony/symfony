@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Adapter;
 
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\Finder\Iterator;
 use Symfony\Component\Finder\Shell\Shell;
 use Symfony\Component\Finder\Expression\Expression;
@@ -90,6 +91,10 @@ abstract class AbstractFindAdapter extends AbstractAdapter
         if ($useSort) {
             $this->buildSorting($command, $this->sort);
         }
+
+        $command->setErrorHandler(function ($stderr) {
+            throw new AccessDeniedException($stderr);
+        });
 
         $paths = $this->shell->testCommand('uniq') ? $command->add('| uniq')->execute() : array_unique($command->execute());
         $iterator = new Iterator\FilePathsIterator($paths, $dir);

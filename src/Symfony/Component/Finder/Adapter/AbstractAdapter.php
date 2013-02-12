@@ -49,20 +49,15 @@ abstract class AbstractAdapter implements AdapterInterface
             self::$areSupportedAdapters[$name] = $this->canBeUsed();
         }
 
-        if (true === self::$areSupportedAdapters[$name]) {
-
-            if (!array_key_exists($dir, self::$areSupportedPaths)) {
-                self::$areSupportedPaths[$dir] = array();
-            }
-
-            if (!array_key_exists($name, self::$areSupportedPaths[$dir])) {
-                self::$areSupportedPaths[$dir][$name] = $this->canBeUsedOnPath($dir);
-            }
-
-            return self::$areSupportedPaths[$dir][$name];
+        if (!self::$areSupportedAdapters[$name]) {
+            return false;
         }
 
-        return false;
+        if (!isset(self::$areSupportedPaths[$dir][$name])) {
+            self::$areSupportedPaths[$dir][$name] = $this->canBeUsedOnPath($dir);
+        }
+
+        return self::$areSupportedPaths[$dir][$name];
     }
 
     /**

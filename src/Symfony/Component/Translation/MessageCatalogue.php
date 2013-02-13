@@ -220,7 +220,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function getResources()
     {
-        return array_values(array_unique($this->resources));
+        return array_values($this->resources);
     }
 
     /**
@@ -230,7 +230,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function addResource(ResourceInterface $resource)
     {
-        $this->resources[] = $resource;
+        $this->resources[$resource->__toString()] = $resource;
     }
 
     /**

@@ -24,8 +24,8 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
 {
     private $messages = array();
     private $metadata = array();
+    private $resources = array();
     private $locale;
-    private $resources;
     private $fallbackCatalogue;
     private $parent;
 
@@ -41,7 +41,6 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     {
         $this->locale = $locale;
         $this->messages = $messages;
-        $this->resources = array();
     }
 
     /**

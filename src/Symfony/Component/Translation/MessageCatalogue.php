@@ -204,9 +204,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     }
 
     /**
-     * Gets the fallback catalogue.
-     *
-     * @return MessageCatalogueInterface A MessageCatalogueInterface instance
+     * {@inheritdoc}
      *
      * @api
      */

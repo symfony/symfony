@@ -146,7 +146,7 @@ interface MessageCatalogueInterface
     /**
      * Gets the fallback catalogue.
      *
-     * @return MessageCatalogueInterface A MessageCatalogueInterface instance
+     * @return MessageCatalogueInterface|null A MessageCatalogueInterface instance or null when no fallback has been set
      *
      * @api
      */

@@ -94,7 +94,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeEnabled()
                 ->end()
                 ->arrayNode('csrf_protection')
-                    ->canBeEnabled()
+                    ->canBeDisabled()
                     ->children()
                         ->scalarNode('field_name')->defaultValue('_token')->end()
                     ->end()

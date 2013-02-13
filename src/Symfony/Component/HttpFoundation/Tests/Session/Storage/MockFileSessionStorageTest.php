@@ -129,7 +129,7 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
      */
     public function testAutoStartException()
     {
-        $storage = new MockFileSessionStorage($this->sessionDir, 'MOCKSESSID', null, false);
+        $storage = new MockFileSessionStorage($this->sessionDir, 'MOCKSESSID', null, false, false);
         $storage->registerBag(new AttributeBag);
         $this->assertFalse($storage->isStarted());
         $storage->getBag('attributes');
@@ -141,5 +141,13 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage->registerBag(new AttributeBag);
         $storage->getBag('attributes');
         $this->assertTrue($storage->isStarted());
+    }
+
+    public function testEmulatePhp()
+    {
+        $storage = new MockFileSessionStorage($this->sessionDir, 'MOCKSESSID', null, false, true);
+        $storage->registerBag($bag = new AttributeBag);
+        $storage->getBag('attributes');
+        $this->assertEquals(array(), $storage->getBag('attributes')->all());
     }
 }

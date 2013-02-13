@@ -57,6 +57,11 @@ class NativeSessionStorage implements SessionStorageInterface
     protected $autoStart;
 
     /**
+     * @var Boolean
+     */
+    protected $emulatePhp;
+
+    /**
      * Constructor.
      *
      * Depending on how you want the storage driver to behave you probably
@@ -96,12 +101,14 @@ class NativeSessionStorage implements SessionStorageInterface
      * upload_progress.min-freq, "1"
      * url_rewriter.tags, "a=href,area=href,frame=src,form=,fieldset="
      *
-     * @param array       $options   Session configuration options.
-     * @param object      $handler   SessionHandlerInterface.
-     * @param MetadataBag $metaBag   MetadataBag.
-     * @param Boolean     $autoStart Autostart flag.
+     * @param array       $options    Session configuration options.
+     * @param object      $handler    SessionHandlerInterface.
+     * @param MetadataBag $metaBag    MetadataBag.
+     * @param Boolean     $autoStart  Autostart flag.
+     * @param Boolean     $emulatePhp Flag to allow access to session bags for inactive session
+     *                                when autostart is off.
      */
-    public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null, $autoStart = true)
+    public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null, $autoStart = true, $emulatePhp = true)
     {
         ini_set('session.cache_limiter', ''); // disable by default because it's managed by HeaderBag (if used)
         ini_set('session.use_cookies', 1);
@@ -116,6 +123,7 @@ class NativeSessionStorage implements SessionStorageInterface
         $this->setOptions($options);
         $this->setSaveHandler($handler);
         $this->autoStart = $autoStart;
+        $this->emulatePhp = $emulatePhp;
     }
 
     /**
@@ -267,7 +275,7 @@ class NativeSessionStorage implements SessionStorageInterface
             $this->loadSession();
         } elseif (!$this->started && $this->autoStart) {
             $this->start();
-        } elseif (!$this->started && !$this->autoStart) {
+        } elseif (!$this->started && !$this->autoStart && !$this->emulatePhp) {
             throw new \RuntimeException('The session has not been started yet.');
         }
 

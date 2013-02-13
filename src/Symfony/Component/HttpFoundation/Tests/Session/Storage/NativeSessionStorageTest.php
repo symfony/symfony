@@ -160,7 +160,7 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
      */
     public function testAutoStartException()
     {
-        $storage = new NativeSessionStorage(array(), null, null, false);
+        $storage = new NativeSessionStorage(array(), null, null, false, false);
         $storage->registerBag(new AttributeBag);
         $this->assertFalse($storage->isStarted());
         $storage->getBag('attributes');
@@ -172,5 +172,13 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage->registerBag(new AttributeBag);
         $storage->getBag('attributes');
         $this->assertTrue($storage->isStarted());
+    }
+
+    public function testEmulatePhp()
+    {
+        $storage = new NativeSessionStorage(array(), null, null, false, true);
+        $storage->registerBag($bag = new AttributeBag);
+        $storage->getBag('attributes');
+        $this->assertEquals(array(), $storage->getBag('attributes')->all());
     }
 }

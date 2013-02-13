@@ -32,12 +32,14 @@ class MockFileSessionStorage extends MockArraySessionStorage
     /**
      * Constructor.
      *
-     * @param string      $savePath Path of directory to save session files.
-     * @param string      $name     Session name.
-     * @param MetadataBag $metaBag  MetadataBag instance.
-     * @param Boolean     $autoStart Autostart flag.
+     * @param string      $savePath   Path of directory to save session files.
+     * @param string      $name       Session name.
+     * @param MetadataBag $metaBag    MetadataBag instance.
+     * @param Boolean     $autoStart  Autostart flag.
+     * @param Boolean     $emulatePhp Flag to allow access to session bags for inactive session
+     *                                when autostart is off.
      */
-    public function __construct($savePath = null, $name = 'MOCKSESSID', MetadataBag $metaBag = null, $autoStart = true)
+    public function __construct($savePath = null, $name = 'MOCKSESSID', MetadataBag $metaBag = null, $autoStart = true, $emulatePhp = true)
     {
         if (null === $savePath) {
             $savePath = sys_get_temp_dir();
@@ -49,7 +51,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
 
         $this->savePath = $savePath;
 
-        parent::__construct($name, $metaBag, $autoStart);
+        parent::__construct($name, $metaBag, $autoStart, $emulatePhp);
     }
 
     /**

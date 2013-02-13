@@ -69,17 +69,25 @@ class MockArraySessionStorage implements SessionStorageInterface
     protected $autoStart;
 
     /**
+     * @var Boolean
+     */
+    protected $emulatePhp;
+
+    /**
      * Constructor.
      *
-     * @param string      $name      Session name.
-     * @param MetadataBag $metaBag   MetadataBag instance.
-     * @param Boolean     $autoStart Autostart flag.
+     * @param string      $name       Session name.
+     * @param MetadataBag $metaBag    MetadataBag instance.
+     * @param Boolean     $autoStart  Autostart flag.
+     * @param Boolean     $emulatePhp Flag to allow access to session bags for inactive session
+     *                                when autostart is off.
      */
-    public function __construct($name = 'MOCKSESSID', MetadataBag $metaBag = null, $autoStart = true)
+    public function __construct($name = 'MOCKSESSID', MetadataBag $metaBag = null, $autoStart = true, $emulatePhp = true)
     {
         $this->name = $name;
         $this->setMetadataBag($metaBag);
         $this->autoStart = $autoStart;
+        $this->emulatePhp = $emulatePhp;
     }
 
     /**
@@ -209,7 +217,7 @@ class MockArraySessionStorage implements SessionStorageInterface
 
         if (!$this->started && $this->autoStart) {
             $this->start();
-        } elseif (!$this->started && !$this->autoStart) {
+        } elseif (!$this->started && !$this->autoStart && !$this->emulatePhp) {
             throw new \RuntimeException('The session has not been started yet.');
         }
 

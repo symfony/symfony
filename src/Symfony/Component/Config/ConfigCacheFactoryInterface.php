@@ -23,9 +23,9 @@ interface ConfigCacheFactoryInterface
      * Factory Method
      *
      * @param string $file The absolute cache path
-     * 
-     * @return ConfigCacheInterface $configCache 
+     * @param callback $callback The callback to be executed when the cache needs to be filled (i. e. is not fresh). The cache will be passed as the only parameter.
+     * @return ConfigCacheInterface $configCache
      */
-    public function create($file);
+    public function cache($file, $callback);
 
 }

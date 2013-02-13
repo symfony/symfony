@@ -16,6 +16,7 @@ use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheFactory;
+use Symfony\Component\Config\ConfigCacheInterface;
 
 /**
  * Translator.
@@ -115,32 +116,44 @@ class Translator extends BaseTranslator
             return parent::loadCatalogue($locale);
         }
 
-        $cache = $this->getConfigCacheFactory()->create($this->options['cache_dir'].'/catalogue.'.$locale.'.php');
-        if (!$cache->isFresh()) {
-            $this->initialize();
+        $self = $this;
+        $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/catalogue.'.$locale.'.php', function ($cache) use ($self, $locale) {
+            $self->fillCache($cache, $locale);
+        });
 
-            parent::loadCatalogue($locale);
+        if (!isset($this->catalogues[$locale])) {
+            $this->catalogues[$locale] = include $cache;
+        }
 
-            $fallbackContent = '';
-            $current = '';
-            foreach ($this->computeFallbackLocales($locale) as $fallback) {
-                $fallbackContent .= sprintf(<<<EOF
+    }
+
+    /* This method is only public to allow it to be called from a callback (prior PHP 5.4?) */
+    public function fillCache(ConfigCacheInterface $cache, $locale)
+    {
+        $this->initialize();
+
+        parent::loadCatalogue($locale);
+
+        $fallbackContent = '';
+        $current = '';
+        foreach ($this->computeFallbackLocales($locale) as $fallback) {
+            $fallbackContent .= sprintf(<<<EOF
 \$catalogue%s = new MessageCatalogue('%s', %s);
 \$catalogue%s->addFallbackCatalogue(\$catalogue%s);
 
 
 EOF
-                    ,
-                    ucfirst($fallback),
-                    $fallback,
-                    var_export($this->catalogues[$fallback]->all(), true),
-                    ucfirst($current),
-                    ucfirst($fallback)
-                );
-                $current = $fallback;
-            }
+                ,
+                ucfirst($fallback),
+                $fallback,
+                var_export($this->catalogues[$fallback]->all(), true),
+                ucfirst($current),
+                ucfirst($fallback)
+            );
+            $current = $fallback;
+        }
 
-            $content = sprintf(<<<EOF
+        $content = sprintf(<<<EOF
 <?php
 
 use Symfony\Component\Translation\MessageCatalogue;
@@ -151,18 +164,13 @@ use Symfony\Component\Translation\MessageCatalogue;
 return \$catalogue;
 
 EOF
-                ,
-                $locale,
-                var_export($this->catalogues[$locale]->all(), true),
-                $fallbackContent
-            );
+            ,
+            $locale,
+            var_export($this->catalogues[$locale]->all(), true),
+            $fallbackContent
+        );
 
-            $cache->write($content, $this->catalogues[$locale]->getResources());
-
-            return;
-        }
-
-        $this->catalogues[$locale] = include $cache;
+        $cache->write($content, $this->catalogues[$locale]->getResources());
     }
 
     protected function initialize()

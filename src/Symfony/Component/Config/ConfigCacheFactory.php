@@ -33,9 +33,11 @@ class ConfigCacheFactory implements ConfigCacheFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create($file)
+    public function cache($file, $callback)
     {
-        return new ConfigCache($file, $this->debug);
+        $cache = new ConfigCache($file, $this->debug);
+        if (!$cache->isFresh()) call_user_func($callback, $cache);
+        return $cache;
     }
 
 }

@@ -99,8 +99,8 @@ class PhpAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function canBeUsedOnPath($dir)
+    protected function canBeUsedOnPath($path)
     {
-        return false !== realpath($dir) || false !== @opendir($dir);
+        return false !== realpath($path) || false !== @opendir($path);
     }
 }

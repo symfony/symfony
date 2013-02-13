@@ -238,9 +238,11 @@ abstract class AbstractAdapter implements AdapterInterface
      *
      * This method should be implemented in all adapters.
      *
+     * @param string Path to check
+     *
      * @see isSupported
      *
      * @return Boolean Whether the adapter supports the given path
      */
-    abstract protected function canBeUsedOnPath($dir);
+    abstract protected function canBeUsedOnPath($path);
 }

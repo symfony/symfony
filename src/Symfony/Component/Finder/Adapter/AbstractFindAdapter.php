@@ -131,9 +131,9 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function canBeUsedOnPath($dir)
+    protected function canBeUsedOnPath($path)
     {
-        return false !== realpath($dir);
+        return false !== realpath($path);
     }
 
     /**

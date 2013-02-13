@@ -103,7 +103,7 @@ interface MessageCatalogueInterface
     /**
      * Sets translations for a given domain.
      *
-     * @param string $messages An array of translations
+     * @param array  $messages An array of translations
      * @param string $domain   The domain name
      *
      * @api
@@ -113,7 +113,7 @@ interface MessageCatalogueInterface
     /**
      * Adds translations for a given domain.
      *
-     * @param string $messages An array of translations
+     * @param array  $messages An array of translations
      * @param string $domain   The domain name
      *
      * @api

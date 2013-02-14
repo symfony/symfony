@@ -19,27 +19,36 @@ namespace Symfony\Component\Translation;
 interface MetadataAwareInterface
 {
     /**
-     * Gets meta data for given domain and key.
+     * Gets metadata for the given domain and key.
+     *
+     * Passing an empty domain will return an array with all metadata indexed by
+     * domain and then by key. Passing an empty key will return an array with all
+     * metadata for the given domain.
      *
      * @param string $domain The domain name
-     * @param string $key    Key
+     * @param string $key    The key
+     *
+     * @return mixed The value that was set or an array with the domains/keys or null
      */
     public function getMetadata($key = '', $domain = 'messages');
 
     /**
-     * Adds meta data to a message domain.
+     * Adds metadata to a message domain.
      *
-     * @param string       $key    Key
-     * @param string|array $value  Value
-     * @param string       $domain The domain name
+     * @param string $key    The key
+     * @param mixed  $value  The value
+     * @param string $domain The domain name
      */
     public function setMetadata($key, $value, $domain = 'messages');
 
     /**
-     * Deletes meta data for given key and domain.
+     * Deletes metadata for the given key and domain.
+     *
+     * Passing an empty domain will delete all metadata. Passing an empty key will
+     * delete all metadata for the given domain.
      *
      * @param string $domain The domain name
-     * @param string $key    Key
+     * @param string $key    The key
      */
     public function deleteMetadata($key = '', $domain = 'messages');
 }

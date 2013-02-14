@@ -91,7 +91,11 @@ class FrameworkExtension extends Extension
         $this->registerValidationConfiguration($config['validation'], $container, $loader);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
-        $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
+
+        if (isset($config['profiler']) && isset($config['profiler']['enabled']) && $config['profiler']['enabled']) {
+            $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
+        }
+
         $this->registerTranslatorConfiguration($config['translator'], $container);
 
         if (isset($config['router'])) {

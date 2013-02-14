@@ -21,6 +21,7 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
  */
 class ApacheUrlMatcher extends UrlMatcher
 {
+
     public function __construct($routes, RequestContext $context)
     {
         $this->routes = $routes;

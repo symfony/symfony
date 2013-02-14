@@ -228,9 +228,9 @@ class Router implements RouterInterface
         if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
             if ($this->options['matcher_needs_collection']) {
                 return $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context, $this->defaults);
-            } else {
-                return $this->matcher = new $this->options['matcher_class'](null, $this->context, $this->defaults);
             }
+
+            return $this->matcher = new $this->options['matcher_class'](null, $this->context, $this->defaults);
         }
 
         $class = $this->options['matcher_cache_class'];

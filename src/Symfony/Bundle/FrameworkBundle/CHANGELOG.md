@@ -9,6 +9,8 @@ CHANGELOG
  * added `TimedPhpEngine`
  * added `--clean` option the the `translation:update` command
  * added `http_method_override` option
+ * Undeprecated `auto_start` session config flag which controls `SessionListener` to manually start sessions.
+ * Added Boolean session config flags `session_on_demand` and `emulation_mode` to control session.
 
 2.2.0
 -----

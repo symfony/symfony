@@ -213,6 +213,9 @@ class Process
             $this->fileHandles = array(
                 self::STDOUT => tmpfile(),
             );
+            if (false === $this->fileHandles[self::STDOUT]) {
+                throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
+            }
             $this->readBytes = array(
                 self::STDOUT => 0,
             );

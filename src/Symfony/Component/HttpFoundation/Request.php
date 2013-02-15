@@ -595,6 +595,16 @@ class Request
     }
 
     /**
+     * Get the state of httpMethodParameterOverride value.
+     *
+     * @return Boolean
+     */
+    public static function getHttpMethodParameterOverride()
+    {
+        return self::$httpMethodParameterOverride;
+    }
+
+    /**
      * Gets a "parameter" value.
      *
      * This method is mainly useful for libraries that want to provide some flexibility.

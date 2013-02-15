@@ -53,6 +53,18 @@ class ProfilerController
     }
 
     /**
+     * Redirects to the last profiles.
+     *
+     * @return RedirectResponse A RedirectResponse instance
+     */
+    public function homeAction()
+    {
+        $this->profiler->disable();
+
+        return new RedirectResponse($this->generator->generate('_profiler_search_results', array('token' => 'empty', 'limit' => 10)));
+    }
+
+    /**
      * Renders a profiler panel for the given token.
      *
      * @param Request $request The current HTTP request

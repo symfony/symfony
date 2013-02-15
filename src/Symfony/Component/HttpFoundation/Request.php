@@ -595,9 +595,9 @@ class Request
     }
 
     /**
-     * Get the state of httpMethodParameterOverride value.
+     * Checks whether support for the _method request parameter is enabled.
      *
-     * @return Boolean
+     * @return Boolean True when the _method request parameter is enabled, false otherwise
      */
     public static function getHttpMethodParameterOverride()
     {

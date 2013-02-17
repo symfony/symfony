@@ -272,9 +272,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('The "CssSelector" component is not available');
         }
 
-        $client = new TestClient();
+        $client = new TestClient(array('PHP_AUTH_USER' => 'foo', 'PHP_AUTH_PW' => 'bar'));
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
-        $crawler = $client->request('GET', 'http://www.example.com/foo/foobar', array(), array(), array('PHP_AUTH_USER' => 'foo', 'PHP_AUTH_PW' => 'bar'));
+        $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
 
         $server = $client->getRequest()->getServer();
         $this->assertArrayHasKey('PHP_AUTH_USER', $server);

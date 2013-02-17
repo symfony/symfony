@@ -1066,4 +1066,13 @@ class HttpCacheTest extends HttpCacheTestCase
             array('10.0.0.2, 10.0.0.3', '10.0.0.2, 10.0.0.3, 10.0.0.1'),
         );
     }
+
+    public function testXForwarderForHeaderForPassRequests()
+    {
+        $this->setNextResponse();
+        $server = array('REMOTE_ADDR' => '10.0.0.1');
+        $this->request('POST', '/', $server);
+
+        $this->assertEquals('10.0.0.1', $this->kernel->getBackendRequest()->headers->get('X-Forwarded-For'));
+    }
 }

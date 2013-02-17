@@ -58,6 +58,7 @@ class ErrorHandler
         $handler = new static();
         $handler->setLevel($level);
 
+        ini_set('display_errors', 0);
         set_error_handler(array($handler, 'handle'));
         register_shutdown_function(array($handler, 'handleFatal'));
         $handler->reservedMemory = str_repeat('x', 10240);

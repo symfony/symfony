@@ -24,10 +24,9 @@ use Symfony\Component\HttpKernel\UriSigner;
  */
 class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 {
-    protected $templating;
-
     private $globalDefaultTemplate;
     private $signer;
+    private $templating;
 
     /**
      * Constructor.
@@ -38,13 +37,23 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      */
     public function __construct($templating = null, UriSigner $signer = null, $globalDefaultTemplate = null)
     {
+        $this->setTemplating($templating);
+        $this->globalDefaultTemplate = $globalDefaultTemplate;
+        $this->signer = $signer;
+    }
+
+    /**
+     * Sets the templating engine to use to render the default content.
+     *
+     * @param EngineInterface|\Twig_Environment|null $templating An EngineInterface or a \Twig_Environment instance
+     */
+    public function setTemplating($templating)
+    {
         if (null !== $templating && !$templating instanceof EngineInterface && !$templating instanceof \Twig_Environment) {
             throw new \InvalidArgumentException('The hinclude rendering strategy needs an instance of \Twig_Environment or Symfony\Component\Templating\EngineInterface');
         }
 
         $this->templating = $templating;
-        $this->globalDefaultTemplate = $globalDefaultTemplate;
-        $this->signer = $signer;
     }
 
     /**

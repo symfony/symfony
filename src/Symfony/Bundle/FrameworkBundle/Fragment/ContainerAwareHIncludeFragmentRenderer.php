@@ -41,7 +41,7 @@ class ContainerAwareHIncludeFragmentRenderer extends HIncludeFragmentRenderer
     public function render($uri, Request $request, array $options = array())
     {
         if (!$this->templating) {
-            $this->templating = $this->container->get('templating');
+            $this->setTemplating($this->container->get('templating'));
         }
 
         return parent::render($uri, $request, $options);

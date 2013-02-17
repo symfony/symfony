@@ -54,6 +54,10 @@ class Process
 
         $this->commandline = $commandline;
         $this->cwd = $cwd;
+        // on windows, if the cwd changed via chdir(), proc_open defaults to the dir where php was started
+        if (null === $this->cwd && defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->cwd = getcwd();
+        }
         if (null !== $env) {
             $this->env = array();
             foreach ($env as $key => $value) {

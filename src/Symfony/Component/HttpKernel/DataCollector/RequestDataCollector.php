@@ -79,11 +79,14 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             }
         }
 
+        $statusCode = $response->getStatusCode();
+
         $this->data = array(
             'format'             => $request->getRequestFormat(),
             'content'            => $content,
             'content_type'       => $response->headers->get('Content-Type') ? $response->headers->get('Content-Type') : 'text/html',
-            'status_code'        => $response->getStatusCode(),
+            'status_text'        => isset(Response::$statusTexts[$statusCode]) ? Response::$statusTexts[$statusCode] : '',
+            'status_code'        => $statusCode,
             'request_query'      => $request->query->all(),
             'request_request'    => $request->request->all(),
             'request_headers'    => $request->headers->all(),
@@ -193,6 +196,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     public function getContentType()
     {
         return $this->data['content_type'];
+    }
+
+    public function getStatusText()
+    {
+        return $this->data['status_text'];
     }
 
     public function getStatusCode()

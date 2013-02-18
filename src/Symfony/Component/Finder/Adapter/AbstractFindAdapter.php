@@ -49,7 +49,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
         $dir = realpath($dir);
 
         if (false === $dir) {
-            throw new AdapterFailureException($this, sprintf('There is no realpath for dir "%s"', $dir));
+            throw new AdapterFailureException($this, sprintf('"%s" is not readable', $dir));
         }
 
         // searching directories containing or not containing strings leads to no result

@@ -101,6 +101,15 @@ class PhpAdapter extends AbstractAdapter
      */
     protected function canBeUsedOnPath($path)
     {
-        return false !== realpath($path) || false !== @opendir($path);
+        if (false !== realpath($path)) {
+            return true;
+        }
+
+        if ($handle = @opendir($path)) {
+            closedir($handle);
+            return true;
+        }
+
+        return false;
     }
 }

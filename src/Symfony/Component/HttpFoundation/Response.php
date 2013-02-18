@@ -254,7 +254,7 @@ class Response
         }
 
         // Check if we need to remove Cache-Control for ssl encrypted downloads (IE <9 fix)
-        if(stristr($headers->get('Content-Disposition'), 'attachment')) {
+        if(false !== stripos($headers->get('Content-Disposition'), 'attachment')) {
             $this->headers->remove('Cache-Control');
         }
 

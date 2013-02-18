@@ -228,13 +228,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testCreateCheckPrecedence()
     {
         // server is used by default
-        $request = Request::create('/', 'GET', array(), array(), array(), array(
+        $request = Request::create('/', 'DELETE', array(), array(), array(), array(
             'HTTP_HOST'     => 'example.com',
             'HTTPS'         => 'on',
             'SERVER_PORT'   => 443,
             'PHP_AUTH_USER' => 'fabien',
             'PHP_AUTH_PW'   => 'pa$$',
             'QUERY_STRING'  => 'foo=bar',
+            'CONTENT_TYPE'  => 'application/json',
         ));
         $this->assertEquals('example.com', $request->getHost());
         $this->assertEquals(443, $request->getPort());
@@ -242,6 +243,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('fabien', $request->getUser());
         $this->assertEquals('pa$$', $request->getPassword());
         $this->assertEquals('', $request->getQueryString());
+        $this->assertEquals('application/json', $request->headers->get('CONTENT_TYPE'));
 
         // URI has precedence over server
         $request = Request::create('http://thomas:pokemon@example.net:8080/?foo=bar', 'GET', array(), array(), array(), array(
@@ -712,7 +714,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->setMethod('POST');
         $request->request->set('_method', 'purge');
+
+        $this->assertFalse(Request::getHttpMethodParameterOverride(), 'httpMethodParameterOverride should be disabled by default');
+
         Request::enableHttpMethodParameterOverride();
+
+        $this->assertTrue(Request::getHttpMethodParameterOverride(), 'httpMethodParameterOverride should be enabled now but it is not');
+
         $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
         $this->disableHttpMethodParameterOverride();
 

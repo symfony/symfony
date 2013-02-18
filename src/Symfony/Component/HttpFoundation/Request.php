@@ -325,7 +325,9 @@ class Request
             case 'POST':
             case 'PUT':
             case 'DELETE':
-                $server['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
+                if (!isset($server['CONTENT_TYPE'])) {
+                    $server['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
+                }
             case 'PATCH':
                 $request = $parameters;
                 $query = array();
@@ -592,6 +594,16 @@ class Request
     public static function enableHttpMethodParameterOverride()
     {
         self::$httpMethodParameterOverride = true;
+    }
+
+    /**
+     * Checks whether support for the _method request parameter is enabled.
+     *
+     * @return Boolean True when the _method request parameter is enabled, false otherwise
+     */
+    public static function getHttpMethodParameterOverride()
+    {
+        return self::$httpMethodParameterOverride;
     }
 
     /**

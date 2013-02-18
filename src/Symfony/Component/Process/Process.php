@@ -131,6 +131,10 @@ class Process
 
         $this->commandline = $commandline;
         $this->cwd = $cwd;
+        // on windows, if the cwd changed via chdir(), proc_open defaults to the dir where php was started
+        if (null === $this->cwd && defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->cwd = getcwd();
+        }
         if (null !== $env) {
             $this->env = array();
             foreach ($env as $key => $value) {
@@ -232,6 +236,9 @@ class Process
             $this->fileHandles = array(
                 self::STDOUT => tmpfile(),
             );
+            if (false === $this->fileHandles[self::STDOUT]) {
+                throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
+            }
             $this->readBytes = array(
                 self::STDOUT => 0,
             );

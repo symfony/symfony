@@ -105,7 +105,7 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('{"foo":"bar"}', $response->getContent());
     }
 
-    public function testStaticCreateWithSimpleTypes()
+    public function testStaticCreateWithScalarTypes()
     {
         $response = JsonResponse::create('foo');
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
@@ -130,24 +130,47 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(202, $response->getStatusCode());
     }
 
-    public function testStaticCreateAddsContentTypeHeader()
+    public function testStaticCreateWithoutPrefixAddsContentTypeHeader()
     {
         $response = JsonResponse::create();
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
     }
 
-    public function testStaticCreateWithCustomHeaders()
+    public function testStaticCreateWithoutPrefixWithCustomHeaders()
     {
         $response = JsonResponse::create(array(), 200, array('ETag' => 'foo'));
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
         $this->assertSame('foo', $response->headers->get('ETag'));
     }
 
-    public function testStaticCreateWithCustomContentType()
+    public function testStaticCreateWithoutPrefixWithCustomContentType()
     {
         $headers = array('Content-Type' => 'application/vnd.acme.blog-v1+json');
 
         $response = JsonResponse::create(array(), 200, $headers);
+        $this->assertSame('application/vnd.acme.blog-v1+json', $response->headers->get('Content-Type'));
+    }
+
+    public function testStaticCreateWithPrefixAddsContentTypeHeader()
+    {
+        $response = JsonResponse::create()->setPrefix();
+        $this->assertSame('text/javascript', $response->headers->get('Content-Type'));
+        $response = JsonResponse::create()->setPrefix()->setPrefix('');
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
+    }
+
+    public function testStaticCreateWithPrefixWithCustomHeaders()
+    {
+        $response = JsonResponse::create(array(), 200, array('ETag' => 'foo'))->setPrefix();
+        $this->assertSame('text/javascript', $response->headers->get('Content-Type'));
+        $this->assertSame('foo', $response->headers->get('ETag'));
+    }
+
+    public function testStaticCreateWithPrefixWithCustomContentType()
+    {
+        $headers = array('Content-Type' => 'application/vnd.acme.blog-v1+json');
+
+        $response = JsonResponse::create(array(), 200, $headers)->setPrefix();
         $this->assertSame('application/vnd.acme.blog-v1+json', $response->headers->get('Content-Type'));
     }
 
@@ -174,18 +197,20 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('"\u003C\u003E\u0027\u0026\u0022"', $response->getContent());
     }
 
-    public function testPrefixJsonPrependADefaultPrefix()
+    public function testSetPrefixPrependADefaultPrefix()
     {
-        $response = JsonResponse::create(array())->prefixJson();
+        $response = JsonResponse::create(array())->setPrefix();
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
         $this->assertEquals('while(1);[]', $response->getContent());
+        $this->assertEquals('text/javascript', $response->headers->get('Content-Type'));
     }
 
-    public function testPrefixJsonCanSetACustomPrefix()
+    public function testSetPrefixCanSetACustomPrefix()
     {
-        $response = JsonResponse::create(array())->prefixJson('for(;;);');
+        $response = JsonResponse::create(array())->setPrefix('for(;;);');
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $response);
         $this->assertEquals('for(;;);[]', $response->getContent());
+        $this->assertEquals('text/javascript', $response->headers->get('Content-Type'));
     }
 
     public function testPrefixJsonDoNoAffectJsonP()

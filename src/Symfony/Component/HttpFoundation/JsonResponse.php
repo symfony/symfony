@@ -90,15 +90,16 @@ class JsonResponse extends Response
     }
 
     /**
-     * Mitigates CSRF attack by prepending a prefix to the generated JSON.
+     * Prepends the given prefix to the generated JSON.
      *
+     * This could help mitigating CSRF attacks.
      * @see http://stackoverflow.com/questions/2669690
      *
-     * @param string $prefix The prefix to prepend to the generated JSON
+     * @param string $prefix The prefix to use in front of the generated JSON
      *
      * @return JsonResponse
      */
-    public function prefixJson($prefix = 'while(1);')
+    public function setPrefix($prefix = 'while(1);')
     {
         $this->prefix = $prefix;
 
@@ -121,8 +122,8 @@ class JsonResponse extends Response
 
         // Only set the header when there is none or when it equals 'text/javascript' (from a previous update with callback)
         // in order to not overwrite a custom definition.
-        if (!$this->headers->has('Content-Type') || 'text/javascript' === $this->headers->get('Content-Type')) {
-            $this->headers->set('Content-Type', 'application/json');
+        if (!$this->headers->has('Content-Type') || in_array($this->headers->get('Content-Type'), array('application/json', 'text/javascript'))) {
+            $this->headers->set('Content-Type', empty($this->prefix) ? 'application/json' : 'text/javascript');
         }
 
         return $this->setContent($this->prefix . $this->data);

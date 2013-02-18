@@ -18,6 +18,7 @@ use Symfony\Component\Finder\Shell\Command;
 use Symfony\Component\Finder\Iterator\SortableIterator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 use Symfony\Component\Finder\Comparator\DateComparator;
+use Symfony\Component\Finder\Exception\AdapterFailureException;
 
 /**
  * Shell engine implementation using GNU find command.
@@ -46,6 +47,10 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     {
         // having "/../" in path make find fail
         $dir = realpath($dir);
+
+        if (false === $dir) {
+            throw new AdapterFailureException($this, sprintf('"%s" is not readable', $dir));
+        }
 
         // searching directories containing or not containing strings leads to no result
         if (Iterator\FileTypeFilterIterator::ONLY_DIRECTORIES === $this->mode && ($this->contains || $this->notContains)) {
@@ -121,6 +126,14 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     protected function canBeUsed()
     {
         return $this->shell->testCommand('find');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function canBeUsedOnPath($path)
+    {
+        return false !== realpath($path);
     }
 
     /**

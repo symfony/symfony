@@ -14,6 +14,10 @@ namespace Symfony\Component\Finder\Tests;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Adapter;
 use Symfony\Component\Finder\Tests\FakeAdapter;
+use Symfony\Component\Finder\Adapter\AbstractFindAdapter;
+use Symfony\Component\Finder\Adapter\PhpAdapter;
+use Symfony\Component\Finder\Adapter\GnuFindAdapter;
+use Symfony\Component\Finder\Adapter\BsdFindAdapter;
 
 class FinderTest extends Iterator\RealIteratorTestCase
 {
@@ -312,6 +316,62 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
+     * @dataProvider getDifferentFinderConfigurationsTestData
+     */
+    public function testSearchAPharArchive($finder)
+    {
+        $iterator = $finder->files()
+            ->name('*.txt')
+            ->name('*.dat')
+            ->in($this->toAbsoluteFixtures(array('test.phar', 'A')));
+
+        try {
+            $this->assertIterator($this->toAbsoluteFixtures(array(
+                'A/B/C/abc.dat',
+                'A/B/ab.dat',
+                'A/a.dat',
+                'test.phar/dolor.txt',
+                'test.phar/ipsum.txt',
+                'test.phar/lorem.txt'
+            )), $iterator);
+
+        } catch(\Exception $e) {
+            $this->assertInstanceOf('RuntimeException', $e, 'No supported adapter found.');
+
+            // The exception should only occur on AbstractFindAdapter instances
+            foreach ($finder->getAdapters() as $adapter) {
+                if (false === $adapter instanceof AbstractFindAdapter) {
+                    $this->fail(
+                        'With adapter instance of "'.get_class($adapter)
+                        . '" in finder chain a stream (phar) should be resolvable.'
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * @dataProvider getAdaptersTestData
+     */
+    public function testAdapterSupportOnAPharArchive($adapter)
+    {
+        $source = $this->toAbsoluteFixtures(array(
+            'test.phar',
+            'A/B/C'
+        ));
+
+        // Current adapter is the PHP adapter
+        if (false === $adapter instanceof AbstractFindAdapter) {
+            $this->assertTrue($adapter->isSupported($source[0]));
+            $this->assertTrue($adapter->isSupported($source[1]));
+        } else {
+            // Current adapter is an native adapter
+            $this->assertFalse($adapter->isSupported($source[0]));
+            $this->assertTrue($adapter->isSupported($source[1]));
+        }
+    }
+
+    /**
      * @dataProvider getAdaptersTestData
      */
     public function testInWithGlob($adapter)
@@ -507,7 +567,11 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $f = array();
         foreach ($files as $file) {
-            $f[] = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$file;
+            $prefix = '';
+            if (false !== strpos($file, 'phar')) {
+                $prefix = 'phar://';
+            }
+            $f[] = $prefix.__DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/Fixtures/'.$file);
         }
 
         return $f;
@@ -622,6 +686,24 @@ class FinderTest extends Iterator\RealIteratorTestCase
             ->addAdapter(new FakeAdapter\DummyAdapter($iterator), 1);
 
         $this->assertIterator($filenames, $finder->in(sys_get_temp_dir())->getIterator());
+    }
+
+    public function getDifferentFinderConfigurationsTestData()
+    {
+        return array_map(
+            function ($finder) { return array($finder); },
+            array(
+                // Default adapter chain
+                Finder::create(),
+                // PHP adapter only
+                $this->buildFinder(new PhpAdapter()),
+                // Native adapters only
+                Finder::create()
+                    ->removeAdapters()
+                    ->addAdapter(new GnuFindAdapter())
+                    ->addAdapter(new BsdFindAdapter())
+            )
+        );
     }
 
     public function getAdaptersTestData()
@@ -742,8 +824,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 new Adapter\GnuFindAdapter(),
                 new Adapter\PhpAdapter()
             ),
-            function (Adapter\AdapterInterface $adapter)  {
-                return $adapter->isSupported();
+            function (Adapter\AdapterInterface $adapter) {
+                return $adapter->isSupported(realpath(sys_get_temp_dir().'/symfony2_finder'));
             }
         );
     }

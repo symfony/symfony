@@ -124,9 +124,11 @@ interface AdapterInterface
     /**
      * Tests adapter support for current platform.
      *
+     * @param string $path
+     *
      * @return Boolean
      */
-    public function isSupported();
+    public function isSupported($path);
 
     /**
      * Returns adapter name.

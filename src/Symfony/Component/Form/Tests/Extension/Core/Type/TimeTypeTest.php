@@ -231,7 +231,7 @@ class TimeTypeTest extends LocalizedTestCase
 
         $form->setData(new \DateTime('03:04:05 UTC'));
 
-        $this->assertEquals(array('hour' => 3), $form->getClientData());
+        $this->assertEquals(array('hour' => 3), $form->getViewData());
     }
 
     public function testSetDataWithSeconds()

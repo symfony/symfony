@@ -215,7 +215,7 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testPrefixJsonDoNoAffectJsonP()
     {
-        $response = JsonResponse::create(array())->setCallback('cb')->prefixJson();
+        $response = JsonResponse::create(array())->setCallback('cb')->setPrefix();
         $this->assertEquals('cb([]);', $response->getContent());
     }
 }

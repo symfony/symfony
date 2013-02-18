@@ -62,7 +62,9 @@ class ResolvedFormType implements ResolvedFormTypeInterface
         // BC
         if ($innerType instanceof AbstractType) {
             /* @var AbstractType $innerType */
+            set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
             $innerType->setExtensions($typeExtensions);
+            restore_error_handler();
         }
 
         $this->innerType = $innerType;

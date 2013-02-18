@@ -253,6 +253,11 @@ class Response
             $this->headers->set('expires', -1);
         }
 
+        // Check if we need to remove Cache-Control for ssl encrypted downloads (IE <9 fix)
+        if (false !== stripos($headers->get('Content-Disposition'), 'attachment')) {
+            $this->headers->remove('Cache-Control');
+        }
+
         return $this;
     }
 

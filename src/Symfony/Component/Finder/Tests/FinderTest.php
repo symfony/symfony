@@ -17,6 +17,7 @@ use Symfony\Component\Finder\Tests\FakeAdapter;
 use Symfony\Component\Finder\Adapter\AbstractFindAdapter;
 use Symfony\Component\Finder\Adapter\PhpAdapter;
 use Symfony\Component\Finder\Adapter\GnuFindAdapter;
+use Symfony\Component\Finder\Adapter\BsdFindAdapter;
 
 class FinderTest extends Iterator\RealIteratorTestCase
 {
@@ -315,9 +316,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getMixedAdapterChainFinderTestData
+     * @dataProvider getDifferentFinderConfigurationsTestData
      */
-    public function testInWithStreamsAndRealpaths($finder)
+    public function testSearchAPharArchive($finder)
     {
         $iterator = $finder->files()
             ->name('*.txt')
@@ -337,14 +338,34 @@ class FinderTest extends Iterator\RealIteratorTestCase
         } catch(\Exception $e) {
             $this->assertInstanceOf('RuntimeException', $e, 'No supported adapter found.');
 
-            // No supported adapter found, its an native one
-            $adapters = $finder->getAdapters();
-            $adapter  = array_shift($adapters);
-            $source   = $this->toAbsoluteFixtures(array(
-                'test.phar/dolor.txt',
-                'A/B/ab.dat'
-            ));
+            // The exception should only occur on AbstractFindAdapter instances
+            foreach ($finder->getAdapters() as $adapter) {
+                if (false === $adapter instanceof AbstractFindAdapter) {
+                    $this->fail(
+                        'With adapter instance of "'.get_class($adapter)
+                        . '" in finder chain a stream (phar) should be resolvable.'
+                    );
+                }
+            }
+        }
+    }
 
+    /**
+     * @dataProvider getAdaptersTestData
+     */
+    public function testAdapterSupportOnAPharArchive($adapter)
+    {
+        $source = $this->toAbsoluteFixtures(array(
+            'test.phar',
+            'A/B/C'
+        ));
+
+        // Current adapter is the PHP adapter
+        if (false === $adapter instanceof AbstractFindAdapter) {
+            $this->assertTrue($adapter->isSupported($source[0]));
+            $this->assertTrue($adapter->isSupported($source[1]));
+        } else {
+            // Current adapter is an native adapter
             $this->assertFalse($adapter->isSupported($source[0]));
             $this->assertTrue($adapter->isSupported($source[1]));
         }
@@ -550,7 +571,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             if (false !== strpos($file, 'phar')) {
                 $prefix = 'phar://';
             }
-            $f[] = $prefix.__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$file;
+            $f[] = $prefix.__DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/Fixtures/'.$file);
         }
 
         return $f;
@@ -667,7 +688,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($filenames, $finder->in(sys_get_temp_dir())->getIterator());
     }
 
-    public function getMixedAdapterChainFinderTestData()
+    public function getDifferentFinderConfigurationsTestData()
     {
         return array_map(
             function ($finder) { return array($finder); },
@@ -677,7 +698,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
                 // PHP adapter only
                 $this->buildFinder(new PhpAdapter()),
                 // Native adapters only
-                $this->buildFinder(new GnuFindAdapter())
+                Finder::create()
+                    ->removeAdapters()
+                    ->addAdapter(new GnuFindAdapter())
+                    ->addAdapter(new BsdFindAdapter())
             )
         );
     }

@@ -236,7 +236,10 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Returns whether the adapter supports a given path.
      *
-     * This method should be implemented in all adapters.
+     * An adapter could support only resolvable absolute paths like the GNU/BSD
+     * find binary adapter. An adapter could also be used for streams like ftp://
+     * or phar:// like the PHP adapter. This method should be implemented in all
+     * adapters.
      *
      * @param string Path to check
      *

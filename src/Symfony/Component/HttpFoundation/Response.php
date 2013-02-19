@@ -143,6 +143,14 @@ class Response
         if ($this->headers->has('Transfer-Encoding')) {
             $this->headers->remove('Content-Length');
         }
+
+        /**
+         * Check if we need to remove Cache-Control for ssl encrypted downloads
+         * @link http://support.microsoft.com/kb/323308
+         */
+        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment')) {
+            $this->headers->remove('Cache-Control');
+        }
     }
 
     /**

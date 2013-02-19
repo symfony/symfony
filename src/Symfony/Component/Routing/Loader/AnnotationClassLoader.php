@@ -131,29 +131,12 @@ abstract class AnnotationClassLoader implements LoaderInterface
                 $globals['path'] = $annot->getPattern();
             }
 
-            if (null !== $annot->getRequirements()) {
-                $globals['requirements'] = $annot->getRequirements();
-            }
-
-            if (null !== $annot->getOptions()) {
-                $globals['options'] = $annot->getOptions();
-            }
-
-            if (null !== $annot->getDefaults()) {
-                $globals['defaults'] = $annot->getDefaults();
-            }
-
-            if (null !== $annot->getSchemes()) {
-                $globals['schemes'] = $annot->getSchemes();
-            }
-
-            if (null !== $annot->getMethods()) {
-                $globals['methods'] = $annot->getMethods();
-            }
-
-            if (null !== $annot->getHost()) {
-                $globals['host'] = $annot->getHost();
-            }
+            $globals['requirements'] = $annot->getRequirements() ?: $globals['requirements'];
+            $globals['options'] = $annot->getOptions() ?: $globals['options'];
+            $globals['defaults'] = $annot->getDefaults() ?: $globals['defaults'];
+            $globals['schemes'] = $annot->getSchemes() ?: $globals['schemes'];
+            $globals['methods'] = $annot->getMethods() ?: $globals['methods'];
+            $globals['host'] = $annot->getHost() ?: $globals['host'];
         }
 
         $collection = new RouteCollection();

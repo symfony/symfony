@@ -40,7 +40,9 @@ class ContainerAwareHIncludeFragmentRenderer extends HIncludeFragmentRenderer
      */
     public function render($uri, Request $request, array $options = array())
     {
-        if (!$this->templating) {
+        // setting the templating cannot be done in the constructor
+        // as it would lead to an infinite recursion in the service container
+        if (!$this->hasTemplating()) {
             $this->setTemplating($this->container->get('templating'));
         }
 

@@ -217,7 +217,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     public function testCacheControl()
     {
         $response = new Response();
-        $response->headers->set('Content-Disposition', 'attachment');
+        $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
         $response->prepare();
 
         $this->assertFalse($response->headers->has('Cache-Control'));

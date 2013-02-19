@@ -214,7 +214,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('text/css; charset=UTF-8', $response->headers->get('Content-Type'));
     }
 
-    public function testCacheControl()
+    public function testNoCacheControlHeaderOnAttachment()
     {
         $response = new Response();
         $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');

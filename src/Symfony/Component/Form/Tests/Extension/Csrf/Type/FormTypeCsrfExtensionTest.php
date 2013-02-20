@@ -196,6 +196,26 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertFalse($form->isValid());
     }
 
+    public function testFailIfRootAndCompoundAndBoundDataIsString()
+    {
+        $form = $this->factory
+            ->createBuilder('form', null, array(
+                'csrf_field_name' => 'csrf',
+                'csrf_provider' => $this->csrfProvider,
+                'intention' => '%INTENTION%',
+                'compound' => true,
+            ))
+            ->add('child', 'text')
+            ->getForm();
+
+        $form->bind('malformed request');
+
+        $this->assertSame(array('child' => null), $form->getData());
+
+        // Validate accordingly
+        $this->assertFalse($form->isValid());
+    }
+
     public function testDontValidateTokenIfCompoundButNoRoot()
     {
         $this->csrfProvider->expects($this->never())

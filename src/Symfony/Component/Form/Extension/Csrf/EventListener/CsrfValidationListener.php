@@ -67,8 +67,9 @@ class CsrfValidationListener implements EventSubscriberInterface
             if (!isset($data[$this->fieldName]) || !$this->csrfProvider->isCsrfTokenValid($this->intention, $data[$this->fieldName])) {
                 $form->addError(new FormError('The CSRF token is invalid. Please try to resubmit the form.'));
             }
-
-            unset($data[$this->fieldName]);
+            if (is_array($data)) {
+                unset($data[$this->fieldName]);
+            }
         }
 
         $event->setData($data);

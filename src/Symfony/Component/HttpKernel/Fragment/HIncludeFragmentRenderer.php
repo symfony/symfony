@@ -57,6 +57,16 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     }
 
     /**
+     * Checks if a templating engine has been set.
+     *
+     * @return Boolean true if the templating engine has been set, false otherwise
+     */
+    public function hasTemplating()
+    {
+        return null !== $this->templating;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * Additional available options:

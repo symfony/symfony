@@ -13,22 +13,19 @@ namespace Symfony\Component\Finder\Tests;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Adapter;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Finder\Tests\FakeAdapter;
 use Symfony\Component\Finder\Adapter\AbstractFindAdapter;
+use Symfony\Component\Finder\Adapter\AdapterInterface;
 use Symfony\Component\Finder\Adapter\PhpAdapter;
 use Symfony\Component\Finder\Adapter\GnuFindAdapter;
 use Symfony\Component\Finder\Adapter\BsdFindAdapter;
+use Symfony\Component\Finder\Tests\Iterator\RealIteratorTestCase;
 
-class FinderTest extends Iterator\RealIteratorTestCase
+class FinderTest extends RealIteratorTestCase
 {
-    protected static $tmpDir;
-
-    public static function setUpBeforeClass()
-    {
-        parent::setUpBeforeClass();
-
-        self::$tmpDir = realpath(sys_get_temp_dir().'/symfony2_finder');
-    }
+    protected static $allValidAdapters;
+    protected static $validNativeAdapters;
 
     public function testCreate()
     {
@@ -36,7 +33,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testDirectories($adapter)
     {
@@ -52,7 +49,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testFiles($adapter)
     {
@@ -68,7 +65,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testDepth($adapter)
     {
@@ -90,7 +87,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testName($adapter)
     {
@@ -117,7 +114,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testNotName($adapter)
     {
@@ -157,7 +154,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testSize($adapter)
     {
@@ -167,7 +164,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testDate($adapter)
     {
@@ -177,7 +174,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testExclude($adapter)
     {
@@ -187,7 +184,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testIgnoreVCS($adapter)
     {
@@ -205,7 +202,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testIgnoreDotFiles($adapter)
     {
@@ -223,7 +220,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testSortByName($adapter)
     {
@@ -233,7 +230,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testSortByType($adapter)
     {
@@ -243,7 +240,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testSortByAccessedTime($adapter)
     {
@@ -253,7 +250,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testSortByChangedTime($adapter)
     {
@@ -263,7 +260,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testSortByModifiedTime($adapter)
     {
@@ -273,7 +270,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testSort($adapter)
     {
@@ -283,7 +280,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testFilter($adapter)
     {
@@ -293,7 +290,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testFollowLinks($adapter)
     {
@@ -307,7 +304,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testIn($adapter)
     {
@@ -325,43 +322,51 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator(array(self::$tmpDir.DIRECTORY_SEPARATOR.'test.php', __DIR__.DIRECTORY_SEPARATOR.'FinderTest.php'), $iterator);
     }
 
-    /**
-     * @dataProvider getDifferentFinderConfigurationsTestData
-     */
-    public function testSearchAPharArchive($finder)
+    public function testPhpAdapterSupportsPharArchive()
     {
+        $finder = $this->buildFinder(new PhpAdapter());
+
         $iterator = $finder->files()
             ->name('*.txt')
             ->name('*.dat')
             ->in($this->toAbsoluteFixtures(array('test.phar', 'A')));
 
-        try {
-            $this->assertIterator($this->toAbsoluteFixtures(array(
-                'A/B/C/abc.dat',
-                'A/B/ab.dat',
-                'A/a.dat',
-                'test.phar/dolor.txt',
-                'test.phar/ipsum.txt',
-                'test.phar/lorem.txt'
-            )), $iterator);
-
-        } catch(\Exception $e) {
-            $this->assertInstanceOf('RuntimeException', $e, 'No supported adapter found.');
-
-            // The exception should only occur on AbstractFindAdapter instances
-            foreach ($finder->getAdapters() as $adapter) {
-                if (false === $adapter instanceof AbstractFindAdapter) {
-                    $this->fail(
-                        'With adapter instance of "'.get_class($adapter)
-                        . '" in finder chain a stream (phar) should be resolvable.'
-                    );
-                }
-            }
-        }
+        $this->assertIterator($this->toAbsoluteFixtures(array(
+            'A/B/C/abc.dat',
+            'A/B/ab.dat',
+            'A/a.dat',
+            'test.phar/dolor.txt',
+            'test.phar/ipsum.txt',
+            'test.phar/lorem.txt'
+        )), $iterator);
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getNativeAdaptersTestData
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage No supported adapter found.
+     */
+    public function testNativeAdaptersDoNotSupportPharArchive($nativeAdapter)
+    {
+        $finder = $this->buildFinder($nativeAdapter);
+
+        $iterator = $finder->files()
+            ->name('*.txt')
+            ->name('*.dat')
+            ->in($this->toAbsoluteFixtures(array('test.phar', 'A')));
+
+        $this->assertIterator($this->toAbsoluteFixtures(array(
+            'A/B/C/abc.dat',
+            'A/B/ab.dat',
+            'A/a.dat',
+            'test.phar/dolor.txt',
+            'test.phar/ipsum.txt',
+            'test.phar/lorem.txt'
+        )), $iterator);
+    }
+
+    /**
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testAdapterSupportOnAPharArchive($adapter)
     {
@@ -382,7 +387,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testInWithGlob($adapter)
     {
@@ -393,7 +398,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      * @expectedException \InvalidArgumentException
      */
     public function testInWithNonDirectoryGlob($adapter)
@@ -403,7 +408,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testGetIterator($adapter)
     {
@@ -439,7 +444,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testRelativePath($adapter)
     {
@@ -460,7 +465,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testRelativePathname($adapter)
     {
@@ -481,7 +486,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testAppendWithAFinder($adapter)
     {
@@ -497,7 +502,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testAppendWithAnArray($adapter)
     {
@@ -510,7 +515,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testAppendReturnsAFinder($adapter)
     {
@@ -518,7 +523,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testAppendDoesNotRequireIn($adapter)
     {
@@ -603,7 +608,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testContainsOnDirectory(Adapter\AdapterInterface $adapter)
     {
@@ -616,7 +621,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testNotContainsOnDirectory(Adapter\AdapterInterface $adapter)
     {
@@ -634,7 +639,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
      *
      * @see https://bugs.php.net/bug.php?id=49104
      *
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testMultipleLocations(Adapter\AdapterInterface $adapter)
     {
@@ -653,7 +658,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     /**
      * Iterator keys must be the file pathname.
      *
-     * @dataProvider getAdaptersTestData
+     * @dataProvider getAllValidAdaptersTestData
      */
     public function testIteratorKeys(Adapter\AdapterInterface $adapter)
     {
@@ -686,7 +691,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $iterator  = new \ArrayIterator(array());
         $filenames = $this->toAbsolute(array('foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto'));
         foreach ($filenames as $file) {
-            $iterator->append(new \Symfony\Component\Finder\SplFileInfo($file, null, null));
+            $iterator->append(new SplFileInfo($file, null, null));
         }
 
         $finder = Finder::create()
@@ -698,30 +703,38 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($filenames, $finder->in(sys_get_temp_dir())->getIterator());
     }
 
-    public function getDifferentFinderConfigurationsTestData()
+    public function getAllValidAdaptersTestData()
     {
-        return array_map(
-            function ($finder) { return array($finder); },
-            array(
-                // Default adapter chain
-                Finder::create(),
-                // PHP adapter only
-                $this->buildFinder(new PhpAdapter()),
-                // Native adapters only
-                Finder::create()
-                    ->removeAdapters()
-                    ->addAdapter(new GnuFindAdapter())
-                    ->addAdapter(new BsdFindAdapter())
-            )
-        );
+        if (!self::$allValidAdapters) {
+            self::$allValidAdapters = array_merge(
+                $this->getNativeAdaptersTestData(),
+                array(array(new PhpAdapter()))
+            );
+        }
+
+        return self::$allValidAdapters;
     }
 
-    public function getAdaptersTestData()
+    public function getNativeAdaptersTestData()
     {
-        return array_map(
-            function ($adapter)  { return array($adapter); },
-            $this->getValidAdapters()
-        );
+        if (!self::$validNativeAdapters) {
+            $adapters = array_filter(
+                array(
+                    new BsdFindAdapter(),
+                    new GnuFindAdapter(),
+                ),
+                function (AdapterInterface $adapter) {
+                    return $adapter->isSupported(self::$tmpDir);
+                }
+            );
+
+            self::$validNativeAdapters = array_map(
+                function ($adapter) { return array($adapter); },
+                $adapters
+            );
+        }
+
+        return self::$validNativeAdapters;
     }
 
     public function getContainsTestData()
@@ -755,7 +768,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     /**
      * @dataProvider getTestPathData
      */
-    public function testPath(Adapter\AdapterInterface $adapter, $matchPatterns, $noMatchPatterns, array $expected)
+    public function testPath(AdapterInterface $adapter, $matchPatterns, $noMatchPatterns, array $expected)
     {
         $finder = $this->buildFinder($adapter);
         $finder->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures')
@@ -810,33 +823,19 @@ class FinderTest extends Iterator\RealIteratorTestCase
     private function buildTestData(array $tests)
     {
         $data = array();
-        foreach ($this->getValidAdapters() as $adapter) {
+        foreach ($this->getAllValidAdaptersTestData() as $adapter) {
             foreach ($tests as $test) {
-                $data[] = array_merge(array($adapter), $test);
+                $data[] = array_merge($adapter, $test);
             }
         }
 
         return $data;
     }
 
-    private function buildFinder(Adapter\AdapterInterface $adapter)
+    private function buildFinder(AdapterInterface $adapter)
     {
         return Finder::create()
             ->removeAdapters()
             ->addAdapter($adapter);
-    }
-
-    private function getValidAdapters()
-    {
-        return array_filter(
-            array(
-                new Adapter\BsdFindAdapter(),
-                new Adapter\GnuFindAdapter(),
-                new Adapter\PhpAdapter()
-            ),
-            function (Adapter\AdapterInterface $adapter) {
-                return $adapter->isSupported(realpath(sys_get_temp_dir().'/symfony2_finder'));
-            }
-        );
     }
 }

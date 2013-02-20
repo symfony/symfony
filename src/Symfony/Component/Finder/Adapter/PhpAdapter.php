@@ -105,7 +105,7 @@ class PhpAdapter extends AbstractAdapter
             return true;
         }
 
-        if ($handle = @opendir($path)) {
+        if (false !== ($handle = @opendir($path))) {
             closedir($handle);
             return true;
         }

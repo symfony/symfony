@@ -39,13 +39,21 @@ abstract class AbstractAdapter implements AdapterInterface
 
     /**
      * {@inheritDoc}
+     *
+     * This generic implementation should not need to be overridden in the derived
+     * class as it provides a cache layer. The 2 following methods should rather
+     * be implemented:
+     *
+     * @see canBeUsed
+     * @see canBeUsedOnPath
      */
-    public function isSupported($dir)
+    public function isSupported($path)
     {
         $name = $this->getName();
-        $dir  = (string) $dir;
+        $canonicalPath = realpath($path);
+        $canonicalPath = false === $canonicalPath ? (string) $path : $canonicalPath;
 
-        if (!array_key_exists($name, self::$areSupportedAdapters)) {
+        if (!isset(self::$areSupportedAdapters[$name])) {
             self::$areSupportedAdapters[$name] = $this->canBeUsed();
         }
 
@@ -53,11 +61,11 @@ abstract class AbstractAdapter implements AdapterInterface
             return false;
         }
 
-        if (!isset(self::$areSupportedPaths[$dir][$name])) {
-            self::$areSupportedPaths[$dir][$name] = $this->canBeUsedOnPath($dir);
+        if (!isset(self::$areSupportedPaths[$canonicalPath][$name])) {
+            self::$areSupportedPaths[$canonicalPath][$name] = $this->canBeUsedOnPath($canonicalPath);
         }
 
-        return self::$areSupportedPaths[$dir][$name];
+        return self::$areSupportedPaths[$canonicalPath][$name];
     }
 
     /**
@@ -223,10 +231,6 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Returns whether the adapter is supported in the current environment.
      *
-     * This method should be implemented in all adapters. Do not implement
-     * isSupported in the adapters as the generic implementation provides a cache
-     * layer.
-     *
      * @see isSupported
      *
      * @return Boolean Whether the adapter is supported
@@ -236,10 +240,9 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Returns whether the adapter supports a given path.
      *
-     * An adapter could support only resolvable absolute paths like the GNU/BSD
-     * find binary adapter. An adapter could also be used for streams like ftp://
-     * or phar:// like the PHP adapter. This method should be implemented in all
-     * adapters.
+     * Some adapters only support resolvable absolute paths like the GNU/BSD
+     * find binary adapter. Others adapters might support PHP streams like "ftp://"
+     * or "phar://" like the PHP adapter.
      *
      * @param string Path to check
      *

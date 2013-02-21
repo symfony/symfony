@@ -365,25 +365,30 @@ class FinderTest extends RealIteratorTestCase
         )), $iterator);
     }
 
-    /**
-     * @dataProvider getAllValidAdaptersTestData
-     */
-    public function testAdapterSupportOnAPharArchive($adapter)
+    public function testPhpAdapterSupportCheckOnPharArchive()
     {
         $source = $this->toAbsoluteFixtures(array(
             'test.phar',
             'A/B/C'
         ));
 
-        // Current adapter is the PHP adapter
-        if (false === $adapter instanceof AbstractFindAdapter) {
-            $this->assertTrue($adapter->isSupported($source[0]));
-            $this->assertTrue($adapter->isSupported($source[1]));
-        } else {
-            // Current adapter is an native adapter
-            $this->assertFalse($adapter->isSupported($source[0]));
-            $this->assertTrue($adapter->isSupported($source[1]));
-        }
+        $adapter = new PhpAdapter();
+        $this->assertTrue($adapter->isSupported($source[0]));
+        $this->assertTrue($adapter->isSupported($source[1]));
+    }
+
+    /**
+     * @dataProvider getNativeAdaptersTestData
+     */
+    public function testNativeAdapterSupportCheckOnPharArchive($nativeAdapter)
+    {
+        $source = $this->toAbsoluteFixtures(array(
+            'test.phar',
+            'A/B/C'
+        ));
+
+        $this->assertFalse($nativeAdapter->isSupported($source[0]));
+        $this->assertTrue($nativeAdapter->isSupported($source[1]));
     }
 
     /**

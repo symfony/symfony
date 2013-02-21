@@ -238,4 +238,12 @@ class FieldTypeTest extends TypeTestCase
         $form = $this->factory->create('field', null, array('attr' => ''));
     }
 
+    // https://github.com/symfony/symfony/issues/6862
+    public function testPassZeroLabelToView()
+    {
+        $view = $this->factory->create('field', null, array('label' => 0))->createView();
+
+        $this->assertEquals('0', $view->get('label'));
+    }
+
 }

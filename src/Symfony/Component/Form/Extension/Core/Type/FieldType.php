@@ -52,7 +52,7 @@ class FieldType extends AbstractType
             ->setAttribute('error_mapping', $options['error_mapping'])
             ->setAttribute('max_length', $options['max_length'])
             ->setAttribute('pattern', $options['pattern'])
-            ->setAttribute('label', $options['label'] ?: $this->humanize($builder->getName()))
+            ->setAttribute('label', strlen($options['label']) > 0 ? $options['label'] : $this->humanize($builder->getName()))
             ->setAttribute('attr', $options['attr'] ?: array())
             ->setAttribute('invalid_message', $options['invalid_message'])
             ->setAttribute('invalid_message_parameters', $options['invalid_message_parameters'])

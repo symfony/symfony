@@ -208,7 +208,7 @@ class Cookie
         }
 
         // attempt a fallback for unusual formatting
-	if (false !== $date = date_create($dateValue, new \DateTimeZone('GMT'))) {
+        if (false !== $date = date_create($dateValue, new \DateTimeZone('GMT'))) {
             return $date->getTimestamp();
         }
 

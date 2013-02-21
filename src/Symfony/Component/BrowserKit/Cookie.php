@@ -208,8 +208,8 @@ class Cookie
         }
 
         // attempt a fallback for unusual formatting
-        if (false !== $dateTimestamp = strtotime($dateValue)) {
-            return $dateTimestamp;
+	if (false !== $date = date_create($dateValue, new \DateTimeZone('GMT'))) {
+            return $date->getTimestamp();
         }
 
         throw new \InvalidArgumentException(sprintf('Could not parse date "%s".', $dateValue));

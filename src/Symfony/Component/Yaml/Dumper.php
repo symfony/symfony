@@ -36,6 +36,16 @@ class Dumper
     }
 
     /**
+     * Gets the indentation.
+     *
+     * @return int
+     */
+    public function getIndentation()
+    {
+        return $this->indentation;
+    }
+
+    /**
      * Dumps a PHP value to YAML.
      *
      * @param mixed   $input                  The PHP value

@@ -35,6 +35,24 @@ class DumperTest extends \PHPUnit_Framework_TestCase
         $this->path = null;
     }
 
+    public function testGetIndentationDefault()
+    {
+        $this->assertEquals(4, $this->dumper->getIndentation());
+    }
+
+    public function testSetGetIndentation()
+    {
+        $this->dumper->setIndentation(6);
+        $this->assertEquals(6, $this->dumper->getIndentation());
+    }
+
+    public function testSetGetIndentationCastToInt()
+    {
+        $this->dumper->setIndentation('8');
+        $this->assertTrue(is_int($this->dumper->getIndentation()));
+        $this->assertEquals(8, $this->dumper->getIndentation());
+    }
+
     public function testSpecifications()
     {
         $files = $this->parser->parse(file_get_contents($this->path.'/index.yml'));

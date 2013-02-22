@@ -494,6 +494,22 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('called'.PHP_EOL, $tester->getDisplay(), '->run() does not call interact() if -n is passed');
     }
 
+    public function testIssue7068()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        $this->ensureStaticCommandHelp($application);
+        $tester = new ApplicationTester($application);
+
+        $tester->run(array('command' => 'list', '--help' => true), array('decorated' => false));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() displays the help if --help is passed');
+
+        $tester->run(array('command' => 'list'), array('decorated' => false));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run1.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() displays the help if -h is passed');
+    }
+
     /**
      * @expectedException \LogicException
      * @dataProvider getAddingAlreadySetDefinitionElementData

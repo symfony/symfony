@@ -564,7 +564,7 @@ class Command
     {
         if ($this->application && !$this->applicationDefinitionMerged) {
             $this->getSynopsis();
-            $this->mergeApplicationDefinition(false);
+            $this->mergeApplicationDefinition();
         }
 
         $messages = array(

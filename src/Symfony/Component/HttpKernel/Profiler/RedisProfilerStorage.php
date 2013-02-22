@@ -199,7 +199,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
 
             $host = $matches[1] ?: $matches[2];
             $port = $matches[3];
-            $dbnum = isset($matches[4]) ? (int) $matches[4] : false;
+            $dbnum = !empty($matches[4]) ? intval($matches[4]) : -1;
 
             if (!extension_loaded('redis')) {
                 throw new \RuntimeException('RedisProfilerStorage requires that the redis extension is loaded.');
@@ -208,7 +208,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
             $redis = new Redis;
             $redis->connect($host, $port);
             
-            if(false !== $dbnum) {
+            if(-1 < $dbnum) {
                 $redis->select($dbnum);
             }
 

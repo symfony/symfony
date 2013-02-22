@@ -257,8 +257,8 @@ class Response
          * Check if we need to remove Cache-Control for ssl encrypted downloads when using IE < 9
          * @link http://support.microsoft.com/kb/323308
          */
-        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/', $request->server->get('HTTP_USER_AGENT'), $matches) > 0 && null === $request->isSecure()) {
-            if (count($matches) > 1 && $matches[1] < 9) {
+        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) == 1 && true === $request->isSecure()) {
+            if(intval(preg_replace("/(MSIE )(.*?);/", "$2", $match[0])) < 9) {
                 $this->headers->remove('Cache-Control');
             }
         }

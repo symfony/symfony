@@ -342,7 +342,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         // Check for IE 10 and HTTPS
         $request->server->set('HTTP_USER_AGENT', 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)');
 
-        $response = new Response('', 200);
+        $response = new Response();
         $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
         $response->prepare($request);
 
@@ -351,7 +351,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         // Check for IE 9 and HTTPS
         $request->server->set('HTTP_USER_AGENT', 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 7.1; Trident/5.0)');
 
-        $response = new Response('', 200);
+        $response = new Response();
         $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
         $response->prepare($request);
 
@@ -360,7 +360,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         // Check for IE 9 and HTTP
         $request->server->set('HTTPS', false);
 
-        $response = new Response('', 200);
+        $response = new Response();
         $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
         $response->prepare($request);
 
@@ -369,7 +369,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         // Check for IE 8 and HTTP
         $request->server->set('HTTP_USER_AGENT', 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)');
 
-        $response = new Response('', 200);
+        $response = new Response();
         $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
         $response->prepare($request);
 
@@ -379,7 +379,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $request->server->set('HTTPS', true);
         $request->server->set('HTTP_USER_AGENT', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.60 Safari/537.17');
 
-        $response = new Response('', 200);
+        $response = new Response();
         $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
         $response->prepare($request);
 
@@ -388,7 +388,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         // Check for non-IE and HTTP
         $request->server->set('HTTPS', false);
 
-        $response = new Response('', 200);
+        $response = new Response();
         $response->headers->set('Content-Disposition', 'attachment; filename="fname.ext"');
         $response->prepare($request);
 

@@ -659,4 +659,15 @@ class FormTypeTest extends TypeTestCase
         $this->assertSame('foo', $view->vars['data']);
         $this->assertSame('bar', $view->vars['value']);
     }
+
+    // https://github.com/symfony/symfony/issues/6862
+    public function testPassZeroLabelToView()
+    {
+        $view = $this->factory->create('form', null, array(
+                'label' => '0'
+            ))
+            ->createView();
+
+        $this->assertSame('0', $view->vars['label']);
+    }
 }

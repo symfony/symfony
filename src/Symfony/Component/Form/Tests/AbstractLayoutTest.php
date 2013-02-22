@@ -1531,11 +1531,11 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [
         ./select
             [@id="name_hour"]
-            [@size="1"]
+            [not(@size)]
             [./option[@value="4"][@selected="selected"]]
         /following-sibling::select
             [@id="name_minute"]
-            [@size="1"]
+            [not(@size)]
             [./option[@value="5"][@selected="selected"]]
     ]
     [count(./select)=2]
@@ -1555,17 +1555,17 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [
         ./select
             [@id="name_hour"]
-            [@size="1"]
+            [not(@size)]
             [./option[@value="4"][@selected="selected"]]
             [count(./option)>23]
         /following-sibling::select
             [@id="name_minute"]
-            [@size="1"]
+            [not(@size)]
             [./option[@value="5"][@selected="selected"]]
             [count(./option)>59]
         /following-sibling::select
             [@id="name_second"]
-            [@size="1"]
+            [not(@size)]
             [./option[@value="6"][@selected="selected"]]
             [count(./option)>59]
     ]
@@ -1616,6 +1616,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [@type="time"]
     [@name="name"]
     [@value="04:05"]
+    [not(@size)]
 '
         );
     }

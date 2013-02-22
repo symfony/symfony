@@ -253,6 +253,14 @@ class Response
             $this->headers->set('expires', -1);
         }
 
+        /**
+         * Check if we need to remove Cache-Control for ssl encrypted downloads when using IE < 9
+         * @link http://support.microsoft.com/kb/323308
+         */
+        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/(?i)msie [1-8]/', $request->server->get('HTTP_USER_AGENT')) && null === $request->server->get('HTTPS')) {
+            $this->headers->remove('Cache-Control');
+        }
+
         return $this;
     }
 

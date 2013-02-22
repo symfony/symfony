@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "doctrine/common": ">2.2,<2.4-dev",
+        "doctrine/common": ">2.2,<2.5-dev",
         "twig/twig": ">=1.9.1,<2.0-dev"
     },
     "replace": {

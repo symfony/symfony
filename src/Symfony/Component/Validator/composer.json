@@ -24,7 +24,7 @@
         "symfony/yaml": "2.1.*"
     },
     "suggest": {
-        "doctrine/common": ">=2.1,<2.4-dev",
+        "doctrine/common": "~2.1",
         "symfony/http-foundation": "2.1.*",
         "symfony/yaml": "2.1.*"
     },

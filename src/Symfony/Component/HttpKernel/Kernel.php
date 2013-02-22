@@ -513,7 +513,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
             foreach ($hierarchy as $bundle) {
                 $this->bundleMap[$bundle] = $bundleMap;
-                array_pop($bundleMap);
+                array_shift($bundleMap);
             }
         }
 

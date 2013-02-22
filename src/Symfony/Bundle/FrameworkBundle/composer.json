@@ -26,7 +26,7 @@
         "symfony/stopwatch": ">=2.2,<2.4-dev",
         "symfony/templating": "~2.1",
         "symfony/translation": ">=2.2,<2.4-dev",
-        "doctrine/common": ">=2.2,<2.4-dev"
+        "doctrine/common": "~2.2"
     },
     "require-dev": {
         "symfony/finder": "~2.0",

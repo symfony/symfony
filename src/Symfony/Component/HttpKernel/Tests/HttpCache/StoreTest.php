@@ -130,14 +130,14 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $this->storeSimpleEntry();
         $response = $this->store->lookup($this->request);
 
-        $this->assertEquals($response->headers->all(), array_merge(array('content-length' => 4, 'x-body-file' => array($this->getStorePath($response->headers->get('X-Content-Digest')))), $this->response->headers->all()));
+        $this->assertEquals($response->headers->all(), array_merge(array('content-length' => 4), $this->response->headers->all()));
     }
 
     public function testRestoresResponseContentFromEntityStoreWithLookup()
     {
         $this->storeSimpleEntry();
         $response = $this->store->lookup($this->request);
-        $this->assertEquals($this->getStorePath('en'.sha1('test')), $response->getContent());
+        $this->assertEquals('test', $response->getContent());
     }
 
     public function testInvalidatesMetaAndEntityStoreEntriesWithInvalidate()
@@ -180,9 +180,9 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $res3 = new Response('test 3', 200, array('Vary' => 'Foo Bar'));
         $this->store->write($req3, $res3);
 
-        $this->assertEquals($this->getStorePath('en'.sha1('test 3')), $this->store->lookup($req3)->getContent());
-        $this->assertEquals($this->getStorePath('en'.sha1('test 2')), $this->store->lookup($req2)->getContent());
-        $this->assertEquals($this->getStorePath('en'.sha1('test 1')), $this->store->lookup($req1)->getContent());
+        $this->assertEquals('test 3', $this->store->lookup($req3)->getContent());
+        $this->assertEquals('test 2', $this->store->lookup($req2)->getContent());
+        $this->assertEquals('test 1', $this->store->lookup($req1)->getContent());
 
         $this->assertCount(3, $this->getStoreMetadata($key));
     }
@@ -192,17 +192,17 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $req1 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar'));
         $res1 = new Response('test 1', 200, array('Vary' => 'Foo Bar'));
         $key = $this->store->write($req1, $res1);
-        $this->assertEquals($this->getStorePath('en'.sha1('test 1')), $this->store->lookup($req1)->getContent());
+        $this->assertEquals('test 1', $this->store->lookup($req1)->getContent());
 
         $req2 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Bling', 'HTTP_BAR' => 'Bam'));
         $res2 = new Response('test 2', 200, array('Vary' => 'Foo Bar'));
         $this->store->write($req2, $res2);
-        $this->assertEquals($this->getStorePath('en'.sha1('test 2')), $this->store->lookup($req2)->getContent());
+        $this->assertEquals('test 2', $this->store->lookup($req2)->getContent());
 
         $req3 = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar'));
         $res3 = new Response('test 3', 200, array('Vary' => 'Foo Bar'));
         $key = $this->store->write($req3, $res3);
-        $this->assertEquals($this->getStorePath('en'.sha1('test 3')), $this->store->lookup($req3)->getContent());
+        $this->assertEquals('test 3', $this->store->lookup($req3)->getContent());
 
         $this->assertCount(2, $this->getStoreMetadata($key));
     }

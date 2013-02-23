@@ -46,7 +46,7 @@ class Link
      */
     public function __construct(\DOMNode $node, $currentUri, $method = 'GET')
     {
-        if (!in_array(substr($currentUri, 0, 4), array('http', 'file'))) {
+        if (!in_array(strtolower(substr($currentUri, 0, 4)), array('http', 'file'))) {
             throw new \InvalidArgumentException(sprintf('Current URI must be an absolute URL ("%s").', $currentUri));
         }
 

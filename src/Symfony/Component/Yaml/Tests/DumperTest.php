@@ -35,22 +35,43 @@ class DumperTest extends \PHPUnit_Framework_TestCase
         $this->path = null;
     }
 
-    public function testGetIndentationDefault()
+    public function testSetIndentation()
     {
-        $this->assertEquals(4, $this->dumper->getIndentation());
-    }
+        $this->dumper->setIndentation(7);
+        $array = array(
+            '' => 'bar',
+            'foo' => '#bar',
+            'foo\'bar' => array(),
+            'bar' => array(1, 'foo'),
+            'foobar' => array(
+                'foo' => 'bar',
+                'bar' => array(1, 'foo'),
+                'foobar' => array(
+                    'foo' => 'bar',
+                    'bar' => array(1, 'foo'),
+                ),
+            ),
+        );
+$expected = <<<EOF
+'': bar
+foo: '#bar'
+'foo''bar': {  }
+bar:
+       - 1
+       - foo
+foobar:
+       foo: bar
+       bar:
+              - 1
+              - foo
+       foobar:
+              foo: bar
+              bar:
+                     - 1
+                     - foo
 
-    public function testSetGetIndentation()
-    {
-        $this->dumper->setIndentation(6);
-        $this->assertEquals(6, $this->dumper->getIndentation());
-    }
-
-    public function testSetGetIndentationCastToInt()
-    {
-        $this->dumper->setIndentation('8');
-        $this->assertTrue(is_int($this->dumper->getIndentation()));
-        $this->assertEquals(8, $this->dumper->getIndentation());
+EOF;
+        $this->assertEquals($expected, $this->dumper->dump($array, 4, 0));
     }
 
     public function testSpecifications()

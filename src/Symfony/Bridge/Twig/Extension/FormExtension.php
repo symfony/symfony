@@ -27,7 +27,7 @@ class FormExtension extends \Twig_Extension
      * This property is public so that it can be accessed directly from compiled
      * templates without having to call a getter, which slightly decreases performance.
      *
-     * @var \Symfony\Component\Form\FormRendererInterface
+     * @var TwigRendererInterface
      */
     public $renderer;
 

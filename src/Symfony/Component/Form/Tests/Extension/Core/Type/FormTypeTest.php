@@ -601,9 +601,11 @@ class FormTypeTest extends TypeTestCase
     // BC
     public function testPropertyPathFalseImpliesDefaultNotMapped()
     {
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
         $form = $this->factory->createNamed('name', 'form', null, array(
             'property_path' => false,
         ));
+        restore_error_handler();
 
         $this->assertEquals(new PropertyPath('name'), $form->getPropertyPath());
         $this->assertFalse($form->getConfig()->getMapped());
@@ -660,5 +662,16 @@ class FormTypeTest extends TypeTestCase
 
         $this->assertSame('foo', $view->vars['data']);
         $this->assertSame('bar', $view->vars['value']);
+    }
+
+    // https://github.com/symfony/symfony/issues/6862
+    public function testPassZeroLabelToView()
+    {
+        $view = $this->factory->create('form', null, array(
+                'label' => '0'
+            ))
+            ->createView();
+
+        $this->assertSame('0', $view->vars['label']);
     }
 }

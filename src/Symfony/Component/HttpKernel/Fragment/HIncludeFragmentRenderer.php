@@ -57,6 +57,16 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     }
 
     /**
+     * Checks if a templating engine has been set.
+     *
+     * @return Boolean true if the templating engine has been set, false otherwise
+     */
+    public function hasTemplating()
+    {
+        return null !== $this->templating;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * Additional available options:
@@ -72,6 +82,9 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 
             $uri = $this->signer->sign($this->generateFragmentUri($uri, $request));
         }
+
+        // We need to replace ampersands in the URI with the encoded form in order to return valid html/xml content.
+        $uri = str_replace('&', '&amp;', $uri);
 
         $template = isset($options['default']) ? $options['default'] : $this->globalDefaultTemplate;
         if (null !== $this->templating && $template && $this->templateExists($template)) {

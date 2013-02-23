@@ -4,6 +4,7 @@ CHANGELOG
 2.2.0
 -----
 
+ * [BC BREAK] the path info for sub-request is now always _fragment (or whatever you configured instead of the default)
  * added Symfony\Component\HttpKernel\EventListener\FragmentListener
  * added Symfony\Component\HttpKernel\UriSigner
  * added Symfony\Component\HttpKernel\FragmentRenderer and rendering strategies (in Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface)

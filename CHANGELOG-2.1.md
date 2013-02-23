@@ -7,6 +7,37 @@ in 2.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.1.0...v2.1.1
 
+* 2.1.8 (2013-02-23)
+
+ b2080c4: [HttpFoundation] Remove Cache-Control when using https download via IE<9 (fixes #6750)
+ b7bd630: [Form] Fixed TimeType not to render a "size" attribute in select tags
+ 368f62f: Expanded fault-tolerance for unusual cookie dates
+ cb03074: [DomCrawler] lowered parsed protocol string (fixes #6986)
+ 3e40c17: [HttpKernel] fixed locale management when exiting sub-requests
+ 179cd58: [Process] Fix regression introduced in #6620 / 880da01c49a9255f5022ab7e18bca38c18f56370, fixes #7082
+ 18b139d: [FrameworkBundle] tweaked reference dumper command (see #7093)
+ 0eff68f: Fix REMOTE_ADDR for cached subrequests
+ 5e8d844: [Process] Warn user with a useful message when tmpfile() failed
+ 42d3c4c: added support for the X-Forwarded-For header (closes #6982, closes #7000)
+ 6a9c510: fixed the IP address in HttpCache when calling the backend
+ 87f3db7: [EventDispathcer] Fix removeListener
+ e0637fa: [DependencyInjection] Add clone for resources which were introduced in 2.1
+ bd0ad92: [DependencyInjection] Allow frozen containers to be dumped to graphviz
+ 83e9558: Fix 'undefined index' error, when entering scope recursively
+ 3615e19: [Security] fixed session creation on login (closes #7011)
+ a12744e: Add dot character `.` to legal mime subtype regular expression
+ e50d333: [HttpKernel] fixed the creation of the Profiler directory
+ ddf4678: [HttpFoundation] fixed the creation of sub-requests under some circumstancies (closes #6923, closes #6936)
+ 8ca00c5: [Security] fixed session creation when none is needed (closes #6917)
+ 74f2fcf: fixed a circular call (closes #6864)
+ 6f71948: [Yaml] fixed wrong merge (indentation default is 4 as of 2.1)
+ 4119caf: [DependencyInjection] fixed the creation of synthetic services in ContainerBuilder
+ 11aaa2e: Added an error message in the DebugClassLoader when using / instead of \.
+ ce38069: [FrameworkBundle] fixed Client::doRequest that must call its parent method (closes #6737)
+ 53ccc2c: [Yaml] fixed ignored text when parsing an inlined mapping or sequence (closes #6786)
+ ab0385c: [Yaml] fixed #6773
+ fea20b7: [Yaml] fixed #6770
+
 * 2.1.7 (2013-01-17)
 
  * e17e232: [Yaml] fixed default value

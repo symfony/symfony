@@ -25,7 +25,7 @@
         "symfony/form": "~2.0",
         "symfony/routing": ">=2.2,<2.3-dev",
         "symfony/validator": ">=2.2,<2.3-dev",
-        "doctrine/common": ">=2.2,<2.4-dev",
+        "doctrine/common": "~2.2",
         "doctrine/dbal": "~2.2",
         "psr/log": "~1.0"
     },

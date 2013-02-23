@@ -22,12 +22,12 @@
         "symfony/config": "2.1.*",
         "symfony/yaml": "2.1.*",
         "symfony/http-kernel": "2.1.*",
-        "doctrine/common": ">=2.2,<2.4-dev"
+        "doctrine/common": "~2.2"
     },
     "suggest": {
         "symfony/config": "2.1.*",
         "symfony/yaml": "2.1.*",
-        "doctrine/common": ">=2.2,<2.4-dev"
+        "doctrine/common": "~2.2"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Routing": "" }

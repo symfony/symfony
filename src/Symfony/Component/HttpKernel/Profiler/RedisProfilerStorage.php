@@ -193,12 +193,13 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     protected function getRedis()
     {
         if (null === $this->redis) {
-            if (!preg_match('#^redis://(?(?=\[.*\])\[(.*)\]|(.*)):(.*)$#', $this->dsn, $matches)) {
-                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Redis with an invalid dsn "%s". The expected format is "redis://[host]:port".', $this->dsn));
+            if (!preg_match('#^redis://(?(?=\[.*\])\[(.*)\]|(.*)):(\d+)(?(?=/\d+)/(\d+))$#', $this->dsn, $matches)) {
+                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Redis with an invalid dsn "%s". The expected format is "redis://[host]:port[/db-number]".', $this->dsn));
             }
 
             $host = $matches[1] ?: $matches[2];
             $port = $matches[3];
+            $dbnum = !empty($matches[4]) ? intval($matches[4]) : -1;
 
             if (!extension_loaded('redis')) {
                 throw new \RuntimeException('RedisProfilerStorage requires that the redis extension is loaded.');
@@ -206,6 +207,10 @@ class RedisProfilerStorage implements ProfilerStorageInterface
 
             $redis = new Redis;
             $redis->connect($host, $port);
+            
+            if(-1 < $dbnum) {
+                $redis->select($dbnum);
+            }
 
             $redis->setOption(self::REDIS_OPT_PREFIX, self::TOKEN_PREFIX);
 

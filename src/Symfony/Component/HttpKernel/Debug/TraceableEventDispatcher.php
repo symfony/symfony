@@ -417,7 +417,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
                 break;
             case KernelEvents::TERMINATE:
                 $token = $event->getResponse()->headers->get('X-Debug-Token');
-                // In the special case described in th `preDispatch` method above, the `$token` section
+                // In the special case described in the `preDispatch` method above, the `$token` section
                 // does not exist, then closing it throws an exception which must be caught.
                 try {
                     $this->stopwatch->stopSection($token);

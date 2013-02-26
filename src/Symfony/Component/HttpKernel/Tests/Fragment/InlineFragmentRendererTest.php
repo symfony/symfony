@@ -17,6 +17,8 @@ use Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Tests\Fixtures\UserRequest;
 
 class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
 {
@@ -95,6 +97,10 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $strategy->render('/', Request::create('/'), array('ignore_errors' => true, 'alt' => '/foo'))->getContent());
     }
 
+    /**
+     * @param $returnValue
+     * @return \PHPUnit_Framework_MockObject_MockObject|HttpKernelInterface
+     */
     private function getKernel($returnValue)
     {
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
@@ -136,5 +142,17 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $renderer->render('/', Request::create('/'), array('ignore_errors' => true));
 
         $this->assertEquals('Foo', ob_get_clean());
+    }
+
+    public function testCreateSubRequestMethod()
+    {
+        $userRequest = new UserRequest();
+        $renderer = new InlineFragmentRenderer($this->getKernel($this->returnValue(null)));
+        $reflectionRenderer = new \ReflectionObject($renderer);
+        $method = $reflectionRenderer->getMethod('createSubRequest');
+        $method->setAccessible(true);
+        $createdSubRequest = $method->invoke($renderer, '/testUri', $userRequest);
+        $this->assertNotSame($userRequest, $createdSubRequest);
+        $this->assertInstanceOf(get_class($userRequest), $createdSubRequest);
     }
 }

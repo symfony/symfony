@@ -154,6 +154,11 @@ abstract class AbstractFindAdapter extends AbstractAdapter
         foreach ($names as $i => $name) {
             $expr = Expression::create($name);
 
+            // Find does not support expandable globs ("*.{a,b}" syntax).
+            if ($expr->isGlob() && $expr->getGlob()->isExpandable()) {
+                $expr = Expression::create($expr->getGlob()->toRegex(false));
+            }
+
             // Fixes 'not search' and 'full path matching' regex problems.
             // - Jokers '.' are replaced by [^/].
             // - We add '[^/]*' before and after regex (if no ^|$ flags are present).
@@ -196,6 +201,11 @@ abstract class AbstractFindAdapter extends AbstractAdapter
 
         foreach ($paths as $i => $path) {
             $expr = Expression::create($path);
+
+            // Find does not support expandable globs ("*.{a,b}" syntax).
+            if ($expr->isGlob() && $expr->getGlob()->isExpandable()) {
+                $expr = Expression::create($expr->getGlob()->toRegex(false));
+            }
 
             // Fixes 'not search' regex problems.
             if ($expr->isRegex()) {

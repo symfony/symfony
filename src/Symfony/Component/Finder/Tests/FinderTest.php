@@ -106,6 +106,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder($adapter);
         $finder->name('~\\.php$~i');
         $this->assertIterator($this->toAbsolute(array('test.php')), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder($adapter);
+        $finder->name('test.p{hp,y}');
+        $this->assertIterator($this->toAbsolute(array('test.php', 'test.py')), $finder->in(self::$tmpDir)->getIterator());
     }
 
     /**
@@ -127,6 +131,12 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->name('test.py');
         $finder->notName('*.php');
         $finder->notName('*.py');
+        $this->assertIterator(array(), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder($adapter);
+        $finder->name('test.ph*');
+        $finder->name('test.py');
+        $finder->notName('*.p{hp,y}');
         $this->assertIterator(array(), $finder->in(self::$tmpDir)->getIterator());
     }
 

@@ -123,6 +123,20 @@ class Expression implements ValueInterface
     }
 
     /**
+     * @throws \LogicException
+     *
+     * @return Glob
+     */
+    public function getGlob()
+    {
+        if (self::TYPE_GLOB !== $this->value->getType()) {
+            throw new \LogicException('Regex cant be transformed to glob.');
+        }
+
+        return $this->value;
+    }
+
+    /**
      * @return Regex
      */
     public function getRegex()

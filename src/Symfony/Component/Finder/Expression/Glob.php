@@ -82,6 +82,17 @@ class Glob implements ValueInterface
     }
 
     /**
+     * Tests if glob is expandable ("*.{a,b}" syntax).
+     *
+     * @return bool
+     */
+    public function isExpandable()
+    {
+        return false !== strpos($this->pattern, '{')
+            && false !== strpos($this->pattern, '}');
+    }
+
+    /**
      * @param bool $strictLeadingDot
      * @param bool $strictWildcardSlash
      *

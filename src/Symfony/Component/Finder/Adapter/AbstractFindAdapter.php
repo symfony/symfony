@@ -200,7 +200,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
             // Fixes 'not search' regex problems.
             if ($expr->isRegex()) {
                 $regex = $expr->getRegex();
-                $regex->prepend($regex->hasStartFlag() ? '' : '.*')->setEndJoker(!$regex->hasEndFlag());
+                $regex->prepend($regex->hasStartFlag() ? $dir.DIRECTORY_SEPARATOR : '.*')->setEndJoker(!$regex->hasEndFlag());
             } else {
                 $expr->prepend('*')->append('*');
             }
@@ -211,7 +211,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
                     ? ($expr->isCaseSensitive() ? '-regex' : '-iregex')
                     : ($expr->isCaseSensitive() ? '-path' : '-ipath')
                 )
-                ->arg($expr->prepend($dir.DIRECTORY_SEPARATOR)->renderPattern());
+                ->arg($expr->renderPattern());
         }
 
         $command->cmd(')');

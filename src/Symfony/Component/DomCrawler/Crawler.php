@@ -145,8 +145,9 @@ class Crawler extends \SplObjectStorage
 
         $base = $this->filterXPath('descendant-or-self::base')->extract(array('href'));
 
-        if (count($base)) {
-            $this->uri = current($base);
+        $baseHref = current($base);
+        if (count($base) && !empty($baseHref)) {
+            $this->uri = $baseHref;
         }
     }
 

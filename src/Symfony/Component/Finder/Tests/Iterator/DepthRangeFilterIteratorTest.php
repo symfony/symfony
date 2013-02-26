@@ -34,10 +34,10 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
     {
         return array(
             array(0, 0, array($this->getAbsolutePath('/.git'), $this->getAbsolutePath('/test.py'), $this->getAbsolutePath('/foo'), $this->getAbsolutePath('/test.php'), $this->getAbsolutePath('/toto'), $this->getAbsolutePath('/.foo'), $this->getAbsolutePath('/.bar'), $this->getAbsolutePath('/foo bar'))),
-            array(0, 1, array($this->getAbsolutePath('/.git'), $this->getAbsolutePath('/test.py'), $this->getAbsolutePath('/foo'), $this->getAbsolutePath('/foo/bar.tmp'), $this->getAbsolutePath('/test.php'), $this->getAbsolutePath('/toto'), $this->getAbsolutePath('/.foo'), $this->getAbsolutePath('/.foo/.bar'), $this->getAbsolutePath('/.bar'), $this->getAbsolutePath('/foo bar'))),
+            array(0, 1, array($this->getAbsolutePath('/.git'), $this->getAbsolutePath('/test.py'), $this->getAbsolutePath('/foo'), $this->getAbsolutePath('/foo/bar.tmp'), $this->getAbsolutePath('/test.php'), $this->getAbsolutePath('/toto'), $this->getAbsolutePath('/.foo'), $this->getAbsolutePath('/.foo/.bar'), $this->getAbsolutePath('/.bar'), $this->getAbsolutePath('/foo bar'), $this->getAbsolutePath('/.foo/bar'))),
             array(2, INF, array()),
-            array(1, INF, array($this->getAbsolutePath('/foo/bar.tmp'), $this->getAbsolutePath('/.foo/.bar'))),
-            array(1, 1, array($this->getAbsolutePath('/foo/bar.tmp'), $this->getAbsolutePath('/.foo/.bar'))),
+            array(1, INF, array($this->getAbsolutePath('/foo/bar.tmp'), $this->getAbsolutePath('/.foo/.bar'), $this->getAbsolutePath('/.foo/bar'))),
+            array(1, 1, array($this->getAbsolutePath('/foo/bar.tmp'), $this->getAbsolutePath('/.foo/.bar'), $this->getAbsolutePath('/.foo/bar'))),
         );
     }
 

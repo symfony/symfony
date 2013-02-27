@@ -52,6 +52,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('secret')->end()
+                ->scalarNode('http_method_override')->defaultFalse()->end()
                 ->scalarNode('trust_proxy_headers')->defaultFalse()->end() // @deprecated, to be removed in 2.3
                 ->arrayNode('trusted_proxies')
                     ->beforeNormalization()

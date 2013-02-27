@@ -52,6 +52,10 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('secret')->end()
+                ->scalarNode('http_method_override')
+                    ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests.")
+                    ->defaultTrue()
+                ->end()
                 ->scalarNode('trust_proxy_headers')->defaultFalse()->end() // @deprecated, to be removed in 2.3
                 ->arrayNode('trusted_proxies')
                     ->beforeNormalization()

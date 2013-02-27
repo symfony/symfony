@@ -41,6 +41,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array('127.0.0.1', '10.0.0.1'), $container->getParameter('kernel.trusted_proxies'));
     }
 
+    public function testHttpMethodOverride()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertFalse($container->getParameter('kernel.http_method_override'));
+    }
+
     public function testEsi()
     {
         $container = $this->createContainerFromFile('full');

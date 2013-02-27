@@ -78,7 +78,8 @@ class TwigExtractor implements ExtractorInterface
         $this->twig->parse($this->twig->tokenize($template));
 
         foreach ($visitor->getMessages() as $message) {
-            $catalogue->set($message[0], $this->prefix.$message[0], $message[1] ? $message[1] : $this->defaultDomain);
+            $placeholder = trim($message[0]);
+            $catalogue->set($placeholder, $this->prefix.$placeholder, $message[1] ? $message[1] : $this->defaultDomain);
         }
 
         $visitor->disable();

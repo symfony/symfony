@@ -460,7 +460,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * Initializes the data structures related to the bundle management.
      *
      *  - the bundles property maps a bundle name to the bundle instance,
-     *  - the bundleMap property maps a bundle name to the bundle inheritance hierarchy (most derived bundle first).
+     *  - the bundleMap property maps a bundle name to the bundle inheritance hierarchy (parents bundles first).
      *
      * @throws \LogicException if two bundles share a common name
      * @throws \LogicException if a bundle tries to extend a non-registered bundle
@@ -498,7 +498,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         if (count($diff = array_values(array_diff(array_keys($directChildren), array_keys($this->bundles))))) {
             throw new \LogicException(sprintf('Bundle "%s" extends bundle "%s", which is not registered.', $directChildren[$diff[0]], $diff[0]));
         }
-
+		
         // inheritance
         $this->bundleMap = array();
         foreach ($topMostBundles as $name => $bundle) {
@@ -507,13 +507,13 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
             while (isset($directChildren[$name])) {
                 $name = $directChildren[$name];
-                array_unshift($bundleMap, $this->bundles[$name]);
+                array_push($bundleMap, $this->bundles[$name]);
                 $hierarchy[] = $name;
             }
 
             foreach ($hierarchy as $bundle) {
                 $this->bundleMap[$bundle] = $bundleMap;
-                array_pop($bundleMap);
+                array_shift($bundleMap);
             }
         }
 

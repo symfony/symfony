@@ -20,6 +20,11 @@ class KernelForTest extends Kernel
     {
         return $this->bundleMap;
     }
+	
+	public function getBundleByName($name)
+	{
+		return parent::getBundle($name);
+	}
 
     public function registerBundles()
     {

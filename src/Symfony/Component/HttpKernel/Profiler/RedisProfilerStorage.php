@@ -209,7 +209,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
             $redis->connect($host, $port);
             
             // if a valid dbnumber is given select the redis index
-            if(-1 < $dbnum) {
+            if (-1 < $dbnum) {
                 $redis->select($dbnum);
             }
 

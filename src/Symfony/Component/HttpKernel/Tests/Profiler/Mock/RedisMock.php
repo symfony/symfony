@@ -245,7 +245,7 @@ class RedisMock
             return false;
         }
         
-        if(0 > $dbnum) {
+        if (0 > $dbnum) {
             return false;
         }
         

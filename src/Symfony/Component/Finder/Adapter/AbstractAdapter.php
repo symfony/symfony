@@ -34,20 +34,38 @@ abstract class AbstractAdapter implements AdapterInterface
     protected $paths       = array();
     protected $notPaths    = array();
 
-    private static $areSupported = array();
+    private static $areSupportedAdapters = array();
+    private static $areSupportedPaths    = array();
 
     /**
      * {@inheritDoc}
+     *
+     * This generic implementation should not need to be overridden in the derived
+     * class as it provides a cache layer. The 2 following methods should rather
+     * be implemented:
+     *
+     * @see canBeUsed
+     * @see canBeUsedOnPath
      */
-    public function isSupported()
+    public function isSupported($path)
     {
         $name = $this->getName();
+        $canonicalPath = realpath($path);
+        $canonicalPath = false === $canonicalPath ? (string) $path : $canonicalPath;
 
-        if (!array_key_exists($name, self::$areSupported)) {
-            self::$areSupported[$name] = $this->canBeUsed();
+        if (!isset(self::$areSupportedAdapters[$name])) {
+            self::$areSupportedAdapters[$name] = $this->canBeUsed();
         }
 
-        return self::$areSupported[$name];
+        if (!self::$areSupportedAdapters[$name]) {
+            return false;
+        }
+
+        if (!isset(self::$areSupportedPaths[$canonicalPath][$name])) {
+            self::$areSupportedPaths[$canonicalPath][$name] = $this->canBeUsedOnPath($canonicalPath);
+        }
+
+        return self::$areSupportedPaths[$canonicalPath][$name];
     }
 
     /**
@@ -213,13 +231,24 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Returns whether the adapter is supported in the current environment.
      *
-     * This method should be implemented in all adapters. Do not implement
-     * isSupported in the adapters as the generic implementation provides a cache
-     * layer.
-     *
      * @see isSupported
      *
      * @return Boolean Whether the adapter is supported
      */
     abstract protected function canBeUsed();
+
+    /**
+     * Returns whether the adapter supports a given path.
+     *
+     * Some adapters only support resolvable absolute paths like the GNU/BSD
+     * find binary adapter. Others adapters might support PHP streams like "ftp://"
+     * or "phar://" like the PHP adapter.
+     *
+     * @param string Path to check
+     *
+     * @see isSupported
+     *
+     * @return Boolean Whether the adapter supports the given path
+     */
+    abstract protected function canBeUsedOnPath($path);
 }

@@ -122,14 +122,14 @@ interface AdapterInterface
     public function searchInDirectory($dir);
 
     /**
-     * Tests adapter support for current platform.
+     * @param string $path
      *
-     * @return Boolean
+     * @return Boolean Whether the adapter can be used on the given path.
      */
-    public function isSupported();
+    public function isSupported($path);
 
     /**
-     * Returns adapter name.
+     * Returns the adapter name.
      *
      * @return string
      */

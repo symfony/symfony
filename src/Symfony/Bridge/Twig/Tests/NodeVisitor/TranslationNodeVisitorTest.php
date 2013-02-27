@@ -18,6 +18,23 @@ class TranslationNodeVisitorTest extends TestCase
         $this->assertEquals($expectedMessages, $visitor->getMessages());
     }
 
+    public function testMessageExtractionWithInvalidDomainNode()
+    {
+        $message = 'new key';
+
+        $node = new \Twig_Node_Expression_Filter(
+            new \Twig_Node_Expression_Constant($message, 0),
+            new \Twig_Node_Expression_Constant('trans', 0),
+            new \Twig_Node(array(
+                new \Twig_Node_Expression_Array(array(), 0),
+                new \Twig_Node_Expression_Name('variable', 0),
+            )),
+            0
+        );
+
+        $this->testMessagesExtraction($node, array(array($message, TranslationNodeVisitor::UNDEFINED_DOMAIN)));
+    }
+
     public function getMessagesExtractionTestData()
     {
         $message = 'new key';

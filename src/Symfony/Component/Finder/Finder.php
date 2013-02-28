@@ -68,7 +68,7 @@ class Finder implements \IteratorAggregate, \Countable
         $this
             ->addAdapter(new GnuFindAdapter())
             ->addAdapter(new BsdFindAdapter())
-            ->addAdapter(new PhpAdapter(), -50)
+            ->setAdapter(new PhpAdapter(), -50)
         ;
     }
 
@@ -97,7 +97,44 @@ class Finder implements \IteratorAggregate, \Countable
         $this->adapters[$adapter->getName()] = array(
             'adapter'  => $adapter,
             'priority' => $priority,
+            'selected' => false,
         );
+
+        return $this->sortAdapters();
+    }
+
+    /**
+     * Removes adapter selection adapter to use best one.
+     *
+     * @return Finder The current Finder instance
+     */
+    public function useBestAdapter()
+    {
+        $this->adapters = array_map(function (array $properties) {
+            $properties['selected'] = false;
+
+            return $properties;
+        }, $this->adapters);
+
+        return $this->sortAdapters();
+    }
+
+    /**
+     * Selects the adapter to use.
+     *
+     * @param Adapter\AdapterInterface $adapter
+     * @param int                      $priority
+     *
+     * @return Finder The current Finder instance
+     */
+    public function setAdapter(Adapter\AdapterInterface $adapter, $priority = 0)
+    {
+        if (!isset($this->adapters[$adapter->getName()])) {
+            $this->addAdapter($adapter, $priority);
+        }
+
+        $this->useBestAdapter();
+        $this->adapters[$adapter->getName()]['selected'] = true;
 
         return $this->sortAdapters();
     }
@@ -692,12 +729,16 @@ class Finder implements \IteratorAggregate, \Countable
         return iterator_count($this->getIterator());
     }
 
-    /*
+    /**
      * @return Finder The current Finder instance
      */
     private function sortAdapters()
     {
         uasort($this->adapters, function (array $a, array $b) {
+            if ($a['selected'] || $b['selected']) {
+                return $a['selected'] ? -1 : 1;
+            }
+
             return $a['priority'] > $b['priority'] ? -1 : 1;
         });
 

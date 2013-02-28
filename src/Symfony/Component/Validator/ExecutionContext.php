@@ -89,10 +89,18 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function addViolation($message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null)
     {
+        if (null === $pluralization) {
+            $translatedMessage = $this->translator->trans($message, $params, $this->translationDomain);
+        } else {
+            try {
+                $translatedMessage = $this->translator->transChoice($message, $pluralization, $params, $this->translationDomain);
+            } catch (\InvalidArgumentException $e) {
+                $translatedMessage = $this->translator->trans($message, $params, $this->translationDomain);
+            }
+        }
+
         $this->globalContext->getViolations()->add(new ConstraintViolation(
-            null === $pluralization
-                ? $this->translator->trans($message, $params, $this->translationDomain)
-                : $this->translator->transChoice($message, $pluralization, $params, $this->translationDomain),
+            $translatedMessage,
             $message,
             $params,
             $this->globalContext->getRoot(),

@@ -683,6 +683,21 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
     }
 
+    public function testAdapterSelection()
+    {
+        // test that by default, PhpAdapter is selected
+        $adapters = Finder::create()->getAdapters();
+        $this->assertTrue($adapters[0] instanceof Adapter\PhpAdapter);
+
+        // test another adapter selection
+        $adapters = Finder::create()->setAdapter('gnu_find')->getAdapters();
+        $this->assertTrue($adapters[0] instanceof Adapter\GnuFindAdapter);
+
+        // test that useBestAdapter method removes selection
+        $adapters = Finder::create()->useBestAdapter()->getAdapters();
+        $this->assertFalse($adapters[0] instanceof Adapter\PhpAdapter);
+    }
+
     public function getTestPathData()
     {
         $tests = array(

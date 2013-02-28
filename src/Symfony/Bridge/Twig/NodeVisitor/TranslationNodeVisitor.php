@@ -59,7 +59,7 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
             // extract constant nodes with a trans filter
             $this->messages[] = array(
                 $node->getNode('node')->getAttribute('value'),
-                $this->readDomain($node->getNode('arguments')->hasNode(1) ? $node->getNode('arguments')->getNode(1) : null),
+                $this->readDomainFromArguments($node->getNode('arguments'), 1),
             );
         } elseif (
             $node instanceof \Twig_Node_Expression_Filter &&
@@ -69,13 +69,13 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
             // extract constant nodes with a trans filter
             $this->messages[] = array(
                 $node->getNode('node')->getAttribute('value'),
-                $this->readDomain($node->getNode('arguments')->hasNode(2) ? $node->getNode('arguments')->getNode(2) : null),
+                $this->readDomainFromArguments($node->getNode('arguments'), 2),
             );
         } elseif ($node instanceof TransNode) {
             // extract trans nodes
             $this->messages[] = array(
                 $node->getNode('body')->getAttribute('data'),
-                $this->readDomain($node->getNode('domain')),
+                $this->readDomainFromNode($node->getNode('domain')),
             );
         }
 
@@ -98,7 +98,31 @@ class TranslationNodeVisitor implements \Twig_NodeVisitorInterface
         return 0;
     }
 
-    private function readDomain(\Twig_Node $node = null)
+    /**
+     * @param \Twig_Node $arguments
+     * @param int        $index
+     *
+     * @return string|null
+     */
+    private function readDomainFromArguments(\Twig_Node $arguments, $index)
+    {
+        if ($arguments->hasNode('domain')) {
+            $argument = $arguments->getNode('domain');
+        } elseif ($arguments->hasNode($index)) {
+            $argument = $arguments->getNode($index);
+        } else {
+            return null;
+        }
+
+        return $this->readDomainFromNode($argument);
+    }
+
+    /**
+     * @param \Twig_Node $node
+     *
+     * @return string|null
+     */
+    private function readDomainFromNode(\Twig_Node $node = null)
     {
         if (null === $node) {
             return null;

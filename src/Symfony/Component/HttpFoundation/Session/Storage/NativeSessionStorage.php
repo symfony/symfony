@@ -143,8 +143,10 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         // start the session
-        if (!session_start()) {
-            throw new \RuntimeException('Failed to start the session');
+        if (!isset($_SESSION)) {
+            if (!session_start()) {
+                throw new \RuntimeException('Failed to start the session');
+            }
         }
 
         $this->loadSession();

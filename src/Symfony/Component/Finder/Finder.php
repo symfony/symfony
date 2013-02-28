@@ -68,7 +68,8 @@ class Finder implements \IteratorAggregate, \Countable
         $this
             ->addAdapter(new GnuFindAdapter())
             ->addAdapter(new BsdFindAdapter())
-            ->setAdapter(new PhpAdapter(), -50)
+            ->addAdapter(new PhpAdapter(), -50)
+            ->setAdapter('php')
         ;
     }
 
@@ -122,19 +123,20 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Selects the adapter to use.
      *
-     * @param Adapter\AdapterInterface $adapter
-     * @param int                      $priority
+     * @param string $name
+     *
+     * @throws \InvalidArgumentException
      *
      * @return Finder The current Finder instance
      */
-    public function setAdapter(Adapter\AdapterInterface $adapter, $priority = 0)
+    public function setAdapter($name)
     {
-        if (!isset($this->adapters[$adapter->getName()])) {
-            $this->addAdapter($adapter, $priority);
+        if (!isset($this->adapters[$name])) {
+            throw new \InvalidArgumentException(sprintf('There is no registered adapter with "%s" name.', $name));
         }
 
         $this->useBestAdapter();
-        $this->adapters[$adapter->getName()]['selected'] = true;
+        $this->adapters[$name]['selected'] = true;
 
         return $this->sortAdapters();
     }

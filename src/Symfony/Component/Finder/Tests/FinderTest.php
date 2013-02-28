@@ -690,7 +690,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertTrue($adapters[0] instanceof Adapter\PhpAdapter);
 
         // test another adapter selection
-        $adapters = Finder::create()->setAdapter(new Adapter\GnuFindAdapter())->getAdapters();
+        $adapters = Finder::create()->setAdapter('gnu_find')->getAdapters();
         $this->assertTrue($adapters[0] instanceof Adapter\GnuFindAdapter);
 
         // test that useBestAdapter method removes selection

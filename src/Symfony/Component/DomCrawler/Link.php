@@ -89,7 +89,7 @@ class Link
         $uri = trim($this->getRawUri());
 
         // absolute URL?
-        if (0 === strpos($uri, 'http')) {
+        if (null !== parse_url($uri, PHP_URL_SCHEME)) {
             return $uri;
         }
 

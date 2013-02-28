@@ -105,17 +105,13 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Removes adapter selection adapter to use best one.
+     * Sets the selected adapter to the best one according to the current platform the code is run on.
      *
      * @return Finder The current Finder instance
      */
     public function useBestAdapter()
     {
-        $this->adapters = array_map(function (array $properties) {
-            $properties['selected'] = false;
-
-            return $properties;
-        }, $this->adapters);
+        $this->resetAdapterSelection();
 
         return $this->sortAdapters();
     }
@@ -132,10 +128,10 @@ class Finder implements \IteratorAggregate, \Countable
     public function setAdapter($name)
     {
         if (!isset($this->adapters[$name])) {
-            throw new \InvalidArgumentException(sprintf('There is no registered adapter with "%s" name.', $name));
+            throw new \InvalidArgumentException(sprintf('Adapter "%s" does not exist.', $name));
         }
 
-        $this->useBestAdapter();
+        $this->resetAdapterSelection();
         $this->adapters[$name]['selected'] = true;
 
         return $this->sortAdapters();
@@ -799,5 +795,17 @@ class Finder implements \IteratorAggregate, \Countable
             ->setSort($this->sort)
             ->setPath($this->paths)
             ->setNotPath($this->notPaths);
+    }
+
+    /**
+     * Unselects all adapters.
+     */
+    private function resetAdapterSelection()
+    {
+        $this->adapters = array_map(function (array $properties) {
+            $properties['selected'] = false;
+
+            return $properties;
+        }, $this->adapters);
     }
 }

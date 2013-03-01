@@ -45,8 +45,7 @@ class FormType extends AbstractType
             ->setDisabled($options['disabled'])
             ->setErrorBubbling($options['error_bubbling'])
             ->setEmptyData($options['empty_data'])
-            // BC compatibility, when "property_path" could be false
-            ->setPropertyPath(is_string($options['property_path']) ? $options['property_path'] : null)
+            ->setPropertyPath($options['property_path'])
             ->setMapped($options['mapped'])
             ->setByReference($options['by_reference'])
             ->setVirtual($options['virtual'])
@@ -55,10 +54,6 @@ class FormType extends AbstractType
             ->setDataLocked(isset($options['data']))
             ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
         ;
-
-        if (false === $options['property_path']) {
-            trigger_error('Setting "property_path" to "false" is deprecated since version 2.1 and will be removed in 2.3. Set "mapped" to "false" instead.', E_USER_DEPRECATED);
-        }
 
         if ($options['trim']) {
             $builder->addEventSubscriber(new TrimListener());
@@ -200,11 +195,6 @@ class FormType extends AbstractType
             return $options['compound'];
         };
 
-        // BC clause: former property_path=false now equals mapped=false
-        $mapped = function (Options $options) {
-            return false !== $options['property_path'];
-        };
-
         // If data is given, the form is locked to that data
         // (independent of its value)
         $resolver->setOptional(array(
@@ -222,7 +212,7 @@ class FormType extends AbstractType
             'max_length'         => null,
             'pattern'            => null,
             'property_path'      => null,
-            'mapped'             => $mapped,
+            'mapped'             => true,
             'by_reference'       => true,
             'error_bubbling'     => $errorBubbling,
             'label'              => null,

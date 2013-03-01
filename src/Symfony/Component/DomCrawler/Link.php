@@ -88,6 +88,11 @@ class Link
     {
         $uri = trim($this->getRawUri());
 
+        // relative URL?
+        if (0 === strpos($uri, '.')) {
+            $uri = substr($uri, 3);
+        }
+
         // absolute URL?
         if (null !== parse_url($uri, PHP_URL_SCHEME)) {
             return $uri;

@@ -3,10 +3,14 @@
 {% block toolbar %}
     {% if collector.counterrors %}
         {% set icon %}
-            <img width="15" height="28" alt="Logs" style="border-width: 0; vertical-align: middle; margin-right: 5px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAcCAYAAAC+lOV/AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQVJREFUeNpi/P//PwO5gImBAjBwmlm8vLyOf/v2zYJYDVxcXCe2bdvmeu7cuS+M9vb2ZIWYoKDgUrKcvWLFipWfP38OYcEmeeDAgQtA6gMQCzg4OBigy0tISHxhYmJiYMFh+EIgBhlgAMXo4DEwffzH5ewLwAA5ADUAG/g7lBMJNkFgCO8fGJsJxTNezUTEM15nE4rnAQ4wkjVraWm9BlK/wc62tLR8fOXKFZmmpqYHhoaGT4Fif/Do/Q7Ep/bt28fz+/dvDkZgKdI4ZcqUmMOHD0t8+vSJi1gXKCgoPGQE5ixTIBuExUjwKsiSpyDNnECGOBCLAjEnkeEA8vMbxqFZ6AMEGADoe2NON2x5yQAAAABJRU5ErkJggg=="/>
+            <img width="15" height="28" alt="Logs" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAcCAYAAABoMT8aAAAA4klEQVQ4y2P4//8/AyWYYXgYwOPp6Xnc3t7+P7EYpB6k7+zZs2ADNEjRjIwDAgKWgAywIUfz8+fPVzg7O/8AGeCATQEQnAfi/SAah/wcV1dXvAYUgORANA75ehcXl+/4DHAABRIe+ZrhbgAhTHsDiEgHBA0glA6GfSDiw5mZma+A+sphBlhVVFQ88vHx+Xfu3Ll7QP5haOjjwtuAuGHv3r3NIMNABqh8+/atsaur666vr+9XUlwSHx//AGQANxCbAnEWyGQicRMQ9wBxIQM0qjiBWAFqkB00/glhayBWHwb1AgB38EJsUtxtWwAAAABJRU5ErkJggg=="/>
+            <span class="sf-toolbar-status sf-toolbar-status-yellow">{{ collector.counterrors }}</span>
         {% endset %}
         {% set text %}
-            <span>{{ collector.counterrors }}</span>
+            <div class="sf-toolbar-info-piece">
+                <b>Exception</b>
+                <span class="sf-toolbar-status sf-toolbar-status-yellow">{{ collector.counterrors }}</span>
+            </div>
         {% endset %}
         {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
     {% endif %}
@@ -27,11 +31,33 @@
 {% block panel %}
     <h2>Logs</h2>
 
+    {% set priority = app.request.query.get('priority', 0) %}
+
+    <table>
+        <tr>
+            <th>Filter</th>
+            <td>
+                <form id="priority-form" action="" method="get" style="display: inline">
+                    <input type="hidden" name="panel" value="logger" />
+                    <label for="priority">Priority</label>
+                    <select id="priority" name="priority" onchange="document.getElementById('priority-form').submit(); ">
+                        {% for value, text in { 100: 'DEBUG', 200: 'INFO', 250: 'NOTICE', 300: 'WARNING', 400: 'ERROR', 500: 'CRITICAL', 550: 'ALERT', 600: 'EMERGENCY' } %}
+                        <option value="{{ value }}"{{ value == priority ? ' selected' : '' }}>{{ text }}</option>
+                        {% endfor %}
+                    </select>
+                    <noscript>
+                        <input type="submit" value="refresh" />
+                    </noscript>
+                </form>
+            </td>
+        </tr>
+    </table>
+
     {% if collector.logs %}
         <ul class="alt">
-            {% for log in collector.logs %}
-                <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if 'ERR' == log.priorityName or 'ERROR' == log.priorityName %} error{% endif %}">
-                    {{ log.message }}
+            {% for log in collector.logs if log.priority >= priority %}
+                <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if log.priority >= 400 %} error{% elseif log.priority >= 300 %} warning{% endif %}">
+                    {{ log.priorityName }} - {{ log.message }}
                     {% if log.context is defined and log.context is not empty %}
                         <br />
                         <small>
@@ -39,6 +65,8 @@
                         </small>
                     {% endif %}
                 </li>
+            {% else %}
+                <li><em>No logs available for this priority.</em></li>
             {% endfor %}
         </ul>
     {% else %}

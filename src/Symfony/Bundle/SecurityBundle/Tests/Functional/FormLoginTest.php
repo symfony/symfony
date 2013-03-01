@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
@@ -65,18 +65,18 @@ class FormLoginTest extends WebTestCase
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
         $client->insulate();
 
-        $client->request('GET', '/protected-resource');
+        $client->request('GET', '/protected_resource');
         $this->assertRedirect($client->getResponse(), '/login');
 
         $form = $client->followRedirect()->selectButton('login')->form();
         $form['_username'] = 'johannes';
         $form['_password'] = 'test';
         $client->submit($form);
-        $this->assertRedirect($client->getResponse(), '/protected-resource');
+        $this->assertRedirect($client->getResponse(), '/protected_resource');
 
         $text = $client->followRedirect()->text();
         $this->assertContains('Hello johannes!', $text);
-        $this->assertContains('You\'re browsing to path "/protected-resource".', $text);
+        $this->assertContains('You\'re browsing to path "/protected_resource".', $text);
     }
 
     public function getConfigs()

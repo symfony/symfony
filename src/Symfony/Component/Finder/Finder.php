@@ -26,7 +26,7 @@ namespace Symfony\Component\Finder;
  *
  * @api
  */
-class Finder implements \IteratorAggregate
+class Finder implements \IteratorAggregate, \Countable
 {
     const IGNORE_VCS_FILES = 1;
     const IGNORE_DOT_FILES = 2;
@@ -44,6 +44,8 @@ class Finder implements \IteratorAggregate
     private $dirs        = array();
     private $dates       = array();
     private $iterators   = array();
+    private $contains    = array();
+    private $notContains = array();
 
     private static $vcsPatterns = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
 
@@ -64,7 +66,7 @@ class Finder implements \IteratorAggregate
      */
     public static function create()
     {
-        return new self();
+        return new static();
     }
 
     /**
@@ -189,6 +191,48 @@ class Finder implements \IteratorAggregate
     }
 
     /**
+     * Adds tests that file contents must match.
+     *
+     * Strings or PCRE patterns can be used:
+     *
+     * $finder->contains('Lorem ipsum')
+     * $finder->contains('/Lorem ipsum/i')
+     *
+     * @param string $pattern A pattern (string or regexp)
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\FilecontentFilterIterator
+     */
+    public function contains($pattern)
+    {
+        $this->contains[] = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Adds tests that file contents must not match.
+     *
+     * Strings or PCRE patterns can be used:
+     *
+     * $finder->notContains('Lorem ipsum')
+     * $finder->notContains('/Lorem ipsum/i')
+     *
+     * @param string $pattern A pattern (string or regexp)
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\FilecontentFilterIterator
+     */
+    public function notContains($pattern)
+    {
+        $this->notContains[] = $pattern;
+
+        return $this;
+    }
+
+    /**
      * Adds tests for file sizes.
      *
      * $finder->size('> 10K');
@@ -214,7 +258,7 @@ class Finder implements \IteratorAggregate
     /**
      * Excludes directories.
      *
-     * @param string $dir A directory to exclude
+     * @param string|array $dirs A directory path or an array of directories
      *
      * @return Finder The current Finder instance
      *
@@ -222,9 +266,9 @@ class Finder implements \IteratorAggregate
      *
      * @api
      */
-    public function exclude($dir)
+    public function exclude($dirs)
     {
-        $this->exclude[] = $dir;
+        $this->exclude = array_merge($this->exclude, (array) $dirs);
 
         return $this;
     }
@@ -245,7 +289,7 @@ class Finder implements \IteratorAggregate
         if ($ignoreDotFiles) {
             $this->ignore = $this->ignore | static::IGNORE_DOT_FILES;
         } else {
-            $this->ignore = $this->ignore ^ static::IGNORE_DOT_FILES;
+            $this->ignore = $this->ignore & ~static::IGNORE_DOT_FILES;
         }
 
         return $this;
@@ -267,7 +311,7 @@ class Finder implements \IteratorAggregate
         if ($ignoreVCS) {
             $this->ignore = $this->ignore | static::IGNORE_VCS_FILES;
         } else {
-            $this->ignore = $this->ignore ^ static::IGNORE_VCS_FILES;
+            $this->ignore = $this->ignore & ~static::IGNORE_VCS_FILES;
         }
 
         return $this;
@@ -285,7 +329,7 @@ class Finder implements \IteratorAggregate
      *
      * This can be slow as all the matching files and directories must be retrieved for comparison.
      *
-     * @param Closure $closure An anonymous function
+     * @param \Closure $closure An anonymous function
      *
      * @return Finder The current Finder instance
      *
@@ -337,12 +381,74 @@ class Finder implements \IteratorAggregate
     }
 
     /**
+     * Sorts files and directories by the last accessed time.
+     *
+     * This is the time that the file was last accessed, read or written to.
+     *
+     * This can be slow as all the matching files and directories must be retrieved for comparison.
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\SortableIterator
+     *
+     * @api
+     */
+    public function sortByAccessedTime()
+    {
+        $this->sort = Iterator\SortableIterator::SORT_BY_ACCESSED_TIME;
+
+        return $this;
+    }
+
+    /**
+     * Sorts files and directories by the last inode changed time.
+     *
+     * This is the time that the inode information was last modified (permissions, owner, group or other metadata).
+     *
+     * On Windows, since inode is not available, changed time is actually the file creation time.
+     *
+     * This can be slow as all the matching files and directories must be retrieved for comparison.
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\SortableIterator
+     *
+     * @api
+     */
+    public function sortByChangedTime()
+    {
+        $this->sort = Iterator\SortableIterator::SORT_BY_CHANGED_TIME;
+
+        return $this;
+    }
+
+    /**
+     * Sorts files and directories by the last modified time.
+     *
+     * This is the last time the actual contents of the file were last modified.
+     *
+     * This can be slow as all the matching files and directories must be retrieved for comparison.
+     *
+     * @return Finder The current Finder instance
+     *
+     * @see Symfony\Component\Finder\Iterator\SortableIterator
+     *
+     * @api
+     */
+    public function sortByModifiedTime()
+    {
+        $this->sort = Iterator\SortableIterator::SORT_BY_MODIFIED_TIME;
+
+        return $this;
+    }
+
+    /**
      * Filters the iterator with an anonymous function.
      *
      * The anonymous function receives a \SplFileInfo and must return false
      * to remove files.
      *
-     * @param Closure $closure An anonymous function
+     * @param \Closure $closure An anonymous function
      *
      * @return Finder The current Finder instance
      *
@@ -452,6 +558,16 @@ class Finder implements \IteratorAggregate
         }
     }
 
+    /**
+     * Counts all the results collected by the iterators.
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return iterator_count($this->getIterator());
+    }
+
     private function searchInDirectory($dir)
     {
         $flags = \RecursiveDirectoryIterator::SKIP_DOTS;
@@ -478,7 +594,7 @@ class Finder implements \IteratorAggregate
         }
 
         if (static::IGNORE_DOT_FILES === (static::IGNORE_DOT_FILES & $this->ignore)) {
-            $this->exclude[] = '\..+';
+            $this->notNames[] = '/^\..+/';
         }
 
         if ($this->exclude) {
@@ -487,6 +603,10 @@ class Finder implements \IteratorAggregate
 
         if ($this->names || $this->notNames) {
             $iterator = new Iterator\FilenameFilterIterator($iterator, $this->names, $this->notNames);
+        }
+
+        if ($this->contains || $this->notContains) {
+            $iterator = new Iterator\FilecontentFilterIterator($iterator, $this->contains, $this->notContains);
         }
 
         if ($this->sizes) {

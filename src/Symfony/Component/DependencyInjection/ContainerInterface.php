@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
@@ -49,6 +50,7 @@ interface ContainerInterface
      *
      * @return object The associated service
      *
+     * @throws InvalidArgumentException if the service is not defined
      * @throws ServiceCircularReferenceException When a circular reference is detected
      * @throws ServiceNotFoundException When the service is not defined
      *
@@ -76,7 +78,7 @@ interface ContainerInterface
      *
      * @return mixed  The parameter value
      *
-     * @throws \InvalidArgumentException if the parameter is not defined
+     * @throws InvalidArgumentException if the parameter is not defined
      *
      * @api
      */

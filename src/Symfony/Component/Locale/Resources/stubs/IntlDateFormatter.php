@@ -12,7 +12,7 @@
 /**
  * Stub implementation for the IntlDateFormatter class of the intl extension
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @see Symfony\Component\IntlDateFormatter\Stub\StubIntlDateFormatter
  */
 

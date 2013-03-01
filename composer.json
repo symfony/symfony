@@ -16,23 +16,18 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2",
-        "doctrine/common": ">=2.1,<2.3-dev",
-        "monolog/monolog": ">=1.0,<1.3-dev",
-        "swiftmailer/swiftmailer": "4.2.*",
-        "twig/twig": ">=1.1,<2.0-dev"
+        "php": ">=5.3.3",
+        "doctrine/common": "~2.2",
+        "twig/twig": ">=1.9.1,<2.0-dev"
     },
     "replace": {
         "symfony/doctrine-bridge": "self.version",
         "symfony/monolog-bridge": "self.version",
+        "symfony/propel1-bridge": "self.version",
         "symfony/swiftmailer-bridge": "self.version",
         "symfony/twig-bridge": "self.version",
-        "symfony/doctrine-abstract-bundle": "self.version",
-        "symfony/doctrine-bundle": "self.version",
         "symfony/framework-bundle": "self.version",
-        "symfony/monolog-bundle": "self.version",
         "symfony/security-bundle": "self.version",
-        "symfony/swiftmailer-bundle": "self.version",
         "symfony/twig-bundle": "self.version",
         "symfony/web-profiler-bundle": "self.version",
         "symfony/browser-kit": "self.version",
@@ -43,11 +38,13 @@
         "symfony/dependency-injection": "self.version",
         "symfony/dom-crawler": "self.version",
         "symfony/event-dispatcher": "self.version",
+        "symfony/filesystem": "self.version",
         "symfony/finder": "self.version",
         "symfony/form": "self.version",
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
         "symfony/locale": "self.version",
+        "symfony/options-resolver": "self.version",
         "symfony/process": "self.version",
         "symfony/routing": "self.version",
         "symfony/security": "self.version",
@@ -57,7 +54,18 @@
         "symfony/validator": "self.version",
         "symfony/yaml": "self.version"
     },
+    "require-dev": {
+        "doctrine/dbal": ">=2.2,<2.4-dev",
+        "doctrine/orm": ">=2.2.3,<2.4-dev",
+        "doctrine/data-fixtures": "1.0.*",
+        "propel/propel1": "dev-master",
+        "monolog/monolog": ">=1.0,<1.3-dev"
+    },
     "autoload": {
-        "psr-0": { "Symfony": "src/" }
-    }
+        "psr-0": {
+            "Symfony": "src/",
+            "SessionHandlerInterface": "src/Symfony/Component/HttpFoundation/Resources/stubs"
+        }
+    },
+    "minimum-stability": "dev"
 }

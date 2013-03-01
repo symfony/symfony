@@ -31,7 +31,7 @@ class ConfigDataCollector extends DataCollector
      *
      * @param KernelInterface $kernel A KernelInterface instance
      */
-    public function __construct(KernelInterface $kernel)
+    public function setKernel(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
     }
@@ -44,9 +44,9 @@ class ConfigDataCollector extends DataCollector
         $this->data = array(
             'token'           => $response->headers->get('X-Debug-Token'),
             'symfony_version' => Kernel::VERSION,
-            'name'            => $this->kernel->getName(),
-            'env'             => $this->kernel->getEnvironment(),
-            'debug'           => $this->kernel->isDebug(),
+            'name'            => isset($this->kernel) ? $this->kernel->getName() : 'n/a',
+            'env'             => isset($this->kernel) ? $this->kernel->getEnvironment() : 'n/a',
+            'debug'           => isset($this->kernel) ? $this->kernel->isDebug() : 'n/a',
             'php_version'     => PHP_VERSION,
             'xdebug_enabled'  => extension_loaded('xdebug'),
             'eaccel_enabled'  => extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'),
@@ -55,8 +55,10 @@ class ConfigDataCollector extends DataCollector
             'bundles'         => array(),
         );
 
-        foreach ($this->kernel->getBundles() as $name => $bundle) {
-            $this->data['bundles'][$name] = $bundle->getPath();
+        if (isset($this->kernel)) {
+            foreach ($this->kernel->getBundles() as $name => $bundle) {
+                $this->data['bundles'][$name] = $bundle->getPath();
+            }
         }
     }
 

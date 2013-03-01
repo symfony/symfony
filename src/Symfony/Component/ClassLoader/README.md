@@ -58,3 +58,15 @@ class loader:
 Furthermore, the component provides tools to aggregate classes into a single
 file, which is especially useful to improve performance on servers that do not
 provide byte caches.
+
+Resources
+---------
+
+You can run the unit tests with the following command:
+
+    phpunit
+
+If you also want to run the unit tests that depend on other Symfony
+Components, install dev dependencies before running PHPUnit:
+
+    php composer.phar install --dev

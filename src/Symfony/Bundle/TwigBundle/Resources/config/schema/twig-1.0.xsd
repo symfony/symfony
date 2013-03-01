@@ -11,6 +11,7 @@
         <xsd:sequence>
             <xsd:element name="form" type="form" minOccurs="0" maxOccurs="1" />
             <xsd:element name="global" type="global" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="path" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
         <xsd:attribute name="auto-reload" type="xsd:string" />

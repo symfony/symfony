@@ -16,6 +16,7 @@
 namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,7 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @api
  */
-class HttpCache implements HttpKernelInterface
+class HttpCache implements HttpKernelInterface, TerminableInterface
 {
     private $kernel;
     private $store;
@@ -210,9 +211,21 @@ class HttpCache implements HttpKernelInterface
             }
         }
 
-        $response->prepare();
+        $response->prepare($request);
 
         return $response;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function terminate(Request $request, Response $response)
+    {
+        if ($this->getKernel() instanceof TerminableInterface) {
+            $this->getKernel()->terminate($request, $response);
+        }
     }
 
     /**
@@ -430,6 +443,18 @@ class HttpCache implements HttpKernelInterface
             $this->esi->addSurrogateEsiCapability($request);
         }
 
+        // modify the X-Forwarded-For header if needed
+        $forwardedFor = $request->headers->get('X-Forwarded-For');
+        if ($forwardedFor) {
+            $request->headers->set('X-Forwarded-For', $forwardedFor.', '.$request->server->get('REMOTE_ADDR'));
+        } else {
+            $request->headers->set('X-Forwarded-For', $request->server->get('REMOTE_ADDR'));
+        }
+
+        // fix the client IP address by setting it to 127.0.0.1 as HttpCache
+        // is always called from the same process as the backend.
+        $request->server->set('REMOTE_ADDR', '127.0.0.1');
+
         // always a "master" request (as the real master request can be in cache)
         $response = $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, $catch);
         // FIXME: we probably need to also catch exceptions if raw === true
@@ -502,7 +527,7 @@ class HttpCache implements HttpKernelInterface
 
             // wait for the lock to be released
             $wait = 0;
-            while (file_exists($lock) && $wait < 5000000) {
+            while (is_file($lock) && $wait < 5000000) {
                 usleep(50000);
                 $wait += 50000;
             }
@@ -568,7 +593,7 @@ class HttpCache implements HttpKernelInterface
     private function restoreResponseBody(Request $request, Response $response)
     {
         if ('HEAD' === $request->getMethod() || 304 === $response->getStatusCode()) {
-            $response->setContent('');
+            $response->setContent(null);
             $response->headers->remove('X-Body-Eval');
             $response->headers->remove('X-Body-File');
 

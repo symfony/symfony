@@ -1,0 +1,60 @@
+parameters:
+    baz_class: BazClass
+    foo_class: FooClass
+    foo: bar
+
+services:
+    foo:
+        class: FooClass
+        tags:
+            - { name: foo, foo: foo }
+            - { name: foo, bar: bar }
+        factory_method: getInstance
+        arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']
+        properties: { foo: bar, moo: '@foo.baz' }
+        calls:
+            - [setBar, ['@bar']]
+            - [initialize, {  }]
+
+        configurator: sc_configure
+    bar:
+        class: FooClass
+        arguments: [foo, '@foo.baz', '%foo_bar%']
+        configurator: ['@foo.baz', configure]
+    foo.baz:
+        class: %baz_class%
+        factory_method: getInstance
+        configurator: ['%baz_class%', configureStatic1]
+    foo_bar:
+        class: %foo_class%
+        scope: prototype
+    method_call1:
+        class: FooClass
+        file: %path%foo.php
+        calls:
+            - [setBar, ['@foo']]
+            - [setBar, ['@?foo2']]
+            - [setBar, ['@?foo3']]
+            - [setBar, ['@?foobaz']]
+
+    factory_service:
+        class: Bar
+        factory_method: getInstance
+        factory_service: foo.baz
+    foo_with_inline:
+        class: Foo
+        calls:
+            - [setBar, ['@inlined']]
+
+    inlined:
+        class: Bar
+        properties: { pub: pub }
+        calls:
+            - [setBaz, ['@baz']]
+
+    baz:
+        class: Baz
+        calls:
+            - [setFoo, ['@foo_with_inline']]
+
+    alias_for_foo: @foo

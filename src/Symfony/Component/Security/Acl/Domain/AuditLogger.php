@@ -27,7 +27,6 @@ abstract class AuditLogger implements AuditLoggerInterface
      *
      * @param Boolean        $granted
      * @param EntryInterface $ace
-     * @return void
      */
     public function logIfNeeded($granted, EntryInterface $ace)
     {
@@ -47,7 +46,6 @@ abstract class AuditLogger implements AuditLoggerInterface
      *
      * @param Boolean        $granted
      * @param EntryInterface $ace
-     * @return void
      */
     abstract protected function doLog($granted, EntryInterface $ace);
 }

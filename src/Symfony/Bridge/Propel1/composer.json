@@ -1,0 +1,30 @@
+{
+    "name": "symfony/propel1-bridge",
+    "type": "symfony-bridge",
+    "description": "Symfony Propel1 Bridge",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/http-foundation": "2.1.*",
+        "symfony/http-kernel": "2.1.*",
+        "symfony/form": "2.1.*",
+        "propel/propel1": "1.6.*"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Bridge\\Propel1": "" }
+    },
+    "target-dir": "Symfony/Bridge/Propel1",
+    "minimum-stability": "dev"
+}

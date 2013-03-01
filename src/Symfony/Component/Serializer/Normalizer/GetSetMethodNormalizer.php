@@ -1,17 +1,17 @@
 <?php
 
-namespace Symfony\Component\Serializer\Normalizer;
-
-use Symfony\Component\Serializer\Exception\RuntimeException;
-
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Serializer\Normalizer;
+
+use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /**
  * Converts between objects with getter and setter methods and arrays.
@@ -33,8 +33,36 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  *
  * @author Nils Adermann <naderman@naderman.de>
  */
-class GetSetMethodNormalizer extends SerializerAwareNormalizer
+class GetSetMethodNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    protected $callbacks = array();
+    protected $ignoredAttributes = array();
+
+    /**
+     * Set normalization callbacks
+     *
+     * @param array $callbacks help normalize the result
+     */
+    public function setCallbacks(array $callbacks)
+    {
+        foreach ($callbacks as $attribute => $callback) {
+            if (!is_callable($callback)) {
+                throw new \InvalidArgumentException(sprintf('The given callback for attribute "%s" is not callable.', $attribute));
+            }
+        }
+        $this->callbacks = $callbacks;
+    }
+
+    /**
+     * Set ignored attributes for normalization
+     *
+     * @param array $ignoredAttributes
+     */
+    public function setIgnoredAttributes(array $ignoredAttributes)
+    {
+        $this->ignoredAttributes = $ignoredAttributes;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -46,9 +74,16 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
         $attributes = array();
         foreach ($reflectionMethods as $method) {
             if ($this->isGetMethod($method)) {
-                $attributeName = strtolower(substr($method->name, 3));
+                $attributeName = lcfirst(substr($method->name, 3));
+
+                if (in_array($attributeName, $this->ignoredAttributes)) {
+                    continue;
+                }
 
                 $attributeValue = $method->invoke($object);
+                if (array_key_exists($attributeName, $this->callbacks)) {
+                    $attributeValue = call_user_func($this->callbacks[$attributeName], $attributeValue);
+                }
                 if (null !== $attributeValue && !is_scalar($attributeValue)) {
                     $attributeValue = $this->serializer->normalize($attributeValue, $format);
                 }
@@ -73,7 +108,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
 
             $params = array();
             foreach ($constructorParameters as $constructorParameter) {
-                $paramName = strtolower($constructorParameter->name);
+                $paramName = lcfirst($constructorParameter->name);
 
                 if (isset($data[$paramName])) {
                     $params[] = $data[$paramName];
@@ -141,7 +176,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer
     /**
      * Checks if a method's name is get.* and can be called without parameters.
      *
-     * @param ReflectionMethod $method the method to check
+     * @param \ReflectionMethod $method the method to check
+     *
      * @return Boolean whether the method is a getter.
      */
     private function isGetMethod(\ReflectionMethod $method)

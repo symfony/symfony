@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
+use Symfony\Component\Validator\Exception\ValidatorException;
 
 /**
  * The default implementation of the ValidatorInterface.
@@ -20,7 +22,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
  * against constraints.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */
@@ -104,11 +106,27 @@ class Validator implements ValidatorInterface
      */
     public function validateValue($value, Constraint $constraint, $groups = null)
     {
+        if ($constraint instanceof Valid) {
+            // Why can't the Valid constraint be executed directly?
+            //
+            // It cannot be executed like regular other constraints, because regular
+            // constraints are only executed *if they belong to the validated group*.
+            // The Valid constraint, on the other hand, is always executed and propagates
+            // the group to the cascaded object. The propagated group depends on
+            //
+            //  * Whether a group sequence is currently being executed. Then the default
+            //    group is propagated.
+            //
+            //  * Otherwise the validated group is propagated.
+
+            throw new ValidatorException('The constraint ' . get_class($constraint) . ' cannot be validated. Use the method validate() instead.');
+        }
+
         $walk = function(GraphWalker $walker, $group) use ($constraint, $value) {
             return $walker->walkConstraint($constraint, $value, $group, '');
         };
 
-        return $this->validateGraph($value, $walk, $groups);
+        return $this->validateGraph('', $walk, $groups);
     }
 
     protected function validateGraph($root, \Closure $walk, $groups = null)

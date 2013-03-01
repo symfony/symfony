@@ -28,7 +28,7 @@ class NullOutput extends Output
      * @param string  $message A message to write to the output
      * @param Boolean $newline Whether to add a newline or not
      */
-    public function doWrite($message, $newline)
+    protected function doWrite($message, $newline)
     {
     }
 }

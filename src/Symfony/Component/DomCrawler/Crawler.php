@@ -112,6 +112,13 @@ class Crawler extends \SplObjectStorage
     /**
      * Adds an HTML content to the list of nodes.
      *
+     * The libxml errors are disabled when the content is parsed.
+     *
+     * If you want to get parsing errors, be sure to enable
+     * internal errors via libxml_use_internal_errors(true)
+     * and then, get the errors via libxml_get_errors(). Be
+     * sure to clear errors with libxml_clear_errors() afterward.
+     *
      * @param string $content The HTML content
      * @param string $charset The charset
      *
@@ -119,26 +126,40 @@ class Crawler extends \SplObjectStorage
      */
     public function addHtmlContent($content, $charset = 'UTF-8')
     {
+        $current = libxml_use_internal_errors(true);
         $disableEntities = libxml_disable_entity_loader(true);
 
         $dom = new \DOMDocument('1.0', $charset);
         $dom->validateOnParse = true;
 
+        if (function_exists('mb_convert_encoding') && in_array(strtolower($charset), array_map('strtolower', mb_list_encodings()))) {
+            $content = mb_convert_encoding($content, 'HTML-ENTITIES', $charset);
+        }
+
         @$dom->loadHTML($content);
 
+        libxml_use_internal_errors($current);
         libxml_disable_entity_loader($disableEntities);
 
         $this->addDocument($dom);
 
-        $base = $this->filter('base')->extract(array('href'));
+        $base = $this->filterXPath('descendant-or-self::base')->extract(array('href'));
 
-        if (count($base)) {
-            $this->uri = current($base);
+        $baseHref = current($base);
+        if (count($base) && !empty($baseHref)) {
+            $this->uri = $baseHref;
         }
     }
 
     /**
      * Adds an XML content to the list of nodes.
+     *
+     * The libxml errors are disabled when the content is parsed.
+     *
+     * If you want to get parsing errors, be sure to enable
+     * internal errors via libxml_use_internal_errors(true)
+     * and then, get the errors via libxml_get_errors(). Be
+     * sure to clear errors with libxml_clear_errors() afterward.
      *
      * @param string $content The XML content
      * @param string $charset The charset
@@ -147,6 +168,7 @@ class Crawler extends \SplObjectStorage
      */
     public function addXmlContent($content, $charset = 'UTF-8')
     {
+        $current = libxml_use_internal_errors(true);
         $disableEntities = libxml_disable_entity_loader(true);
 
         $dom = new \DOMDocument('1.0', $charset);
@@ -155,6 +177,7 @@ class Crawler extends \SplObjectStorage
         // remove the default namespace to make XPath expressions simpler
         @$dom->loadXML(str_replace('xmlns', 'ns', $content), LIBXML_NONET);
 
+        libxml_use_internal_errors($current);
         libxml_disable_entity_loader($disableEntities);
 
         $this->addDocument($dom);

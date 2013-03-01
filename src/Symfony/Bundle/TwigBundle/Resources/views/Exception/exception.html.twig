@@ -3,7 +3,7 @@
     <div class="block_exception">
         <div class="block_exception_detected clear_fix">
             <div class="illustration_exception">
-                <img alt="Exception detected!" src="{{ asset('bundles/framework/images/exception_detected.gif') }}"/>
+                <img alt="Exception detected!" src="{{ asset('bundles/framework/images/exception_detected.png') }}"/>
             </div>
             <div class="text_exception">
 
@@ -12,7 +12,7 @@
                 </div>
 
                 <h1>
-                    {{ exception.message|e|replace({"\n": '<br />'})|format_file_from_text }}
+                    {{ exception.message|nl2br|format_file_from_text }}
                 </h1>
 
                 <div>
@@ -25,7 +25,7 @@
                         <ul>
                             {% for i, previous in exception.allPrevious %}
                                 <li>
-                                    {{ previous.class|abbr_class }} <a href="#traces_link_{{ i + 1 }}" onclick="toggle('traces_{{ i + 1 }}', 'traces'); switchIcons('icon_traces_{{ i + 1 }}_open', 'icon_traces_{{ i + 1 }}_close');">&raquo;</a>
+                                    {{ previous.class|abbr_class }} <a href="#traces_link_{{ i + 1 }}" onclick="toggle('traces_{{ i + 1 }}', 'traces'); switchIcons('icon_traces_{{ i + 1 }}_open', 'icon_traces_{{ i + 1 }}_close');">&#187;</a>
                                 </li>
                             {% endfor %}
                         </ul>

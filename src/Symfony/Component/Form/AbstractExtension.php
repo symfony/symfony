@@ -15,7 +15,7 @@ use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class AbstractExtension implements FormExtensionInterface
 {
@@ -44,13 +44,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     private $typeGuesserLoaded = false;
 
     /**
-     * Returns a type by name.
-     *
-     * @param string $name The name of the type
-     *
-     * @return FormTypeInterface The type
-     *
-     * @throws FormException if the given type is not supported by this extension
+     * {@inheritdoc}
      */
     public function getType($name)
     {
@@ -66,11 +60,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     }
 
     /**
-     * Returns whether the given type is supported.
-     *
-     * @param string $name The name of the type
-     *
-     * @return Boolean Whether the type is supported by this extension
+     * {@inheritdoc}
      */
     public function hasType($name)
     {
@@ -82,11 +72,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     }
 
     /**
-     * Returns the extensions for the given type.
-     *
-     * @param string $name The name of the type
-     *
-     * @return array An array of extensions as FormTypeExtensionInterface instances
+     * {@inheritdoc}
      */
     public function getTypeExtensions($name)
     {
@@ -100,11 +86,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     }
 
     /**
-     * Returns whether this extension provides type extensions for the given type.
-     *
-     * @param string $name The name of the type
-     *
-     * @return Boolean Whether the given type has extensions
+     * {@inheritdoc}
      */
     public function hasTypeExtensions($name)
     {
@@ -116,9 +98,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     }
 
     /**
-     * Returns the type guesser provided by this extension.
-     *
-     * @return FormTypeGuesserInterface|null The type guesser
+     * {@inheritdoc}
      */
     public function getTypeGuesser()
     {

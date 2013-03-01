@@ -1,0 +1,12 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+
+    <form action="{{ path('form_login_check') }}" method="post">
+        {{ form_widget(form) }}
+
+        {# Note: ensure the submit name does not conflict with the form's name or it may clobber field data #}
+        <input type="submit" name="login" />
+    </form>
+
+{% endblock %}

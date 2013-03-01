@@ -30,6 +30,8 @@ class Cookie
         'D, d M Y H:i:s T',
         'D, d-M-y H:i:s T',
         'D, d-M-Y H:i:s T',
+        'D, d-m-y H:i:s T',
+        'D, d-m-Y H:i:s T',
         'D M j G:i:s Y',
         'D M d H:i:s Y T',
     );
@@ -201,6 +203,11 @@ class Cookie
             if (false !== $date = \DateTime::createFromFormat($dateFormat, $dateValue, new \DateTimeZone('GMT'))) {
                 return $date->getTimestamp();
             }
+        }
+
+        // attempt a fallback for unusual formatting
+        if (false !== $date = date_create($dateValue, new \DateTimeZone('GMT'))) {
+            return $date->getTimestamp();
         }
 
         throw new \InvalidArgumentException(sprintf('Could not parse date "%s".', $dateValue));

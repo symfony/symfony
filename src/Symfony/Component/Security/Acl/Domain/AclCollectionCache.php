@@ -29,10 +29,9 @@ class AclCollectionCache
     /**
      * Constructor.
      *
-     * @param AclProviderInterface              $aclProvider
-     * @param ObjectIdentityRetrievalStrategy   $oidRetrievalStrategy
-     * @param SecurityIdentityRetrievalStrategy $sidRetrievalStrategy
-     * @return void
+     * @param AclProviderInterface                       $aclProvider
+     * @param ObjectIdentityRetrievalStrategyInterface   $oidRetrievalStrategy
+     * @param SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy
      */
     public function __construct(AclProviderInterface $aclProvider, ObjectIdentityRetrievalStrategyInterface $oidRetrievalStrategy, SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy)
     {
@@ -47,7 +46,6 @@ class AclCollectionCache
      *
      * @param mixed $collection anything that can be passed to foreach()
      * @param array $tokens     an array of TokenInterface implementations
-     * @return void
      */
     public function cache($collection, array $tokens = array())
     {

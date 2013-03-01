@@ -61,10 +61,10 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses a node from a loaded XML file.
      *
-     * @param RouteCollection $collection the collection to associate with the node
-     * @param DOMElement      $node       the node to parse
-     * @param string          $path       the path of the XML file being processed
-     * @param string          $file
+     * @param RouteCollection  $collection the collection to associate with the node
+     * @param \DOMElement      $node       the node to parse
+     * @param string           $path       the path of the XML file being processed
+     * @param string           $file
      */
     protected function parseNode(RouteCollection $collection, \DOMElement $node, $path, $file)
     {
@@ -76,8 +76,33 @@ class XmlFileLoader extends FileLoader
                 $resource = (string) $node->getAttribute('resource');
                 $type = (string) $node->getAttribute('type');
                 $prefix = (string) $node->getAttribute('prefix');
+
+                $defaults = array();
+                $requirements = array();
+                $options = array();
+
+                foreach ($node->childNodes as $n) {
+                    if (!$n instanceof \DOMElement) {
+                        continue;
+                    }
+
+                    switch ($n->tagName) {
+                        case 'default':
+                            $defaults[(string) $n->getAttribute('key')] = trim((string) $n->nodeValue);
+                            break;
+                        case 'requirement':
+                            $requirements[(string) $n->getAttribute('key')] = trim((string) $n->nodeValue);
+                            break;
+                        case 'option':
+                            $options[(string) $n->getAttribute('key')] = trim((string) $n->nodeValue);
+                            break;
+                        default:
+                            throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $n->tagName));
+                    }
+                }
+
                 $this->setCurrentDir(dirname($path));
-                $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix);
+                $collection->addCollection($this->import($resource, ('' !== $type ? $type : null), false, $file), $prefix, $defaults, $requirements, $options);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
@@ -85,12 +110,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return Boolean True if this class supports the given resource, false otherwise
+     * {@inheritdoc}
      *
      * @api
      */

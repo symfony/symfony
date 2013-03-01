@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing;
 
+use Symfony\Component\HttpFoundation\Request;
+
 /**
  * Holds information about the current request.
  *
@@ -49,6 +51,16 @@ class RequestContext
         $this->httpPort = $httpPort;
         $this->httpsPort = $httpsPort;
         $this->parameters = array();
+    }
+
+    public function fromRequest(Request $request)
+    {
+        $this->setBaseUrl($request->getBaseUrl());
+        $this->setMethod($request->getMethod());
+        $this->setHost($request->getHost());
+        $this->setScheme($request->getScheme());
+        $this->setHttpPort($request->isSecure() ? $this->httpPort : $request->getPort());
+        $this->setHttpsPort($request->isSecure() ? $request->getPort() : $this->httpsPort);
     }
 
     /**

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\CacheWarmer;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
@@ -29,9 +29,9 @@ class ProxyCacheWarmer implements CacheWarmerInterface
     /**
      * Constructor.
      *
-     * @param RegistryInterface $registry A RegistryInterface instance
+     * @param ManagerRegistry $registry A ManagerRegistry instance
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
@@ -48,9 +48,9 @@ class ProxyCacheWarmer implements CacheWarmerInterface
 
     public function warmUp($cacheDir)
     {
-        foreach ($this->registry->getEntityManagers() as $em) {
+        foreach ($this->registry->getManagers() as $em) {
             // we need the directory no matter the proxy cache generation strategy
-            if (!file_exists($proxyCacheDir = $em->getConfiguration()->getProxyDir())) {
+            if (!is_dir($proxyCacheDir = $em->getConfiguration()->getProxyDir())) {
                 if (false === @mkdir($proxyCacheDir, 0777, true)) {
                     throw new \RuntimeException(sprintf('Unable to create the Doctrine Proxy directory "%s".', $proxyCacheDir));
                 }

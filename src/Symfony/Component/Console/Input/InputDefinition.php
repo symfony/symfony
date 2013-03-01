@@ -113,7 +113,7 @@ class InputDefinition
     public function addArgument(InputArgument $argument)
     {
         if (isset($this->arguments[$argument->getName()])) {
-            throw new \LogicException(sprintf('An argument with name "%s" already exist.', $argument->getName()));
+            throw new \LogicException(sprintf('An argument with name "%s" already exists.', $argument->getName()));
         }
 
         if ($this->hasAnArrayArgument) {
@@ -261,10 +261,10 @@ class InputDefinition
      */
     public function addOption(InputOption $option)
     {
-        if (isset($this->options[$option->getName()])) {
-            throw new \LogicException(sprintf('An option named "%s" already exist.', $option->getName()));
-        } elseif (isset($this->shortcuts[$option->getShortcut()])) {
-            throw new \LogicException(sprintf('An option with shortcut "%s" already exist.', $option->getShortcut()));
+        if (isset($this->options[$option->getName()]) && !$option->equals($this->options[$option->getName()])) {
+            throw new \LogicException(sprintf('An option named "%s" already exists.', $option->getName()));
+        } elseif (isset($this->shortcuts[$option->getShortcut()]) && !$option->equals($this->options[$this->shortcuts[$option->getShortcut()]])) {
+            throw new \LogicException(sprintf('An option with shortcut "%s" already exists.', $option->getShortcut()));
         }
 
         $this->options[$option->getName()] = $option;
@@ -279,6 +279,8 @@ class InputDefinition
      * @param string $name The InputOption name
      *
      * @return InputOption A InputOption object
+     *
+     * @throws \InvalidArgumentException When option given doesn't exist
      *
      * @api
      */
@@ -426,7 +428,7 @@ class InputDefinition
             $text[] = '<comment>Arguments:</comment>';
             foreach ($this->getArguments() as $argument) {
                 if (null !== $argument->getDefault() && (!is_array($argument->getDefault()) || count($argument->getDefault()))) {
-                    $default = sprintf('<comment> (default: %s)</comment>', is_bool($argument->getDefault()) || is_array($argument->getDefault()) ? str_replace("\n", '', var_export($argument->getDefault(), true)): $argument->getDefault());
+                    $default = sprintf('<comment> (default: %s)</comment>', $this->formatDefaultValue($argument->getDefault()));
                 } else {
                     $default = '';
                 }
@@ -444,7 +446,7 @@ class InputDefinition
 
             foreach ($this->getOptions() as $option) {
                 if ($option->acceptValue() && null !== $option->getDefault() && (!is_array($option->getDefault()) || count($option->getDefault()))) {
-                    $default = sprintf('<comment> (default: %s)</comment>', is_bool($option->getDefault()) || is_array($option->getDefault()) ? str_replace("\n", '', var_export($option->getDefault(), true)): $option->getDefault());
+                    $default = sprintf('<comment> (default: %s)</comment>', $this->formatDefaultValue($option->getDefault()));
                 } else {
                     $default = '';
                 }
@@ -520,5 +522,14 @@ class InputDefinition
         }
 
         return $asDom ? $dom : $dom->saveXml();
+    }
+
+    private function formatDefaultValue($default)
+    {
+        if (version_compare(PHP_VERSION, '5.4', '<')) {
+            return str_replace('\/', '/', json_encode($default));
+        }
+
+        return json_encode($default, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 }

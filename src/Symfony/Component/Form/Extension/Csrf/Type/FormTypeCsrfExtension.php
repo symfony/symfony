@@ -12,78 +12,79 @@
 namespace Symfony\Component\Form\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\Extension\Csrf\EventListener\EnsureCsrfFieldListener;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 class FormTypeCsrfExtension extends AbstractTypeExtension
 {
-    private $enabled;
-    private $fieldName;
+    private $defaultCsrfProvider;
+    private $defaultEnabled;
+    private $defaultFieldName;
 
-    public function __construct($enabled = true, $fieldName = '_token')
+    public function __construct(CsrfProviderInterface $defaultCsrfProvider, $defaultEnabled = true, $defaultFieldName = '_token')
     {
-        $this->enabled = $enabled;
-        $this->fieldName = $fieldName;
+        $this->defaultCsrfProvider = $defaultCsrfProvider;
+        $this->defaultEnabled = $defaultEnabled;
+        $this->defaultFieldName = $defaultFieldName;
     }
 
     /**
      * Adds a CSRF field to the form when the CSRF protection is enabled.
      *
-     * @param FormBuilder $builder The form builder
-     * @param array       $options The options
+     * @param FormBuilderInterface $builder The form builder
+     * @param array                $options The options
      */
-    public function buildForm(FormBuilder $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$options['csrf_protection']) {
             return;
         }
 
-        $listener = new EnsureCsrfFieldListener(
-            $builder->getFormFactory(),
-            $options['csrf_field_name'],
-            $options['intention'],
-            $options['csrf_provider']
-        );
-
-        // use a low priority so higher priority listeners don't remove the field
         $builder
-            ->setAttribute('csrf_field_name', $options['csrf_field_name'])
-            ->addEventListener(FormEvents::PRE_SET_DATA, array($listener, 'ensureCsrfField'), -10)
-            ->addEventListener(FormEvents::PRE_BIND, array($listener, 'ensureCsrfField'), -10)
+            ->setAttribute('csrf_factory', $builder->getFormFactory())
+            ->addEventSubscriber(new CsrfValidationListener($options['csrf_field_name'], $options['csrf_provider'], $options['intention']))
         ;
     }
 
     /**
-     * Removes CSRF fields from all the form views except the root one.
+     * Adds a CSRF field to the root form view.
      *
-     * @param FormView      $view The form view
-     * @param FormInterface $form The form
+     * @param FormView      $view    The form view
+     * @param FormInterface $form    The form
+     * @param array         $options The options
      */
-    public function buildViewBottomUp(FormView $view, FormInterface $form)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        if ($view->hasParent() && $form->hasAttribute('csrf_field_name')) {
-            $name = $form->getAttribute('csrf_field_name');
+        if ($options['csrf_protection'] && !$view->parent && $options['compound']) {
+            $factory = $form->getConfig()->getAttribute('csrf_factory');
+            $data = $options['csrf_provider']->generateCsrfToken($options['intention']);
 
-            if (isset($view[$name])) {
-                unset($view[$name]);
-            }
+            $csrfForm = $factory->createNamed($options['csrf_field_name'], 'hidden', $data, array(
+                'mapped' => false,
+            ));
+
+            $view->children[$options['csrf_field_name']] = $csrfForm->createView($view);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getDefaultOptions(array $options)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        return array(
-            'csrf_protection'   => $this->enabled,
-            'csrf_field_name'   => $this->fieldName,
-            'csrf_provider'     => null,
+        $resolver->setDefaults(array(
+            'csrf_protection'   => $this->defaultEnabled,
+            'csrf_field_name'   => $this->defaultFieldName,
+            'csrf_provider'     => $this->defaultCsrfProvider,
             'intention'         => 'unknown',
-        );
+        ));
     }
 
     /**

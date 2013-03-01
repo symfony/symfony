@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraint;
  * Validates that a value is a valid IP address
  *
  * @Annotation
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
  *
  * @api
@@ -64,7 +64,7 @@ class Ip extends Constraint
 
     public $version = self::V4;
 
-    public $message = 'This is not a valid IP address';
+    public $message = 'This is not a valid IP address.';
 
     /**
      * {@inheritDoc}

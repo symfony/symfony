@@ -17,6 +17,10 @@ use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\Helper\HelperInterface;
 use Symfony\Component\Templating\Loader\LoaderInterface;
 
+if (!defined('ENT_SUBSTITUTE')) {
+    define('ENT_SUBSTITUTE', 8);
+}
+
 /**
  * PhpEngine is an engine able to render PHP templates.
  *
@@ -34,6 +38,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     protected $charset;
     protected $cache;
     protected $escapers;
+    protected static $escaperCache;
     protected $globals;
     protected $parser;
 
@@ -330,6 +335,20 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function escape($value, $context = 'html')
     {
+        if (is_numeric($value)) {
+            return $value;
+        }
+
+        // If we deal with a scalar value, we can cache the result to increase
+        // the performance when the same value is escaped multiple times (e.g. loops)
+        if (is_scalar($value)) {
+            if (!isset(self::$escaperCache[$context][$value])) {
+                self::$escaperCache[$context][$value] = call_user_func($this->getEscaper($context), $value);
+            }
+
+            return self::$escaperCache[$context][$value];
+        }
+
         return call_user_func($this->getEscaper($context), $value);
     }
 
@@ -368,6 +387,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     public function setEscaper($context, $escaper)
     {
         $this->escapers[$context] = $escaper;
+        self::$escaperCache[$context] = array();
     }
 
     /**
@@ -444,7 +464,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                 function ($value) use ($that) {
                     // Numbers and Boolean values get turned into strings which can cause problems
                     // with type comparisons (e.g. === or is_int() etc).
-                    return is_string($value) ? htmlspecialchars($value, ENT_QUOTES, $that->getCharset(), false) : $value;
+                    return is_string($value) ? htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, $that->getCharset(), false) : $value;
                 },
 
             'js' =>
@@ -485,6 +505,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                     return $value;
                 },
         );
+
+        self::$escaperCache = array();
     }
 
     /**
@@ -500,10 +522,10 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function convertEncoding($string, $to, $from)
     {
-        if (function_exists('iconv')) {
-            return iconv($from, $to, $string);
-        } elseif (function_exists('mb_convert_encoding')) {
+        if (function_exists('mb_convert_encoding')) {
             return mb_convert_encoding($string, $to, $from);
+        } elseif (function_exists('iconv')) {
+            return iconv($from, $to, $string);
         }
 
         throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');

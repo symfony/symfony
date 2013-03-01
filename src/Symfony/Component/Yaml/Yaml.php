@@ -85,7 +85,7 @@ class Yaml
      *
      * @return array The YAML converted to a PHP array
      *
-     * @throws \InvalidArgumentException If the YAML is not valid
+     * @throws ParseException If the YAML is not valid
      *
      * @api
      */
@@ -145,7 +145,7 @@ class Yaml
      *
      * @api
      */
-    public static function dump($array, $inline = 2, $indent = 2, $exceptionOnInvalidType = false, $objectSupport = false)
+    public static function dump($array, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $objectSupport = false)
     {
         $yaml = new Dumper();
         $yaml->setIndentation($indent);

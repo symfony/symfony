@@ -16,10 +16,11 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2"
+        "php": ">=5.3.3"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Yaml": "" }
     },
-    "target-dir": "Symfony/Component/Yaml"
+    "target-dir": "Symfony/Component/Yaml",
+    "minimum-stability": "dev"
 }

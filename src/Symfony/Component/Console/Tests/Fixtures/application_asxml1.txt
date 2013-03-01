@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<symfony>
+  <commands>
+    <command id="help" name="help">
+  <usage>help [--xml] [command_name]</usage>
+  <description>Displays help for a command</description>
+  <help>The &lt;info&gt;help&lt;/info&gt; command displays help for a given command:
+ 
+   &lt;info&gt;php app/console help list&lt;/info&gt;
+ 
+ You can also output the help as XML by using the &lt;comment&gt;--xml&lt;/comment&gt; option:
+ 
+   &lt;info&gt;php app/console help --xml list&lt;/info&gt;</help>
+  <aliases />
+  <arguments>
+    <argument name="command_name" is_required="0" is_array="0">
+      <description>The command name</description>
+      <defaults>
+        <default>help</default>
+      </defaults>
+    </argument>
+  </arguments>
+  <options>
+    <option name="--xml" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+      <description>To output help as XML</description>
+    </option>
+  </options>
+</command>
+    <command id="list" name="list">
+  <usage>list [--xml] [--raw] [namespace]</usage>
+  <description>Lists commands</description>
+  <help>The &lt;info&gt;list&lt;/info&gt; command lists all commands:
+ 
+   &lt;info&gt;php app/console list&lt;/info&gt;
+ 
+ You can also display the commands for a specific namespace:
+ 
+   &lt;info&gt;php app/console list test&lt;/info&gt;
+ 
+ You can also output the information as XML by using the &lt;comment&gt;--xml&lt;/comment&gt; option:
+ 
+   &lt;info&gt;php app/console list --xml&lt;/info&gt;
+ 
+ It's also possible to get raw list of commands (useful for embedding command runner):
+ 
+   &lt;info&gt;php app/console list --raw&lt;/info&gt;</help>
+  <aliases/>
+  <arguments>
+    <argument name="namespace" is_required="0" is_array="0">
+      <description>The namespace name</description>
+      <defaults/>
+    </argument>
+  </arguments>
+  <options>
+    <option name="--xml" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+      <description>To output help as XML</description>
+    </option>
+    <option name="--raw" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+      <description>To output raw command list</description>
+    </option>
+  </options>
+</command>
+    <command id="foo:bar" name="foo:bar">
+  <usage>foo:bar</usage>
+  <description>The foo:bar command</description>
+  <help/>
+  <aliases>
+    <alias>afoobar</alias>
+  </aliases>
+  <arguments/>
+  <options/>
+</command>
+  </commands>
+  <namespaces>
+    <namespace id="_global">
+      <command>help</command>
+      <command>list</command>
+    </namespace>
+    <namespace id="foo">
+      <command>foo:bar</command>
+    </namespace>
+  </namespaces>
+</symfony>

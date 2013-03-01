@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\GroupSequenceProvider;
 use Symfony\Component\Validator\Constraint;
 
 class AnnotationLoader implements LoaderInterface
@@ -38,6 +39,8 @@ class AnnotationLoader implements LoaderInterface
         foreach ($this->reader->getClassAnnotations($reflClass) as $constraint) {
             if ($constraint instanceof GroupSequence) {
                 $metadata->setGroupSequence($constraint->groups);
+            } elseif ($constraint instanceof GroupSequenceProvider) {
+                $metadata->setGroupSequenceProvider(true);
             } elseif ($constraint instanceof Constraint) {
                 $metadata->addConstraint($constraint);
             }

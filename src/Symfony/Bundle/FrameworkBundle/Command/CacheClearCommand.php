@@ -36,14 +36,15 @@ class CacheClearCommand extends ContainerAwareCommand
             ->setName('cache:clear')
             ->setDefinition(array(
                 new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
+                new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
             ))
             ->setDescription('Clears the cache')
             ->setHelp(<<<EOF
-The <info>cache:clear</info> command clears the application cache for a given environment
+The <info>%command.name%</info> command clears the application cache for a given environment
 and debug mode:
 
-<info>php app/console cache:clear --env=dev</info>
-<info>php app/console cache:clear --env=prod --no-debug</info>
+<info>php %command.full_name% --env=dev</info>
+<info>php %command.full_name% --env=prod --no-debug</info>
 EOF
             )
         ;
@@ -64,12 +65,14 @@ EOF
         $kernel = $this->getContainer()->get('kernel');
         $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
 
+        $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
+
         if ($input->getOption('no-warmup')) {
             rename($realCacheDir, $oldCacheDir);
         } else {
             $warmupDir = $realCacheDir.'_new';
 
-            $this->warmup($warmupDir);
+            $this->warmup($warmupDir, !$input->getOption('no-optional-warmers'));
 
             rename($realCacheDir, $oldCacheDir);
             rename($warmupDir, $realCacheDir);
@@ -78,7 +81,7 @@ EOF
         $this->getContainer()->get('filesystem')->remove($oldCacheDir);
     }
 
-    protected function warmup($warmupDir)
+    protected function warmup($warmupDir, $enableOptionalWarmers = true)
     {
         $this->getContainer()->get('filesystem')->remove($warmupDir);
 
@@ -94,13 +97,38 @@ EOF
         $kernel->boot();
 
         $warmer = $kernel->getContainer()->get('cache_warmer');
-        $warmer->enableOptionalWarmers();
+
+        if ($enableOptionalWarmers) {
+            $warmer->enableOptionalWarmers();
+        }
+
         $warmer->warmUp($warmupDir);
+
+        foreach (Finder::create()->files()->name('*.meta')->in($warmupDir) as $file) {
+            // fix meta references to the Kernel
+            $content = preg_replace(
+                '/C\:\d+\:"'.preg_quote($class.$this->getTempKernelSuffix(), '"/').'"/',
+                sprintf('C:%s:"%s"', strlen($class), $class),
+                file_get_contents($file)
+            );
+
+            // fix meta references to cache files
+            $realWarmupDir = substr($warmupDir, 0, -4);
+            $content = preg_replace_callback(
+                '/s\:\d+\:"'.preg_quote($warmupDir, '/').'([^"]+)"/',
+                function (array $matches) use ($realWarmupDir) {
+                    $path = $realWarmupDir.$matches[1];
+                    return sprintf('s:%s:"%s"', strlen($path), $path);
+                },
+                $content
+            );
+
+            file_put_contents($file, $content);
+        }
 
         // fix container files and classes
         $regex = '/'.preg_quote($this->getTempKernelSuffix(), '/').'/';
-        $finder = new Finder();
-        foreach ($finder->files()->name(get_class($kernel->getContainer()).'*')->in($warmupDir) as $file) {
+        foreach (Finder::create()->files()->name(get_class($kernel->getContainer()).'*')->in($warmupDir) as $file) {
             $content = file_get_contents($file);
             $content = preg_replace($regex, '', $content);
 
@@ -109,16 +137,6 @@ EOF
 
             file_put_contents(preg_replace($regex, '', $file), $content);
             unlink($file);
-        }
-
-        // fix meta references to the Kernel
-        foreach ($finder->files()->name('*.meta')->in($warmupDir) as $file) {
-            $content = preg_replace(
-                '/C\:\d+\:"'.preg_quote($class.$this->getTempKernelSuffix(), '"/').'"/',
-                sprintf('C:%s:"%s"', strlen($class), $class),
-                file_get_contents($file)
-            );
-            file_put_contents($file, $content);
         }
     }
 

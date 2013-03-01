@@ -16,14 +16,15 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2",
+        "php": ">=5.3.3",
         "swiftmailer/swiftmailer": ">=4.2.0,<4.3-dev"
     },
     "suggest": {
-        "symfony/http-kernel": "self.version"
+        "symfony/http-kernel": "2.1.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Swiftmailer": "" }
     },
-    "target-dir": "Symfony/Bridge/Swiftmailer"
+    "target-dir": "Symfony/Bridge/Swiftmailer",
+    "minimum-stability": "dev"
 }

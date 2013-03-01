@@ -1,17 +1,17 @@
 <?php
 
-namespace Symfony\Component\Serializer\Encoder;
-
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Serializer\Encoder;
+
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Encodes XML data
@@ -91,6 +91,28 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         return $this->parseXml($xml);
     }
+
+    /**
+      * Checks whether the serializer can encode to given format
+      *
+      * @param string $format format name
+      * @return Boolean
+      */
+     public function supportsEncoding($format)
+     {
+         return 'xml' === $format;
+     }
+
+     /**
+      * Checks whether the serializer can decode from given format
+      *
+      * @param string $format format name
+      * @return Boolean
+      */
+     public function supportsDecoding($format)
+     {
+         return 'xml' === $format;
+     }
 
     /**
      * Sets the root node name
@@ -218,14 +240,15 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
             if ($key === 'item') {
                 if (isset($value['@key'])) {
-                    $data[(string) $value['@key']] = $value['#'];
-                } elseif (isset($data['item'])) {
-                    $tmp = $data['item'];
-                    unset($data['item']);
-                    $data[] = $tmp;
-                    $data[] = $value;
+                    if (isset($value['#'])) {
+                        $data[(string) $value['@key']] = $value['#'];
+                    } else {
+                        $data[(string) $value['@key']] = $value;
+                    }
+                } else {
+                    $data['item'][] = $value;
                 }
-            } elseif (array_key_exists($key, $data)) {
+            } elseif (array_key_exists($key, $data) || $key == "entry") {
                 if ((false === is_array($data[$key]))  || (false === isset($data[$key][0]))) {
                     $data[$key] = array($data[$key]);
                 }
@@ -326,6 +349,18 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
+     * Checks if a value contains any characters which would require CDATA wrapping.
+     *
+     * @param string $val
+     *
+     * @return Boolean
+     */
+    private function needsCdataWrapping($val)
+    {
+        return preg_match('/[<>&]/', $val);
+    }
+
+    /**
      * Tests the value being passed and decide what sort of element to create
      *
      * @param DOMNode $node
@@ -346,8 +381,10 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             return $this->buildXml($node, $this->serializer->normalize($val, $this->format));
         } elseif (is_numeric($val)) {
             return $this->appendText($node, (string) $val);
-        } elseif (is_string($val)) {
+        } elseif (is_string($val) && $this->needsCdataWrapping($val)) {
             return $this->appendCData($node, $val);
+        } elseif (is_string($val)) {
+            return $this->appendText($node, $val);
         } elseif (is_bool($val)) {
             return $this->appendText($node, (int) $val);
         } elseif ($val instanceof \DOMNode) {

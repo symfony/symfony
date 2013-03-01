@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
@@ -31,6 +32,8 @@ class ExceptionController extends ContainerAware
      * @param DebugLoggerInterface $logger    A DebugLoggerInterface instance
      * @param string               $format    The format to use for rendering (html, xml, ...)
      *
+     * @return Response
+     *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
     public function showAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html')
@@ -42,7 +45,7 @@ class ExceptionController extends ContainerAware
         $templating = $this->container->get('templating');
         $code = $exception->getStatusCode();
 
-        $response = $templating->renderResponse(
+        return $templating->renderResponse(
             $this->findTemplate($templating, $format, $code, $this->container->get('kernel')->isDebug()),
             array(
                 'status_code'    => $code,
@@ -52,13 +55,11 @@ class ExceptionController extends ContainerAware
                 'currentContent' => $currentContent,
             )
         );
-
-        $response->setStatusCode($code);
-        $response->headers->replace($exception->getHeaders());
-
-        return $response;
     }
 
+    /**
+     * @return string
+     */
     protected function getAndCleanOutputBuffering()
     {
         // ob_get_level() never returns 0 on some Windows configurations, so if
@@ -76,6 +77,14 @@ class ExceptionController extends ContainerAware
         return $currentContent;
     }
 
+    /**
+     * @param EngineInterface $templating
+     * @param string          $format
+     * @param integer         $code       An HTTP response status code
+     * @param Boolean         $debug
+     *
+     * @return TemplateReference
+     */
     protected function findTemplate($templating, $format, $code, $debug)
     {
         $name = $debug ? 'exception' : 'error';

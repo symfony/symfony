@@ -13,7 +13,7 @@
         <parameter key="security.authentication.rememberme.services.persistent.class">Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices</parameter>
         <parameter key="security.authentication.rememberme.services.simplehash.class">Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices</parameter>
 
-        <parameter key="security.rememberme.response_listener.class">Symfony\Bundle\SecurityBundle\EventListener\ResponseListener</parameter>
+        <parameter key="security.rememberme.response_listener.class">Symfony\Component\Security\Http\RememberMe\ResponseListener</parameter>
     </parameters>
 
     <services>

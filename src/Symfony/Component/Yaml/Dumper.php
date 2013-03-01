@@ -23,7 +23,7 @@ class Dumper
      *
      * @var integer
      */
-    protected $indentation = 2;
+    protected $indentation = 4;
 
     /**
      * Sets the indentation.
@@ -32,7 +32,7 @@ class Dumper
      */
     public function setIndentation($num)
     {
-        $this->indentation = $num;
+        $this->indentation = (int) $num;
     }
 
     /**

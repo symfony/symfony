@@ -12,7 +12,7 @@
 /**
  * Stub implementation for the Locale class of the intl extension
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @see Symfony\Component\Locale\Stub\StubLocale
  */
 

@@ -60,6 +60,7 @@ build: 56
     font-family: Georgia, "Times New Roman", Times, serif;
     font-size: 20px;
     color: #313131;
+    word-break: break-all;
 }
 
 .sf-exceptionreset li {
@@ -75,11 +76,16 @@ build: 56
     padding: 5px 4px;
     list-style-type: decimal;
     margin-left: 20px;
+    white-space: break-word;
 }
 .sf-exceptionreset #logs .traces li.error {
     font-style: normal;
     color: #AA3333;
     background: #f9ecec;
+}
+.sf-exceptionreset #logs .traces li.warning {
+    font-style: normal;
+    background: #ffcc00;
 }
 /* fix for Opera not liking empty <li> */
 .sf-exceptionreset .traces li:after {
@@ -195,7 +201,7 @@ build: 56
     vertical-align: middle;
 }
 
-.sf-exceptionreset .linked ul, 
+.sf-exceptionreset .linked ul,
 .sf-exceptionreset .linked li {
     display: inline;
 }
@@ -209,16 +215,16 @@ build: 56
     padding: 10px 0;
 }
 .sf-exceptionreset ol li {
-    list-style: decimal; 
-    margin-left: 20px; 
+    list-style: decimal;
+    margin-left: 20px;
     padding: 2px;
     padding-bottom: 20px;
 }
 .sf-exceptionreset ol ol li {
-    list-style-position: inside; 
-    margin-left: 0; 
-    white-space: nowrap; 
-    font-size: 12px; 
+    list-style-position: inside;
+    margin-left: 0;
+    white-space: nowrap;
+    font-size: 12px;
     padding-bottom: 0;
 }
 .sf-exceptionreset li .selected {

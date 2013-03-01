@@ -31,35 +31,51 @@ class CookieJar
      */
     public function set(Cookie $cookie)
     {
-        $this->cookieJar[$cookie->getName()] = $cookie;
+        $this->cookieJar[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
     }
 
     /**
      * Gets a cookie by name.
      *
-     * @param string $name The cookie name
+     * @param string $name   The cookie name
+     * @param string $path   The cookie path
+     * @param string $domain The cookie domain
      *
      * @return Cookie|null A Cookie instance or null if the cookie does not exist
      *
      * @api
      */
-    public function get($name)
+    public function get($name, $path = '/', $domain = null)
     {
         $this->flushExpiredCookies();
 
-        return isset($this->cookieJar[$name]) ? $this->cookieJar[$name] : null;
+        return isset($this->cookieJar[$domain][$path][$name]) ? $this->cookieJar[$domain][$path][$name] : null;
     }
 
     /**
      * Removes a cookie by name.
      *
-     * @param string $name The cookie name
+     * @param string $name   The cookie name
+     * @param string $path   The cookie path
+     * @param string $domain The cookie domain
      *
      * @api
      */
-    public function expire($name)
+    public function expire($name, $path = '/', $domain = null)
     {
-        unset($this->cookieJar[$name]);
+        if (null === $path) {
+            $path = '/';
+        }
+
+        unset($this->cookieJar[$domain][$path][$name]);
+
+        if (empty($this->cookieJar[$domain][$path])) {
+            unset($this->cookieJar[$domain][$path]);
+
+            if (empty($this->cookieJar[$domain])) {
+                unset($this->cookieJar[$domain]);
+            }
+        }
     }
 
     /**
@@ -73,6 +89,31 @@ class CookieJar
     }
 
     /**
+     * Updates the cookie jar from a response Set-Cookie headers.
+     *
+     * @param array  $setCookies Set-Cookie headers from an HTTP response
+     * @param string $uri        The base URL
+     */
+    public function updateFromSetCookie(array $setCookies, $uri = null)
+    {
+        $cookies = array();
+
+        foreach ($setCookies as $cookie) {
+            foreach (explode(',', $cookie) as $i => $part) {
+                if (0 === $i || preg_match('/^(?P<token>\s*[0-9A-Za-z!#\$%\&\'\*\+\-\.^_`\|~]+)=/', $part)) {
+                    $cookies[] = ltrim($part);
+                } else {
+                    $cookies[count($cookies) - 1] .= ','.$part;
+                }
+            }
+        }
+
+        foreach ($cookies as $cookie) {
+            $this->set(Cookie::fromString($cookie, $uri));
+        }
+    }
+
+    /**
      * Updates the cookie jar from a Response object.
      *
      * @param Response $response A Response object
@@ -80,9 +121,7 @@ class CookieJar
      */
     public function updateFromResponse(Response $response, $uri = null)
     {
-        foreach ($response->getHeader('Set-Cookie', false) as $cookie) {
-            $this->set(Cookie::fromString($cookie, $uri));
-        }
+        $this->updateFromSetCookie($response->getHeader('Set-Cookie', false), $uri);
     }
 
     /**
@@ -94,7 +133,16 @@ class CookieJar
     {
         $this->flushExpiredCookies();
 
-        return $this->cookieJar;
+        $flattenedCookies = array();
+        foreach ($this->cookieJar as $path) {
+            foreach ($path as $cookies) {
+                foreach ($cookies as $cookie) {
+                    $flattenedCookies[] = $cookie;
+                }
+            }
+        }
+
+        return $flattenedCookies;
     }
 
     /**
@@ -110,25 +158,28 @@ class CookieJar
         $this->flushExpiredCookies();
 
         $parts = array_replace(array('path' => '/'), parse_url($uri));
-
         $cookies = array();
-        foreach ($this->cookieJar as $cookie) {
-            if ($cookie->getDomain()) {
-                $domain = ltrim($cookie->getDomain(), '.');
+        foreach ($this->cookieJar as $domain => $pathCookies) {
+            if ($domain) {
+                $domain = ltrim($domain, '.');
                 if ($domain != substr($parts['host'], -strlen($domain))) {
                     continue;
                 }
             }
 
-            if ($cookie->getPath() != substr($parts['path'], 0, strlen($cookie->getPath()))) {
-                continue;
-            }
+            foreach ($pathCookies as $path => $namedCookies) {
+                if ($path != substr($parts['path'], 0, strlen($path))) {
+                    continue;
+                }
 
-            if ($cookie->isSecure() && 'https' != $parts['scheme']) {
-                continue;
-            }
+                foreach ($namedCookies as $cookie) {
+                    if ($cookie->isSecure() && 'https' != $parts['scheme']) {
+                        continue;
+                    }
 
-            $cookies[$cookie->getName()] = $returnsRawValue ? $cookie->getRawValue() : $cookie->getValue();
+                    $cookies[$cookie->getName()] = $returnsRawValue ? $cookie->getRawValue() : $cookie->getValue();
+                }
+            }
         }
 
         return $cookies;
@@ -151,10 +202,13 @@ class CookieJar
      */
     public function flushExpiredCookies()
     {
-        $cookies = $this->cookieJar;
-        foreach ($cookies as $name => $cookie) {
-            if ($cookie->isExpired()) {
-                unset($this->cookieJar[$name]);
+        foreach ($this->cookieJar as $domain => $pathCookies) {
+            foreach ($pathCookies as $path => $namedCookies) {
+                foreach ($namedCookies as $name => $cookie) {
+                    if ($cookie->isExpired()) {
+                        unset($this->cookieJar[$domain][$path][$name]);
+                    }
+                }
             }
         }
     }

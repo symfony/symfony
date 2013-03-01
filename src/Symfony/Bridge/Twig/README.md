@@ -7,6 +7,9 @@ Symfony2 components.
 Resources
 ---------
 
-Unit tests:
+If you want to run the unit tests, install dev dependencies before
+running PHPUnit:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Bridge/Twig
+    php composer.phar install --dev
+
+    phpunit

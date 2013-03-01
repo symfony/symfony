@@ -127,6 +127,19 @@ class Command
     }
 
     /**
+     * Checks whether the command is enabled or not in the current environment
+     *
+     * Override this to check for x or y and return false if the command can not
+     * run properly under the current conditions.
+     *
+     * @return Boolean
+     */
+    public function isEnabled()
+    {
+        return true;
+    }
+
+    /**
      * Configures the current command.
      */
     protected function configure()
@@ -144,7 +157,7 @@ class Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @return integer 0 if everything went fine, or an error code
+     * @return null|integer null or 0 if everything went fine, or an error code
      *
      * @throws \LogicException When this abstract method is not implemented
      * @see    setCode()
@@ -165,7 +178,7 @@ class Command
     }
 
     /**
-     * Initializes the command just before the input is validated.
+     * Initializes the command just after the input has been validated.
      *
      * This is mainly useful when a lot of commands extends one main command
      * where some things need to be initialized based on the input arguments and options.
@@ -220,10 +233,12 @@ class Command
         $input->validate();
 
         if ($this->code) {
-            return call_user_func($this->code, $input, $output);
+            $statusCode = call_user_func($this->code, $input, $output);
+        } else {
+            $statusCode = $this->execute($input, $output);
         }
 
-        return $this->execute($input, $output);
+        return is_numeric($statusCode) ? $statusCode : 0;
     }
 
     /**
@@ -256,10 +271,9 @@ class Command
             return;
         }
 
-        $this->definition->setArguments(array_merge(
-            $this->application->getDefinition()->getArguments(),
-            $this->definition->getArguments()
-        ));
+        $currentArguments = $this->definition->getArguments();
+        $this->definition->setArguments($this->application->getDefinition()->getArguments());
+        $this->definition->addArguments($currentArguments);
 
         $this->definition->addOptions($this->application->getDefinition()->getOptions());
 
@@ -550,7 +564,7 @@ class Command
 
         if ($help = $this->getProcessedHelp()) {
             $messages[] = '<comment>Help:</comment>';
-            $messages[] = ' '.implode("\n ", explode("\n", $help))."\n";
+            $messages[] = ' '.str_replace("\n", "\n ", $help)."\n";
         }
 
         return implode("\n", $messages);
@@ -575,11 +589,10 @@ class Command
         $usageXML->appendChild($dom->createTextNode(sprintf($this->getSynopsis(), '')));
 
         $commandXML->appendChild($descriptionXML = $dom->createElement('description'));
-        $descriptionXML->appendChild($dom->createTextNode(implode("\n ", explode("\n", $this->getDescription()))));
+        $descriptionXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $this->getDescription())));
 
         $commandXML->appendChild($helpXML = $dom->createElement('help'));
-        $help = $this->help;
-        $helpXML->appendChild($dom->createTextNode(implode("\n ", explode("\n", $help))));
+        $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $this->getProcessedHelp())));
 
         $commandXML->appendChild($aliasesXML = $dom->createElement('aliases'));
         foreach ($this->getAliases() as $alias) {

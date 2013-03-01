@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
@@ -32,7 +33,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
-use Symfony\Component\ClassLoader\DebugUniversalClassLoader;
+use Symfony\Component\ClassLoader\DebugClassLoader;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -43,7 +44,7 @@ use Symfony\Component\ClassLoader\DebugUniversalClassLoader;
  *
  * @api
  */
-abstract class Kernel implements KernelInterface
+abstract class Kernel implements KernelInterface, TerminableInterface
 {
     protected $bundles;
     protected $bundleMap;
@@ -55,12 +56,13 @@ abstract class Kernel implements KernelInterface
     protected $name;
     protected $startTime;
     protected $classes;
+    protected $errorReportingLevel;
 
-    const VERSION         = '2.0.23-DEV';
-    const VERSION_ID      = '20023';
+    const VERSION         = '2.1.9-DEV';
+    const VERSION_ID      = '20109';
     const MAJOR_VERSION   = '2';
-    const MINOR_VERSION   = '0';
-    const RELEASE_VERSION = '23';
+    const MINOR_VERSION   = '1';
+    const RELEASE_VERSION = '9';
     const EXTRA_VERSION   = 'DEV';
 
     /**
@@ -77,7 +79,7 @@ abstract class Kernel implements KernelInterface
         $this->debug = (Boolean) $debug;
         $this->booted = false;
         $this->rootDir = $this->getRootDir();
-        $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+        $this->name = $this->getName();
         $this->classes = array();
 
         if ($this->debug) {
@@ -93,8 +95,8 @@ abstract class Kernel implements KernelInterface
             ini_set('display_errors', 1);
             error_reporting(-1);
 
-            DebugUniversalClassLoader::enable();
-            ErrorHandler::register();
+            DebugClassLoader::enable();
+            ErrorHandler::register($this->errorReportingLevel);
             if ('cli' !== php_sapi_name()) {
                 ExceptionHandler::register();
             }
@@ -136,6 +138,22 @@ abstract class Kernel implements KernelInterface
         }
 
         $this->booted = true;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function terminate(Request $request, Response $response)
+    {
+        if (false === $this->booted) {
+            return;
+        }
+
+        if ($this->getHttpKernel() instanceof TerminableInterface) {
+            $this->getHttpKernel()->terminate($request, $response);
+        }
     }
 
     /**
@@ -336,6 +354,10 @@ abstract class Kernel implements KernelInterface
      */
     public function getName()
     {
+        if (null === $this->name) {
+            $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
+        }
+
         return $this->name;
     }
 
@@ -400,7 +422,7 @@ abstract class Kernel implements KernelInterface
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {
-        if (!$this->booted && file_exists($this->getCacheDir().'/classes.map')) {
+        if (!$this->booted && is_file($this->getCacheDir().'/classes.map')) {
             ClassCollectionLoader::load(include($this->getCacheDir().'/classes.map'), $this->getCacheDir(), $name, $this->debug, false, $extension);
         }
     }
@@ -447,6 +469,18 @@ abstract class Kernel implements KernelInterface
     public function getLogDir()
     {
         return $this->rootDir.'/logs';
+    }
+
+    /**
+     * Gets the charset of the application.
+     *
+     * @return string The charset
+     *
+     * @api
+     */
+    public function getCharset()
+    {
+        return 'UTF-8';
     }
 
     /**
@@ -583,7 +617,7 @@ abstract class Kernel implements KernelInterface
                 'kernel.cache_dir'       => $this->getCacheDir(),
                 'kernel.logs_dir'        => $this->getLogDir(),
                 'kernel.bundles'         => $bundles,
-                'kernel.charset'         => 'UTF-8',
+                'kernel.charset'         => $this->getCharset(),
                 'kernel.container_class' => $this->getContainerClass(),
             ),
             $this->getEnvParameters()
@@ -626,11 +660,9 @@ abstract class Kernel implements KernelInterface
             }
         }
 
-        $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
+        $container = $this->getContainerBuilder();
         $extensions = array();
         foreach ($this->bundles as $bundle) {
-            $bundle->build($container);
-
             if ($extension = $bundle->getContainerExtension()) {
                 $container->registerExtension($extension);
                 $extensions[] = $extension->getAlias();
@@ -640,6 +672,10 @@ abstract class Kernel implements KernelInterface
                 $container->addObjectResource($bundle);
             }
         }
+        foreach ($this->bundles as $bundle) {
+            $bundle->build($container);
+        }
+
         $container->addObjectResource($this);
 
         // ensure these extensions are implicitly loaded
@@ -653,6 +689,16 @@ abstract class Kernel implements KernelInterface
         $container->compile();
 
         return $container;
+    }
+
+    /**
+     * Gets a new ContainerBuilder instance used to build the service container.
+     *
+     * @return ContainerBuilder
+     */
+    protected function getContainerBuilder()
+    {
+        return new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
     }
 
     /**

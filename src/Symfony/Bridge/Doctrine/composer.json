@@ -1,4 +1,4 @@
- {
+{
     "name": "symfony/doctrine-bridge",
     "type": "symfony-bridge",
     "description": "Symfony Doctrine Bridge",
@@ -16,17 +16,19 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2",
-        "doctrine/common": ">=2.1,<2.3-dev"
+        "php": ">=5.3.3",
+        "doctrine/common": ">=2.2,<2.4-dev"
     },
     "suggest": {
-        "doctrine/dbal": ">=2.1,<2.3",
-        "doctrine/orm": ">=2.1,<2.3",
-        "symfony/form": "self.version",
-        "symfony/validator": "self.version"
+        "symfony/form": "2.1.*",
+        "symfony/validator": "2.1.*",
+        "doctrine/data-fixtures": "1.0.*",
+        "doctrine/dbal": ">=2.2,<2.4-dev",
+        "doctrine/orm": ">=2.2.3,<2.4-dev"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Doctrine": "" }
     },
-    "target-dir": "Symfony/Bridge/Doctrine"
+    "target-dir": "Symfony/Bridge/Doctrine",
+    "minimum-stability": "dev"
 }

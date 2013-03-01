@@ -134,10 +134,10 @@ class Unescaper
      */
     private function convertEncoding($value, $to, $from)
     {
-        if (function_exists('iconv')) {
-            return iconv($from, $to, $value);
-        } elseif (function_exists('mb_convert_encoding')) {
+        if (function_exists('mb_convert_encoding')) {
             return mb_convert_encoding($value, $to, $from);
+        } elseif (function_exists('iconv')) {
+            return iconv($from, $to, $value);
         }
 
         throw new \RuntimeException('No suitable convert encoding function (install the iconv or mbstring extension).');

@@ -20,7 +20,7 @@ class DirectoryResource implements SelfValidatingResourceInterface
 {
     private $directory;
     private $pattern;
-    private $mtime;
+    private $hash;
 
     /**
      * Constructor.
@@ -32,7 +32,7 @@ class DirectoryResource implements SelfValidatingResourceInterface
     {
         if (is_dir($directory)) {
             $this->directory = $directory;
-            $this->mtime = $this->scanNewestMtime();
+            $this->hash = $this->calculateHash();
         }
         $this->pattern = $pattern;
     }
@@ -55,12 +55,12 @@ class DirectoryResource implements SelfValidatingResourceInterface
             return false;
         }
 
-        return $this->scanNewestMtime() == $this->mtime;
+        return $this->calculateHash() == $this->hash;
     }
 
-    public function scanNewestMtime()
+    protected function calculateHash()
     {
-        $newestMTime = filemtime($this->directory);
+        $hash = '';
 
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
             // if regex filtering is enabled only check matching files
@@ -68,16 +68,14 @@ class DirectoryResource implements SelfValidatingResourceInterface
                 continue;
             }
 
-            // always monitor directories for changes, except the .. entries
-            // (otherwise deleted files wouldn't get detected)
-            if ($file->isDir() && '/..' === substr($file, -3)) {
+            if ($file->isDir()) { // only check files as directories change state also if files not matching the pattern are added/deleted
                 continue;
             }
 
-            $newestMTime = max($file->getMTime(), $newestMTime);
+            $hash = md5($hash .  '-' . $file . '-' . $file->getMTime());
         }
 
-        return $newestMTime;
+        return $hash;
     }
 
     public function serialize()
@@ -85,7 +83,7 @@ class DirectoryResource implements SelfValidatingResourceInterface
         return serialize(array(
             'directory' => $this->filename,
             'pattern' => $this->pattern,
-            'mtime' => $this->mtime
+            'hash' => $this->hash
         ));
     }
 
@@ -94,7 +92,7 @@ class DirectoryResource implements SelfValidatingResourceInterface
         $data = unserialize($serialized);
         $this->directory = $data['directory'];
         $this->pattern = $data['pattern'];
-        $this->mtime = $data['mtime'];
+        $this->hash = $data['hash'];
     }
 
 }

@@ -71,7 +71,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         $resource = new DirectoryResource($this->directory);
         $this->assertTrue($resource->isFresh(), '->isFresh() returns true if the resource has not changed');
 
-        $this->touch($this->directory, 20);
+        $this->touch($this->directory.'/tmp2.xml', 20);
         $this->assertFalse($resource->isFresh(), '->isFresh() returns false if the resource has been updated');
 
         $resource = new DirectoryResource('/____foo/foobar'.rand(1, 999999));
@@ -142,9 +142,13 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 
         $subdirectory = $this->directory.'/subdirectory';
         mkdir($subdirectory);
-        $this->touch($subdirectory, 20);
+        $this->touch($subdirectory.'/newfile.xml', 20);
 
-        $this->assertFalse($resource->isFresh(), '->isFresh() returns false if a subdirectory is modified (e.g. a file gets deleted)');
+        $this->assertFalse($resource->isFresh(), '->isFresh() returns false if a subdirectory is modified (e.g. a file is added)');
+
+        unlink($subdirectory.'/newfile.xml');
+
+        $this->assertTrue($resource->isFresh(), '->isFresh() returns true if a subdirectory is reverted to its previous state');
     }
 
     /**
@@ -152,13 +156,6 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilterRegexListNoMatch()
     {
-        $this->markTestSkipped("
-            Creating a new file will change the directory's mtime, even if it does not match the pattern.
-            We need to track the mtime to notice deleted files.
-            So it is not possible to consider the cache still fresh if a file not matching the pattern is added
-            (or deleted).
-        ");
-
         $resource = new DirectoryResource($this->directory, '/\.(foo|xml)$/');
 
         $this->touch($this->directory.'/new.bar', 20);

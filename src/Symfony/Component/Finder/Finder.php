@@ -69,6 +69,7 @@ class Finder implements \IteratorAggregate, \Countable
             ->addAdapter(new GnuFindAdapter())
             ->addAdapter(new BsdFindAdapter())
             ->addAdapter(new PhpAdapter(), -50)
+            ->setAdapter('php')
         ;
     }
 
@@ -97,7 +98,41 @@ class Finder implements \IteratorAggregate, \Countable
         $this->adapters[$adapter->getName()] = array(
             'adapter'  => $adapter,
             'priority' => $priority,
+            'selected' => false,
         );
+
+        return $this->sortAdapters();
+    }
+
+    /**
+     * Sets the selected adapter to the best one according to the current platform the code is run on.
+     *
+     * @return Finder The current Finder instance
+     */
+    public function useBestAdapter()
+    {
+        $this->resetAdapterSelection();
+
+        return $this->sortAdapters();
+    }
+
+    /**
+     * Selects the adapter to use.
+     *
+     * @param string $name
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return Finder The current Finder instance
+     */
+    public function setAdapter($name)
+    {
+        if (!isset($this->adapters[$name])) {
+            throw new \InvalidArgumentException(sprintf('Adapter "%s" does not exist.', $name));
+        }
+
+        $this->resetAdapterSelection();
+        $this->adapters[$name]['selected'] = true;
 
         return $this->sortAdapters();
     }
@@ -692,12 +727,16 @@ class Finder implements \IteratorAggregate, \Countable
         return iterator_count($this->getIterator());
     }
 
-    /*
+    /**
      * @return Finder The current Finder instance
      */
     private function sortAdapters()
     {
         uasort($this->adapters, function (array $a, array $b) {
+            if ($a['selected'] || $b['selected']) {
+                return $a['selected'] ? -1 : 1;
+            }
+
             return $a['priority'] > $b['priority'] ? -1 : 1;
         });
 
@@ -718,7 +757,7 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         if (static::IGNORE_DOT_FILES === (static::IGNORE_DOT_FILES & $this->ignore)) {
-            $this->notNames[] = '/^\..+/';
+            $this->notPaths[] = '#(^|/)\..+(/|$)#';
         }
 
         foreach ($this->adapters as $adapter) {
@@ -756,5 +795,17 @@ class Finder implements \IteratorAggregate, \Countable
             ->setSort($this->sort)
             ->setPath($this->paths)
             ->setNotPath($this->notPaths);
+    }
+
+    /**
+     * Unselects all adapters.
+     */
+    private function resetAdapterSelection()
+    {
+        $this->adapters = array_map(function (array $properties) {
+            $properties['selected'] = false;
+
+            return $properties;
+        }, $this->adapters);
     }
 }

@@ -99,6 +99,14 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'locale'             => $request->getLocale(),
         );
 
+        if (isset($this->data['request_headers']['php-auth-pw'])) {
+            $this->data['request_headers']['php-auth-pw'] = '******';
+        }
+
+        if (isset($this->data['request_server']['PHP_AUTH_PW'])) {
+            $this->data['request_server']['PHP_AUTH_PW'] = '******';
+        }
+
         if (isset($this->controllers[$request])) {
             $controller = $this->controllers[$request];
             if (is_array($controller)) {

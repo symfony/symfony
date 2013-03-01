@@ -70,6 +70,18 @@ class DebugClassLoader
     }
 
     /**
+     * Finds a file by class name
+     *
+     * @param string $class A class name to resolve to file
+     *
+     * @return string|null
+     */
+    public function findFile($class)
+    {
+        return $this->classFinder->findFile($class);
+    }
+
+    /**
      * Loads the given class or interface.
      *
      * @param string $class The name of the class

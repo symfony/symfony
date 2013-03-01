@@ -33,11 +33,17 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
         }
 
         if ($node instanceof TransDefaultDomainNode) {
-            $var = $env->getParser()->getVarName();
-            $name = new \Twig_Node_Expression_AssignName($var, $node->getLine());
-            $this->domain = new \Twig_Node_Expression_Name($var, $node->getLine());
+            if ($node->getNode('expr') instanceof \Twig_Node_Expression_Constant) {
+                $this->domain = $node->getNode('expr');
 
-            return new \Twig_Node_Set(false, new \Twig_Node(array($name)), new \Twig_Node(array($node->getNode('expr'))), $node->getLine());
+                return $node;
+            } else {
+                $var = $env->getParser()->getVarName();
+                $name = new \Twig_Node_Expression_AssignName($var, $node->getLine());
+                $this->domain = new \Twig_Node_Expression_Name($var, $node->getLine());
+
+                return new \Twig_Node_Set(false, new \Twig_Node(array($name)), new \Twig_Node(array($node->getNode('expr'))), $node->getLine());
+            }
         }
 
         if (null === $this->domain) {
@@ -68,6 +74,10 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
      */
     public function leaveNode(\Twig_NodeInterface $node, \Twig_Environment $env)
     {
+        if ($node instanceof TransDefaultDomainNode) {
+            return false;
+        }
+
         return $node;
     }
 
@@ -76,6 +86,6 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
      */
     public function getPriority()
     {
-        return 0;
+        return -10;
     }
 }

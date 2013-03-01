@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\EventListener;
 
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\PropertyAccess\PropertyPath;

@@ -7,6 +7,24 @@ in 2.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.2.0...v2.2.1
 
+* 2.2.0 (2013-03-01)
+
+ * 5b19c89: [Console] fixed unparsed StringInput tokens
+ * e92b76c: Mask PHP_AUTH_PW header in profiler
+ * bae83c7: [TwigBridge] fixed trans twig extractor
+ * f40adbc: [Finder] adds adapter selection/unselection capabilities
+ * 8f8ba38: [DomCrawler] fix handling of schemes by Link::getUri()
+ * 83382bc: [TwigBridge] fixed the translator extractor that were not trimming the text in trans tags (closes #7056)
+ * b1ea8e5: Fixed handling absent href attribute in base tag
+ * 83a61cf: fixed paths/notPaths regex for shell adapters
+ * 32c5bf7: fix issue 4911
+ * 13b8ce0: Adds expandable globs support to shell adapters
+ * 850bd5a: [HttpFoundation] Fixed messed up headers
+ * 4ecc246: Fixes AppCache + ESI + Stopwatch problem
+ * 0690709: added a DebuClassLoader::findFile() method to make the wrapping less invasive
+ * da22926: [Validator] gracefully handle transChoice errors
+ * 635b1fc: StringInput resets the given options
+
 * 2.2.0-RC3 (2013-02-24)
 
  * b2080c4: [HttpFoundation] Remove Cache-Control when using https download via IE<9 (fixes #6750)

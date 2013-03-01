@@ -542,11 +542,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         return 'Container';
     }
 
-    /*
-     * This method exists and is public because closures cannot call
-     * protected methods (yet). *Do not* call it from outside the class.
-    */
-    public function _fillContainerCache(ConfigCacheInterface $cache)
+    /* This method is only public to allow it to be called from a callback (prior PHP 5.4?) */
+    public function fillCache(ConfigCacheInterface $cache)
     {
         $container = $this->buildContainer();
         $container->compile();
@@ -568,7 +565,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $warmCache = false;
 
         $cache = $cacheFactory->cache($this->getCacheDir().'/'.$class.'.php', function($cache) use ($self, $warmCache) {
-            $self->_fillContainerCache($cache);
+            $self->fillCache($cache);
             $warmCache = true;
         });
 

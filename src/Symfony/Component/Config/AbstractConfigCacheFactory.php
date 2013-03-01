@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Config;
 
-use Symfony\Component\Config\Resource\DefaultResourceValidator;
-
 /**
  * Abstract base implementation for ConfigCacheFactories.
  *

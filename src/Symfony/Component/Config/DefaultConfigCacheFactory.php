@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Config;
 
-use Symfony\Component\Config\Resource\DefaultResourceValidator;
+use Symfony\Component\Config\Resource\SelfValidatingResourceValidator;
 
 /**
  * Default implementation of ConfigCacheFactoryInterface
@@ -40,7 +40,7 @@ class DefaultConfigCacheFactory extends AbstractConfigCacheFactory
 
             case true:
                 $cache = new ResourceValidatingCache($cacheFilename);
-                $cache->addResourceValidator(new DefaultResourceValidator());
+                $cache->addResourceValidator(new SelfValidatingResourceValidator());
 
                 return $cache;
         }

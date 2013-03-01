@@ -17,15 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
-    public function deprecationErrorHandler($errorNumber, $message, $file, $line, $context)
-    {
-        if ($errorNumber & E_USER_DEPRECATED) {
-            return true;
-        }
-
-        return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
-    }
-
     /**
      * @covers Symfony\Component\HttpFoundation\Request::__construct
      */
@@ -908,8 +899,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         // restore initial $_SERVER array
         $_SERVER = $server;
-
-        restore_error_handler();
     }
 
     public function testGetScriptName()
@@ -1156,32 +1145,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
 
         $this->assertContains('Accept-Language: zh, en-us; q=0.8, en; q=0.6', $request->__toString());
-    }
-
-    /**
-     * @dataProvider splitHttpAcceptHeaderData
-     */
-    public function testSplitHttpAcceptHeader($acceptHeader, $expected)
-    {
-        $request = new Request();
-
-        set_error_handler(array($this, "deprecationErrorHandler"));
-        $this->assertEquals($expected, $request->splitHttpAcceptHeader($acceptHeader));
-        restore_error_handler();
-    }
-
-    public function splitHttpAcceptHeaderData()
-    {
-        return array(
-            array(null, array()),
-            array('text/html;q=0.8', array('text/html' => 0.8)),
-            array('text/html;foo=bar;q=0.8 ', array('text/html;foo=bar' => 0.8)),
-            array('text/html;charset=utf-8; q=0.8', array('text/html;charset=utf-8' => 0.8)),
-            array('text/html,application/xml;q=0.9,*/*;charset=utf-8; q=0.8', array('text/html' => 1.0, 'application/xml' => 0.9, '*/*;charset=utf-8' => 0.8)),
-            array('text/html,application/xhtml+xml;q=0.9,*/*;q=0.8; foo=bar', array('text/html' => 1.0, 'application/xhtml+xml' => 0.9, '*/*;foo=bar' => 0.8)),
-            array('text/html,application/xhtml+xml;charset=utf-8;q=0.9; foo=bar,*/*', array('text/html' => 1.0, '*/*' => 1.0, 'application/xhtml+xml;charset=utf-8;foo=bar' => 0.9)),
-            array('text/html,application/xhtml+xml', array('text/html' => 1.0, 'application/xhtml+xml' => 1.0)),
-        );
     }
 
     public function testIsMethod()

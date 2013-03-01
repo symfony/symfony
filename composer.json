@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
+        "symfony/icu": ">=1.0",
         "doctrine/common": "~2.2",
         "twig/twig": "~1.11",
         "psr/log": "~1.0"
@@ -37,6 +38,7 @@
         "symfony/framework-bundle": "self.version",
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
+        "symfony/intl": "self.version",
         "symfony/locale": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
@@ -68,8 +70,9 @@
         "psr-0": { "Symfony\\": "src/" },
         "classmap": [
             "src/Symfony/Component/HttpFoundation/Resources/stubs",
-            "src/Symfony/Component/Locale/Resources/stubs"
-        ]
+            "src/Symfony/Component/Intl/Resources/stubs"
+        ],
+        "files": [ "src/Symfony/Component/Intl/Resources/stubs/functions.php" ]
     },
     "minimum-stability": "dev",
     "extra": {

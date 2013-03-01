@@ -1,0 +1,44 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Intl\ResourceBundle;
+
+/**
+ * Default implementation of {@link RegionBundleInterface}.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class RegionBundle extends AbstractBundle implements RegionBundleInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getCountryName($locale, $country)
+    {
+        return $this->readEntry($locale, array('Countries', $country));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCountryNames($locale)
+    {
+        if (null === ($countries = $this->readEntry($locale, array('Countries')))) {
+            return array();
+        }
+
+        if ($countries instanceof \Traversable) {
+            $countries = iterator_to_array($countries);
+        }
+
+        return $countries;
+    }
+}

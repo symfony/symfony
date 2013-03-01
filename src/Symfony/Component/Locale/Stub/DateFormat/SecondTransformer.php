@@ -11,38 +11,17 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
+use Symfony\Component\Intl\DateFormatter\DateFormat\SecondTransformer as BaseSecondTransformer;
+
 /**
- * Parser and formatter for the second format
+ * Alias of {@link \Symfony\Component\Intl\DateFormatter\DateFormat\SecondTransformer}.
  *
- * @author Igor Wiedler <igor@wiedler.ch>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+ *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\SecondTransformer}
+ *             instead.
  */
-class SecondTransformer extends Transformer
+class SecondTransformer extends BaseSecondTransformer
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function format(\DateTime $dateTime, $length)
-    {
-        $secondOfMinute = (int) $dateTime->format('s');
-
-        return $this->padLeft($secondOfMinute, $length);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getReverseMatchingRegExp($length)
-    {
-        return 1 === $length ? '\d{1,2}' : '\d{'.$length.'}';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function extractDateOptions($matched, $length)
-    {
-        return array(
-            'second' => (int) $matched,
-        );
-    }
 }

@@ -54,29 +54,6 @@ class RenderTokenParserTest extends TestCase
                     'render'
                 )
             ),
-            // deprecated in 2.2
-            array(
-                '{% render "foo" with {foo: 2} %}',
-                new RenderNode(
-                    new \Twig_Node_Expression_Constant('foo', 1),
-                    new \Twig_Node_Expression_Array(array(), 1),
-                    1,
-                    'render'
-                )
-            ),
-            // deprecated in 2.2
-            array(
-                '{% render "foo" with {foo: 2}, {foo: 1} %}',
-                new RenderNode(
-                    new \Twig_Node_Expression_Constant('foo', 1),
-                    new \Twig_Node_Expression_Array(array(
-                        new \Twig_Node_Expression_Constant('foo', 1),
-                        new \Twig_Node_Expression_Constant('1', 1),
-                    ), 1),
-                    1,
-                    'render'
-                )
-            ),
         );
     }
 }

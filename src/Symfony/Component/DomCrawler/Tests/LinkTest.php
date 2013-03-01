@@ -79,10 +79,6 @@ class LinkTest extends \PHPUnit_Framework_TestCase
         return array(
             array('/foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
             array('/foo', 'http://localhost/bar/foo', 'http://localhost/foo'),
-            array('
-            /foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
-            array('/foo
-            ', 'http://localhost/bar/foo', 'http://localhost/foo'),
 
             array('foo', 'http://localhost/bar/foo/', 'http://localhost/bar/foo/foo'),
             array('foo', 'http://localhost/bar/foo', 'http://localhost/bar/foo'),
@@ -99,6 +95,9 @@ class LinkTest extends \PHPUnit_Framework_TestCase
             array('?foo=2', 'http://localhost/bar?foo=1', 'http://localhost/bar?foo=2'),
             array('?foo=2', 'http://localhost/bar/?foo=1', 'http://localhost/bar/?foo=2'),
             array('?bar=2', 'http://localhost?foo=1', 'http://localhost?bar=2'),
+
+            array('../foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
+            array('../foo', 'http://localhost/bar/foo', 'http://localhost/foo'),
         );
     }
 

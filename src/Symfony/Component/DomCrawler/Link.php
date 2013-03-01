@@ -137,7 +137,7 @@ class Link
     protected function getCleanedRawUri()
     {
         $uri = trim($this->getRawUri());
-        $uri = preg_replace('/^\.*/', '', $uri);
+        $uri = preg_replace('/^\../', '', $uri);
 
         return $uri;
     }

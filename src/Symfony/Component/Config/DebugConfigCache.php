@@ -63,11 +63,11 @@ class DebugConfigCache extends ProductionConfigCache
         $resources = unserialize(file_get_contents($this->getMetaFile()));
         foreach ($resources as $resource) {
             foreach ($this->resourceValidators as $validator) {
-                switch ($validator->isFresh($resource)) {
-                    case true:
-                        continue 2; // next resource
-                    case false:
-                        return false; // this resource is stale
+                $check = $validator->isFresh($resource);
+                if (true === $check) {
+                    continue 2; // next resource
+                } else if (false === $check) {
+                    return false; // this resource is stale
                 }
             }
 

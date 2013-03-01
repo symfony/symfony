@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -22,7 +23,7 @@ use Symfony\Component\Config\Util\CacheFileUtils;
 class ConfigCache implements ConfigCacheInterface
 {
 
-    private $impl;
+    private $cacheImplementation;
 
     /**
      * Constructor.
@@ -33,21 +34,21 @@ class ConfigCache implements ConfigCacheInterface
     public function __construct($file, $debug)
     {
         $factory = new DefaultConfigCacheFactory($debug);
-        $this->impl = $factory->createCache($file);
+        $this->cacheImplementation = $factory->createCache($file);
     }
 
     public function __toString()
     {
-        return $this->impl->__toString();
+        return $this->cacheImplementation->__toString();
     }
 
     public function isFresh()
     {
-        return $this->impl->isFresh();
+        return $this->cacheImplementation->isFresh();
     }
 
     public function write($content, array $metadata = null)
     {
-        $this->impl->write($content, $metadata);
+        $this->cacheImplementation->write($content, $metadata);
     }
 }

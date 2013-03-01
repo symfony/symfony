@@ -104,10 +104,31 @@ EOF
 
         $warmer->warmUp($warmupDir);
 
+        foreach (Finder::create()->files()->name('*.meta')->in($warmupDir) as $file) {
+            // fix meta references to the Kernel
+            $content = preg_replace(
+                '/C\:\d+\:"'.preg_quote($class.$this->getTempKernelSuffix(), '"/').'"/',
+                sprintf('C:%s:"%s"', strlen($class), $class),
+                file_get_contents($file)
+            );
+
+            // fix meta references to cache files
+            $realWarmupDir = substr($warmupDir, 0, -4);
+            $content = preg_replace_callback(
+                '/s\:\d+\:"'.preg_quote($warmupDir, '/').'([^"]+)"/',
+                function (array $matches) use ($realWarmupDir) {
+                    $path = $realWarmupDir.$matches[1];
+                    return sprintf('s:%s:"%s"', strlen($path), $path);
+                },
+                $content
+            );
+
+            file_put_contents($file, $content);
+        }
+
         // fix container files and classes
         $regex = '/'.preg_quote($this->getTempKernelSuffix(), '/').'/';
-        $finder = new Finder();
-        foreach ($finder->files()->name(get_class($kernel->getContainer()).'*')->in($warmupDir) as $file) {
+        foreach (Finder::create()->files()->name(get_class($kernel->getContainer()).'*')->in($warmupDir) as $file) {
             $content = file_get_contents($file);
             $content = preg_replace($regex, '', $content);
 
@@ -116,16 +137,6 @@ EOF
 
             file_put_contents(preg_replace($regex, '', $file), $content);
             unlink($file);
-        }
-
-        // fix meta references to the Kernel
-        foreach ($finder->files()->name('*.meta')->in($warmupDir) as $file) {
-            $content = preg_replace(
-                '/C\:\d+\:"'.preg_quote($class.$this->getTempKernelSuffix(), '"/').'"/',
-                sprintf('C:%s:"%s"', strlen($class), $class),
-                file_get_contents($file)
-            );
-            file_put_contents($file, $content);
         }
     }
 

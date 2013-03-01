@@ -26,8 +26,6 @@ class Configuration implements ConfigurationInterface
      * Generates the configuration tree builder.
      *
      * @return TreeBuilder The tree builder
-     *
-     * @throws \RuntimeException When using the deprecated 'charset' setting
      */
     public function getConfigTreeBuilder()
     {
@@ -36,21 +34,6 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('charset')
-                    ->defaultNull()
-                    ->beforeNormalization()
-                        ->ifTrue(function($v) { return null !== $v; })
-                        ->then(function($v) {
-                            $message = 'The charset setting is deprecated. Just remove it from your configuration file.';
-
-                            if ('UTF-8' !== $v) {
-                                $message .= sprintf('You need to define a getCharset() method in your Application Kernel class that returns "%s".', $v);
-                            }
-
-                            throw new \RuntimeException($message);
-                        })
-                    ->end()
-                ->end()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
                     ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests.")
@@ -200,16 +183,6 @@ class Configuration implements ConfigurationInterface
                     ->info('session configuration')
                     ->canBeUnset()
                     ->children()
-                        ->booleanNode('auto_start')
-                            ->info('DEPRECATED! Session starts on demand')
-                            ->defaultFalse()
-                            ->beforeNormalization()
-                                ->ifTrue(function($v) { return null !== $v; })
-                                ->then(function($v) {
-                                    throw new \RuntimeException('The auto_start setting is deprecated. Just remove it from your configuration file.');
-                                })
-                            ->end()
-                        ->end()
                         ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
                         ->scalarNode('handler_id')->defaultValue('session.handler.native_file')->end()
                         ->scalarNode('name')->end()

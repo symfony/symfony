@@ -87,7 +87,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     protected static function getBundleDefaultConfig()
     {
         return array(
-            'charset'             => null,
             'http_method_override' => true,
             'trusted_proxies'     => array(),
             'ide'                 => null,

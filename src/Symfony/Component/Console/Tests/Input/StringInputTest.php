@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
-use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\StringInput;
 
 class StringInputTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,7 +35,8 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
             array(new InputOption('foo', null, InputOption::VALUE_REQUIRED))
         );
 
-        $input = new StringInput('--foo=bar', $definition);
+        $input = new StringInput('--foo=bar');
+        $input->bind($definition);
         $actual = $input->getOption('foo');
 
         $this->assertEquals('bar', $actual);

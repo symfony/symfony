@@ -88,11 +88,6 @@
         <xsd:attribute name="cookie-secure" type="xsd:boolean" />
         <xsd:attribute name="cookie-httponly" type="xsd:boolean" />
         <!-- deprecated attributes -->
-        <xsd:attribute name="lifetime" type="xsd:string" />
-        <xsd:attribute name="path" type="xsd:string" />
-        <xsd:attribute name="domain" type="xsd:string" />
-        <xsd:attribute name="secure" type="xsd:boolean" />
-        <xsd:attribute name="httponly" type="xsd:boolean" />
         <xsd:attribute name="auto-start" type="xsd:boolean" />
         <!-- end of deprecated attributes -->
         <xsd:attribute name="cache-limiter" type="xsd:string" />

@@ -77,14 +77,4 @@ interface ValidationVisitorInterface
      * @param string            $propertyPath The current property path in the validation graph.
      */
     public function visit(MetadataInterface $metadata, $value, $group, $propertyPath);
-
-    /**
-     * Returns a graph walker with an alternative, deprecated API of the
-     * visitor.
-     *
-     * @return GraphWalker The graph walker.
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3.
-     */
-    public function getGraphWalker();
 }

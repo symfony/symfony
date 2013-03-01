@@ -12,10 +12,8 @@
 namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactoryAdapter;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
@@ -225,15 +223,10 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setMetadataFactory($metadataFactory)
+    public function setMetadataFactory(MetadataFactoryInterface $metadataFactory)
     {
         if (count($this->xmlMappings) > 0 || count($this->yamlMappings) > 0 || count($this->methodMappings) > 0 || null !== $this->annotationReader) {
             throw new ValidatorException('You cannot set a custom metadata factory after adding custom mappings. You should do either of both.');
-        }
-
-        if ($metadataFactory instanceof ClassMetadataFactoryInterface
-                && !$metadataFactory instanceof MetadataFactoryInterface) {
-            $metadataFactory = new ClassMetadataFactoryAdapter($metadataFactory);
         }
 
         $this->metadataFactory = $metadataFactory;

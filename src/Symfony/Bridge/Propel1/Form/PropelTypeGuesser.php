@@ -85,6 +85,7 @@ class PropelTypeGuesser implements FormTypeGuesserInterface
                     //check if this is mysql enum
                     $choices = $column->getValueSet();
                     $labels = array_map('ucfirst', $choices);
+
                     return new TypeGuess('choice', array('choices' => array_combine($choices, $labels)), Guess::MEDIUM_CONFIDENCE);
                 }
             case \PropelColumnTypes::VARCHAR:

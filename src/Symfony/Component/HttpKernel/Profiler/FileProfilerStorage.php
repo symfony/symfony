@@ -225,7 +225,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
             return null;
         }
 
-        while(true) {
+        while (true) {
             $chunkSize = min($position, 1024);
             $position -= $chunkSize;
             fseek($file, $position);

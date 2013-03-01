@@ -360,6 +360,7 @@ class ClassCollectionLoader
         }
         $resolved[$nodeName] = $node;
         unset($unresolved[$nodeName]);
+
         return $resolved;
     }
 }

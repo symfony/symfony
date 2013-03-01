@@ -467,13 +467,14 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->addResource($a = new FileResource(__DIR__.'/Fixtures/xml/services1.xml'));
         $container->addResource($b = new FileResource(__DIR__.'/Fixtures/xml/services2.xml'));
-        $resources = array();
+
+        $foundA = $foundB = false;
         foreach ($container->getResources() as $resource) {
-            if (false === strpos($resource, '.php')) {
-                $resources[] = $resource;
-            }
+            if ($resource == $a) $foundA = true;
+            else if ($resource == $b) $foundB = true;
         }
-        $this->assertEquals(array($a, $b), $resources, '->getResources() returns an array of resources read for the current configuration');
+
+        $this->assertTrue($foundA && $foundB, '->getResources() returns an array of resources read for the current configuration');
         $this->assertSame($container, $container->setResources(array()));
         $this->assertEquals(array(), $container->getResources());
     }

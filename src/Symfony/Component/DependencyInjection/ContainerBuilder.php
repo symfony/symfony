@@ -168,7 +168,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getResources()
     {
-        return array_unique($this->resources);
+        return array_unique($this->resources, SORT_REGULAR);
     }
 
     /**

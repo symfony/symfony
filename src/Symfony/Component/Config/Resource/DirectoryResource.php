@@ -16,41 +16,25 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DirectoryResource implements ResourceInterface, \Serializable
+class DirectoryResource implements SelfValidatingResourceInterface
 {
-    private $resource;
+    private $directory;
     private $pattern;
+    private $mtime;
 
     /**
      * Constructor.
      *
-     * @param string $resource The file path to the resource
+     * @param string $directory The file path to the resource
      * @param string $pattern  A pattern to restrict monitored files
      */
-    public function __construct($resource, $pattern = null)
+    public function __construct($directory, $pattern = null)
     {
-        $this->resource = $resource;
+        if (is_dir($directory)) {
+            $this->directory = $directory;
+            $this->mtime = $this->scanNewestMtime();
+        }
         $this->pattern = $pattern;
-    }
-
-    /**
-     * Returns a string representation of the Resource.
-     *
-     * @return string A string representation of the Resource
-     */
-    public function __toString()
-    {
-        return (string) $this->resource;
-    }
-
-    /**
-     * Returns the resource tied to this Resource.
-     *
-     * @return mixed The resource
-     */
-    public function getResource()
-    {
-        return $this->resource;
     }
 
     public function getPattern()
@@ -65,14 +49,20 @@ class DirectoryResource implements ResourceInterface, \Serializable
      *
      * @return Boolean true if the resource has not been updated, false otherwise
      */
-    public function isFresh($timestamp)
+    public function isFresh()
     {
-        if (!is_dir($this->resource)) {
+        if (!$this->directory || !is_dir($this->directory)) {
             return false;
         }
 
-        $newestMTime = filemtime($this->resource);
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
+        return $this->scanNewestMtime() == $this->mtime;
+    }
+
+    public function scanNewestMtime()
+    {
+        $newestMTime = filemtime($this->directory);
+
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
             // if regex filtering is enabled only check matching files
             if ($this->pattern && $file->isFile() && !preg_match($this->pattern, $file->getBasename())) {
                 continue;
@@ -87,16 +77,24 @@ class DirectoryResource implements ResourceInterface, \Serializable
             $newestMTime = max($file->getMTime(), $newestMTime);
         }
 
-        return $newestMTime < $timestamp;
+        return $newestMTime;
     }
 
     public function serialize()
     {
-        return serialize(array($this->resource, $this->pattern));
+        return serialize(array(
+            'directory' => $this->filename,
+            'pattern' => $this->pattern,
+            'mtime' => $this->mtime
+        ));
     }
 
     public function unserialize($serialized)
     {
-        list($this->resource, $this->pattern) = unserialize($serialized);
+        $data = unserialize($serialized);
+        $this->directory = $data['directory'];
+        $this->pattern = $data['pattern'];
+        $this->mtime = $data['mtime'];
     }
+
 }

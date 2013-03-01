@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\Util\CacheFileUtils;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
@@ -20,10 +21,7 @@ class CompilerDebugDumpPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        // this does not really mean a ConfigCache, but just a way of atomically
-        // writing to a file?
-        $cache = new ConfigCache($this->getCompilerLogFilename($container), false);
-        $cache->write(implode("\n", $container->getCompiler()->getLog()));
+        CacheFileUtils::dumpInFile($this->getCompilerLogFilename($container), implode("\n", $container->getCompiler()->getLog()));
     }
 
     public static function getCompilerLogFilename(ContainerInterface $container)

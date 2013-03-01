@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Config;
 
+use Symfony\Component\Config\Resource\DefaultResourceValidator;
+
 /**
  * Default implementation of ConfigCacheFactoryInterface
  *
  * @author Benjamin Klotz <bk@webfactory.de>
  */
-class ConfigCacheFactory implements ConfigCacheFactoryInterface 
+class DefaultConfigCacheFactory implements ConfigCacheFactoryInterface
 {
     protected $debug;
 
@@ -30,12 +32,24 @@ class ConfigCacheFactory implements ConfigCacheFactoryInterface
         $this->debug = $debug;
     }
 
+    public function createCache($cacheFilename) {
+        switch ($this->debug) {
+            case false:
+                return new ProductionConfigCache($cacheFilename);
+
+            case true:
+                $cache = new DebugConfigCache($cacheFilename);
+                $cache->addResourceValidator(new DefaultResourceValidator());
+                return $cache;
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
     public function cache($file, $callback)
     {
-        $cache = new ConfigCache($file, $this->debug);
+        $cache = $this->createCache($file);
         if (!$cache->isFresh()) call_user_func($callback, $cache);
         return $cache;
     }

@@ -31,7 +31,8 @@ use Symfony\Component\HttpKernel\Debug\ErrorHandler;
 use Symfony\Component\HttpKernel\Debug\ExceptionHandler;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
-use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\DefaultConfigCacheFactory;
+use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\ClassLoader\DebugClassLoader;
 
@@ -541,6 +542,16 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         return 'Container';
     }
 
+    /*
+     * This method exists and is public because closures cannot call
+     * protected methods (yet). *Do not* call it from outside the class.
+    */
+    public function _fillContainerCache(ConfigCacheInterface $cache) {
+        $container = $this->buildContainer();
+        $container->compile();
+        $this->dumpContainer($cache, $container, $this->getContainerClass(), $this->getContainerBaseClass());
+    }
+
     /**
      * Initializes the service container.
      *
@@ -550,22 +561,22 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected function initializeContainer()
     {
         $class = $this->getContainerClass();
-        $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
-        $fresh = true;
-        if (!$cache->isFresh()) {
-            $container = $this->buildContainer();
-            $container->compile();
-            $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
+        $cacheFactory = new DefaultConfigCacheFactory($this->debug);
 
-            $fresh = false;
-        }
+        $self = $this;
+        $warmCache = false;
+
+        $cache = $cacheFactory->cache($this->getCacheDir().'/'.$class.'.php', function($cache) use ($self, $warmCache) {
+            $self->_fillContainerCache($cache);
+            $warmCache = true;
+        });
 
         require_once $cache;
 
         $this->container = new $class();
         $this->container->set('kernel', $this);
 
-        if (!$fresh && $this->container->has('cache_warmer')) {
+        if ($warmCache && $this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
     }
@@ -693,7 +704,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * @param string           $class     The name of the class to generate
      * @param string           $baseClass The name of the container's base class
      */
-    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
+    protected function dumpContainer(ConfigCacheInterface $cache, ContainerBuilder $container, $class, $baseClass)
     {
         // cache the container
         $dumper = new PhpDumper($container);

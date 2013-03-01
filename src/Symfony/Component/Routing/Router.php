@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
+use Symfony\Component\Config\DefaultConfigCacheFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -219,7 +220,7 @@ class Router implements RouterInterface
     private function getConfigCacheFactory()
     {
         if (!$this->configCacheFactory) {
-            $this->configCacheFactory = new \Symfony\Component\Config\ConfigCacheFactory($this->options['debug']);
+            $this->configCacheFactory = new DefaultConfigCacheFactory($this->options['debug']);
         }
 
         return $this->configCacheFactory;

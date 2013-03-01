@@ -17,13 +17,19 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 {
     protected $directory;
 
+    protected function touch($file, $reltime = 0) {
+        touch($file, time() + $reltime);
+        clearstatcache($file);
+    }
+
     protected function setUp()
     {
         $this->directory = sys_get_temp_dir().'/symfonyDirectoryIterator';
         if (!file_exists($this->directory)) {
             mkdir($this->directory);
         }
-        touch($this->directory.'/tmp.xml');
+        $this->touch($this->directory.'/tmp.xml', -86410);
+        $this->touch($this->directory, -86420); // touch dir afterwards because will be updated when creating file
     }
 
     protected function tearDown()
@@ -50,15 +56,6 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         rmdir($directory);
     }
 
-    /**
-     * @covers Symfony\Component\Config\Resource\DirectoryResource::getResource
-     */
-    public function testGetResource()
-    {
-        $resource = new DirectoryResource($this->directory);
-        $this->assertEquals($this->directory, $resource->getResource(), '->getResource() returns the path to the resource');
-    }
-
     public function testGetPattern()
     {
         $resource = new DirectoryResource('foo', 'bar');
@@ -71,11 +68,13 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     public function testIsFresh()
     {
         $resource = new DirectoryResource($this->directory);
-        $this->assertTrue($resource->isFresh(time() + 10), '->isFresh() returns true if the resource has not changed');
-        $this->assertFalse($resource->isFresh(time() - 86400), '->isFresh() returns false if the resource has been updated');
+        $this->assertTrue($resource->isFresh(), '->isFresh() returns true if the resource has not changed');
+
+        $this->touch($this->directory, 20);
+        $this->assertFalse($resource->isFresh(), '->isFresh() returns false if the resource has been updated');
 
         $resource = new DirectoryResource('/____foo/foobar'.rand(1, 999999));
-        $this->assertFalse($resource->isFresh(time()), '->isFresh() returns false if the resource does not exist');
+        $this->assertFalse($resource->isFresh(), '->isFresh() returns false if the resource does not exist');
     }
 
     /**
@@ -84,8 +83,8 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     public function testIsFreshUpdateFile()
     {
         $resource = new DirectoryResource($this->directory);
-        touch($this->directory.'/tmp.xml', time() + 20);
-        $this->assertFalse($resource->isFresh(time() + 10), '->isFresh() returns false if an existing file is modified');
+        $this->touch($this->directory.'/tmp.xml', 20);
+        $this->assertFalse($resource->isFresh(), '->isFresh() returns false if an existing file is modified');
     }
 
     /**
@@ -94,8 +93,8 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     public function testIsFreshNewFile()
     {
         $resource = new DirectoryResource($this->directory);
-        touch($this->directory.'/new.xml', time() + 20);
-        $this->assertFalse($resource->isFresh(time() + 10), '->isFresh() returns false if a new file is added');
+        $this->touch($this->directory.'/new.xml', 20);
+        $this->assertFalse($resource->isFresh(), '->isFresh() returns false if a new file is added');
     }
 
     /**
@@ -105,7 +104,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     {
         $resource = new DirectoryResource($this->directory);
         unlink($this->directory.'/tmp.xml');
-        $this->assertFalse($resource->isFresh(time()), '->isFresh() returns false if an existing file is removed');
+        $this->assertFalse($resource->isFresh(), '->isFresh() returns false if an existing file is removed');
     }
 
     /**
@@ -115,7 +114,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     {
         $resource = new DirectoryResource($this->directory);
         $this->removeDirectory($this->directory);
-        $this->assertFalse($resource->isFresh(time()), '->isFresh() returns false if the whole resource is removed');
+        $this->assertFalse($resource->isFresh(), '->isFresh() returns false if the whole resource is removed');
     }
 
     /**
@@ -127,10 +126,10 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         mkdir($subdirectory);
 
         $resource = new DirectoryResource($this->directory);
-        $this->assertTrue($resource->isFresh(time() + 10), '->isFresh() returns true if an unmodified subdirectory exists');
+        $this->assertTrue($resource->isFresh(), '->isFresh() returns true if an unmodified subdirectory exists');
 
-        touch($subdirectory.'/newfile.xml', time() + 20);
-        $this->assertFalse($resource->isFresh(time() + 10), '->isFresh() returns false if a new file in a subdirectory is added');
+        $this->touch($subdirectory.'/newfile.xml', 20);
+        $this->assertFalse($resource->isFresh(), '->isFresh() returns false if a new file in a subdirectory is added');
     }
 
     /**
@@ -142,9 +141,9 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 
         $subdirectory = $this->directory.'/subdirectory';
         mkdir($subdirectory);
-        touch($subdirectory, time() + 20);
+        $this->touch($subdirectory, 20);
 
-        $this->assertFalse($resource->isFresh(time() + 10), '->isFresh() returns false if a subdirectory is modified (e.g. a file gets deleted)');
+        $this->assertFalse($resource->isFresh(), '->isFresh() returns false if a subdirectory is modified (e.g. a file gets deleted)');
     }
 
     /**
@@ -152,10 +151,17 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilterRegexListNoMatch()
     {
+        $this->markTestSkipped("
+            Creating a new file will change the directory's mtime, even if it does not match the pattern.
+            We need to track the mtime to notice deleted files.
+            So it is not possible to consider the cache still fresh if a file not matching the pattern is added
+            (or deleted).
+        ");
+
         $resource = new DirectoryResource($this->directory, '/\.(foo|xml)$/');
 
-        touch($this->directory.'/new.bar', time() + 20);
-        $this->assertTrue($resource->isFresh(time() + 10), '->isFresh() returns true if a new file not matching the filter regex is created');
+        $this->touch($this->directory.'/new.bar', 20);
+        $this->assertTrue($resource->isFresh(), '->isFresh() returns true if a new file not matching the filter regex is created');
     }
 
     /**
@@ -165,7 +171,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
     {
         $resource = new DirectoryResource($this->directory, '/\.(foo|xml)$/');
 
-        touch($this->directory.'/new.xml', time() + 20);
-        $this->assertFalse($resource->isFresh(time() + 10), '->isFresh() returns false if an new file matching the filter regex is created ');
+        $this->touch($this->directory.'/new.xml', 20);
+        $this->assertFalse($resource->isFresh(), '->isFresh() returns false if an new file matching the filter regex is created ');
     }
 }

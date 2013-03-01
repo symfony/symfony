@@ -168,7 +168,9 @@ class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
         $r1->expects($this->any())->method('__toString')->will($this->returnValue('r1'));
         $catalogue->addResource($r1);
 
-        $this->assertEquals(array($r, $r1), $catalogue->getResources());
+        $resources = $catalogue->getResources();
+        $this->assertContains($r, $resources);
+        $this->assertContains($r1, $resources);
     }
 
     public function testMetadataDelete()

@@ -33,7 +33,7 @@ interface OutputInterface
     /**
      * Writes a message to the output.
      *
-     * @param string|array $messages The message as an array of lines of a single string
+     * @param string|array $messages The message as an array of lines or a single string
      * @param Boolean      $newline  Whether to add a newline or not
      * @param integer      $type     The type of output (0: normal, 1: raw, 2: plain)
      *

@@ -89,7 +89,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         return array(
             'charset'             => null,
             'http_method_override' => true,
-            'trust_proxy_headers' => false,
             'trusted_proxies'     => array(),
             'ide'                 => null,
             'default_locale'      => 'en',

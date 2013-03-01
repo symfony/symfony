@@ -56,7 +56,6 @@ class Configuration implements ConfigurationInterface
                     ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests.")
                     ->defaultTrue()
                 ->end()
-                ->scalarNode('trust_proxy_headers')->defaultFalse()->end() // @deprecated, to be removed in 2.3
                 ->arrayNode('trusted_proxies')
                     ->beforeNormalization()
                         ->ifTrue(function($v) { return !is_array($v) && !is_null($v); })

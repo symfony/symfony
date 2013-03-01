@@ -465,18 +465,6 @@ class Request
     }
 
     /**
-     * Trusts $_SERVER entries coming from proxies.
-     *
-     * @deprecated Deprecated since version 2.0, to be removed in 2.3. Use setTrustedProxies instead.
-     */
-    public static function trustProxyData()
-    {
-        trigger_error('trustProxyData() is deprecated since version 2.0 and will be removed in 2.3. Use setTrustedProxies() instead.', E_USER_DEPRECATED);
-
-        self::$trustProxy = true;
-    }
-
-    /**
      * Sets a list of trusted proxies.
      *
      * You should only list the reverse proxies that you manage directly.
@@ -525,19 +513,6 @@ class Request
         }
 
         self::$trustedHeaders[$key] = $value;
-    }
-
-    /**
-     * Returns true if $_SERVER entries coming from proxies are trusted,
-     * false otherwise.
-     *
-     * @return boolean
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use getTrustedProxies instead.
-     */
-    public static function isProxyTrusted()
-    {
-        return self::$trustProxy;
     }
 
     /**

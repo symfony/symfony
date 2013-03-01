@@ -19,7 +19,6 @@ class WithComments
 
 $string = 'string shoult not be   modified';
 
-
 $heredoc = <<<HD
 
 

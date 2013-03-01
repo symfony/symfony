@@ -19,7 +19,6 @@ namespace Symfony\Component\Config\Resource;
  */
 class DefaultResourceValidator implements ResourceValidatorInterface
 {
-
     public function isFresh(ResourceInterface $resource)
     {
         if ($resource instanceof SelfValidatingResourceInterface) {
@@ -29,4 +28,3 @@ class DefaultResourceValidator implements ResourceValidatorInterface
         return null;
     }
 }
-

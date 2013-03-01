@@ -26,7 +26,8 @@ class DebugConfigCache extends ProductionConfigCache
 {
     protected $resourceValidators = array();
 
-    public function addResourceValidator(ResourceValidatorInterface $validator) {
+    public function addResourceValidator(ResourceValidatorInterface $validator)
+    {
         $this->resourceValidators[] = $validator;
     }
 

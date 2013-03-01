@@ -79,6 +79,10 @@ class LinkTest extends \PHPUnit_Framework_TestCase
         return array(
             array('/foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
             array('/foo', 'http://localhost/bar/foo', 'http://localhost/foo'),
+            array('
+            /foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
+            array('/foo
+            ', 'http://localhost/bar/foo', 'http://localhost/foo'),
 
             array('foo', 'http://localhost/bar/foo/', 'http://localhost/bar/foo/foo'),
             array('foo', 'http://localhost/bar/foo', 'http://localhost/bar/foo'),
@@ -95,20 +99,6 @@ class LinkTest extends \PHPUnit_Framework_TestCase
             array('?foo=2', 'http://localhost/bar?foo=1', 'http://localhost/bar?foo=2'),
             array('?foo=2', 'http://localhost/bar/?foo=1', 'http://localhost/bar/?foo=2'),
             array('?bar=2', 'http://localhost?foo=1', 'http://localhost?bar=2'),
-
-            array('../foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
-            array('../foo', 'http://localhost/bar/foo', 'http://localhost/foo'),
         );
-    }
-
-    public function testRelativeLink()
-    {
-        $dom = new \DOMDocument();
-        $dom->loadHTML('<html><a href="../foo">foo</a></html>');
-
-        $node = $dom->getElementsByTagName('a')->item(0);
-        $link = new Link($node, 'http://localhost/bar/');
-
-        $this->assertEquals('http://localhost/foo', $link->getUri());
     }
 }

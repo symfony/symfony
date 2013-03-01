@@ -86,7 +86,12 @@ class Link
      */
     public function getUri()
     {
-        $uri = $this->getCleanedRawUri();
+        $uri = trim($this->getRawUri());
+
+        // relative URL?
+        if (0 === strpos($uri, '.')) {
+            $uri = substr($uri, 3);
+        }
 
         // absolute URL?
         if (0 === strpos($uri, 'http')) {
@@ -127,19 +132,6 @@ class Link
 
         // relative path
         return substr($this->currentUri, 0, strrpos($this->currentUri, '/') + 1).$uri;
-    }
-
-    /**
-     * Trim and remove relative link
-     *
-     * @return mixed
-     */
-    protected function getCleanedRawUri()
-    {
-        $uri = trim($this->getRawUri());
-        $uri = preg_replace('/^\../', '', $uri);
-
-        return $uri;
     }
 
     /**

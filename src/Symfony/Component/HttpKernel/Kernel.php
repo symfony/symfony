@@ -33,6 +33,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\DefaultConfigCacheFactory;
 use Symfony\Component\Config\ConfigCacheInterface;
+use Symfony\Component\Config\Util\CacheFileUtils;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\ClassLoader\DebugClassLoader;
 
@@ -636,13 +637,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected function buildContainer()
     {
         foreach (array('cache' => $this->getCacheDir(), 'logs' => $this->getLogDir()) as $name => $dir) {
-            if (!is_dir($dir)) {
-                if (false === @mkdir($dir, 0777, true)) {
-                    throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, $dir));
-                }
-            } elseif (!is_writable($dir)) {
-                throw new \RuntimeException(sprintf("Unable to write in the %s directory (%s)\n", $name, $dir));
-            }
+            CacheFileUtils::createCacheDir($dir, $name);
         }
 
         $container = $this->getContainerBuilder();

@@ -22,6 +22,27 @@ class CacheFileUtils
 {
 
     /**
+     * Make sure the given directory can be used as a cache directory, creating it if necessary.
+     * @param  $dir              The directory path
+     * @param  $name             An optional name to be used in the exception message in case of failure
+     * @throws \RuntimeException if the directory cannot be created or written to.
+     */
+    public static function createCacheDir($dir, $name = null)
+    {
+        if ($name) {
+            $name = " ($name)";
+        }
+
+        if (!is_dir($dir)) {
+            if (false === @mkdir($dir, 0777, true)) {
+                throw new \RuntimeException(sprintf('Unable to create the %s directory%s\n', $dir, $name));
+            }
+        } elseif (!is_writable($dir)) {
+            throw new \RuntimeException(sprintf('Unable to write in the %s directory%s\n', $dir, $name));
+        }
+    }
+
+    /**
      * Tries to create a writeable directory that can contain a given file.
      *
      * @param $filename          The file the containing directory has to be created for
@@ -31,14 +52,7 @@ class CacheFileUtils
     public static function createDirectoryForFile($filename)
     {
         $dir = dirname($filename);
-        if (!is_dir($dir)) {
-            if (false === @mkdir($dir, 0777, true)) {
-                throw new \RuntimeException(sprintf('Unable to create the %s directory', $dir));
-            }
-        } elseif (!is_writable($dir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the %s directory', $dir));
-        }
-
+        self::createCacheDir($dir);
         return $dir;
     }
 

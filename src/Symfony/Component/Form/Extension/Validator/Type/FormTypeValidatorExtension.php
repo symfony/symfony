@@ -85,6 +85,7 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
             'cascade_validation'         => false,
             'invalid_message'            => 'This value is not valid.',
             'invalid_message_parameters' => array(),
+            'ignore_extra_data'          => false,
             'extra_fields_message'       => 'This form should not contain extra fields.',
             'post_max_size_message'      => 'The uploaded file was too large. Please try to upload a smaller file.',
         ));

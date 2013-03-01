@@ -18,7 +18,7 @@ use Symfony\Component\Config\Resource\DefaultResourceValidator;
  *
  * @author Benjamin Klotz <bk@webfactory.de>
  */
-class DefaultConfigCacheFactory implements ConfigCacheFactoryInterface
+class DefaultConfigCacheFactory extends AbstractConfigCacheFactory
 {
     protected $debug;
 
@@ -45,15 +45,4 @@ class DefaultConfigCacheFactory implements ConfigCacheFactoryInterface
                 return $cache;
         }
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function cache($file, $callback)
-    {
-        $cache = $this->createCache($file);
-        if (!$cache->isFresh()) call_user_func($callback, $cache);
-        return $cache;
-    }
-
 }

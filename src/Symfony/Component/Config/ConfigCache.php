@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Config;
 
-use Symfony\Component\Config\Resource\ResourceInterface;
-use Symfony\Component\Config\Util\CacheFileUtils;
-
 /**
  * ConfigCache is n (almost) backwards-compatible way of using the new
  * cache implementation classes.
@@ -22,7 +19,6 @@ use Symfony\Component\Config\Util\CacheFileUtils;
  */
 class ConfigCache implements ConfigCacheInterface
 {
-
     private $cacheImplementation;
 
     /**

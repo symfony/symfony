@@ -26,7 +26,7 @@ class DirectoryResource implements SelfValidatingResourceInterface
      * Constructor.
      *
      * @param string $directory The file path to the resource
-     * @param string $pattern  A pattern to restrict monitored files
+     * @param string $pattern   A pattern to restrict monitored files
      */
     public function __construct($directory, $pattern = null)
     {

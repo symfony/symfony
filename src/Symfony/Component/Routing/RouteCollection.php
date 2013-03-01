@@ -121,7 +121,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Adds a route collection at the end of the current set by appending all
      * routes of the added collection.
      *
-     * @param RouteCollection $collection      A RouteCollection instance
+     * @param RouteCollection $collection A RouteCollection instance
      *
      * @api
      */

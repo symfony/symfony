@@ -25,7 +25,7 @@ class ProductionConfigCache implements ConfigCacheInterface
     /**
      * Constructor.
      *
-     * @param string  $file  The absolute cache path
+     * @param string $file The absolute cache path
      */
     public function __construct($file)
     {

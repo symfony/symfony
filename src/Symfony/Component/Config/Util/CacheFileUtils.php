@@ -24,9 +24,9 @@ class CacheFileUtils
     /**
      * Tries to create a writeable directory that can contain a given file.
      *
-     * @param $filename The file the containing directory has to be created for
+     * @param $filename          The file the containing directory has to be created for
      * @throws \RuntimeException If the directory cannot be created or written to
-     * @return string The directory now available for caching
+     * @return string            The directory now available for caching
      */
     public static function createDirectoryForFile($filename)
     {

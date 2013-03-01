@@ -546,7 +546,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * This method exists and is public because closures cannot call
      * protected methods (yet). *Do not* call it from outside the class.
     */
-    public function _fillContainerCache(ConfigCacheInterface $cache) {
+    public function _fillContainerCache(ConfigCacheInterface $cache)
+    {
         $container = $this->buildContainer();
         $container->compile();
         $this->dumpContainer($cache, $container, $this->getContainerClass(), $this->getContainerBaseClass());

@@ -17,13 +17,13 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  */
-interface ResourceValidatorInterface {
+interface ResourceValidatorInterface
+{
 
     /**
      * Check whether the given resource is still fresh.
      * @param ResourceInterface $resource
-     * @return boolean|null Return true if the resource is still fresh, false if not.
-     * Return null if this particular validator cannot tell for the resource.
+     * @return boolean|null     Return true if the resource is still fresh, false if not and NULL if this particular validator cannot tell for the resource.
      */
     public function isFresh(ResourceInterface $resource);
 }

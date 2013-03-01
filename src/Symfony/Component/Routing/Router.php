@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\DefaultConfigCacheFactory;
 use Psr\Log\LoggerInterface;

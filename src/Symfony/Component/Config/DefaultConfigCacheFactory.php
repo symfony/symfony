@@ -32,7 +32,8 @@ class DefaultConfigCacheFactory implements ConfigCacheFactoryInterface
         $this->debug = $debug;
     }
 
-    public function createCache($cacheFilename) {
+    public function createCache($cacheFilename)
+    {
         switch ($this->debug) {
             case false:
                 return new ProductionConfigCache($cacheFilename);
@@ -40,6 +41,7 @@ class DefaultConfigCacheFactory implements ConfigCacheFactoryInterface
             case true:
                 $cache = new DebugConfigCache($cacheFilename);
                 $cache->addResourceValidator(new DefaultResourceValidator());
+
                 return $cache;
         }
     }
@@ -51,6 +53,7 @@ class DefaultConfigCacheFactory implements ConfigCacheFactoryInterface
     {
         $cache = $this->createCache($file);
         if (!$cache->isFresh()) call_user_func($callback, $cache);
+
         return $cache;
     }
 

@@ -17,7 +17,8 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  */
-class DefaultResourceValidator implements ResourceValidatorInterface {
+class DefaultResourceValidator implements ResourceValidatorInterface
+{
 
     public function isFresh(ResourceInterface $resource)
     {

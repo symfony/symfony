@@ -17,7 +17,8 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 {
     protected $directory;
 
-    protected function touch($file, $reltime = 0) {
+    protected function touch($file, $reltime = 0)
+    {
         touch($file, time() + $reltime);
         clearstatcache($file);
     }

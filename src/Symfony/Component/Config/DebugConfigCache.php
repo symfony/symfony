@@ -30,15 +30,18 @@ class DebugConfigCache extends ProductionConfigCache
         $this->resourceValidators[] = $validator;
     }
 
-    public function setResourceValidators(array $validators) {
+    public function setResourceValidators(array $validators)
+    {
         $this->resourceValidators = $validators;
     }
 
-    public function getResourceValidators() {
+    public function getResourceValidators()
+    {
         return $this->resourceValidators;
     }
 
-    protected function getMetaFile() {
+    protected function getMetaFile()
+    {
         return $this->file.'.meta';
     }
 
@@ -66,7 +69,7 @@ class DebugConfigCache extends ProductionConfigCache
                 $check = $validator->isFresh($resource);
                 if (true === $check) {
                     continue 2; // next resource
-                } else if (false === $check) {
+                } elseif (false === $check) {
                     return false; // this resource is stale
                 }
             }

@@ -18,7 +18,8 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
     protected $resource;
     protected $file;
 
-    protected function touch($file, $reltime = 0) {
+    protected function touch($file, $reltime = 0)
+    {
         touch($file, time() + $reltime);
         clearstatcache($file);
     }

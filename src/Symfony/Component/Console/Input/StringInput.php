@@ -37,9 +37,13 @@ class StringInput extends ArgvInput
      */
     public function __construct($input, InputDefinition $definition = null)
     {
-        parent::__construct(array(), $definition);
+        parent::__construct(array(), null);
 
         $this->setTokens($this->tokenize($input));
+
+        if (null !== $definition) {
+            $this->bind($definition);
+        }
     }
 
     /**

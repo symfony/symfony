@@ -36,10 +36,10 @@ class DefaultConfigCacheFactory implements ConfigCacheFactoryInterface
     {
         switch ($this->debug) {
             case false:
-                return new ProductionConfigCache($cacheFilename);
+                return new NonvalidatingCache($cacheFilename);
 
             case true:
-                $cache = new DebugConfigCache($cacheFilename);
+                $cache = new ResourceValidatingCache($cacheFilename);
                 $cache->addResourceValidator(new DefaultResourceValidator());
 
                 return $cache;

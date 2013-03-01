@@ -22,7 +22,7 @@ use Symfony\Component\Config\Resource\ResourceValidatorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DebugConfigCache extends ProductionConfigCache
+class ResourceValidatingCache extends NonvalidatingCache
 {
     protected $resourceValidators = array();
 

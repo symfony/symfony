@@ -18,7 +18,7 @@ use Symfony\Component\Config\Util\CacheFileUtils;
  * A cache that never expires once it has been written.
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ProductionConfigCache implements ConfigCacheInterface
+class NonvalidatingCache implements ConfigCacheInterface
 {
     protected $file;
 

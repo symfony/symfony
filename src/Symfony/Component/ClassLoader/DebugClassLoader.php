@@ -53,7 +53,7 @@ class DebugClassLoader
         }
 
         foreach ($functions as $function) {
-            if (is_array($function) && method_exists($function[0], 'findFile')) {
+            if (is_array($function) && !$function[0] instanceof self && method_exists($function[0], 'findFile')) {
                 $function = array(new static($function[0]), 'loadClass');
             }
 
@@ -103,5 +103,10 @@ class DebugClassLoader
 
             return true;
         }
+    }
+
+    public function getClassFinder()
+    {
+        return $this->classFinder;
     }
 }

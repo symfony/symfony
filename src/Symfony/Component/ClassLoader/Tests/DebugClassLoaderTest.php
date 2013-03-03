@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\ClassLoader\Tests;
 
+use Symfony\Component\ClassLoader\ClassLoader;
 use Symfony\Component\ClassLoader\DebugClassLoader;
-use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +20,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->loader = new UniversalClassLoader();
+        $this->loader = new ClassLoader();
         spl_autoload_register(array($this->loader, 'loadClass'));
     }
 

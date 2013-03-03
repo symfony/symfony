@@ -184,7 +184,7 @@ class SecurityExtension extends Extension
                 $access['path'],
                 $access['host'],
                 $access['methods'],
-                $access['ip']
+                $access['ips']
             );
 
             $container->getDefinition('security.access_map')

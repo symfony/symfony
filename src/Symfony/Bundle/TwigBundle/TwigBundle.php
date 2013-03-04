@@ -15,6 +15,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigEnvironmentPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExceptionListenerPass;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\FormExtensionPass;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TransExtensionPass;
 
 /**
  * Bundle.
@@ -27,6 +29,8 @@ class TwigBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new FormExtensionPass());
+        $container->addCompilerPass(new TransExtensionPass());
         $container->addCompilerPass(new TwigEnvironmentPass());
         $container->addCompilerPass(new ExceptionListenerPass());
     }

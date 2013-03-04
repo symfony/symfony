@@ -29,6 +29,16 @@ final class PropertyAccess
     }
 
     /**
+     * Creates a property accessor builder.
+     *
+     * @return PropertyAccessorBuilder The new property accessor builder
+     */
+    public static function getPropertyAccessorBuilder()
+    {
+        return new PropertyAccessorBuilder();
+    }
+
+    /**
      * This class cannot be instantiated.
      */
     private function __construct()

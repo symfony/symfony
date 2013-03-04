@@ -62,23 +62,32 @@ EOF
             throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
         }
 
+        $filesystem = $this->getContainer()->get('filesystem');
         $kernel = $this->getContainer()->get('kernel');
         $output->writeln(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
 
         $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
 
+        if ($filesystem->exists($oldCacheDir)) {
+            $filesystem->remove($oldCacheDir);
+        }
+
         if ($input->getOption('no-warmup')) {
-            rename($realCacheDir, $oldCacheDir);
+            $filesystem->rename($realCacheDir, $oldCacheDir);
         } else {
             $warmupDir = $realCacheDir.'_new';
 
+            if ($filesystem->exists($warmupDir)) {
+                $filesystem->remove($warmupDir);
+            }
+
             $this->warmup($warmupDir, !$input->getOption('no-optional-warmers'));
 
-            rename($realCacheDir, $oldCacheDir);
-            rename($warmupDir, $realCacheDir);
+            $filesystem->rename($realCacheDir, $oldCacheDir);
+            $filesystem->rename($warmupDir, $realCacheDir);
         }
 
-        $this->getContainer()->get('filesystem')->remove($oldCacheDir);
+        $filesystem->remove($oldCacheDir);
     }
 
     protected function warmup($warmupDir, $enableOptionalWarmers = true)

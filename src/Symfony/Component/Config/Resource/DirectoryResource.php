@@ -20,7 +20,7 @@ class DirectoryResource implements SelfValidatingResourceInterface
 {
     private $directory;
     private $pattern;
-    private $hash;
+    private $hash = '';
 
     /**
      * Constructor.
@@ -30,10 +30,8 @@ class DirectoryResource implements SelfValidatingResourceInterface
      */
     public function __construct($directory, $pattern = null)
     {
-        if (is_dir($directory)) {
-            $this->directory = $directory;
-            $this->hash = $this->calculateHash();
-        }
+        $this->directory = $directory;
+        $this->hash = $this->calculateHash();
         $this->pattern = $pattern;
     }
 
@@ -46,15 +44,10 @@ class DirectoryResource implements SelfValidatingResourceInterface
      * Returns true if the resource has not been updated since the given timestamp.
      *
      * @param integer $timestamp The last time the resource was loaded
-     *
      * @return Boolean true if the resource has not been updated, false otherwise
      */
     public function isFresh()
     {
-        if (!$this->directory || !is_dir($this->directory)) {
-            return false;
-        }
-
         return $this->calculateHash() == $this->hash;
     }
 
@@ -62,17 +55,21 @@ class DirectoryResource implements SelfValidatingResourceInterface
     {
         $hash = '';
 
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
-            // if regex filtering is enabled only check matching files
-            if ($this->pattern && $file->isFile() && !preg_match($this->pattern, $file->getBasename())) {
-                continue;
-            }
+        if (is_dir($this->directory)) {
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
 
-            if ($file->isDir()) { // only check files as directories change state also if files not matching the pattern are added/deleted
-                continue;
-            }
+                // only check files, because directories change state also if files not matching the pattern are added/deleted
+                if ($file->isDir()) {
+                    continue;
+                }
 
-            $hash = md5($hash .  '-' . $file . '-' . $file->getMTime());
+                // if regex filtering is enabled only check matching files
+                if ($this->pattern && !preg_match($this->pattern, $file->getBasename())) {
+                    continue;
+                }
+
+                $hash = md5($hash .  '-' . $file . '-' . $file->getMTime());
+            }
         }
 
         return $hash;
@@ -81,7 +78,7 @@ class DirectoryResource implements SelfValidatingResourceInterface
     public function serialize()
     {
         return serialize(array(
-            'directory' => $this->filename,
+            'directory' => $this->directory,
             'pattern' => $this->pattern,
             'hash' => $this->hash
         ));

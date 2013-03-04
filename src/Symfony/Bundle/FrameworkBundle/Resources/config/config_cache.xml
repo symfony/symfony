@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="config.cache_factory.class">Symfony\Bundle\FrameworkBundle\Config\FrameworkConfigCacheFactory</parameter>
+    </parameters>
+
+    <services>
+        <service id="config.cache_factory.default" class="%config.cache_factory.class%" public="false" />
+        <service id="config.cache_factory" alias="config.cache_factory.default" />
+
+        <service class="Symfony\Component\Config\Resource\SelfValidatingResourceValidator" public="false">
+            <tag name="config.resource_validator" />
+        </service>
+    </services>
+</container>

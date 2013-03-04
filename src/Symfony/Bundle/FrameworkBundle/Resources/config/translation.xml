@@ -42,6 +42,9 @@
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
+            <call method="setConfigCacheFactory">
+                <argument type="service" id="config.cache_factory"/>
+            </call>
         </service>
 
         <service id="translator" class="%translator.identity.class%">

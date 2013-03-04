@@ -104,6 +104,8 @@ class FrameworkExtension extends Extension
             $loader->load('serializer.xml');
         }
 
+        $this->registerConfigCacheConfiguration(array(), $container, $loader);
+
         $this->addClassesToCompile(array(
             'Symfony\\Component\\HttpFoundation\\ParameterBag',
             'Symfony\\Component\\HttpFoundation\\HeaderBag',
@@ -678,6 +680,11 @@ class FrameworkExtension extends Extension
             ;
             $container->setAlias('annotation_reader', 'annotations.cached_reader');
         }
+    }
+
+    private function registerConfigCacheConfiguration(array $config, ContainerBuilder $container,$loader)
+    {
+        $loader->load('config_cache.xml');
     }
 
     /**

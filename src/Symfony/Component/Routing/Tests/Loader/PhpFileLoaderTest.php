@@ -44,12 +44,12 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
         foreach ($routes as $route) {
-            $this->assertEquals('/blog/{slug}', $route->getPath());
-            $this->assertEquals('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
-            $this->assertEquals('GET', $route->getRequirement('_method'));
-            $this->assertEquals('https', $route->getRequirement('_scheme'));
-            $this->assertEquals('{locale}.example.com', $route->getHost());
-            $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
+            $this->assertSame('/blog/{slug}', $route->getPath());
+            $this->assertSame('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
+            $this->assertSame('{locale}.example.com', $route->getHost());
+            $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
+            $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
+            $this->assertEquals(array('https'), $route->getSchemes());
         }
     }
 }

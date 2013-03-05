@@ -1,0 +1,32 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\CssSelector\Node;
+
+/**
+ * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ */
+interface NodeInterface
+{
+    /**
+     * Returns node's specificity.
+     *
+     * @return Specificity
+     */
+    public function getSpecificity();
+
+    /**
+     * Returns node's string representation.
+     *
+     * @return string
+     */
+    public function __toString();
+}

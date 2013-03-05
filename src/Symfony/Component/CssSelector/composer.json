@@ -11,6 +11,10 @@
             "email": "fabien@symfony.com"
         },
         {
+            "name": "Jean-François Simon",
+            "email": "jeanfrancois.simon@sensiolabs.com"
+        },
+        {
             "name": "Symfony Community",
             "homepage": "http://symfony.com/contributors"
         }

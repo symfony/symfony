@@ -11,49 +11,65 @@
 
 namespace Symfony\Component\CssSelector\Node;
 
-use Symfony\Component\CssSelector\XPathExpr;
-
 /**
- * HashNode represents a "selector#id" node.
+ * Represents a "<selector>#<id>" node.
  *
- * This component is a port of the Python lxml library,
- * which is copyright Infrae and distributed under the BSD license.
+ * This component is a port of the Python cssselector library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
-class HashNode implements NodeInterface
+class HashNode extends AbstractNode
 {
-    protected $selector;
-    protected $id;
+    /**
+     * @var NodeInterface
+     */
+    private $selector;
 
     /**
-     * Constructor.
-     *
-     * @param NodeInterface $selector The NodeInterface object
-     * @param string        $id       The ID
+     * @var string
      */
-    public function __construct($selector, $id)
+    private $id;
+
+    /**
+     * @param NodeInterface $selector
+     * @param string        $id
+     */
+    public function __construct(NodeInterface $selector, $id)
     {
         $this->selector = $selector;
         $this->id = $id;
     }
 
     /**
-     * {@inheritDoc}
+     * @return NodeInterface
      */
-    public function __toString()
+    public function getSelector()
     {
-        return sprintf('%s[%s#%s]', __CLASS__, $this->selector, $this->id);
+        return $this->selector;
     }
 
     /**
-     * {@inheritDoc}
+     * @return string
      */
-    public function toXpath()
+    public function getId()
     {
-        $path = $this->selector->toXpath();
-        $path->addCondition(sprintf('@id = %s', XPathExpr::xpathLiteral($this->id)));
+        return $this->id;
+    }
 
-        return $path;
+    /**
+     * {@inheritdoc}
+     */
+    public function getSpecificity()
+    {
+        return $this->selector->getSpecificity()->plus(new Specificity(1, 0, 0));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString()
+    {
+        return sprintf('%s[%s#%s]', $this->getNodeName(), $this->selector, $this->id);
     }
 }

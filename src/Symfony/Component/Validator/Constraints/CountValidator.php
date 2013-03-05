@@ -39,7 +39,7 @@ class CountValidator extends ConstraintValidator
             $this->context->addViolation($constraint->exactMessage, array(
                 '{{ count }}' => $count,
                 '{{ limit }}' => $constraint->min,
-            ), $value, (int) $constraint->min);
+            ), $value, (int) $constraint->min, $constraint->code);
 
             return;
         }
@@ -48,7 +48,7 @@ class CountValidator extends ConstraintValidator
             $this->context->addViolation($constraint->maxMessage, array(
                 '{{ count }}' => $count,
                 '{{ limit }}' => $constraint->max,
-            ), $value, (int) $constraint->max);
+            ), $value, (int) $constraint->max, $constraint->code);
 
             return;
         }
@@ -57,7 +57,7 @@ class CountValidator extends ConstraintValidator
             $this->context->addViolation($constraint->minMessage, array(
                 '{{ count }}' => $count,
                 '{{ limit }}' => $constraint->min,
-            ), $value, (int) $constraint->min);
+            ), $value, (int) $constraint->min, $constraint->code);
         }
     }
 }

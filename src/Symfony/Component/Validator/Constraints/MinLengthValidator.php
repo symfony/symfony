@@ -56,7 +56,7 @@ class MinLengthValidator extends ConstraintValidator
             $this->context->addViolation($constraint->message, array(
                 '{{ value }}' => $stringValue,
                 '{{ limit }}' => $constraint->limit,
-            ), $value, (int) $constraint->limit);
+            ), $value, (int) $constraint->limit, $constraint->code);
         }
     }
 }

@@ -47,7 +47,7 @@ class LengthValidator extends ConstraintValidator
             $this->context->addViolation($constraint->exactMessage, array(
                 '{{ value }}' => $stringValue,
                 '{{ limit }}' => $constraint->min,
-            ), $value, (int) $constraint->min);
+            ), $value, (int) $constraint->min, $constraint->code);
 
             return;
         }
@@ -56,7 +56,7 @@ class LengthValidator extends ConstraintValidator
             $this->context->addViolation($constraint->maxMessage, array(
                 '{{ value }}' => $stringValue,
                 '{{ limit }}' => $constraint->max,
-            ), $value, (int) $constraint->max);
+            ), $value, (int) $constraint->max, $constraint->code);
 
             return;
         }
@@ -65,7 +65,7 @@ class LengthValidator extends ConstraintValidator
             $this->context->addViolation($constraint->minMessage, array(
                 '{{ value }}' => $stringValue,
                 '{{ limit }}' => $constraint->min,
-            ), $value, (int) $constraint->min);
+            ), $value, (int) $constraint->min, $constraint->code);
         }
     }
 }

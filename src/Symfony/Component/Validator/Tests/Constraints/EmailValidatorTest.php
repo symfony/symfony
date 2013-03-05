@@ -94,6 +94,47 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($email, $constraint);
     }
 
+    /**
+     * @dataProvider getInvalidEmails
+     */
+    public function testCodePopulation($email)
+    {
+        $constraint = new Email(array(
+            'message' => 'foo',
+            'code' => 666
+        ));
+
+        print_r($constraint);
+
+        print_r(
+            $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('foo', array('{{ value }}' => $email), null, null, 666)
+        );
+
+        $this->validator->validate($email, $constraint);
+    }
+
+    /**
+     * @dataProvider getInvalidEmails
+     */
+    public function testCodeNotPopulated($email)
+    {
+        $constraint = new Email(array(
+            'message' => 'foo',
+        ));
+
+        print_r($constraint);
+
+        print_r(
+            $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('foo', array('{{ value }}' => $email), null, null, null)
+        );
+
+        $this->validator->validate($email, $constraint);
+    }
+
     public function getInvalidEmails()
     {
         return array(

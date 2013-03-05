@@ -46,7 +46,7 @@ class MinValidator extends ConstraintValidator
             $this->context->addViolation($constraint->invalidMessage, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->limit,
-            ));
+            ), null, null, $constraint->code);
 
             return;
         }
@@ -55,7 +55,7 @@ class MinValidator extends ConstraintValidator
             $this->context->addViolation($constraint->message, array(
                 '{{ value }}' => $value,
                 '{{ limit }}' => $constraint->limit,
-            ));
+            ), null, null, $constraint->code);
         }
     }
 }

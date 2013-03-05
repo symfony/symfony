@@ -37,15 +37,20 @@ class PropertyMetadata extends MemberMetadata
      */
     public function getPropertyValue($object)
     {
-        return $this->getReflectionMember()->getValue($object);
+        return $this->getReflectionMember($object)->getValue($object);
     }
 
     /**
      * {@inheritDoc}
      */
-    protected function newReflectionMember()
+    protected function newReflectionMember($objectOrClassName)
     {
-        $member = new \ReflectionProperty($this->getClassName(), $this->getName());
+        $class = new \ReflectionClass($objectOrClassName);
+        while (!$class->hasProperty($this->getName())) {
+            $class = $class->getParentClass();
+        }
+
+        $member = new \ReflectionProperty($class->getName(), $this->getName());
         $member->setAccessible(true);
 
         return $member;

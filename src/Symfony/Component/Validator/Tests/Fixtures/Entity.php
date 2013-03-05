@@ -33,8 +33,8 @@ class Entity extends EntityParent implements EntityInterface
     protected $firstName;
     protected $lastName;
     public $reference;
-
     private $internal;
+    public $data = 'Overridden data';
 
     public function __construct($internal = null)
     {
@@ -52,5 +52,10 @@ class Entity extends EntityParent implements EntityInterface
     public function getLastName()
     {
         return $this->lastName;
+    }
+
+    public function getData()
+    {
+        return 'Overridden data';
     }
 }

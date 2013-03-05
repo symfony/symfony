@@ -44,7 +44,8 @@ class GetterMetadata extends MemberMetadata
      */
     public function getPropertyValue($object)
     {
-        return $this->getReflectionMember()->invoke($object);
+        $refl = new \ReflectionMethod(get_class($object), $this->getName());
+        return $refl->invoke($object);
     }
 
     /**

@@ -163,7 +163,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function remove($name)
     {
         // just for BC
-        $root = $this->getRoot();
+        $root = $this;
+        while ($root->parent) {
+            $root = $root->parent;
+        }
 
         foreach ((array) $name as $n) {
             unset($root->routes[$n]);

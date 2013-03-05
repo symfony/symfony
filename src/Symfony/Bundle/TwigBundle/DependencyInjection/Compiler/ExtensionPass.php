@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
-class ExtensionsPass implements CompilerPassInterface
+class ExtensionPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {

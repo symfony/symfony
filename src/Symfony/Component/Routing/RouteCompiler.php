@@ -68,7 +68,7 @@ class RouteCompiler implements RouteCompilerInterface
         }
 
         // find the first optional token
-        $firstOptional = INF;
+        $firstOptional = PHP_INT_MAX;
         for ($i = count($tokens) - 1; $i >= 0; $i--) {
             $token = $tokens[$i];
             if ('variable' === $token[0] && $route->hasDefault($token[3])) {

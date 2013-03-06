@@ -21,25 +21,50 @@ namespace Symfony\Component\CssSelector\Token;
  */
 class TokenStream
 {
-    private $used;
     private $tokens;
+    private $frozen;
+    private $used;
     private $cursor;
-    private $source;
     private $peeked;
     private $peeking;
 
     /**
-     * @param Token[]     $tokens
-     * @param null|string $source
+     * @param Token[] $tokens
      */
-    public function __construct(array $tokens, $source = null)
+    public function __construct(array $tokens = array())
     {
-        $this->used = array();
         $this->tokens = $tokens;
+        $this->frozen = false;
+        $this->used = array();
         $this->cursor = 0;
-        $this->source = $source;
         $this->peeked = null;
         $this->peeking = false;
+    }
+
+    /**
+     * Pushes a token.
+     *
+     * @param Token $token
+     *
+     * @return TokenStream
+     */
+    public function push(Token $token)
+    {
+        $this->tokens[] = $token;
+
+        return $this;
+    }
+
+    /**
+     * Freezes stream.
+     *
+     * @return TokenStream
+     */
+    public function freeze()
+    {
+        $this->frozen = true;
+
+        return $this;
     }
 
     /**
@@ -91,8 +116,7 @@ class TokenStream
     {
         $next = $this->getNext();
 
-        // todo: use constants
-        if ('IDENT' !== $next->getType()) {
+        if (!$next->isDelimiter()) {
             throw new \LogicException('syntax error: expected identifier');
         }
 
@@ -110,11 +134,11 @@ class TokenStream
     {
         $next = $this->getNext();
 
-        if ('IDENT' === $next->getType()) {
+        if ($next->isIdentifier()) {
             return $next->getValue();
         }
 
-        if ('DELIM' === $next->getType() && '*' === $next->getValue()) {
+        if ($next->isWildcardDelimiter()) {
             return null;
         }
 

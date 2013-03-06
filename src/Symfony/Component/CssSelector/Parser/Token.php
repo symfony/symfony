@@ -21,12 +21,18 @@ namespace Symfony\Component\CssSelector\Token;
  */
 class Token
 {
-    const TYPE_DELIMITER = 'DELIM';
-    const TYPE_FILE_END  = 'EOF';
-    const TYPE_IDENT     = 'IDENT';
+    const TYPE_FILE_END   = 0;
+    const TYPE_DELIMITER  = 1;
+    const TYPE_WHITESPACE = 2;
+    const TYPE_IDENTIFIER = 3;
+    const TYPE_HASH       = 4;
+    const TYPE_NUMBER     = 5;
+    const TYPE_STRING     = 6;
+
+    const VALUE_WILDCARD = '*';
 
     /**
-     * @var string
+     * @var int
      */
     private $type;
 
@@ -41,7 +47,7 @@ class Token
     private $position;
 
     /**
-     * @param string $type
+     * @param int    $type
      * @param string $value
      * @param int    $position
      */
@@ -53,7 +59,7 @@ class Token
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getType()
     {
@@ -79,6 +85,14 @@ class Token
     /**
      * @return boolean
      */
+    public function isFileEnd()
+    {
+        return self::TYPE_FILE_END === $this->type;
+    }
+
+    /**
+     * @return boolean
+     */
     public function isDelimiter()
     {
         return self::TYPE_DELIMITER === $this->type;
@@ -87,8 +101,48 @@ class Token
     /**
      * @return boolean
      */
-    public function isFileEnd()
+    public function isWildcardDelimiter()
     {
-        return self::TYPE_FILE_END === $this->type;
+        return self::TYPE_DELIMITER === $this->type && self::VALUE_WILDCARD === $this->value;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isWhitespace()
+    {
+        return self::TYPE_WHITESPACE === $this->type;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIdentifier()
+    {
+        return self::TYPE_IDENTIFIER === $this->type;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isHash()
+    {
+        return self::TYPE_HASH === $this->type;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isNumber()
+    {
+        return self::TYPE_NUMBER === $this->type;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isString()
+    {
+        return self::TYPE_STRING === $this->type;
     }
 }

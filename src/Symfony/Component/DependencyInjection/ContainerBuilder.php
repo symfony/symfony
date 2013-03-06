@@ -350,7 +350,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
             $this->loading[$id] = true;
 
-            $service = $this->createService($definition, $id);
+            try {
+                $service = $this->createService($definition, $id);
+            } catch (\Exception $e) {
+                unset($this->loading[$id]);
+                throw $e;
+            }
 
             unset($this->loading[$id]);
 

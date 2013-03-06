@@ -441,19 +441,30 @@ class PhpDumper extends Dumper
         $this->referenceVariables = array();
         $this->variableCount = 0;
 
-        $return = '';
+        $return = array();
+
         if ($definition->isSynthetic()) {
-            $return = sprintf('@throws RuntimeException always since this service is expected to be injected dynamically');
+            $return[] = '@throws RuntimeException always since this service is expected to be injected dynamically';
         } elseif ($class = $definition->getClass()) {
-            $return = sprintf("@return %s A %s instance.", 0 === strpos($class, '%') ? 'Object' : $class, $class);
+            $return[] = sprintf("@return %s A %s instance.", 0 === strpos($class, '%') ? 'object' : $class, $class);
         } elseif ($definition->getFactoryClass()) {
-            $return = sprintf('@return Object An instance returned by %s::%s().', $definition->getFactoryClass(), $definition->getFactoryMethod());
+            $return[] = sprintf('@return object An instance returned by %s::%s().', $definition->getFactoryClass(), $definition->getFactoryMethod());
         } elseif ($definition->getFactoryService()) {
-            $return = sprintf('@return Object An instance returned by %s::%s().', $definition->getFactoryService(), $definition->getFactoryMethod());
+            $return[] = sprintf('@return object An instance returned by %s::%s().', $definition->getFactoryService(), $definition->getFactoryMethod());
         }
 
+        $scope = $definition->getScope();
+        if (!in_array($scope, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE))) {
+            if ($return && 0 === strpos($return[count($return) - 1], '@return')) {
+                $return[] = '';
+            }
+            $return[] = sprintf("@throws InactiveScopeException when the '%s' service is requested while the '%s' scope is not active", $id, $scope);
+        }
+
+        $return = implode("\n     * ", $return);
+
         $doc = '';
-        if (ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope()) {
+        if (ContainerInterface::SCOPE_PROTOTYPE !== $scope) {
             $doc .= <<<EOF
 
      *
@@ -484,8 +495,7 @@ EOF;
 
 EOF;
 
-        $scope = $definition->getScope();
-        if (ContainerInterface::SCOPE_CONTAINER !== $scope && ContainerInterface::SCOPE_PROTOTYPE !== $scope) {
+        if (!in_array($scope, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE))) {
             $code .= <<<EOF
         if (!isset(\$this->scopedServices['$scope'])) {
             throw new InactiveScopeException('$id', '$scope');

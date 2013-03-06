@@ -14,7 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\ChoiceValidator;
 
-function choice_callback()
+function choiceCallback()
 {
     return array('foo', 'bar');
 }
@@ -95,7 +95,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidChoiceCallbackFunction()
     {
-        $constraint = new Choice(array('callback' => __NAMESPACE__.'\choice_callback'));
+        $constraint = new Choice(array('callback' => __NAMESPACE__.'\choiceCallback'));
 
         $this->context->expects($this->never())
             ->method('addViolation');

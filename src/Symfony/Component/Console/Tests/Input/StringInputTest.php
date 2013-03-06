@@ -35,11 +35,14 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
             array(new InputOption('foo', null, InputOption::VALUE_REQUIRED))
         );
 
+        // call to bind
         $input = new StringInput('--foo=bar');
         $input->bind($definition);
-        $actual = $input->getOption('foo');
+        $this->assertEquals('bar', $input->getOption('foo'));
 
-        $this->assertEquals('bar', $actual);
+        // definition in constructor
+        $input = new StringInput('--foo=bar', $definition);
+        $this->assertEquals('bar', $input->getOption('foo'));
     }
 
     public function getTokenizeData()

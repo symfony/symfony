@@ -287,7 +287,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      *
      * @throws UnexpectedValueException
      */
-    private function buildXml($parentNode, $data, $xmlRootNodeName)
+    private function buildXml($parentNode, $data, $xmlRootNodeName = null)
     {
         $append = true;
 
@@ -392,7 +392,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     private function selectNodeType($node, $val)
     {
         if (is_array($val)) {
-            return $this->buildXml($node, $val, null);
+            return $this->buildXml($node, $val);
         } elseif ($val instanceof \SimpleXMLElement) {
             $child = $this->dom->importNode(dom_import_simplexml($val), true);
             $node->appendChild($child);

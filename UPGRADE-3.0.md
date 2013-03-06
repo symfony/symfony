@@ -79,6 +79,11 @@ UPGRADE FROM 2.x to 3.0
    $route->setSchemes('https');
    ```
 
+### Translator
+
+ * The `Translator::setFallbackLocale()` method has been removed in favor of
+   `Translator::setFallbackLocales()`.
+
 ### Twig Bridge
 
  * The `render` tag is deprecated in favor of the `render` function.

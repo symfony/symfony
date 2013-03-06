@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added Translator::getFallbackLocales()
+ * deprecated Translator::setFallbackLocale() in favor of the new Translator::setFallbackLocales() method
+
 2.2.0
 -----
 

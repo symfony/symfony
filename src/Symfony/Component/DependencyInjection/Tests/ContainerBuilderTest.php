@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Config\Resource\FileResource;
@@ -114,6 +115,26 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $builder->register('foobar', 'stdClass')->setScope('container');
         $this->assertTrue($builder->get('bar') === $builder->get('bar'), '->get() always returns the same instance if the service is shared');
+    }
+
+    /**
+     * @covers                   \Symfony\Component\DependencyInjection\ContainerBuilder::get
+     * @expectedException        \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage You have requested a synthetic service ("foo"). The DIC does not know how to construct this service.
+     */
+    public function testGetXXX()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'stdClass')->setSynthetic(true);
+
+        // we expect a RuntimeException here as foo is synthetic
+        try {
+            $builder->get('foo');
+        } catch (RuntimeException $e) {
+        }
+
+        // we must also have the same RuntimeException here
+        $builder->get('foo');
     }
 
     /**

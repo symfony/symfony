@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\CssSelector\Token;
+namespace Symfony\Component\CssSelector\Parser\Tokenizer;
 
 /**
  * CSS selector tokenizer escaping applier.
@@ -21,26 +21,51 @@ namespace Symfony\Component\CssSelector\Token;
  */
 class TokenizerEscaping
 {
+    /**
+     * @var TokenizerPatterns
+     */
     private $patterns;
 
+    /**
+     * @param TokenizerPatterns $patterns
+     */
     public function __construct(TokenizerPatterns $patterns)
     {
         $this->patterns = $patterns;
     }
 
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
     public function escapeUnicode($value)
     {
-//        return preg_replace($this->patterns->getUnicodeEscapePattern(), '\\$1', $value);
+        $value = $this->replaceUnicodeSequences($value);
+
+        return preg_replace($this->patterns->getSimpleEscapePattern(), '$1', $value);
     }
 
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
     public function escapeUnicodeAndNewLine($value)
     {
-        return $value;
+        $value = preg_replace($this->patterns->getNewLineEscapePattern(), '', $value);
+
+        return $this->escapeUnicode($value);
     }
 
-    private function relplaceUnicodeSequances($value)
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
+    private function replaceUnicodeSequences($value)
     {
-        return preg_replace_callback('', function (array $match) {
+        return preg_replace_callback($this->patterns->getUnicodeEscapePattern(), function (array $match) {
             $code = $match[1];
 
             if (bin2hex($code) > 0xFFFD) {

@@ -9,9 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\CssSelector\Token;
+namespace Symfony\Component\CssSelector\Parser\Tokenizer;
 
-use Symfony\Component\CssSelector\Token\Handler;
+use Symfony\Component\CssSelector\Parser\Handler;
+use Symfony\Component\CssSelector\Parser\Reader;
+use Symfony\Component\CssSelector\Parser\Token;
+use Symfony\Component\CssSelector\Parser\TokenStream;
 
 /**
  * CSS selector tokenizer.
@@ -34,7 +37,7 @@ class Tokenizer
     public function __construct()
     {
         $patterns = new TokenizerPatterns();
-        $escaping = new TokenizerEscaping();
+        $escaping = new TokenizerEscaping($patterns);
 
         $this->handlers = array(
             new Handler\WhitespaceHandler(),
@@ -49,13 +52,12 @@ class Tokenizer
     /**
      * Tokenize selector source code.
      *
-     * @param string $source
+     * @param Reader $reader
      *
      * @return TokenStream
      */
-    public function tokenize($source)
+    public function tokenize(Reader $reader)
     {
-        $reader = new Reader($source);
         $stream = new TokenStream();
 
         while (!$reader->isEOF()) {

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\CssSelector\Token;
+namespace Symfony\Component\CssSelector\Parser;
 
 /**
  * CSS selector token.
@@ -29,7 +29,7 @@ class Token
     const TYPE_NUMBER     = 5;
     const TYPE_STRING     = 6;
 
-    const VALUE_WILDCARD = '*';
+    const VALUE_WILDCARD  = '*';
 
     /**
      * @var int

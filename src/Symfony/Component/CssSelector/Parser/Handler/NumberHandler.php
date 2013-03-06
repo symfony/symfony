@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\CssSelector\Token\Handler;
+namespace Symfony\Component\CssSelector\Parser\Handler;
 
-use Symfony\Component\CssSelector\Token\Reader;
-use Symfony\Component\CssSelector\Token\Token;
-use Symfony\Component\CssSelector\Token\TokenStream;
-use Symfony\Component\CssSelector\Token\TokenizerEscaping;
-use Symfony\Component\CssSelector\Token\TokenizerPatterns;
+use Symfony\Component\CssSelector\Parser\Reader;
+use Symfony\Component\CssSelector\Parser\Token;
+use Symfony\Component\CssSelector\Parser\TokenStream;
+use Symfony\Component\CssSelector\Parser\TokenizerEscaping;
+use Symfony\Component\CssSelector\Parser\TokenizerPatterns;
 
 /**
  * CSS selector comment handler.

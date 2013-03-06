@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\CssSelector\Token\Handler;
+namespace Symfony\Component\CssSelector\Parser\Handler;
 
-use Symfony\Component\CssSelector\Token\Reader;
-use Symfony\Component\CssSelector\Token\Token;
-use Symfony\Component\CssSelector\Token\TokenStream;
+use Symfony\Component\CssSelector\Parser\Reader;
+use Symfony\Component\CssSelector\Parser\Token;
+use Symfony\Component\CssSelector\Parser\TokenStream;
 
 /**
  * CSS selector comment handler.

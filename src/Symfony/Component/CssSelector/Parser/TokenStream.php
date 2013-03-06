@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\CssSelector\Token;
+namespace Symfony\Component\CssSelector\Parser;
 
 /**
  * CSS selector token stream.
@@ -21,19 +21,42 @@ namespace Symfony\Component\CssSelector\Token;
  */
 class TokenStream
 {
+    /**
+     * @var Token[]
+     */
     private $tokens;
+
+    /**
+     * @var boolean
+     */
     private $frozen;
+
+    /**
+     * @var Token[]
+     */
     private $used;
+
+    /**
+     * @var int
+     */
     private $cursor;
+
+    /**
+     * @var Token|null
+     */
     private $peeked;
+
+    /**
+     * @var boolean
+     */
     private $peeking;
 
     /**
-     * @param Token[] $tokens
+     * Constructor.
      */
-    public function __construct(array $tokens = array())
+    public function __construct()
     {
-        $this->tokens = $tokens;
+        $this->tokens = array();
         $this->frozen = false;
         $this->used = array();
         $this->cursor = 0;
@@ -86,6 +109,10 @@ class TokenStream
         if (isset($this->tokens[$this->cursor])) {
             throw new \LogicException('no more tokens');
         }
+
+        do {
+            $this->cursor ++;
+        } while ($this->tokens[$this->cursor]->isWhitespace());
 
         return $this->tokens[$this->cursor ++];
     }

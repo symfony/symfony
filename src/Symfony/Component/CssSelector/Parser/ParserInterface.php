@@ -9,27 +9,26 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\CssSelector\Parser\Handler;
+namespace Symfony\Component\CssSelector\Parser;
 
-use Symfony\Component\CssSelector\Parser\Reader;
-use Symfony\Component\CssSelector\Parser\Token;
-use Symfony\Component\CssSelector\Parser\TokenStream;
+use Symfony\Component\CssSelector\Node\NodeInterface;
 
 /**
- * CSS selector handler interface.
+ * CSS selector parser interface.
  *
  * This component is a port of the Python lxml library,
  * which is copyright Infrae and distributed under the BSD license.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
-interface HandlerInterface
+interface ParserInterface
 {
     /**
-     * @param Reader      $reader
-     * @param TokenStream $stream
+     * Parses given selector source into an array of tokens.
      *
-     * @return boolean
+     * @param string $source
+     *
+     * @return NodeInterface[]
      */
-    public function handle(Reader $reader, TokenStream $stream);
+    public function parse($source);
 }

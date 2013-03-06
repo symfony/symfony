@@ -128,7 +128,7 @@ class Translator implements TranslatorInterface
      */
     public function setFallbackLocale($locales)
     {
-        $this->setFallbackLocales(is_array($locales) ? $locales : array($locales))
+        $this->setFallbackLocales(is_array($locales) ? $locales : array($locales));
     }
 
     /**

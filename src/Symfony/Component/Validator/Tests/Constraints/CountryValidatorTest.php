@@ -99,7 +99,7 @@ class CountryValidatorTest extends LocalizedTestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $country,
-            ));
+            ), $country);
 
         $this->validator->validate($country, $constraint);
     }

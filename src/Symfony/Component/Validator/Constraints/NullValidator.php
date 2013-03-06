@@ -27,7 +27,7 @@ class NullValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (null !== $value) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value), null, null, $constraint->code);
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value), $value, null, $constraint->code);
         }
     }
 }

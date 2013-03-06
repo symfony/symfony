@@ -59,7 +59,7 @@ class ChoiceValidator extends ConstraintValidator
         if ($constraint->multiple) {
             foreach ($value as $_value) {
                 if (!in_array($_value, $choices, $constraint->strict)) {
-                    $this->context->addViolation($constraint->multipleMessage, array('{{ value }}' => $_value), null, null, $constraint->code);
+                    $this->context->addViolation($constraint->multipleMessage, array('{{ value }}' => $_value), $_value, null, $constraint->code);
                 }
             }
 
@@ -77,7 +77,7 @@ class ChoiceValidator extends ConstraintValidator
                 return;
             }
         } elseif (!in_array($value, $choices, $constraint->strict)) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value), null, null, $constraint->code);
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value), $value, null, $constraint->code);
         }
     }
 }

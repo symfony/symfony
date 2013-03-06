@@ -27,7 +27,7 @@ class BlankValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if ('' !== $value && null !== $value) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value), null, null, $constraint->code);
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value), $value, null, $constraint->code);
         }
     }
 }

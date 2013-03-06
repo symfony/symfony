@@ -149,7 +149,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolationAt')
             ->with('[baz]', 'myMessage', array(
                 '{{ field }}' => 'baz'
-            ));
+            ), 'baz');
 
         $this->validator->validate($data, new Collection(array(
             'fields' => array(
@@ -213,7 +213,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolationAt')
             ->with('[foo]', 'myMessage', array(
                 '{{ field }}' => 'foo',
-            ));
+            ), 'foo');
 
         $this->validator->validate($data, $constraint);
     }

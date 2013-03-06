@@ -40,7 +40,7 @@ class LocaleValidator extends ConstraintValidator
         $value = (string) $value;
 
         if (!in_array($value, \Symfony\Component\Locale\Locale::getLocales())) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value), null, null, $constraint->code);
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value), $value, null, $constraint->code);
         }
     }
 }

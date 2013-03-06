@@ -55,7 +55,7 @@ class UrlValidator extends ConstraintValidator
         $pattern = sprintf(static::PATTERN, implode('|', $constraint->protocols));
 
         if (!preg_match($pattern, $value)) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value), null, null, $constraint->code);
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value), $value, null, $constraint->code);
         }
     }
 }

@@ -44,7 +44,7 @@ class ImageValidator extends FileValidator
 
         $size = @getimagesize($value);
         if (empty($size) || ($size[0] === 0) || ($size[1] === 0)) {
-            $this->context->addViolation($constraint->sizeNotDetectedMessage, array(), null, null, $constraint->code);
+            $this->context->addViolation($constraint->sizeNotDetectedMessage, array(), $value, null, $constraint->code);
 
             return;
         }
@@ -61,7 +61,7 @@ class ImageValidator extends FileValidator
                 $this->context->addViolation($constraint->minWidthMessage, array(
                     '{{ width }}'    => $width,
                     '{{ min_width }}' => $constraint->minWidth
-                ), null, null, $constraint->code);
+                ), $value, null, $constraint->code);
 
                 return;
             }
@@ -76,7 +76,7 @@ class ImageValidator extends FileValidator
                 $this->context->addViolation($constraint->maxWidthMessage, array(
                     '{{ width }}'    => $width,
                     '{{ max_width }}' => $constraint->maxWidth
-                ), null, null, $constraint->code);
+                ), $value, null, $constraint->code);
 
                 return;
             }
@@ -91,7 +91,7 @@ class ImageValidator extends FileValidator
                 $this->context->addViolation($constraint->minHeightMessage, array(
                     '{{ height }}'    => $height,
                     '{{ min_height }}' => $constraint->minHeight
-                ), null, null, $constraint->code);
+                ), $value, null, $constraint->code);
 
                 return;
             }
@@ -106,7 +106,7 @@ class ImageValidator extends FileValidator
                 $this->context->addViolation($constraint->maxHeightMessage, array(
                     '{{ height }}'    => $height,
                     '{{ max_height }}' => $constraint->maxHeight
-                ), null, null, $constraint->code);
+                ), $value, null, $constraint->code);
             }
         }
     }

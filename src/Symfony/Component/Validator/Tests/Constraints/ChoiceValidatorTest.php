@@ -159,7 +159,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => 'baz',
-            ), null, null);
+            ), 'baz', null);
 
         $this->validator->validate('baz', $constraint);
     }

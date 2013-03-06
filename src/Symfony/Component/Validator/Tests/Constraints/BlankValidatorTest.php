@@ -61,7 +61,7 @@ class BlankValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('myMessage', array(
                 '{{ value }}' => $value,
-            ));
+            ), $this->identicalTo($value));
 
         $this->validator->validate($value, $constraint);
     }

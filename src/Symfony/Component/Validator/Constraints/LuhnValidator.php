@@ -39,7 +39,7 @@ class LuhnValidator extends ConstraintValidator
         }
 
         if (!is_numeric($value)) {
-            $this->context->addViolation($constraint->message, array(), null, null, $constraint->code);
+            $this->context->addViolation($constraint->message, array(), $value, null, $constraint->code);
 
             return;
         }
@@ -52,7 +52,7 @@ class LuhnValidator extends ConstraintValidator
         }
 
         if ($sum === 0 || ($sum % 10) !== 0) {
-            $this->context->addViolation($constraint->message, array(), null, null, $constraint->code);
+            $this->context->addViolation($constraint->message, array(), $value, null, $constraint->code);
         }
     }
 }

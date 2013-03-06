@@ -68,7 +68,6 @@ class ArgvInput extends Input
     protected function setTokens(array $tokens)
     {
         $this->tokens = $tokens;
-        $this->parse();
     }
 
     /**

@@ -122,7 +122,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
      * @expectedException        \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage You have requested a synthetic service ("foo"). The DIC does not know how to construct this service.
      */
-    public function testGetXXX()
+    public function testGetUnsetLoadingServiceWhenCreateServiceThrowsAnException()
     {
         $builder = new ContainerBuilder();
         $builder->register('foo', 'stdClass')->setSynthetic(true);

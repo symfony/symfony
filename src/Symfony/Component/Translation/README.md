@@ -9,7 +9,7 @@ translated strings from these including support for pluralization.
     use Symfony\Component\Translation\Loader\ArrayLoader;
 
     $translator = new Translator('fr_FR', new MessageSelector());
-    $translator->setFallbackLocale('fr');
+    $translator->setFallbackLocales(array('fr'));
     $translator->addLoader('array', new ArrayLoader());
     $translator->addResource('array', array(
         'Hello World!' => 'Bonjour',

@@ -16,7 +16,7 @@ class Locale extends \Locale
     /**
      * The ICU data version that ships with Symfony
      */
-    const ICU_DATA_VERSION = '49';
+    const ICU_DATA_VERSION = '50';
 
     /**
      * Caches the countries in different locales

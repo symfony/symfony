@@ -118,14 +118,17 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection1->add('overridden', new Route('/overridden1'));
         $collection1->add('foo1', new Route('/{foo}'));
         $collection1->add('bar1', new Route('/{bar}'));
+        $collection1->addPrefix('/b\'b');
         $collection2 = new RouteCollection();
-        $collection2->addCollection($collection1, '/b\'b');
+        $collection2->addCollection($collection1);
         $collection2->add('overridden', new Route('/{var}', array(), array('var' => '.*')));
         $collection1 = new RouteCollection();
         $collection1->add('foo2', new Route('/{foo1}'));
         $collection1->add('bar2', new Route('/{bar1}'));
-        $collection2->addCollection($collection1, '/b\'b');
-        $collection->addCollection($collection2, '/a');
+        $collection1->addPrefix('/b\'b');
+        $collection2->addCollection($collection1);
+        $collection2->addPrefix('/a');
+        $collection->addCollection($collection2);
 
         // overridden through addCollection() and multiple sub-collections with no own prefix
         $collection1 = new RouteCollection();
@@ -137,15 +140,16 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection3->add('hey', new Route('/hey/'));
         $collection2->addCollection($collection3);
         $collection1->addCollection($collection2);
-        $collection->addCollection($collection1, '/multi');
+        $collection1->addPrefix('/multi');
+        $collection->addCollection($collection1);
 
         // "dynamic" prefix
         $collection1 = new RouteCollection();
         $collection1->add('foo3', new Route('/{foo}'));
         $collection1->add('bar3', new Route('/{bar}'));
-        $collection2 = new RouteCollection();
-        $collection2->addCollection($collection1, '/b');
-        $collection->addCollection($collection2, '/{_locale}');
+        $collection1->addPrefix('/b');
+        $collection1->addPrefix('{_locale}');
+        $collection->addCollection($collection1);
 
         // route between collections
         $collection->add('ababa', new Route('/ababa'));
@@ -153,7 +157,8 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         // collection with static prefix but only one route
         $collection1 = new RouteCollection();
         $collection1->add('foo4', new Route('/{foo}'));
-        $collection->addCollection($collection1, '/aba');
+        $collection1->addPrefix('/aba');
+        $collection->addCollection($collection1);
 
         // prefix and host
 
@@ -215,10 +220,12 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection2->add('b', new Route('/{var}'));
         $collection3 = new RouteCollection();
         $collection3->add('c', new Route('/{var}'));
-
-        $collection2->addCollection($collection3, '/c');
-        $collection1->addCollection($collection2, '/b');
-        $collection->addCollection($collection1, '/a');
+        $collection3->addPrefix('/c');
+        $collection2->addCollection($collection3);
+        $collection2->addPrefix('/b');
+        $collection1->addCollection($collection2);
+        $collection1->addPrefix('/a');
+        $collection->addCollection($collection1);
 
         /* test case 2 */
 

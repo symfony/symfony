@@ -194,7 +194,10 @@
                     h = space,
                     x = request.left * ratio + space, // position
                     canvas = cache.get(elementId) || cache.set(elementId, document.getElementById(elementId)),
-                    ctx    = canvas.getContext("2d");
+                    ctx    = canvas.getContext("2d"),
+                    backingStoreRatio,
+                    scaleRatio,
+                    devicePixelRatio;
 
                 // Filter events whose total time is below the threshold.
                 drawableEvents = request.events.filter(function(event) {
@@ -203,8 +206,20 @@
 
                 canvasHeight += gapPerEvent * drawableEvents.length;
 
-                canvas.width  = width;
-                canvas.height = canvasHeight;
+                // For retina displays so text and boxes will be crisp
+                devicePixelRatio  = window.devicePixelRatio          == "undefined" ? 1 : window.devicePixelRatio;
+                backingStoreRatio = ctx.webkitBackingStorePixelRatio == "undefined" ? 1 : ctx.webkitBackingStorePixelRatio;
+                scaleRatio        = devicePixelRatio / 1;
+
+                canvasHeight += gapPerEvent * drawableEvents.length;
+
+                canvas.width  = width * scaleRatio;
+                canvas.height = canvasHeight * scaleRatio;
+
+                canvas.style.width = width + 'px';
+                canvas.style.height = canvasHeight + 'px';
+
+                ctx.scale(scaleRatio, scaleRatio);
 
                 ctx.textBaseline = "middle";
                 ctx.lineWidth = 0;

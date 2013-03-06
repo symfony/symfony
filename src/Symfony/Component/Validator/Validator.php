@@ -52,7 +52,7 @@ class Validator implements ValidatorInterface
         MetadataFactoryInterface $metadataFactory,
         ConstraintValidatorFactoryInterface $validatorFactory,
         TranslatorInterface $translator,
-        $translationDomain = null,
+        $translationDomain = 'validators',
         array $objectInitializers = array()
     )
     {

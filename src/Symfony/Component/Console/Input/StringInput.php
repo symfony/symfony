@@ -33,13 +33,19 @@ class StringInput extends ArgvInput
      * @param string          $input      An array of parameters from the CLI (in the argv format)
      * @param InputDefinition $definition A InputDefinition instance
      *
+     * @deprecated The second argument is deprecated as it does not work (will be removed in 3.0), use 'bind' method instead
+     *
      * @api
      */
     public function __construct($input, InputDefinition $definition = null)
     {
-        parent::__construct(array(), $definition);
+        parent::__construct(array(), null);
 
         $this->setTokens($this->tokenize($input));
+
+        if (null !== $definition) {
+            $this->bind($definition);
+        }
     }
 
     /**

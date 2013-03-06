@@ -202,10 +202,10 @@
    ```
    use Symfony\Component\PropertyAccess\PropertyAccess;
 
-   $accessor = PropertyAccess::getPropertyAccessor();
+   $propertyAccessor = PropertyAccess::getPropertyAccessor();
 
    $value = $propertyAccessor->getValue($object, 'some.path');
-   $accessor->setValue($object, 'some.path', 'new value');
+   $propertyAccessor->setValue($object, 'some.path', 'new value');
    ```
 
    After (alternative 2):
@@ -214,11 +214,11 @@
    use Symfony\Component\PropertyAccess\PropertyAccess;
    use Symfony\Component\PropertyAccess\PropertyPath;
 
-   $accessor = PropertyAccess::getPropertyAccessor();
+   $propertyAccessor = PropertyAccess::getPropertyAccessor();
    $propertyPath = new PropertyPath('some.path');
 
    $value = $propertyAccessor->getValue($object, $propertyPath);
-   $accessor->setValue($object, $propertyPath, 'new value');
+   $propertyAccessor->setValue($object, $propertyPath, 'new value');
    ```
 
 ### Routing

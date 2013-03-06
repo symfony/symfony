@@ -50,6 +50,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('en',$c->getLocale());
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\HeaderBag',$c->getResponseHeaders());
+        $this->assertEquals('OK',$c->getStatusText());
         $this->assertEquals(200,$c->getStatusCode());
         $this->assertEquals('application/json',$c->getContentType());
     }

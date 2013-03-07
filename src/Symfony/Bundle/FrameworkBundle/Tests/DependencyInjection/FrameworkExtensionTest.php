@@ -187,8 +187,13 @@ abstract class FrameworkExtensionTest extends TestCase
             '->registerTranslatorConfiguration() finds Security translation resources'
         );
 
-        $calls = $container->getDefinition('translator.default')->getMethodCalls();
-        $this->assertEquals(array('fr'), $calls[0][1][0]);
+        $haveFallbackLocale = false;
+        foreach ($container->getDefinition('translator.default')->getMethodCalls() as $call) {
+            if ('setFallbackLocales' == $call[0] && 'fr' == $call[1][0]) {
+                $haveFallbackLocale = true;
+            }
+        }
+        $this->assertTrue($haveFallbackLocale, '-> setFallbackLocale() is called with the expected value.');
     }
 
     /**

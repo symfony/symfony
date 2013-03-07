@@ -222,7 +222,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function getResources()
     {
-        return $this->resources;
+        return array_unique($this->resources, SORT_REGULAR);
     }
 
     /**

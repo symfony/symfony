@@ -40,7 +40,7 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
     public function enterNode(\Twig_NodeInterface $node, \Twig_Environment $env)
     {
         if ($node instanceof \Twig_Node_Block) {
-            $this->scope = $this->scope->open();
+            $this->scope = $this->scope->enter();
         }
 
         if ($node instanceof \Twig_Node_Module) {
@@ -61,8 +61,7 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
             }
         }
 
-        $domain = $this->scope->get('domain');
-        if (null === $domain) {
+        if (!$this->scope->has('domain')) {
             return $node;
         }
 
@@ -74,11 +73,11 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
                     $arguments->setNode($ind - 1, new \Twig_Node_Expression_Array(array(), $node->getLine()));
                 }
 
-                $arguments->setNode($ind, $domain);
+                $arguments->setNode($ind, $this->scope->get('domain'));
             }
         } elseif ($node instanceof TransNode) {
             if (null === $node->getNode('domain')) {
-                $node->setNode('domain', $domain);
+                $node->setNode('domain', $this->scope->get('domain'));
             }
         }
 
@@ -95,7 +94,7 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
         }
 
         if ($node instanceof \Twig_Node_Block) {
-            $this->scope = $this->scope->close();
+            $this->scope = $this->scope->leave();
         }
 
         return $node;

@@ -23,11 +23,17 @@ class Scope
     private $data;
 
     /**
+     * @var boolean
+     */
+    private $left;
+
+    /**
      * @param Scope $parent
      */
     public function __construct(Scope $parent = null)
     {
         $this->parent = $parent;
+        $this->left = false;
     }
 
     /**
@@ -35,7 +41,7 @@ class Scope
      *
      * @return Scope
      */
-    public function open()
+    public function enter()
     {
         $child = new self($this);
         $this->children[] = $child;
@@ -48,8 +54,10 @@ class Scope
      *
      * @return Scope|null
      */
-    public function close()
+    public function leave()
     {
+        $this->left = true;
+
         return $this->parent;
     }
 
@@ -59,13 +67,39 @@ class Scope
      * @param string $key
      * @param mixed  $value
      *
+     * @throws \LogicException
+     *
      * @return Scope Current scope
      */
     public function set($key, $value)
     {
+        if ($this->left) {
+            throw new \LogicException('Left scope is not mutable.');
+        }
+
         $this->data[$key] = $value;
 
         return $this;
+    }
+
+    /**
+     * Tests if a data is visible from current scope.
+     *
+     * @param string $key
+     *
+     * @return boolean
+     */
+    public function has($key)
+    {
+        if (array_key_exists($key, $this->data)) {
+            return true;
+        }
+
+        if (null === $this->parent) {
+            return false;
+        }
+
+        return $this->parent->has($key);
     }
 
     /**
@@ -78,7 +112,7 @@ class Scope
      */
     public function get($key, $default = null)
     {
-        if (isset($this->data[$key])) {
+        if (array_key_exists($key, $this->data)) {
             return $this->data[$key];
         }
 

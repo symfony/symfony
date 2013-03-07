@@ -110,10 +110,6 @@ class TokenStream
             throw new \LogicException('no more tokens');
         }
 
-        do {
-            $this->cursor ++;
-        } while ($this->tokens[$this->cursor]->isWhitespace());
-
         return $this->tokens[$this->cursor ++];
     }
 
@@ -130,6 +126,16 @@ class TokenStream
         }
 
         return $this->peeked;
+    }
+
+    /**
+     * Returns used tokens.
+     *
+     * @return Token[]
+     */
+    public function getUsed()
+    {
+        return $this->used;
     }
 
     /**
@@ -165,7 +171,7 @@ class TokenStream
             return $next->getValue();
         }
 
-        if ($next->isWildcardDelimiter()) {
+        if ($next->isDelimiter(array('*'))) {
             return null;
         }
 
@@ -179,7 +185,7 @@ class TokenStream
     {
         $peek = $this->getPeek();
 
-        if ('S' === $peek->getType()) {
+        if ($peek->isWhitespace()) {
             $this->getNext();
         }
     }

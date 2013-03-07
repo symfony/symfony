@@ -21,15 +21,13 @@ namespace Symfony\Component\CssSelector\Parser;
  */
 class Token
 {
-    const TYPE_FILE_END   = 0;
-    const TYPE_DELIMITER  = 1;
-    const TYPE_WHITESPACE = 2;
-    const TYPE_IDENTIFIER = 3;
-    const TYPE_HASH       = 4;
-    const TYPE_NUMBER     = 5;
-    const TYPE_STRING     = 6;
-
-    const VALUE_WILDCARD  = '*';
+    const TYPE_FILE_END   = 'eof';
+    const TYPE_DELIMITER  = 'delimiter';
+    const TYPE_WHITESPACE = 'whitespace';
+    const TYPE_IDENTIFIER = 'identifier';
+    const TYPE_HASH       = 'hash';
+    const TYPE_NUMBER     = 'number';
+    const TYPE_STRING     = 'string';
 
     /**
      * @var int
@@ -91,19 +89,21 @@ class Token
     }
 
     /**
+     * @param array $values
+     *
      * @return boolean
      */
-    public function isDelimiter()
+    public function isDelimiter(array $values = array())
     {
-        return self::TYPE_DELIMITER === $this->type;
-    }
+        if (self::TYPE_DELIMITER !== $this->type) {
+            return false;
+        }
 
-    /**
-     * @return boolean
-     */
-    public function isWildcardDelimiter()
-    {
-        return self::TYPE_DELIMITER === $this->type && self::VALUE_WILDCARD === $this->value;
+        if (empty($values)) {
+            return true;
+        }
+
+        return in_array($this->value, $values);
     }
 
     /**
@@ -144,5 +144,10 @@ class Token
     public function isString()
     {
         return self::TYPE_STRING === $this->type;
+    }
+
+    public function __toString()
+    {
+        return sprintf('<%s "%s" at %s>', $this->type, $this->value, $this->position);
     }
 }

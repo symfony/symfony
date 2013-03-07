@@ -12,6 +12,8 @@
 namespace Symfony\Component\CssSelector;
 
 use Symfony\Component\CssSelector\Exception\ParseException;
+use Symfony\Component\CssSelector\Exception\SyntaxException;
+use Symfony\Component\CssSelector\Parser\Parser;
 
 /**
  * CssSelector is the main entry point of the component and can convert CSS
@@ -38,11 +40,18 @@ class CssSelector
      *
      * @return string
      *
-     * @throws ParseException When got None for xpath expression
+     * @throws ParseException When got null for xpath expression
      *
      * @api
      */
     public static function toXPath($cssExpr, $prefix = 'descendant-or-self::')
     {
+        $translator = new HTMLTranslator();
+
+        try {
+            return $translator->cssToXPath($cssExpr, $prefix);
+        } catch (SyntaxException $e) {
+            throw new ParseException('Syntax error: '.$e->getMessage(), 0, $e);
+        }
     }
 }

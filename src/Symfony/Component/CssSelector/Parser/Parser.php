@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\CssSelector\Parser;
 
-use Symfony\Component\CssSelector\Parser\Shortcut\ClassParser;
-use Symfony\Component\CssSelector\Parser\Shortcut\ElementParser;
-use Symfony\Component\CssSelector\Parser\Shortcut\HashParser;
+use Symfony\Component\CssSelector\Exception\SyntaxException;
+use Symfony\Component\CssSelector\Node;
+use Symfony\Component\CssSelector\Parser\Shortcut;
 use Symfony\Component\CssSelector\Parser\Tokenizer\Tokenizer;
 
 /**
@@ -36,16 +36,22 @@ class Parser implements ParserInterface
      */
     private $shortcuts;
 
+    /**
+     * Constructor.
+     */
     public function __construct()
     {
         $this->tokenizer = new Tokenizer();
         $this->shortcuts = array(
-            new ElementParser(),
-            new HashParser(),
-            new ClassParser(),
+            new Shortcut\ElementParser(),
+            new Shortcut\HashParser(),
+            new Shortcut\ClassParser(),
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function parse($source)
     {
         foreach ($this->shortcuts as $shortcut) {
@@ -59,6 +65,313 @@ class Parser implements ParserInterface
         $reader = new Reader($source);
         $stream = $this->tokenizer->tokenize($reader);
 
-        return iterator_to_array(new SelectorIterator($stream));
+        return $this->parseSelectorList($stream);
+    }
+
+    /**
+     * Parses selector nodes.
+     *
+     * @param TokenStream $stream
+     *
+     * @return array
+     */
+    private function parseSelectorList(TokenStream $stream)
+    {
+        $stream->skipWhitespace();
+        $selectors = array();
+
+        while (true) {
+            $selectors[] = $this->parserSelectorNode($stream);
+
+            if ($stream->getPeek()->isDelimiter(array(','))) {
+                $stream->getNext();
+                $stream->skipWhitespace();
+            } else {
+                break;
+            }
+        }
+
+        return $selectors;
+    }
+
+    /**
+     * Parses next selector or combined node.
+     *
+     * @param TokenStream $stream
+     *
+     * @throws SyntaxException
+     *
+     * @return Node\SelectorNode
+     */
+    private function parserSelectorNode(TokenStream $stream)
+    {
+        list($result, $pseudoElement) = $this->parseSimpleSelector($stream);
+
+        while (true) {
+            $stream->skipWhitespace();
+            $peek = $stream->getPeek();
+
+            if ($peek->isFileEnd() || $peek->isDelimiter(array(','))) {
+                break;
+            }
+
+            if (null !== $pseudoElement) {
+                throw new SyntaxException('Got pseudo-element "::'.$pseudoElement.'" not at the end of a selector');
+            }
+
+            if ($peek->isDelimiter(array('+', '>', '~'))) {
+                $combinator = $stream->getNext()->getValue();
+                $stream->skipWhitespace();
+            } else {
+                $combinator = ' ';
+            }
+
+            list($nextSelector, $pseudoElement) = $this->parseSimpleSelector($stream);
+            $result = new Node\CombinedSelectorNode($result, $combinator, $nextSelector);
+        }
+
+        return new Node\SelectorNode($result, $pseudoElement);
+    }
+
+    /**
+     * Parses next simple node (hash, class, pseudo, negation).
+     *
+     * @param TokenStream $stream
+     * @param boolean     $insideNegation
+     *
+     * @throws SyntaxException
+     *
+     * @return array
+     */
+    private function parseSimpleSelector(TokenStream $stream, $insideNegation = false)
+    {
+        $stream->skipWhitespace();
+
+        $selectorStart = count($stream->getUsed());
+        $result = $this->parseElementNode($stream);
+        $pseudoElement = null;
+
+        while (true) {
+            $peek = $stream->getPeek();
+            if ($peek->isWhitespace()
+                || $peek->isFileEnd()
+                || $peek->isDelimiter(array(',', '+', '>', '~'))
+                || ($insideNegation && $peek->isDelimiter(array(')')))
+            ) {
+                break;
+            }
+
+            if (null !== $pseudoElement) {
+                throw new SyntaxException('Got pseudo-element "::'.$pseudoElement.'" not at the end of a selector');
+            }
+
+            if ($peek->isHash()) {
+                $result = new Node\HashNode($result, $stream->getNext()->getValue());
+            } elseif ($peek->isDelimiter(array('.'))) {
+                $stream->getNext();
+                $result = new Node\ClassNode($result, $stream->getNextIdentifier());
+            } elseif ($peek->isDelimiter(array('['))) {
+                $stream->getNext();
+                $result = $this->parseAttributeNode($result, $stream);
+            } elseif ($peek->isDelimiter(array(':'))) {
+                $stream->getNext();
+
+                if ($stream->getPeek()->isDelimiter(array(':'))) {
+                    $stream->getNext();
+                    $pseudoElement = $stream->getNextIdentifier();
+
+                    continue;
+                }
+
+                $identifier = $stream->getNextIdentifier();
+                if (in_array(strtolower($identifier), array('first-line', 'first-letter', 'before', 'after'))) {
+                    // Special case: CSS 2.1 pseudo-elements can have a single ':'.
+                    // Any new pseudo-element must have two.
+                    $pseudoElement = $identifier;
+
+                    continue;
+                }
+
+                if (!$stream->getPeek()->isDelimiter(array('('))) {
+                    $result = new Node\PseudoNode($result, $identifier);
+                }
+
+                $stream->getNext();
+                $stream->skipWhitespace();
+
+                if ('not' === strtolower($identifier)) {
+                    if ($insideNegation) {
+                        throw new SyntaxException('Got nested :not()');
+                    }
+
+                    list($argument, $argumentPseudoElement) = $this->parseSimpleSelector($stream, true);
+                    $next = $stream->getNext();
+
+                    if (null !== $argumentPseudoElement) {
+                        throw new SyntaxException(sprintf(
+                            'Got pseudo-element ::%s inside ::not() at %s',
+                            $argumentPseudoElement,
+                            $next->getPosition()
+                        ));
+                    }
+
+                    if (!$next->isDelimiter(array(')'))) {
+                        throw new SyntaxException(sprintf('Expected ")", got %s', $next));
+                    }
+
+                    $result = new Node\NegationNode($result, $argument);
+                } else {
+                    $arguments = $this->parseArgumentList($stream);
+
+                    if (empty($arguments)) {
+                        throw new SyntaxException(sprintf('Expected at least an argument, got %s', $next));
+                    }
+                }
+            } else {
+                throw new SyntaxException(sprintf('Expected selector, got %s', $peek));
+            }
+        }
+
+        if (count($stream->getUsed()) === $selectorStart) {
+            throw new SyntaxException('Expected selector, got '.$stream->getPeek());
+        }
+
+        return array($result, $pseudoElement);
+    }
+
+    /**
+     * Parses next element node.
+     *
+     * @param TokenStream $stream
+     *
+     * @return Node\ElementNode
+     */
+    private function parseElementNode(TokenStream $stream)
+    {
+        $peek = $stream->getPeek();
+
+        if ($peek->isIdentifier() || $peek->isDelimiter(array('*'))) {
+            if ($peek->isIdentifier()) {
+                $namespace = $stream->getNext()->getValue();
+            } else {
+                $stream->getNext();
+                $namespace = null;
+            }
+
+            if ($stream->getPeek()->isDelimiter(array('|'))) {
+                $stream->getNext();
+                $element = $stream->getNextIdentifierOrStar();
+            } else {
+                $element = $namespace;
+                $namespace = null;
+            }
+        } else {
+            $element = $namespace = null;
+        }
+
+        return new Node\ElementNode($namespace, $element);
+    }
+
+    /**
+     * Parses next attribute node.
+     *
+     * @param Node\NodeInterface $selector
+     * @param TokenStream        $stream
+     *
+     * @throws SyntaxException
+     *
+     * @return Node\AttributeNode
+     */
+    private function parseAttributeNode(Node\NodeInterface $selector, TokenStream $stream)
+    {
+        $stream->skipWhitespace();
+        $attribute = $stream->getNextIdentifierOrStar();
+
+        if (null === $attribute || !$stream->getPeek()->isDelimiter(array('|'))) {
+            throw new SyntaxException(sprintf('Expected '|', got %s', $stream->getPeek()));
+        }
+
+        if ($stream->getPeek()->isDelimiter(array('|'))) {
+            $stream->getNext();
+
+            if ($stream->getPeek()->isDelimiter(array('='))) {
+                $namespace = null;
+                $stream->getNext();
+                $operator = '|=';
+            } else {
+                $namespace = $attribute;
+                $attribute = $stream->getNextIdentifier();
+                $operator = null;
+            }
+        } else {
+            $namespace = $operator = null;
+        }
+
+        if (null === $operator) {
+            $stream->skipWhitespace();
+            $next = $stream->getNext();
+
+            if ($next->isDelimiter(array(']'))) {
+                return new Node\AttributeNode($selector, $namespace, $attribute, 'exists', null);
+            } elseif ($next->isDelimiter(array('='))) {
+                $operator = '=';
+            } elseif ($next->isDelimiter(array('^', '$', '*', '~', '|', '!'))
+                && $stream->getPeek()->isDelimiter(array('='))
+            ) {
+                $operator = $next->getValue().'=';
+                $stream->getNext();
+            } else {
+                throw new SyntaxException(sprintf('Operator expected, got %s', $next));
+            }
+        }
+
+        $stream->skipWhitespace();
+        $value = $stream->getNext();
+
+        if (!($value->isIdentifier() || $value->isString())) {
+            throw new SyntaxException(sprintf('Expected string or identifier, got %s', $value));
+        }
+
+        $stream->skipWhitespace();
+        $next = $stream->getNext();
+
+        if (!$next->isDelimiter(array(']'))) {
+            throw new SyntaxException(sprintf('Expected "]", got %s', $next));
+        }
+
+        return new Node\AttributeNode($selector, $namespace, $attribute, $operator, $value->getValue());
+    }
+
+    /**
+     * Parses next arguments.
+     *
+     * @param TokenStream $stream
+     *
+     * @throws SyntaxException
+     *
+     * @return array
+     */
+    private function parseArgumentList(TokenStream $stream)
+    {
+        $arguments = array();
+
+        while (true) {
+            $stream->skipWhitespace();
+            $next = $stream->getNext();
+
+            if ($next->isIdentifier()
+                || $next->isString()
+                || $next->isNumber()
+                || $next->isDelimiter(array('+', '-'))
+            ) {
+                $arguments[] = $next;
+            } elseif ($next->isDelimiter(array(')'))) {
+                break;
+            } else {
+                throw new SyntaxException(sprintf('Expected an argument, got %s', $next));
+            }
+        }
+
+        return $arguments;
     }
 }

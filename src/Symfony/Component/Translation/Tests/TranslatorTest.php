@@ -263,16 +263,13 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('10 things', $translator->transChoice('some_message2', 10, array('%count%' => 10)));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testTransChoiceFallbackWithNoTranslation()
     {
         $translator = new Translator('ru', new MessageSelector());
         $translator->setFallbackLocales(array('en'));
         $translator->addLoader('array', new ArrayLoader());
 
-        $this->assertEquals('10 things', $translator->transChoice('some_message2', 10, array('%count%' => 10)));
+        $this->assertEquals('some_message2', $translator->transChoice('some_message2', 10, array('%count%' => 10)));
     }
 }
 

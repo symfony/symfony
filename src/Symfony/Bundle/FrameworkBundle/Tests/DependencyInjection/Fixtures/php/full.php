@@ -4,6 +4,7 @@ $container->loadFromExtension('framework', array(
     'secret' => 's3cr3t',
     'default_locale' => 'fr',
     'form' => null,
+    'http_method_override' => false,
     'trust_proxy_headers' => true,
     'trusted_proxies' => array('127.0.0.1', '10.0.0.1'),
     'csrf_protection' => array(

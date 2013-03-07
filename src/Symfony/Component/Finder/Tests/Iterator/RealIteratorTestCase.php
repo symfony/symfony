@@ -74,7 +74,8 @@ abstract class RealIteratorTestCase extends IteratorTestCase
 
     protected static function setTmpDir()
     {
-        self::$tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'symfony2_finder';
+        $tmp = getenv('TMPDIR') ? getenv('TMPDIR') : (function_exists('sys_get_temp_dir') ? sys_get_temp_dir() : '');
+        self::$tmpDir = $tmp . DIRECTORY_SEPARATOR . 'symfony2_finder';
     }
 
     protected static function getTmpDir()

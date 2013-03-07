@@ -50,7 +50,7 @@ class DbalLogger implements SQLLogger
             // Blob data must not be logged as they can be very huge and break formatters.
             foreach ($types as $index => $type) {
                 if ('blob' === $type) {
-                    $params[$index] = '';
+                    $params[$index] = 'blob value';
                 }
             }
         }

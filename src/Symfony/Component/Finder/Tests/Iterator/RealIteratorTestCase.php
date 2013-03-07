@@ -14,12 +14,15 @@ namespace Symfony\Component\Finder\Tests\Iterator;
 abstract class RealIteratorTestCase extends IteratorTestCase
 {
 
-    protected static $tmpDir;
+    /*
+     * Use self::getTmpDir() to get $tmpDir
+     */
+    private static $tmpDir;
     protected static $files;
 
     public static function setUpBeforeClass()
     {
-        self::$tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'symfony2_finder';
+        self::setTmpDir();
 
         self::$files = array(
             '.git/',
@@ -69,14 +72,27 @@ abstract class RealIteratorTestCase extends IteratorTestCase
         }
     }
 
-    protected static function toAbsolute($files = null)
+    protected static function setTmpDir()
+    {
+        self::$tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'symfony2_finder';
+    }
+
+    protected static function getTmpDir()
     {
         /*
          * Without the call to setUpBeforeClass() property can be null.
          */
         if (!self::$tmpDir) {
-            self::$tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'symfony2_finder';
+            self::setTmpDir();
         }
+
+        return self::$tmpDir;
+    }
+
+
+    protected static function toAbsolute($files = null)
+    {
+        self::setTmpDir();
 
         if (is_array($files)) {
             $f = array();

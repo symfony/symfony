@@ -33,7 +33,7 @@ class TranslationUpdateCommand extends ContainerAwareCommand
     protected $catalogue;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -74,7 +74,7 @@ EOF
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

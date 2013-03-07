@@ -29,12 +29,12 @@ use Symfony\Component\Config\FileLocator;
 class ContainerDebugCommand extends ContainerAwareCommand
 {
     /**
-     * @var ContainerBuilder
+     * @var ContainerBuilder|null
      */
     protected $containerBuilder;
 
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -74,7 +74,9 @@ EOF
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
+     *
+     * @throws \LogicException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -307,7 +309,7 @@ EOF
      *
      * @param string $serviceId The service id to resolve
      *
-     * @return \Symfony\Component\DependencyInjection\Definition|\Symfony\Component\DependencyInjection\Alias
+     * @return Definition|Alias
      */
     protected function resolveServiceDefinition($serviceId)
     {
@@ -328,7 +330,7 @@ EOF
      * Renders list of tagged services grouped by tag
      *
      * @param OutputInterface $output
-     * @param bool            $showPrivate
+     * @param Boolean         $showPrivate
      */
     protected function outputTags(OutputInterface $output, $showPrivate = false)
     {

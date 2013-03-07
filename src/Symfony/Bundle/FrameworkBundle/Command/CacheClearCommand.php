@@ -28,7 +28,7 @@ class CacheClearCommand extends ContainerAwareCommand
     protected $name;
 
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function configure()
     {

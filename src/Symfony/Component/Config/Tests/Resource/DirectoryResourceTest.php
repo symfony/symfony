@@ -25,7 +25,7 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->directory = sys_get_temp_dir().'/symfonyDirectoryIterator';
+        $this->directory = sys_get_temp_dir().'/DirectoryResourceTest';
         if (!file_exists($this->directory)) {
             mkdir($this->directory);
         }
@@ -74,8 +74,22 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
         $this->touch($this->directory.'/tmp2.xml', 20);
         $this->assertFalse($resource->isFresh(), '->isFresh() returns false if the resource has been updated');
 
-        $resource = new DirectoryResource('/____foo/foobar'.rand(1, 999999));
-        $this->assertFalse($resource->isFresh(), '->isFresh() returns false if the resource does not exist');
+        /*
+         * A DirectoryResource for a nonexistent directory will stay fresh as long as the directory
+         * does not exist.
+         *
+         * For clients of ConfigCache, that's the right way to say "I checked that directory when I built
+         * the cache's contents. As long as nobody creates this dir and puts something in it that matches
+         * my pattern, the cache is valid.".
+         *
+         */
+        $dir = $this->directory.'/subdir';
+        $resource = new DirectoryResource($dir);
+        $this->assertTrue($resource->isFresh(), '->isFresh() returns true if the resource does not exist');
+        mkdir($dir);
+        $this->assertTrue($resource->isFresh(), '->isFresh() returns true if a directory is created but does not contain anything');
+        $this->touch($dir."/foo.xml", 20);
+        $this->assertFalse($resource->isFresh(), '->isFresh() returns false if files become available in a previously non-existing directory');
     }
 
     /**

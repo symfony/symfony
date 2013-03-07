@@ -23,7 +23,7 @@ interface ContainerAwareInterface
     /**
      * Sets the Container.
      *
-     * @param ContainerInterface $container A ContainerInterface instance
+     * @param ContainerInterface|null $container A ContainerInterface instance or null
      *
      * @api
      */

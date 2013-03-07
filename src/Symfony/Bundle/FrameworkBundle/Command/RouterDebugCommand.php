@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouterInterface;
 class RouterDebugCommand extends ContainerAwareCommand
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isEnabled()
     {
@@ -40,7 +40,7 @@ class RouterDebugCommand extends ContainerAwareCommand
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -60,7 +60,9 @@ EOF
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
+     *
+     * @throws \InvalidArgumentException When route does not exist
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

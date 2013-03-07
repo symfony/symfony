@@ -66,6 +66,8 @@ class FrameworkExtension extends Extension
             $container->setParameter('kernel.secret', $config['secret']);
         }
 
+        $container->setParameter('kernel.http_method_override', $config['http_method_override']);
+
         $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
 
         // @deprecated, to be removed in 2.3

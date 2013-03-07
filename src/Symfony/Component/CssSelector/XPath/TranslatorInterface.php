@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\CssSelector\XPath;
 
-use Symfony\Component\CssSelector\Node\NodeInterface;
 use Symfony\Component\CssSelector\Node\SelectorNode;
 
 /**

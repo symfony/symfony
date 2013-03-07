@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\CssSelector\XPath;
 
+use Doctrine\ORM\Query\AST\Functions\FunctionNode;
+use Symfony\Component\CssSelector\Node\AttributeNode;
+use Symfony\Component\CssSelector\Node\NodeInterface;
+use Symfony\Component\CssSelector\Node\PseudoNode;
 use Symfony\Component\CssSelector\Node\SelectorNode;
 use Symfony\Component\CssSelector\Parser\Parser;
 use Symfony\Component\CssSelector\Parser\ParserInterface;
@@ -31,9 +35,24 @@ class GenericTranslator implements TranslatorInterface
     private $parser;
 
     /**
-     * @var TranslatorComponents
+     * @var array
      */
-    private $components;
+    private $nodeTranslators;
+
+    /**
+     * @var array
+     */
+    private $combinatorTranslators;
+
+    /**
+     * @var array
+     */
+    private $functionTranslators;
+
+    /**
+     * @var array
+     */
+    private $attributeTranslators;
 
     /**
      * Constructor.
@@ -43,19 +62,30 @@ class GenericTranslator implements TranslatorInterface
     public function __construct(ParserInterface $parser = null)
     {
         $this->parser = $parser ?: new Parser();
-        $this->components = new TranslatorComponents();
+        $this->nodeTranslators = array();
+        $this->combinatorTranslators = array();
+        $this->functionTranslators = array();
+        $this->attributeTranslators = array();
+    }
 
-        $this->components
-            ->registerNodeTranslator('Attribute', new Node\ClassTranslator($this->components))
-            ->registerNodeTranslator('Class', new Node\ClassTranslator($this->components))
-            ->registerNodeTranslator('CombinedSelector', new Node\ClassTranslator($this->components))
-            ->registerNodeTranslator('Element', new Node\ClassTranslator($this->components))
-            ->registerNodeTranslator('Function', new Node\ClassTranslator($this->components))
-            ->registerNodeTranslator('Hash', new Node\HashTranslator($this->components))
-            ->registerNodeTranslator('Negation', new Node\ElementTranslator($this->components))
-            ->registerNodeTranslator('Pseudo', new Node\ElementTranslator($this->components))
-            ->registerNodeTranslator('Selector', new Node\ElementTranslator($this->components))
-        ;
+    /**
+     * @param string $element
+     *
+     * @return string
+     */
+    public static function getXpathLiteral($element)
+    {
+        if (false === strpos($element, "'")) {
+            return "'".$element."'";
+        }
+
+        if (false === strpos($element, '"')) {
+            return '"'.$element.'"';
+        }
+
+        return sprintf('concat(%s)', implode(',', function ($part) {
+            return GenericTranslator::getXpathLiteral($part);
+        }, preg_split("('+)", $element)));
     }
 
     /**
@@ -68,7 +98,7 @@ class GenericTranslator implements TranslatorInterface
         /** @var SelectorNode $selector */
         foreach ($selectors as $selector) {
             if (null !== $selector->getPseudoElement()) {
-                throw new ExpressionError('Pseudo-elements are not supported.');
+                throw new ExpressionErrorException('Pseudo-elements are not supported.');
             }
         }
 
@@ -85,5 +115,29 @@ class GenericTranslator implements TranslatorInterface
     public function selectorToXPath(SelectorNode $selector, $prefix = 'descendant-or-self::')
     {
         return ($prefix ?: '').$this->components->getNodeTranslator($selector->getNodeName())->toXPath($selector);
+    }
+
+    public function nodeToXPath(NodeInterface $node)
+    {
+        if (!isset($this->nodeTranslators[$node->getNodeName()])) {
+            throw new \InvalidArgumentException();
+        }
+
+
+    }
+
+    public function addFunctionCondition(XPathExpr $xpath, FunctionNode $function, $last = null, $addNameTest = null)
+    {
+
+    }
+
+    public function addPseudoCondition(XPathExpr $xpath, PseudoNode $seudo)
+    {
+
+    }
+
+    public function addAttributeCondition(XPathExpr $xpath, AttributeNode $attribute)
+    {
+
     }
 }

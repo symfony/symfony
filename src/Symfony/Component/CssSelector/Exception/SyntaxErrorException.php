@@ -19,6 +19,6 @@ namespace Symfony\Component\CssSelector\Exception;
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
-class SyntaxException extends \Exception
+class SyntaxErrorException extends \Exception
 {
 }

@@ -12,8 +12,7 @@
 namespace Symfony\Component\CssSelector;
 
 use Symfony\Component\CssSelector\Exception\ParseException;
-use Symfony\Component\CssSelector\Exception\SyntaxException;
-use Symfony\Component\CssSelector\Parser\Parser;
+use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
 
 /**
  * CssSelector is the main entry point of the component and can convert CSS
@@ -50,7 +49,7 @@ class CssSelector
 
         try {
             return $translator->cssToXPath($cssExpr, $prefix);
-        } catch (SyntaxException $e) {
+        } catch (SyntaxErrorException $e) {
             throw new ParseException('Syntax error: '.$e->getMessage(), 0, $e);
         }
     }

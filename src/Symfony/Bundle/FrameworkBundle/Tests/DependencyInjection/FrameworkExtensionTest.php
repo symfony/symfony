@@ -45,7 +45,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertTrue($container->getParameter('kernel.http_method_override'));
+        $this->assertFalse($container->getParameter('kernel.http_method_override'));
     }
 
     public function testEsi()

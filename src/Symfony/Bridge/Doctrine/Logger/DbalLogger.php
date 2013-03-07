@@ -46,6 +46,15 @@ class DbalLogger implements SQLLogger
             $this->stopwatch->start('doctrine', 'doctrine');
         }
 
+        if (is_array($types)) {
+            // Blob data must not be logged as they can be very huge and break formatters.
+            foreach ($types as $index => $type) {
+                if ('blob' === $type) {
+                    $params[$index] = '';
+                }
+            }
+        }
+
         if (null !== $this->logger) {
             $this->log($sql, null === $params ? array() : $params);
         }

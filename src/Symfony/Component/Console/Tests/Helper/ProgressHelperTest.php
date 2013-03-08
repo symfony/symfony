@@ -74,6 +74,27 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->generateOutput('  0/50 [>---------------------------]   0%').$this->generateOutput('  1/50 [>---------------------------]   2%').$this->generateOutput('  2/50 [=>--------------------------]   4%'), stream_get_contents($output->getStream()));
     }
 
+    public function testOverwriteWithShorterLine()
+    {
+        $progress = new ProgressHelper();
+        $progress->setFormat(' %current%/%max% [%bar%] %percent%%');
+        $progress->start($output = $this->getOutputStream(), 50);
+        $progress->display();
+        $progress->advance();
+
+        // set shorter format
+        $progress->setFormat(' %current%/%max% [%bar%]');
+        $progress->advance();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput('  0/50 [>---------------------------]   0%') .
+            $this->generateOutput('  1/50 [>---------------------------]   2%') .
+            $this->generateOutput('  2/50 [=>--------------------------]     '),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     protected function getOutputStream()
     {
         return new StreamOutput(fopen('php://memory', 'r+', false));
@@ -86,10 +107,10 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
         $expectedout = $expected;
 
         if ($this->lastMessagesLength !== null) {
-            $expectedout = str_repeat("\x20", $this->lastMessagesLength)."\x0D".$expected;
+            $expectedout = str_pad($expected, $this->lastMessagesLength, "\x20", STR_PAD_RIGHT);
         }
 
-        $this->lastMessagesLength = strlen($expected);
+        $this->lastMessagesLength = strlen($expectedout);
 
         return "\x0D".$expectedout;
     }

@@ -384,21 +384,22 @@ class ProgressHelper extends Helper
      * Overwrites a previous message to the output.
      *
      * @param OutputInterface $output   An Output instance
-     * @param string|array    $messages The message as an array of lines or a single string
+     * @param string          $messages The message
      */
-    private function overwrite(OutputInterface $output, $messages)
+    private function overwrite(OutputInterface $output, $message)
     {
+        $length = strlen($message);
+
+        // append whitespace to match the last line's length
+        if (($this->lastMessagesLength !== null) && ($this->lastMessagesLength > $length)) {
+            $message = str_pad($message, $this->lastMessagesLength, "\x20", STR_PAD_RIGHT);
+        }
+
         // carriage return
         $output->write("\x0D");
-        if ($this->lastMessagesLength!==null) {
-            // clear the line with the length of the last message
-            $output->write(str_repeat("\x20", $this->lastMessagesLength));
-            // carriage return
-            $output->write("\x0D");
-        }
-        $output->write($messages);
+        $output->write($message);
 
-        $this->lastMessagesLength=strlen($messages);
+        $this->lastMessagesLength = strlen($message);
     }
 
     /**

@@ -12,9 +12,9 @@
 namespace Symfony\Component\Translation\Tests\Dumper;
 
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\Dumper\XliffFileDumper2;
+use Symfony\Component\Translation\Dumper\XliffFileWithResnameDumper;
 
-class XliffFileDumper2Test extends \PHPUnit_Framework_TestCase
+class XliffFileWithResnameDumperTest extends \PHPUnit_Framework_TestCase
 {
     public function testDump()
     {
@@ -22,7 +22,7 @@ class XliffFileDumper2Test extends \PHPUnit_Framework_TestCase
         $catalogue->add(array('foo' => 'bar', 'key' => ''));
 
         $tempDir = sys_get_temp_dir();
-        $dumper = new XliffFileDumper2();
+        $dumper = new XliffFileWithResnameDumper();
         $dumper->dump($catalogue, array('path' => $tempDir));
 
         $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resname-clean.xlf'), file_get_contents($tempDir.'/messages.en.xlf'));

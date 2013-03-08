@@ -16,7 +16,7 @@ namespace Symfony\Component\Translation\Dumper;
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
-class XliffFileDumper2 extends XliffFileDumper
+class XliffFileWithResnameDumper extends XliffFileDumper
 {
     /**
      * {@inheritdoc}

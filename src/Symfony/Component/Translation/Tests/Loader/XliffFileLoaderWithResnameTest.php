@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
-use Symfony\Component\Translation\Loader\XliffFileLoader2;
+use Symfony\Component\Translation\Loader\XliffFileWithResnameLoader;
 
-class XliffFileLoader2Test extends XliffFileLoaderTest
+class XliffFileWithResnameLoaderTest extends XliffFileLoaderTest
 {
     public function testLoadWithResname()
     {
@@ -25,6 +25,6 @@ class XliffFileLoader2Test extends XliffFileLoaderTest
 
     protected function createLoader()
     {
-        return new XliffFileLoader2();
+        return new XliffFileWithResnameLoader();
     }
 }

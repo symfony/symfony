@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\SimpleXMLElement;
  *
  * @api
  */
-class XliffFileLoader2 extends XliffFileLoader
+class XliffFileWithResnameLoader extends XliffFileLoader
 {
     /**
      * {@inheritdoc}

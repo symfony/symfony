@@ -707,6 +707,11 @@ class FinderTest extends Iterator\RealIteratorTestCase
                     'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat.copy',
                 )
             ),
+            array('/^with space\//', 'foobar',
+                array(
+                    'with space'.DIRECTORY_SEPARATOR.'foo.txt',
+                )
+            ),
         );
 
         return $this->buildTestData($tests);

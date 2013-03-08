@@ -260,7 +260,7 @@ class YamlDumper extends Dumper
         foreach ($parameters as $key => $value) {
             if (is_array($value)) {
                 $value = $this->prepareParameters($value, $escape);
-            } elseif ($value instanceof Reference) {
+            } elseif ($value instanceof Reference || is_string($value) && 0 === strpos($value, '@')) {
                 $value = '@'.$value;
             }
 

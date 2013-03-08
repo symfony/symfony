@@ -104,9 +104,4 @@ class DebugClassLoader
             return true;
         }
     }
-
-    public function getClassFinder()
-    {
-        return $this->classFinder;
-    }
 }

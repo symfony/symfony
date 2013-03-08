@@ -37,7 +37,11 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
         $functions = spl_autoload_functions();
         foreach ($functions as $function) {
             if (is_array($function) && $function[0] instanceof DebugClassLoader) {
-                $this->assertNotInstanceOf('Symfony\Component\ClassLoader\DebugClassLoader', $function[0]->getClassFinder());
+                $reflClass = new \ReflectionClass($function[0]);
+                $reflProp = $reflClass->getProperty('classFinder');
+                $reflProp->setAccessible(true);
+
+                $this->assertNotInstanceOf('Symfony\Component\ClassLoader\DebugClassLoader', $reflProp->getValue($function[0]));
                 return;
             }
         }

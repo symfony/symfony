@@ -95,6 +95,47 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testSetCurrentProgress()
+    {
+        $progress = new ProgressHelper();
+        $progress->start($output = $this->getOutputStream(), 50);
+        $progress->display();
+        $progress->advance();
+        $progress->setCurrent(15);
+        $progress->setCurrent(25);
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput('  0/50 [>---------------------------]   0%') .
+            $this->generateOutput('  1/50 [>---------------------------]   2%') .
+            $this->generateOutput(' 15/50 [========>-------------------]  30%') .
+            $this->generateOutput(' 25/50 [==============>-------------]  50%'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    /**
+     * @expectedException        \LogicException
+     * @expectedExceptionMessage You must start the progress bar
+     */
+    public function testSetCurrentBeforeStarting()
+    {
+        $progress = new ProgressHelper();
+        $progress->setCurrent(15);
+    }
+
+    /**
+     * @expectedException        \LogicException
+     * @expectedExceptionMessage You can't regress the progress bar
+     */
+    public function testRegressProgress()
+    {
+        $progress = new ProgressHelper();
+        $progress->start($output = $this->getOutputStream(), 50);
+        $progress->setCurrent(15);
+        $progress->setCurrent(10);
+    }
+
     protected function getOutputStream()
     {
         return new StreamOutput(fopen('php://memory', 'r+', false));

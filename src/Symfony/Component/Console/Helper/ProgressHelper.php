@@ -237,6 +237,36 @@ class ProgressHelper extends Helper
     }
 
     /**
+     * Sets the current progress.
+     *
+     * @param integer $current The current progress
+     * @param Boolean $redraw  Whether to redraw or not
+     *
+     * @throws \LogicException
+     */
+    public function setCurrent($current, $redraw = false)
+    {
+        if (null === $this->startTime) {
+            throw new \LogicException('You must start the progress bar before calling setCurrent().');
+        }
+
+        $current = (int) $current;
+
+        if ($current < $this->current) {
+            throw new \LogicException('You can\'t regress the progress bar');
+        }
+
+        if ($this->current === 0) {
+            $redraw = true;
+        }
+
+        $this->current = $current;
+        if ($redraw || $this->current % $this->redrawFreq === 0) {
+            $this->display();
+        }
+    }
+
+    /**
      * Outputs the current progress string.
      *
      * @param Boolean $finish Forces the end result

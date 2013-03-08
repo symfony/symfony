@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Loader;
 
+use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Config\Resource\FileResource;
 
@@ -39,10 +40,12 @@ class XliffFileLoader implements LoaderInterface
 
         $catalogue = new MessageCatalogue($locale);
         foreach ($xml->xpath('//xliff:trans-unit') as $translation) {
-            if (!isset($translation->source) || !isset($translation->target)) {
+            if (!$this->validateTranslation($translation)) {
                 continue;
             }
-            $catalogue->set((string) $translation->source, (string) $translation->target, $domain);
+
+            list($source, $target) = $this->parseTranslation($translation);
+            $catalogue->set($source, $target, $domain);
         }
         $catalogue->addResource(new FileResource($resource));
 
@@ -50,9 +53,35 @@ class XliffFileLoader implements LoaderInterface
     }
 
     /**
+     * Validates a 'trans-unit' tag.
+     *
+     * @param \SimpleXMLElement $translation
+     *
+     * @return bool
+     */
+    protected function validateTranslation(\SimpleXMLElement $translation)
+    {
+        return isset($translation->source) && isset($translation->target);
+    }
+
+    /**
+     * Parses 'trans-unit' tag element.
+     *
+     * @param \SimpleXMLElement $translation
+     *
+     * @return array An array of 2 elements: the source and the target
+     */
+    protected function parseTranslation(\SimpleXMLElement $translation)
+    {
+        return array((string) $translation->source, (string) $translation->target);
+    }
+
+    /**
      * Validates and parses the given file into a SimpleXMLElement
      *
      * @param string $file
+     *
+     * @throws \RuntimeException
      *
      * @return \SimpleXMLElement
      */
@@ -108,6 +137,8 @@ class XliffFileLoader implements LoaderInterface
 
     /**
      * Returns the XML errors of the internal XML parser
+     *
+     * @param boolean $internalErrors
      *
      * @return array An array of errors
      */

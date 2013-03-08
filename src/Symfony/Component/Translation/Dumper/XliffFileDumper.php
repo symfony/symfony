@@ -27,24 +27,22 @@ class XliffFileDumper extends FileDumper
     {
         $dom = new \DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = true;
+
         $xliff = $dom->appendChild($dom->createElement('xliff'));
         $xliff->setAttribute('version', '1.2');
         $xliff->setAttribute('xmlns', 'urn:oasis:names:tc:xliff:document:1.2');
+
         $xliffFile = $xliff->appendChild($dom->createElement('file'));
         $xliffFile->setAttribute('source-language', $messages->getLocale());
         $xliffFile->setAttribute('datatype', 'plaintext');
         $xliffFile->setAttribute('original', 'file.ext');
-        $xliffBody = $xliffFile->appendChild($dom->createElement('body'));
+
         $id = 1;
+        $xliffBody = $xliffFile->appendChild($dom->createElement('body'));
         foreach ($messages->all($domain) as $source => $target) {
-            $trans = $dom->createElement('trans-unit');
-            $trans->setAttribute('id', $id);
-            $s = $trans->appendChild($dom->createElement('source'));
-            $s->appendChild($dom->createTextNode($source));
-            $t = $trans->appendChild($dom->createElement('target'));
-            $t->appendChild($dom->createTextNode($target));
-            $xliffBody->appendChild($trans);
-            $id++;
+            $translation = $dom->createElement('trans-unit');
+            $this->buildTranslation($translation, $id++, $source, $target);
+            $xliffBody->appendChild($translation);
         }
 
         return $dom->saveXML();
@@ -56,5 +54,22 @@ class XliffFileDumper extends FileDumper
     protected function getExtension()
     {
         return 'xlf';
+    }
+
+    /**
+     * @param \DOMElement $node
+     * @param string      $id
+     * @param string      $source
+     * @param string      $target
+     */
+    protected function buildTranslation(\DOMElement $node, $id, $source, $target)
+    {
+        $node->setAttribute('id', $id);
+
+        $s = $node->appendChild($node->ownerDocument->createElement('source'));
+        $s->appendChild($node->ownerDocument->createTextNode($source));
+
+        $t = $node->appendChild($node->ownerDocument->createElement('target'));
+        $t->appendChild($node->ownerDocument->createTextNode($target));
     }
 }

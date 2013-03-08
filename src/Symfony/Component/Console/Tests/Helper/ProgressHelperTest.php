@@ -136,6 +136,21 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
         $progress->setCurrent(10);
     }
 
+    public function testMultiByteSupport()
+    {
+        if (!function_exists('mb_strlen') || (false === $encoding = mb_detect_encoding('■'))) {
+            $this->markTestIncomplete('The mbstring extension is needed for multi-byte support');
+        }
+
+        $progress = new ProgressHelper();
+        $progress->start($output = $this->getOutputStream());
+        $progress->setBarCharacter('■');
+        $progress->advance(3);
+
+        rewind($output->getStream());
+        $this->assertEquals($this->generateOutput('    3 [■■■>------------------------]'), stream_get_contents($output->getStream()));
+    }
+
     protected function getOutputStream()
     {
         return new StreamOutput(fopen('php://memory', 'r+', false));

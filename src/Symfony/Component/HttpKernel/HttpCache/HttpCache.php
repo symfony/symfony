@@ -448,6 +448,18 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $this->esi->addSurrogateEsiCapability($request);
         }
 
+        // modify the X-Forwarded-For header if needed
+        $forwardedFor = $request->headers->get('X-Forwarded-For');
+        if ($forwardedFor) {
+            $request->headers->set('X-Forwarded-For', $forwardedFor.', '.$request->server->get('REMOTE_ADDR'));
+        } else {
+            $request->headers->set('X-Forwarded-For', $request->server->get('REMOTE_ADDR'));
+        }
+
+        // fix the client IP address by setting it to 127.0.0.1 as HttpCache
+        // is always called from the same process as the backend.
+        $request->server->set('REMOTE_ADDR', '127.0.0.1');
+
         // always a "master" request (as the real master request can be in cache)
         $response = $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, $catch);
         // FIXME: we probably need to also catch exceptions if raw === true

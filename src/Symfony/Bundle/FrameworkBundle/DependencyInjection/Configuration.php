@@ -52,6 +52,10 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('secret')->end()
+                ->scalarNode('http_method_override')
+                    ->info("Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests.")
+                    ->defaultTrue()
+                ->end()
                 ->scalarNode('trust_proxy_headers')->defaultFalse()->end() // @deprecated, to be removed in 2.3
                 ->arrayNode('trusted_proxies')
                     ->beforeNormalization()
@@ -73,6 +77,7 @@ class Configuration implements ConfigurationInterface
 
         $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
+        $this->addFragmentsSection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
@@ -90,7 +95,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('form')
                     ->info('form configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                 ->end()
                 ->arrayNode('csrf_protection')
                     ->canBeDisabled()
@@ -108,7 +113,22 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('esi')
                     ->info('esi configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addFragmentsSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('fragments')
+                    ->info('fragments configuration')
+                    ->canBeEnabled()
+                    ->children()
+                        ->scalarNode('path')->defaultValue('/_fragment')->end()
+                    ->end()
                 ->end()
             ->end()
         ;
@@ -120,7 +140,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('profiler')
                     ->info('profiler configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->children()
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_master_requests')->defaultFalse()->end()
@@ -160,8 +180,10 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('https_port')->defaultValue(443)->end()
                         ->scalarNode('strict_requirements')
                             ->info(
-                                'set to false to disable exceptions when a route is '.
-                                'generated with invalid parameters (and return null instead)'
+                                "set to true to throw an exception when a parameter does not match the requirements\n".
+                                "set to false to disable exceptions when a parameter does not match the requirements (and return null instead)\n".
+                                "set to null to disable parameter checks against requirements\n".
+                                "'true' is the preferred configuration in development mode, while 'false' or 'null' might be preferred in production"
                             )
                             ->defaultTrue()
                         ->end()
@@ -351,7 +373,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('translator')
                     ->info('translator configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->children()
                         ->scalarNode('fallback')->defaultValue('en')->end()
                     ->end()
@@ -366,10 +388,11 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('validation')
                     ->info('validation configuration')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->children()
                         ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
+                        ->scalarNode('translation_domain')->defaultValue('validators')->end()
                     ->end()
                 ->end()
             ->end()

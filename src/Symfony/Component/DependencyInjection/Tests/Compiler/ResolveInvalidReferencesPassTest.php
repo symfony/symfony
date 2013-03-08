@@ -61,6 +61,20 @@ class ResolveInvalidReferencesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $def->getProperties());
     }
 
+    public function testStrictFlagIsPreserved()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar');
+        $def = $container
+            ->register('foo')
+            ->addArgument(new Reference('bar', ContainerInterface::NULL_ON_INVALID_REFERENCE, false))
+        ;
+
+        $this->process($container);
+
+        $this->assertFalse($def->getArgument(0)->isStrict());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveInvalidReferencesPass();

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 
 class StringInputTest extends \PHPUnit_Framework_TestCase
@@ -25,6 +27,22 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
         $p = $r->getProperty('tokens');
         $p->setAccessible(true);
         $this->assertEquals($tokens, $p->getValue($input), $message);
+    }
+
+    public function testInputOptionWithGivenString()
+    {
+        $definition = new InputDefinition(
+            array(new InputOption('foo', null, InputOption::VALUE_REQUIRED))
+        );
+
+        // call to bind
+        $input = new StringInput('--foo=bar');
+        $input->bind($definition);
+        $this->assertEquals('bar', $input->getOption('foo'));
+
+        // definition in constructor
+        $input = new StringInput('--foo=bar', $definition);
+        $this->assertEquals('bar', $input->getOption('foo'));
     }
 
     public function getTokenizeData()

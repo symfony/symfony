@@ -181,9 +181,9 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provideCompileWithHostnameData
+     * @dataProvider provideCompileWithHostData
      */
-    public function testCompileWithHostname($name, $arguments, $prefix, $regex, $variables, $pathVariables, $tokens, $hostnameRegex, $hostnameVariables, $hostnameTokens)
+    public function testCompileWithHost($name, $arguments, $prefix, $regex, $variables, $pathVariables, $tokens, $hostRegex, $hostVariables, $hostTokens)
     {
         $r = new \ReflectionClass('Symfony\\Component\\Routing\\Route');
         $route = $r->newInstanceArgs($arguments);
@@ -194,16 +194,16 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
         $this->assertEquals($pathVariables, $compiled->getPathVariables(), $name.' (path variables)');
         $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
-        $this->assertEquals($hostnameRegex, str_replace(array("\n", ' '), '', $compiled->getHostnameRegex()), $name.' (hostname regex)');
-        $this->assertEquals($hostnameVariables, $compiled->getHostnameVariables(), $name.' (hostname variables)');
-        $this->assertEquals($hostnameTokens, $compiled->getHostnameTokens(), $name.' (hostname tokens)');
+        $this->assertEquals($hostRegex, str_replace(array("\n", ' '), '', $compiled->getHostRegex()), $name.' (host regex)');
+        $this->assertEquals($hostVariables, $compiled->getHostVariables(), $name.' (host variables)');
+        $this->assertEquals($hostTokens, $compiled->getHostTokens(), $name.' (host tokens)');
     }
 
-    public function provideCompileWithHostnameData()
+    public function provideCompileWithHostData()
     {
         return array(
             array(
-                'Route with hostname pattern',
+                'Route with host pattern',
                 array('/hello', array(), array(), array(), 'www.example.com'),
                 '/hello', '#^/hello$#s', array(), array(), array(
                     array('text', '/hello'),
@@ -213,7 +213,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
             array(
-                'Route with hostname pattern and some variables',
+                'Route with host pattern and some variables',
                 array('/hello/{name}', array(), array(), array(), 'www.example.{tld}'),
                 '/hello', '#^/hello/(?P<name>[^/]++)$#s', array('tld', 'name'), array('name'), array(
                     array('variable', '/', '[^/]++', 'name'),
@@ -225,7 +225,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
             array(
-                'Route with variable at beginning of hostname',
+                'Route with variable at beginning of host',
                 array('/hello', array(), array(), array(), '{locale}.example.{tld}'),
                 '/hello', '#^/hello$#s', array('locale', 'tld'), array(), array(
                     array('text', '/hello'),
@@ -237,7 +237,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
             array(
-                'Route with hostname variables that has a default value',
+                'Route with host variables that has a default value',
                 array('/hello', array('locale' => 'a', 'tld' => 'b'), array(), array(), '{locale}.example.{tld}'),
                 '/hello', '#^/hello$#s', array('locale', 'tld'), array(), array(
                     array('text', '/hello'),

@@ -27,23 +27,35 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     private $rootNodeName = 'response';
 
     /**
+     * Construct new XmlEncoder and allow to change the root node element name.
+     *
+     * @param string $rootNodeName
+     */
+    public function __construct($rootNodeName = 'response')
+    {
+        $this->rootNodeName = $rootNodeName;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function encode($data, $format)
+    public function encode($data, $format, array $context = array())
     {
         if ($data instanceof \DOMDocument) {
             return $data->saveXML();
         }
 
+        $xmlRootNodeName = $this->resolveXmlRootName($context);
+
         $this->dom = new \DOMDocument();
         $this->format = $format;
 
         if (null !== $data && !is_scalar($data)) {
-            $root = $this->dom->createElement($this->rootNodeName);
+            $root = $this->dom->createElement($xmlRootNodeName);
             $this->dom->appendChild($root);
-            $this->buildXml($root, $data);
+            $this->buildXml($root, $data, $xmlRootNodeName);
         } else {
-            $this->appendNode($this->dom, $data, $this->rootNodeName);
+            $this->appendNode($this->dom, $data, $xmlRootNodeName);
         }
 
         return $this->dom->saveXML();
@@ -52,7 +64,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * {@inheritdoc}
      */
-    public function decode($data, $format)
+    public function decode($data, $format, array $context = array())
     {
         $internalErrors = libxml_use_internal_errors(true);
         $disableEntities = libxml_disable_entity_loader(true);
@@ -269,12 +281,13 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      *
      * @param DOMNode      $parentNode
      * @param array|object $data       data
+     * @param string       $xmlRootNodeName
      *
      * @return Boolean
      *
      * @throws UnexpectedValueException
      */
-    private function buildXml($parentNode, $data)
+    private function buildXml($parentNode, $data, $xmlRootNodeName)
     {
         $append = true;
 
@@ -310,21 +323,24 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
             return $append;
         }
+
         if (is_object($data)) {
             $data = $this->serializer->normalize($data, $this->format);
             if (null !== $data && !is_scalar($data)) {
-                return $this->buildXml($parentNode, $data);
+                return $this->buildXml($parentNode, $data, $xmlRootNodeName);
             }
+
             // top level data object was normalized into a scalar
             if (!$parentNode->parentNode->parentNode) {
                 $root = $parentNode->parentNode;
                 $root->removeChild($parentNode);
 
-                return $this->appendNode($root, $data, $this->rootNodeName);
+                return $this->appendNode($root, $data, $xmlRootNodeName);
             }
 
             return $this->appendNode($parentNode, $data, 'data');
         }
+
         throw new UnexpectedValueException('An unexpected value could not be serialized: '.var_export($data, true));
     }
 
@@ -376,7 +392,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     private function selectNodeType($node, $val)
     {
         if (is_array($val)) {
-            return $this->buildXml($node, $val);
+            return $this->buildXml($node, $val, null);
         } elseif ($val instanceof \SimpleXMLElement) {
             $child = $this->dom->importNode(dom_import_simplexml($val), true);
             $node->appendChild($child);
@@ -399,4 +415,15 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         return true;
     }
+
+    /**
+     * Get real XML root node name, taking serializer options into account.
+     */
+    private function resolveXmlRootName(array $context = array())
+    {
+        return isset($context['xml_root_node_name'])
+            ? $context['xml_root_node_name']
+            : $this->rootNodeName;
+    }
+
 }

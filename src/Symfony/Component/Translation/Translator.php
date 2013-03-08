@@ -122,14 +122,40 @@ class Translator implements TranslatorInterface
      *
      * @param string|array $locales The fallback locale(s)
      *
+     * @deprecated since 2.3, to be removed in 3.0. Use setFallbackLocales() instead.
+     *
      * @api
      */
     public function setFallbackLocale($locales)
     {
+        $this->setFallbackLocales(is_array($locales) ? $locales : array($locales));
+    }
+
+    /**
+     * Sets the fallback locales.
+     *
+     * @param array $locales The fallback locales
+     *
+     * @api
+     */
+    public function setFallbackLocales(array $locales)
+    {
         // needed as the fallback locales are linked to the already loaded catalogues
         $this->catalogues = array();
 
-        $this->fallbackLocales = is_array($locales) ? $locales : array($locales);
+        $this->fallbackLocales = $locales;
+    }
+
+    /**
+     * Gets the fallback locales.
+     *
+     * @return array $locales The fallback locales
+     *
+     * @api
+     */
+    public function getFallbackLocales()
+    {
+        return $this->fallbackLocales;
     }
 
     /**

@@ -28,7 +28,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'resource', 'type', 'prefix', 'pattern', 'hostname_pattern', 'defaults', 'requirements', 'options',
+        'resource', 'type', 'prefix', 'pattern', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options',
     );
 
     /**
@@ -63,6 +63,15 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($config as $name => $config) {
+            if (isset($config['pattern'])) {
+                if (isset($config['path'])) {
+                    throw new \InvalidArgumentException(sprintf('The file "%s" cannot define both a "path" and a "pattern" attribute. Use only "path".', $path));
+                }
+
+                $config['path'] = $config['pattern'];
+                unset($config['pattern']);
+            }
+
             $this->validate($config, $name, $path);
 
             if (isset($config['resource'])) {
@@ -98,9 +107,11 @@ class YamlFileLoader extends FileLoader
         $defaults = isset($config['defaults']) ? $config['defaults'] : array();
         $requirements = isset($config['requirements']) ? $config['requirements'] : array();
         $options = isset($config['options']) ? $config['options'] : array();
-        $hostnamePattern = isset($config['hostname_pattern']) ? $config['hostname_pattern'] : null;
+        $host = isset($config['host']) ? $config['host'] : '';
+        $schemes = isset($config['schemes']) ? $config['schemes'] : array();
+        $methods = isset($config['methods']) ? $config['methods'] : array();
 
-        $route = new Route($config['pattern'], $defaults, $requirements, $options, $hostnamePattern);
+        $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods);
 
         $collection->add($name, $route);
     }
@@ -120,15 +131,23 @@ class YamlFileLoader extends FileLoader
         $defaults = isset($config['defaults']) ? $config['defaults'] : array();
         $requirements = isset($config['requirements']) ? $config['requirements'] : array();
         $options = isset($config['options']) ? $config['options'] : array();
-        $hostnamePattern = isset($config['hostname_pattern']) ? $config['hostname_pattern'] : null;
+        $host = isset($config['host']) ? $config['host'] : null;
+        $schemes = isset($config['schemes']) ? $config['schemes'] : null;
+        $methods = isset($config['methods']) ? $config['methods'] : null;
 
         $this->setCurrentDir(dirname($path));
 
         $subCollection = $this->import($config['resource'], $type, false, $file);
         /* @var $subCollection RouteCollection */
         $subCollection->addPrefix($prefix);
-        if (null !== $hostnamePattern) {
-            $subCollection->setHostnamePattern($hostnamePattern);
+        if (null !== $host) {
+            $subCollection->setHost($host);
+        }
+        if (null !== $schemes) {
+            $subCollection->setSchemes($schemes);
+        }
+        if (null !== $methods) {
+            $subCollection->setMethods($methods);
         }
         $subCollection->addDefaults($defaults);
         $subCollection->addRequirements($requirements);
@@ -158,9 +177,9 @@ class YamlFileLoader extends FileLoader
                 $path, $name, implode('", "', $extraKeys), implode('", "', self::$availableKeys)
             ));
         }
-        if (isset($config['resource']) && isset($config['pattern'])) {
+        if (isset($config['resource']) && isset($config['path'])) {
             throw new \InvalidArgumentException(sprintf(
-                'The routing file "%s" must not specify both the "resource" key and the "pattern" key for "%s". Choose between an import and a route definition.',
+                'The routing file "%s" must not specify both the "resource" key and the "path" key for "%s". Choose between an import and a route definition.',
                 $path, $name
             ));
         }
@@ -170,9 +189,9 @@ class YamlFileLoader extends FileLoader
                 $name, $path
             ));
         }
-        if (!isset($config['resource']) && !isset($config['pattern'])) {
+        if (!isset($config['resource']) && !isset($config['path'])) {
             throw new \InvalidArgumentException(sprintf(
-                'You must define a "pattern" for the route "%s" in file "%s".',
+                'You must define a "path" for the route "%s" in file "%s".',
                 $name, $path
             ));
         }

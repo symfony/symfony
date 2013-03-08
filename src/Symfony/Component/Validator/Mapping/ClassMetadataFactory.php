@@ -70,20 +70,16 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface, MetadataFac
 
         // Include constraints from the parent class
         if ($parent = $metadata->getReflectionClass()->getParentClass()) {
-            set_error_handler(array($this, 'handleBC'));
-            $metadata->mergeConstraints($this->getClassMetadata($parent->name));
-            restore_error_handler();
+            $metadata->mergeConstraints($this->getMetadataFor($parent->name));
         }
 
         // Include constraints from all implemented interfaces
-        set_error_handler(array($this, 'handleBC'));
         foreach ($metadata->getReflectionClass()->getInterfaces() as $interface) {
             if ('Symfony\Component\Validator\GroupSequenceProviderInterface' === $interface->name) {
                 continue;
             }
-            $metadata->mergeConstraints($this->getClassMetadata($interface->name));
+            $metadata->mergeConstraints($this->getMetadataFor($interface->name));
         }
-        restore_error_handler();
 
         if (null !== $this->loader) {
             $this->loader->loadClassMetadata($metadata);
@@ -125,17 +121,5 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface, MetadataFac
         trigger_error('getClassMetadata() is deprecated since version 2.2 and will be removed in 2.3. Use getMetadataFor() instead.', E_USER_DEPRECATED);
 
         return $this->getMetadataFor($class);
-    }
-
-    /**
-     * @deprecated This is used to keep BC until deprecated methods are removed
-     */
-    public function handleBC($errorNumber, $message, $file, $line, $context)
-    {
-        if ($errorNumber & E_USER_DEPRECATED) {
-            return true;
-        }
-
-        return false;
     }
 }

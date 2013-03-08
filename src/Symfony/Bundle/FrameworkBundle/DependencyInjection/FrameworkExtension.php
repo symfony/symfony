@@ -41,6 +41,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('web.xml');
         $loader->load('services.xml');
+        $loader->load('fragment_renderer.xml');
 
         // A translator must always be registered (as support is included by
         // default in the Form component). If disabled, an identity translator
@@ -65,6 +66,8 @@ class FrameworkExtension extends Extension
             $container->setParameter('kernel.secret', $config['secret']);
         }
 
+        $container->setParameter('kernel.http_method_override', $config['http_method_override']);
+
         $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
 
         // @deprecated, to be removed in 2.3
@@ -80,33 +83,23 @@ class FrameworkExtension extends Extension
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
 
-        if (isset($config['form']) && !empty($config['form']['enabled'])) {
+        if ($this->isConfigEnabled($container, $config['form'])) {
             $this->registerFormConfiguration($config, $container, $loader);
             $config['validation']['enabled'] = true;
-        }
-
-        if (!empty($config['validation']['enabled'])) {
-            $this->registerValidationConfiguration($config['validation'], $container, $loader);
-        }
-
-        if (isset($config['esi'])) {
-            $this->registerEsiConfiguration($config['esi'], $loader);
-        }
-
-        if (isset($config['profiler'])) {
-            $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
-        }
-
-        if (isset($config['router'])) {
-            $this->registerRouterConfiguration($config['router'], $container, $loader);
         }
 
         if (isset($config['templating'])) {
             $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
         }
 
-        if (isset($config['translator'])) {
-            $this->registerTranslatorConfiguration($config['translator'], $container);
+        $this->registerValidationConfiguration($config['validation'], $container, $loader);
+        $this->registerEsiConfiguration($config['esi'], $container, $loader);
+        $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
+        $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
+        $this->registerTranslatorConfiguration($config['translator'], $container);
+
+        if (isset($config['router'])) {
+            $this->registerRouterConfiguration($config['router'], $container, $loader);
         }
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
@@ -156,7 +149,7 @@ class FrameworkExtension extends Extension
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('form.xml');
-        if (isset($config['csrf_protection'])) {
+        if ($this->isConfigEnabled($container, $config['csrf_protection'])) {
             if (!isset($config['session'])) {
                 throw new \LogicException('CSRF protection needs that sessions are enabled.');
             }
@@ -165,22 +158,44 @@ class FrameworkExtension extends Extension
             }
             $loader->load('form_csrf.xml');
 
-            $container->setParameter('form.type_extension.csrf.enabled', $config['csrf_protection']['enabled']);
+            $container->setParameter('form.type_extension.csrf.enabled', true);
             $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
+        } else {
+            $container->setParameter('form.type_extension.csrf.enabled', false);
         }
     }
 
     /**
      * Loads the ESI configuration.
      *
-     * @param array         $config An ESI configuration array
-     * @param XmlFileLoader $loader An XmlFileLoader instance
+     * @param array            $config    An ESI configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
-    private function registerEsiConfiguration(array $config, XmlFileLoader $loader)
+    private function registerEsiConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!empty($config['enabled'])) {
-            $loader->load('esi.xml');
+        if (!$this->isConfigEnabled($container, $config)) {
+            return;
         }
+
+        $loader->load('esi.xml');
+    }
+
+    /**
+     * Loads the fragments configuration.
+     *
+     * @param array            $config    A fragments configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerFragmentsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!$this->isConfigEnabled($container, $config)) {
+            return;
+        }
+
+        $loader->load('fragment_listener.xml');
+        $container->setParameter('fragment.path', $config['path']);
     }
 
     /**
@@ -239,7 +254,7 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (!$config['enabled']) {
+        if (!$this->isConfigEnabled($container, $config)) {
             $container->getDefinition('profiler')->addMethodCall('disable', array());
         }
     }
@@ -256,8 +271,8 @@ class FrameworkExtension extends Extension
         $loader->load('routing.xml');
 
         $container->setParameter('router.resource', $config['resource']);
+        $container->setParameter('router.cache_class_prefix', $container->getParameter('kernel.name').ucfirst($container->getParameter('kernel.environment')));
         $router = $container->findDefinition('router.default');
-
         $argument = $router->getArgument(2);
         $argument['strict_requirements'] = $config['strict_requirements'];
         if (isset($config['type'])) {
@@ -352,7 +367,7 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('templating.helper.code.file_link_format', isset($links[$ide]) ? $links[$ide] : $ide);
         $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
-        $container->setParameter('templating.hinclude.default_template', $config['hinclude_default_template']);
+        $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('templating_debug.xml');
@@ -429,7 +444,9 @@ class FrameworkExtension extends Extension
         if (1 === count($engines)) {
             $container->setAlias('templating', (string) reset($engines));
         } else {
-            $container->getDefinition('templating.engine.delegating')->replaceArgument(1, $engines);
+            foreach ($engines as $engine) {
+                $container->getDefinition('templating.engine.delegating')->addMethodCall('addEngine', array($engine));
+            }
             $container->setAlias('templating', 'templating.engine.delegating');
         }
     }
@@ -509,56 +526,63 @@ class FrameworkExtension extends Extension
      */
     private function registerTranslatorConfiguration(array $config, ContainerBuilder $container)
     {
-        if (!empty($config['enabled'])) {
-            // Use the "real" translator instead of the identity default
-            $container->setAlias('translator', 'translator.default');
-            $translator = $container->findDefinition('translator.default');
-            $translator->addMethodCall('setFallbackLocale', array($config['fallback']));
+        if (!$this->isConfigEnabled($container, $config)) {
+            return;
+        }
 
-            // Discover translation directories
-            $dirs = array();
-            if (class_exists('Symfony\Component\Validator\Validator')) {
-                $r = new \ReflectionClass('Symfony\Component\Validator\Validator');
+        // Use the "real" translator instead of the identity default
+        $container->setAlias('translator', 'translator.default');
+        $translator = $container->findDefinition('translator.default');
+        $translator->addMethodCall('setFallbackLocales', array($config['fallback']));
 
-                $dirs[] = dirname($r->getFilename()).'/Resources/translations';
-            }
-            if (class_exists('Symfony\Component\Form\Form')) {
-                $r = new \ReflectionClass('Symfony\Component\Form\Form');
+        // Discover translation directories
+        $dirs = array();
+        if (class_exists('Symfony\Component\Validator\Validator')) {
+            $r = new \ReflectionClass('Symfony\Component\Validator\Validator');
 
-                $dirs[] = dirname($r->getFilename()).'/Resources/translations';
-            }
-            $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
-            foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
-                $reflection = new \ReflectionClass($class);
-                if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/translations')) {
-                    $dirs[] = $dir;
-                }
-                if (is_dir($dir = sprintf($overridePath, $bundle))) {
-                    $dirs[] = $dir;
-                }
-            }
-            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/translations')) {
+            $dirs[] = dirname($r->getFilename()).'/Resources/translations';
+        }
+        if (class_exists('Symfony\Component\Form\Form')) {
+            $r = new \ReflectionClass('Symfony\Component\Form\Form');
+
+            $dirs[] = dirname($r->getFilename()).'/Resources/translations';
+        }
+        if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
+            $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
+
+            $dirs[] = dirname($r->getFilename()).'/../../Resources/translations';
+        }
+        $overridePath = $container->getParameter('kernel.root_dir').'/Resources/%s/translations';
+        foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
+            $reflection = new \ReflectionClass($class);
+            if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/translations')) {
                 $dirs[] = $dir;
             }
+            if (is_dir($dir = sprintf($overridePath, $bundle))) {
+                $dirs[] = $dir;
+            }
+        }
+        if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/translations')) {
+            $dirs[] = $dir;
+        }
 
-            // Register translation resources
-            if ($dirs) {
-                foreach ($dirs as $dir) {
-                    $container->addResource(new DirectoryResource($dir));
-                }
-                $finder = Finder::create()
-                    ->files()
-                    ->filter(function (\SplFileInfo $file) {
-                        return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
-                    })
-                    ->in($dirs)
-                ;
+        // Register translation resources
+        if ($dirs) {
+            foreach ($dirs as $dir) {
+                $container->addResource(new DirectoryResource($dir));
+            }
+            $finder = Finder::create()
+                ->files()
+                ->filter(function (\SplFileInfo $file) {
+                    return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
+                })
+                ->in($dirs)
+            ;
 
-                foreach ($finder as $file) {
-                    // filename is domain.locale.format
-                    list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
-                    $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
-                }
+            foreach ($finder as $file) {
+                // filename is domain.locale.format
+                list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
+                $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
             }
         }
     }
@@ -572,8 +596,13 @@ class FrameworkExtension extends Extension
      */
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        if (!$this->isConfigEnabled($container, $config)) {
+            return;
+        }
+
         $loader->load('validator.xml');
 
+        $container->setParameter('validator.translation_domain', $config['translation_domain']);
         $container->setParameter('validator.mapping.loader.xml_files_loader.mapping_files', $this->getValidatorXmlMappingFiles($container));
         $container->setParameter('validator.mapping.loader.yaml_files_loader.mapping_files', $this->getValidatorYamlMappingFiles($container));
 

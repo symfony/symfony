@@ -52,7 +52,11 @@ class Shell
     {
         if (self::TYPE_WINDOWS === $this->type) {
             // todo: find a way to test if windows command exists
-            return true;
+            return false;
+        }
+
+        if (!function_exists('exec')) {
+            return false;
         }
 
         // todo: find a better way (command could not be available)

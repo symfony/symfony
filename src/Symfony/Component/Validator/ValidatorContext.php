@@ -89,7 +89,8 @@ class ValidatorContext implements ValidatorContextInterface
 
         return new Validator(
             $this->metadataFactory,
-            $this->constraintValidatorFactory
+            $this->constraintValidatorFactory,
+            new DefaultTranslator()
         );
     }
 

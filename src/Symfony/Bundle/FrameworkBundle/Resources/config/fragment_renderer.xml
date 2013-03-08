@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="fragment.handler.class">Symfony\Component\HttpKernel\Fragment\FragmentHandler</parameter>
+        <parameter key="fragment.renderer.inline.class">Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
+        <parameter key="fragment.renderer.hinclude.class">Symfony\Bundle\FrameworkBundle\Fragment\ContainerAwareHIncludeFragmentRenderer</parameter>
+        <parameter key="fragment.renderer.hinclude.global_template"></parameter>
+        <parameter key="fragment.path">/_fragment</parameter>
+    </parameters>
+
+    <services>
+        <service id="fragment.handler" class="%fragment.handler.class%">
+            <tag name="kernel.event_subscriber" />
+            <argument type="collection" />
+            <argument>%kernel.debug%</argument>
+        </service>
+
+        <service id="fragment.renderer.inline" class="%fragment.renderer.inline.class%">
+            <tag name="kernel.fragment_renderer" />
+            <argument type="service" id="http_kernel" />
+            <call method="setFragmentPath"><argument>%fragment.path%</argument></call>
+        </service>
+
+        <service id="fragment.renderer.hinclude" class="%fragment.renderer.hinclude.class%">
+            <tag name="kernel.fragment_renderer" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="uri_signer" />
+            <argument>%fragment.renderer.hinclude.global_template%</argument>
+            <call method="setFragmentPath"><argument>%fragment.path%</argument></call>
+        </service>
+    </services>
+</container>

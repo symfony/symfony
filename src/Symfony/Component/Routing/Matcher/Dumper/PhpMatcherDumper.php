@@ -109,19 +109,19 @@ EOF;
      */
     private function compileRoutes(RouteCollection $routes, $supportsRedirections)
     {
-        $fetchedHostname = false;
+        $fetchedHost = false;
 
-        $groups = $this->groupRoutesByHostnameRegex($routes);
+        $groups = $this->groupRoutesByHostRegex($routes);
         $code = '';
 
         foreach ($groups as $collection) {
-            if (null !== $regex = $collection->getAttribute('hostname_regex')) {
-                if (!$fetchedHostname) {
-                    $code .= "        \$hostname = \$this->context->getHost();\n\n";
-                    $fetchedHostname = true;
+            if (null !== $regex = $collection->getAttribute('host_regex')) {
+                if (!$fetchedHost) {
+                    $code .= "        \$host = \$this->context->getHost();\n\n";
+                    $fetchedHost = true;
                 }
 
-                $code .= sprintf("        if (preg_match(%s, \$hostname, \$hostnameMatches)) {\n", var_export($regex, true));
+                $code .= sprintf("        if (preg_match(%s, \$host, \$hostMatches)) {\n", var_export($regex, true));
             }
 
             $tree = $this->buildPrefixTree($collection);
@@ -198,7 +198,7 @@ EOF;
         $conditions = array();
         $hasTrailingSlash = false;
         $matches = false;
-        $hostnameMatches = false;
+        $hostMatches = false;
         $methods = array();
 
         if ($req = $route->getRequirement('_method')) {
@@ -233,8 +233,8 @@ EOF;
             $matches = true;
         }
 
-        if ($compiledRoute->getHostnameVariables()) {
-            $hostnameMatches = true;
+        if ($compiledRoute->getHostVariables()) {
+            $hostMatches = true;
         }
 
         $conditions = implode(' && ', $conditions);
@@ -295,10 +295,10 @@ EOF;
         }
 
         // optimize parameters array
-        if ($matches || $hostnameMatches) {
+        if ($matches || $hostMatches) {
             $vars = array();
-            if ($hostnameMatches) {
-                $vars[] = '$hostnameMatches';
+            if ($hostMatches) {
+                $vars[] = '$hostMatches';
             }
             if ($matches) {
                 $vars[] = '$matches';
@@ -323,27 +323,27 @@ EOF;
     }
 
     /**
-     * Groups consecutive routes having the same hostname regex.
+     * Groups consecutive routes having the same host regex.
      *
-     * The result is a collection of collections of routes having the same hostname regex.
+     * The result is a collection of collections of routes having the same host regex.
      *
      * @param RouteCollection $routes A flat RouteCollection
      *
-     * @return DumperCollection A collection with routes grouped by hostname regex in sub-collections
+     * @return DumperCollection A collection with routes grouped by host regex in sub-collections
      */
-    private function groupRoutesByHostnameRegex(RouteCollection $routes)
+    private function groupRoutesByHostRegex(RouteCollection $routes)
     {
         $groups = new DumperCollection();
 
         $currentGroup = new DumperCollection();
-        $currentGroup->setAttribute('hostname_regex', null);
+        $currentGroup->setAttribute('host_regex', null);
         $groups->add($currentGroup);
 
         foreach ($routes as $name => $route) {
-            $hostnameRegex = $route->compile()->getHostnameRegex();
-            if ($currentGroup->getAttribute('hostname_regex') !== $hostnameRegex) {
+            $hostRegex = $route->compile()->getHostRegex();
+            if ($currentGroup->getAttribute('host_regex') !== $hostRegex) {
                 $currentGroup = new DumperCollection();
-                $currentGroup->setAttribute('hostname_regex', $hostnameRegex);
+                $currentGroup->setAttribute('host_regex', $hostRegex);
                 $groups->add($currentGroup);
             }
             $currentGroup->add(new DumperRoute($name, $route));

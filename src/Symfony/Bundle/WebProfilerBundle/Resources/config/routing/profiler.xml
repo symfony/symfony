@@ -4,6 +4,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
+    <route id="_profiler_home" pattern="/">
+        <default key="_controller">web_profiler.controller.profiler:homeAction</default>
+    </route>
+
     <route id="_profiler_search" pattern="/search">
         <default key="_controller">web_profiler.controller.profiler:searchAction</default>
     </route>
@@ -50,16 +54,6 @@
 
     <route id="_profiler_exception_css" pattern="/{token}/exception.css">
         <default key="_controller">web_profiler.controller.exception:cssAction</default>
-    </route>
-
-    <route id="_profiler_redirect" pattern="/">
-        <default key="_controller">FrameworkBundle:Redirect:redirect</default>
-        <default key="route">_profiler_search_results</default>
-        <default key="token">empty</default>
-        <default key="ip"></default>
-        <default key="url"></default>
-        <default key="method"></default>
-        <default key="limit">10</default>
     </route>
 
 </routes>

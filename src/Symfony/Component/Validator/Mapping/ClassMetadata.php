@@ -111,7 +111,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
 
             foreach ($this->getConstrainedProperties() as $property) {
                 foreach ($this->getMemberMetadatas($property) as $member) {
-                    $member->accept($visitor, $member->getValue($value), $group, $pathPrefix.$property, $propagatedGroup);
+                    $member->accept($visitor, $member->getPropertyValue($value), $group, $pathPrefix.$property, $propagatedGroup);
                 }
             }
         }
@@ -299,6 +299,14 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     public function getMemberMetadatas($property)
     {
         return $this->members[$property];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasPropertyMetadata($property)
+    {
+        return array_key_exists($property, $this->members);
     }
 
     /**

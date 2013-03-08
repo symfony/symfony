@@ -65,6 +65,9 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function getParent()
     {
+        trigger_error('getParent() is deprecated since version 2.2 and will be removed in 2.3. There is no substitution ' .
+            'because RouteCollection is not tree structure anymore.', E_USER_DEPRECATED);
+
         return $this->parent;
     }
 
@@ -77,6 +80,9 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function getRoot()
     {
+        trigger_error('getRoot() is deprecated since version 2.2 and will be removed in 2.3. There is no substitution ' .
+            'because RouteCollection is not tree structure anymore.', E_USER_DEPRECATED);
+
         $parent = $this;
         while ($parent->getParent()) {
             $parent = $parent->getParent();
@@ -157,7 +163,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
     public function remove($name)
     {
         // just for BC
-        $root = $this->getRoot();
+        $root = $this;
+        while ($root->parent) {
+            $root = $root->parent;
+        }
 
         foreach ((array) $name as $n) {
             unset($root->routes[$n]);
@@ -184,6 +193,8 @@ class RouteCollection implements \IteratorAggregate, \Countable
         // this is to keep BC
         $numargs = func_num_args();
         if ($numargs > 1) {
+            trigger_error('addCollection() should only be used with a single parameter. The params $prefix, $defaults, $requirements and $options ' .
+                'are deprecated since version 2.2 and will be removed in 2.3. Use addPrefix() and addOptions() instead.', E_USER_DEPRECATED);
             $collection->addPrefix($this->prefix . func_get_arg(1));
             if ($numargs > 2) {
                 $collection->addDefaults(func_get_arg(2));
@@ -232,10 +243,16 @@ class RouteCollection implements \IteratorAggregate, \Countable
         $this->prefix = '/' . $prefix . $this->prefix;
 
         // this is to keep BC
-        $options = func_num_args() > 3 ? func_get_arg(3) : array();
+        if (func_num_args() > 3) {
+            trigger_error('The fourth parameter ($options) of addPrefix() is deprecated since version 2.2 and will be removed in 2.3. ' .
+                'Use addOptions() instead.', E_USER_DEPRECATED);
+            $options = func_get_arg(3);
+        } else {
+            $options = array();
+        }
 
         foreach ($this->routes as $route) {
-            $route->setPattern('/' . $prefix . $route->getPattern());
+            $route->setPath('/' . $prefix . $route->getPath());
             $route->addDefaults($defaults);
             $route->addRequirements($requirements);
             $route->addOptions($options);
@@ -251,20 +268,23 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function getPrefix()
     {
+        trigger_error('getPrefix() is deprecated since version 2.2 and will be removed in 2.3. The method suggests that ' .
+            'all routes in the collection would have this prefix, which is not necessarily true.', E_USER_DEPRECATED);
+
         return $this->prefix;
     }
 
     /**
-     * Sets the hostname pattern on all routes.
+     * Sets the host pattern on all routes.
      *
      * @param string $pattern      The pattern
      * @param array  $defaults     An array of default values
      * @param array  $requirements An array of requirements
      */
-    public function setHostnamePattern($pattern, array $defaults = array(), array $requirements = array())
+    public function setHost($pattern, array $defaults = array(), array $requirements = array())
     {
         foreach ($this->routes as $route) {
-            $route->setHostnamePattern($pattern);
+            $route->setHost($pattern);
             $route->addDefaults($defaults);
             $route->addRequirements($requirements);
         }
@@ -315,6 +335,30 @@ class RouteCollection implements \IteratorAggregate, \Countable
             foreach ($this->routes as $route) {
                 $route->addOptions($options);
             }
+        }
+    }
+
+    /**
+     * Sets the schemes (e.g. 'https') all child routes are restricted to.
+     *
+     * @param string|array $schemes The scheme or an array of schemes
+     */
+    public function setSchemes($schemes)
+    {
+        foreach ($this->routes as $route) {
+            $route->setSchemes($schemes);
+        }
+    }
+
+    /**
+     * Sets the HTTP methods (e.g. 'POST') all child routes are restricted to.
+     *
+     * @param string|array $methods The method or an array of methods
+     */
+    public function setMethods($methods)
+    {
+        foreach ($this->routes as $route) {
+            $route->setMethods($methods);
         }
     }
 

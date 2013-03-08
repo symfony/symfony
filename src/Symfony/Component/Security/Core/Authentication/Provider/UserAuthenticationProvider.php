@@ -71,6 +71,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             if ($this->hideUserNotFoundExceptions) {
                 throw new BadCredentialsException('Bad credentials', 0, $notFound);
             }
+            $notFound->setUsername($username);
 
             throw $notFound;
         }

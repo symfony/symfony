@@ -28,9 +28,10 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  * The @Route annotation can be set on the class (for global parameters),
  * and on each method.
  *
- * The @Route annotation main value is the route pattern. The annotation also
- * recognizes three parameters: requirements, options, and name. The name parameter
- * is mandatory. Here is an example of how you should be able to use it:
+ * The @Route annotation main value is the route path. The annotation also
+ * recognizes several parameters: requirements, options, defaults, schemes,
+ * methods, host, and name. The name parameter is mandatory.
+ * Here is an example of how you should be able to use it:
  *
  *     /**
  *      * @Route("/Blog")
@@ -108,11 +109,13 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         $globals = array(
-            'pattern'          => '',
-            'requirements'     => array(),
-            'options'          => array(),
-            'defaults'         => array(),
-            'hostname_pattern' => '',
+            'path'         => '',
+            'requirements' => array(),
+            'options'      => array(),
+            'defaults'     => array(),
+            'schemes'      => array(),
+            'methods'      => array(),
+            'host'         => '',
         );
 
         $class = new \ReflectionClass($class);
@@ -121,8 +124,11 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
-            if (null !== $annot->getPattern()) {
-                $globals['pattern'] = $annot->getPattern();
+            // for BC reasons
+            if (null !== $annot->getPath()) {
+                $globals['path'] = $annot->getPath();
+            } elseif (null !== $annot->getPattern()) {
+                $globals['path'] = $annot->getPattern();
             }
 
             if (null !== $annot->getRequirements()) {
@@ -137,8 +143,16 @@ abstract class AnnotationClassLoader implements LoaderInterface
                 $globals['defaults'] = $annot->getDefaults();
             }
 
-            if (null !== $annot->getHostnamePattern()) {
-                $globals['hostname_pattern'] = $annot->getHostnamePattern();
+            if (null !== $annot->getSchemes()) {
+                $globals['schemes'] = $annot->getSchemes();
+            }
+
+            if (null !== $annot->getMethods()) {
+                $globals['methods'] = $annot->getMethods();
+            }
+
+            if (null !== $annot->getHost()) {
+                $globals['host'] = $annot->getHost();
             }
         }
 
@@ -172,13 +186,15 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
         $requirements = array_replace($globals['requirements'], $annot->getRequirements());
         $options = array_replace($globals['options'], $annot->getOptions());
+        $schemes = array_replace($globals['schemes'], $annot->getSchemes());
+        $methods = array_replace($globals['methods'], $annot->getMethods());
 
-        $hostnamePattern = $annot->getHostnamePattern();
-        if (null === $hostnamePattern) {
-            $hostnamePattern = $globals['hostname_pattern'];
+        $host = $annot->getHost();
+        if (null === $host) {
+            $host = $globals['host'];
         }
 
-        $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options, $hostnamePattern);
+        $route = new Route($globals['path'].$annot->getPath(), $defaults, $requirements, $options, $host, $schemes, $methods);
 
         $this->configureRoute($route, $class, $method, $annot);
 

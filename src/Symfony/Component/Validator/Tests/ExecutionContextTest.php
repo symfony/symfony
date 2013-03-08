@@ -19,11 +19,14 @@ use Symfony\Component\Validator\ExecutionContext;
 
 class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 {
+    const TRANS_DOMAIN = 'trans_domain';
+
     private $visitor;
     private $violations;
     private $metadata;
     private $metadataFactory;
     private $globalContext;
+    private $translator;
 
     /**
      * @var ExecutionContext
@@ -51,13 +54,23 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         $this->globalContext->expects($this->any())
             ->method('getMetadataFactory')
             ->will($this->returnValue($this->metadataFactory));
-        $this->context = new ExecutionContext($this->globalContext, $this->metadata, 'currentValue', 'Group', 'foo.bar');
+        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->context = new ExecutionContext($this->globalContext, $this->translator, self::TRANS_DOMAIN, $this->metadata, 'currentValue', 'Group', 'foo.bar');
     }
 
     protected function tearDown()
     {
         $this->globalContext = null;
         $this->context = null;
+    }
+
+    public function deprecationErrorHandler($errorNumber, $message, $file, $line, $context)
+    {
+        if ($errorNumber & E_USER_DEPRECATED) {
+            return true;
+        }
+
+        return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
     }
 
     public function testInit()
@@ -72,30 +85,36 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('GRAPHWALKER'));
 
         // BC
+        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->assertNull($this->context->getCurrentClass());
         $this->assertNull($this->context->getCurrentProperty());
         $this->assertSame('GRAPHWALKER', $this->context->getGraphWalker());
         $this->assertSame($this->metadataFactory, $this->context->getMetadataFactory());
+        restore_error_handler();
     }
 
     public function testInitWithClassMetadata()
     {
         // BC
+        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->metadata = new ClassMetadata(__NAMESPACE__ . '\ExecutionContextTest_TestClass');
-        $this->context = new ExecutionContext($this->globalContext, $this->metadata, 'currentValue', 'Group', 'foo.bar');
+        $this->context = new ExecutionContext($this->globalContext, $this->translator, self::TRANS_DOMAIN, $this->metadata, 'currentValue', 'Group', 'foo.bar');
 
         $this->assertSame(__NAMESPACE__ . '\ExecutionContextTest_TestClass', $this->context->getCurrentClass());
         $this->assertNull($this->context->getCurrentProperty());
+        restore_error_handler();
     }
 
     public function testInitWithPropertyMetadata()
     {
         // BC
+        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->metadata = new PropertyMetadata(__NAMESPACE__ . '\ExecutionContextTest_TestClass', 'myProperty');
-        $this->context = new ExecutionContext($this->globalContext, $this->metadata, 'currentValue', 'Group', 'foo.bar');
+        $this->context = new ExecutionContext($this->globalContext, $this->translator, self::TRANS_DOMAIN, $this->metadata, 'currentValue', 'Group', 'foo.bar');
 
         $this->assertSame(__NAMESPACE__ . '\ExecutionContextTest_TestClass', $this->context->getCurrentClass());
         $this->assertSame('myProperty', $this->context->getCurrentProperty());
+        restore_error_handler();
     }
 
     public function testClone()
@@ -111,10 +130,16 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     public function testAddViolation()
     {
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('Error', array('foo' => 'bar'))
+            ->will($this->returnValue('Translated error'));
+
         $this->context->addViolation('Error', array('foo' => 'bar'), 'invalid');
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
+                'Translated error',
                 'Error',
                 array('foo' => 'bar'),
                 'Root',
@@ -126,10 +151,16 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     public function testAddViolationUsesPreconfiguredValueIfNotPassed()
     {
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('Error', array())
+            ->will($this->returnValue('Translated error'));
+
         $this->context->addViolation('Error');
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
+                'Translated error',
                 'Error',
                 array(),
                 'Root',
@@ -141,21 +172,32 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     public function testAddViolationUsesPassedNullValue()
     {
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('Error', array('foo1' => 'bar1'))
+            ->will($this->returnValue('Translated error'));
+        $this->translator->expects($this->once())
+            ->method('transChoice')
+            ->with('Choice error', 1, array('foo2' => 'bar2'))
+            ->will($this->returnValue('Translated choice error'));
+
         // passed null value should override preconfigured value "invalid"
-        $this->context->addViolation('Error', array('foo' => 'bar'), null);
-        $this->context->addViolation('Error', array('foo' => 'bar'), null, 1);
+        $this->context->addViolation('Error', array('foo1' => 'bar1'), null);
+        $this->context->addViolation('Choice error', array('foo2' => 'bar2'), null, 1);
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
+                'Translated error',
                 'Error',
-                array('foo' => 'bar'),
+                array('foo1' => 'bar1'),
                 'Root',
                 'foo.bar',
                 null
             ),
             new ConstraintViolation(
-                'Error',
-                array('foo' => 'bar'),
+                'Translated choice error',
+                'Choice error',
+                array('foo2' => 'bar2'),
                 'Root',
                 'foo.bar',
                 null,
@@ -166,11 +208,19 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     public function testAddViolationAtPath()
     {
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('Error', array('foo' => 'bar'))
+            ->will($this->returnValue('Translated error'));
+
         // override preconfigured property path
+        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->context->addViolationAtPath('bar.baz', 'Error', array('foo' => 'bar'), 'invalid');
+        restore_error_handler();
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
+                'Translated error',
                 'Error',
                 array('foo' => 'bar'),
                 'Root',
@@ -182,10 +232,18 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     public function testAddViolationAtPathUsesPreconfiguredValueIfNotPassed()
     {
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('Error', array())
+            ->will($this->returnValue('Translated error'));
+
+        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->context->addViolationAtPath('bar.baz', 'Error');
+        restore_error_handler();
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
+                'Translated error',
                 'Error',
                 array(),
                 'Root',
@@ -197,12 +255,24 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     public function testAddViolationAtPathUsesPassedNullValue()
     {
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('Error', array('foo' => 'bar'))
+            ->will($this->returnValue('Translated error'));
+        $this->translator->expects($this->once())
+            ->method('transChoice')
+            ->with('Choice error', 3, array('foo' => 'bar'))
+            ->will($this->returnValue('Translated choice error'));
+
         // passed null value should override preconfigured value "invalid"
+        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->context->addViolationAtPath('bar.baz', 'Error', array('foo' => 'bar'), null);
-        $this->context->addViolationAtPath('bar.baz', 'Error', array('foo' => 'bar'), null, 1);
+        $this->context->addViolationAtPath('bar.baz', 'Choice error', array('foo' => 'bar'), null, 3);
+        restore_error_handler();
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
+                'Translated error',
                 'Error',
                 array('foo' => 'bar'),
                 'Root',
@@ -210,23 +280,32 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
                 null
             ),
             new ConstraintViolation(
-                'Error',
+                'Translated choice error',
+                'Choice error',
                 array('foo' => 'bar'),
                 'Root',
                 'bar.baz',
                 null,
-                1
+                3
             ),
         )), $this->context->getViolations());
     }
 
     public function testAddViolationAt()
     {
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('Error', array('foo' => 'bar'))
+            ->will($this->returnValue('Translated error'));
+
         // override preconfigured property path
+        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->context->addViolationAt('bam.baz', 'Error', array('foo' => 'bar'), 'invalid');
+        restore_error_handler();
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
+                'Translated error',
                 'Error',
                 array('foo' => 'bar'),
                 'Root',
@@ -238,10 +317,18 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     public function testAddViolationAtUsesPreconfiguredValueIfNotPassed()
     {
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('Error', array())
+            ->will($this->returnValue('Translated error'));
+
+        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->context->addViolationAt('bam.baz', 'Error');
+        restore_error_handler();
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
+                'Translated error',
                 'Error',
                 array(),
                 'Root',
@@ -253,12 +340,24 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     public function testAddViolationAtUsesPassedNullValue()
     {
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('Error', array('foo' => 'bar'))
+            ->will($this->returnValue('Translated error'));
+        $this->translator->expects($this->once())
+            ->method('transChoice')
+            ->with('Choice error', 2, array('foo' => 'bar'))
+            ->will($this->returnValue('Translated choice error'));
+
         // passed null value should override preconfigured value "invalid"
+        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->context->addViolationAt('bam.baz', 'Error', array('foo' => 'bar'), null);
-        $this->context->addViolationAt('bam.baz', 'Error', array('foo' => 'bar'), null, 1);
+        $this->context->addViolationAt('bam.baz', 'Choice error', array('foo' => 'bar'), null, 2);
+        restore_error_handler();
 
         $this->assertEquals(new ConstraintViolationList(array(
             new ConstraintViolation(
+                'Translated error',
                 'Error',
                 array('foo' => 'bar'),
                 'Root',
@@ -266,14 +365,28 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
                 null
             ),
             new ConstraintViolation(
-                'Error',
+                'Translated choice error',
+                'Choice error',
                 array('foo' => 'bar'),
                 'Root',
                 'foo.bar.bam.baz',
                 null,
-                1
+                2
             ),
         )), $this->context->getViolations());
+    }
+
+    public function testAddViolationPluralTranslationError()
+    {
+        $this->translator->expects($this->once())
+            ->method('transChoice')
+            ->with('foo')
+            ->will($this->throwException(new \InvalidArgumentException()));
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('foo');
+
+        $this->context->addViolation('foo', array(), null, 2);
     }
 
     public function testGetPropertyPath()
@@ -293,7 +406,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPropertyPathWithEmptyCurrentPropertyPath()
     {
-        $this->context = new ExecutionContext($this->globalContext, $this->metadata, 'currentValue', 'Group', '');
+        $this->context = new ExecutionContext($this->globalContext, $this->translator, self::TRANS_DOMAIN, $this->metadata, 'currentValue', 'Group', '');
 
         $this->assertEquals('bam.baz', $this->context->getPropertyPath('bam.baz'));
     }

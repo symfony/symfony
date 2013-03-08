@@ -11,36 +11,42 @@
 
 namespace Symfony\Component\Security\Core\Exception;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
 /**
  * AuthenticationException is the base class for all authentication exceptions.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexander <iam.asm89@gmail.com>
  */
 class AuthenticationException extends \RuntimeException implements \Serializable
 {
-    private $extraInformation;
+    private $token;
 
-    public function __construct($message, $extraInformation = null, $code = 0, \Exception $previous = null)
+    /**
+     * Get the token.
+     *
+     * @return TokenInterface
+     */
+    public function getToken()
     {
-        parent::__construct($message, $code, $previous);
-
-        $this->extraInformation = $extraInformation;
+        return $this->token;
     }
 
-    public function getExtraInformation()
+    /**
+     * Set the token.
+     *
+     * @param TokenInterface $token
+     */
+    public function setToken(TokenInterface $token)
     {
-        return $this->extraInformation;
-    }
-
-    public function setExtraInformation($extraInformation)
-    {
-        $this->extraInformation = $extraInformation;
+        $this->token = $token;
     }
 
     public function serialize()
     {
         return serialize(array(
-            $this->extraInformation,
+            $this->token,
             $this->code,
             $this->message,
             $this->file,
@@ -51,11 +57,31 @@ class AuthenticationException extends \RuntimeException implements \Serializable
     public function unserialize($str)
     {
         list(
-            $this->extraInformation,
+            $this->token,
             $this->code,
             $this->message,
             $this->file,
             $this->line
         ) = unserialize($str);
+    }
+
+    /**
+     * Message key to be used by the translation component.
+     *
+     * @return string
+     */
+    public function getMessageKey()
+    {
+        return 'An authentication exception occurred.';
+    }
+
+    /**
+     * Message data to be used by the translation component.
+     *
+     * @return array
+     */
+    public function getMessageData()
+    {
+        return array();
     }
 }

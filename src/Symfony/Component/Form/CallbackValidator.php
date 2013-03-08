@@ -27,7 +27,7 @@ class CallbackValidator implements FormValidatorInterface
      */
     public function __construct($callback)
     {
-        trigger_error('CallbackValidator is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+        trigger_error('CallbackValidator is deprecated since version 2.1 and will be removed in 2.3. Use the FormEvents::POST_BIND event instead.', E_USER_DEPRECATED);
 
         $this->callback = $callback;
     }

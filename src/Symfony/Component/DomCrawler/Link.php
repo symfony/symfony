@@ -46,7 +46,7 @@ class Link
      */
     public function __construct(\DOMNode $node, $currentUri, $method = 'GET')
     {
-        if (!in_array(substr($currentUri, 0, 4), array('http', 'file'))) {
+        if (!in_array(strtolower(substr($currentUri, 0, 4)), array('http', 'file'))) {
             throw new \InvalidArgumentException(sprintf('Current URI must be an absolute URL ("%s").', $currentUri));
         }
 
@@ -89,7 +89,7 @@ class Link
         $uri = trim($this->getRawUri());
 
         // absolute URL?
-        if (0 === strpos($uri, 'http')) {
+        if (null !== parse_url($uri, PHP_URL_SCHEME)) {
             return $uri;
         }
 
@@ -118,6 +118,11 @@ class Link
             }
 
             return $baseUri.$uri;
+        }
+
+        // absolute URL with relative schema
+        if (0 === strpos($uri, '//')) {
+            return preg_replace('#^([^/]*)//.*$#', '$1', $this->currentUri).$uri;
         }
 
         // absolute path

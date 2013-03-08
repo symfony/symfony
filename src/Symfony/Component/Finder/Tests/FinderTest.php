@@ -106,6 +106,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder($adapter);
         $finder->name('~\\.php$~i');
         $this->assertIterator($this->toAbsolute(array('test.php')), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder($adapter);
+        $finder->name('test.p{hp,y}');
+        $this->assertIterator($this->toAbsolute(array('test.php', 'test.py')), $finder->in(self::$tmpDir)->getIterator());
     }
 
     /**
@@ -127,6 +131,12 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->name('test.py');
         $finder->notName('*.php');
         $finder->notName('*.py');
+        $this->assertIterator(array(), $finder->in(self::$tmpDir)->getIterator());
+
+        $finder = $this->buildFinder($adapter);
+        $finder->name('test.ph*');
+        $finder->name('test.py');
+        $finder->notName('*.p{hp,y}');
         $this->assertIterator(array(), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -179,15 +189,15 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = $this->buildFinder($adapter);
         $this->assertSame($finder, $finder->ignoreVCS(false)->ignoreDotFiles(false));
-        $this->assertIterator($this->toAbsolute(array('.git', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', '.bar', '.foo', '.foo/.bar', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
+        $this->assertIterator($this->toAbsolute(array('.git', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', '.bar', '.foo', '.foo/.bar', '.foo/bar', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder($adapter);
         $finder->ignoreVCS(false)->ignoreVCS(false)->ignoreDotFiles(false);
-        $this->assertIterator($this->toAbsolute(array('.git', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', '.bar', '.foo', '.foo/.bar', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
+        $this->assertIterator($this->toAbsolute(array('.git', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', '.bar', '.foo', '.foo/.bar', '.foo/bar', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder($adapter);
         $this->assertSame($finder, $finder->ignoreVCS(true)->ignoreDotFiles(false));
-        $this->assertIterator($this->toAbsolute(array('foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', '.bar', '.foo', '.foo/.bar', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
+        $this->assertIterator($this->toAbsolute(array('foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', '.bar', '.foo', '.foo/.bar', '.foo/bar', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
     }
 
     /**
@@ -197,11 +207,11 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = $this->buildFinder($adapter);
         $this->assertSame($finder, $finder->ignoreDotFiles(false)->ignoreVCS(false));
-        $this->assertIterator($this->toAbsolute(array('.git', '.bar', '.foo', '.foo/.bar', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
+        $this->assertIterator($this->toAbsolute(array('.git', '.bar', '.foo', '.foo/.bar', '.foo/bar', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder($adapter);
         $finder->ignoreDotFiles(false)->ignoreDotFiles(false)->ignoreVCS(false);
-        $this->assertIterator($this->toAbsolute(array('.git', '.bar', '.foo', '.foo/.bar', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
+        $this->assertIterator($this->toAbsolute(array('.git', '.bar', '.foo', '.foo/.bar', '.foo/bar', 'foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto', 'foo bar')), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder($adapter);
         $this->assertSame($finder, $finder->ignoreDotFiles(true)->ignoreVCS(false));
@@ -576,6 +586,19 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertEquals(1, count($finder));
     }
 
+    /**
+     * Iterator keys must be the file pathname.
+     *
+     * @dataProvider getAdaptersTestData
+     */
+    public function testIteratorKeys(Adapter\AdapterInterface $adapter)
+    {
+        $finder = $this->buildFinder($adapter)->in(self::$tmpDir);
+        foreach ($finder as $key => $file) {
+            $this->assertEquals($file->getPathname(), $key);
+        }
+    }
+
     public function testAdaptersOrdering()
     {
         $finder = Finder::create()
@@ -658,6 +681,21 @@ class FinderTest extends Iterator\RealIteratorTestCase
             ->notPath($noMatchPatterns);
 
         $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
+    }
+
+    public function testAdapterSelection()
+    {
+        // test that by default, PhpAdapter is selected
+        $adapters = Finder::create()->getAdapters();
+        $this->assertTrue($adapters[0] instanceof Adapter\PhpAdapter);
+
+        // test another adapter selection
+        $adapters = Finder::create()->setAdapter('gnu_find')->getAdapters();
+        $this->assertTrue($adapters[0] instanceof Adapter\GnuFindAdapter);
+
+        // test that useBestAdapter method removes selection
+        $adapters = Finder::create()->useBestAdapter()->getAdapters();
+        $this->assertFalse($adapters[0] instanceof Adapter\PhpAdapter);
     }
 
     public function getTestPathData()

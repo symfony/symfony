@@ -35,7 +35,7 @@ interface FormConfigInterface
     /**
      * Returns the property path that the form should be mapped to.
      *
-     * @return null|Util\PropertyPathInterface The property path.
+     * @return null|\Symfony\Component\PropertyAccess\PropertyPathInterface The property path.
      */
     public function getPropertyPath();
 

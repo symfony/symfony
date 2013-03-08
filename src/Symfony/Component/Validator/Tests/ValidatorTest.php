@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
 use Symfony\Component\Validator\Tests\Fixtures\FailingConstraint;
 use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
@@ -37,7 +38,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->metadataFactory = new FakeMetadataFactory();
-        $this->validator = new Validator($this->metadataFactory, new ConstraintValidatorFactory());
+        $this->validator = new Validator($this->metadataFactory, new ConstraintValidatorFactory(), new DefaultTranslator());
     }
 
     protected function tearDown()
@@ -46,7 +47,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator = null;
     }
 
-    public function testValidate_defaultGroup()
+    public function testValidateDefaultGroup()
     {
         $entity = new Entity();
         $metadata = new ClassMetadata(get_class($entity));
@@ -60,6 +61,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
             'Failed',
+            'Failed',
             array(),
             $entity,
             'firstName',
@@ -69,7 +71,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($violations, $this->validator->validate($entity));
     }
 
-    public function testValidate_oneGroup()
+    public function testValidateOneGroup()
     {
         $entity = new Entity();
         $metadata = new ClassMetadata(get_class($entity));
@@ -83,6 +85,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
             'Failed',
+            'Failed',
             array(),
             $entity,
             'lastName',
@@ -92,7 +95,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($violations, $this->validator->validate($entity, 'Custom'));
     }
 
-    public function testValidate_multipleGroups()
+    public function testValidateMultipleGroups()
     {
         $entity = new Entity();
         $metadata = new ClassMetadata(get_class($entity));
@@ -108,12 +111,14 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
             'Failed',
+            'Failed',
             array(),
             $entity,
             'firstName',
             ''
         ));
         $violations->add(new ConstraintViolation(
+            'Failed',
             'Failed',
             array(),
             $entity,
@@ -126,7 +131,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($violations, $result);
     }
 
-    public function testValidate_groupSequenceProvider()
+    public function testValidateGroupSequenceProvider()
     {
         $entity = new GroupSequenceProviderEntity();
         $metadata = new ClassMetadata(get_class($entity));
@@ -142,6 +147,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
             'Failed',
+            'Failed',
             array(),
             $entity,
             'firstName',
@@ -154,6 +160,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
 
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
+            'Failed',
             'Failed',
             array(),
             $entity,
@@ -180,6 +187,10 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
         $result = $this->validator->validateProperty($entity, 'firstName');
 
         $this->assertCount(1, $result);
+
+        $result = $this->validator->validateProperty($entity, 'lastName');
+
+        $this->assertCount(0, $result);
     }
 
     public function testValidatePropertyValue()
@@ -198,6 +209,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
+            'Failed',
             'Failed',
             array(),
             '',
@@ -232,7 +244,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadataFor')
             ->with('VALUE')
             ->will($this->returnValue($metadata));
-        $this->validator = new Validator($this->metadataFactory, new ConstraintValidatorFactory());
+        $this->validator = new Validator($this->metadataFactory, new ConstraintValidatorFactory(), new DefaultTranslator());
 
         $this->validator->validateProperty('VALUE', 'someProperty');
     }
@@ -249,7 +261,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadataFor')
             ->with('VALUE')
             ->will($this->returnValue($metadata));
-        $this->validator = new Validator($this->metadataFactory, new ConstraintValidatorFactory());
+        $this->validator = new Validator($this->metadataFactory, new ConstraintValidatorFactory(), new DefaultTranslator());
 
         $this->validator->validatePropertyValue('VALUE', 'someProperty', 'propertyValue');
     }

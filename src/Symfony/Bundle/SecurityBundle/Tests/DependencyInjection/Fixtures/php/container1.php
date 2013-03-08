@@ -22,6 +22,10 @@ $container->loadFromExtension('security', array(
             'iterations' => 5,
             'key_length' => 30,
         ),
+        'JMS\FooBundle\Entity\User6' => array(
+            'algorithm' => 'bcrypt',
+            'cost' => 15,
+        ),
     ),
     'providers' => array(
         'default' => array(

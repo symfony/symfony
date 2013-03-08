@@ -82,17 +82,11 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($session->has('_security_session'));
     }
 
-    protected function runSessionOnKernelResponse($newToken, $original = null)
+    public function testOnKernelResponseWithoutSession()
     {
-        $session = new Session(new MockArraySessionStorage());
-
-        if ($original !== null) {
-            $session->set('_security_session', $original);
-        }
-
-        $this->securityContext->setToken($newToken);
-
+        $this->securityContext->setToken(new UsernamePasswordToken('test1', 'pass1', 'phpunit'));
         $request = new Request();
+        $session = new Session(new MockArraySessionStorage());
         $request->setSession($session);
 
         $event = new FilterResponseEvent(
@@ -105,13 +99,14 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new ContextListener($this->securityContext, array(), 'session');
         $listener->onKernelResponse($event);
 
-        return $session;
+        $this->assertTrue($session->isStarted());
     }
 
-    public function testOnKernelResponseWithoutSession()
+    public function testOnKernelResponseWithoutSessionNorToken()
     {
-        $this->securityContext->setToken(new UsernamePasswordToken('test1', 'pass1', 'phpunit'));
         $request = new Request();
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
 
         $event = new FilterResponseEvent(
             $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
@@ -123,7 +118,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new ContextListener($this->securityContext, array(), 'session');
         $listener->onKernelResponse($event);
 
-        $this->assertFalse($request->hasSession());
+        $this->assertFalse($session->isStarted());
     }
 
     /**
@@ -168,4 +163,30 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
             array(null),
         );
     }
-}
+
+    protected function runSessionOnKernelResponse($newToken, $original = null)
+    {
+        $session = new Session(new MockArraySessionStorage());
+
+        if ($original !== null) {
+            $session->set('_security_session', $original);
+        }
+
+        $this->securityContext->setToken($newToken);
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $event = new FilterResponseEvent(
+            $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
+
+        $listener = new ContextListener($this->securityContext, array(), 'session');
+        $listener->onKernelResponse($event);
+
+        return $session;
+    }}

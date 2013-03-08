@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader;
+use Symfony\Component\Translation\TranslatorInterface;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
@@ -74,6 +75,16 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      * @var CacheInterface
      */
     private $metadataCache;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var null|string
+     */
+    private $translationDomain;
 
     /**
      * {@inheritdoc}
@@ -257,6 +268,26 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setTranslationDomain($translationDomain)
+    {
+        $this->translationDomain = $translationDomain;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getValidator()
     {
         $metadataFactory = $this->metadataFactory;
@@ -296,7 +327,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         }
 
         $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory();
+        $translator = $this->translator ?: new DefaultTranslator();
 
-        return new Validator($metadataFactory, $validatorFactory, $this->initializers);
+        return new Validator($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);
     }
 }

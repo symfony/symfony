@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
 use Symfony\Bridge\Doctrine\Tests\DoctrineOrmTestCase;
+use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleIdentEntity;
@@ -132,7 +133,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $metadataFactory->addMetadata($metadata);
         $validatorFactory = $this->createValidatorFactory($uniqueValidator);
 
-        return new Validator($metadataFactory, $validatorFactory);
+        return new Validator($metadataFactory, $validatorFactory, new DefaultTranslator());
     }
 
     private function createSchema($em)

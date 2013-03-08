@@ -280,6 +280,6 @@ class FormRenderer implements FormRendererInterface
      */
     public function humanize($text)
     {
-        return ucfirst(trim(strtolower(preg_replace('/[_\s]+/', ' ', $text))));
+        return ucfirst(trim(strtolower(preg_replace(array('/([A-Z])/', '/[_\s]+/'), array('_$1', ' '), $text))));
     }
 }

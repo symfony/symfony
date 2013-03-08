@@ -184,6 +184,23 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($source, $this->encoder->encode($obj, 'xml'));
     }
 
+    public function testEncodeSerializerXmlRootNodeNameOption()
+    {
+        $options = array('xml_root_node_name' => 'test');
+        $this->encoder = new XmlEncoder;
+        $serializer = new Serializer(array(), array('xml' => new XmlEncoder()));
+        $this->encoder->setSerializer($serializer);
+
+        $array = array(
+            'person' => array('@gender' => 'M', '#' => 'Peter'),
+        );
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<test><person gender="M">Peter</person></test>'."\n";
+
+        $this->assertEquals($expected, $serializer->serialize($array, 'xml', $options));
+    }
+
     public function testDecode()
     {
         $source = $this->getXmlSource();

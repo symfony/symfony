@@ -23,10 +23,11 @@ interface DecoderInterface
      *
      * @param scalar $data   Data to decode
      * @param string $format Format name
+     * @param array  $context options that decoders have access to.
      *
      * @return mixed
      */
-    public function decode($data, $format);
+    public function decode($data, $format, array $context = array());
 
     /**
      * Checks whether the serializer can decode from given format

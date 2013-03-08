@@ -25,7 +25,7 @@ class Crawler extends \SplObjectStorage
     /**
      * @var string The current URI or the base href value
      */
-    private $uri;
+    protected $uri;
 
     /**
      * Constructor.
@@ -145,8 +145,9 @@ class Crawler extends \SplObjectStorage
 
         $base = $this->filterXPath('descendant-or-self::base')->extract(array('href'));
 
-        if (count($base)) {
-            $this->uri = current($base);
+        $baseHref = current($base);
+        if (count($base) && !empty($baseHref)) {
+            $this->uri = $baseHref;
         }
     }
 
@@ -703,7 +704,7 @@ class Crawler extends \SplObjectStorage
         return sprintf("concat(%s)", implode($parts, ', '));
     }
 
-    private function getNode($position)
+    protected function getNode($position)
     {
         foreach ($this as $i => $node) {
             if ($i == $position) {
@@ -716,7 +717,7 @@ class Crawler extends \SplObjectStorage
         // @codeCoverageIgnoreEnd
     }
 
-    private function sibling($node, $siblingDir = 'nextSibling')
+    protected function sibling($node, $siblingDir = 'nextSibling')
     {
         $nodes = array();
 

@@ -51,7 +51,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         $attributes = array();
         foreach ($request->attributes->all() as $key => $value) {
             if ('_route' == $key && is_object($value)) {
-                $value = $value->getPattern();
+                $value = $value->getPath();
             }
 
             $attributes[$key] = $this->varToString($value);
@@ -79,11 +79,14 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             }
         }
 
+        $statusCode = $response->getStatusCode();
+
         $this->data = array(
             'format'             => $request->getRequestFormat(),
             'content'            => $content,
             'content_type'       => $response->headers->get('Content-Type') ? $response->headers->get('Content-Type') : 'text/html',
-            'status_code'        => $response->getStatusCode(),
+            'status_text'        => isset(Response::$statusTexts[$statusCode]) ? Response::$statusTexts[$statusCode] : '',
+            'status_code'        => $statusCode,
             'request_query'      => $request->query->all(),
             'request_request'    => $request->request->all(),
             'request_headers'    => $request->headers->all(),
@@ -98,6 +101,14 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'controller'         => 'n/a',
             'locale'             => $request->getLocale(),
         );
+
+        if (isset($this->data['request_headers']['php-auth-pw'])) {
+            $this->data['request_headers']['php-auth-pw'] = '******';
+        }
+
+        if (isset($this->data['request_server']['PHP_AUTH_PW'])) {
+            $this->data['request_server']['PHP_AUTH_PW'] = '******';
+        }
 
         if (isset($this->controllers[$request])) {
             $controller = $this->controllers[$request];
@@ -193,6 +204,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     public function getContentType()
     {
         return $this->data['content_type'];
+    }
+
+    public function getStatusText()
+    {
+        return $this->data['status_text'];
     }
 
     public function getStatusCode()

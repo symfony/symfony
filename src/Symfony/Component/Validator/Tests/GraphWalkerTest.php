@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests;
 
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintAValidator;
+use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\ValidationVisitor;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\Reference;
@@ -52,8 +53,10 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
+
         $this->metadataFactory = new FakeMetadataFactory();
-        $this->visitor = new ValidationVisitor('Root', $this->metadataFactory, new ConstraintValidatorFactory());
+        $this->visitor = new ValidationVisitor('Root', $this->metadataFactory, new ConstraintValidatorFactory(), new DefaultTranslator());
         $this->walker = $this->visitor->getGraphWalker();
         $this->metadata = new ClassMetadata(self::CLASSNAME);
         $this->metadataFactory->addMetadata($this->metadata);
@@ -61,10 +64,21 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
+        restore_error_handler();
+
         $this->metadataFactory = null;
         $this->visitor = null;
         $this->walker = null;
         $this->metadata = null;
+    }
+
+    public function deprecationErrorHandler($errorNumber, $message, $file, $line, $context)
+    {
+        if ($errorNumber & E_USER_DEPRECATED) {
+            return true;
+        }
+
+        return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
     }
 
     public function testWalkObjectPassesCorrectClassAndProperty()
@@ -173,6 +187,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
             'Failed',
+            'Failed',
             array(),
             'Root',
             'firstName',
@@ -205,6 +220,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
             'Failed',
+            'Failed',
             array(),
             'Root',
             'reference',
@@ -231,6 +247,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         // Only group "Second" was validated
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
+            'Failed',
             'Failed',
             array(),
             'Root',
@@ -286,6 +303,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
             'Failed',
+            'Failed',
             array(),
             'Root',
             'path',
@@ -317,6 +335,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
+            'Failed',
             'Failed',
             array(),
             'Root',
@@ -350,6 +369,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
+            'Failed',
             'Failed',
             array(),
             'Root',
@@ -450,6 +470,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
             'Failed',
+            'Failed',
             array(),
             'Root',
             'path[key][nested]',
@@ -515,6 +536,7 @@ class GraphWalkerTest extends \PHPUnit_Framework_TestCase
 
         $violations = new ConstraintViolationList();
         $violations->add(new ConstraintViolation(
+            'message',
             'message',
             array('param' => 'value'),
             'Root',

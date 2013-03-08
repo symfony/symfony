@@ -23,11 +23,11 @@
                 <target>Værdien skal være en af de givne muligheder.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choices.</source>
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
                 <target>Du skal vælge mindst {{ limit }} muligheder.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choices.</source>
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
                 <target>Du kan højest vælge {{ limit }} muligheder.</target>
             </trans-unit>
             <trans-unit id="8">
@@ -75,7 +75,7 @@
                 <target>Værdien skal være {{ limit }} eller mindre.</target>
             </trans-unit>
             <trans-unit id="19">
-                <source>This value is too long. It should have {{ limit }} characters or less.</source>
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
                 <target>Værdien er for lang. Den skal have {{ limit }} bogstaver eller mindre.</target>
             </trans-unit>
             <trans-unit id="20">
@@ -83,7 +83,7 @@
                 <target>Værdien skal være {{ limit }} eller mere.</target>
             </trans-unit>
             <trans-unit id="21">
-                <source>This value is too short. It should have {{ limit }} characters or more.</source>
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
                 <target>Værdien er for kort. Den skal have {{ limit }} tegn eller flere.</target>
             </trans-unit>
             <trans-unit id="22">
@@ -179,7 +179,7 @@
                 <target>Værdien skal være brugerens nuværende password.</target>
             </trans-unit>
             <trans-unit id="48">
-                <source>This value should have exactly {{ limit }} characters.</source>
+                <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
                 <target>Værdien skal have præcis {{ limit }} tegn.</target>
             </trans-unit>
             <trans-unit id="49">

@@ -42,7 +42,7 @@ class MoneyTypeTest extends LocalizedTestCase
         $view1 = $form1->createView();
         $view2 = $form2->createView();
 
-        $this->assertSame('{{ widget }} £', $view1->get('money_pattern'));
-        $this->assertSame('{{ widget }} €', $view2->get('money_pattern'));
+        $this->assertSame('{{ widget }} £', $view1->vars['money_pattern']);
+        $this->assertSame('{{ widget }} €', $view2->vars['money_pattern']);
     }
 }

@@ -23,11 +23,11 @@
                 <target>選択された値は選択肢として有効な値ではありません.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choices.</source>
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
                 <target>{{ limit }}個以上選択してください.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choices.</source>
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
                 <target>{{ limit }}個以内で選択してください.</target>
             </trans-unit>
             <trans-unit id="8">
@@ -75,7 +75,7 @@
                 <target>値は{{ limit }}以下でなければなりません.</target>
             </trans-unit>
             <trans-unit id="19">
-                <source>This value is too long. It should have {{ limit }} characters or less.</source>
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
                 <target>値が長すぎます。{{ limit }}文字以内でなければなりません.</target>
             </trans-unit>
             <trans-unit id="20">
@@ -83,7 +83,7 @@
                 <target>値は{{ limit }}以上でなければなりません.</target>
             </trans-unit>
             <trans-unit id="21">
-                <source>This value is too short. It should have {{ limit }} characters or more.</source>
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
                 <target>値が短すぎます。{{ limit }}文字以上でなければなりません.</target>
             </trans-unit>
             <trans-unit id="22">

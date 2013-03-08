@@ -18,6 +18,7 @@ class ConstraintViolationTest extends \PHPUnit_Framework_TestCase
     public function testToStringHandlesArrays()
     {
         $violation = new ConstraintViolation(
+            'Array',
             '{{ value }}',
             array('{{ value }}' => array(1, 2, 3)),
             'Root',

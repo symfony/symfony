@@ -13,8 +13,6 @@
     background-image: -o-linear-gradient(top, #e4e4e4, #ffffff);
     background: linear-gradient(top, #e4e4e4, #ffffff);
 
-    -moz-border-radius: 16px 0 0 0;
-    -webkit-border-radius: 16px 0 0 0;
     border-radius: 16px 0 0 0;
 
     z-index: 6000000;
@@ -40,6 +38,10 @@
 
     bottom: 0;
     border-top: 1px solid #bbb;
+}
+.sf-toolbarreset abbr {
+    border-bottom: 1px dotted #000000;
+    cursor: help;
 }
 .sf-toolbarreset span,
 .sf-toolbarreset div {
@@ -79,11 +81,19 @@
 }
 
 .sf-toolbar-block .sf-toolbar-info-piece {
-    padding-bottom: 5px;
+    line-height: 19px;
+    margin-bottom: 5px;
+}
+
+.sf-toolbar-block .sf-toolbar-info-piece .sf-toolbar-status {
+    padding: 0px 5px;
+    border-radius: 5px;
+    margin-bottom: 0px;
+    vertical-align: top;
 }
 
 .sf-toolbar-block .sf-toolbar-info-piece:last-child {
-    padding-bottom: 0;
+    margin-bottom: 0;
 }
 
 .sf-toolbar-block .sf-toolbar-info-piece a,
@@ -94,6 +104,7 @@
 .sf-toolbar-block .sf-toolbar-info-piece b {
     display: inline-block;
     width: 110px;
+    vertical-align: top;
 }
 
 .sf-toolbar-block .sf-toolbar-info-with-next-pointer:after {
@@ -112,11 +123,17 @@
     position: absolute;
     background-color: #fff;
     border: 1px solid #bbb;
-    padding: 10px 8px;
+    padding: 9px 0;
     margin-left: -1px;
 
     bottom: 38px;
     border-bottom-width: 0;
+    border-bottom: 1px solid #bbb;
+    border-radius: 4px 4px 0 0;
+}
+
+.sf-toolbarreset > div:last-of-type .sf-toolbar-info {
+    right: -1px;
 }
 
 .sf-toolbar-block .sf-toolbar-info:empty {
@@ -230,14 +247,28 @@
 }
 
 .sf-toolbar-block:hover {
-    box-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0 0 5px;
+    border-right: none;
+    margin-right: 1px;
+    position: relative;
 }
 
 .sf-toolbar-block:hover .sf-toolbar-icon {
     background-color: #fff;
+    border-top: 1px dotted #DDD;
+    position: relative;
+    margin-top: -1px;
+    z-index: 10002;
 }
+
 .sf-toolbar-block:hover .sf-toolbar-info {
     display: block;
+    min-width: -webkit-calc(100% + 2px);
+    min-width: calc(100% + 2px);
+    z-index: 10001;
+    box-sizing: border-box;
+    padding: 9px;
+    line-height: 19px;
 }
 
 /***** Override the setting when the toolbar is on the top *****/
@@ -254,8 +285,6 @@
         background-image: -o-linear-gradient(135deg, #e4e4e4, #ffffff);
         background: linear-gradient(225deg, #e4e4e4, #ffffff);
 
-        -moz-border-radius: 0 0 0 16px;
-        -webkit-border-radius: 0 0 0 16px;
         border-radius: 0 0 0 16px;
     }
 
@@ -274,7 +303,14 @@
         top: 39px;
         bottom: auto;
         border-top-width: 0;
-        border-bottom: 1px solid #bbb;
+        border-radius: 0 0 4px 4px;
+    }
+
+    .sf-toolbar-block:hover .sf-toolbar-icon {
+        border-top: none;
+        border-bottom: 1px dotted #DDD;
+        margin-top: 0;
+        margin-bottom: -1px;
     }
 {% endif %}
 
@@ -287,11 +323,6 @@
         background-image: -webkit-gradient(linear, 0% 0%, 100% 0%, from(#cbcbcb), to(#e8e8e8)); !important;
         background-image: -o-linear-gradient(180deg, #cbcbcb, #e8e8e8); !important;
         background: linear-gradient(90deg, #cbcbcb, #e8e8e8); !important;
-    }
-
-    .sf-toolbarreset abbr {
-        border-bottom: 1px dotted #000000;
-        cursor: help;
     }
 {% endif %}
 

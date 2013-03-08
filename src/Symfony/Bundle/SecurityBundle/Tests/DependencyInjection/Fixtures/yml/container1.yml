@@ -16,6 +16,9 @@ security:
             encode_as_base64: false
             iterations: 5
             key_length: 30
+        JMS\FooBundle\Entity\User6:
+            algorithm: bcrypt
+            cost: 15
 
     providers:
         default:

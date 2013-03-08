@@ -17,19 +17,20 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/event-dispatcher": "2.2.*",
-        "symfony/http-foundation": "2.2.*"
+        "symfony/event-dispatcher": "~2.1",
+        "symfony/http-foundation": ">=2.2,<2.4-dev",
+        "psr/log": "~1.0"
     },
     "require-dev": {
         "symfony/browser-kit": "2.2.*",
-        "symfony/class-loader": "2.2.*",
-        "symfony/config": "2.2.*",
+        "symfony/class-loader": "~2.1",
+        "symfony/config": "~2.0",
         "symfony/console": "2.2.*",
-        "symfony/dependency-injection": "2.2.*",
-        "symfony/finder": "2.2.*",
-        "symfony/process": "2.2.*",
-        "symfony/routing": "2.2.*",
-        "symfony/stopwatch": "2.2.*"
+        "symfony/dependency-injection": "~2.0",
+        "symfony/finder": "~2.0",
+        "symfony/process": "~2.0",
+        "symfony/routing": ">=2.2,<2.4-dev",
+        "symfony/stopwatch": ">=2.2,<2.4-dev"
     },
     "suggest": {
         "symfony/browser-kit": "2.2.*",
@@ -46,7 +47,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.2-dev"
+            "dev-master": "2.3-dev"
         }
     }
 }

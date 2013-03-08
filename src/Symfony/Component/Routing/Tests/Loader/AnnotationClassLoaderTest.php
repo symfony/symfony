@@ -89,10 +89,12 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     {
         $routeDatas = array_replace(array(
             'name'         => 'route',
-            'pattern'      => '/',
+            'path'         => '/',
             'requirements' => array(),
             'options'      => array(),
             'defaults'     => array(),
+            'schemes'      => array(),
+            'methods'      => array(),
         ), $routeDatas);
 
         $this->reader
@@ -103,7 +105,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $routeCollection = $this->loader->load($className);
         $route = $routeCollection->get($routeDatas['name']);
 
-        $this->assertSame($routeDatas['pattern'], $route->getPattern(), '->load preserves pattern annotation');
+        $this->assertSame($routeDatas['path'], $route->getPath(), '->load preserves path annotation');
         $this->assertSame($routeDatas['requirements'],$route->getRequirements(), '->load preserves requirements annotation');
         $this->assertCount(0, array_intersect($route->getOptions(), $routeDatas['options']), '->load preserves options annotation');
         $this->assertSame(array_replace($routeDatas['defaults'], $methodArgs), $route->getDefaults(), '->load preserves defaults annotation');

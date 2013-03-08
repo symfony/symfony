@@ -56,11 +56,11 @@ class GetResponseForControllerResultEvent extends GetResponseEvent
     /**
      * Assigns the return value of the controller.
      *
-     * @param array The controller return value
+     * @param mixed The controller return value
      *
      * @api
      */
-    public function setControllerResult(array $controllerResult)
+    public function setControllerResult($controllerResult)
     {
         $this->controllerResult = $controllerResult;
     }

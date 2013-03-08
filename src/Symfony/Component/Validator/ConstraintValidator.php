@@ -103,6 +103,8 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     public function validate($value, Constraint $constraint)
     {
+        trigger_error('isValid() is deprecated since version 2.1 and will be removed in 2.3. Implement validate() instead.', E_USER_DEPRECATED);
+
         return $this->isValid($value, $constraint);
     }
 
@@ -113,6 +115,5 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     protected function isValid($value, Constraint $constraint)
     {
-        trigger_error('isValid() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
     }
 }

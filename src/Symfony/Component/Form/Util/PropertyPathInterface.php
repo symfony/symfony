@@ -11,74 +11,17 @@
 
 namespace Symfony\Component\Form\Util;
 
+use Symfony\Component\PropertyAccess\PropertyPathInterface as BasePropertyPathInterface;
+
 /**
+ * Alias for {@link \Symfony\Component\PropertyAccess\PropertyPathInterface}.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated deprecated since version 2.2, to be removed in 2.3. Use
+ *             {@link \Symfony\Component\PropertyAccess\PropertyPathInterface}
+ *             instead.
  */
-interface PropertyPathInterface extends \Traversable
+interface PropertyPathInterface extends BasePropertyPathInterface
 {
-    /**
-     * Returns the string representation of the property path
-     *
-     * @return string The path as string.
-     */
-    public function __toString();
-
-    /**
-     * Returns the length of the property path, i.e. the number of elements.
-     *
-     * @return integer The path length.
-     */
-    public function getLength();
-
-    /**
-     * Returns the parent property path.
-     *
-     * The parent property path is the one that contains the same items as
-     * this one except for the last one.
-     *
-     * If this property path only contains one item, null is returned.
-     *
-     * @return PropertyPath The parent path or null.
-     */
-    public function getParent();
-
-    /**
-     * Returns the elements of the property path as array
-     *
-     * @return array An array of property/index names
-     */
-    public function getElements();
-
-    /**
-     * Returns the element at the given index in the property path
-     *
-     * @param  integer $index The index key
-     *
-     * @return string A property or index name
-     *
-     * @throws \OutOfBoundsException If the offset is invalid.
-     */
-    public function getElement($index);
-
-    /**
-     * Returns whether the element at the given index is a property
-     *
-     * @param  integer $index The index in the property path
-     *
-     * @return Boolean Whether the element at this index is a property
-     *
-     * @throws \OutOfBoundsException If the offset is invalid.
-     */
-    public function isProperty($index);
-
-    /**
-     * Returns whether the element at the given index is an array index
-     *
-     * @param  integer $index The index in the property path
-     *
-     * @return Boolean Whether the element at this index is an array index
-     *
-     * @throws \OutOfBoundsException If the offset is invalid.
-     */
-    public function isIndex($index);
 }

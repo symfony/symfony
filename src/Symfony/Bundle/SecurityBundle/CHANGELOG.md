@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
 * Added PBKDF2 Password encoder
+* Added BCrypt password encoder
 
 2.1.0
 -----

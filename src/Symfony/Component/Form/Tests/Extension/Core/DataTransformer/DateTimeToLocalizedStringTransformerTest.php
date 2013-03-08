@@ -121,14 +121,14 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $this->assertEquals('Feb 3, 2010 4:05 AM', $transformer->transform($this->dateTime));
     }
 
-    public function testTransform_empty()
+    public function testTransformEmpty()
     {
         $transformer = new DateTimeToLocalizedStringTransformer();
 
         $this->assertSame('', $transformer->transform(null));
     }
 
-    public function testTransform_differentTimezones()
+    public function testTransformWithDifferentTimezones()
     {
         $transformer = new DateTimeToLocalizedStringTransformer('America/New_York', 'Asia/Hong_Kong');
 
@@ -140,7 +140,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $this->assertEquals($dateTime->format('d.m.Y H:i'), $transformer->transform($input));
     }
 
-    public function testTransform_differentPatterns()
+    public function testTransformWithDifferentPatterns()
     {
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'MM*yyyy*dd HH|mm|ss');
 
@@ -206,7 +206,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('Feb 3, 2010 04:05 AM'));
     }
 
-    public function testReverseTransform_differentTimezones()
+    public function testReverseTransformWithDifferentTimezones()
     {
         $transformer = new DateTimeToLocalizedStringTransformer('America/New_York', 'Asia/Hong_Kong');
 
@@ -216,14 +216,14 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $this->assertDateTimeEquals($dateTime, $transformer->reverseTransform('03.02.2010 04:05'));
     }
 
-    public function testReverseTransform_differentPatterns()
+    public function testReverseTransformWithDifferentPatterns()
     {
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'MM*yyyy*dd HH|mm|ss');
 
         $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('02*2010*03 04|05|06'));
     }
 
-    public function testReverseTransform_empty()
+    public function testReverseTransformEmpty()
     {
         $transformer = new DateTimeToLocalizedStringTransformer();
 

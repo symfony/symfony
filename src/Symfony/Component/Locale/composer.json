@@ -19,7 +19,7 @@
         "php": ">=5.3.3"
     },
     "suggest": {
-        "ext-intl": ">=5.3.3"
+        "ext-intl": "to use other locales than built-in `en`"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Locale\\": "" },
@@ -29,7 +29,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.2-dev"
+            "dev-master": "2.3-dev"
         }
     }
 }

@@ -41,6 +41,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array('127.0.0.1', '10.0.0.1'), $container->getParameter('kernel.trusted_proxies'));
     }
 
+    public function testHttpMethodOverride()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertFalse($container->getParameter('kernel.http_method_override'));
+    }
+
     public function testEsi()
     {
         $container = $this->createContainerFromFile('full');
@@ -204,6 +211,11 @@ abstract class FrameworkExtensionTest extends TestCase
             str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Form/Resources/translations/validators.en.xlf'),
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
+        );
+        $this->assertContains(
+            str_replace('/', DIRECTORY_SEPARATOR, 'Symfony/Component/Security/Resources/translations/security.en.xlf'),
+            $files,
+            '->registerTranslatorConfiguration() finds Security translation resources'
         );
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();

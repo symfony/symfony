@@ -4,6 +4,12 @@ CHANGELOG
 2.2.0
 -----
 
+ * [BC BREAK] the path info for sub-request is now always _fragment (or whatever you configured instead of the default)
+ * added Symfony\Component\HttpKernel\EventListener\FragmentListener
+ * added Symfony\Component\HttpKernel\UriSigner
+ * added Symfony\Component\HttpKernel\FragmentRenderer and rendering strategies (in Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface)
+ * added Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel
+ * added ControllerReference to create reference of Controllers (used in the FragmentRenderer class)
  * [BC BREAK] renamed TimeDataCollector::getTotalTime() to
    TimeDataCollector::getDuration()
  * updated the MemoryDataCollector to include the memory used in the 

@@ -11,83 +11,76 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
+use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
  * Provides integration with the HttpKernel component.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HttpKernelExtension extends \Twig_Extension implements EventSubscriberInterface
+class HttpKernelExtension extends \Twig_Extension
 {
-    private $kernel;
-    private $request;
+    private $handler;
 
     /**
      * Constructor.
      *
-     * @param HttpKernelInterface $kernel A HttpKernelInterface install
+     * @param FragmentHandler $handler A FragmentHandler instance
      */
-    public function __construct(HttpKernelInterface $kernel)
+    public function __construct(FragmentHandler $handler)
     {
-        $this->kernel = $kernel;
+        $this->handler = $handler;
     }
 
     public function getFunctions()
     {
         return array(
-            'render' => new \Twig_Function_Method($this, 'render', array('needs_environment' => true, 'is_safe' => array('html'))),
+            'render'     => new \Twig_Function_Method($this, 'renderFragment', array('is_safe' => array('html'))),
+            'render_*'   => new \Twig_Function_Method($this, 'renderFragmentStrategy', array('is_safe' => array('html'))),
+            'controller' => new \Twig_Function_Method($this, 'controller'),
         );
     }
 
     /**
-     * Renders a URI.
+     * Renders a fragment.
      *
-     * @param \Twig_Environment $twig A \Twig_Environment instance
-     * @param string            $uri  The URI to render
+     * @param string $uri     A URI
+     * @param array  $options An array of options
      *
-     * @return string The Response content
+     * @return string The fragment content
      *
-     * @throws \RuntimeException
+     * @see Symfony\Component\HttpKernel\Fragment\FragmentHandler::render()
      */
-    public function render(\Twig_Environment $twig, $uri)
+    public function renderFragment($uri, $options = array())
     {
-        if (null !== $this->request) {
-            $cookies = $this->request->cookies->all();
-            $server = $this->request->server->all();
-        } else {
-            $cookies = array();
-            $server = array();
-        }
+        $options = $this->handler->fixOptions($options);
 
-        $subRequest = Request::create($uri, 'get', array(), $cookies, array(), $server);
-        if (null !== $this->request && $this->request->getSession()) {
-            $subRequest->setSession($this->request->getSession());
-        }
+        $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
+        unset($options['strategy']);
 
-        $response = $this->kernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST, false);
-
-        if (!$response->isSuccessful()) {
-            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $subRequest->getUri(), $response->getStatusCode()));
-        }
-
-        return $response->getContent();
+        return $this->handler->render($uri, $strategy, $options);
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    /**
+     * Renders a fragment.
+     *
+     * @param string $strategy A strategy name
+     * @param string $uri      A URI
+     * @param array  $options  An array of options
+     *
+     * @return string The fragment content
+     *
+     * @see Symfony\Component\HttpKernel\Fragment\FragmentHandler::render()
+     */
+    public function renderFragmentStrategy($strategy, $uri, $options = array())
     {
-        $this->request = $event->getRequest();
+        return $this->handler->render($uri, $strategy, $options);
     }
 
-    public static function getSubscribedEvents()
+    public function controller($controller, $attributes = array(), $query = array())
     {
-        return array(
-            KernelEvents::REQUEST => array('onKernelRequest'),
-        );
+        return new ControllerReference($controller, $attributes, $query);
     }
 
     public function getName()

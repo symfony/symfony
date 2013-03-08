@@ -235,6 +235,20 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $headers->makeDisposition($disposition, $filename, $filenameFallback));
     }
 
+    public function testToStringDoesntMessUpHeaders()
+    {
+        $headers = new ResponseHeaderBag();
+
+        $headers->set('Location', 'http://www.symfony.com');
+        $headers->set('Content-type', 'text/html');
+
+        (string) $headers;
+
+        $allHeaders = $headers->allPreserveCase();
+        $this->assertEquals(array('http://www.symfony.com'), $allHeaders['Location']);
+        $this->assertEquals(array('text/html'), $allHeaders['Content-type']);
+    }
+
     public function provideMakeDisposition()
     {
         return array(

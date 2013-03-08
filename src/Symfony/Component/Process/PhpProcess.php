@@ -68,6 +68,6 @@ class PhpProcess extends Process
             $this->setCommandLine($php);
         }
 
-        return parent::start($callback);
+        parent::start($callback);
     }
 }

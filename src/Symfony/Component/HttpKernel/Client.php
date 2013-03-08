@@ -79,9 +79,8 @@ class Client extends BaseClient
         $kernel = str_replace("'", "\\'", serialize($this->kernel));
         $request = str_replace("'", "\\'", serialize($request));
 
-        $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\UniversalClassLoader');
+        $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\ClassLoader');
         $requirePath = str_replace("'", "\\'", $r->getFileName());
-
         $symfonyPath = str_replace("'", "\\'", realpath(__DIR__.'/../../..'));
 
         return <<<EOF
@@ -89,8 +88,8 @@ class Client extends BaseClient
 
 require_once '$requirePath';
 
-\$loader = new Symfony\Component\ClassLoader\UniversalClassLoader();
-\$loader->registerNamespaces(array('Symfony' => '$symfonyPath'));
+\$loader = new Symfony\Component\ClassLoader\ClassLoader();
+\$loader->addPrefix('Symfony', '$symfonyPath');
 \$loader->register();
 
 \$kernel = unserialize('$kernel');

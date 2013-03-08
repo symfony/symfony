@@ -28,7 +28,7 @@ class Max extends Constraint
 
     public function __construct($options = null)
     {
-        trigger_error('Max is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+        trigger_error('Max is deprecated since version 2.1 and will be removed in 2.3. Use Range instead.', E_USER_DEPRECATED);
 
         parent::__construct($options);
     }

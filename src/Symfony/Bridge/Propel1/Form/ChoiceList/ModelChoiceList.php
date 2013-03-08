@@ -18,6 +18,7 @@ use \Persistent;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Widely inspired by the EntityChoiceList.
@@ -69,16 +70,17 @@ class ModelChoiceList extends ObjectChoiceList
      *
      * @see Symfony\Bridge\Propel1\Form\Type\ModelType How to use the preferred choices.
      *
-     * @param string              $class       The FQCN of the model class to be loaded.
-     * @param string              $labelPath   A property path pointing to the property used for the choice labels.
-     * @param array               $choices     An optional array to use, rather than fetching the models.
-     * @param ModelCriteria       $queryObject The query to use retrieving model data from database.
-     * @param string              $groupPath   A property path pointing to the property used to group the choices.
-     * @param array|ModelCriteria $preferred   The preferred items of this choice.
-     *                                         Either an array if $choices is given,
-     *                                         or a ModelCriteria to be merged with the $queryObject.
+     * @param string                   $class             The FQCN of the model class to be loaded.
+     * @param string                   $labelPath         A property path pointing to the property used for the choice labels.
+     * @param array                    $choices           An optional array to use, rather than fetching the models.
+     * @param ModelCriteria            $queryObject       The query to use retrieving model data from database.
+     * @param string                   $groupPath         A property path pointing to the property used to group the choices.
+     * @param array|ModelCriteria      $preferred         The preferred items of this choice.
+     *                                                    Either an array if $choices is given,
+     *                                                    or a ModelCriteria to be merged with the $queryObject.
+     * @param PropertyAccessorInterface $propertyAccessor The reflection graph for reading property paths.
      */
-    public function __construct($class, $labelPath = null, $choices = null, $queryObject = null, $groupPath = null, $preferred = array())
+    public function __construct($class, $labelPath = null, $choices = null, $queryObject = null, $groupPath = null, $preferred = array(), PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->class        = $class;
 
@@ -104,7 +106,7 @@ class ModelChoiceList extends ObjectChoiceList
             $this->identifierAsIndex = true;
         }
 
-        parent::__construct($choices, $labelPath, $preferred, $groupPath);
+        parent::__construct($choices, $labelPath, $preferred, $groupPath, null, $propertyAccessor);
     }
 
     /**

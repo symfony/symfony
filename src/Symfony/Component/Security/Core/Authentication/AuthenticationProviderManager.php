@@ -77,7 +77,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
                     break;
                 }
             } catch (AccountStatusException $e) {
-                $e->setExtraInformation($token);
+                $e->setToken($token);
 
                 throw $e;
             } catch (AuthenticationException $e) {
@@ -105,7 +105,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
             $this->eventDispatcher->dispatch(AuthenticationEvents::AUTHENTICATION_FAILURE, new AuthenticationFailureEvent($token, $lastException));
         }
 
-        $lastException->setExtraInformation($token);
+        $lastException->setToken($token);
 
         throw $lastException;
     }

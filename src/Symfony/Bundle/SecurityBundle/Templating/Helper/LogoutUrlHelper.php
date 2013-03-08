@@ -55,36 +55,40 @@ class LogoutUrlHelper extends Helper
     }
 
     /**
-     * Generate the relative logout URL for the firewall.
+     * Generates the absolute logout path for the firewall.
      *
      * @param string $key The firewall key
-     * @return string The relative logout URL
+     *
+     * @return string The logout path
      */
     public function getLogoutPath($key)
     {
-        return $this->generateLogoutUrl($key, false);
+        return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
     /**
-     * Generate the absolute logout URL for the firewall.
+     * Generates the absolute logout URL for the firewall.
      *
      * @param string $key The firewall key
-     * @return string The absolute logout URL
+     *
+     * @return string The logout URL
      */
     public function getLogoutUrl($key)
     {
-        return $this->generateLogoutUrl($key, true);
+        return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     /**
-     * Generate the logout URL for the firewall.
+     * Generates the logout URL for the firewall.
      *
-     * @param string  $key      The firewall key
-     * @param Boolean $absolute Whether to generate an absolute URL
+     * @param string         $key           The firewall key
+     * @param Boolean|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
+     *
      * @return string The logout URL
+     *
      * @throws \InvalidArgumentException if no LogoutListener is registered for the key
      */
-    private function generateLogoutUrl($key, $absolute)
+    private function generateLogoutUrl($key, $referenceType)
     {
         if (!array_key_exists($key, $this->listeners)) {
             throw new \InvalidArgumentException(sprintf('No LogoutListener found for firewall key "%s".', $key));
@@ -97,13 +101,13 @@ class LogoutUrlHelper extends Helper
         if ('/' === $logoutPath[0]) {
             $request = $this->container->get('request');
 
-            $url = ($absolute ? $request->getUriForPath($logoutPath) : $request->getBasePath() . $logoutPath);
+            $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($logoutPath) : $request->getBasePath() . $logoutPath;
 
             if (!empty($parameters)) {
                 $url .= '?' . http_build_query($parameters);
             }
         } else {
-            $url = $this->router->generate($logoutPath, $parameters, $absolute);
+            $url = $this->router->generate($logoutPath, $parameters, $referenceType);
         }
 
         return $url;

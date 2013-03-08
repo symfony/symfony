@@ -195,19 +195,27 @@ class BinaryFileResponse extends Response
             // Process the range headers.
             if (!$request->headers->has('If-Range') || $this->getEtag() == $request->headers->get('If-Range')) {
                 $range = $request->headers->get('Range');
+                $fileSize = $this->file->getSize();
 
-                list($start, $end) = array_map('intval', explode('-', substr($range, 6), 2)) + array(0);
+                list($start, $end) = explode('-', substr($range, 6), 2) + array(0);
 
-                if ('' !== $end) {
-                    $this->maxlen = $end - $start;
+                $end = ('' === $end) ? $fileSize - 1 : (int) $end;
+
+                if ('' === $start) {
+                    $start = $fileSize - $end;
+                    $end = $fileSize - 1;
                 } else {
-                    $end = $this->file->getSize() - 1;
+                    $start = (int) $start;
                 }
 
+                $start = max($start, 0);
+                $end = min($end, $fileSize - 1);
+
+                $this->maxlen = $end < $fileSize ? $end - $start + 1 : -1;
                 $this->offset = $start;
 
                 $this->setStatusCode(206);
-                $this->headers->set('Content-Range', sprintf('bytes %s-%s/%s', $start, $end, $this->file->getSize()));
+                $this->headers->set('Content-Range', sprintf('bytes %s-%s/%s', $start, $end, $fileSize));
             }
         }
 

@@ -21,7 +21,7 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
     /**
      * tests find() with the env var PHP_PATH
      */
-    public function testFindWithPHP_PATH()
+    public function testFindWithPhpPath()
     {
         if (defined('PHP_BINARY')) {
             $this->markTestSkipped('The PHP binary is easily available as of PHP 5.4');

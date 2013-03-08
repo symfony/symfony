@@ -31,6 +31,15 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder = null;
     }
 
+    public function deprecationErrorHandler($errorNumber, $message, $file, $line, $context)
+    {
+        if ($errorNumber & E_USER_DEPRECATED) {
+            return true;
+        }
+
+        return \PHPUnit_Util_ErrorHandler::handleError($errorNumber, $message, $file, $line);
+    }
+
     public function testAddObjectInitializer()
     {
         $this->assertSame($this->builder, $this->builder->addObjectInitializer(
@@ -89,15 +98,17 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testSetMetadataFactory()
     {
+        set_error_handler(array($this, "deprecationErrorHandler"));
         $this->assertSame($this->builder, $this->builder->setMetadataFactory(
             $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface'))
         );
+        restore_error_handler();
     }
 
     public function testSetMetadataCache()
     {
-        $this->assertSame($this->builder, $this->builder->setMetadataCache($this->getMock(
-            'Symfony\Component\Validator\Mapping\Cache\CacheInterface'))
+        $this->assertSame($this->builder, $this->builder->setMetadataCache(
+            $this->getMock('Symfony\Component\Validator\Mapping\Cache\CacheInterface'))
         );
     }
 
@@ -106,5 +117,17 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->builder, $this->builder->setConstraintValidatorFactory(
             $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface'))
         );
+    }
+
+    public function testSetTranslator()
+    {
+        $this->assertSame($this->builder, $this->builder->setTranslator(
+            $this->getMock('Symfony\Component\Translation\TranslatorInterface'))
+        );
+    }
+
+    public function testSetTranslationDomain()
+    {
+        $this->assertSame($this->builder, $this->builder->setTranslationDomain('TRANS_DOMAIN'));
     }
 }

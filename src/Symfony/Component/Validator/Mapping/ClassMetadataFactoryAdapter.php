@@ -29,6 +29,8 @@ class ClassMetadataFactoryAdapter implements MetadataFactoryInterface
 
     public function __construct(ClassMetadataFactoryInterface $innerFactory)
     {
+        trigger_error(sprintf('ClassMetadataFactoryInterface is deprecated since version 2.1 and will be removed in 2.3. Implement MetadataFactoryInterface instead on %s.', get_class($innerFactory)), E_USER_DEPRECATED);
+
         $this->innerFactory = $innerFactory;
     }
 
@@ -38,9 +40,7 @@ class ClassMetadataFactoryAdapter implements MetadataFactoryInterface
     public function getMetadataFor($value)
     {
         $class = is_object($value) ? get_class($value) : $value;
-        set_error_handler(array($this, 'handleBC'));
         $metadata = $this->innerFactory->getClassMetadata($class);
-        restore_error_handler();
 
         if (null === $metadata) {
             throw new NoSuchMetadataException('No metadata exists for class '. $class);
@@ -56,22 +56,8 @@ class ClassMetadataFactoryAdapter implements MetadataFactoryInterface
     {
         $class = is_object($value) ? get_class($value) : $value;
 
-        set_error_handler(array($this, 'handleBC'));
         $return = null !== $this->innerFactory->getClassMetadata($class);
-        restore_error_handler();
 
         return $return;
-    }
-
-    /**
-     * @deprecated This is used to keep BC until deprecated methods are removed
-     */
-    public function handleBC($errorNumber, $message, $file, $line, $context)
-    {
-        if ($errorNumber & E_USER_DEPRECATED) {
-            return true;
-        }
-
-        return false;
     }
 }

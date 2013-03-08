@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\HttpKernel\Exception\FatalErrorException;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * ErrorHandler.
@@ -58,6 +58,7 @@ class ErrorHandler
         $handler = new static();
         $handler->setLevel($level);
 
+        ini_set('display_errors', 0);
         set_error_handler(array($handler, 'handle'));
         register_shutdown_function(array($handler, 'handleFatal'));
         $handler->reservedMemory = str_repeat('x', 10240);
@@ -86,16 +87,9 @@ class ErrorHandler
 
         if ($level & (E_USER_DEPRECATED | E_DEPRECATED)) {
             if (null !== self::$logger) {
-                $deprecation = array(
-                    'type' => self::TYPE_DEPRECATION,
-                    'file' => $file,
-                    'line' => $line,
-                    'stack' => version_compare(PHP_VERSION, '5.4', '<')
-                        ? array_slice(debug_backtrace(false), 0, 10)
-                        : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10)
-                );
+                $stack = version_compare(PHP_VERSION, '5.4', '<') ? array_slice(debug_backtrace(false), 0, 10) : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
 
-                self::$logger->warn($message, $deprecation);
+                self::$logger->warning($message, array('type' => self::TYPE_DEPRECATION, 'stack' => $stack));
             }
 
             return true;

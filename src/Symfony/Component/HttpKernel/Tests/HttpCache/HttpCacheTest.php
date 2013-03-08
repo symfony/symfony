@@ -1034,4 +1034,45 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Hello World!', $this->response->getContent());
         $this->assertEquals(12, $this->response->headers->get('Content-Length'));
     }
+
+    public function testClientIpIsAlwaysLocalhostForForwardedRequests()
+    {
+        $this->setNextResponse();
+        $this->request('GET', '/', array('REMOTE_ADDR' => '10.0.0.1'));
+
+        $this->assertEquals('127.0.0.1', $this->kernel->getBackendRequest()->server->get('REMOTE_ADDR'));
+    }
+
+    /**
+     * @dataProvider getXForwardedForData
+     */
+    public function testXForwarderForHeaderForForwardedRequests($xForwardedFor, $expected)
+    {
+        $this->setNextResponse();
+        $server = array('REMOTE_ADDR' => '10.0.0.1');
+        if (false !== $xForwardedFor) {
+            $server['HTTP_X_FORWARDED_FOR'] = $xForwardedFor;
+        }
+        $this->request('GET', '/', $server);
+
+        $this->assertEquals($expected, $this->kernel->getBackendRequest()->headers->get('X-Forwarded-For'));
+    }
+
+    public function getXForwardedForData()
+    {
+        return array(
+            array(false, '10.0.0.1'),
+            array('10.0.0.2', '10.0.0.2, 10.0.0.1'),
+            array('10.0.0.2, 10.0.0.3', '10.0.0.2, 10.0.0.3, 10.0.0.1'),
+        );
+    }
+
+    public function testXForwarderForHeaderForPassRequests()
+    {
+        $this->setNextResponse();
+        $server = array('REMOTE_ADDR' => '10.0.0.1');
+        $this->request('POST', '/', $server);
+
+        $this->assertEquals('10.0.0.1', $this->kernel->getBackendRequest()->headers->get('X-Forwarded-For'));
+    }
 }

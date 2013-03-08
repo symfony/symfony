@@ -12,7 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Bundle\FrameworkBundle\HttpKernel;
+use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
+use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 /**
  * ActionsHelper manages action inclusions.
@@ -21,31 +22,41 @@ use Symfony\Bundle\FrameworkBundle\HttpKernel;
  */
 class ActionsHelper extends Helper
 {
-    protected $kernel;
+    private $handler;
 
     /**
      * Constructor.
      *
-     * @param HttpKernel $kernel A HttpKernel instance
+     * @param FragmentHandler $handler A FragmentHandler instance
      */
-    public function __construct(HttpKernel $kernel)
+    public function __construct(FragmentHandler $handler)
     {
-        $this->kernel = $kernel;
+        $this->handler = $handler;
     }
 
     /**
-     * Returns the Response content for a given URI.
+     * Returns the fragment content for a given URI.
      *
      * @param string $uri     A URI
      * @param array  $options An array of options
      *
-     * @return string
+     * @return string The fragment content
      *
-     * @see Symfony\Bundle\FrameworkBundle\HttpKernel::render()
+     * @see Symfony\Component\HttpKernel\Fragment\FragmentHandler::render()
      */
     public function render($uri, array $options = array())
     {
-        return $this->kernel->render($uri, $options);
+        $options = $this->handler->fixOptions($options);
+
+        $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
+        unset($options['strategy']);
+
+        return $this->handler->render($uri, $strategy, $options);
+    }
+
+    public function controller($controller, $attributes = array(), $query = array())
+    {
+        return new ControllerReference($controller, $attributes, $query);
     }
 
     /**

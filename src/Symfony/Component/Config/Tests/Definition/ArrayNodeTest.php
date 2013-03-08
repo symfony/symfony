@@ -25,19 +25,13 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * normalize() should protect against child values with no corresponding node
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Unrecognized options "foo" under "root"
      */
     public function testExceptionThrownOnUnrecognizedChild()
     {
         $node = new ArrayNode('root');
-
-        try {
-            $node->normalize(array('foo' => 'bar'));
-            $this->fail('An exception should have been throw for a bad child node');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException', $e);
-            $this->assertEquals('Unrecognized options "foo" under "root"', $e->getMessage());
-        }
+        $node->normalize(array('foo' => 'bar'));
     }
 
     /**

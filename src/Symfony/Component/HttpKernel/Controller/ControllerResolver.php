@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Controller;
 
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -58,7 +58,7 @@ class ControllerResolver implements ControllerResolverInterface
     {
         if (!$controller = $request->attributes->get('_controller')) {
             if (null !== $this->logger) {
-                $this->logger->warn('Unable to look for the controller as the "_controller" parameter is missing');
+                $this->logger->warning('Unable to look for the controller as the "_controller" parameter is missing');
             }
 
             return false;

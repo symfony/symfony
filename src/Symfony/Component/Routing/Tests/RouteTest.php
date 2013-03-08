@@ -18,25 +18,33 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $route = new Route('/{foo}', array('foo' => 'bar'), array('foo' => '\d+'), array('foo' => 'bar'), '{locale}.example.com');
-        $this->assertEquals('/{foo}', $route->getPattern(), '__construct() takes a pattern as its first argument');
+        $this->assertEquals('/{foo}', $route->getPath(), '__construct() takes a path as its first argument');
         $this->assertEquals(array('foo' => 'bar'), $route->getDefaults(), '__construct() takes defaults as its second argument');
         $this->assertEquals(array('foo' => '\d+'), $route->getRequirements(), '__construct() takes requirements as its third argument');
         $this->assertEquals('bar', $route->getOption('foo'), '__construct() takes options as its fourth argument');
-        $this->assertEquals('{locale}.example.com', $route->getHostnamePattern(), '__construct() takes a hostname pattern as its fifth argument');
+        $this->assertEquals('{locale}.example.com', $route->getHost(), '__construct() takes a host pattern as its fifth argument');
+
+        $route = new Route('/', array(), array(), array(), '', array('Https'), array('POST', 'put'));
+        $this->assertEquals(array('https'), $route->getSchemes(), '__construct() takes schemes as its sixth argument and lowercases it');
+        $this->assertEquals(array('POST', 'PUT'), $route->getMethods(), '__construct() takes methods as its seventh argument and uppercases it');
+
+        $route = new Route('/', array(), array(), array(), '', 'Https', 'Post');
+        $this->assertEquals(array('https'), $route->getSchemes(), '__construct() takes a single scheme as its sixth argument');
+        $this->assertEquals(array('POST'), $route->getMethods(), '__construct() takes a single method as its seventh argument');
     }
 
-    public function testPattern()
+    public function testPath()
     {
         $route = new Route('/{foo}');
-        $route->setPattern('/{bar}');
-        $this->assertEquals('/{bar}', $route->getPattern(), '->setPattern() sets the pattern');
-        $route->setPattern('');
-        $this->assertEquals('/', $route->getPattern(), '->setPattern() adds a / at the beginning of the pattern if needed');
-        $route->setPattern('bar');
-        $this->assertEquals('/bar', $route->getPattern(), '->setPattern() adds a / at the beginning of the pattern if needed');
-        $this->assertEquals($route, $route->setPattern(''), '->setPattern() implements a fluent interface');
-        $route->setPattern('//path');
-        $this->assertEquals('/path', $route->getPattern(), '->setPattern() does not allow two slashes "//" at the beginning of the pattern as it would be confused with a network path when generating the path from the route');
+        $route->setPath('/{bar}');
+        $this->assertEquals('/{bar}', $route->getPath(), '->setPath() sets the path');
+        $route->setPath('');
+        $this->assertEquals('/', $route->getPath(), '->setPath() adds a / at the beginning of the path if needed');
+        $route->setPath('bar');
+        $this->assertEquals('/bar', $route->getPath(), '->setPath() adds a / at the beginning of the path if needed');
+        $this->assertEquals($route, $route->setPath(''), '->setPath() implements a fluent interface');
+        $route->setPath('//path');
+        $this->assertEquals('/path', $route->getPath(), '->setPath() does not allow two slahes "//" at the beginning of the path as it would be confused with a network path when generating the path from the route');
     }
 
     public function testOptions()
@@ -85,7 +93,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('\d+', $route->getRequirement('foo'), '->getRequirement() returns a requirement');
         $this->assertNull($route->getRequirement('bar'), '->getRequirement() returns null if a requirement is not defined');
         $route->setRequirements(array('foo' => '^\d+$'));
-        $this->assertEquals('\d+', $route->getRequirement('foo'), '->getRequirement() removes ^ and $ from the pattern');
+        $this->assertEquals('\d+', $route->getRequirement('foo'), '->getRequirement() removes ^ and $ from the path');
         $this->assertEquals($route, $route->setRequirements(array()), '->setRequirements() implements a fluent interface');
 
         $route->setRequirements(array('foo' => '\d+'));
@@ -98,7 +106,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     {
         $route = new Route('/{foo}');
         $route->setRequirement('foo', '^\d+$');
-        $this->assertEquals('\d+', $route->getRequirement('foo'), '->setRequirement() removes ^ and $ from the pattern');
+        $this->assertEquals('\d+', $route->getRequirement('foo'), '->setRequirement() removes ^ and $ from the path');
     }
 
     /**
@@ -122,11 +130,55 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testHostnamePattern()
+    public function testHost()
     {
         $route = new Route('/');
-        $route->setHostnamePattern('{locale}.example.net');
-        $this->assertEquals('{locale}.example.net', $route->getHostnamePattern(), '->setHostnamePattern() sets the hostname pattern');
+        $route->setHost('{locale}.example.net');
+        $this->assertEquals('{locale}.example.net', $route->getHost(), '->setHost() sets the host pattern');
+    }
+
+    public function testScheme()
+    {
+        $route = new Route('/');
+        $this->assertEquals(array(), $route->getSchemes(), 'schemes is initialized with array()');
+        $route->setSchemes('hTTp');
+        $this->assertEquals(array('http'), $route->getSchemes(), '->setSchemes() accepts a single scheme string and lowercases it');
+        $route->setSchemes(array('HttpS', 'hTTp'));
+        $this->assertEquals(array('https', 'http'), $route->getSchemes(), '->setSchemes() accepts an array of schemes and lowercases them');
+    }
+
+    public function testSchemeIsBC()
+    {
+        $route = new Route('/');
+        $route->setRequirement('_scheme', 'http|https');
+        $this->assertEquals('http|https', $route->getRequirement('_scheme'));
+        $this->assertEquals(array('http', 'https'), $route->getSchemes());
+        $route->setSchemes(array('hTTp'));
+        $this->assertEquals('http', $route->getRequirement('_scheme'));
+        $route->setSchemes(array());
+        $this->assertNull($route->getRequirement('_scheme'));
+    }
+
+    public function testMethod()
+    {
+        $route = new Route('/');
+        $this->assertEquals(array(), $route->getMethods(), 'methods is initialized with array()');
+        $route->setMethods('gEt');
+        $this->assertEquals(array('GET'), $route->getMethods(), '->setMethods() accepts a single method string and uppercases it');
+        $route->setMethods(array('gEt', 'PosT'));
+        $this->assertEquals(array('GET', 'POST'), $route->getMethods(), '->setMethods() accepts an array of methods and uppercases them');
+    }
+
+    public function testMethodIsBC()
+    {
+        $route = new Route('/');
+        $route->setRequirement('_method', 'GET|POST');
+        $this->assertEquals('GET|POST', $route->getRequirement('_method'));
+        $this->assertEquals(array('GET', 'POST'), $route->getMethods());
+        $route->setMethods(array('gEt'));
+        $this->assertEquals('GET', $route->getRequirement('_method'));
+        $route->setMethods(array());
+        $this->assertNull($route->getRequirement('_method'));
     }
 
     public function testCompile()

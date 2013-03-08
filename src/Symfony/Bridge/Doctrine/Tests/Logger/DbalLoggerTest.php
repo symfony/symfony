@@ -67,4 +67,30 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
             'nonutf8' => "\x7F\xFF"
         ));
     }
+
+    public function testLogBlobAndClob()
+    {
+        $logger = $this->getMock('Symfony\\Component\\HttpKernel\\Log\\LoggerInterface');
+
+        $dbalLogger = $this
+            ->getMockBuilder('Symfony\\Bridge\\Doctrine\\Logger\\DbalLogger')
+            ->setConstructorArgs(array($logger, null))
+            ->setMethods(array('log'))
+            ->getMock()
+        ;
+
+        $dbalLogger
+            ->expects($this->once())
+            ->method('log')
+            ->with('SQL', array('blob' => 'blob value', 'clob' => 'clob value'))
+        ;
+
+        $dbalLogger->startQuery('SQL', array(
+            'blob' => 'binary data which should not be logged',
+            'clob' => 'potentially huge amount data which should not be logged',
+        ), array(
+            'blob' => 'blob',
+            'clob' => 'clob',
+        ));
+    }
 }

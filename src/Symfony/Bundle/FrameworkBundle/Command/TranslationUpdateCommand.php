@@ -27,13 +27,7 @@ use Symfony\Component\Yaml\Yaml;
 class TranslationUpdateCommand extends ContainerAwareCommand
 {
     /**
-     * Compiled catalogue of messages.
-     * @var MessageCatalogue
-     */
-    protected $catalogue;
-
-    /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -74,7 +68,7 @@ EOF
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

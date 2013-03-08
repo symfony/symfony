@@ -15,7 +15,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -26,7 +25,7 @@ use Symfony\Component\Finder\Finder;
 class AssetsInstallCommand extends ContainerAwareCommand
 {
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -62,9 +61,9 @@ EOT
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
      *
-     * @throws \InvalidArgumentException When the target directory does not exist
+     * @throws \InvalidArgumentException When the target directory does not exist or symlink cannot be used
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

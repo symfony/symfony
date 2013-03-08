@@ -25,7 +25,7 @@ use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
 class RouterMatchCommand extends ContainerAwareCommand
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isEnabled()
     {
@@ -41,7 +41,7 @@ class RouterMatchCommand extends ContainerAwareCommand
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -61,7 +61,7 @@ EOF
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

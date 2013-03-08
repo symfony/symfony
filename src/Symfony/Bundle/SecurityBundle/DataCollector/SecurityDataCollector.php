@@ -65,7 +65,7 @@ class SecurityDataCollector extends DataCollector
     /**
      * Checks if security is enabled.
      *
-     * @return Boolean true if security is enabled, false otherwise
+     * @return boolean true if security is enabled, false otherwise
      */
     public function isEnabled()
     {
@@ -95,7 +95,7 @@ class SecurityDataCollector extends DataCollector
     /**
      * Checks if the user is authenticated or not.
      *
-     * @return Boolean true if the user is authenticated, false otherwise
+     * @return boolean true if the user is authenticated, false otherwise
      */
     public function isAuthenticated()
     {
@@ -105,7 +105,7 @@ class SecurityDataCollector extends DataCollector
     /**
      * Get the class name of the security token.
      *
-     * @return String The token
+     * @return string The token
      */
     public function getTokenClass()
     {

@@ -37,11 +37,19 @@ class XliffFileDumper extends FileDumper
         $xliffFile->setAttribute('datatype', 'plaintext');
         $xliffFile->setAttribute('original', 'file.ext');
 
-        $id = 1;
         $xliffBody = $xliffFile->appendChild($dom->createElement('body'));
         foreach ($messages->all($domain) as $source => $target) {
             $translation = $dom->createElement('trans-unit');
-            $this->buildTranslation($translation, $id++, $source, $target);
+
+            $translation->setAttribute('id', md5($source));
+            $translation->setAttribute('resname', $source);
+
+            $s = $translation->appendChild($dom->createElement('source'));
+            $s->appendChild($dom->createTextNode($source));
+
+            $t = $translation->appendChild($dom->createElement('target'));
+            $t->appendChild($dom->createTextNode($target));
+
             $xliffBody->appendChild($translation);
         }
 
@@ -54,22 +62,5 @@ class XliffFileDumper extends FileDumper
     protected function getExtension()
     {
         return 'xlf';
-    }
-
-    /**
-     * @param \DOMElement $node
-     * @param string      $id
-     * @param string      $source
-     * @param string      $target
-     */
-    protected function buildTranslation(\DOMElement $node, $id, $source, $target)
-    {
-        $node->setAttribute('id', $id);
-
-        $s = $node->appendChild($node->ownerDocument->createElement('source'));
-        $s->appendChild($node->ownerDocument->createTextNode($source));
-
-        $t = $node->appendChild($node->ownerDocument->createElement('target'));
-        $t->appendChild($node->ownerDocument->createTextNode($target));
     }
 }

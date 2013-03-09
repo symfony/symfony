@@ -40,40 +40,18 @@ class XliffFileLoader implements LoaderInterface
 
         $catalogue = new MessageCatalogue($locale);
         foreach ($xml->xpath('//xliff:trans-unit') as $translation) {
-            if (!$this->validateTranslation($translation)) {
+            $attributes = $translation->attributes();
+
+            if (!(isset($attributes['resname']) || isset($translation->source)) || !isset($translation->target)) {
                 continue;
             }
 
-            list($source, $target) = $this->parseTranslation($translation);
-            $catalogue->set($source, $target, $domain);
+            $source = isset($attributes['resname']) && $attributes['resname'] ? $attributes['resname'] : $translation->source;
+            $catalogue->set((string) $source, (string) $translation->target, $domain);
         }
         $catalogue->addResource(new FileResource($resource));
 
         return $catalogue;
-    }
-
-    /**
-     * Validates a 'trans-unit' tag.
-     *
-     * @param \SimpleXMLElement $translation
-     *
-     * @return bool
-     */
-    protected function validateTranslation(\SimpleXMLElement $translation)
-    {
-        return isset($translation->source) && isset($translation->target);
-    }
-
-    /**
-     * Parses 'trans-unit' tag element.
-     *
-     * @param \SimpleXMLElement $translation
-     *
-     * @return array An array of 2 elements: the source and the target
-     */
-    protected function parseTranslation(\SimpleXMLElement $translation)
-    {
-        return array((string) $translation->source, (string) $translation->target);
     }
 
     /**

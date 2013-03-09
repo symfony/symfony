@@ -20,6 +20,7 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
         // see http://english-zone.com/spelling/plurals.html
         // see http://www.scribd.com/doc/3271143/List-of-100-Irregular-Plural-Nouns-in-English
         return array(
+            array('images', 'image'),
             array('tags', 'tag'),
             array('alumni', 'alumnus'),
             array('funguses', array('fungus', 'funguse', 'fungusis')),

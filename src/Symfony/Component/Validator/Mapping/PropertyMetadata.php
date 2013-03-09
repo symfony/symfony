@@ -20,11 +20,13 @@ class PropertyMetadata extends MemberMetadata
      *
      * @param string $class The class this property is defined on
      * @param string $name  The name of this property
+     *
+     * @throws ValidatorException
      */
     public function __construct($class, $name)
     {
         if (!property_exists($class, $name)) {
-            throw new ValidatorException(sprintf('Property %s does not exists in class %s', $name, $class));
+            throw new ValidatorException(sprintf('Property %s does not exist in class %s', $name, $class));
         }
 
         parent::__construct($class, $name, $name);
@@ -33,7 +35,7 @@ class PropertyMetadata extends MemberMetadata
     /**
      * {@inheritDoc}
      */
-    public function getValue($object)
+    public function getPropertyValue($object)
     {
         return $this->getReflectionMember()->getValue($object);
     }

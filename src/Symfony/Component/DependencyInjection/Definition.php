@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 
 /**
  * Definition represents a service definition.
@@ -161,7 +162,7 @@ class Definition
     }
 
     /**
-     * Sets the service class.
+     * Gets the service class.
      *
      * @return string The service class
      *
@@ -240,14 +241,14 @@ class Definition
      *
      * @return Definition The current instance
      *
-     * @throws \OutOfBoundsException When the replaced argument does not exist
+     * @throws OutOfBoundsException When the replaced argument does not exist
      *
      * @api
      */
     public function replaceArgument($index, $argument)
     {
         if ($index < 0 || $index > count($this->arguments) - 1) {
-            throw new \OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));
+            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));
         }
 
         $this->arguments[$index] = $argument;
@@ -274,14 +275,14 @@ class Definition
      *
      * @return mixed The argument value
      *
-     * @throws \OutOfBoundsException When the argument does not exist
+     * @throws OutOfBoundsException When the argument does not exist
      *
      * @api
      */
     public function getArgument($index)
     {
         if ($index < 0 || $index > count($this->arguments) - 1) {
-            throw new \OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));
+            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));
         }
 
         return $this->arguments[$index];
@@ -372,7 +373,7 @@ class Definition
     /**
      * Gets the methods to call after service initialization.
      *
-     * @return  array An array of method calls
+     * @return array An array of method calls
      *
      * @api
      */
@@ -452,6 +453,22 @@ class Definition
     public function hasTag($name)
     {
         return isset($this->tags[$name]);
+    }
+
+    /**
+     * Clears all tags for a given name.
+     *
+     * @param string $name The tag name
+     *
+     * @return Definition
+     */
+    public function clearTag($name)
+    {
+        if (isset($this->tags[$name])) {
+            unset($this->tags[$name]);
+        }
+
+        return $this;
     }
 
     /**

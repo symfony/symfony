@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * Emulates the invalid behavior if the reference is not found within the
@@ -46,7 +47,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
             foreach ($definition->getMethodCalls() as $call) {
                 try {
                     $calls[] = array($call[0], $this->processArguments($call[1], true));
-                } catch (\RuntimeException $ignore) {
+                } catch (RuntimeException $ignore) {
                     // this call is simply removed
                 }
             }
@@ -57,7 +58,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
                 try {
                     $value = $this->processArguments(array($value), true);
                     $properties[$name] = reset($value);
-                } catch (\RuntimeException $ignore) {
+                } catch (RuntimeException $ignore) {
                     // ignore property
                 }
             }
@@ -73,7 +74,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
      *
      * @return array
      *
-     * @throws \RuntimeException When the config is invalid
+     * @throws RuntimeException When the config is invalid
      */
     private function processArguments(array $arguments, $inMethodCall = false)
     {
@@ -93,7 +94,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
                     $arguments[$k] = null;
                 } elseif (!$exists && ContainerInterface::IGNORE_ON_INVALID_REFERENCE === $invalidBehavior) {
                     if ($inMethodCall) {
-                        throw new \RuntimeException('Method shouldn\'t be called.');
+                        throw new RuntimeException('Method shouldn\'t be called.');
                     }
 
                     $arguments[$k] = null;

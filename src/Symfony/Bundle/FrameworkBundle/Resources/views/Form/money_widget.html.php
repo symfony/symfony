@@ -1,1 +1,1 @@
-<?php echo str_replace('{{ widget }}', $view['form']->renderBlock('field_widget'), $money_pattern) ?>
+<?php echo str_replace('{{ widget }}', $view['form']->block($form, 'form_widget_simple'), $money_pattern) ?>

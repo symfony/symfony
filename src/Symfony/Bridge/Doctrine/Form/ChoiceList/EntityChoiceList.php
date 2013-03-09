@@ -11,38 +11,33 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
-use Symfony\Component\Form\Util\PropertyPath;
-use Symfony\Component\Form\Exception\FormException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ArrayChoiceList;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\NoResultException;
+use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\StringCastException;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
+use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-class EntityChoiceList extends ArrayChoiceList
+/**
+ * A choice list presenting a list of Doctrine entities as choices
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class EntityChoiceList extends ObjectChoiceList
 {
     /**
-     * @var Doctrine\ORM\EntityManager
+     * @var ObjectManager
      */
     private $em;
 
     /**
-     * @var Doctrine\ORM\Mapping\ClassMetadata
+     * @var string
      */
     private $class;
 
     /**
-     * The entities from which the user can choose
-     *
-     * This array is either indexed by ID (if the ID is a single field)
-     * or by key in the choices array (if the ID consists of multiple fields)
-     *
-     * This property is initialized by initializeChoices(). It should only
-     * be accessed through getEntity() and getEntities().
-     *
-     * @var Collection
+     * @var \Doctrine\Common\Persistence\Mapping\ClassMetadata
      */
-    private $entities = array();
+    private $classMetadata;
 
     /**
      * Contains the query builder that builds the query for fetching the
@@ -50,256 +45,354 @@ class EntityChoiceList extends ArrayChoiceList
      *
      * This property should only be accessed through queryBuilder.
      *
-     * @var Doctrine\ORM\QueryBuilder
+     * @var EntityLoaderInterface
      */
-    private $queryBuilder;
+    private $entityLoader;
 
     /**
-     * The fields of which the identifier of the underlying class consists
-     *
-     * This property should only be accessed through identifier.
+     * The identifier field, if the identifier is not composite
      *
      * @var array
      */
-    private $identifier = array();
+    private $idField = null;
 
     /**
-     * A cache for \ReflectionProperty instances for the underlying class
+     * Whether to use the identifier for index generation
      *
-     * This property should only be accessed through getReflProperty().
+     * @var Boolean
+     */
+    private $idAsIndex = false;
+
+    /**
+     * Whether to use the identifier for value generation
+     *
+     * @var Boolean
+     */
+    private $idAsValue = false;
+
+    /**
+     * Whether the entities have already been loaded.
+     *
+     * @var Boolean
+     */
+    private $loaded = false;
+
+    /**
+     * The preferred entities.
      *
      * @var array
      */
-    private $reflProperties = array();
+    private $preferredEntities = array();
 
     /**
-     * A cache for the UnitOfWork instance of Doctrine
+     * Creates a new entity choice list.
      *
-     * @var Doctrine\ORM\UnitOfWork
+     * @param ObjectManager             $manager           An EntityManager instance
+     * @param string                    $class             The class name
+     * @param string                    $labelPath         The property path used for the label
+     * @param EntityLoaderInterface     $entityLoader      An optional query builder
+     * @param array                     $entities          An array of choices
+     * @param array                     $preferredEntities An array of preferred choices
+     * @param string                    $groupPath         A property path pointing to the property used
+     *                                                     to group the choices. Only allowed if
+     *                                                     the choices are given as flat array.
+     * @param PropertyAccessorInterface $propertyAccessor  The reflection graph for reading property paths.
      */
-    private $unitOfWork;
-
-    private $propertyPath;
-
-    /**
-     * Constructor.
-     *
-     * @param EntityManager         $em           An EntityManager instance
-     * @param string                $class        The class name
-     * @param string                $property     The property name
-     * @param QueryBuilder|\Closure $queryBuilder An optional query builder
-     * @param array|\Closure        $choices      An array of choices or a function returning an array
-     */
-    public function __construct(EntityManager $em, $class, $property = null, $queryBuilder = null, $choices = null)
+    public function __construct(ObjectManager $manager, $class, $labelPath = null, EntityLoaderInterface $entityLoader = null, $entities = null,  array $preferredEntities = array(), $groupPath = null, PropertyAccessorInterface $propertyAccessor = null)
     {
-        // If a query builder was passed, it must be a closure or QueryBuilder
-        // instance
-        if (!(null === $queryBuilder || $queryBuilder instanceof QueryBuilder || $queryBuilder instanceof \Closure)) {
-            throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or \Closure');
-        }
+        $this->em = $manager;
+        $this->entityLoader = $entityLoader;
+        $this->classMetadata = $manager->getClassMetadata($class);
+        $this->class = $this->classMetadata->getName();
+        $this->loaded = is_array($entities) || $entities instanceof \Traversable;
+        $this->preferredEntities = $preferredEntities;
 
-        if ($queryBuilder instanceof \Closure) {
-            $queryBuilder = $queryBuilder($em->getRepository($class));
+        $identifier = $this->classMetadata->getIdentifierFieldNames();
 
-            if (!$queryBuilder instanceof QueryBuilder) {
-                throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
+        if (1 === count($identifier)) {
+            $this->idField = $identifier[0];
+            $this->idAsValue = true;
+
+            if ('integer' === $this->classMetadata->getTypeOfField($this->idField)) {
+                $this->idAsIndex = true;
             }
         }
 
-        $this->em = $em;
-        $this->class = $class;
-        $this->queryBuilder = $queryBuilder;
-        $this->unitOfWork = $em->getUnitOfWork();
-        $this->identifier = $em->getClassMetadata($class)->getIdentifierFieldNames();
-
-        // The property option defines, which property (path) is used for
-        // displaying entities as strings
-        if ($property) {
-            $this->propertyPath = new PropertyPath($property);
+        if (!$this->loaded) {
+            // Make sure the constraints of the parent constructor are
+            // fulfilled
+            $entities = array();
         }
 
-        if (!is_array($choices) && !$choices instanceof \Closure && !is_null($choices)) {
-            throw new UnexpectedTypeException($choices, 'array or \Closure or null');
-        }
-
-        $this->choices = $choices;
+        parent::__construct($entities, $labelPath, $preferredEntities, $groupPath, null, $propertyAccessor);
     }
 
     /**
-     * Initializes the choices and returns them.
+     * Returns the list of entities
      *
-     * If the entities were passed in the "choices" option, this method
-     * does not have any significant overhead. Otherwise, if a query builder
-     * was passed in the "query_builder" option, this builder is now used
-     * to construct a query which is executed. In the last case, all entities
-     * for the underlying class are fetched from the repository.
+     * @return array
      *
-     * @return array  An array of choices
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
      */
-    protected function load()
+    public function getChoices()
     {
-        parent::load();
+        if (!$this->loaded) {
+            $this->load();
+        }
 
-        if (is_array($this->choices)) {
-            $entities = $this->choices;
-        } elseif ($qb = $this->queryBuilder) {
-            $entities = $qb->getQuery()->execute();
+        return parent::getChoices();
+    }
+
+    /**
+     * Returns the values for the entities
+     *
+     * @return array
+     *
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    public function getValues()
+    {
+        if (!$this->loaded) {
+            $this->load();
+        }
+
+        return parent::getValues();
+    }
+
+    /**
+     * Returns the choice views of the preferred choices as nested array with
+     * the choice groups as top-level keys.
+     *
+     * @return array
+     *
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    public function getPreferredViews()
+    {
+        if (!$this->loaded) {
+            $this->load();
+        }
+
+        return parent::getPreferredViews();
+    }
+
+    /**
+     * Returns the choice views of the choices that are not preferred as nested
+     * array with the choice groups as top-level keys.
+     *
+     * @return array
+     *
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    public function getRemainingViews()
+    {
+        if (!$this->loaded) {
+            $this->load();
+        }
+
+        return parent::getRemainingViews();
+    }
+
+    /**
+     * Returns the entities corresponding to the given values.
+     *
+     * @param array $values
+     *
+     * @return array
+     *
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    public function getChoicesForValues(array $values)
+    {
+        if (!$this->loaded) {
+            // Optimize performance in case we have an entity loader and
+            // a single-field identifier
+            if ($this->idAsValue && $this->entityLoader) {
+                if (empty($values)) {
+                    return array();
+                }
+
+                return $this->entityLoader->getEntitiesByIds($this->idField, $values);
+            }
+
+            $this->load();
+        }
+
+        return parent::getChoicesForValues($values);
+    }
+
+    /**
+     * Returns the values corresponding to the given entities.
+     *
+     * @param array $entities
+     *
+     * @return array
+     *
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    public function getValuesForChoices(array $entities)
+    {
+        if (!$this->loaded) {
+            // Optimize performance for single-field identifiers. We already
+            // know that the IDs are used as values
+
+            // Attention: This optimization does not check choices for existence
+            if ($this->idAsValue) {
+                $values = array();
+
+                foreach ($entities as $entity) {
+                    if ($entity instanceof $this->class) {
+                        // Make sure to convert to the right format
+                        $values[] = $this->fixValue(current($this->getIdentifierValues($entity)));
+                    }
+                }
+
+                return $values;
+            }
+
+            $this->load();
+        }
+
+        return parent::getValuesForChoices($entities);
+    }
+
+    /**
+     * Returns the indices corresponding to the given entities.
+     *
+     * @param array $entities
+     *
+     * @return array
+     *
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    public function getIndicesForChoices(array $entities)
+    {
+        if (!$this->loaded) {
+            // Optimize performance for single-field identifiers. We already
+            // know that the IDs are used as indices
+
+            // Attention: This optimization does not check choices for existence
+            if ($this->idAsIndex) {
+                $indices = array();
+
+                foreach ($entities as $entity) {
+                    if ($entity instanceof $this->class) {
+                        // Make sure to convert to the right format
+                        $indices[] = $this->fixIndex(current($this->getIdentifierValues($entity)));
+                    }
+                }
+
+                return $indices;
+            }
+
+            $this->load();
+        }
+
+        return parent::getIndicesForChoices($entities);
+    }
+
+    /**
+     * Returns the entities corresponding to the given values.
+     *
+     * @param array $values
+     *
+     * @return array
+     *
+     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     */
+    public function getIndicesForValues(array $values)
+    {
+        if (!$this->loaded) {
+            // Optimize performance for single-field identifiers.
+
+            // Attention: This optimization does not check values for existence
+            if ($this->idAsIndex && $this->idAsValue) {
+                return $this->fixIndices($values);
+            }
+
+            $this->load();
+        }
+
+        return parent::getIndicesForValues($values);
+    }
+
+    /**
+     * Creates a new unique index for this entity.
+     *
+     * If the entity has a single-field identifier, this identifier is used.
+     *
+     * Otherwise a new integer is generated.
+     *
+     * @param mixed $entity The choice to create an index for
+     *
+     * @return integer|string A unique index containing only ASCII letters,
+     *                        digits and underscores.
+     */
+    protected function createIndex($entity)
+    {
+        if ($this->idAsIndex) {
+            return $this->fixIndex(current($this->getIdentifierValues($entity)));
+        }
+
+        return parent::createIndex($entity);
+    }
+
+    /**
+     * Creates a new unique value for this entity.
+     *
+     * If the entity has a single-field identifier, this identifier is used.
+     *
+     * Otherwise a new integer is generated.
+     *
+     * @param mixed $entity The choice to create a value for
+     *
+     * @return integer|string A unique value without character limitations.
+     */
+    protected function createValue($entity)
+    {
+        if ($this->idAsValue) {
+            return (string) current($this->getIdentifierValues($entity));
+        }
+
+        return parent::createValue($entity);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function fixIndex($index)
+    {
+        $index = parent::fixIndex($index);
+
+        // If the ID is a single-field integer identifier, it is used as
+        // index. Replace any leading minus by underscore to make it a valid
+        // form name.
+        if ($this->idAsIndex && $index < 0) {
+            $index = strtr($index, '-', '_');
+        }
+
+        return $index;
+    }
+
+    /**
+     * Loads the list with entities.
+     */
+    private function load()
+    {
+        if ($this->entityLoader) {
+            $entities = $this->entityLoader->getEntities();
         } else {
             $entities = $this->em->getRepository($this->class)->findAll();
         }
 
-        $this->choices = array();
-        $this->entities = array();
-
-        $this->loadEntities($entities);
-
-        return $this->choices;
-    }
-
-    /**
-     * Converts entities into choices with support for groups.
-     *
-     * The choices are generated from the entities. If the entities have a
-     * composite identifier, the choices are indexed using ascending integers.
-     * Otherwise the identifiers are used as indices.
-     *
-     * If the option "property" was passed, the property path in that option
-     * is used as option values. Otherwise this method tries to convert
-     * objects to strings using __toString().
-     *
-     * @param array  $entities An array of entities
-     * @param string $group    A group name
-     */
-    private function loadEntities($entities, $group = null)
-    {
-        foreach ($entities as $key => $entity) {
-            if (is_array($entity)) {
-                // Entities are in named groups
-                $this->loadEntities($entity, $key);
-                continue;
-            }
-
-            if ($this->propertyPath) {
-                // If the property option was given, use it
-                $value = $this->propertyPath->getValue($entity);
-            } else {
-                // Otherwise expect a __toString() method in the entity
-                if (!method_exists($entity, '__toString')) {
-                    throw new FormException(sprintf('Entity "%s" passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).', $this->class));
-                }
-
-                $value = (string) $entity;
-            }
-
-            if (count($this->identifier) > 1) {
-                // When the identifier consists of multiple field, use
-                // naturally ordered keys to refer to the choices
-                $id = $key;
-            } else {
-                // When the identifier is a single field, index choices by
-                // entity ID for performance reasons
-                $id = current($this->getIdentifierValues($entity));
-            }
-
-            if (null === $group) {
-                // Flat list of choices
-                $this->choices[$id] = $value;
-            } else {
-                // Nested choices
-                $this->choices[$group][$id] = $value;
-            }
-
-            $this->entities[$id] = $entity;
-        }
-    }
-
-    /**
-     * Returns the fields of which the identifier of the underlying class consists.
-     *
-     * @return array
-     */
-    public function getIdentifier()
-    {
-        return $this->identifier;
-    }
-
-    /**
-     * Returns the according entities for the choices.
-     *
-     * If the choices were not initialized, they are initialized now. This
-     * is an expensive operation, except if the entities were passed in the
-     * "choices" option.
-     *
-     * @return array  An array of entities
-     */
-    public function getEntities()
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
-        return $this->entities;
-    }
-
-    /**
-     * Returns the entity for the given key.
-     *
-     * If the underlying entities have composite identifiers, the choices
-     * are initialized. The key is expected to be the index in the choices
-     * array in this case.
-     *
-     * If they have single identifiers, they are either fetched from the
-     * internal entity cache (if filled) or loaded from the database.
-     *
-     * @param string $key The choice key (for entities with composite
-     *                     identifiers) or entity ID (for entities with single
-     *                     identifiers)
-     *
-     * @return object      The matching entity
-     */
-    public function getEntity($key)
-    {
-        if (!$this->loaded) {
-            $this->load();
-        }
-
         try {
-            if (count($this->identifier) > 1) {
-                // $key is a collection index
-                $entities = $this->getEntities();
-
-                return isset($entities[$key]) ? $entities[$key] : null;
-            } elseif ($this->entities) {
-                return isset($this->entities[$key]) ? $this->entities[$key] : null;
-            } elseif ($qb = $this->queryBuilder) {
-                // should we clone the builder?
-                $alias = $qb->getRootAlias();
-                $where = $qb->expr()->eq($alias.'.'.current($this->identifier), $key);
-
-                return $qb->andWhere($where)->getQuery()->getSingleResult();
-            }
-
-            return $this->em->find($this->class, $key);
-        } catch (NoResultException $e) {
-            return null;
-        }
-    }
-
-    /**
-     * Returns the \ReflectionProperty instance for a property of the underlying class.
-     *
-     * @param string $property The name of the property
-     *
-     * @return \ReflectionProperty The reflection instance
-     */
-    private function getReflProperty($property)
-    {
-        if (!isset($this->reflProperties[$property])) {
-            $this->reflProperties[$property] = new \ReflectionProperty($this->class, $property);
-            $this->reflProperties[$property]->setAccessible(true);
+            // The second parameter $labels is ignored by ObjectChoiceList
+            parent::initialize($entities, array(), $this->preferredEntities);
+        } catch (StringCastException $e) {
+            throw new StringCastException(str_replace('argument $labelPath', 'option "property"', $e->getMessage()), null, $e);
         }
 
-        return $this->reflProperties[$property];
+        $this->loaded = true;
     }
 
     /**
@@ -313,14 +406,19 @@ class EntityChoiceList extends ArrayChoiceList
      *
      * @return array          The identifier values
      *
-     * @throws FormException  If the entity does not exist in Doctrine's identity map
+     * @throws Exception If the entity does not exist in Doctrine's identity map
      */
-    public function getIdentifierValues($entity)
+    private function getIdentifierValues($entity)
     {
-        if (!$this->unitOfWork->isInIdentityMap($entity)) {
-            throw new FormException('Entities passed to the choice field must be managed');
+        if (!$this->em->contains($entity)) {
+            throw new Exception(
+                'Entities passed to the choice field must be managed. Maybe ' .
+                'persist them in the entity manager?'
+            );
         }
 
-        return $this->unitOfWork->getEntityIdentifier($entity);
+        $this->em->initializeObject($entity);
+
+        return $this->classMetadata->getIdentifierValues($entity);
     }
 }

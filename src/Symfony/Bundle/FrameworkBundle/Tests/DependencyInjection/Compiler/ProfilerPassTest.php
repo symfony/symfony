@@ -70,7 +70,7 @@ class ProfilerPassTest extends \PHPUnit_Framework_TestCase
 
         // grab the method calls off of the "profiler" definition
         $methodCalls = $definition->getMethodCalls();
-        $this->assertEquals(1, count($methodCalls));
+        $this->assertCount(1, $methodCalls);
         $this->assertEquals('add', $methodCalls[0][0]); // grab the method part of the first call
     }
 }

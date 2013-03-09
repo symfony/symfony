@@ -71,6 +71,8 @@ class SlotsHelper extends Helper
      *
      * @param string $name The slot name
      *
+     * @return Boolean
+     *
      * @api
      */
     public function has($name)
@@ -81,8 +83,8 @@ class SlotsHelper extends Helper
     /**
      * Gets the slot value.
      *
-     * @param string $name    The slot name
-     * @param string $default The default slot content
+     * @param string         $name    The slot name
+     * @param Boolean|string $default The default slot content
      *
      * @return string The slot content
      *
@@ -109,8 +111,8 @@ class SlotsHelper extends Helper
     /**
      * Outputs a slot.
      *
-     * @param string $name    The slot name
-     * @param string $default The default slot content
+     * @param string         $name    The slot name
+     * @param Boolean|string $default The default slot content
      *
      * @return Boolean true if the slot is defined or if a default content has been provided, false otherwise
      *

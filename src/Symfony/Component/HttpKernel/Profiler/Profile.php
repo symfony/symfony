@@ -18,21 +18,38 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Profile implements \Serializable
+class Profile
 {
     private $token;
-    private $collectors;
+
+    /**
+     * @var DataCollectorInterface[]
+     */
+    private $collectors = array();
+
     private $ip;
+    private $method;
     private $url;
     private $time;
-    private $parent;
-    private $children;
 
+    /**
+     * @var Profile
+     */
+    private $parent;
+
+    /**
+     * @var Profile[]
+     */
+    private $children = array();
+
+    /**
+     * Constructor.
+     *
+     * @param string $token The token
+     */
     public function __construct($token)
     {
         $this->token = $token;
-        $this->collectors = array();
-        $this->children = array();
     }
 
     /**
@@ -66,13 +83,23 @@ class Profile implements \Serializable
     }
 
     /**
-     * Returns the parent token.
+     * Returns the parent profile.
      *
      * @return Profile The parent profile
      */
     public function getParent()
     {
         return $this->parent;
+    }
+
+    /**
+     * Returns the parent token.
+     *
+     * @return null|string The parent token
+     */
+    public function getParentToken()
+    {
+        return $this->parent ? $this->parent->getToken() : null;
     }
 
     /**
@@ -85,9 +112,29 @@ class Profile implements \Serializable
         return $this->ip;
     }
 
+    /**
+     * Sets the IP.
+     *
+     * @param string $ip
+     */
     public function setIp($ip)
     {
         $this->ip = $ip;
+    }
+
+    /**
+     * Returns the request method.
+     *
+     * @return string The request method
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    public function setMethod($method)
+    {
+        $this->method = $method;
     }
 
     /**
@@ -112,6 +159,10 @@ class Profile implements \Serializable
      */
     public function getTime()
     {
+        if (null === $this->time) {
+            return 0;
+        }
+
         return $this->time;
     }
 
@@ -123,13 +174,18 @@ class Profile implements \Serializable
     /**
      * Finds children profilers.
      *
-     * @return array An array of Profile
+     * @return Profile[] An array of Profile
      */
     public function getChildren()
     {
         return $this->children;
     }
 
+    /**
+     * Sets children profiler.
+     *
+     * @param Profile[] $children An array of Profile
+     */
     public function setChildren(array $children)
     {
         $this->children = array();
@@ -138,11 +194,26 @@ class Profile implements \Serializable
         }
     }
 
+    /**
+     * Adds the child token
+     *
+     * @param Profile $child The child Profile
+     */
     public function addChild(Profile $child)
     {
         $this->children[] = $child;
+        $child->setParent($this);
     }
 
+    /**
+     * Gets a Collector by name.
+     *
+     * @param string $name A collector name
+     *
+     * @return DataCollectorInterface A DataCollectorInterface instance
+     *
+     * @throws \InvalidArgumentException if the collector does not exist
+     */
     public function getCollector($name)
     {
         if (!isset($this->collectors[$name])) {
@@ -152,11 +223,21 @@ class Profile implements \Serializable
         return $this->collectors[$name];
     }
 
+    /**
+     * Gets the Collectors associated with this profile.
+     *
+     * @return DataCollectorInterface[]
+     */
     public function getCollectors()
     {
         return $this->collectors;
     }
 
+    /**
+     * Sets the Collectors associated with this profile.
+     *
+     * @param DataCollectorInterface[] $collectors
+     */
     public function setCollectors(array $collectors)
     {
         $this->collectors = array();
@@ -165,23 +246,30 @@ class Profile implements \Serializable
         }
     }
 
+    /**
+     * Adds a Collector.
+     *
+     * @param DataCollectorInterface $collector A DataCollectorInterface instance
+     */
     public function addCollector(DataCollectorInterface $collector)
     {
         $this->collectors[$collector->getName()] = $collector;
     }
 
+    /**
+     * Returns true if a Collector for the given name exists.
+     *
+     * @param string $name A collector name
+     *
+     * @return Boolean
+     */
     public function hasCollector($name)
     {
         return isset($this->collectors[$name]);
     }
 
-    public function serialize()
+    public function __sleep()
     {
-        return serialize(array($this->token, $this->parent, $this->children, $this->collectors, $this->ip, $this->url, $this->time));
-    }
-
-    public function unserialize($data)
-    {
-        list($this->token, $this->parent, $this->children, $this->collectors, $this->ip, $this->url, $this->time) = unserialize($data);
+        return array('token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time');
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-namespace Symfony\Component\Security\Core\Authentication\RememberMe;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -10,6 +8,8 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 
 /**
  * Interface for TokenProviders
@@ -39,9 +39,9 @@ interface TokenProviderInterface
     /**
      * Updates the token according to this data.
      *
-     * @param string   $series
-     * @param string   $tokenValue
-     * @param DateTime $lastUsed
+     * @param string    $series
+     * @param string    $tokenValue
+     * @param \DateTime $lastUsed
      */
     public function updateToken($series, $tokenValue, \DateTime $lastUsed);
 

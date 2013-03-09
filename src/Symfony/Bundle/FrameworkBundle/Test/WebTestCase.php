@@ -35,6 +35,10 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      */
     protected static function createClient(array $options = array(), array $server = array())
     {
+        if (null !== static::$kernel) {
+            static::$kernel->shutdown();
+        }
+
         static::$kernel = static::createKernel($options);
         static::$kernel->boot();
 
@@ -51,6 +55,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      * If not, override this method in your test classes.
      *
      * @return string The directory where phpunit.xml(.dist) is stored
+     *
+     * @throws \RuntimeException
      */
     protected static function getPhpUnitXmlDir()
     {
@@ -60,8 +66,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
 
         $dir = static::getPhpUnitCliConfigArgument();
         if ($dir === null &&
-            (file_exists(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
-            file_exists(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
+            (is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
+            is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
             $dir = getcwd();
         }
 
@@ -109,6 +115,8 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
      * When the Kernel is located, the file is required.
      *
      * @return string The Kernel class name
+     *
+     * @throws \RuntimeException
      */
     protected static function getKernelClass()
     {

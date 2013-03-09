@@ -27,6 +27,8 @@ system:
 Resources
 ---------
 
-Unit tests:
+You can run the unit tests with the following command:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/Routing
+    $ cd path/to/Symfony/Component/Routing/
+    $ composer.phar install --dev
+    $ phpunit

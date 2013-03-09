@@ -58,3 +58,12 @@ class loader:
 Furthermore, the component provides tools to aggregate classes into a single
 file, which is especially useful to improve performance on servers that do not
 provide byte caches.
+
+Resources
+---------
+
+You can run the unit tests with the following command:
+
+    $ cd path/to/Symfony/Component/ClassLoader/
+    $ composer.phar install --dev
+    $ phpunit

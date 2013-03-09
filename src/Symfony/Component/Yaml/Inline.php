@@ -33,6 +33,8 @@ class Inline
      * @param Boolean $objectSupport          true if object support is enabled, false otherwise
      *
      * @return array A PHP array representing the YAML string
+     *
+     * @throws ParseException
      */
     public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false)
     {
@@ -235,11 +237,6 @@ class Inline
      */
     private static function parseQuotedScalar($scalar, &$i)
     {
-        // Only check the current item we're dealing with (for sequences)
-        $subject = substr($scalar, $i);
-        $items = preg_split('/[\'"]\s*(?:[,:]|[}\]]\s*,)/', $subject);
-        $subject = substr($subject, 0, strlen($items[0]) + 1);
-
         if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
             throw new ParseException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
         }
@@ -439,9 +436,11 @@ class Inline
     }
 
     /**
-     * Gets a regex that matches an unix timestamp
+     * Gets a regex that matches a YAML date.
      *
      * @return string The regular expression
+     *
+     * @see http://www.yaml.org/spec/1.2/spec.html#id2761573
      */
     private static function getTimestampRegex()
     {

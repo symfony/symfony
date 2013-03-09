@@ -15,7 +15,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\Output;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -32,7 +31,7 @@ class ContainerDebugCommand extends ContainerAwareCommand
     /**
      * @var ContainerBuilder
      */
-    private $containerBuilder;
+    protected $containerBuilder;
 
     /**
      * @see Command
@@ -40,25 +39,35 @@ class ContainerDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
-                new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)  or search (foo*)'),
-                new InputOption('show-private', null, InputOption::VALUE_NONE, 'Use to show public *and* private services'),
-            ))
             ->setName('container:debug')
+            ->setDefinition(array(
+                new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
+                new InputOption('show-private', null, InputOption::VALUE_NONE, 'Use to show public *and* private services'),
+                new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Show all services with a specific tag'),
+                new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application')
+            ))
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<EOF
-The <info>container:debug</info> command displays all configured <comment>public</comment> services:
+The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
 
-  <info>container:debug</info>
+  <info>php %command.full_name%</info>
 
 To get specific information about a service, specify its name:
 
-  <info>container:debug validator</info>
+  <info>php %command.full_name% validator</info>
 
 By default, private services are hidden. You can display all services by
 using the --show-private flag:
 
-  <info>container:debug --show-private</info>
+  <info>php %command.full_name% --show-private</info>
+
+Use the --tags option to display tagged <comment>public</comment> services grouped by tag:
+
+  <info>php %command.full_name% --tags</info>
+
+Find all services with a specific tag by specifying the tag name with the --tag option:
+
+  <info>php %command.full_name% --tag=form.type</info>
 EOF
             )
         ;
@@ -72,7 +81,27 @@ EOF
         $name = $input->getArgument('name');
 
         $this->containerBuilder = $this->getContainerBuilder();
-        $serviceIds = $this->containerBuilder->getServiceIds();
+
+        $tag = $input->getOption('tag');
+        if ($input->getOption('tags')) {
+            if ($tag || $input->getArgument('name')) {
+                throw new \InvalidArgumentException('The --tags option cannot be combined with the --tag option or the service name argument.');
+            }
+
+            $this->outputTags($output, $input->getOption('show-private'));
+
+            return;
+        }
+
+        if (null !== $tag) {
+            if ($input->getArgument('name')) {
+                throw new \InvalidArgumentException('The --tag option cannot be combined with the service name argument.');
+            }
+
+            $serviceIds = array_keys($this->containerBuilder->findTaggedServiceIds($tag));
+        } else {
+            $serviceIds = $this->containerBuilder->getServiceIds();
+        }
 
         // sort so that it reads like an index of services
         asort($serviceIds);
@@ -80,11 +109,11 @@ EOF
         if ($name) {
             $this->outputService($output, $name);
         } else {
-            $this->outputServices($output, $serviceIds, $input->getOption('show-private'));
+            $this->outputServices($output, $serviceIds, $input->getOption('show-private'), $tag);
         }
     }
 
-    protected function outputServices(OutputInterface $output, $serviceIds, $showPrivate = false)
+    protected function outputServices(OutputInterface $output, $serviceIds, $showPrivate = false, $showTagAttributes = null)
     {
         // set the label to specify public or public+private
         if ($showPrivate) {
@@ -92,12 +121,16 @@ EOF
         } else {
             $label = '<comment>Public</comment> services';
         }
+        if ($showTagAttributes) {
+            $label .= ' with tag <info>'.$showTagAttributes.'</info>';
+        }
 
         $output->writeln($this->getHelper('formatter')->formatSection('container', $label));
 
         // loop through to get space needed and filter private services
         $maxName = 4;
         $maxScope = 6;
+        $maxTags = array();
         foreach ($serviceIds as $key => $serviceId) {
             $definition = $this->resolveServiceDefinition($serviceId);
 
@@ -111,32 +144,86 @@ EOF
                 if (strlen($definition->getScope()) > $maxScope) {
                     $maxScope = strlen($definition->getScope());
                 }
+
+                if (null !== $showTagAttributes) {
+                    $tags = $definition->getTag($showTagAttributes);
+                    foreach ($tags as $tag) {
+                        foreach ($tag as $key => $value) {
+                            if (!isset($maxTags[$key])) {
+                                $maxTags[$key] = strlen($key);
+                            }
+                            if (strlen($value) > $maxTags[$key]) {
+                                $maxTags[$key] = strlen($value);
+                            }
+                        }
+                    }
+                }
             }
 
             if (strlen($serviceId) > $maxName) {
                 $maxName = strlen($serviceId);
             }
         }
-        $format  = '%-'.$maxName.'s %-'.$maxScope.'s %s';
+        $format = '%-'.$maxName.'s ';
+        $format .= implode("", array_map(function($length) { return "%-{$length}s "; }, $maxTags));
+        $format .= '%-'.$maxScope.'s %s';
 
         // the title field needs extra space to make up for comment tags
-        $format1  = '%-'.($maxName + 19).'s %-'.($maxScope + 19).'s %s';
-        $output->writeln(sprintf($format1, '<comment>Name</comment>', '<comment>Scope</comment>', '<comment>Class Name</comment>'));
+        $format1 = '%-'.($maxName + 19).'s ';
+        $format1 .= implode("", array_map(function($length) { return '%-'.($length + 19).'s '; }, $maxTags));
+        $format1 .= '%-'.($maxScope + 19).'s %s';
+
+        $tags = array();
+        foreach ($maxTags as $tagName => $length) {
+            $tags[] = '<comment>'.$tagName.'</comment>';
+        }
+        $output->writeln(vsprintf($format1, $this->buildArgumentsArray('<comment>Service Id</comment>', '<comment>Scope</comment>', '<comment>Class Name</comment>', $tags)));
 
         foreach ($serviceIds as $serviceId) {
             $definition = $this->resolveServiceDefinition($serviceId);
 
             if ($definition instanceof Definition) {
-                $output->writeln(sprintf($format, $serviceId, $definition->getScope(), $definition->getClass()));
+                $lines = array();
+                if (null !== $showTagAttributes) {
+                    foreach ($definition->getTag($showTagAttributes) as $key => $tag) {
+                        $tagValues = array();
+                        foreach (array_keys($maxTags) as $tagName) {
+                            $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : "";
+                        }
+                        if (0 === $key) {
+                            $lines[] = $this->buildArgumentsArray($serviceId, $definition->getScope(), $definition->getClass(), $tagValues);
+                        } else {
+                            $lines[] = $this->buildArgumentsArray('  "', '', '', $tagValues);
+                        }
+                    }
+                } else {
+                    $lines[] = $this->buildArgumentsArray($serviceId, $definition->getScope(), $definition->getClass());
+                }
+
+                foreach ($lines as $arguments) {
+                    $output->writeln(vsprintf($format, $arguments));
+                }
             } elseif ($definition instanceof Alias) {
                 $alias = $definition;
-                $output->writeln(sprintf($format, $serviceId, 'n/a', sprintf('<comment>alias for</comment> <info>%s</info>', (string) $alias)));
+                $output->writeln(vsprintf($format, $this->buildArgumentsArray($serviceId, 'n/a', sprintf('<comment>alias for</comment> <info>%s</info>', (string) $alias), count($maxTags) ? array_fill(0, count($maxTags), "") : array())));
             } else {
                 // we have no information (happens with "service_container")
                 $service = $definition;
-                $output->writeln(sprintf($format, $serviceId, '', get_class($service)));
+                $output->writeln(vsprintf($format, $this->buildArgumentsArray($serviceId, '', get_class($service), count($maxTags) ? array_fill(0, count($maxTags), "") : array())));
             }
         }
+    }
+
+    protected function buildArgumentsArray($serviceId, $scope, $className, array $tagAttributes = array())
+    {
+        $arguments = array($serviceId);
+        foreach ($tagAttributes as $tagAttribute) {
+            $arguments[] = $tagAttribute;
+        }
+        $arguments[] = $scope;
+        $arguments[] = $className;
+
+        return $arguments;
     }
 
     /**
@@ -151,16 +238,33 @@ EOF
         $output->writeln('');
 
         if ($definition instanceof Definition) {
-            $output->writeln(sprintf('<comment>Service Id</comment>   %s', $serviceId));
-            $output->writeln(sprintf('<comment>Class</comment>        %s', $definition->getClass()));
+            $output->writeln(sprintf('<comment>Service Id</comment>       %s', $serviceId));
+            $output->writeln(sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: "-"));
 
-            $tags = $definition->getTags() ? implode(', ', array_keys($definition->getTags())) : '-';
-            $output->writeln(sprintf('<comment>Tags</comment>         %s', $tags));
+            $tags = $definition->getTags();
+            if (count($tags)) {
+                $output->writeln('<comment>Tags</comment>');
+                foreach ($tags as $tagName => $tagData) {
+                    foreach ($tagData as $singleTagData) {
+                        $output->writeln(sprintf('    - %-30s (%s)', $tagName, implode(', ', array_map(function($key, $value) {
+                            return sprintf('<info>%s</info>: %s', $key, $value);
+                        }, array_keys($singleTagData), array_values($singleTagData)))));
+                    }
+                }
+            } else {
+                $output->writeln('<comment>Tags</comment>             -');
+            }
 
-            $output->writeln(sprintf('<comment>Scope</comment>        %s', $definition->getScope()));
+            $output->writeln(sprintf('<comment>Scope</comment>            %s', $definition->getScope()));
 
             $public = $definition->isPublic() ? 'yes' : 'no';
-            $output->writeln(sprintf('<comment>Public</comment>       %s', $public));
+            $output->writeln(sprintf('<comment>Public</comment>           %s', $public));
+
+            $synthetic = $definition->isSynthetic() ? 'yes' : 'no';
+            $output->writeln(sprintf('<comment>Synthetic</comment>        %s', $synthetic));
+
+            $file = $definition->getFile() ? $definition->getFile() : '-';
+            $output->writeln(sprintf('<comment>Required File</comment>    %s', $file));
         } elseif ($definition instanceof Alias) {
             $alias = $definition;
             $output->writeln(sprintf('This service is an alias for the service <info>%s</info>', (string) $alias));
@@ -176,14 +280,16 @@ EOF
      * Loads the ContainerBuilder from the cache.
      *
      * @return ContainerBuilder
+     *
+     * @throws \LogicException
      */
-    private function getContainerBuilder()
+    protected function getContainerBuilder()
     {
         if (!$this->getApplication()->getKernel()->isDebug()) {
             throw new \LogicException(sprintf('Debug information about the container is only available in debug mode.'));
         }
 
-        if (!file_exists($cachedFile = $this->getContainer()->getParameter('debug.container.dump'))) {
+        if (!is_file($cachedFile = $this->getContainer()->getParameter('debug.container.dump'))) {
             throw new \LogicException(sprintf('Debug information about the container could not be found. Please clear the cache and try again.'));
         }
 
@@ -203,7 +309,7 @@ EOF
      *
      * @return \Symfony\Component\DependencyInjection\Definition|\Symfony\Component\DependencyInjection\Alias
      */
-    private function resolveServiceDefinition($serviceId)
+    protected function resolveServiceDefinition($serviceId)
     {
         if ($this->containerBuilder->hasDefinition($serviceId)) {
             return $this->containerBuilder->getDefinition($serviceId);
@@ -216,5 +322,46 @@ EOF
 
         // the service has been injected in some special way, just return the service
         return $this->containerBuilder->get($serviceId);
+    }
+
+    /**
+     * Renders list of tagged services grouped by tag
+     *
+     * @param OutputInterface $output
+     * @param bool            $showPrivate
+     */
+    protected function outputTags(OutputInterface $output, $showPrivate = false)
+    {
+        $tags = $this->containerBuilder->findTags();
+        asort($tags);
+
+        $label = 'Tagged services';
+        $output->writeln($this->getHelper('formatter')->formatSection('container', $label));
+
+        foreach ($tags as $tag) {
+            $serviceIds = $this->containerBuilder->findTaggedServiceIds($tag);
+
+            foreach ($serviceIds as $serviceId => $attributes) {
+                $definition = $this->resolveServiceDefinition($serviceId);
+                if ($definition instanceof Definition) {
+                    if (!$showPrivate && !$definition->isPublic()) {
+                        unset($serviceIds[$serviceId]);
+                        continue;
+                    }
+                }
+            }
+
+            if (count($serviceIds) === 0) {
+                continue;
+            }
+
+            $output->writeln($this->getHelper('formatter')->formatSection('tag', $tag));
+
+            foreach ($serviceIds as $serviceId => $attributes) {
+                $output->writeln($serviceId);
+            }
+
+            $output->writeln('');
+        }
     }
 }

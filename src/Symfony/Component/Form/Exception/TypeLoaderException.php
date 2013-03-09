@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Form\Exception;
 
-class TypeLoaderException extends FormException
+class TypeLoaderException extends Exception
 {
 }

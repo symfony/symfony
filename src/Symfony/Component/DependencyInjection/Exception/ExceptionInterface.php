@@ -12,7 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Exception;
 
 /**
- * ExceptionInterface
+ * Base ExceptionInterface for Dependency Injection component.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <bulat@theopenskyproject.com>

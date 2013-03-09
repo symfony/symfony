@@ -27,16 +27,30 @@ class FlattenException
     private $class;
     private $statusCode;
     private $headers;
+    private $file;
+    private $line;
 
-    public static function create(\Exception $exception, $statusCode = 500, array $headers = array())
+    public static function create(\Exception $exception, $statusCode = null, array $headers = array())
     {
         $e = new static();
         $e->setMessage($exception->getMessage());
         $e->setCode($exception->getCode());
+
+        if ($exception instanceof HttpExceptionInterface) {
+            $statusCode = $exception->getStatusCode();
+            $headers = array_merge($headers, $exception->getHeaders());
+        }
+
+        if (null === $statusCode) {
+            $statusCode = 500;
+        }
+
         $e->setStatusCode($statusCode);
         $e->setHeaders($headers);
-        $e->setTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
+        $e->setTraceFromException($exception);
         $e->setClass(get_class($exception));
+        $e->setFile($exception->getFile());
+        $e->setLine($exception->getLine());
         if ($exception->getPrevious()) {
             $e->setPrevious(static::create($exception->getPrevious()));
         }
@@ -88,6 +102,26 @@ class FlattenException
         $this->class = $class;
     }
 
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    public function setFile($file)
+    {
+        $this->file = $file;
+    }
+
+    public function getLine()
+    {
+        return $this->line;
+    }
+
+    public function setLine($line)
+    {
+        $this->line = $line;
+    }
+
     public function getMessage()
     {
         return $this->message;
@@ -132,6 +166,40 @@ class FlattenException
     public function getTrace()
     {
         return $this->trace;
+    }
+
+    public function setTraceFromException(\Exception $exception)
+    {
+        $trace = $exception->getTrace();
+
+        if ($exception instanceof FatalErrorException) {
+            if (function_exists('xdebug_get_function_stack')) {
+                $trace = array_slice(array_reverse(xdebug_get_function_stack()), 4);
+
+                foreach ($trace as $i => $frame) {
+                    //  XDebug pre 2.1.1 doesn't currently set the call type key http://bugs.xdebug.org/view.php?id=695
+                    if (!isset($frame['type'])) {
+                        $trace[$i]['type'] = '??';
+                    }
+
+                    if ('dynamic' === $trace[$i]['type']) {
+                        $trace[$i]['type'] = '->';
+                    } elseif ('static' === $trace[$i]['type']) {
+                        $trace[$i]['type'] = '::';
+                    }
+
+                    // XDebug also has a different name for the parameters array
+                    if (isset($frame['params']) && !isset($frame['args'])) {
+                        $trace[$i]['args'] = $frame['params'];
+                        unset($trace[$i]['params']);
+                    }
+                }
+            } else {
+                $trace = array_slice(array_reverse($trace), 1);
+            }
+        }
+
+        $this->setTrace($trace, $exception->getFile(), $exception->getLine());
     }
 
     public function setTrace($trace, $file, $line)
@@ -187,11 +255,21 @@ class FlattenException
                 $result[$key] = array('boolean', $value);
             } elseif (is_resource($value)) {
                 $result[$key] = array('resource', get_resource_type($value));
+            } elseif ($value instanceof \__PHP_Incomplete_Class) {
+                // Special case of object, is_object will return false
+                $result[$key] = array('incomplete-object', $this->getClassNameFromIncomplete($value));
             } else {
                 $result[$key] = array('string', (string) $value);
             }
         }
 
         return $result;
+    }
+
+    private function getClassNameFromIncomplete(\__PHP_Incomplete_Class $value)
+    {
+        $array = new \ArrayObject($value);
+
+        return $array['__PHP_Incomplete_Class_Name'];
     }
 }

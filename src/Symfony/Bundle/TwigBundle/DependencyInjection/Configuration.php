@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
@@ -34,7 +34,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('exception_controller')->defaultValue('Symfony\\Bundle\\TwigBundle\\Controller\\ExceptionController::showAction')->end()
+                ->scalarNode('exception_controller')->defaultValue('twig.controller.exception:showAction')->end()
             ->end()
         ;
 
@@ -54,15 +54,15 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('resource')
                     ->children()
                         ->arrayNode('resources')
-                            ->addDefaultsIfNotSet()
-                            ->defaultValue(array('form_div_layout.html.twig'))
+                            ->addDefaultChildrenIfNoneSet()
+                            ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
+                            ->example(array('MyBundle::form.html.twig'))
                             ->validate()
                                 ->ifTrue(function($v) { return !in_array('form_div_layout.html.twig', $v); })
                                 ->then(function($v){
                                     return array_merge(array('form_div_layout.html.twig'), $v);
                                 })
                             ->end()
-                            ->prototype('scalar')->end()
                         ->end()
                     ->end()
                 ->end()
@@ -76,7 +76,9 @@ class Configuration implements ConfigurationInterface
             ->fixXmlConfig('global')
             ->children()
                 ->arrayNode('globals')
+                    ->normalizeKeys(false)
                     ->useAttributeAsKey('key')
+                    ->example(array('foo' => '"@bar"', 'pi' => 3.14))
                     ->prototype('array')
                         ->beforeNormalization()
                             ->ifTrue(function($v){ return is_string($v) && 0 === strpos($v, '@'); })
@@ -114,14 +116,43 @@ class Configuration implements ConfigurationInterface
     private function addTwigOptions(ArrayNodeDefinition $rootNode)
     {
         $rootNode
+            ->fixXmlConfig('path')
             ->children()
                 ->scalarNode('autoescape')->end()
-                ->scalarNode('base_template_class')->end()
+                ->scalarNode('base_template_class')->example('Twig_Template')->end()
                 ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->scalarNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->scalarNode('strict_variables')->end()
                 ->scalarNode('auto_reload')->end()
+                ->scalarNode('optimizations')->end()
+                ->arrayNode('paths')
+                    ->normalizeKeys(false)
+                    ->beforeNormalization()
+                        ->always()
+                        ->then(function ($paths) {
+                            $normalized = array();
+                            foreach ($paths as $path => $namespace) {
+                                if (is_array($namespace)) {
+                                    // xml
+                                    $path = $namespace['value'];
+                                    $namespace = $namespace['namespace'];
+                                }
+
+                                // path within the default namespace
+                                if (ctype_digit((string) $path)) {
+                                    $path = $namespace;
+                                    $namespace = null;
+                                }
+
+                                $normalized[$path] = $namespace;
+                            }
+
+                            return $normalized;
+                        })
+                    ->end()
+                    ->prototype('variable')->end()
+                ->end()
             ->end()
         ;
     }

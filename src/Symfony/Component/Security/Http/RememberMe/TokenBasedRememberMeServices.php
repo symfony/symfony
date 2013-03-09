@@ -1,14 +1,5 @@
 <?php
 
-namespace Symfony\Component\Security\Http\RememberMe;
-
-use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserInterface;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -17,6 +8,15 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace Symfony\Component\Security\Http\RememberMe;
+
+use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Concrete implementation of the RememberMeServicesInterface providing
@@ -43,7 +43,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
             $user = $this->getUserProvider($class)->loadUserByUsername($username);
         } catch (\Exception $ex) {
             if (!$ex instanceof AuthenticationException) {
-                $ex = new AuthenticationException($ex->getMessage(), null, $ex->getCode(), $ex);
+                $ex = new AuthenticationException($ex->getMessage(), $ex->getCode(), $ex);
             }
 
             throw $ex;

@@ -19,8 +19,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\SessionUnavailableException;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -70,14 +69,16 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @param SessionAuthenticationStrategyInterface $sessionStrategy
      * @param HttpUtils                              $httpUtils             An HttpUtilsInterface instance
      * @param string                                 $providerKey
+     * @param AuthenticationSuccessHandlerInterface  $successHandler
+     * @param AuthenticationFailureHandlerInterface  $failureHandler
      * @param array                                  $options               An array of options for the processing of a
      *                                                                      successful, or failed authentication attempt
-     * @param AuthenticationSuccessHandlerInterface $successHandler
-     * @param AuthenticationFailureHandlerInterface $failureHandler
-     * @param LoggerInterface                       $logger         A LoggerInterface instance
-     * @param EventDispatcherInterface              $dispatcher     An EventDispatcherInterface instance
+     * @param LoggerInterface                        $logger                A LoggerInterface instance
+     * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
+     *
+     * @throws \InvalidArgumentException
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -91,13 +92,6 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->failureHandler = $failureHandler;
         $this->options = array_merge(array(
             'check_path'                     => '/login_check',
-            'login_path'                     => '/login',
-            'always_use_default_target_path' => false,
-            'default_target_path'            => '/',
-            'target_path_parameter'          => '_target_path',
-            'use_referer'                    => false,
-            'failure_path'                   => null,
-            'failure_forward'                => false,
         ), $options);
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
@@ -118,6 +112,9 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * Handles form based authentication.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @throws \RuntimeException
+     * @throws SessionUnavailableException
      */
     final public function handle(GetResponseEvent $event)
     {
@@ -133,7 +130,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
         try {
             if (!$request->hasPreviousSession()) {
-                throw new SessionUnavailableException('Your session has timed-out, or you have disabled cookies.');
+                throw new SessionUnavailableException('Your session has timed out, or you have disabled cookies.');
             }
 
             if (null === $returnValue = $this->attemptAuthentication($request)) {
@@ -177,7 +174,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      *
      * @param Request $request A Request instance
      *
-     * @return TokenInterface The authenticated token, or null if full authentication is not possible
+     * @return TokenInterface|Response|null The authenticated token, null if full authentication is not possible, or a Response
      *
      * @throws AuthenticationException if the authentication fails
      */
@@ -191,32 +188,13 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
         $this->securityContext->setToken(null);
 
-        if (null !== $this->failureHandler) {
-            return $this->failureHandler->onAuthenticationFailure($request, $failed);
+        $response = $this->failureHandler->onAuthenticationFailure($request, $failed);
+
+        if (!$response instanceof Response) {
+            throw new \RuntimeException('Authentication Failure Handler did not return a Response.');
         }
 
-        if (null === $this->options['failure_path']) {
-            $this->options['failure_path'] = $this->options['login_path'];
-        }
-
-        if ($this->options['failure_forward']) {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Forwarding to %s', $this->options['failure_path']));
-            }
-
-            $subRequest = $this->httpUtils->createRequest($request, $this->options['failure_path']);
-            $subRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
-
-            return $event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
-        }
-
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Redirecting to %s', $this->options['failure_path']));
-        }
-
-        $request->getSession()->set(SecurityContextInterface::AUTHENTICATION_ERROR, $failed);
-
-        return $this->httpUtils->createRedirectResponse($request, $this->options['failure_path']);
+        return $response;
     }
 
     private function onSuccess(GetResponseEvent $event, Request $request, TokenInterface $token)
@@ -236,10 +214,10 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
         }
 
-        if (null !== $this->successHandler) {
-            $response = $this->successHandler->onAuthenticationSuccess($request, $token);
-        } else {
-            $response = $this->httpUtils->createRedirectResponse($request, $this->determineTargetUrl($request));
+        $response = $this->successHandler->onAuthenticationSuccess($request, $token);
+
+        if (!$response instanceof Response) {
+            throw new \RuntimeException('Authentication Success Handler did not return a Response.');
         }
 
         if (null !== $this->rememberMeServices) {
@@ -247,36 +225,5 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         }
 
         return $response;
-    }
-
-    /**
-     * Builds the target URL according to the defined options.
-     *
-     * @param Request $request
-     *
-     * @return string
-     */
-    private function determineTargetUrl(Request $request)
-    {
-        if ($this->options['always_use_default_target_path']) {
-            return $this->options['default_target_path'];
-        }
-
-        if ($targetUrl = $request->get($this->options['target_path_parameter'], null, true)) {
-            return $targetUrl;
-        }
-
-        $session = $request->getSession();
-        if ($targetUrl = $session->get('_security.target_path')) {
-            $session->remove('_security.target_path');
-
-            return $targetUrl;
-        }
-
-        if ($this->options['use_referer'] && $targetUrl = $request->headers->get('Referer')) {
-            return $targetUrl;
-        }
-
-        return $this->options['default_target_path'];
     }
 }

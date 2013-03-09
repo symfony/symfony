@@ -20,8 +20,12 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverP
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CompilerDebugDumpPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtractorPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FragmentRendererPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Scope;
@@ -42,6 +46,10 @@ class FrameworkBundle extends Bundle
         } elseif ($this->container->getParameter('kernel.trust_proxy_headers')) {
             Request::trustProxyData(); // @deprecated, to be removed in 2.3
         }
+
+        if ($this->container->getParameter('kernel.http_method_override')) {
+            Request::enableHttpMethodParameterOverride();
+        }
     }
 
     public function build(ContainerBuilder $container)
@@ -59,6 +67,10 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new FormPass());
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new AddCacheWarmerPass());
+        $container->addCompilerPass(new AddCacheClearerPass());
+        $container->addCompilerPass(new TranslationExtractorPass());
+        $container->addCompilerPass(new TranslationDumperPass());
+        $container->addCompilerPass(new FragmentRendererPass(), PassConfig::TYPE_AFTER_REMOVING);
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);

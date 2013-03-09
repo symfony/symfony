@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -71,6 +71,8 @@ class SwitchUserListener implements ListenerInterface
      * Handles digest authentication.
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
+     *
+     * @throws \LogicException
      */
     public function handle(GetResponseEvent $event)
     {
@@ -86,9 +88,7 @@ class SwitchUserListener implements ListenerInterface
             try {
                 $this->securityContext->setToken($this->attemptSwitchUser($request));
             } catch (AuthenticationException $e) {
-                if (null !== $this->logger) {
-                    $this->logger->warn(sprintf('Switch User failed: "%s"', $e->getMessage()));
-                }
+                throw new \LogicException(sprintf('Switch User failed: "%s"', $e->getMessage()));
             }
         }
 
@@ -104,12 +104,21 @@ class SwitchUserListener implements ListenerInterface
      * @param Request $request A Request instance
      *
      * @return TokenInterface|null The new TokenInterface if successfully switched, null otherwise
+     *
+     * @throws \LogicException
+     * @throws AccessDeniedException
      */
     private function attemptSwitchUser(Request $request)
     {
         $token = $this->securityContext->getToken();
-        if (false !== $this->getOriginalToken($token)) {
-            throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
+        $originalToken = $this->getOriginalToken($token);
+
+        if (false !== $originalToken) {
+            if ($token->getUsername() === $request->get($this->usernameParameter)) {
+                return $token;
+            } else {
+                throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
+            }
         }
 
         if (false === $this->accessDecisionManager->decide($token, array($this->role))) {
@@ -144,11 +153,13 @@ class SwitchUserListener implements ListenerInterface
      * @param Request $request A Request instance
      *
      * @return TokenInterface The original TokenInterface instance
+     *
+     * @throws AuthenticationCredentialsNotFoundException
      */
     private function attemptExitUser(Request $request)
     {
         if (false === $original = $this->getOriginalToken($this->securityContext->getToken())) {
-            throw new AuthenticationCredentialsNotFoundException(sprintf('Could not find original Token object.'));
+            throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
         }
 
         if (null !== $this->dispatcher) {

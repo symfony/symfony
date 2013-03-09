@@ -17,18 +17,17 @@ namespace Symfony\Component\Form\Util;
  * If the iterator encounters a virtual field group, it enters the field
  * group and traverses its children as well.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class VirtualFormAwareIterator extends \ArrayIterator implements \RecursiveIterator
 {
     public function getChildren()
     {
-        return new self($this->current()->getChildren());
+        return new self($this->current()->all());
     }
 
     public function hasChildren()
     {
-        return $this->current()->hasAttribute('virtual')
-                && $this->current()->getAttribute('virtual');
+        return $this->current()->getConfig()->getVirtual();
     }
 }

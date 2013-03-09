@@ -16,10 +16,16 @@
         }
     ],
     "require": {
-        "php": ">=5.3.2"
+        "php": ">=5.3.3"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Serializer": "" }
+        "psr-0": { "Symfony\\Component\\Serializer\\": "" }
     },
-    "target-dir": "Symfony/Component/Serializer"
+    "target-dir": "Symfony/Component/Serializer",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.3-dev"
+        }
+    }
 }

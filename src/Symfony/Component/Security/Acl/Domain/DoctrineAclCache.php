@@ -37,7 +37,7 @@ class DoctrineAclCache implements AclCacheInterface
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
      * @param string                              $prefix
      *
-     * @return void
+     * @throws \InvalidArgumentException
      */
     public function __construct(Cache $cache, PermissionGrantingStrategyInterface $permissionGrantingStrategy, $prefix = self::PREFIX)
     {

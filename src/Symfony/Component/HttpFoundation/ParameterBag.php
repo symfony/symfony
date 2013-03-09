@@ -18,8 +18,13 @@ namespace Symfony\Component\HttpFoundation;
  *
  * @api
  */
-class ParameterBag
+class ParameterBag implements \IteratorAggregate, \Countable
 {
+    /**
+     * Parameter storage.
+     *
+     * @var array
+     */
     protected $parameters;
 
     /**
@@ -88,6 +93,10 @@ class ParameterBag
      * @param string  $path    The key
      * @param mixed   $default The default value if the parameter key does not exist
      * @param boolean $deep    If true, a path like foo[bar] will find deeper items
+     *
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
      *
      * @api
      */
@@ -224,7 +233,8 @@ class ParameterBag
      */
     public function getDigits($key, $default = '', $deep = false)
     {
-        return preg_replace('/[^[:digit:]]/', '', $this->get($key, $default, $deep));
+        // we need to remove - and + because they're allowed in the filter
+        return str_replace(array('-', '+'), '', $this->filter($key, $default, $deep, FILTER_SANITIZE_NUMBER_INT));
     }
 
     /**
@@ -241,5 +251,55 @@ class ParameterBag
     public function getInt($key, $default = 0, $deep = false)
     {
         return (int) $this->get($key, $default, $deep);
+    }
+
+    /**
+     * Filter key.
+     *
+     * @param string  $key     Key.
+     * @param mixed   $default Default = null.
+     * @param boolean $deep    Default = false.
+     * @param integer $filter  FILTER_* constant.
+     * @param mixed   $options Filter options.
+     *
+     * @see http://php.net/manual/en/function.filter-var.php
+     *
+     * @return mixed
+     */
+    public function filter($key, $default = null, $deep = false, $filter=FILTER_DEFAULT, $options=array())
+    {
+        $value = $this->get($key, $default, $deep);
+
+        // Always turn $options into an array - this allows filter_var option shortcuts.
+        if (!is_array($options) && $options) {
+            $options = array('flags' => $options);
+        }
+
+        // Add a convenience check for arrays.
+        if (is_array($value) && !isset($options['flags'])) {
+            $options['flags'] = FILTER_REQUIRE_ARRAY;
+        }
+
+        return filter_var($value, $filter, $options);
+    }
+
+    /**
+     * Returns an iterator for parameters.
+     *
+     * @return \ArrayIterator An \ArrayIterator instance
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->parameters);
+    }
+
+    /**
+     * Returns the number of parameters.
+     *
+     * @return int The number of parameters
+     */
+    public function count()
+    {
+        return count($this->parameters);
     }
 }

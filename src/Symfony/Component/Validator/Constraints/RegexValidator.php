@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 /**
  * Validates whether a value match or not given regexp pattern
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
  *
  * @api
@@ -26,19 +26,12 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class RegexValidator extends ConstraintValidator
 {
     /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @return Boolean Whether or not the value is valid
-     *
-     * @api
+     * {@inheritDoc}
      */
-    public function isValid($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
-            return true;
+            return;
         }
 
         if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
@@ -48,11 +41,7 @@ class RegexValidator extends ConstraintValidator
         $value = (string) $value;
 
         if ($constraint->match xor preg_match($constraint->pattern, $value)) {
-            $this->setMessage($constraint->message, array('{{ value }}' => $value));
-
-            return false;
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
         }
-
-        return true;
     }
 }

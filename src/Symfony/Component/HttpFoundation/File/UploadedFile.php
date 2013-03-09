@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 /**
  * A file uploaded through a form.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  * @author Fabien Potencier <fabien@symfony.com>
  *
@@ -119,6 +119,19 @@ class UploadedFile extends File
     }
 
     /**
+     * Returns the original file extension
+     *
+     * It is extracted from the original file name that was uploaded.
+     * Then is should not be considered as a safe value.
+     *
+     * @return string The extension
+     */
+    public function getClientOriginalExtension()
+    {
+        return pathinfo($this->originalName, PATHINFO_EXTENSION);
+    }
+
+    /**
      * Returns the file mime type.
      *
      * It is extracted from the request from which the file has been uploaded.
@@ -212,7 +225,7 @@ class UploadedFile extends File
     /**
      * Returns the maximum size of an uploaded file as configured in php.ini
      *
-     * @return type The maximum size of an uploaded file in bytes
+     * @return int The maximum size of an uploaded file in bytes
      */
     public static function getMaxFilesize()
     {

@@ -29,6 +29,7 @@ abstract class BaseNode implements NodeInterface
     protected $allowOverwrite;
     protected $required;
     protected $equivalentValues;
+    protected $attributes = array();
 
     /**
      * Constructor.
@@ -51,6 +52,76 @@ abstract class BaseNode implements NodeInterface
         $this->allowOverwrite = true;
         $this->required = false;
         $this->equivalentValues = array();
+    }
+
+    public function setAttribute($key, $value)
+    {
+        $this->attributes[$key] = $value;
+    }
+
+    public function getAttribute($key, $default = null)
+    {
+        return isset($this->attributes[$key]) ? $this->attributes[$key] : $default;
+    }
+
+    public function hasAttribute($key)
+    {
+        return isset($this->attributes[$key]);
+    }
+
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    public function setAttributes(array $attributes)
+    {
+        $this->attributes = $attributes;
+    }
+
+    public function removeAttribute($key)
+    {
+        unset($this->attributes[$key]);
+    }
+
+    /**
+     * Sets an info message.
+     *
+     * @param string $info
+     */
+    public function setInfo($info)
+    {
+        $this->setAttribute('info', $info);
+    }
+
+    /**
+     * Returns info message.
+     *
+     * @return string The info text
+     */
+    public function getInfo()
+    {
+        return $this->getAttribute('info');
+    }
+
+    /**
+     * Sets the example configuration for this node.
+     *
+     * @param string|array $example
+     */
+    public function setExample($example)
+    {
+        $this->setAttribute('example', $example);
+    }
+
+    /**
+     * Retrieves the example configuration for this node.
+     *
+     * @return string|array The example
+     */
+    public function getExample()
+    {
+        return $this->getAttribute('example');
     }
 
     /**
@@ -87,7 +158,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Sets the closures used for normalization.
      *
-     * @param array $closures An array of Closures used for normalization
+     * @param \Closure[] $closures An array of Closures used for normalization
      */
     public function setNormalizationClosures(array $closures)
     {
@@ -97,7 +168,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Sets the closures used for final validation.
      *
-     * @param array $closures An array of Closures used for final validation
+     * @param \Closure[] $closures An array of Closures used for final validation
      */
     public function setFinalValidationClosures(array $closures)
     {
@@ -176,6 +247,8 @@ abstract class BaseNode implements NodeInterface
      */
     final public function normalize($value)
     {
+        $value = $this->preNormalize($value);
+
         // run custom normalization closures
         foreach ($this->normalizationClosures as $closure) {
             $value = $closure($value);
@@ -196,11 +269,25 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
+     * Normalizes the value before any other normalization is applied.
+     *
+     * @param $value
+     *
+     * @return $value The normalized array value
+     */
+    protected function preNormalize($value)
+    {
+        return $value;
+    }
+
+    /**
      * Finalizes a value, applying all finalization closures.
      *
      * @param mixed $value The value to finalize
      *
      * @return mixed The finalized value
+     *
+     * @throws InvalidConfigurationException
      */
     final public function finalize($value)
     {

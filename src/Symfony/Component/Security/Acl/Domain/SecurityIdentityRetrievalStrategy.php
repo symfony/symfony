@@ -34,8 +34,6 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
      *
      * @param RoleHierarchyInterface      $roleHierarchy
      * @param AuthenticationTrustResolver $authenticationTrustResolver
-     *
-     * @return void
      */
     public function __construct(RoleHierarchyInterface $roleHierarchy, AuthenticationTrustResolver $authenticationTrustResolver)
     {

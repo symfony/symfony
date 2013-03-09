@@ -1,18 +1,18 @@
 <?php
 
-namespace Symfony\Component\Serializer\Encoder;
-
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
+namespace Symfony\Component\Serializer\Encoder;
+
 /**
- * Defines the interface of encoders that are able to decode their own format
+ * Defines the interface of decoders
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
@@ -21,10 +21,20 @@ interface DecoderInterface
     /**
      * Decodes a string into PHP data
      *
-     * @param string $data   Data to decode
-     * @param string $format Format to decode from
+     * @param scalar $data   Data to decode
+     * @param string $format Format name
+     * @param array  $context options that decoders have access to.
      *
      * @return mixed
      */
-    public function decode($data, $format);
+    public function decode($data, $format, array $context = array());
+
+    /**
+     * Checks whether the serializer can decode from given format
+     *
+     * @param string $format format name
+     *
+     * @return Boolean
+     */
+    public function supportsDecoding($format);
 }

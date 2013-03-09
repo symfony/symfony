@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
-use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
+use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TemplateNameParser extends BaseTemplateNameParser
+class TemplateNameParser implements TemplateNameParserInterface
 {
     protected $kernel;
     protected $cache;
@@ -80,26 +80,4 @@ class TemplateNameParser extends BaseTemplateNameParser
 
         return $this->cache[$name] = $template;
     }
-
-    /**
-     * Convert a filename to a template.
-     *
-     * @param string $file The filename
-     *
-     * @return TemplateReferenceInterface A template
-     */
-    public function parseFromFilename($file)
-    {
-        $parts = explode('/', strtr($file, '\\', '/'));
-
-        $elements = explode('.', array_pop($parts));
-        if (3 > count($elements)) {
-            return false;
-        }
-        $engine = array_pop($elements);
-        $format = array_pop($elements);
-
-        return new TemplateReference('', implode('/', $parts), implode('.', $elements), $format, $engine);
-    }
-
 }

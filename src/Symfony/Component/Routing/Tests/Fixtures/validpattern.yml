@@ -1,0 +1,17 @@
+blog_show:
+    path:         /blog/{slug}
+    defaults:     { _controller: MyBlogBundle:Blog:show }
+    host:         "{locale}.example.com"
+    requirements: { 'locale': '\w+' }
+    methods:      ['GET']
+    schemes:      ['https']
+    options:
+        compiler_class: RouteCompiler
+
+blog_show_legacy:
+    pattern:      /blog/{slug}
+    defaults:     { _controller: MyBlogBundle:Blog:show }
+    host:         "{locale}.example.com"
+    requirements: { '_method': 'GET', 'locale': '\w+', _scheme: 'https' }
+    options:
+        compiler_class: RouteCompiler

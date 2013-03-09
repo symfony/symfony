@@ -19,7 +19,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  * Transforms between a number type and a localized number with grouping
  * (each thousand) and comma separators.
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
  */
 class NumberToLocalizedStringTransformer implements DataTransformerInterface
@@ -103,6 +103,11 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             return null;
         }
 
+        if ('NaN' === $value) {
+            throw new TransformationFailedException('"NaN" is not a valid number');
+        }
+
+        $position = 0;
         $formatter = $this->getNumberFormatter();
         $groupSep = $formatter->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
         $decSep = $formatter->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
@@ -115,13 +120,33 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             $value = str_replace(',', $decSep, $value);
         }
 
-        $value = $formatter->parse($value);
+        $result = $formatter->parse($value, \NumberFormatter::TYPE_DOUBLE, $position);
 
         if (intl_is_failure($formatter->getErrorCode())) {
             throw new TransformationFailedException($formatter->getErrorMessage());
         }
 
-        return $value;
+        if ($result >= INF || $result <= -INF) {
+            throw new TransformationFailedException('I don\'t have a clear idea what infinity looks like');
+        }
+
+        // After parsing, position holds the index of the character where the
+        // parsing stopped
+        if ($position < strlen($value)) {
+            // Check if there are unrecognized characters at the end of the
+            // number
+            $remainder = substr($value, $position);
+
+            // Remove all whitespace characters
+            if ('' !== preg_replace('/[\s\xc2\xa0]*/', '', $remainder)) {
+                throw new TransformationFailedException(
+                    sprintf('The number contains unrecognized characters: "%s"',
+                        $remainder
+                    ));
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -133,7 +158,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     {
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
 
-        if ($this->precision !== null) {
+        if (null !== $this->precision) {
             $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->precision);
             $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
         }

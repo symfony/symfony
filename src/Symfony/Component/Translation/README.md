@@ -9,7 +9,7 @@ translated strings from these including support for pluralization.
     use Symfony\Component\Translation\Loader\ArrayLoader;
 
     $translator = new Translator('fr_FR', new MessageSelector());
-    $translator->setFallbackLocale('fr');
+    $translator->setFallbackLocales(array('fr'));
     $translator->addLoader('array', new ArrayLoader());
     $translator->addResource('array', array(
         'Hello World!' => 'Bonjour',
@@ -24,10 +24,12 @@ Silex integration:
 
 https://github.com/fabpot/Silex/blob/master/src/Silex/Provider/TranslationServiceProvider.php
 
-Unit tests:
-
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/Translation
-
 Documentation:
 
 http://symfony.com/doc/2.0/book/translation.html
+
+You can run the unit tests with the following command:
+
+    $ cd path/to/Symfony/Component/Translation/
+    $ composer.phar install --dev
+    $ phpunit

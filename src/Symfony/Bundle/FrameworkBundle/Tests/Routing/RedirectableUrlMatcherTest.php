@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
@@ -46,7 +46,13 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
 
         $this->assertEquals(array(
-                '_route' => 'foo',
+                '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
+                'path'        => '/foo',
+                'permanent'   => true,
+                'scheme'      => 'https',
+                'httpPort'    => $context->getHttpPort(),
+                'httpsPort'   => $context->getHttpsPort(),
+                '_route'      => 'foo',
             ),
             $matcher->match('/foo')
         );

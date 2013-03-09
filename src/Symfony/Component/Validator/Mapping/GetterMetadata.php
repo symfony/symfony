@@ -20,6 +20,8 @@ class GetterMetadata extends MemberMetadata
      *
      * @param string $class    The class the getter is defined on
      * @param string $property The property which the getter returns
+     *
+     * @throws ValidatorException
      */
     public function __construct($class, $property)
     {
@@ -40,7 +42,7 @@ class GetterMetadata extends MemberMetadata
     /**
      * {@inheritDoc}
      */
-    public function getValue($object)
+    public function getPropertyValue($object)
     {
         return $this->getReflectionMember()->invoke($object);
     }

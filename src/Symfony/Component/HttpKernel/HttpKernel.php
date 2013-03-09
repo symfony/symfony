@@ -13,11 +13,13 @@ namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -29,10 +31,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @api
  */
-class HttpKernel implements HttpKernelInterface
+class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
-    private $dispatcher;
-    private $resolver;
+    protected $dispatcher;
+    protected $resolver;
 
     /**
      * Constructor
@@ -76,6 +78,16 @@ class HttpKernel implements HttpKernelInterface
 
             return $this->handleException($e, $request, $type);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function terminate(Request $request, Response $response)
+    {
+        $this->dispatcher->dispatch(KernelEvents::TERMINATE, new PostResponseEvent($this, $request, $response));
     }
 
     /**
@@ -160,27 +172,50 @@ class HttpKernel implements HttpKernelInterface
     }
 
     /**
-     * Handles and exception by trying to convert it to a Response.
+     * Handles an exception by trying to convert it to a Response.
      *
      * @param \Exception $e       An \Exception instance
      * @param Request    $request A Request instance
      * @param integer    $type    The type of the request
      *
      * @return Response A Response instance
+     *
+     * @throws \Exception
      */
     private function handleException(\Exception $e, $request, $type)
     {
         $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
         $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
 
+        // a listener might have replaced the exception
+        $e = $event->getException();
+
         if (!$event->hasResponse()) {
             throw $e;
         }
 
+        $response = $event->getResponse();
+
+        // the developer asked for a specific status code
+        if ($response->headers->has('X-Status-Code')) {
+            $response->setStatusCode($response->headers->get('X-Status-Code'));
+
+            $response->headers->remove('X-Status-Code');
+        } elseif (!$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {
+            // ensure that we actually have an error response
+            if ($e instanceof HttpExceptionInterface) {
+                // keep the HTTP status code and headers
+                $response->setStatusCode($e->getStatusCode());
+                $response->headers->add($e->getHeaders());
+            } else {
+                $response->setStatusCode(500);
+            }
+        }
+
         try {
-            return $this->filterResponse($event->getResponse(), $request, $type);
+            return $this->filterResponse($response, $request, $type);
         } catch (\Exception $e) {
-            return $event->getResponse();
+            return $response;
         }
     }
 

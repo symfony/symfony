@@ -29,6 +29,8 @@ class RememberMeToken extends AbstractToken
      * @param UserInterface $user
      * @param string        $providerKey
      * @param string        $key
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(UserInterface $user, $providerKey, $key)
     {
@@ -52,7 +54,7 @@ class RememberMeToken extends AbstractToken
     public function setAuthenticated($authenticated)
     {
         if ($authenticated) {
-            throw new \RuntimeException('You cannot set this token to authenticated after creation.');
+            throw new \LogicException('You cannot set this token to authenticated after creation.');
         }
 
         parent::setAuthenticated(false);

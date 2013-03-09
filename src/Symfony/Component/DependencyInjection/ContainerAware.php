@@ -18,7 +18,7 @@ namespace Symfony\Component\DependencyInjection;
  *
  * @api
  */
-class ContainerAware implements ContainerAwareInterface
+abstract class ContainerAware implements ContainerAwareInterface
 {
     /**
      * @var ContainerInterface

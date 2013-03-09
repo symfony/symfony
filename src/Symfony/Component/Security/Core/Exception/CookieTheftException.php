@@ -1,7 +1,5 @@
 <?php
 
-namespace Symfony\Component\Security\Core\Exception;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -11,12 +9,22 @@ namespace Symfony\Component\Security\Core\Exception;
  * file that was distributed with this source code.
  */
 
+namespace Symfony\Component\Security\Core\Exception;
+
 /**
  * This exception is thrown when the RememberMeServices implementation
  * detects that a presented cookie has already been used by someone else.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Alexander <iam.asm89@gmail.com>
  */
 class CookieTheftException extends AuthenticationException
 {
+    /**
+     * {@inheritDoc}
+     */
+    public function getMessageKey()
+    {
+        return 'Cookie has already been used by someone else.';
+    }
 }

@@ -266,6 +266,8 @@ class StubNumberFormatter
      *                           NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
      *                           described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
      *
+     * @return StubNumberFormatter
+     *
      * @see    http://www.php.net/manual/en/numberformatter.create.php
      * @see    http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see    http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
@@ -324,7 +326,7 @@ class StubNumberFormatter
      *
      * @see    http://www.php.net/manual/en/numberformatter.format.php
      *
-     * @throws RuntimeException                       If the method is called with the class $style 'CURRENCY'
+     * @throws \RuntimeException                       If the method is called with the class $style 'CURRENCY'
      * @throws MethodArgumentNotImplementedException  If the $type is different than TYPE_DEFAULT
      */
     public function format($value, $type = self::TYPE_DEFAULT)

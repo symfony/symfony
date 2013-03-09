@@ -14,8 +14,8 @@ namespace Symfony\Component\Form\Exception;
 /**
  * Thrown when a form type is configured incorrectly
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class TypeDefinitionException extends FormException
+class TypeDefinitionException extends Exception
 {
 }

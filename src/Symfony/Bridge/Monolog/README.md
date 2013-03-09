@@ -6,6 +6,8 @@ Provides integration for Monolog with various Symfony2 components.
 Resources
 ---------
 
-Unit tests:
+You can run the unit tests with the following command:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Bridge/Monolog
+    $ cd path/to/Symfony/Bridge/Monolog/
+    $ composer.phar install --dev
+    $ phpunit

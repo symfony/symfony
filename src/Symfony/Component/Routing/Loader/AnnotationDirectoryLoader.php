@@ -25,8 +25,8 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
     /**
      * Loads from annotations from a directory.
      *
-     * @param string $path A directory path
-     * @param string $type The resource type
+     * @param string      $path A directory path
+     * @param string|null $type The resource type
      *
      * @return RouteCollection A RouteCollection instance
      *
@@ -38,7 +38,12 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
 
         $collection = new RouteCollection();
         $collection->addResource(new DirectoryResource($dir, '/\.php$/'));
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
+        $files = iterator_to_array(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir), \RecursiveIteratorIterator::LEAVES_ONLY));
+        usort($files, function (\SplFileInfo $a, \SplFileInfo $b) {
+            return (string) $a > (string) $b ? 1 : -1;
+        });
+
+        foreach ($files as $file) {
             if (!$file->isFile() || '.php' !== substr($file->getFilename(), -4)) {
                 continue;
             }
@@ -57,12 +62,7 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
     }
 
     /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return Boolean True if this class supports the given resource, false otherwise
+     * {@inheritdoc}
      */
     public function supports($resource, $type = null)
     {

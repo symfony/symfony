@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\DependencyInjection\Compiler;
@@ -49,7 +49,7 @@ class CheckCircularReferencesPass implements CompilerPassInterface
     /**
      * Checks for circular references.
      *
-     * @param array $edges An array of Nodes
+     * @param ServiceReferenceGraphEdge[] $edges An array of Edges
      *
      * @throws ServiceCircularReferenceException When a circular reference is found.
      */

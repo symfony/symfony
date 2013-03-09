@@ -81,11 +81,15 @@ class Yaml
      *   print_r($array);
      *  </code>
      *
+     * As this method accepts both plain strings and file names as an input,
+     * you must validate the input before calling this method. Passing a file
+     * as an input is a deprecated feature and will be removed in 3.0.
+     *
      * @param string $input Path to a YAML file or a string containing YAML
      *
      * @return array The YAML converted to a PHP array
      *
-     * @throws \InvalidArgumentException If the YAML is not valid
+     * @throws ParseException If the YAML is not valid
      *
      * @api
      */
@@ -145,7 +149,7 @@ class Yaml
      *
      * @api
      */
-    public static function dump($array, $inline = 2, $indent = 2, $exceptionOnInvalidType = false, $objectSupport = false)
+    public static function dump($array, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $objectSupport = false)
     {
         $yaml = new Dumper();
         $yaml->setIndentation($indent);

@@ -55,6 +55,8 @@ class Comparator
      * Sets the comparison operator.
      *
      * @param string $operator A valid operator
+     *
+     * @throws \InvalidArgumentException
      */
     public function setOperator($operator)
     {
@@ -62,7 +64,7 @@ class Comparator
             $operator = '==';
         }
 
-        if (!in_array($operator, array('>', '<', '>=', '<=', '=='))) {
+        if (!in_array($operator, array('>', '<', '>=', '<=', '==', '!='))) {
             throw new \InvalidArgumentException(sprintf('Invalid operator "%s".', $operator));
         }
 
@@ -73,6 +75,8 @@ class Comparator
      * Tests against the target.
      *
      * @param mixed $test A test value
+     *
+     * @return Boolean
      */
     public function test($test)
     {
@@ -85,6 +89,8 @@ class Comparator
                 return $test < $this->target;
             case '<=':
                 return $test <= $this->target;
+            case '!=':
+                return $test != $this->target;
         }
 
         return $test == $this->target;

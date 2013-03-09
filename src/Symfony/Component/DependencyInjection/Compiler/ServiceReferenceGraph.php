@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+
 /**
  * This is a directed graph of your services.
  *
@@ -21,6 +23,9 @@ namespace Symfony\Component\DependencyInjection\Compiler;
  */
 class ServiceReferenceGraph
 {
+    /**
+     * @var ServiceReferenceGraphNode[]
+     */
     private $nodes;
 
     /**
@@ -50,12 +55,12 @@ class ServiceReferenceGraph
      *
      * @return ServiceReferenceGraphNode The node matching the supplied identifier
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException if no node matches the supplied identifier
      */
     public function getNode($id)
     {
         if (!isset($this->nodes[$id])) {
-            throw new \InvalidArgumentException(sprintf('There is no node with id "%s".', $id));
+            throw new InvalidArgumentException(sprintf('There is no node with id "%s".', $id));
         }
 
         return $this->nodes[$id];
@@ -64,7 +69,7 @@ class ServiceReferenceGraph
     /**
      * Returns all nodes.
      *
-     * @return array An array of all ServiceReferenceGraphNode objects
+     * @return ServiceReferenceGraphNode[] An array of all ServiceReferenceGraphNode objects
      */
     public function getNodes()
     {

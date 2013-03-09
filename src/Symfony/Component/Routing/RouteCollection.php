@@ -16,70 +16,103 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 /**
  * A RouteCollection represents a set of Route instances.
  *
- * When adding a route, it overrides existing routes with the
- * same name defined in the instance or its children and parents.
+ * When adding a route at the end of the collection, an existing route
+ * with the same name is removed first. So there can only be one route
+ * with a given name.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Tobias Schultze <http://tobion.de>
  *
  * @api
  */
-class RouteCollection implements \IteratorAggregate
+class RouteCollection implements \IteratorAggregate, \Countable
 {
-    private $routes;
-    private $resources;
-    private $prefix;
-    private $parent;
+    /**
+     * @var Route[]
+     */
+    private $routes = array();
 
     /**
-     * Constructor.
-     *
-     * @api
+     * @var array
      */
-    public function __construct()
-    {
-        $this->routes = array();
-        $this->resources = array();
-        $this->prefix = '';
-    }
+    private $resources = array();
+
+    /**
+     * @var string
+     * @deprecated since version 2.2, will be removed in 2.3
+     */
+    private $prefix = '';
+
+    /**
+     * @var RouteCollection|null
+     * @deprecated since version 2.2, will be removed in 2.3
+     */
+    private $parent;
 
     public function __clone()
     {
         foreach ($this->routes as $name => $route) {
             $this->routes[$name] = clone $route;
-            if ($route instanceof RouteCollection) {
-                $this->routes[$name]->setParent($this);
-            }
         }
     }
 
     /**
      * Gets the parent RouteCollection.
      *
-     * @return RouteCollection The parent RouteCollection
+     * @return RouteCollection|null The parent RouteCollection or null when it's the root
+     *
+     * @deprecated since version 2.2, will be removed in 2.3
      */
     public function getParent()
     {
+        trigger_error('getParent() is deprecated since version 2.2 and will be removed in 2.3. There is no substitution ' .
+            'because RouteCollection is not tree structure anymore.', E_USER_DEPRECATED);
+
         return $this->parent;
     }
 
     /**
-     * Sets the parent RouteCollection.
+     * Gets the root RouteCollection.
      *
-     * @param RouteCollection $parent The parent RouteCollection
+     * @return RouteCollection The root RouteCollection
+     *
+     * @deprecated since version 2.2, will be removed in 2.3
      */
-    public function setParent(RouteCollection $parent)
+    public function getRoot()
     {
-        $this->parent = $parent;
+        trigger_error('getRoot() is deprecated since version 2.2 and will be removed in 2.3. There is no substitution ' .
+            'because RouteCollection is not tree structure anymore.', E_USER_DEPRECATED);
+
+        $parent = $this;
+        while ($parent->getParent()) {
+            $parent = $parent->getParent();
+        }
+
+        return $parent;
     }
 
     /**
-     * Gets the current RouteCollection as an Iterator.
+     * Gets the current RouteCollection as an Iterator that includes all routes.
      *
-     * @return \ArrayIterator An \ArrayIterator interface
+     * It implements \IteratorAggregate.
+     *
+     * @see all()
+     *
+     * @return \ArrayIterator An \ArrayIterator object for iterating over routes
      */
     public function getIterator()
     {
         return new \ArrayIterator($this->routes);
+    }
+
+    /**
+     * Gets the number of Routes in this collection.
+     *
+     * @return int The number of routes
+     */
+    public function count()
+    {
+        return count($this->routes);
     }
 
     /**
@@ -88,45 +121,23 @@ class RouteCollection implements \IteratorAggregate
      * @param string $name  The route name
      * @param Route  $route A Route instance
      *
-     * @throws \InvalidArgumentException When route name contains non valid characters
-     *
      * @api
      */
     public function add($name, Route $route)
     {
-        if (!preg_match('/^[a-z0-9A-Z_.]+$/', $name)) {
-            throw new \InvalidArgumentException(sprintf('The provided route name "%s" contains non valid characters. A route name must only contain digits (0-9), letters (a-z and A-Z), underscores (_) and dots (.).', $name));
-        }
-
-        $parent = $this;
-        while ($parent->getParent()) {
-            $parent = $parent->getParent();
-        }
-
-        if ($parent) {
-            $parent->remove($name);
-        }
+        unset($this->routes[$name]);
 
         $this->routes[$name] = $route;
     }
 
     /**
-     * Returns the array of routes.
+     * Returns all routes in this collection.
      *
-     * @return array An array of routes
+     * @return Route[] An array of routes
      */
     public function all()
     {
-        $routes = array();
-        foreach ($this->routes as $name => $route) {
-            if ($route instanceof RouteCollection) {
-                $routes = array_merge($routes, $route->all());
-            } else {
-                $routes[$name] = $route;
-            }
-        }
-
-        return $routes;
+        return $this->routes;
     }
 
     /**
@@ -134,100 +145,221 @@ class RouteCollection implements \IteratorAggregate
      *
      * @param string $name The route name
      *
-     * @return Route  $route A Route instance
+     * @return Route|null A Route instance or null when not found
      */
     public function get($name)
     {
-        // get the latest defined route
-        foreach (array_reverse($this->routes) as $routes) {
-            if (!$routes instanceof RouteCollection) {
-                continue;
-            }
-
-            if (null !== $route = $routes->get($name)) {
-                return $route;
-            }
-        }
-
-        if (isset($this->routes[$name])) {
-            return $this->routes[$name];
-        }
+        return isset($this->routes[$name]) ? $this->routes[$name] : null;
     }
 
     /**
-     * Removes a route by name.
+     * Removes a route or an array of routes by name from the collection
      *
-     * @param string $name The route name
+     * For BC it's also removed from the root, which will not be the case in 2.3
+     * as the RouteCollection won't be a tree structure.
+     *
+     * @param string|array $name The route name or an array of route names
      */
     public function remove($name)
     {
-        if (isset($this->routes[$name])) {
-            unset($this->routes[$name]);
+        // just for BC
+        $root = $this;
+        while ($root->parent) {
+            $root = $root->parent;
         }
 
-        foreach ($this->routes as $routes) {
-            if ($routes instanceof RouteCollection) {
-                $routes->remove($name);
+        foreach ((array) $name as $n) {
+            unset($root->routes[$n]);
+            unset($this->routes[$n]);
+        }
+    }
+
+    /**
+     * Adds a route collection at the end of the current set by appending all
+     * routes of the added collection.
+     *
+     * @param RouteCollection $collection      A RouteCollection instance
+     *
+     * @api
+     */
+    public function addCollection(RouteCollection $collection)
+    {
+        // This is to keep BC for getParent() and getRoot(). It does not prevent
+        // infinite loops by recursive referencing. But we don't need that logic
+        // anymore as the tree logic has been deprecated and we are just widening
+        // the accepted range.
+        $collection->parent = $this;
+
+        // this is to keep BC
+        $numargs = func_num_args();
+        if ($numargs > 1) {
+            trigger_error('addCollection() should only be used with a single parameter. The params $prefix, $defaults, $requirements and $options ' .
+                'are deprecated since version 2.2 and will be removed in 2.3. Use addPrefix() and addOptions() instead.', E_USER_DEPRECATED);
+            $collection->addPrefix($this->prefix . func_get_arg(1));
+            if ($numargs > 2) {
+                $collection->addDefaults(func_get_arg(2));
+                if ($numargs > 3) {
+                    $collection->addRequirements(func_get_arg(3));
+                    if ($numargs > 4) {
+                        $collection->addOptions(func_get_arg(4));
+                    }
+                }
             }
+        } else {
+            // the sub-collection must have the prefix of the parent (current instance) prepended because it does not
+            // necessarily already have it applied (depending on the order RouteCollections are added to each other)
+            // this will be removed when the BC layer for getPrefix() is removed
+            $collection->addPrefix($this->prefix);
         }
+
+        // we need to remove all routes with the same names first because just replacing them
+        // would not place the new route at the end of the merged array
+        foreach ($collection->all() as $name => $route) {
+            unset($this->routes[$name]);
+            $this->routes[$name] = $route;
+        }
+
+        $this->resources = array_merge($this->resources, $collection->getResources());
     }
 
     /**
-     * Adds a route collection to the current set of routes (at the end of the current set).
+     * Adds a prefix to the path of all child routes.
      *
-     * @param RouteCollection $collection A RouteCollection instance
-     * @param string          $prefix     An optional prefix to add before each pattern of the route collection
-     *
-     * @api
-     */
-    public function addCollection(RouteCollection $collection, $prefix = '')
-    {
-        $collection->setParent($this);
-        $collection->addPrefix($prefix);
-
-        // remove all routes with the same name in all existing collections
-        foreach (array_keys($collection->all()) as $name) {
-            $this->remove($name);
-        }
-
-        $this->routes[] = $collection;
-    }
-
-    /**
-     * Adds a prefix to all routes in the current set.
-     *
-     * @param string $prefix An optional prefix to add before each pattern of the route collection
+     * @param string $prefix       An optional prefix to add before each pattern of the route collection
+     * @param array  $defaults     An array of default values
+     * @param array  $requirements An array of requirements
      *
      * @api
      */
-    public function addPrefix($prefix)
+    public function addPrefix($prefix, array $defaults = array(), array $requirements = array())
     {
-        // a prefix must not end with a slash
-        $prefix = rtrim($prefix, '/');
+        $prefix = trim(trim($prefix), '/');
 
-        if (!$prefix) {
+        if ('' === $prefix) {
             return;
         }
 
-        // a prefix must start with a slash
-        if ('/' !== $prefix[0]) {
-            $prefix = '/'.$prefix;
+        // a prefix must start with a single slash and must not end with a slash
+        $this->prefix = '/' . $prefix . $this->prefix;
+
+        // this is to keep BC
+        if (func_num_args() > 3) {
+            trigger_error('The fourth parameter ($options) of addPrefix() is deprecated since version 2.2 and will be removed in 2.3. ' .
+                'Use addOptions() instead.', E_USER_DEPRECATED);
+            $options = func_get_arg(3);
+        } else {
+            $options = array();
         }
 
-        $this->prefix = $prefix.$this->prefix;
+        foreach ($this->routes as $route) {
+            $route->setPath('/' . $prefix . $route->getPath());
+            $route->addDefaults($defaults);
+            $route->addRequirements($requirements);
+            $route->addOptions($options);
+        }
+    }
 
-        foreach ($this->routes as $name => $route) {
-            if ($route instanceof RouteCollection) {
-                $route->addPrefix($prefix);
-            } else {
-                $route->setPattern($prefix.$route->getPattern());
+    /**
+     * Returns the prefix that may contain placeholders.
+     *
+     * @return string The prefix
+     *
+     * @deprecated since version 2.2, will be removed in 2.3
+     */
+    public function getPrefix()
+    {
+        trigger_error('getPrefix() is deprecated since version 2.2 and will be removed in 2.3. The method suggests that ' .
+            'all routes in the collection would have this prefix, which is not necessarily true.', E_USER_DEPRECATED);
+
+        return $this->prefix;
+    }
+
+    /**
+     * Sets the host pattern on all routes.
+     *
+     * @param string $pattern      The pattern
+     * @param array  $defaults     An array of default values
+     * @param array  $requirements An array of requirements
+     */
+    public function setHost($pattern, array $defaults = array(), array $requirements = array())
+    {
+        foreach ($this->routes as $route) {
+            $route->setHost($pattern);
+            $route->addDefaults($defaults);
+            $route->addRequirements($requirements);
+        }
+    }
+
+    /**
+     * Adds defaults to all routes.
+     *
+     * An existing default value under the same name in a route will be overridden.
+     *
+     * @param array $defaults An array of default values
+     */
+    public function addDefaults(array $defaults)
+    {
+        if ($defaults) {
+            foreach ($this->routes as $route) {
+                $route->addDefaults($defaults);
             }
         }
     }
 
-    public function getPrefix()
+    /**
+     * Adds requirements to all routes.
+     *
+     * An existing requirement under the same name in a route will be overridden.
+     *
+     * @param array $requirements An array of requirements
+     */
+    public function addRequirements(array $requirements)
     {
-        return $this->prefix;
+        if ($requirements) {
+            foreach ($this->routes as $route) {
+                $route->addRequirements($requirements);
+            }
+        }
+    }
+
+    /**
+     * Adds options to all routes.
+     *
+     * An existing option value under the same name in a route will be overridden.
+     *
+     * @param array $options An array of options
+     */
+    public function addOptions(array $options)
+    {
+        if ($options) {
+            foreach ($this->routes as $route) {
+                $route->addOptions($options);
+            }
+        }
+    }
+
+    /**
+     * Sets the schemes (e.g. 'https') all child routes are restricted to.
+     *
+     * @param string|array $schemes The scheme or an array of schemes
+     */
+    public function setSchemes($schemes)
+    {
+        foreach ($this->routes as $route) {
+            $route->setSchemes($schemes);
+        }
+    }
+
+    /**
+     * Sets the HTTP methods (e.g. 'POST') all child routes are restricted to.
+     *
+     * @param string|array $methods The method or an array of methods
+     */
+    public function setMethods($methods)
+    {
+        foreach ($this->routes as $route) {
+            $route->setMethods($methods);
+        }
     }
 
     /**
@@ -237,14 +369,7 @@ class RouteCollection implements \IteratorAggregate
      */
     public function getResources()
     {
-        $resources = $this->resources;
-        foreach ($this as $routes) {
-            if ($routes instanceof RouteCollection) {
-                $resources = array_merge($resources, $routes->getResources());
-            }
-        }
-
-        return array_unique($resources);
+        return array_unique($this->resources);
     }
 
     /**

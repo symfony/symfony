@@ -89,7 +89,7 @@ class Link
         $uri = trim($this->getRawUri());
 
         // absolute URL?
-        if (0 === strpos($uri, 'http')) {
+        if (null !== parse_url($uri, PHP_URL_SCHEME)) {
             return $uri;
         }
 
@@ -120,6 +120,11 @@ class Link
             return $baseUri.$uri;
         }
 
+        // absolute URL with relative schema
+        if (0 === strpos($uri, '//')) {
+            return preg_replace('#^([^/]*)//.*$#', '$1', $this->currentUri).$uri;
+        }
+
         // absolute path
         if ('/' === $uri[0]) {
             return preg_replace('#^(.*?//[^/]+)(?:\/.*)?$#', '$1', $this->currentUri).$uri;
@@ -130,7 +135,7 @@ class Link
     }
 
     /**
-     * Returns raw uri data
+     * Returns raw uri data.
      *
      * @return string
      */
@@ -140,7 +145,7 @@ class Link
     }
 
     /**
-     * Sets current \DOMNode instance
+     * Sets current \DOMNode instance.
      *
      * @param \DOMNode $node A \DOMNode instance
      *

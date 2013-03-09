@@ -20,6 +20,11 @@ namespace Symfony\Component\HttpFoundation;
  */
 class ServerBag extends ParameterBag
 {
+    /**
+     * Gets the HTTP headers.
+     *
+     * @return array
+     */
     public function getHeaders()
     {
         $headers = array();
@@ -39,11 +44,13 @@ class ServerBag extends ParameterBag
         } else {
             /*
              * php-cgi under Apache does not pass HTTP Basic user/pass to PHP by default
-             * For this workaround to work, add this line to your .htaccess file:
+             * For this workaround to work, add these lines to your .htaccess file:
+             * RewriteCond %{HTTP:Authorization} ^(.+)$
              * RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
              *
              * A sample .htaccess file:
              * RewriteEngine On
+             * RewriteCond %{HTTP:Authorization} ^(.+)$
              * RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
              * RewriteCond %{REQUEST_FILENAME} !-f
              * RewriteRule ^(.*)$ app.php [QSA,L]

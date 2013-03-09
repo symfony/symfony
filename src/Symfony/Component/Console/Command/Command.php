@@ -127,6 +127,19 @@ class Command
     }
 
     /**
+     * Checks whether the command is enabled or not in the current environment
+     *
+     * Override this to check for x or y and return false if the command can not
+     * run properly under the current conditions.
+     *
+     * @return Boolean
+     */
+    public function isEnabled()
+    {
+        return true;
+    }
+
+    /**
      * Configures the current command.
      */
     protected function configure()
@@ -144,7 +157,7 @@ class Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @return integer 0 if everything went fine, or an error code
+     * @return null|integer null or 0 if everything went fine, or an error code
      *
      * @throws \LogicException When this abstract method is not implemented
      * @see    setCode()
@@ -165,7 +178,7 @@ class Command
     }
 
     /**
-     * Initializes the command just before the input is validated.
+     * Initializes the command just after the input has been validated.
      *
      * This is mainly useful when a lot of commands extends one main command
      * where some things need to be initialized based on the input arguments and options.
@@ -188,6 +201,8 @@ class Command
      * @param OutputInterface $output An OutputInterface instance
      *
      * @return integer The command exit code
+     *
+     * @throws \Exception
      *
      * @see setCode()
      * @see execute()
@@ -220,10 +235,12 @@ class Command
         $input->validate();
 
         if ($this->code) {
-            return call_user_func($this->code, $input, $output);
+            $statusCode = call_user_func($this->code, $input, $output);
+        } else {
+            $statusCode = $this->execute($input, $output);
         }
 
-        return $this->execute($input, $output);
+        return is_numeric($statusCode) ? $statusCode : 0;
     }
 
     /**
@@ -232,16 +249,22 @@ class Command
      * If this method is used, it overrides the code defined
      * in the execute() method.
      *
-     * @param \Closure $code A \Closure
+     * @param callable $code A callable(InputInterface $input, OutputInterface $output)
      *
      * @return Command The current instance
+     *
+     * @throws \InvalidArgumentException
      *
      * @see execute()
      *
      * @api
      */
-    public function setCode(\Closure $code)
+    public function setCode($code)
     {
+        if (!is_callable($code)) {
+            throw new \InvalidArgumentException('Invalid callable provided to Command::setCode.');
+        }
+
         $this->code = $code;
 
         return $this;
@@ -249,17 +272,20 @@ class Command
 
     /**
      * Merges the application definition with the command definition.
+     *
+     * @param Boolean $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      */
-    private function mergeApplicationDefinition()
+    private function mergeApplicationDefinition($mergeArgs = true)
     {
         if (null === $this->application || true === $this->applicationDefinitionMerged) {
             return;
         }
 
-        $this->definition->setArguments(array_merge(
-            $this->application->getDefinition()->getArguments(),
-            $this->definition->getArguments()
-        ));
+        if ($mergeArgs) {
+            $currentArguments = $this->definition->getArguments();
+            $this->definition->setArguments($this->application->getDefinition()->getArguments());
+            $this->definition->addArguments($currentArguments);
+        }
 
         $this->definition->addOptions($this->application->getDefinition()->getOptions());
 
@@ -536,6 +562,11 @@ class Command
      */
     public function asText()
     {
+        if ($this->application && !$this->applicationDefinitionMerged) {
+            $this->getSynopsis();
+            $this->mergeApplicationDefinition(false);
+        }
+
         $messages = array(
             '<comment>Usage:</comment>',
             ' '.$this->getSynopsis(),
@@ -550,7 +581,7 @@ class Command
 
         if ($help = $this->getProcessedHelp()) {
             $messages[] = '<comment>Help:</comment>';
-            $messages[] = ' '.implode("\n ", explode("\n", $help))."\n";
+            $messages[] = ' '.str_replace("\n", "\n ", $help)."\n";
         }
 
         return implode("\n", $messages);
@@ -565,6 +596,11 @@ class Command
      */
     public function asXml($asDom = false)
     {
+        if ($this->application && !$this->applicationDefinitionMerged) {
+            $this->getSynopsis();
+            $this->mergeApplicationDefinition(false);
+        }
+
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
         $dom->appendChild($commandXML = $dom->createElement('command'));
@@ -575,11 +611,10 @@ class Command
         $usageXML->appendChild($dom->createTextNode(sprintf($this->getSynopsis(), '')));
 
         $commandXML->appendChild($descriptionXML = $dom->createElement('description'));
-        $descriptionXML->appendChild($dom->createTextNode(implode("\n ", explode("\n", $this->getDescription()))));
+        $descriptionXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $this->getDescription())));
 
         $commandXML->appendChild($helpXML = $dom->createElement('help'));
-        $help = $this->help;
-        $helpXML->appendChild($dom->createTextNode(implode("\n ", explode("\n", $help))));
+        $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $this->getProcessedHelp())));
 
         $commandXML->appendChild($aliasesXML = $dom->createElement('aliases'));
         foreach ($this->getAliases() as $alias) {

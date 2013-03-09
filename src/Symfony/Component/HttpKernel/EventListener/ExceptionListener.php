@@ -11,22 +11,24 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * ExceptionListener.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExceptionListener
+class ExceptionListener implements EventSubscriberInterface
 {
-    private $controller;
-    private $logger;
+    protected $controller;
+    protected $logger;
 
     public function __construct($controller, LoggerInterface $logger = null)
     {
@@ -47,29 +49,12 @@ class ExceptionListener
         $exception = $event->getException();
         $request = $event->getRequest();
 
-        if (null !== $this->logger) {
-            $message = sprintf('%s: %s (uncaught exception) at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine());
-            if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
-                $this->logger->crit($message);
-            } else {
-                $this->logger->err($message);
-            }
-        } else {
-            error_log(sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
-        }
-
-        $logger = $this->logger instanceof DebugLoggerInterface ? $this->logger : null;
-
-        $flattenException = FlattenException::create($exception);
-        if ($exception instanceof HttpExceptionInterface) {
-            $flattenException->setStatusCode($exception->getStatusCode());
-            $flattenException->setHeaders($exception->getHeaders());
-        }
+        $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
 
         $attributes = array(
             '_controller' => $this->controller,
-            'exception'   => $flattenException,
-            'logger'      => $logger,
+            'exception'   => FlattenException::create($exception),
+            'logger'      => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
             'format'      => $request->getRequestFormat(),
         );
 
@@ -79,26 +64,45 @@ class ExceptionListener
         try {
             $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
         } catch (\Exception $e) {
-            $message = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
-            if (null !== $this->logger) {
-                if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
-                    $this->logger->crit($message);
-                } else {
-                    $this->logger->err($message);
-                }
-            } else {
-                error_log($message);
-            }
+            $this->logException($exception, sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage()), false);
 
             // set handling to false otherwise it wont be able to handle further more
             $handling = false;
 
-            // re-throw the exception as this is a catch-all
-            throw $exception;
+            // re-throw the exception from within HttpKernel as this is a catch-all
+            return;
         }
 
         $event->setResponse($response);
 
         $handling = false;
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::EXCEPTION => array('onKernelException', -128),
+        );
+    }
+
+    /**
+     * Logs an exception.
+     *
+     * @param \Exception $exception The original \Exception instance
+     * @param string     $message   The error message to log
+     * @param Boolean    $original  False when the handling of the exception thrown another exception
+     */
+    protected function logException(\Exception $exception, $message, $original = true)
+    {
+        $isCritical = !$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500;
+        if (null !== $this->logger) {
+            if ($isCritical) {
+                $this->logger->critical($message);
+            } else {
+                $this->logger->error($message);
+            }
+        } elseif (!$original || $isCritical) {
+            error_log($message);
+        }
     }
 }

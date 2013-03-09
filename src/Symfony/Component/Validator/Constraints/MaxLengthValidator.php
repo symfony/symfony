@@ -16,49 +16,47 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
+ *
+ * @deprecated Deprecated since version 2.1, to be removed in 2.3.
  */
 class MaxLengthValidator extends ConstraintValidator
 {
+    public function __construct($options = null)
+    {
+        trigger_error('MaxLengthValidator is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
+    }
+
     /**
-     * Checks if the passed value is valid.
-     *
-     * @param mixed      $value      The value that should be validated
-     * @param Constraint $constraint The constraint for the validation
-     *
-     * @return Boolean Whether or not the value is valid
-     *
-     * @api
+     * {@inheritDoc}
      */
-    public function isValid($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
-            return true;
+            return;
         }
 
         if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $value = (string) $value;
+        $stringValue = (string) $value;
 
         if (function_exists('grapheme_strlen') && 'UTF-8' === $constraint->charset) {
-            $length = grapheme_strlen($value);
+            $length = grapheme_strlen($stringValue);
         } elseif (function_exists('mb_strlen')) {
-            $length = mb_strlen($value, $constraint->charset);
+            $length = mb_strlen($stringValue, $constraint->charset);
         } else {
-            $length = strlen($value);
+            $length = strlen($stringValue);
         }
 
         if ($length > $constraint->limit) {
-            $this->setMessage($constraint->message, array(
-                '{{ value }}' => $value,
+            $this->context->addViolation($constraint->message, array(
+                '{{ value }}' => $stringValue,
                 '{{ limit }}' => $constraint->limit,
-            ));
-
-            return false;
+            ), $value, (int) $constraint->limit);
         }
-
-        return true;
     }
 }

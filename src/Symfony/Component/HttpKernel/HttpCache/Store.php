@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Store implements StoreInterface
 {
-    private $root;
+    protected $root;
     private $keyCache;
     private $locks;
 
@@ -71,7 +71,13 @@ class Store implements StoreInterface
      */
     public function lock(Request $request)
     {
-        if (false !== $lock = @fopen($path = $this->getPath($this->getCacheKey($request).'.lck'), 'x')) {
+        $path = $this->getPath($this->getCacheKey($request).'.lck');
+        if (!is_dir(dirname($path)) && false === @mkdir(dirname($path), 0777, true)) {
+            return false;
+        }
+
+        $lock = @fopen($path, 'x');
+        if (false !== $lock) {
             fclose($lock);
 
             $this->locks[] = $path;
@@ -79,7 +85,7 @@ class Store implements StoreInterface
             return true;
         }
 
-        return $path;
+        return !file_exists($path) ?: $path;
     }
 
     /**
@@ -94,6 +100,11 @@ class Store implements StoreInterface
         $file = $this->getPath($this->getCacheKey($request).'.lck');
 
         return is_file($file) ? @unlink($file) : false;
+    }
+
+    public function isLocked(Request $request)
+    {
+        return is_file($this->getPath($this->getCacheKey($request).'.lck'));
     }
 
     /**
@@ -126,7 +137,7 @@ class Store implements StoreInterface
         }
 
         list($req, $headers) = $match;
-        if (file_exists($body = $this->getPath($headers['x-content-digest'][0]))) {
+        if (is_file($body = $this->getPath($headers['x-content-digest'][0]))) {
             return $this->restoreResponse($headers, $body);
         }
 
@@ -146,6 +157,8 @@ class Store implements StoreInterface
      * @param Response $response A Response instance
      *
      * @return string The key under which the response is stored
+     *
+     * @throws \RuntimeException
      */
     public function write(Request $request, Response $response)
     {
@@ -154,7 +167,7 @@ class Store implements StoreInterface
 
         // write the response body to the entity store if this is the original response
         if (!$response->headers->has('X-Content-Digest')) {
-            $digest = 'en'.sha1($response->getContent());
+            $digest = $this->generateContentDigest($response);
 
             if (false === $this->save($digest, $response->getContent())) {
                 throw new \RuntimeException('Unable to store the entity.');
@@ -193,9 +206,23 @@ class Store implements StoreInterface
     }
 
     /**
+     * Returns content digest for $response.
+     *
+     * @param Response $response
+     *
+     * @return string
+     */
+    protected function generateContentDigest(Response $response)
+    {
+        return 'en'.sha1($response->getContent());
+    }
+
+    /**
      * Invalidates all cache entries that match the request.
      *
      * @param Request $request A Request instance
+     *
+     * @throws \RuntimeException
      */
     public function invalidate(Request $request)
     {
@@ -285,7 +312,7 @@ class Store implements StoreInterface
      */
     public function purge($url)
     {
-        if (file_exists($path = $this->getPath($this->getCacheKey(Request::create($url))))) {
+        if (is_file($path = $this->getPath($this->getCacheKey(Request::create($url))))) {
             unlink($path);
 
             return true;
@@ -305,7 +332,7 @@ class Store implements StoreInterface
     {
         $path = $this->getPath($key);
 
-        return file_exists($path) ? file_get_contents($path) : false;
+        return is_file($path) ? file_get_contents($path) : false;
     }
 
     /**
@@ -313,6 +340,8 @@ class Store implements StoreInterface
      *
      * @param string $key  The store key
      * @param string $data The data to store
+     *
+     * @return Boolean
      */
     private function save($key, $data)
     {
@@ -336,7 +365,7 @@ class Store implements StoreInterface
             return false;
         }
 
-        chmod($path, 0644);
+        @chmod($path, 0666 & ~umask());
     }
 
     public function getPath($key)
@@ -392,6 +421,8 @@ class Store implements StoreInterface
      *
      * @param array  $headers An array of HTTP headers for the Response
      * @param string $body    The Response body
+     *
+     * @return Response
      */
     private function restoreResponse($headers, $body = null)
     {

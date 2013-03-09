@@ -22,6 +22,8 @@ interface FormExtensionInterface
      * @param string $name The name of the type
      *
      * @return FormTypeInterface The type
+     *
+     * @throws Exception\FormException if the given type is not supported by this extension
      */
     public function getType($name);
 
@@ -39,7 +41,7 @@ interface FormExtensionInterface
      *
      * @param string $name The name of the type
      *
-     * @return array An array of extensions as FormTypeExtensionInterface instances
+     * @return FormTypeExtensionInterface[] An array of extensions as FormTypeExtensionInterface instances
      */
     public function getTypeExtensions($name);
 

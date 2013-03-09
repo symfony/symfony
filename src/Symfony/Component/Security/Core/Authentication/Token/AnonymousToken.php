@@ -24,9 +24,9 @@ class AnonymousToken extends AbstractToken
     /**
      * Constructor.
      *
-     * @param string $key   The key shared with the authentication provider
-     * @param string $user  The user
-     * @param Role[] $roles An array of roles
+     * @param string          $key   The key shared with the authentication provider
+     * @param string          $user  The user
+     * @param RoleInterface[] $roles An array of roles
      */
     public function __construct($key, $user, array $roles = array())
     {
@@ -66,9 +66,9 @@ class AnonymousToken extends AbstractToken
     /**
      * {@inheritDoc}
      */
-    public function unserialize($str)
+    public function unserialize($serialized)
     {
-        list($this->key, $parentStr) = unserialize($str);
+        list($this->key, $parentStr) = unserialize($serialized);
         parent::unserialize($parentStr);
     }
 }

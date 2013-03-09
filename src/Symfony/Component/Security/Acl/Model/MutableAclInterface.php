@@ -25,7 +25,6 @@ interface MutableAclInterface extends AclInterface
      * Deletes a class-based ACE
      *
      * @param integer $index
-     * @return void
      */
     public function deleteClassAce($index);
 
@@ -34,7 +33,6 @@ interface MutableAclInterface extends AclInterface
      *
      * @param integer $index
      * @param string  $field
-     * @return void
      */
     public function deleteClassFieldAce($index, $field);
 
@@ -42,7 +40,6 @@ interface MutableAclInterface extends AclInterface
      * Deletes an object-based ACE
      *
      * @param integer $index
-     * @return void
      */
     public function deleteObjectAce($index);
 
@@ -51,7 +48,6 @@ interface MutableAclInterface extends AclInterface
      *
      * @param integer $index
      * @param string  $field
-     * @return void
      */
     public function deleteObjectFieldAce($index, $field);
 
@@ -70,7 +66,6 @@ interface MutableAclInterface extends AclInterface
      * @param integer                   $index
      * @param Boolean                   $granting
      * @param string                    $strategy
-     * @return void
      */
     public function insertClassAce(SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
 
@@ -83,7 +78,6 @@ interface MutableAclInterface extends AclInterface
      * @param integer                   $index
      * @param Boolean                   $granting
      * @param string                    $strategy
-     * @return void
      */
     public function insertClassFieldAce($field, SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
 
@@ -95,7 +89,6 @@ interface MutableAclInterface extends AclInterface
      * @param integer                   $index
      * @param Boolean                   $granting
      * @param string                    $strategy
-     * @return void
      */
     public function insertObjectAce(SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
 
@@ -108,7 +101,6 @@ interface MutableAclInterface extends AclInterface
      * @param integer                   $index
      * @param Boolean                   $granting
      * @param string                    $strategy
-     * @return void
      */
     public function insertObjectFieldAce($field, SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
 
@@ -116,17 +108,15 @@ interface MutableAclInterface extends AclInterface
      * Sets whether entries are inherited
      *
      * @param Boolean $boolean
-     * @return void
      */
     public function setEntriesInheriting($boolean);
 
     /**
      * Sets the parent ACL
      *
-     * @param AclInterface $acl
-     * @return void
+     * @param AclInterface|null $acl
      */
-    public function setParentAcl(AclInterface $acl);
+    public function setParentAcl(AclInterface $acl = null);
 
     /**
      * Updates a class-based ACE
@@ -134,7 +124,6 @@ interface MutableAclInterface extends AclInterface
      * @param integer $index
      * @param integer $mask
      * @param string  $strategy if null the strategy should not be changed
-     * @return void
      */
     public function updateClassAce($index, $mask, $strategy = null);
 
@@ -145,7 +134,6 @@ interface MutableAclInterface extends AclInterface
      * @param string  $field
      * @param integer $mask
      * @param string  $strategy if null the strategy should not be changed
-     * @return void
      */
     public function updateClassFieldAce($index, $field, $mask, $strategy = null);
 
@@ -155,7 +143,6 @@ interface MutableAclInterface extends AclInterface
      * @param integer $index
      * @param integer $mask
      * @param string  $strategy if null the strategy should not be changed
-     * @return void
      */
     public function updateObjectAce($index, $mask, $strategy = null);
 
@@ -166,7 +153,6 @@ interface MutableAclInterface extends AclInterface
      * @param string  $field
      * @param integer $mask
      * @param string  $strategy if null the strategy should not be changed
-     * @return void
      */
     public function updateObjectFieldAce($index, $field, $mask, $strategy = null);
 }

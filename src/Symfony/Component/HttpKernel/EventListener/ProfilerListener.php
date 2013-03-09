@@ -15,16 +15,18 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * ProfilerListener collects data for the current request by listening to the onKernelResponse event.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ProfilerListener
+class ProfilerListener implements EventSubscriberInterface
 {
     protected $profiler;
     protected $matcher;
@@ -115,14 +117,17 @@ class ProfilerListener
             array_pop($this->requests);
 
             $parent = end($this->requests);
-            $profiles = isset($this->children[$parent]) ? $this->children[$parent] : array();
-            $profiles[] = $profile;
-            $this->children[$parent] = $profiles;
+
+            // when simulating requests, we might not have the parent
+            if ($parent) {
+                $profiles = isset($this->children[$parent]) ? $this->children[$parent] : array();
+                $profiles[] = $profile;
+                $this->children[$parent] = $profiles;
+            }
         }
 
         if (isset($this->children[$request])) {
             foreach ($this->children[$request] as $child) {
-                $child->setParent($profile);
                 $profile->addChild($child);
             }
             $this->children[$request] = array();
@@ -131,6 +136,17 @@ class ProfilerListener
         if ($master) {
             $this->saveProfiles($profile);
         }
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return array(
+            // kernel.request must be registered as early as possible to not break
+            // when an exception is thrown in any other kernel.request listener
+            KernelEvents::REQUEST => array('onKernelRequest', 1024),
+            KernelEvents::RESPONSE => array('onKernelResponse', -100),
+            KernelEvents::EXCEPTION => 'onKernelException',
+        );
     }
 
     /**

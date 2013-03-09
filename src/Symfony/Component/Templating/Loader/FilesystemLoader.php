@@ -51,7 +51,7 @@ class FilesystemLoader extends Loader
     {
         $file = $template->get('name');
 
-        if (self::isAbsolutePath($file) && file_exists($file)) {
+        if (self::isAbsolutePath($file) && is_file($file)) {
             return new FileStorage($file);
         }
 
@@ -90,6 +90,8 @@ class FilesystemLoader extends Loader
      * @param TemplateReferenceInterface $template A template
      * @param integer                    $time     The last modification time of the cached template (timestamp)
      *
+     * @return Boolean true if the template is still fresh, false otherwise
+     *
      * @api
      */
     public function isFresh(TemplateReferenceInterface $template, $time)
@@ -106,7 +108,7 @@ class FilesystemLoader extends Loader
      *
      * @param string $file A path
      *
-     * @return true if the path exists and is absolute, false otherwise
+     * @return Boolean true if the path exists and is absolute, false otherwise
      */
     protected static function isAbsolutePath($file)
     {
@@ -115,6 +117,7 @@ class FilesystemLoader extends Loader
                 && $file[1] == ':'
                 && ($file[2] == '\\' || $file[2] == '/')
             )
+            || null !== parse_url($file, PHP_URL_SCHEME)
         ) {
             return true;
         }

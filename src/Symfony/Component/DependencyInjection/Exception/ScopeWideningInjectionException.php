@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the Symfony framework.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\DependencyInjection\Exception;
@@ -23,7 +23,7 @@ class ScopeWideningInjectionException extends RuntimeException
     private $destServiceId;
     private $destScope;
 
-    public function __construct($sourceServiceId, $sourceScope, $destServiceId, $destScope)
+    public function __construct($sourceServiceId, $sourceScope, $destServiceId, $destScope, \Exception $previous = null)
     {
         parent::__construct(sprintf(
             'Scope Widening Injection detected: The definition "%s" references the service "%s" which belongs to a narrower scope. '
@@ -34,7 +34,7 @@ class ScopeWideningInjectionException extends RuntimeException
            $sourceServiceId,
            $destScope,
            $destServiceId
-        ));
+        ), 0, $previous);
 
         $this->sourceServiceId = $sourceServiceId;
         $this->sourceScope = $sourceScope;

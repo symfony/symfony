@@ -9,6 +9,9 @@ can optionally be used to convert from different formats to arrays.
 Resources
 ---------
 
-Unit tests:
+You can run the unit tests with the following command:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/Config
+    $ cd path/to/Symfony/Component/Config/
+    $ composer.phar install --dev
+    $ phpunit
+

@@ -11,14 +11,15 @@
 
 namespace Symfony\Bridge\Doctrine\Form;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Form\AbstractExtension;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class DoctrineOrmExtension extends AbstractExtension
 {
     protected $registry;
 
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
@@ -26,7 +27,7 @@ class DoctrineOrmExtension extends AbstractExtension
     protected function loadTypes()
     {
         return array(
-            new Type\EntityType($this->registry),
+            new Type\EntityType($this->registry, PropertyAccess::getPropertyAccessor()),
         );
     }
 

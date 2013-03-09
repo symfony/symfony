@@ -29,11 +29,13 @@ class ParameterNotFoundException extends InvalidArgumentException
      * @param string $sourceId  The service id that references the non-existent parameter
      * @param string $sourceKey The parameter key that references the non-existent parameter
      */
-    public function __construct($key, $sourceId = null, $sourceKey = null)
+    public function __construct($key, $sourceId = null, $sourceKey = null, \Exception $previous = null)
     {
         $this->key = $key;
         $this->sourceId = $sourceId;
         $this->sourceKey = $sourceKey;
+
+        parent::__construct('', 0, $previous);
 
         $this->updateRepr();
     }

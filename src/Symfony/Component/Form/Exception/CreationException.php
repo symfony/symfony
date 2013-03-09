@@ -14,8 +14,8 @@ namespace Symfony\Component\Form\Exception;
 /**
  * Thrown when a form could not be constructed by a FormFactory
  *
- * @author Bernhard Schussek <bernhard.schussek@symfony.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CreationException extends FormException
+class CreationException extends Exception
 {
 }

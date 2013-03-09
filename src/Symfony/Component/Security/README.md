@@ -9,10 +9,15 @@ the Java Spring framework.
 Resources
 ---------
 
-Unit tests:
-
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/Security
-
 Documentation:
 
 http://symfony.com/doc/2.0/book/security.html
+
+Resources
+---------
+
+You can run the unit tests with the following command:
+
+    $ cd path/to/Symfony/Component/Security/
+    $ composer.phar install --dev
+    $ phpunit

@@ -19,6 +19,7 @@ use Symfony\Component\BrowserKit\Response as DomResponse;
 use Symfony\Component\BrowserKit\Cookie as DomCookie;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\HttpKernel\TerminableInterface;
 
 /**
  * Client simulates a browser and makes requests to a Kernel object.
@@ -57,22 +58,29 @@ class Client extends BaseClient
      */
     protected function doRequest($request)
     {
-        return $this->kernel->handle($request);
+        $response = $this->kernel->handle($request);
+
+        if ($this->kernel instanceof TerminableInterface) {
+            $this->kernel->terminate($request, $response);
+        }
+
+        return $response;
     }
 
     /**
      * Returns the script to execute when the request must be insulated.
      *
      * @param Request $request A Request instance
+     *
+     * @return string
      */
     protected function getScript($request)
     {
         $kernel = str_replace("'", "\\'", serialize($this->kernel));
         $request = str_replace("'", "\\'", serialize($request));
 
-        $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\UniversalClassLoader');
+        $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\ClassLoader');
         $requirePath = str_replace("'", "\\'", $r->getFileName());
-
         $symfonyPath = str_replace("'", "\\'", realpath(__DIR__.'/../../..'));
 
         return <<<EOF
@@ -80,8 +88,8 @@ class Client extends BaseClient
 
 require_once '$requirePath';
 
-\$loader = new Symfony\Component\ClassLoader\UniversalClassLoader();
-\$loader->registerNamespaces(array('Symfony' => '$symfonyPath'));
+\$loader = new Symfony\Component\ClassLoader\ClassLoader();
+\$loader->addPrefix('Symfony', '$symfonyPath');
 \$loader->register();
 
 \$kernel = unserialize('$kernel');
@@ -172,6 +180,11 @@ EOF;
             $headers['Set-Cookie'] = $cookies;
         }
 
-        return new DomResponse($response->getContent(), $response->getStatusCode(), $headers);
+        // this is needed to support StreamedResponse
+        ob_start();
+        $response->sendContent();
+        $content = ob_get_clean();
+
+        return new DomResponse($content, $response->getStatusCode(), $headers);
     }
 }

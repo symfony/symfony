@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation;
 
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 /**
  * Translator.
@@ -22,11 +23,34 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
  */
 class Translator implements TranslatorInterface
 {
-    protected $catalogues;
+    /**
+     * @var MessageCatalogueInterface[]
+     */
+    protected $catalogues = array();
+
+    /**
+     * @var string
+     */
     protected $locale;
-    private $fallbackLocale;
-    private $loaders;
-    private $resources;
+
+    /**
+     * @var array
+     */
+    private $fallbackLocales = array();
+
+    /**
+     * @var LoaderInterface[]
+     */
+    private $loaders = array();
+
+    /**
+     * @var array
+     */
+    private $resources = array();
+
+    /**
+     * @var MessageSelector
+     */
     private $selector;
 
     /**
@@ -37,13 +61,10 @@ class Translator implements TranslatorInterface
      *
      * @api
      */
-    public function __construct($locale, MessageSelector $selector)
+    public function __construct($locale, MessageSelector $selector = null)
     {
         $this->locale = $locale;
-        $this->selector = $selector;
-        $this->loaders = array();
-        $this->resources = array();
-        $this->catalogues = array();
+        $this->selector = null === $selector ? new MessageSelector() : $selector;
     }
 
     /**
@@ -97,18 +118,44 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Sets the fallback locale.
+     * Sets the fallback locale(s).
      *
-     * @param string $locale The fallback locale
+     * @param string|array $locales The fallback locale(s)
+     *
+     * @deprecated since 2.3, to be removed in 3.0. Use setFallbackLocales() instead.
      *
      * @api
      */
-    public function setFallbackLocale($locale)
+    public function setFallbackLocale($locales)
     {
-        // needed as the fallback locale is used to fill-in non-yet translated messages
+        $this->setFallbackLocales(is_array($locales) ? $locales : array($locales));
+    }
+
+    /**
+     * Sets the fallback locales.
+     *
+     * @param array $locales The fallback locales
+     *
+     * @api
+     */
+    public function setFallbackLocales(array $locales)
+    {
+        // needed as the fallback locales are linked to the already loaded catalogues
         $this->catalogues = array();
 
-        $this->fallbackLocale = $locale;
+        $this->fallbackLocales = $locales;
+    }
+
+    /**
+     * Gets the fallback locales.
+     *
+     * @return array $locales The fallback locales
+     *
+     * @api
+     */
+    public function getFallbackLocales()
+    {
+        return $this->fallbackLocales;
     }
 
     /**
@@ -144,19 +191,34 @@ class Translator implements TranslatorInterface
             $this->loadCatalogue($locale);
         }
 
-        if (!$this->catalogues[$locale]->defines((string) $id, $domain)) {
-            // we will use the fallback
-            $locale = $this->computeFallbackLocale($locale);
+        $id = (string) $id;
 
-            if (!isset($this->catalogues[$locale])) {
-                $this->loadCatalogue($locale);
+        $catalogue = $this->catalogues[$locale];
+        while (!$catalogue->defines($id, $domain)) {
+            if ($cat = $catalogue->getFallbackCatalogue()) {
+                $catalogue = $cat;
+                $locale = $catalogue->getLocale();
+            } else {
+                break;
             }
         }
 
-        return strtr($this->selector->choose($this->catalogues[$locale]->get((string) $id, $domain), (int) $number, $locale), $parameters);
+        return strtr($this->selector->choose($catalogue->get($id, $domain), (float) $number, $locale), $parameters);
     }
 
     protected function loadCatalogue($locale)
+    {
+        try {
+            $this->doLoadCatalogue($locale);
+        } catch (NotFoundResourceException $e) {
+            if (!$this->computeFallbackLocales($locale)) {
+                throw $e;
+            }
+        }
+        $this->loadFallbackCatalogues($locale);
+    }
+
+    private function doLoadCatalogue($locale)
     {
         $this->catalogues[$locale] = new MessageCatalogue($locale);
 
@@ -168,31 +230,37 @@ class Translator implements TranslatorInterface
                 $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
             }
         }
-
-        $this->addFallbackCatalogue($locale);
     }
 
-    protected function computeFallbackLocale($locale)
+    private function loadFallbackCatalogues($locale)
     {
+        $current = $this->catalogues[$locale];
+
+        foreach ($this->computeFallbackLocales($locale) as $fallback) {
+            if (!isset($this->catalogues[$fallback])) {
+                $this->doLoadCatalogue($fallback);
+            }
+
+            $current->addFallbackCatalogue($this->catalogues[$fallback]);
+            $current = $this->catalogues[$fallback];
+        }
+    }
+
+    protected function computeFallbackLocales($locale)
+    {
+        $locales = array();
+        foreach ($this->fallbackLocales as $fallback) {
+            if ($fallback === $locale) {
+                continue;
+            }
+
+            $locales[] = $fallback;
+        }
+
         if (strrchr($locale, '_') !== false) {
-            return substr($locale, 0, -strlen(strrchr($locale, '_')));
-        } else {
-            return $this->fallbackLocale;
-        }
-    }
-
-    private function addFallbackCatalogue($locale)
-    {
-        if (!$fallback = $this->computeFallbackLocale($locale)) {
-            return;
+            array_unshift($locales, substr($locale, 0, -strlen(strrchr($locale, '_'))));
         }
 
-        if (!isset($this->catalogues[$fallback])) {
-            $this->loadCatalogue($fallback);
-        }
-
-        if ($fallback != $locale) {
-            $this->catalogues[$locale]->addFallbackCatalogue($this->catalogues[$fallback]);
-        }
+        return array_unique($locales);
     }
 }

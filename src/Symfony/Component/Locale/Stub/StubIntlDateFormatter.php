@@ -13,7 +13,6 @@ namespace Symfony\Component\Locale\Stub;
 
 use Symfony\Component\Locale\Stub\StubLocale;
 use Symfony\Component\Locale\Stub\DateFormat\FullTransformer;
-use Symfony\Component\Locale\Exception\NotImplementedException;
 use Symfony\Component\Locale\Exception\MethodNotImplementedException;
 use Symfony\Component\Locale\Exception\MethodArgumentNotImplementedException;
 use Symfony\Component\Locale\Exception\MethodArgumentValueNotImplementedException;
@@ -91,7 +90,7 @@ class StubIntlDateFormatter
     private $pattern;
 
     /**
-     * @var DateTimeZone
+     * @var \DateTimeZone
      */
     private $dateTimeZone;
 
@@ -150,6 +149,8 @@ class StubIntlDateFormatter
      *                           One of the calendar constants.
      * @param string $pattern Optional pattern to use when formatting
      *
+     * @return StubIntlDateFormatter
+     *
      * @see    http://www.php.net/manual/en/intldateformatter.create.php
      * @see    http://userguide.icu-project.org/formatparse/datetime
      *
@@ -169,7 +170,7 @@ class StubIntlDateFormatter
      *
      * @see    http://www.php.net/manual/en/intldateformatter.format.php
      *
-     * @throws NotImplementedException    If one of the formatting characters is not implemented
+     * @throws MethodArgumentValueNotImplementedException If one of the formatting characters is not implemented
      */
     public function format($timestamp)
     {
@@ -373,7 +374,7 @@ class StubIntlDateFormatter
     /**
      * Returns whether the formatter is lenient
      *
-     * @return string   The timezone identifier used by the formatter
+     * @return Boolean
      *
      * @see    http://www.php.net/manual/en/intldateformatter.islenient.php
      *
@@ -381,7 +382,7 @@ class StubIntlDateFormatter
      */
     public function isLenient()
     {
-        throw new MethodNotImplementedException(__METHOD__);
+        return false;
     }
 
     /**
@@ -432,10 +433,8 @@ class StubIntlDateFormatter
         $timestamp = $transformer->parse($dateTime, $value);
 
         // behave like the intl extension. FullTransformer::parse() set the proper error
-        if (false === $timestamp) {
-            $this->errorCode = StubIntl::getErrorCode();
-            $this->errorMessage = StubIntl::getErrorMessage();
-        }
+        $this->errorCode = StubIntl::getErrorCode();
+        $this->errorMessage = StubIntl::getErrorMessage();
 
         return $timestamp;
     }

@@ -13,7 +13,10 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Bridge\Twig\TokenParser\TransTokenParser;
 use Symfony\Bridge\Twig\TokenParser\TransChoiceTokenParser;
+use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
+use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 
 /**
  * Provides integration of the Translation component with Twig.
@@ -23,10 +26,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 class TranslationExtension extends \Twig_Extension
 {
     private $translator;
+    private $translationNodeVisitor;
 
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
+        $this->translationNodeVisitor = new TranslationNodeVisitor();
     }
 
     public function getTranslator()
@@ -60,16 +65,40 @@ class TranslationExtension extends \Twig_Extension
             //     {0} There is no apples|{1} There is one apple|]1,Inf] There is {{ count }} apples
             // {% endtranschoice %}
             new TransChoiceTokenParser(),
+
+            // {% trans_default_domain "foobar" %}
+            new TransDefaultDomainTokenParser(),
         );
     }
 
-    public function trans($message, array $arguments = array(), $domain = "messages", $locale = null)
+    /**
+     * {@inheritdoc}
+     */
+    public function getNodeVisitors()
     {
+        return array($this->translationNodeVisitor, new TranslationDefaultDomainNodeVisitor());
+    }
+
+    public function getTranslationNodeVisitor()
+    {
+        return $this->translationNodeVisitor;
+    }
+
+    public function trans($message, array $arguments = array(), $domain = null, $locale = null)
+    {
+        if (null === $domain) {
+            $domain = 'messages';
+        }
+
         return $this->translator->trans($message, $arguments, $domain, $locale);
     }
 
-    public function transchoice($message, $count, array $arguments = array(), $domain = "messages", $locale = null)
+    public function transchoice($message, $count, array $arguments = array(), $domain = null, $locale = null)
     {
+        if (null === $domain) {
+            $domain = 'messages';
+        }
+
         return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
     }
 

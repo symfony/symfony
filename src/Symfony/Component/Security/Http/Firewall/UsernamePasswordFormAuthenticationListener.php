@@ -13,7 +13,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
@@ -37,15 +37,15 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
     /**
      * {@inheritdoc}
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, array $options = array(), AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfProviderInterface $csrfProvider = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, CsrfProviderInterface $csrfProvider = null)
     {
-        parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, array_merge(array(
+        parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, $successHandler, $failureHandler, array_merge(array(
             'username_parameter' => '_username',
             'password_parameter' => '_password',
             'csrf_parameter'     => '_csrf_token',
             'intention'          => 'authenticate',
             'post_only'          => true,
-        ), $options), $successHandler, $failureHandler, $logger, $dispatcher);
+        ), $options), $logger, $dispatcher);
 
         $this->csrfProvider = $csrfProvider;
     }
@@ -53,16 +53,20 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
     /**
      * {@inheritdoc}
      */
-    protected function attemptAuthentication(Request $request)
+    protected function requiresAuthentication(Request $request)
     {
-        if ($this->options['post_only'] && 'post' !== strtolower($request->getMethod())) {
-            if (null !== $this->logger) {
-                $this->logger->debug(sprintf('Authentication method not supported: %s.', $request->getMethod()));
-            }
-
-            return null;
+        if ($this->options['post_only'] && !$request->isMethod('POST')) {
+            return false;
         }
 
+        return parent::requiresAuthentication($request);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function attemptAuthentication(Request $request)
+    {
         if (null !== $this->csrfProvider) {
             $csrfToken = $request->get($this->options['csrf_parameter'], null, true);
 
@@ -71,8 +75,13 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
             }
         }
 
-        $username = trim($request->get($this->options['username_parameter'], null, true));
-        $password = $request->get($this->options['password_parameter'], null, true);
+        if ($this->options['post_only']) {
+            $username = trim($request->request->get($this->options['username_parameter'], null, true));
+            $password = $request->request->get($this->options['password_parameter'], null, true);
+        } else {
+            $username = trim($request->get($this->options['username_parameter'], null, true));
+            $password = $request->get($this->options['password_parameter'], null, true);
+        }
 
         $request->getSession()->set(SecurityContextInterface::LAST_USERNAME, $username);
 

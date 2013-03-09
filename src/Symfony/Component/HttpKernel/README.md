@@ -21,7 +21,7 @@ framework:
 
 It takes a ``Request`` as an input and should return a ``Response`` as an
 output. Using this interface makes your code compatible with all frameworks
-using the Symfony2 components. And this will gives you many cool features for
+using the Symfony2 components. And this will give you many cool features for
 free.
 
 Creating a framework based on the Symfony2 components is really easy. Here is
@@ -82,6 +82,8 @@ with no efforts.
 Resources
 ---------
 
-Unit tests:
+You can run the unit tests with the following command:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/HttpKernel
+    $ cd path/to/Symfony/Component/HttpKernel/
+    $ composer.phar install --dev
+    $ phpunit

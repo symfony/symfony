@@ -49,7 +49,8 @@ class TwigExtension extends Extension
             }
         }
 
-        $configuration = new Configuration();
+        $configuration = $this->getConfiguration($configs, $container);
+
         $config = $this->processConfiguration($configuration, $configs);
 
         $container->setParameter('twig.exception_listener.controller', $config['exception_controller']);
@@ -57,7 +58,34 @@ class TwigExtension extends Extension
         $container->setParameter('twig.form.resources', $config['form']['resources']);
 
         $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
-        $container->getDefinition('twig.loader')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
+        $container->getDefinition('twig.loader.filesystem')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
+
+        $twigFilesystemLoaderDefinition = $container->getDefinition('twig.loader.filesystem');
+
+        // register user-configured paths
+        foreach ($config['paths'] as $path => $namespace) {
+            if (!$namespace) {
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path));
+            } else {
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
+            }
+        }
+
+        // register bundles as Twig namespaces
+        foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
+            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
+                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
+            }
+
+            $reflection = new \ReflectionClass($class);
+            if (is_dir($dir = dirname($reflection->getFilename()).'/Resources/views')) {
+                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
+            }
+        }
+
+        if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
+            $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
+        }
 
         if (!empty($config['globals'])) {
             $def = $container->getDefinition('twig');
@@ -78,18 +106,36 @@ class TwigExtension extends Extension
 
         $container->setParameter('twig.options', $config);
 
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('debug.xml');
+
+            $container->setDefinition('templating.engine.twig', $container->findDefinition('debug.templating.engine.twig'));
+            $container->setAlias('debug.templating.engine.twig', 'templating.engine.twig');
+        }
+
+        if (!isset($config['autoescape'])) {
+            $container->findDefinition('templating.engine.twig')->addMethodCall('setDefaultEscapingStrategy', array(array(new Reference('templating.engine.twig'), 'guessDefaultEscapingStrategy')));
+        }
+
         $this->addClassesToCompile(array(
             'Twig_Environment',
-            'Twig_ExtensionInterface',
             'Twig_Extension',
             'Twig_Extension_Core',
             'Twig_Extension_Escaper',
             'Twig_Extension_Optimizer',
             'Twig_LoaderInterface',
             'Twig_Markup',
-            'Twig_TemplateInterface',
             'Twig_Template',
         ));
+    }
+
+    private function addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
+    {
+        $name = $bundle;
+        if ('Bundle' === substr($name, -6)) {
+            $name = substr($name, 0, -6);
+        }
+        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
     }
 
     /**

@@ -21,14 +21,12 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
  */
 class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
 {
-    private $parameterBag;
-
     /**
      * Processes the ContainerBuilder to resolve parameter placeholders.
      *
      * @param ContainerBuilder $container
      *
-     * @throws ParameterNotFoundException When an invalid parameter is referenced
+     * @throws ParameterNotFoundException
      */
     public function process(ContainerBuilder $container)
     {

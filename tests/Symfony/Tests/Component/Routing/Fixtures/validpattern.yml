@@ -1,3 +1,0 @@
-blog_show:
-    pattern:   /blog/{slug}
-    defaults:  { _controller: MyBlogBundle:Blog:show }

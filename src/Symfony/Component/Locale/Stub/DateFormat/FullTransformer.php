@@ -27,7 +27,11 @@ class FullTransformer
     private $notImplementedChars = 'GYuwWFgecSAZvVW';
     private $regExp;
 
+    /**
+     * @var Transformer[]
+     */
     private $transformers;
+
     private $pattern;
     private $timezone;
 
@@ -69,7 +73,7 @@ class FullTransformer
     /**
      * Return the array of Transformer objects
      *
-     * @return  array  Associative array of Transformer objects (format char => Transformer)
+     * @return Transformer[] Associative array of Transformer objects (format char => Transformer)
      */
     public function getTransformers()
     {
@@ -79,7 +83,7 @@ class FullTransformer
     /**
      * Format a DateTime using ICU dateformat pattern
      *
-     * @param DateTime $dateTime A DateTime object to be used to generate the formatted value
+     * @param \DateTime $dateTime A DateTime object to be used to generate the formatted value
      *
      * @return string               The formatted value
      */
@@ -127,12 +131,12 @@ class FullTransformer
     /**
      * Parse a pattern based string to a timestamp value
      *
-     * @param DateTime $dateTime A configured DateTime object to use to perform the date calculation
+     * @param \DateTime $dateTime A configured DateTime object to use to perform the date calculation
      * @param string   $value    String to convert to a time value
      *
      * @return int                       The corresponding Unix timestamp
      *
-     * @throws InvalidArgumentException  When the value can not be matched with pattern
+     * @throws \InvalidArgumentException  When the value can not be matched with pattern
      */
     public function parse(\DateTime $dateTime, $value)
     {
@@ -150,6 +154,9 @@ class FullTransformer
                     $options = array_merge($options, $transformer->extractDateOptions($matches[$char]['value'], $length));
                 }
             }
+
+            // reset error code and message
+            StubIntl::setError(StubIntl::U_ZERO_ERROR);
 
             return $this->calculateUnixTimestamp($dateTime, $options);
         }
@@ -173,6 +180,10 @@ class FullTransformer
         $that = $this;
 
         $escapedPattern = preg_quote($pattern, '/');
+
+        // ICU 4.8 recognizes slash ("/") in a value to be parsed as a dash ("-") and vice-versa
+        // when parsing a date/time value
+        $escapedPattern = preg_replace('/\\\[\-|\/]/', '[\/\-]', $escapedPattern);
 
         $reverseMatchingRegExp = preg_replace_callback($this->regExp, function($matches) use ($that) {
             $length = strlen($matches[0]);
@@ -271,8 +282,8 @@ class FullTransformer
      * Calculates the Unix timestamp based on the matched values by the reverse matching regular
      * expression of parse()
      *
-     * @param DateTime $dateTime The DateTime object to be used to calculate the timestamp
-     * @param array    $options  An array with the matched values to be used to calculate the timestamp
+     * @param \DateTime $dateTime The DateTime object to be used to calculate the timestamp
+     * @param array     $options  An array with the matched values to be used to calculate the timestamp
      *
      * @return Boolean|int        The calculated timestamp or false if matched date is invalid
      */

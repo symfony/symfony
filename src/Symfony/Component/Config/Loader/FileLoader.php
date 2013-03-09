@@ -57,6 +57,9 @@ abstract class FileLoader extends Loader
      * @param string  $sourceResource The original resource importing the new resource
      *
      * @return mixed
+     *
+     * @throws FileLoaderLoadException
+     * @throws FileLoaderImportCircularReferenceException
      */
     public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
     {

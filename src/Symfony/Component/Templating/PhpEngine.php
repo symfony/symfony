@@ -17,6 +17,10 @@ use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\Helper\HelperInterface;
 use Symfony\Component\Templating\Loader\LoaderInterface;
 
+if (!defined('ENT_SUBSTITUTE')) {
+    define('ENT_SUBSTITUTE', 8);
+}
+
 /**
  * PhpEngine is an engine able to render PHP templates.
  *
@@ -34,6 +38,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     protected $charset;
     protected $cache;
     protected $escapers;
+    protected static $escaperCache;
     protected $globals;
     protected $parser;
 
@@ -42,7 +47,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
      * @param LoaderInterface             $loader  A loader instance
-     * @param array                       $helpers An array of helper instances
+     * @param HelperInterface[]           $helpers An array of helper instances
      */
     public function __construct(TemplateNameParserInterface $parser, LoaderInterface $loader, array $helpers = array())
     {
@@ -146,6 +151,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param array   $parameters An array of parameters to pass to the template
      *
      * @return string|false The evaluated template, or false if the engine is unable to render the template
+     *
+     * @throws \InvalidArgumentException
      */
     protected function evaluate(Storage $template, array $parameters = array())
     {
@@ -222,6 +229,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $name The helper name
      *
+     * @throws \LogicException
+     *
      * @api
      */
     public function offsetUnset($name)
@@ -230,7 +239,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     }
 
     /**
-     * @param Helper[] $helpers An array of helper
+     * Adds some helpers.
+     *
+     * @param HelperInterface[] $helpers An array of helper
      *
      * @api
      */
@@ -244,7 +255,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * Sets the helpers.
      *
-     * @param Helper[] $helpers An array of helper
+     * @param HelperInterface[] $helpers An array of helper
      *
      * @api
      */
@@ -330,6 +341,20 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function escape($value, $context = 'html')
     {
+        if (is_numeric($value)) {
+            return $value;
+        }
+
+        // If we deal with a scalar value, we can cache the result to increase
+        // the performance when the same value is escaped multiple times (e.g. loops)
+        if (is_scalar($value)) {
+            if (!isset(self::$escaperCache[$context][$value])) {
+                self::$escaperCache[$context][$value] = call_user_func($this->getEscaper($context), $value);
+            }
+
+            return self::$escaperCache[$context][$value];
+        }
+
         return call_user_func($this->getEscaper($context), $value);
     }
 
@@ -368,6 +393,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     public function setEscaper($context, $escaper)
     {
         $this->escapers[$context] = $escaper;
+        self::$escaperCache[$context] = array();
     }
 
     /**
@@ -376,6 +402,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param string $context The context name
      *
      * @return mixed  $escaper A PHP callable
+     *
+     * @throws \InvalidArgumentException
      *
      * @api
      */
@@ -444,7 +472,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                 function ($value) use ($that) {
                     // Numbers and Boolean values get turned into strings which can cause problems
                     // with type comparisons (e.g. === or is_int() etc).
-                    return is_string($value) ? htmlspecialchars($value, ENT_QUOTES, $that->getCharset(), false) : $value;
+                    return is_string($value) ? htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, $that->getCharset(), false) : $value;
                 },
 
             'js' =>
@@ -485,6 +513,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                     return $value;
                 },
         );
+
+        self::$escaperCache = array();
     }
 
     /**
@@ -500,10 +530,10 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function convertEncoding($string, $to, $from)
     {
-        if (function_exists('iconv')) {
-            return iconv($from, $to, $string);
-        } elseif (function_exists('mb_convert_encoding')) {
+        if (function_exists('mb_convert_encoding')) {
             return mb_convert_encoding($string, $to, $from);
+        } elseif (function_exists('iconv')) {
+            return iconv($from, $to, $string);
         }
 
         throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');

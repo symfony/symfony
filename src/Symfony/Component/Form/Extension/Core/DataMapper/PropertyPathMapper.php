@@ -11,82 +11,90 @@
 
 namespace Symfony\Component\Form\Extension\Core\DataMapper;
 
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Util\VirtualFormAwareIterator;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * A data mapper using property paths to read/write data.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 class PropertyPathMapper implements DataMapperInterface
 {
     /**
-     * Stores the class that the data of this form must be instances of.
-     *
-     * @var string
+     * @var PropertyAccessorInterface
      */
-    private $dataClass;
+    private $propertyAccessor;
 
-    public function __construct($dataClass = null)
+    /**
+     * Creates a new property path mapper.
+     *
+     * @param PropertyAccessorInterface $propertyAccessor
+     */
+    public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->dataClass = $dataClass;
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::getPropertyAccessor();
     }
 
     /**
-     * @param dataClass $data
-     * @param array     $forms
-     *
-     * @throws UnexpectedTypeException if the type of the data parameter is not supported
+     * {@inheritdoc}
      */
     public function mapDataToForms($data, array $forms)
     {
-        if (!empty($data) && !is_array($data) && !is_object($data)) {
-            throw new UnexpectedTypeException($data, 'Object, array or empty');
+        if (null === $data || array() === $data) {
+            return;
         }
 
-        if (!empty($data)) {
-            if (null !== $this->dataClass && !$data instanceof $this->dataClass) {
-                throw new UnexpectedTypeException($data, $this->dataClass);
-            }
-
-            $iterator = new VirtualFormAwareIterator($forms);
-            $iterator = new \RecursiveIteratorIterator($iterator);
-
-            foreach ($iterator as $form) {
-                $this->mapDataToForm($data, $form);
-            }
+        if (!is_array($data) && !is_object($data)) {
+            throw new UnexpectedTypeException($data, 'object, array or empty');
         }
-    }
 
-    public function mapDataToForm($data, FormInterface $form)
-    {
-        if (!empty($data)) {
-            if ($form->getAttribute('property_path') !== null) {
-                $form->setData($form->getAttribute('property_path')->getValue($data));
-            }
-        }
-    }
-
-    public function mapFormsToData(array $forms, &$data)
-    {
         $iterator = new VirtualFormAwareIterator($forms);
         $iterator = new \RecursiveIteratorIterator($iterator);
 
         foreach ($iterator as $form) {
-            $this->mapFormToData($form, $data);
+            /* @var FormInterface $form */
+            $propertyPath = $form->getPropertyPath();
+            $config = $form->getConfig();
+
+            if (null !== $propertyPath && $config->getMapped()) {
+                $form->setData($this->propertyAccessor->getValue($data, $propertyPath));
+            }
         }
     }
 
-    public function mapFormToData(FormInterface $form, &$data)
+    /**
+     * {@inheritdoc}
+     */
+    public function mapFormsToData(array $forms, &$data)
     {
-        if ($form->getAttribute('property_path') !== null && $form->isSynchronized() && !$form->isReadOnly()) {
-            $propertyPath = $form->getAttribute('property_path');
+        if (null === $data) {
+            return;
+        }
 
-            // If the data is identical to the value in $data, we are
-            // dealing with a reference
-            $isReference = $form->getData() === $propertyPath->getValue($data);
-            $byReference = $form->getAttribute('by_reference');
+        if (!is_array($data) && !is_object($data)) {
+            throw new UnexpectedTypeException($data, 'object, array or empty');
+        }
 
-            if (!(is_object($data) && $isReference && $byReference)) {
-                $propertyPath->setValue($data, $form->getData());
+        $iterator = new VirtualFormAwareIterator($forms);
+        $iterator = new \RecursiveIteratorIterator($iterator);
+
+        foreach ($iterator as $form) {
+            /* @var FormInterface $form */
+            $propertyPath = $form->getPropertyPath();
+            $config = $form->getConfig();
+
+            // Write-back is disabled if the form is not synchronized (transformation failed)
+            // and if the form is disabled (modification not allowed)
+            if (null !== $propertyPath && $config->getMapped() && $form->isSynchronized() && !$form->isDisabled()) {
+                // If the data is identical to the value in $data, we are
+                // dealing with a reference
+                if (!is_object($data) || !$config->getByReference() || $form->getData() !== $this->propertyAccessor->getValue($data, $propertyPath)) {
+                    $this->propertyAccessor->setValue($data, $propertyPath, $form->getData());
+                }
             }
         }
     }

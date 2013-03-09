@@ -40,9 +40,24 @@ The component provides a lot of features like output coloring, input and
 output abstractions (so that you can easily unit-test your commands),
 validation, automatic help messages, ...
 
+Tests
+-----
+
+You can run the unit tests with the following command:
+
+    $ cd path/to/Symfony/Component/Console/
+    $ composer.phar install --dev
+    $ phpunit
+
+Third Party
+-----------
+
+`Resources/bin/hiddeninput.exe` is a third party binary provided within this
+component. Find sources and license at https://github.com/Seldaek/hidden-input.
+
 Resources
 ---------
 
-Unit tests:
+[The Console Component](http://symfony.com/doc/current/components/console.html)
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/Console
+[How to create a Console Command](http://symfony.com/doc/current/cookbook/console/console_command.html)

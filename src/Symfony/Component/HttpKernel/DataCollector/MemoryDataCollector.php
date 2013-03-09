@@ -21,14 +21,17 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class MemoryDataCollector extends DataCollector
 {
+    public function __construct()
+    {
+        $this->data = array('memory' => 0);
+    }
+
     /**
      * {@inheritdoc}
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $this->data = array(
-            'memory' => memory_get_peak_usage(true),
-        );
+        $this->updateMemoryUsage();
     }
 
     /**
@@ -39,6 +42,14 @@ class MemoryDataCollector extends DataCollector
     public function getMemory()
     {
         return $this->data['memory'];
+    }
+
+    /**
+     * Updates the memory usage data.
+     */
+    public function updateMemoryUsage()
+    {
+        $this->data['memory'] = memory_get_peak_usage(true);
     }
 
     /**

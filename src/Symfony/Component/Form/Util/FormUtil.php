@@ -11,52 +11,47 @@
 
 namespace Symfony\Component\Form\Util;
 
-abstract class FormUtil
+use Symfony\Component\PropertyAccess\StringUtil;
+
+/**
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class FormUtil
 {
-    public static function toArrayKey($value)
-    {
-        if (is_bool($value) || (string) (int) $value === (string) $value) {
-            return (int) $value;
-        }
+    /**
+     * This class should not be instantiated
+     */
+    private function __construct() {}
 
-        return (string) $value;
-    }
-
-    public static function toArrayKeys(array $array)
+    /**
+     * Alias for {@link StringUtil::singularify()}
+     *
+     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
+     *             {@link StringUtil::singularify()} instead.
+     */
+    public static function singularify($plural)
     {
-        return array_map(array(__CLASS__, 'toArrayKey'), $array);
+        trigger_error('\Symfony\Component\Form\Util\FormUtil::singularify() is deprecated since version 2.2 and will be removed in 2.3. Use \Symfony\Component\PropertyAccess\StringUtil::singularify() in the PropertyAccess component instead.', E_USER_DEPRECATED);
+
+        return StringUtil::singularify($plural);
     }
 
     /**
-     * Returns whether the given choice is a group.
+     * Returns whether the given data is empty.
      *
-     * @param mixed $choice A choice
+     * This logic is reused multiple times throughout the processing of
+     * a form and needs to be consistent. PHP's keyword `empty` cannot
+     * be used as it also considers 0 and "0" to be empty.
      *
-     * @return Boolean Whether the choice is a group
+     * @param  mixed $data
+     *
+     * @return Boolean
      */
-    public static function isChoiceGroup($choice)
+    public static function isEmpty($data)
     {
-        return is_array($choice) || $choice instanceof \Traversable;
-    }
-
-    /**
-     * Returns whether the given choice is selected.
-     *
-     * @param mixed $choice The choice
-     * @param mixed $value  the value
-     *
-     * @return Boolean Whether the choice is selected
-     */
-    public static function isChoiceSelected($choice, $value)
-    {
-        $choice = static::toArrayKey($choice);
-
-        // The value should already have been converted by value transformers,
-        // otherwise we had to do the conversion on every call of this method
-        if (is_array($value)) {
-            return false !== array_search($choice, $value, true);
-        }
-
-        return $choice === $value;
+        // Should not do a check for array() === $data!!!
+        // This method is used in occurrences where arrays are
+        // not considered to be empty, ever.
+        return null === $data || '' === $data;
     }
 }

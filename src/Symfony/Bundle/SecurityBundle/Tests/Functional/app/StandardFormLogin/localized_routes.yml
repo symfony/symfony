@@ -7,8 +7,9 @@ security:
 
     providers:
         in_memory:
-            users:
-                johannes: { password: test, roles: [ROLE_USER] }
+            memory:
+                users:
+                    johannes: { password: test, roles: [ROLE_USER] }
 
     firewalls:
         default:

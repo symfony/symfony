@@ -33,6 +33,9 @@ we are looking for files on Amazon S3:
 Resources
 ---------
 
-Unit tests:
+You can run the unit tests with the following command:
 
-https://github.com/symfony/symfony/tree/master/tests/Symfony/Tests/Component/Finder
+    $ cd path/to/Symfony/Component/Finder/
+    $ composer.phar install --dev
+    $ phpunit
+

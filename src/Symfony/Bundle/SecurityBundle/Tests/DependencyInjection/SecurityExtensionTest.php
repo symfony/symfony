@@ -14,7 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 use Symfony\Component\DependencyInjection\Reference;
 
 use Symfony\Component\DependencyInjection\Parameter;
-
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -46,7 +46,6 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
             'security.user.provider.concrete.basic',
             'security.user.provider.concrete.basic_foo',
             'security.user.provider.concrete.basic_bar',
-            'security.user.provider.concrete.doctrine',
             'security.user.provider.concrete.service',
             'security.user.provider.concrete.chain',
         );
@@ -57,7 +56,6 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
         // chain provider
         $this->assertEquals(array(array(
             new Reference('security.user.provider.concrete.service'),
-            new Reference('security.user.provider.concrete.doctrine'),
             new Reference('security.user.provider.concrete.basic'),
         )), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
     }
@@ -156,6 +154,17 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
                 'arguments' => array('md5', true, 5000),
             ),
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
+            'JMS\FooBundle\Entity\User5' => array(
+                'class' => new Parameter('security.encoder.pbkdf2.class'),
+                'arguments' => array('sha1', false, 5, 30),
+            ),
+            'JMS\FooBundle\Entity\User6' => array(
+                'class' => new Parameter('security.encoder.bcrypt.class'),
+                'arguments' => array(
+                         new Reference('security.secure_random'),
+                         15,
+                )
+            ),
         )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
@@ -180,6 +189,9 @@ abstract class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $security = new SecurityExtension();
         $container->registerExtension($security);
+
+        $bundle = new SecurityBundle();
+        $bundle->build($container); // Attach all default factories
         $this->loadFromFile($container, $file);
 
         $container->getCompilerPassConfig()->setOptimizationPasses(array());

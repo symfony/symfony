@@ -14,8 +14,8 @@ namespace Symfony\Component\CssSelector\Parser\Handler;
 use Symfony\Component\CssSelector\Parser\Reader;
 use Symfony\Component\CssSelector\Parser\Token;
 use Symfony\Component\CssSelector\Parser\TokenStream;
-use Symfony\Component\CssSelector\Parser\TokenizerEscaping;
-use Symfony\Component\CssSelector\Parser\TokenizerPatterns;
+use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerEscaping;
+use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
 
 /**
  * CSS selector comment handler.

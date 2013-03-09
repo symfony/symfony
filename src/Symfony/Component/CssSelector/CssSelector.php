@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\CssSelector;
 
-use Symfony\Component\CssSelector\Exception\ParseException;
-use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
+use Symfony\Component\CssSelector\Exception;
+use Symfony\Component\CssSelector\XPath\Extension\HtmlExtension;
+use Symfony\Component\CssSelector\XPath\Translator;
 
 /**
  * CssSelector is the main entry point of the component and can convert CSS
@@ -39,18 +40,24 @@ class CssSelector
      *
      * @return string
      *
-     * @throws ParseException When got null for xpath expression
+     * @throws Exception\ParseException When got null for xpath expression
      *
      * @api
      */
     public static function toXPath($cssExpr, $prefix = 'descendant-or-self::')
     {
-        $translator = new HTMLTranslator();
+        $translator = new Translator();
+        // todo: add a way to switch on/off HTML extension without BC break
+        $translator->registerExtension(new HtmlExtension($translator));
 
         try {
             return $translator->cssToXPath($cssExpr, $prefix);
-        } catch (SyntaxErrorException $e) {
-            throw new ParseException('Syntax error: '.$e->getMessage(), 0, $e);
+        } catch (Exception\SyntaxErrorException $e) {
+            throw new Exception\ParseException('Syntax error: '.$e->getMessage(), 0, $e);
+        } catch (Exception\ExpressionErrorException $e) {
+            throw new Exception\ParseException('Expression error: '.$e->getMessage(), 0, $e);
+        } catch (Exception\InternalErrorException $e) {
+            throw new Exception\ParseException('Internal error: '.$e->getMessage(), 0, $e);
         }
     }
 }

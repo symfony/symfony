@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\CssSelector\Parser\Handler;
 
+use Symfony\Component\CssSelector\Exception\InternalErrorException;
 use Symfony\Component\CssSelector\Parser\Reader;
 use Symfony\Component\CssSelector\Parser\Token;
 use Symfony\Component\CssSelector\Parser\TokenStream;
-use Symfony\Component\CssSelector\Parser\TokenizerEscaping;
-use Symfony\Component\CssSelector\Parser\TokenizerPatterns;
+use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerEscaping;
+use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
 
 /**
  * CSS selector comment handler.
@@ -62,17 +63,17 @@ class StringHandler implements HandlerInterface
         $match = $reader->findPattern($this->patterns->getQuotedStringPattern($quote));
 
         if (!$match) {
-            throw new \LogicException('Should have found at least an empty match');
+            throw new InternalErrorException('Should have found at least an empty match at '.$reader->getPosition().'.');
         }
 
         // check unclosed strings
         if (strlen($match[0]) === $reader->getRemainingLength()) {
-            throw new \LogicException('Unclosed string at '.$reader->getPosition());
+            throw new InternalErrorException('Unclosed string at '.$reader->getPosition().'.');
         }
 
         // check quotes pairs validity
         if ($quote !== $reader->getSubstring(1, strlen($match[0]))) {
-            throw new \LogicException('Invalid string at '.$reader->getPosition());
+            throw new InternalErrorException('Invalid string at '.$reader->getPosition().'.');
         }
 
         $string = $this->escaping->escapeUnicodeAndNewLine($match[0]);

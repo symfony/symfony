@@ -146,6 +146,9 @@ class Token
         return self::TYPE_STRING === $this->type;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return sprintf('<%s "%s" at %s>', $this->type, $this->value, $this->position);

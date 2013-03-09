@@ -37,11 +37,6 @@ class XPathExpr
     private $condition;
 
     /**
-     * @var boolean
-     */
-    private $starPrefix;
-
-    /**
      * @param string  $path
      * @param string  $element
      * @param string  $condition
@@ -52,7 +47,18 @@ class XPathExpr
         $this->path = $path;
         $this->element = $element;
         $this->condition = $condition;
-        $this->starPrefix = $starPrefix;
+
+        if ($starPrefix) {
+            $this->addStarPrefix();
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getElement()
+    {
+        return $this->element;
     }
 
     /**
@@ -68,12 +74,20 @@ class XPathExpr
     }
 
     /**
+     * @return string
+     */
+    public function getCondition()
+    {
+        return $this->condition;
+    }
+
+    /**
      * @return XPathExpr
      */
     public function addNameTest()
     {
         if ('*' !== $this->element) {
-            $this->addCondition('name()='.GenericTranslator::getXpathLiteral($this->element));
+            $this->addCondition('name()='.Translator::getXpathLiteral($this->element));
             $this->element = '*';
         }
 
@@ -81,23 +95,36 @@ class XPathExpr
     }
 
     /**
-     * @param string $starPrefix
-     *
      * @return XPathExpr
      */
-    public function setStarPrefix($starPrefix)
+    public function addStarPrefix()
     {
-        $this->starPrefix = (bool) $starPrefix;
+        $this->path .= '*/';
 
         return $this;
     }
 
     /**
-     * @return boolean
+     * Joins another XPathExpr with a combiner.
+     *
+     * @param string    $combiner
+     * @param XPathExpr $expr
+     *
+     * @return XPathExpr
      */
-    public function hasStarPrefix()
+    public function join($combiner, XPathExpr $expr)
     {
-        return $this->starPrefix;
+        $path = $this->__toString().$combiner;
+
+        if ('*/' !== $expr->path) {
+            $path .= $expr->path;
+        }
+
+        $this->path = $path;
+        $this->element = $expr->element;
+        $this->condition = $expr->condition;
+
+        return $this;
     }
 
     /**

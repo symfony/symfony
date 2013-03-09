@@ -69,6 +69,47 @@ class Parser implements ParserInterface
     }
 
     /**
+     * Parses the arguments for ":nth-child()" and friends.
+     *
+     * @param Token[] $tokens
+     *
+     * @throws SyntaxErrorException
+     *
+     * @return array
+     */
+    public static function parseSeries(array $tokens)
+    {
+        foreach ($tokens as $token) {
+            if ($token->isString()) {
+                throw new SyntaxErrorException('String not allowed as function argument.');
+            }
+        }
+
+        $joined = trim(implode('', array_map(function (Token $token) {
+            return $token->getValue();
+        }, $tokens)));
+
+        switch (true) {
+            case 'odd' === $joined:
+                return array(2, 1);
+            case 'even' === $joined:
+                return array(2, 0);
+            case 'n' === $joined:
+                return array(1, 0);
+            case false === strpos($joined, 'n'):
+                return array(0, (int) $joined);
+        }
+
+        $split = explode('n', $joined);
+        $first = isset($split[0]) ? $split[0] : null;
+
+        return array(
+            $first ? ('-' === $first || '+' === $first ? 1 + (int) $first : (int) $first) : 1,
+            isset($split[1]) && $split[1] ? (int) $split[1] : 0
+        );
+    }
+
+    /**
      * Parses selector nodes.
      *
      * @param TokenStream $stream
@@ -221,11 +262,31 @@ class Parser implements ParserInterface
 
                     $result = new Node\NegationNode($result, $argument);
                 } else {
-                    $arguments = $this->parseArgumentList($stream);
+                    $arguments = array();
+                    $next = null;
+
+                    while (true) {
+                        $stream->skipWhitespace();
+                        $next = $stream->getNext();
+
+                        if ($next->isIdentifier()
+                            || $next->isString()
+                            || $next->isNumber()
+                            || $next->isDelimiter(array('+', '-'))
+                        ) {
+                            $arguments[] = $next;
+                        } elseif ($next->isDelimiter(array(')'))) {
+                            break;
+                        } else {
+                            throw new SyntaxErrorException(sprintf('Expected an argument, got %s', $next));
+                        }
+                    }
 
                     if (empty($arguments)) {
                         throw new SyntaxErrorException(sprintf('Expected at least an argument, got %s', $next));
                     }
+
+                    $result = new Node\FunctionNode($result, $identifier, $arguments);
                 }
             } else {
                 throw new SyntaxErrorException(sprintf('Expected selector, got %s', $peek));
@@ -340,38 +401,5 @@ class Parser implements ParserInterface
         }
 
         return new Node\AttributeNode($selector, $namespace, $attribute, $operator, $value->getValue());
-    }
-
-    /**
-     * Parses next arguments.
-     *
-     * @param TokenStream $stream
-     *
-     * @throws SyntaxErrorException
-     *
-     * @return array
-     */
-    private function parseArgumentList(TokenStream $stream)
-    {
-        $arguments = array();
-
-        while (true) {
-            $stream->skipWhitespace();
-            $next = $stream->getNext();
-
-            if ($next->isIdentifier()
-                || $next->isString()
-                || $next->isNumber()
-                || $next->isDelimiter(array('+', '-'))
-            ) {
-                $arguments[] = $next;
-            } elseif ($next->isDelimiter(array(')'))) {
-                break;
-            } else {
-                throw new SyntaxErrorException(sprintf('Expected an argument, got %s', $next));
-            }
-        }
-
-        return $arguments;
     }
 }

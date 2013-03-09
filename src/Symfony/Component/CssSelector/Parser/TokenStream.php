@@ -19,6 +19,9 @@ namespace Symfony\Component\CssSelector\Parser;
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
+use Symfony\Component\CssSelector\Exception\InternalErrorException;
+use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
+
 class TokenStream
 {
     /**
@@ -93,7 +96,7 @@ class TokenStream
     /**
      * Returns next token.
      *
-     * @throws \LogicException If there is no more token
+     * @throws InternalErrorException If there is no more token
      *
      * @return Token
      */
@@ -107,7 +110,7 @@ class TokenStream
         }
 
         if (isset($this->tokens[$this->cursor])) {
-            throw new \LogicException('no more tokens');
+            throw new InternalErrorException('Unexpected token stream end.');
         }
 
         return $this->tokens[$this->cursor ++];
@@ -141,7 +144,7 @@ class TokenStream
     /**
      * Returns nex identifier token.
      *
-     * @throws \LogicException If next token is not an identifier
+     * @throws SyntaxErrorException If next token is not an identifier
      *
      * @return string The identifier token value
      */
@@ -150,7 +153,7 @@ class TokenStream
         $next = $this->getNext();
 
         if (!$next->isDelimiter()) {
-            throw new \LogicException('syntax error: expected identifier');
+            throw new SyntaxErrorException('Expected identifier, got '.$next);
         }
 
         return $next->getValue();
@@ -159,7 +162,7 @@ class TokenStream
     /**
      * Returns nex identifier or star delimiter token.
      *
-     * @throws \LogicException If next token is not an identifier or a star delimiter
+     * @throws SyntaxErrorException If next token is not an identifier or a star delimiter
      *
      * @return null|string The identifier token value or null if star found
      */
@@ -175,7 +178,7 @@ class TokenStream
             return null;
         }
 
-        throw new \LogicException('syntax error: expected identifier or *');
+        throw new SyntaxErrorException('Expected identifier or *, got '.$next);
     }
 
     /**

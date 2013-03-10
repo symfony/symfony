@@ -139,7 +139,7 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
     public function testMultiByteSupport()
     {
         if (!function_exists('mb_strlen') || (false === $encoding = mb_detect_encoding('■'))) {
-            $this->markTestIncomplete('The mbstring extension is needed for multi-byte support');
+            $this->markTestSkipped('The mbstring extension is needed for multi-byte support');
         }
 
         $progress = new ProgressHelper();

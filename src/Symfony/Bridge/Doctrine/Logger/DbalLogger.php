@@ -22,6 +22,9 @@ use Doctrine\DBAL\Logging\SQLLogger;
  */
 class DbalLogger implements SQLLogger
 {
+    const MAX_STRING_LENGTH = 32;
+    const BINARY_DATA_VALUE = '(binary value)';
+
     protected $logger;
     protected $stopwatch;
 
@@ -46,16 +49,22 @@ class DbalLogger implements SQLLogger
             $this->stopwatch->start('doctrine', 'doctrine');
         }
 
-        if (is_array($types)) {
-            // 'blob' and 'clob' data must not be logged as they can be very huge and break formatters.
-            foreach ($types as $index => $type) {
-                switch ((string) $type) {
-                    case 'blob':
-                        $params[$index] = 'blob value';
-                        break;
-                    case 'clob':
-                        $params[$index] = 'clob value';
-                        break;
+        if (is_array($params)) {
+            foreach ($params as $index => $param) {
+                if (!is_string($params[$index])) {
+                    continue;
+                }
+
+                // non utf-8 strings break json encoding
+                if ('UTF-8' !== mb_detect_encoding($params[$index], 'UTF-8', true)) {
+                    $params[$index] = self::BINARY_DATA_VALUE;
+                    continue;
+                }
+
+                // too long string must be shorten
+                if (self::MAX_STRING_LENGTH < strlen($params[$index])) {
+                    $params[$index] = substr($params[$index], self::MAX_STRING_LENGTH - 6).' [...]';
+                    continue;
                 }
             }
         }

@@ -137,6 +137,19 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         $utils->checkRequestPath($this->getRequest(), 'foobar');
     }
 
+    public function testCleanQueryString()
+    {
+        $utils = new HttpUtils($this->getUrlGenerator());
+        $method = new \ReflectionMethod($utils, 'cleanQueryString');
+        $method->setAccessible(true);
+
+        $this->assertEquals('/path', $method->invoke($utils, '/path', array()));
+        $this->assertEquals('/path', $method->invoke($utils, '/path', array('a')));
+        $this->assertEquals('/path?b=2', $method->invoke($utils, '/path?a=1&b=2', array('a')));
+        $this->assertEquals('/path', $method->invoke($utils, '/path?a=1&b=2', array('a', 'b')));
+        $this->assertEquals('/path', $method->invoke($utils, '/path?a=1&b=2', array('a', 'b', 'c')));
+    }
+
     private function getUrlGenerator()
     {
         $urlGenerator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');

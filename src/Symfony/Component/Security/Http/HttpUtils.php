@@ -145,6 +145,36 @@ class HttpUtils
             throw new \LogicException('You must provide a UrlGeneratorInterface instance to be able to use routes.');
         }
 
-        return $this->urlGenerator->generate($route, $attributes, $absolute);
+        $url = $this->urlGenerator->generate($route, $attributes, $absolute);
+
+        // unnecessary query string parameters must be removed from url
+        // (ie. query parameters that are presents in $attributes)
+        return $this->cleanQueryString($url, array_keys($attributes));
+    }
+
+    private function cleanQueryString($url, array $unwantedParameters = array())
+    {
+        if (0 === count($unwantedParameters)) {
+            return $url;
+        }
+
+        $position = strpos($url, '?');
+        if (false === $position) {
+            return $url;
+        }
+
+        $queryString = substr($url, $position + 1);
+        parse_str($queryString, $queryParameters);
+
+        foreach ($unwantedParameters as $parameter) {
+            unset($queryParameters[$parameter]);
+        }
+
+        $url = substr($url, 0, $position);
+        if (count($queryParameters) > 0) {
+            $url .= '?'.http_build_query($queryParameters);
+        }
+
+        return $url;
     }
 }

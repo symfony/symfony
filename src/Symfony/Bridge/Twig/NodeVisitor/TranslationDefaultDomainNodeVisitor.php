@@ -43,10 +43,6 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
             $this->scope = $this->scope->enter();
         }
 
-        if ($node instanceof \Twig_Node_Module) {
-            $this->scope->set('domain', null);
-        }
-
         if ($node instanceof TransDefaultDomainNode) {
             if ($node->getNode('expr') instanceof \Twig_Node_Expression_Constant) {
                 $this->scope->set('domain', $node->getNode('expr'));

@@ -164,7 +164,6 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new ContainerAwareEventDispatcher($container);
         $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
 
-        $event->setDispatcher($dispatcher);
         $event->setName('onEvent');
 
         $service

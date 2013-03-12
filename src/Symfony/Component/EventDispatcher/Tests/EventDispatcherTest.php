@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherAwareEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -237,12 +238,21 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testEventReceivesTheDispatcherInstance()
     {
-        $test = $this;
+        $event = new EventDispatcherAwareEvent();
         $this->dispatcher->addListener('test', function ($event) use (&$dispatcher) {
             $dispatcher = $event->getDispatcher();
         });
-        $this->dispatcher->dispatch('test');
+        $this->dispatcher->dispatch('test', $event);
         $this->assertSame($this->dispatcher, $dispatcher);
+    }
+
+    public function testEventDoesNotReceiveTheDispatcherInstance()
+    {
+        $this->dispatcher->addListener('test', function ($event) use (&$dispatcher) {
+            $dispatcher = method_exists($event, 'getDispatcher') ? $event->getDispatcher() : null;
+        });
+        $this->dispatcher->dispatch('test');
+        $this->assertNull($dispatcher);
     }
 
     /**

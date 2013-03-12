@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\EventDispatcher\Tests;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherAwareEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
- * Test class for Event.
+ * Test class for EventDispatcherAwareEvent.
  */
-class EventTest extends \PHPUnit_Framework_TestCase
+class EventDispatcherAwareEventTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Symfony\Component\EventDispatcher\Event
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherAwareEvent
      */
     protected $event;
 
@@ -35,7 +35,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->event = new Event;
+        $this->event = new EventDispatcherAwareEvent;
         $this->dispatcher = new EventDispatcher();
     }
 
@@ -49,25 +49,14 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher = null;
     }
 
-    public function testIsPropagationStopped()
+    public function testSetDispatcher()
     {
-        $this->assertFalse($this->event->isPropagationStopped());
+        $this->event->setDispatcher($this->dispatcher);
+        $this->assertSame($this->dispatcher, $this->event->getDispatcher());
     }
 
-    public function testStopPropagationAndIsPropagationStopped()
+    public function testGetDispatcher()
     {
-        $this->event->stopPropagation();
-        $this->assertTrue($this->event->isPropagationStopped());
-    }
-
-    public function testGetName()
-    {
-        $this->assertNull($this->event->getName());
-    }
-
-    public function testSetName()
-    {
-        $this->event->setName('foo');
-        $this->assertEquals('foo', $this->event->getName());
+        $this->assertNull($this->event->getDispatcher());
     }
 }

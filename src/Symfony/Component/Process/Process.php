@@ -138,7 +138,12 @@ class Process
         if (null !== $env) {
             $this->env = array();
             foreach ($env as $key => $value) {
-                $this->env[(binary) $key] = (binary) $value;
+                if (!is_array($value)) {
+                    $this->env[(binary) $key] = (binary) $value;
+                } else {
+                    // there are occasions where $value is an array, but proc_open can't handle arrays
+                    $this->env[(binary) $key] = (binary) current($value);
+                }
             }
         } else {
             $this->env = null;

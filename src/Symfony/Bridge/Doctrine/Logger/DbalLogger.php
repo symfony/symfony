@@ -56,7 +56,7 @@ class DbalLogger implements SQLLogger
                 }
 
                 // non utf-8 strings break json encoding
-                if ('UTF-8' !== mb_detect_encoding($params[$index], 'UTF-8', true)) {
+                if (null === preg_match('#[^\p{L}\p{N} ]#u', $params[$index])) {
                     $params[$index] = self::BINARY_DATA_VALUE;
                     continue;
                 }

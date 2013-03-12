@@ -72,8 +72,8 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
         return array(
             array(0, 0, $this->toAbsolute($lessThan1)),
             array(0, 1, $this->toAbsolute($lessThanOrEqualTo1)),
-            array(2, INF, array()),
-            array(1, INF, $this->toAbsolute($graterThanOrEqualTo1)),
+            array(2, PHP_INT_MAX, array()),
+            array(1, PHP_INT_MAX, $this->toAbsolute($graterThanOrEqualTo1)),
             array(1, 1, $this->toAbsolute($equalTo1)),
         );
     }

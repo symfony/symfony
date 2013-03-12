@@ -137,17 +137,15 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         $utils->checkRequestPath($this->getRequest(), 'foobar');
     }
 
-    public function testCleanQueryString()
+    public function testRemoveQueryString()
     {
         $utils = new HttpUtils($this->getUrlGenerator());
-        $method = new \ReflectionMethod($utils, 'cleanQueryString');
+        $method = new \ReflectionMethod($utils, 'removeQueryString');
         $method->setAccessible(true);
 
-        $this->assertEquals('/path', $method->invoke($utils, '/path', array()));
-        $this->assertEquals('/path', $method->invoke($utils, '/path', array('a')));
-        $this->assertEquals('/path?b=2', $method->invoke($utils, '/path?a=1&b=2', array('a')));
-        $this->assertEquals('/path', $method->invoke($utils, '/path?a=1&b=2', array('a', 'b')));
-        $this->assertEquals('/path', $method->invoke($utils, '/path?a=1&b=2', array('a', 'b', 'c')));
+        $this->assertEquals('/path', $method->invoke($utils, '/path'));
+        $this->assertEquals('/path', $method->invoke($utils, '/path?a=1'));
+        $this->assertEquals('/path', $method->invoke($utils, '/path?a=1&b=2'));
     }
 
     private function getUrlGenerator()

@@ -149,32 +149,18 @@ class HttpUtils
 
         // unnecessary query string parameters must be removed from url
         // (ie. query parameters that are presents in $attributes)
-        return $this->cleanQueryString($url, array_keys($attributes));
+        // fortunately, they all are, so we have to remove entire query string
+        return $this->removeQueryString($url);
     }
 
-    private function cleanQueryString($url, array $unwantedParameters = array())
+    private function removeQueryString($url)
     {
-        if (0 === count($unwantedParameters)) {
-            return $url;
-        }
-
         $position = strpos($url, '?');
+
         if (false === $position) {
             return $url;
         }
 
-        $queryString = substr($url, $position + 1);
-        parse_str($queryString, $queryParameters);
-
-        foreach ($unwantedParameters as $parameter) {
-            unset($queryParameters[$parameter]);
-        }
-
-        $url = substr($url, 0, $position);
-        if (count($queryParameters) > 0) {
-            $url .= '?'.http_build_query($queryParameters);
-        }
-
-        return $url;
+        return substr($url, 0, $position);
     }
 }

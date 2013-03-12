@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class FormFactory implements FormFactoryInterface
 {
@@ -96,14 +98,36 @@ class FormFactory implements FormFactoryInterface
             return $this->createNamedBuilder($property, 'text', $data, $options, $parent);
         }
 
-        $typeGuess = $guesser->guessType($class, $property);
-        $maxLengthGuess = $guesser->guessMaxLength($class, $property);
+        $propertyPath = $property;
+
+        if (isset($options['property_path'])) {
+            $propertyPath = new PropertyPath($options['property_path']);
+            if (null !== $parent->getData()) {
+                $propertyLength = $propertyPath->getLength();
+                $propertyAccessor = PropertyAccess::getPropertyAccessor();
+                $classInstance = $parent->getData();
+                for ($i = 0; $i < $propertyLength-1; ++$i) {
+                    $element = $propertyPath->getElement($i);
+                    $isIndex = $propertyPath->isIndex($i);
+                    $element = $isIndex ? '[' . $element . ']' : $element;
+                    $classInstance = $propertyAccessor->getValue($classInstance, $element);
+                }
+                $class = get_class($classInstance);
+                $propertyPath = $propertyPath->getElement($propertyLength - 1);
+            }
+            else {
+                $propertyPath = $propertyPath->getElement(0);
+            }
+        }
+
+        $typeGuess = $guesser->guessType($class, $propertyPath);
+        $maxLengthGuess = $guesser->guessMaxLength($class, $propertyPath);
         // Keep $minLengthGuess for BC until Symfony 2.3
         set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handleBC'));
-        $minLengthGuess = $guesser->guessMinLength($class, $property);
+        $minLengthGuess = $guesser->guessMinLength($class, $propertyPath);
         restore_error_handler();
-        $requiredGuess = $guesser->guessRequired($class, $property);
-        $patternGuess = $guesser->guessPattern($class, $property);
+        $requiredGuess = $guesser->guessRequired($class, $propertyPath);
+        $patternGuess = $guesser->guessPattern($class, $propertyPath);
 
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 

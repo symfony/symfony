@@ -14,11 +14,13 @@ namespace Symfony\Bundle\FrameworkBundle;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\HttpKernel as BaseHttpKernel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * This HttpKernel is used to manage scope changes of the DI container.
@@ -149,6 +151,7 @@ class HttpKernel extends BaseHttpKernel
             return $this->renderHIncludeTag($uri, $defaultContent);
         }
 
+        /** @var Request $request */
         $request = $this->container->get('request');
 
         // controller or URI or path?
@@ -188,6 +191,11 @@ class HttpKernel extends BaseHttpKernel
 
             $response->sendContent();
         } catch (\Exception $e) {
+            if ($options['ignore_errors']) {
+                $event = new GetResponseForExceptionEvent($this, $request, HttpKernelInterface::SUB_REQUEST, $e);
+                $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
+            }
+
             if ($options['alt']) {
                 $alt = $options['alt'];
                 unset($options['alt']);

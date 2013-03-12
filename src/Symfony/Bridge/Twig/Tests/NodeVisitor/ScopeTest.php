@@ -11,9 +11,6 @@ class ScopeTest extends TestCase
     {
         $scope = new Scope();
         $scope->enter();
-        $result = $scope->get('test');
-        $scope->leave();
-
-        $this->assertEquals($result, null);
+        $this->assertNull($scope->get('test'));
     }
 }

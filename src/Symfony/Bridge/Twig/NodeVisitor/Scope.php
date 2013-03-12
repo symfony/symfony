@@ -34,6 +34,7 @@ class Scope
     {
         $this->parent = $parent;
         $this->left = false;
+        $this->data = array();
     }
 
     /**

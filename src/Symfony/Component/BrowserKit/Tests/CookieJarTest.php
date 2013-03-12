@@ -82,6 +82,13 @@ class CookieJarTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $cookieJar->get('bar')->getValue(), '->updateFromSetCookie() keeps existing cookies');
     }
 
+    public function testUpdateFromEmptySetCookie()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->updateFromSetCookie(array(''));
+        $this->assertEquals(array(), $cookieJar->all());
+    }
+
     public function testUpdateFromSetCookieWithMultipleCookies()
     {
         $timestamp = time() + 3600;

@@ -7,6 +7,19 @@ use Symfony\Bridge\Twig\Node\TransNode;
 
 class TwigNodeProvider
 {
+    public static function getModule($content)
+    {
+        return new \Twig_Node_Module(
+            new \Twig_Node_Expression_Constant($content, 0),
+            null,
+            new \Twig_Node_Expression_Array(array(), 0),
+            new \Twig_Node_Expression_Array(array(), 0),
+            new \Twig_Node_Expression_Array(array(), 0),
+            null,
+            null
+        );
+    }
+
     public static function getTransFilter($message, $domain = null)
     {
         $arguments = $domain ? array(

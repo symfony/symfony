@@ -81,6 +81,11 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         }
     }
 
+    /**
+     * @param $uri
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return Request
+     */
     protected function createSubRequest($uri, Request $request)
     {
         $cookies = $request->cookies->all();
@@ -89,7 +94,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         // the sub-request is internal
         $server['REMOTE_ADDR'] = '127.0.0.1';
 
-        $subRequest = Request::create($uri, 'get', array(), $cookies, array(), $server);
+        $subRequest = call_user_func(array(get_class($request), 'create'), $uri, 'get', array(), $cookies, array(), $server);
         if ($session = $request->getSession()) {
             $subRequest->setSession($session);
         }

@@ -39,7 +39,7 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
      */
     public function enterNode(\Twig_NodeInterface $node, \Twig_Environment $env)
     {
-        if ($node instanceof \Twig_Node_Block) {
+        if ($node instanceof \Twig_Node_Block || $node instanceof \Twig_Node_Module) {
             $this->scope = $this->scope->enter();
         }
 
@@ -89,7 +89,7 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
             return false;
         }
 
-        if ($node instanceof \Twig_Node_Block) {
+        if ($node instanceof \Twig_Node_Block || $node instanceof \Twig_Node_Module) {
             $this->scope = $this->scope->leave();
         }
 

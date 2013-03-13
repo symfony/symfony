@@ -75,13 +75,15 @@ EOF
         if ($input->getOption('no-warmup')) {
             $filesystem->rename($realCacheDir, $oldCacheDir);
         } else {
-            $warmupDir = $realCacheDir.'_new';
+            // the warmup cache dir name must have the have length than the real one
+            // to avoid the many problems in serialized resources files
+            $warmupDir = substr($realCacheDir, 0, -1).'_';
 
             if ($filesystem->exists($warmupDir)) {
                 $filesystem->remove($warmupDir);
             }
 
-            $this->warmup($warmupDir, !$input->getOption('no-optional-warmers'));
+            $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
 
             $filesystem->rename($realCacheDir, $oldCacheDir);
             $filesystem->rename($warmupDir, $realCacheDir);
@@ -90,7 +92,7 @@ EOF
         $filesystem->remove($oldCacheDir);
     }
 
-    protected function warmup($warmupDir, $enableOptionalWarmers = true)
+    protected function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
     {
         $this->getContainer()->get('filesystem')->remove($warmupDir);
 
@@ -113,39 +115,27 @@ EOF
 
         $warmer->warmUp($warmupDir);
 
+        // fix references to the Kernel in .meta files
         foreach (Finder::create()->files()->name('*.meta')->in($warmupDir) as $file) {
-            // fix meta references to the Kernel
-            $content = preg_replace(
+            file_put_contents($file, preg_replace(
                 '/C\:\d+\:"'.preg_quote($class.$this->getTempKernelSuffix(), '"/').'"/',
                 sprintf('C:%s:"%s"', strlen($class), $class),
                 file_get_contents($file)
-            );
-
-            // fix meta references to cache files
-            $realWarmupDir = substr($warmupDir, 0, -4);
-            $content = preg_replace_callback(
-                '/s\:\d+\:"'.preg_quote($warmupDir, '/').'([^"]+)"/',
-                function (array $matches) use ($realWarmupDir) {
-                    $path = $realWarmupDir.$matches[1];
-                    return sprintf('s:%s:"%s"', strlen($path), $path);
-                },
-                $content
-            );
-
-            file_put_contents($file, $content);
+            ));
         }
 
-        // fix container files and classes
-        $regex = '/'.preg_quote($this->getTempKernelSuffix(), '/').'/';
+        // fix kernel class names in container-specific cache classes
+        // and rename those classes by removing temp suffix
         foreach (Finder::create()->files()->name(get_class($kernel->getContainer()).'*')->in($warmupDir) as $file) {
-            $content = file_get_contents($file);
-            $content = preg_replace($regex, '', $content);
-
-            // fix absolute paths to the cache directory
-            $content = preg_replace('/'.preg_quote($warmupDir, '/').'/', preg_replace('/_new$/', '', $warmupDir), $content);
-
-            file_put_contents(preg_replace($regex, '', $file), $content);
+            $content = str_replace($this->getTempKernelSuffix(), '', file_get_contents($file));
+            file_put_contents(str_replace($this->getTempKernelSuffix(), '', $file), $content);
             unlink($file);
+        }
+
+        // fix references to cached files with the real cache directory name
+        foreach (Finder::create()->files()->in($warmupDir) as $file) {
+            $content = str_replace($warmupDir, $realCacheDir, file_get_contents($file));
+            file_put_contents($file, $content);
         }
     }
 

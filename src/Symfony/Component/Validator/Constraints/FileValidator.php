@@ -37,8 +37,21 @@ class FileValidator extends ConstraintValidator
         if ($value instanceof UploadedFile && !$value->isValid()) {
             switch ($value->getError()) {
                 case UPLOAD_ERR_INI_SIZE:
-                    $maxSize = UploadedFile::getMaxFilesize();
-                    $maxSize = $constraint->maxSize ? min($maxSize, $constraint->maxSize) : $maxSize;
+                    if ($constraint->maxSize) {
+                        if (ctype_digit((string) $constraint->maxSize)) {
+                            $maxSize = (int) $constraint->maxSize;
+                        } elseif (preg_match('/^\d++k$/', $constraint->maxSize)) {
+                            $maxSize = $constraint->maxSize * 1024;
+                        } elseif (preg_match('/^\d++M$/', $constraint->maxSize)) {
+                            $maxSize = $constraint->maxSize * 1048576;
+                        } else {
+                            throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $constraint->maxSize));
+                        }
+                        $maxSize = min(UploadedFile::getMaxFilesize(), $maxSize);
+                    } else {
+                        $maxSize = UploadedFile::getMaxFilesize();
+                    }
+
                     $this->context->addViolation($constraint->uploadIniSizeErrorMessage, array(
                         '{{ limit }}' => $maxSize,
                         '{{ suffix }}' => 'bytes',
@@ -97,15 +110,15 @@ class FileValidator extends ConstraintValidator
         if ($constraint->maxSize) {
             if (ctype_digit((string) $constraint->maxSize)) {
                 $size = filesize($path);
-                $limit = $constraint->maxSize;
+                $limit = (int) $constraint->maxSize;
                 $suffix = 'bytes';
-            } elseif (preg_match('/^(\d+)k$/', $constraint->maxSize, $matches)) {
+            } elseif (preg_match('/^\d++k$/', $constraint->maxSize)) {
                 $size = round(filesize($path) / 1000, 2);
-                $limit = $matches[1];
+                $limit = (int) $constraint->maxSize;
                 $suffix = 'kB';
-            } elseif (preg_match('/^(\d+)M$/', $constraint->maxSize, $matches)) {
+            } elseif (preg_match('/^\d++M$/', $constraint->maxSize)) {
                 $size = round(filesize($path) / 1000000, 2);
-                $limit = $matches[1];
+                $limit = (int) $constraint->maxSize;
                 $suffix = 'MB';
             } else {
                 throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $constraint->maxSize));

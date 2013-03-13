@@ -150,17 +150,11 @@ class HttpUtils
         // unnecessary query string parameters must be removed from url
         // (ie. query parameters that are presents in $attributes)
         // fortunately, they all are, so we have to remove entire query string
-        return $this->removeQueryString($url);
-    }
-
-    private function removeQueryString($url)
-    {
         $position = strpos($url, '?');
-
-        if (false === $position) {
-            return $url;
+        if (false !== $position) {
+            $url = substr($url, 0, $position);
         }
 
-        return substr($url, 0, $position);
+        return $url;
     }
 }

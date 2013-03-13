@@ -132,7 +132,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
 
         $this->firstCalledEvent[$eventName] = $this->stopwatch->start($eventName.'.loading', 'event_listener_loading');
 
-        if (!$this->dispatcher->getListeners($eventName)) {
+        if (!$this->dispatcher->hasListeners($eventName)) {
             $this->firstCalledEvent[$eventName]->stop();
         }
 

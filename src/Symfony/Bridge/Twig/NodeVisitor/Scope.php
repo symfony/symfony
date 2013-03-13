@@ -32,6 +32,7 @@ class Scope
      */
     public function __construct(Scope $parent = null)
     {
+        $this->data = array();
         $this->parent = $parent;
         $this->left = false;
         $this->data = array();

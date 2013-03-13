@@ -297,13 +297,19 @@ class Store implements StoreInterface
      */
     public function purge($url)
     {
-        if (is_file($path = $this->getPath($this->getCacheKey(Request::create($url))))) {
-            unlink($path);
+        $key = $this->getCacheKey(Request::create($url));
 
-            return true;
+        $path = $this->getPath($key);
+        if (!is_file($path)) {
+            return false;
         }
 
-        return false;
+        foreach ($this->getMetadata($key) as $entry) {
+            $response = $this->restoreResponse($entry[1]);
+            unlink($this->getPath($response->headers->get('X-Content-Digest')));
+        }
+
+        return unlink($path);
     }
 
     /**

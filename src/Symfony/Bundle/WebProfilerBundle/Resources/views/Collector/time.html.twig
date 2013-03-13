@@ -77,8 +77,6 @@
         </small>
     </h3>
 
-    {% set max = collector.events.__section__.endtime %}
-
     {{ display_timeline('timeline_' ~ token, collector.events, colors) }}
 
     {% if profile.children|length %}

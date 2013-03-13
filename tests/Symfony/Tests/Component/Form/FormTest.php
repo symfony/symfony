@@ -779,7 +779,6 @@ class FormTest extends \PHPUnit_Framework_TestCase
 
     public function testBindMapsBoundChildrenOntoEmptyData()
     {
-        $test = $this;
         $mapper = $this->getDataMapper();
         $object = new \stdClass();
         $form = $this->getBuilder()

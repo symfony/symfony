@@ -25,6 +25,7 @@ class DumperTest extends \PHPUnit_Framework_TestCase
     {
         $this->parser = new Parser();
         $this->dumper = new Dumper();
+        $this->dumper->setIndentation(2);
         $this->path = __DIR__.'/Fixtures';
     }
 

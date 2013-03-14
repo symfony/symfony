@@ -30,5 +30,13 @@ class ExtensionPass implements CompilerPassInterface
         if ($container->has('translator')) {
             $container->getDefinition('twig.extension.trans')->addTag('twig.extension');
         }
+
+        if ($container->has('router')) {
+            $container->getDefinition('twig.extension.routing')->addTag('twig.extension');
+        }
+
+        if ($container->has('fragment.handler')) {
+            $container->getDefinition('twig.extension.httpkernel')->addTag('twig.extension');
+        }
     }
 }

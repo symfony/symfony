@@ -57,9 +57,6 @@ class TwigExtension extends Extension
 
         $container->setParameter('twig.form.resources', $config['form']['resources']);
 
-        $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
-        $container->getDefinition('twig.loader.filesystem')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
-
         $twigFilesystemLoaderDefinition = $container->getDefinition('twig.loader.filesystem');
 
         // register user-configured paths

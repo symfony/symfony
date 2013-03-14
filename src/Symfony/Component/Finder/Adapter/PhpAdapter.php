@@ -36,7 +36,7 @@ class PhpAdapter extends AbstractAdapter
             \RecursiveIteratorIterator::SELF_FIRST
         );
 
-        if ($this->minDepth > 0 || $this->maxDepth < INF) {
+        if ($this->minDepth > 0 || $this->maxDepth < PHP_INT_MAX) {
             $iterator = new Iterator\DepthRangeFilterIterator($iterator, $this->minDepth, $this->maxDepth);
         }
 

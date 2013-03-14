@@ -60,9 +60,8 @@ abstract class AbstractFindAdapter extends AbstractAdapter
         }
 
         $find->add('-mindepth')->add($this->minDepth + 1);
-        // warning! INF < INF => true ; INF == INF => false ; INF === INF => true
-        // https://bugs.php.net/bug.php?id=9118
-        if (INF !== $this->maxDepth) {
+
+        if (PHP_INT_MAX !== $this->maxDepth) {
             $find->add('-maxdepth')->add($this->maxDepth + 1);
         }
 

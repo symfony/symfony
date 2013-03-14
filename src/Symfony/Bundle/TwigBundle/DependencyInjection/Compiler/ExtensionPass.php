@@ -27,8 +27,16 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.loader')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
         }
 
-        if (false === $container->has('translator')) {
+        if ($container->has('translator')) {
             $container->getDefinition('twig.extension.trans')->addTag('twig.extension');
+        }
+
+        if ($container->has('router')) {
+            $container->getDefinition('twig.extension.routing')->addTag('twig.extension');
+        }
+
+        if ($container->has('fragment.handler')) {
+            $container->getDefinition('twig.extension.httpkernel')->addTag('twig.extension');
         }
     }
 }

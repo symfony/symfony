@@ -79,7 +79,6 @@
         </service>
 
         <service id="twig.extension.routing" class="%twig.extension.routing.class%" public="false">
-            <tag name="twig.extension" />
             <argument type="service" id="router" />
         </service>
 
@@ -88,7 +87,6 @@
         </service>
 
         <service id="twig.extension.httpkernel" class="%twig.extension.httpkernel.class%" public="false">
-            <tag name="twig.extension" />
             <argument type="service" id="fragment.handler" />
         </service>
 

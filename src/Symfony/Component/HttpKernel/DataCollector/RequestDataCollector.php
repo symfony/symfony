@@ -133,7 +133,13 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                     }
                 }
             } elseif ($controller instanceof \Closure) {
-                $this->data['controller'] = 'Closure';
+                $r = new \ReflectionFunction($controller);
+                $this->data['controller'] = array(
+                    'class'  => $r->getName(),
+                    'method' => null,
+                    'file'   => $r->getFilename(),
+                    'line'   => $r->getStartLine(),
+                );
             } else {
                 $this->data['controller'] = (string) $controller ?: 'n/a';
             }

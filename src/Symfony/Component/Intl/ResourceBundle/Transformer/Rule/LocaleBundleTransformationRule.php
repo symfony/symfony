@@ -201,7 +201,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
 
         // Some languages are simply not translated
         // Example: "az" (Azerbaijani) has no translation in "af" (Afrikaans)
-        if (null === ($name = $this->languageBundle->getLanguageName($displayLocale, $lang))) {
+        if (null === ($name = $this->languageBundle->getLanguageName($lang, null, $displayLocale))) {
             return null;
         }
 
@@ -216,7 +216,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
         // i.e. in zh_Hans_MO, "Hans" is the script
         if ($script) {
             // Some scripts are not translated into every language
-            if (null === ($scriptName = $this->languageBundle->getScriptName($displayLocale, $script, $lang))) {
+            if (null === ($scriptName = $this->languageBundle->getScriptName($script, $lang, $displayLocale))) {
                 return null;
             }
 
@@ -227,7 +227,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
         // i.e. in de_AT, "AT" is the region
         if ($region) {
             // Some regions are not translated into every language
-            if (null === ($regionName = $this->regionBundle->getCountryName($displayLocale, $region))) {
+            if (null === ($regionName = $this->regionBundle->getCountryName($region, $displayLocale))) {
                 return null;
             }
 

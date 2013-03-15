@@ -73,7 +73,7 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
         foreach ($currencyBundle->getCurrencyNames('en') as $code => $name) {
             $currencies[$code] = array(
                 CurrencyBundle::INDEX_NAME => $name,
-                CurrencyBundle::INDEX_SYMBOL => $currencyBundle->getCurrencySymbol('en', $code),
+                CurrencyBundle::INDEX_SYMBOL => $currencyBundle->getCurrencySymbol($code, 'en'),
                 CurrencyBundle::INDEX_FRACTION_DIGITS => $currencyBundle->getFractionDigits($code),
                 CurrencyBundle::INDEX_ROUNDING_INCREMENT => $currencyBundle->getRoundingIncrement($code),
             );

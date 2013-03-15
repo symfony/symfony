@@ -28,7 +28,7 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
         }
 
         if (null === ($languages = $this->readEntry($locale, array('Languages')))) {
-            return array();
+            return null;
         }
 
         // Some languages are translated together with their region,

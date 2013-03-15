@@ -48,7 +48,7 @@ class LanguageBundleTest extends \PHPUnit_Framework_TestCase
             ->with(self::RES_DIR, 'en', array('Languages'))
             ->will($this->returnValue($languages));
 
-        $this->assertSame('German', $this->bundle->getLanguageName('de', 'en'));
+        $this->assertSame('German', $this->bundle->getLanguageName('de', null, 'en'));
     }
 
     public function testGetLanguageNameWithRegion()
@@ -115,7 +115,7 @@ class LanguageBundleTest extends \PHPUnit_Framework_TestCase
             ->with(self::RES_DIR, 'en')
             ->will($this->returnValue($data));
 
-        $this->assertSame('latin', $this->bundle->getScriptName('Latn', 'en'));
+        $this->assertSame('latin', $this->bundle->getScriptName('Latn', null, 'en'));
     }
 
     public function testGetScriptNameIncludedInLanguage()
@@ -177,7 +177,7 @@ class LanguageBundleTest extends \PHPUnit_Framework_TestCase
             ->with(self::RES_DIR, 'en')
             ->will($this->returnValue($data));
 
-        $this->assertNull($this->bundle->getScriptName('Latn', 'en'));
+        $this->assertNull($this->bundle->getScriptName('Latn', null, 'en'));
     }
 
     public function testGetScriptNames()

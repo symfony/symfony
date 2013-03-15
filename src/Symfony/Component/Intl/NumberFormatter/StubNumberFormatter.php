@@ -483,7 +483,7 @@ class StubNumberFormatter
      * Parse a number
      *
      * @param string $value    The value to parse
-     * @param string $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
+     * @param int    $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
      * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
      * @return Boolean|string                               The parsed value of false on error

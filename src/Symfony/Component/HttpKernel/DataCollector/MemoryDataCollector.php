@@ -24,8 +24,8 @@ class MemoryDataCollector extends DataCollector
     public function __construct()
     {
         $this->data = array(
-            'memory' => 0,
-            'memory_limit' => rtrim(ini_get('memory_limit'), 'M')
+            'memory'       => 0,
+            'memory_limit' => $this->convertToBytes(ini_get('memory_limit')),
         );
     }
 
@@ -71,5 +71,15 @@ class MemoryDataCollector extends DataCollector
     public function getName()
     {
         return 'memory';
+    }
+
+    private function convertToBytes($memoryLimit)
+    {
+        if (preg_match('#^(\d+)([bkmgt])#i', $memoryLimit, $match)) {
+            $shift = array('b' => 0, 'k' => 10, 'm' => 20, 'g' => 30, 't' => 40);
+            $memoryLimit = ($match[1] * (1 << $shift[strtolower($match[2])]));
+        }
+
+        return (int) $memoryLimit;
     }
 }

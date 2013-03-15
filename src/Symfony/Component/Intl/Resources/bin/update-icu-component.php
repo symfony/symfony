@@ -24,16 +24,20 @@ use Symfony\Component\Filesystem\Filesystem;
 require_once __DIR__ . '/common.php';
 require_once __DIR__ . '/autoload.php';
 
-if ($GLOBALS['argc'] > 2) {
+if ($GLOBALS['argc'] > 3) {
     bailout(<<<MESSAGE
-Usage: php update-icu-component.php <path/to/icu/source>
+Usage: php update-icu-component.php <path/to/icu/source> <path/to/icu/build>
 
 Updates the ICU data for Symfony2 to the latest version of the ICU version
 included in the intl extension. For example, if your intl extension includes
 ICU 4.8, the script will download the latest data available for ICU 4.8.
 
 If you downloaded the SVN repository before, you can pass the path to the
-repository in the first optional argument.
+repository source in the first optional argument.
+
+If you also built the repository before, you can pass the directory where that
+build is stored in the second parameter. The build directory needs to contain
+the subdirectories bin/ and lib/.
 
 For running this script, the intl extension must be loaded and all vendors
 must have been installed through composer:
@@ -75,7 +79,7 @@ foreach ($urls as $urlVersion => $url) {
     echo "  $urlVersion\n";
 }
 
-if (2 === $GLOBALS['argc']) {
+if ($GLOBALS['argc'] >= 2) {
     $sourceDir = $GLOBALS['argv'][1];
     $svn = new SvnRepository($sourceDir);
 
@@ -89,47 +93,69 @@ if (2 === $GLOBALS['argc']) {
     echo "SVN checkout to {$sourceDir} complete.\n";
 }
 
-// Always build genrb so that we can determine the ICU version of the
-// download by running genrb --version
-echo "Building genrb.\n";
+if ($GLOBALS['argc'] >= 3) {
+    $buildDir = $GLOBALS['argv'][2];
+} else {
+    // Always build genrb so that we can determine the ICU version of the
+    // download by running genrb --version
+    echo "Building genrb.\n";
 
-cd($sourceDir);
+    cd($sourceDir);
 
-echo "Running configure...\n";
+    echo "Running configure...\n";
 
-$buildDir = sys_get_temp_dir() . '/icu-data/' . $shortIcuVersion . '/build';
+    $buildDir = sys_get_temp_dir() . '/icu-data/' . $shortIcuVersion . '/build';
 
-$filesystem->remove($buildDir);
-$filesystem->mkdir($buildDir);
+    $filesystem->remove($buildDir);
+    $filesystem->mkdir($buildDir);
 
-run('./configure --prefix=' . $buildDir . ' 2>&1');
+    run('./configure --prefix=' . $buildDir . ' 2>&1');
 
-echo "Running make...\n";
+    echo "Running make...\n";
 
-echo "libicudata.so\n";
+    // If the directory "lib" does not exist in the download, create it or we
+    // will run into problems when building libicuuc.so.
+    $filesystem->mkdir($sourceDir . '/lib');
 
-cd($sourceDir . '/stubdata');
-run('make 2>&1 && make install 2>&1');
+    // If the directory "bin" does not exist in the download, create it or we
+    // will run into problems when building genrb.
+    $filesystem->mkdir($sourceDir . '/bin');
 
-echo "libicuuc.so\n";
+    echo "[1/5] libicudata.so...";
 
-cd($sourceDir . '/common');
-run('make 2>&1 && make install 2>&1');
+    cd($sourceDir . '/stubdata');
+    run('make 2>&1 && make install 2>&1');
 
-echo "libicui18n.so\n";
+    echo " ok.\n";
 
-cd($sourceDir . '/i18n');
-run('make 2>&1 && make install 2>&1');
+    echo "[2/5] libicuuc.so...";
 
-echo "libicutu.so\n";
+    cd($sourceDir . '/common');
+    run('make 2>&1 && make install 2>&1');
 
-cd($sourceDir . '/tools/toolutil');
-run('make 2>&1 && make install 2>&1');
+    echo " ok.\n";
 
-echo "genrb\n";
+    echo "[3/5] libicui18n.so...";
 
-cd($sourceDir . '/tools/genrb');
-run('make 2>&1 && make install 2>&1');
+    cd($sourceDir . '/i18n');
+    run('make 2>&1 && make install 2>&1');
+
+    echo " ok.\n";
+
+    echo "[4/5] libicutu.so...";
+
+    cd($sourceDir . '/tools/toolutil');
+    run('make 2>&1 && make install 2>&1');
+
+    echo " ok.\n";
+
+    echo "[5/5] genrb...";
+
+    cd($sourceDir . '/tools/genrb');
+    run('make 2>&1 && make install 2>&1');
+
+    echo " ok.\n";
+}
 
 $genrb = $buildDir . '/bin/genrb';
 $genrbEnv = 'LD_LIBRARY_PATH=' . $buildDir . '/lib ';

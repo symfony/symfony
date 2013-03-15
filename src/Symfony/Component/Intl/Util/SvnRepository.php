@@ -56,7 +56,7 @@ class SvnRepository
 
         $filesystem = new Filesystem();
 
-        if (!$filesystem->exists($targetDir)) {
+        if (!$filesystem->exists($targetDir . '/.svn')) {
             $filesystem->remove($targetDir);
             $filesystem->mkdir($targetDir);
 

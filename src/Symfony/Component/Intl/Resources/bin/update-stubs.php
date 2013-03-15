@@ -63,7 +63,7 @@ if ($shortIcuVersionInIntlComponent !== $shortIcuVersionInIcuComponent) {
 
 $icuVersionInIcuComponent = IcuData::getVersion();
 
-echo "Compiling stubs for ICU version $icuVersionInIcuComponent.";
+echo "Compiling stubs for ICU version $icuVersionInIcuComponent.\n";
 
 echo "Preparing stub creation...\n";
 

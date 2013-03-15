@@ -28,6 +28,8 @@ class LocaleTest extends IntlTestCase
         $this->skipIfIntlExtensionNotLoaded();
 
         Intl::setDataSource(Intl::STUB);
+
+        Locale::setDefault('en');
     }
 
     public function testGetDisplayCountries()

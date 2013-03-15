@@ -24,7 +24,7 @@ interface LanguageBundleInterface extends ResourceBundleInterface
      * @param string      $lang   A language code (e.g. "en").
      * @param string|null $region Optional. A region code (e.g. "US").
      * @param string      $locale Optional. The locale to return the name in.
-     *                            Defaults to {@link \Locale::getLocale()}.
+     *                            Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The name of the language or NULL if not found.
      */
@@ -34,7 +34,7 @@ interface LanguageBundleInterface extends ResourceBundleInterface
      * Returns the names of all known languages.
      *
      * @param string $locale Optional. The locale to return the names in.
-     *                       Defaults to {@link \Locale::getLocale()}.
+     *                       Defaults to {@link \Locale::getDefault()}.
      *
      * @return string[] A list of language names indexed by language codes.
      */
@@ -46,7 +46,7 @@ interface LanguageBundleInterface extends ResourceBundleInterface
      * @param string $script A script code (e.g. "Hans").
      * @param string $lang   Optional. A language code (e.g. "zh").
      * @param string $locale Optional. The locale to return the name in.
-     *                       Defaults to {@link \Locale::getLocale()}.
+     *                       Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The name of the script or NULL if not found.
      */
@@ -56,7 +56,7 @@ interface LanguageBundleInterface extends ResourceBundleInterface
      * Returns the names of all known scripts.
      *
      * @param string $locale Optional. The locale to return the names in.
-     *                       Defaults to {@link \Locale::getLocale()}.
+     *                       Defaults to {@link \Locale::getDefault()}.
      *
      * @return string[] A list of script names indexed by script codes.
      */

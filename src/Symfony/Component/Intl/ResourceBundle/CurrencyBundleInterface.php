@@ -23,7 +23,7 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *
      * @param string $currency A currency code (e.g. "EUR").
      * @param string $locale   Optional. The locale to return the result in.
-     *                         Defaults to {@link \Locale::getLocale()}.
+     *                         Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The currency symbol or NULL if not found.
      */
@@ -34,7 +34,7 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *
      * @param string $currency A currency code (e.g. "EUR").
      * @param string $locale   Optional. The locale to return the name in.
-     *                         Defaults to {@link \Locale::getLocale()}.
+     *                         Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The name of the currency or NULL if not found.
      */
@@ -44,7 +44,7 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      * Returns the names of all known currencies.
      *
      * @param string $locale Optional. The locale to return the names in.
-     *                       Defaults to {@link \Locale::getLocale()}.
+     *                       Defaults to {@link \Locale::getDefault()}.
      *
      * @return string[] A list of currency names indexed by currency codes.
      */

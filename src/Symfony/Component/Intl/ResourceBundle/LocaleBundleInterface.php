@@ -23,7 +23,7 @@ interface LocaleBundleInterface extends ResourceBundleInterface
      *
      * @param string $ofLocale The locale to return the name of (e.g. "de_AT").
      * @param string $locale   Optional. The locale to return the name in.
-     *                         Defaults to {@link \Locale::getLocale()}.
+     *                         Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The name of the locale or NULL if not found.
      */
@@ -33,7 +33,7 @@ interface LocaleBundleInterface extends ResourceBundleInterface
      * Returns the names of all known locales.
      *
      * @param string $locale Optional. The locale to return the names in.
-     *                       Defaults to {@link \Locale::getLocale()}.
+     *                       Defaults to {@link \Locale::getDefault()}.
      *
      * @return string[] A list of locale names indexed by locale codes.
      */

@@ -23,7 +23,7 @@ interface RegionBundleInterface extends ResourceBundleInterface
      *
      * @param string $country A country code (e.g. "US").
      * @param string $locale  Optional. The locale to return the name in.
-     *                        Defaults to {@link \Locale::getLocale()}.
+     *                        Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The name of the country or NULL if not found.
      */
@@ -33,7 +33,7 @@ interface RegionBundleInterface extends ResourceBundleInterface
      * Returns the names of all known countries.
      *
      * @param string $locale Optional. The locale to return the names in.
-     *                       Defaults to {@link \Locale::getLocale()}.
+     *                       Defaults to {@link \Locale::getDefault()}.
      *
      * @return string[] A list of country names indexed by country codes.
      */

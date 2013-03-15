@@ -11,18 +11,24 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Intl\Intl;
+
 abstract class LocalizedTestCase extends TypeTestCase
 {
     protected function setUp()
     {
         parent::setUp();
 
-        if (!class_exists('Symfony\Component\Locale\Locale')) {
-            $this->markTestSkipped('The "Locale" component is not available');
+        if (!class_exists('Symfony\Component\Intl\Intl')) {
+            $this->markTestSkipped('The "Intl" component is not available');
         }
 
-        if (!extension_loaded('intl')) {
+        if (!Intl::isExtensionLoaded()) {
             $this->markTestSkipped('The "intl" extension is not available');
         }
+
+        Intl::setDataSource(Intl::STUB);
+
+        \Locale::setDefault('en');
     }
 }

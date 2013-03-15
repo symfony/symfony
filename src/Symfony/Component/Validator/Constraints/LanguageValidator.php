@@ -39,8 +39,9 @@ class LanguageValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+        $languages = Intl::getLanguageBundle()->getLanguageNames();
 
-        if (!in_array($value, array_keys(Intl::getLanguageBundle()->getLanguageNames(\Locale::getDefault())))) {
+        if (!isset($languages[$value])) {
             $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
         }
     }

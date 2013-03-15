@@ -39,8 +39,9 @@ class CountryValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+        $countries = Intl::getRegionBundle()->getCountryNames();
 
-        if (!in_array($value, array_keys(Intl::getRegionBundle()->getCountryNames(\Locale::getDefault())))) {
+        if (!isset($countries[$value])) {
             $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
         }
     }

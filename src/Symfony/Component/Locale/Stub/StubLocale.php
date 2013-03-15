@@ -99,7 +99,7 @@ class StubLocale extends BaseStubLocale
         foreach ($bundle->getCurrencyNames($locale) as $currency => $name) {
             self::$currencies[$currency] = array(
                 'name' => $name,
-                'symbol' => $bundle->getCurrencySymbol($locale, $currency),
+                'symbol' => $bundle->getCurrencySymbol($currency, $locale),
                 'fractionDigits' => $bundle->getFractionDigits($currency),
                 'roundingIncrement' => $bundle->getRoundingIncrement($currency)
             );

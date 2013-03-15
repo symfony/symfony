@@ -11,6 +11,12 @@
 
 return array(
     'Currencies' => array(
+        'XUA' => array(
+            0 => 'ADB Unit of Account',
+            1 => 'XUA',
+            2 => 2,
+            3 => 0,
+        ),
         'AFN' => array(
             0 => 'Afghan Afghani',
             1 => 'AFN',
@@ -115,7 +121,7 @@ return array(
         ),
         'AUD' => array(
             0 => 'Australian Dollar',
-            1 => 'AU$',
+            1 => 'A$',
             2 => 2,
             3 => 0,
         ),
@@ -295,7 +301,7 @@ return array(
         ),
         'BRL' => array(
             0 => 'Brazilian Real',
-            1 => 'BR$',
+            1 => 'R$',
             2 => 2,
             3 => 0,
         ),
@@ -1409,6 +1415,12 @@ return array(
             2 => 2,
             3 => 0,
         ),
+        'SSP' => array(
+            0 => 'South Sudanese Pound',
+            1 => 'SSP',
+            2 => 2,
+            3 => 0,
+        ),
         'SUR' => array(
             0 => 'Soviet Rouble',
             1 => 'SUR',
@@ -1442,6 +1454,12 @@ return array(
         'LKR' => array(
             0 => 'Sri Lankan Rupee',
             1 => 'LKR',
+            2 => 2,
+            3 => 0,
+        ),
+        'XSU' => array(
+            0 => 'Sucre',
+            1 => 'XSU',
             2 => 2,
             3 => 0,
         ),

@@ -111,21 +111,19 @@ abstract class AbstractNumberFormatterTest extends IntlTestCase
 
     public function formatCurrencyWithCurrencyStyleBrazilianRealRoundingProvider()
     {
-        $brl = Intl::isExtensionLoaded() && IcuVersion::compare(Intl::getIcuVersion(), '4.8', '>=') ? 'BR' : 'R';
-
         return array(
-            array(100, 'BRL', $brl, '%s$100.00'),
-            array(-100, 'BRL', $brl, '(%s$100.00)'),
-            array(1000.12, 'BRL', $brl, '%s$1,000.12'),
+            array(100, 'BRL', 'R', '%s$100.00'),
+            array(-100, 'BRL', 'R', '(%s$100.00)'),
+            array(1000.12, 'BRL', 'R', '%s$1,000.12'),
 
             // Rounding checks
-            array(1000.121, 'BRL', $brl, '%s$1,000.12'),
-            array(1000.123, 'BRL', $brl, '%s$1,000.12'),
-            array(1000.125, 'BRL', $brl, '%s$1,000.12'),
-            array(1000.127, 'BRL', $brl, '%s$1,000.13'),
-            array(1000.129, 'BRL', $brl, '%s$1,000.13'),
-            array(11.50999, 'BRL', $brl, '%s$11.51'),
-            array(11.9999464, 'BRL', $brl, '%s$12.00')
+            array(1000.121, 'BRL', 'R', '%s$1,000.12'),
+            array(1000.123, 'BRL', 'R', '%s$1,000.12'),
+            array(1000.125, 'BRL', 'R', '%s$1,000.12'),
+            array(1000.127, 'BRL', 'R', '%s$1,000.13'),
+            array(1000.129, 'BRL', 'R', '%s$1,000.13'),
+            array(11.50999, 'BRL', 'R', '%s$11.51'),
+            array(11.9999464, 'BRL', 'R', '%s$12.00')
         );
     }
 

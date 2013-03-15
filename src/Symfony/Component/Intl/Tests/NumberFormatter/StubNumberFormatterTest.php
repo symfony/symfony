@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\Tests\NumberFormatter;
 
 use Symfony\Component\Intl\Globals\StubIntlGlobals;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\NumberFormatter\StubNumberFormatter;
 
 /**
@@ -20,6 +21,14 @@ use Symfony\Component\Intl\NumberFormatter\StubNumberFormatter;
  */
 class StubNumberFormatterTest extends AbstractNumberFormatterTest
 {
+    protected function setUp()
+    {
+        // Force the use of stub data to have consistent results
+        Intl::setDataSource(Intl::STUB);
+
+        parent::setUp();
+    }
+
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException
      */

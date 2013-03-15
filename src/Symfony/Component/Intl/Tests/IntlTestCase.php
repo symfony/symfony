@@ -22,12 +22,6 @@ use Symfony\Component\Intl\Util\Version;
  */
 abstract class IntlTestCase extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        // Always use stub data for testing to have consistent results
-        Intl::setDataSource(Intl::STUB);
-    }
-
     protected function is32Bit()
     {
         return PHP_INT_SIZE == 4;

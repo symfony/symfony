@@ -33,6 +33,14 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
 
+    public function testLoadWithResname()
+    {
+        $loader = new XliffFileLoader();
+        $catalogue = $loader->load(__DIR__.'/../fixtures/resname.xlf', 'en', 'domain1');
+
+        $this->assertEquals(array('foo' => 'bar', 'bar' => 'baz', 'baz' => 'foo'), $catalogue->all('domain1'));
+    }
+
     public function testIncompleteResource()
     {
         $loader = new XliffFileLoader();

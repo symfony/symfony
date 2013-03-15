@@ -18,7 +18,7 @@ use Symfony\Component\Icu\IcuLocaleBundle;
 use Symfony\Component\Icu\IcuRegionBundle;
 use Symfony\Component\Intl\Exception\InvalidArgumentException;
 use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
-use Symfony\Component\Intl\ResourceBundle\Reader\BufferedReader;
+use Symfony\Component\Intl\ResourceBundle\Reader\BufferedBundleReader;
 use Symfony\Component\Intl\ResourceBundle\Reader\PhpBundleReader;
 use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReader;
 use Symfony\Component\Intl\ResourceBundle\Stub\StubCurrencyBundle;
@@ -301,7 +301,7 @@ class Intl
     private static function getPhpReader()
     {
         if (null === self::$phpReader) {
-            self::$phpReader = new StructuredBundleReader(new BufferedReader(
+            self::$phpReader = new StructuredBundleReader(new BufferedBundleReader(
                 new PhpBundleReader(),
                 self::BUFFER_SIZE
             ));
@@ -318,7 +318,7 @@ class Intl
     private static function getBinaryReader()
     {
         if (null === self::$binaryReader) {
-            self::$binaryReader = new StructuredBundleReader(new BufferedReader(
+            self::$binaryReader = new StructuredBundleReader(new BufferedBundleReader(
                 new BinaryBundleReader(),
                 self::BUFFER_SIZE
             ));

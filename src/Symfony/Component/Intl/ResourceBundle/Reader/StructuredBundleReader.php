@@ -56,14 +56,14 @@ class StructuredBundleReader implements StructuredBundleReaderInterface
     /**
      * {@inheritdoc}
      */
-    public function readEntry($path, $locale, array $indices, $mergeFallback = true)
+    public function readEntry($path, $locale, array $indices, $fallback = true)
     {
         $data = $this->reader->read($path, $locale);
 
         $entry = RecursiveArrayAccess::get($data, $indices);
         $multivalued = is_array($entry) || $entry instanceof \Traversable;
 
-        if (!($mergeFallback && (null === $entry || $multivalued))) {
+        if (!($fallback && (null === $entry || $multivalued))) {
             return $entry;
         }
 

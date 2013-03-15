@@ -33,17 +33,18 @@ interface StructuredBundleReaderInterface extends BundleReaderInterface
      *
      *     $reader->readEntry('...', 'en', array('TopLevel', 'NestedLevel', 'Entry'));
      *
-     * @param string   $path      The path to the resource bundle.
-     * @param string   $locale    The locale to read.
-     * @param string[] $indices   The indices to read from the bundle.
-     * @param Boolean  $mergeFallback Whether to merge the value with the value
-     *                                from the fallback locale (e.g. "en" for
-     *                                "en_GB"). Only applicable if the result
-     *                                is multivalued (array, \ArrayAccess).
+     * @param string   $path     The path to the resource bundle.
+     * @param string   $locale   The locale to read.
+     * @param string[] $indices  The indices to read from the bundle.
+     * @param Boolean  $fallback Whether to merge the value with the value from
+     *                           the fallback locale (e.g. "en" for "en_GB").
+     *                           Only applicable if the result is multivalued
+     *                           (i.e. array or \ArrayAccess) or cannot be found
+     *                           in the requested locale.
      *
      * @return mixed Returns an array or {@link \ArrayAccess} instance for
      *               complex data, a scalar value for simple data and NULL
      *               if the given path could not be accessed.
      */
-    public function readEntry($path, $locale, array $indices, $mergeFallback = true);
+    public function readEntry($path, $locale, array $indices, $fallback = true);
 }

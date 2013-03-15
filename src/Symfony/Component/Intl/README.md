@@ -103,11 +103,233 @@ The only supported attributes are `\NumberFormatter::FRACTION_DIGITS`,
 The only supported rounding modes are `\NumberFormatter::ROUND_HALFEVEN`,
 `\NumberFormatter::ROUND_HALFDOWN` and `\NumberFormatter::ROUND_HALFUP`.
 
+### IntlDateFormatter
+
+Dates can be formatted with the [`\IntlDateFormatter`] [4] class. The following
+methods are supported. All other methods are not supported and will throw an
+exception when used.
+
+##### __construct($locale, $datetype, $timetype, $timezone = null, $calendar = \IntlDateFormatter::GREGORIAN, $pattern = null)
+
+The only supported locale is "en". The parameter `$calendar` can only be
+`\IntlDateFormatter::GREGORIAN`.
+
+##### ::create($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
+
+See `__construct()`.
+
+##### format($timestamp)
+
+Fully supported.
+
+##### getCalendar()
+
+Fully supported.
+
+##### getDateType()
+
+Fully supported.
+
+##### getErrorCode()
+
+Fully supported.
+
+##### getErrorMessage()
+
+Fully supported.
+
+##### getLocale($type = StubLocale::ACTUAL_LOCALE)
+
+The parameter `$type` is ignored.
+
+##### getPattern()
+
+Fully supported.
+
+##### getTimeType()
+
+Fully supported.
+
+##### getTimeZoneId()
+
+Fully supported.
+
+##### isLenient()
+
+Always returns `false`.
+
+##### parse($value, &$position = null)
+
+The parameter `$position` must always be `null`.
+
+##### setLenient($lenient)
+
+Only accepts `false`.
+
+##### setPattern($pattern)
+
+Fully supported.
+
+##### setTimeZoneId($timeZoneId)
+
+Fully supported.
+
+##### setTimeZone($timeZone)
+
+Fully supported.
+
+### Collator
+
+Localized strings can be sorted with the [`\Collator`] [5] class. The following
+methods are supported. All other methods are not supported and will throw an
+exception when used.
+
+##### __construct($locale)
+
+The only supported locale is "en".
+
+##### create($locale)
+
+See `__construct()`.
+
+##### asort(&$array, $sortFlag = self::SORT_REGULAR)
+
+Fully supported.
+
+##### getErrorCode()
+
+Fully supported.
+
+##### getErrorMessage()
+
+Fully supported.
+
+##### getLocale($type = StubLocale::ACTUAL_LOCALE)
+
+The parameter `$type` is ignored.
+
+### ResourceBundle
+
+The `\ResourceBundle` class is not and will not be supported. Instead, this
+component ships a set of readers and writers for reading and writing arrays
+(or array-like objects) from/to resource bundle files. The following classes
+are supported:
+
+##### TextBundleWriter
+
+Writes a resource bundle to a .txt file. These text files can be converted to
+binary .res files using the `BundleCompiler` class.
+
+    use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
+    use Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompiler;
+
+    $writer = new TextBundleWriter();
+    $writer->write('/path/to/bundle', 'en', array(
+        'Data' => array(
+            'entry1',
+            'entry2',
+            ...
+        ),
+    ));
+
+    $compiler = new BundleCompiler();
+    $compiler->compile('/path/to/bundle', '/path/to/binary/bundle');
+
+The command "genrb" must be available for the `BundleCompiler` to work. If the
+command is located in a non-standard location, you can pass its path to the
+constructor of the `BundleCompiler`.
+
+##### PhpBundleWriter
+
+Writes a resource bundle to a .php file.
+
+    use Symfony\Component\Intl\ResourceBundle\Writer\PhpBundleWriter;
+
+    $writer = new PhpBundleWriter();
+    $writer->write('/path/to/bundle', 'en', array(
+        'Data' => array(
+            'entry1',
+            'entry2',
+            ...
+        ),
+    ));
+
+##### BinaryBundleReader
+
+Reads binary resource bundle files and returns an array or an array-like object.
+This class currently only works with the intl extension installed.
+
+    use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
+
+    $reader = new BinaryBundleReader();
+    $data = $reader->read('/path/to/bundle', 'en');
+
+    echo $data['Data']['entry1'];
+
+##### PhpBundleReader
+
+Reads resource bundles from .php files and returns an array or an array-like
+object.
+
+    use Symfony\Component\Intl\ResourceBundle\Reader\PhpBundleReader;
+
+    $reader = new PhpBundleReader();
+    $data = $reader->read('/path/to/bundle', 'en');
+
+    echo $data['Data']['entry1'];
+
+##### BufferedBundleReader
+
+Wraps another reader, but keeps the last N reads in a buffer, where N is a
+buffer size passed to the constructor.
+
+    use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
+    use Symfony\Component\Intl\ResourceBundle\Reader\BufferedBundleReader;
+
+    $reader = new BufferedBundleReader(new BinaryBundleReader(), 10);
+
+    // actually reads the file
+    $data = $reader->read('/path/to/bundle', 'en');
+
+    // returns data from the buffer
+    $data = $reader->read('/path/to/bundle', 'en');
+
+    // actually reads the file
+    $data = $reader->read('/path/to/bundle', 'fr');
+
+##### StructuredBundleReader
+
+Wraps another reader and offers a `readEntry()` method for reading an entry
+of the resource bundle without having to worry whether array keys are set or
+not. If a path cannot be resolved, `null` is returned.
+
+    use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
+    use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReader;
+
+    $reader = new StructuredBundleReader(new BinaryBundleReader());
+
+    $data = $reader->read('/path/to/bundle', 'en');
+
+    // Produces an error if the key "Data" does not exist
+    echo $data['Data']['entry1'];
+
+    // Returns null if the key "Data" does not exist
+    echo $reader->readEntry('/path/to/bundle', 'en', array('Data', 'entry1'));
+
+Additionally, the `readEntry()` method resolves fallback locales. For example,
+the fallback locale of "en_GB" is "en". For single-valued entries (strings,
+numbers etc.), the entry will be read from the fallback locale if it cannot be
+found in the more specific locale. For multi-valued entries (arrays), the
+values of the more specific and the fallback locale will be merged. In order
+to suppress this behavior, the last parameter `$fallback` can be set to `false`.
+
+    echo $reader->readEntry('/path/to/bundle', 'en', array('Data', 'entry1'), false);
+
 Included Resource Bundles
 -------------------------
 
 The ICU data is located in several "resource bundles". You can access a PHP
-wrapper of these bundles through the static Intl class.
+wrapper of these bundles through the static `Intl` class.
 
 Languages and Scripts
 ~~~~~~~~~~~~~~~~~~~~~
@@ -115,13 +337,17 @@ Languages and Scripts
 The translations of language and script names can be found in the language
 bundle.
 
+    use Symfony\Component\Intl\Intl;
+
+    \Locale::setDefault('en');
+
     $languages = Intl::getLanguageBundle()->getLanguageNames();
     // => array('ab' => 'Abkhazian', ...)
 
     $language = Intl::getLanguageBundle()->getLanguageName('de');
     // => 'German'
 
-    $language = Intl::getLanguageBundle()->getLanguageName('de', 'AT);
+    $language = Intl::getLanguageBundle()->getLanguageName('de', 'AT');
     // => 'Austrian German'
 
     $scripts = Intl::getLanguageBundle()->getScriptNames();
@@ -130,10 +356,20 @@ bundle.
     $script = Intl::getLanguageBundle()->getScriptName('Hans');
     // => 'Simplified'
 
+All methods accept the translation locale as last, optional parameter, which
+defaults to the current default locale.
+
+    $languages = Intl::getLanguageBundle()->getLanguageNames('de');
+    // => array('ab' => 'Abchasisch', ...)
+
 Countries
 ~~~~~~~~~
 
 The translations of country names can be found in the region bundle.
+
+    use Symfony\Component\Intl\Intl;
+
+    \Locale::setDefault('en');
 
     $countries = Intl::getRegionBundle()->getCountryNames();
     // => array('AF' => 'Afghanistan', ...)
@@ -141,10 +377,20 @@ The translations of country names can be found in the region bundle.
     $country = Intl::getRegionBundle()->getCountryName('GB');
     // => 'United Kingdom'
 
+All methods accept the translation locale as last, optional parameter, which
+defaults to the current default locale.
+
+    $countries = Intl::getRegionBundle()->getCountryNames('de');
+    // => array('AF' => 'Afghanistan', ...)
+
 Locales
 ~~~~~~~
 
 The translations of locale names can be found in the locale bundle.
+
+    use Symfony\Component\Intl\Intl;
+
+    \Locale::setDefault('en');
 
     $locales = Intl::getLocaleBundle()->getLocaleNames();
     // => array('af' => 'Afrikaans', ...)
@@ -152,19 +398,29 @@ The translations of locale names can be found in the locale bundle.
     $locale = Intl::getLocaleBundle()->getLocaleName('zh_Hans_MO');
     // => 'Chinese (Simplified, Macau SAR China)'
 
+All methods accept the translation locale as last, optional parameter, which
+defaults to the current default locale.
+
+    $locales = Intl::getLocaleBundle()->getLocaleNames('de');
+    // => array('af' => 'Afrikaans', ...)
+
 Currencies
 ~~~~~~~~~~
 
 The translations of currency names and other currency-related information can
 be found in the currency bundle.
 
+    use Symfony\Component\Intl\Intl;
+
+    \Locale::setDefault('en');
+
     $currencies = Intl::getCurrencyBundle()->getCurrencyNames();
     // => array('AFN' => 'Afghan Afghani', ...)
 
-    $currency = Intl::getCurrencyBundle()->getCurrencyNames('INR');
+    $currency = Intl::getCurrencyBundle()->getCurrencyName('INR');
     // => 'Indian Rupee'
 
-    $symbol = Intl::getCurrencyBundle()->getCurrencyNames('INR');
+    $symbol = Intl::getCurrencyBundle()->getCurrencySymbol('INR');
     // => '₹'
 
     $fractionDigits = Intl::getCurrencyBundle()->getFractionDigits('INR');
@@ -172,6 +428,13 @@ be found in the currency bundle.
 
     $roundingIncrement = Intl::getCurrencyBundle()->getRoundingIncrement('INR');
     // => 0
+
+All methods (except for `getFractionDigits()` and `getRoundingIncrement()`)
+accept the translation locale as last, optional parameter, which defaults to the
+current default locale.
+
+    $currencies = Intl::getCurrencyBundle()->getCurrencyNames('de');
+    // => array('AFN' => 'Afghanische Afghani', ...)
 
 Resources
 ---------

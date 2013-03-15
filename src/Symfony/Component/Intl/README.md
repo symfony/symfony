@@ -217,8 +217,9 @@ are supported:
 
 ##### TextBundleWriter
 
-Writes a resource bundle to a .txt file. These text files can be converted to
-binary .res files using the `BundleCompiler` class.
+Writes an array or an array-like object to a plain text resource bundle. The
+resulting .txt file can be converted to a binary .res file with the
+`BundleCompiler` class.
 
     use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
     use Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompiler;
@@ -237,11 +238,11 @@ binary .res files using the `BundleCompiler` class.
 
 The command "genrb" must be available for the `BundleCompiler` to work. If the
 command is located in a non-standard location, you can pass its path to the
-constructor of the `BundleCompiler`.
+`BundleCompiler` constructor.
 
 ##### PhpBundleWriter
 
-Writes a resource bundle to a .php file.
+Writes an array or an array-like object to a .php resource bundle.
 
     use Symfony\Component\Intl\ResourceBundle\Writer\PhpBundleWriter;
 

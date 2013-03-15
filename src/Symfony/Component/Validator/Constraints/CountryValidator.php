@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -39,7 +40,7 @@ class CountryValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (!in_array($value, \Symfony\Component\Locale\Locale::getCountries())) {
+        if (!in_array($value, array_keys(Intl::getRegionBundle()->getCountryNames(\Locale::getDefault())))) {
             $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
         }
     }

@@ -11,12 +11,24 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Intl\Intl;
+
 abstract class LocalizedTestCase extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        if (!extension_loaded('intl')) {
+        parent::setUp();
+
+        if (!class_exists('Symfony\Component\Intl\Intl')) {
+            $this->markTestSkipped('The "Intl" component is not available');
+        }
+
+        if (!Intl::isExtensionLoaded()) {
             $this->markTestSkipped('The "intl" extension is not available');
         }
+
+        Intl::setDataSource(Intl::STUB);
+
+        \Locale::setDefault('en');
     }
 }

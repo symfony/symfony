@@ -63,10 +63,6 @@ class LanguageValidatorTest extends LocalizedTestCase
      */
     public function testValidLanguages($language)
     {
-        if (!class_exists('Symfony\Component\Locale\Locale')) {
-            $this->markTestSkipped('The "Locale" component is not available');
-        }
-
         $this->context->expects($this->never())
             ->method('addViolation');
 
@@ -87,10 +83,6 @@ class LanguageValidatorTest extends LocalizedTestCase
      */
     public function testInvalidLanguages($language)
     {
-        if (!class_exists('Symfony\Component\Locale\Locale')) {
-            $this->markTestSkipped('The "Locale" component is not available');
-        }
-
         $constraint = new Language(array(
             'message' => 'myMessage'
         ));

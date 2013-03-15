@@ -25,7 +25,10 @@ class LocaleTest extends IntlTestCase
 {
     protected function setUp()
     {
-        $this->skipIfIntlExtensionNotLoaded();
+        // This class extends from \Ļocale, so we need the extension
+        if (!Intl::isExtensionLoaded()) {
+            $this->markTestSkipped('The intl extension is not available.');
+        }
 
         Intl::setDataSource(Intl::STUB);
 

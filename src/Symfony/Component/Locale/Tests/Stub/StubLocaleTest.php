@@ -28,7 +28,7 @@ class StubLocaleTest extends \PHPUnit_Framework_TestCase
     public function testGetCurrenciesData()
     {
         $currencies = StubLocale::getCurrenciesData('en');
-        $this->assertEquals('BR$', $currencies['BRL']['symbol']);
+        $this->assertEquals('R$', $currencies['BRL']['symbol']);
         $this->assertEquals('Brazilian Real', $currencies['BRL']['name']);
         $this->assertEquals(2, $currencies['BRL']['fractionDigits']);
         $this->assertEquals(0, $currencies['BRL']['roundingIncrement']);

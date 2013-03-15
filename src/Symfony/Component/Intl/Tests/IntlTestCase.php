@@ -47,8 +47,8 @@ abstract class IntlTestCase extends \PHPUnit_Framework_TestCase
 
     protected function skipIfInsufficientIcuVersion()
     {
-        if (IcuVersion::compare(Intl::getIcuVersion(), Intl::getStubIcuVersion(), '!=', $precision = 1)) {
-            $this->markTestSkipped('Please change ICU version to ' . Intl::getStubIcuVersion());
+        if (IcuVersion::compare(Intl::getIcuVersion(), Intl::getIcuStubVersion(), '!=', $precision = 1)) {
+            $this->markTestSkipped('Please change ICU version to ' . Intl::getIcuStubVersion());
         }
     }
 

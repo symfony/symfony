@@ -48,7 +48,7 @@ To update the stub files, run the update-stubs.php script:
 
 The script will fail if you don't have the latest ICU version. If you want to
 upgrade the ICU version, adjust the return value of the
-`Intl::getStubIcuVersion()` before you run the script.
+`Intl::getIcuStubVersion()` before you run the script.
 
 The script creates copies of the binary resource bundles in the Icu component
 and stores them in the Resources/ directory of the Intl component. The copies

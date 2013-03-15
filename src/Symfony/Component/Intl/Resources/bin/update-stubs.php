@@ -50,7 +50,7 @@ if (!class_exists('\Symfony\Component\Icu\IcuData')) {
 }
 
 $shortIcuVersionInPhp = strip_minor_versions(Intl::getIcuVersion());
-$shortIcuVersionInIntlComponent = strip_minor_versions(Intl::getStubIcuVersion());
+$shortIcuVersionInIntlComponent = strip_minor_versions(Intl::getIcuStubVersion());
 $shortIcuVersionInIcuComponent = strip_minor_versions(IcuData::getVersion());
 
 if ($shortIcuVersionInPhp !== $shortIcuVersionInIcuComponent) {

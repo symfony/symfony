@@ -286,7 +286,7 @@ class Intl
      *
      * @return string The ICU version of the stub classes.
      */
-    public static function getStubIcuVersion()
+    public static function getIcuStubVersion()
     {
         return '50.1.0';
     }

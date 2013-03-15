@@ -245,7 +245,9 @@ class Intl
     public static function getIcuVersion()
     {
         if (false === self::$icuVersion) {
-            if (defined('INTL_ICU_VERSION')) {
+            if (!self::isExtensionLoaded()) {
+                self::$icuVersion = self::getIcuStubVersion();
+            } elseif (defined('INTL_ICU_VERSION')) {
                 self::$icuVersion = INTL_ICU_VERSION;
             } else {
                 try {

@@ -140,7 +140,7 @@ class HttpUtils
             throw new \LogicException('You must provide a UrlGeneratorInterface instance to be able to use routes.');
         }
 
-        $url = $this->urlGenerator->generate($path, $attributes, UrlGeneratorInterface::ABSOLUTE_URL);
+        $url = $this->urlGenerator->generate($path, $request->attributes->all(), UrlGeneratorInterface::ABSOLUTE_URL);
 
         // unnecessary query string parameters must be removed from url
         // (ie. query parameters that are presents in $attributes)

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Intl\ResourceBundle\Transformer;
 
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Intl\ResourceBundle\Compiler\ResourceBundleCompilerInterface;
+use Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompilerInterface;
 
 /**
  * Default implementation of {@link CompilationContextInterface}.
@@ -37,7 +37,7 @@ class CompilationContext implements CompilationContextInterface
     private $filesystem;
 
     /**
-     * @var ResourceBundleCompilerInterface
+     * @var BundleCompilerInterface
      */
     private $compiler;
 
@@ -46,7 +46,7 @@ class CompilationContext implements CompilationContextInterface
      */
     private $icuVersion;
 
-    public function __construct($sourceDir, $binaryDir, Filesystem $filesystem, ResourceBundleCompilerInterface $compiler, $icuVersion)
+    public function __construct($sourceDir, $binaryDir, Filesystem $filesystem, BundleCompilerInterface $compiler, $icuVersion)
     {
         $this->sourceDir = $sourceDir;
         $this->binaryDir = $binaryDir;

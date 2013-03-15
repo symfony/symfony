@@ -39,14 +39,14 @@ class SvnRepository
     /**
      * Downloads the ICU data for the given version.
      *
-     * @param string $url     The URL to download from.
-     * @param string $version The ICU version to download.
+     * @param string $url       The URL to download from.
+     * @param string $targetDir The directory in which to store the repository.
      *
      * @return SvnRepository The directory where the data is stored.
      *
      * @throws RuntimeException If an error occurs during the download.
      */
-    public static function download($url, $version)
+    public static function download($url, $targetDir)
     {
         exec('which svn', $output, $result);
 
@@ -54,17 +54,9 @@ class SvnRepository
             throw new RuntimeException('The command "svn" is not installed.');
         }
 
-        $targetDir = sys_get_temp_dir() . '/icu-data/' . $version;
-
         $filesystem = new Filesystem();
 
-        if ($filesystem->exists($targetDir)) {
-            exec('svn update ' . $targetDir, $output, $result);
-
-            if ($result !== 0) {
-                throw new RuntimeException('The SVN checkout of ' . $targetDir . 'failed.');
-            }
-        } else {
+        if (!$filesystem->exists($targetDir)) {
             $filesystem->remove($targetDir);
             $filesystem->mkdir($targetDir);
 

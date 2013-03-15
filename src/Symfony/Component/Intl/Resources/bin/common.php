@@ -47,7 +47,7 @@ function run($command)
 
     if (0 !== $status) {
         $output = implode("\n", $output);
-        echo "Error:\n" . LINE . "$output\n" . LINE;
+        echo "Error while running:\n    " . getcwd() . '$ ' . $command . "\nOutput:\n" . LINE . "$output\n" . LINE;
 
         bailout("\"$command\" failed.");
     }

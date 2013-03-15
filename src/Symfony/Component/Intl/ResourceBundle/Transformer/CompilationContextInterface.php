@@ -43,7 +43,7 @@ interface CompilationContextInterface
     /**
      * Returns a resource bundle compiler.
      *
-     * @return \Symfony\Component\Intl\ResourceBundle\Compiler\ResourceBundleCompilerInterface The loaded resource bundle compiler.
+     * @return \Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompilerInterface The loaded resource bundle compiler.
      */
     public function getCompiler();
 

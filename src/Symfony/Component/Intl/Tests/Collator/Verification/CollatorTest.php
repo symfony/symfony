@@ -25,7 +25,6 @@ class CollatorTest extends AbstractCollatorTest
     protected function setUp()
     {
         $this->skipIfIntlExtensionNotLoaded();
-        $this->skipIfInsufficientIcuVersion();
 
         parent::setUp();
     }

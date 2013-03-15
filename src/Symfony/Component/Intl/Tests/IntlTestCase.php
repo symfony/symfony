@@ -43,10 +43,7 @@ abstract class IntlTestCase extends \PHPUnit_Framework_TestCase
         if (!Intl::isExtensionLoaded()) {
             $this->markTestSkipped('The intl extension is not available.');
         }
-    }
 
-    protected function skipIfInsufficientIcuVersion()
-    {
         if (IcuVersion::compare(Intl::getIcuVersion(), Intl::getIcuStubVersion(), '!=', $precision = 1)) {
             $this->markTestSkipped('Please change ICU version to ' . Intl::getIcuStubVersion());
         }

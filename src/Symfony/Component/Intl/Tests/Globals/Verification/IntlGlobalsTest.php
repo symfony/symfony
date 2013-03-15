@@ -24,7 +24,6 @@ class IntlGlobalsTest extends AbstractIntlGlobalsTest
     protected function setUp()
     {
         $this->skipIfIntlExtensionNotLoaded();
-        $this->skipIfInsufficientIcuVersion();
 
         parent::setUp();
     }

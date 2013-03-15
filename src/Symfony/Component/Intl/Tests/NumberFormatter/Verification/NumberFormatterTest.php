@@ -22,7 +22,6 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
     protected function setUp()
     {
         $this->skipIfIntlExtensionNotLoaded();
-        $this->skipIfInsufficientIcuVersion();
 
         parent::setUp();
     }

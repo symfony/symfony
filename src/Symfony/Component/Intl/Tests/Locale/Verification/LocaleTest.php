@@ -24,7 +24,6 @@ class LocaleTest extends AbstractLocaleTest
     protected function setUp()
     {
         $this->skipIfIntlExtensionNotLoaded();
-        $this->skipIfInsufficientIcuVersion();
 
         parent::setUp();
     }

@@ -12,11 +12,12 @@
 namespace Symfony\Component\Intl\Tests\ResourceBundle\Reader;
 
 use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
+use Symfony\Component\Intl\Tests\IntlTestCase;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class BinaryBundleReaderTest extends \PHPUnit_Framework_TestCase
+class BinaryBundleReaderTest extends IntlTestCase
 {
     /**
      * @var BinaryBundleReader
@@ -25,6 +26,8 @@ class BinaryBundleReaderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->skipIfIntlExtensionNotLoaded();
+
         $this->reader = new BinaryBundleReader();
     }
 

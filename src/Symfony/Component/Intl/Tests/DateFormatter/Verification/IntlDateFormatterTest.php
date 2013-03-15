@@ -25,7 +25,6 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     protected function setUp()
     {
         $this->skipIfIntlExtensionNotLoaded();
-        $this->skipIfInsufficientIcuVersion();
 
         parent::setUp();
     }

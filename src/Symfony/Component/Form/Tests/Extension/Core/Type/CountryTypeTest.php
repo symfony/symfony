@@ -17,17 +17,15 @@ class CountryTypeTest extends LocalizedTestCase
 {
     public function testCountriesAreSelectable()
     {
-        \Locale::setDefault('de_AT');
-
         $form = $this->factory->create('country');
         $view = $form->createView();
         $choices = $view->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContains(new ChoiceView('DE', 'DE', 'Deutschland'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('GB', 'GB', 'Vereinigtes Königreich'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('US', 'US', 'Vereinigte Staaten'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('FR', 'FR', 'Frankreich'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('DE', 'DE', 'Germany'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('GB', 'GB', 'United Kingdom'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('US', 'US', 'United States'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('FR', 'FR', 'France'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('MY', 'MY', 'Malaysia'), $choices, '', false, false);
     }
 

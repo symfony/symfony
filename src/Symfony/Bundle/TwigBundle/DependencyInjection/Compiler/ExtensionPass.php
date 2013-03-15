@@ -24,7 +24,7 @@ class ExtensionPass implements CompilerPassInterface
         if ($container->has('form.extension')) {
             $container->getDefinition('twig.extension.form')->addTag('twig.extension');
             $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
-            $container->getDefinition('twig.loader')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
+            $container->getDefinition('twig.loader.filesystem')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
         }
 
         if ($container->has('translator')) {

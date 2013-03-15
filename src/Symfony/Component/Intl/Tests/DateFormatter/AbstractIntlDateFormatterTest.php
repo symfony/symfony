@@ -14,7 +14,6 @@ namespace Symfony\Component\Intl\Tests\DateFormatter;
 use Symfony\Component\Intl\DateFormatter\StubIntlDateFormatter;
 use Symfony\Component\Intl\Globals\StubIntlGlobals;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\Tests\IntlTestCase;
 use Symfony\Component\Intl\Util\IcuVersion;
 use Symfony\Component\Intl\Util\Version;
 
@@ -23,7 +22,7 @@ use Symfony\Component\Intl\Util\Version;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractIntlDateFormatterTest extends IntlTestCase
+abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * When a time zone is not specified, it uses the system default however it returns null in the getter method

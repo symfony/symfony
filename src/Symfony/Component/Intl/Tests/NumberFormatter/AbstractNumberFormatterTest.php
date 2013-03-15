@@ -15,14 +15,14 @@ use Symfony\Component\Intl\Globals\StubIntlGlobals;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Locale;
 use Symfony\Component\Intl\NumberFormatter\StubNumberFormatter;
-use Symfony\Component\Intl\Tests\IntlTestCase;
 use Symfony\Component\Intl\Util\IcuVersion;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
  * Note that there are some values written like -2147483647 - 1. This is the lower 32bit int max and is a known
  * behavior of PHP.
  */
-abstract class AbstractNumberFormatterTest extends IntlTestCase
+abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider formatCurrencyWithDecimalStyleProvider
@@ -547,7 +547,7 @@ abstract class AbstractNumberFormatterTest extends IntlTestCase
 
     public function testParseTypeInt64With32BitIntegerInPhp32Bit()
     {
-        $this->skipIfNot32Bit();
+        IntlTestHelper::require32Bit($this);
 
         $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
 
@@ -573,7 +573,7 @@ abstract class AbstractNumberFormatterTest extends IntlTestCase
 
     public function testParseTypeInt64With32BitIntegerInPhp64Bit()
     {
-        $this->skipIfNot64Bit();
+        IntlTestHelper::require64Bit($this);
 
         $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
 
@@ -591,7 +591,7 @@ abstract class AbstractNumberFormatterTest extends IntlTestCase
      */
     public function testParseTypeInt64With64BitIntegerInPhp32Bit()
     {
-        $this->skipIfNot32Bit();
+        IntlTestHelper::require32Bit($this);
 
         $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
 
@@ -610,7 +610,7 @@ abstract class AbstractNumberFormatterTest extends IntlTestCase
      */
     public function testParseTypeInt64With64BitIntegerInPhp64Bit()
     {
-        $this->skipIfNot64Bit();
+        IntlTestHelper::require64Bit($this);
 
         $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
 

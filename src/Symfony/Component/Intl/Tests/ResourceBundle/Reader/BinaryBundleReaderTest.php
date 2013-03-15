@@ -12,12 +12,12 @@
 namespace Symfony\Component\Intl\Tests\ResourceBundle\Reader;
 
 use Symfony\Component\Intl\ResourceBundle\Reader\BinaryBundleReader;
-use Symfony\Component\Intl\Tests\IntlTestCase;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class BinaryBundleReaderTest extends IntlTestCase
+class BinaryBundleReaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var BinaryBundleReader
@@ -26,7 +26,7 @@ class BinaryBundleReaderTest extends IntlTestCase
 
     protected function setUp()
     {
-        $this->skipIfIntlExtensionNotLoaded();
+        IntlTestHelper::requireFullIntl($this);
 
         $this->reader = new BinaryBundleReader();
     }

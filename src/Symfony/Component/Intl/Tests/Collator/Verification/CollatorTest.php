@@ -13,6 +13,7 @@ namespace Symfony\Component\Intl\Tests\Collator\Verification;
 
 use Symfony\Component\Intl\Locale;
 use Symfony\Component\Intl\Tests\Collator\AbstractCollatorTest;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
  * Verifies that {@link AbstractCollatorTest} matches the behavior of the
@@ -24,7 +25,7 @@ class CollatorTest extends AbstractCollatorTest
 {
     protected function setUp()
     {
-        $this->skipIfIntlExtensionNotLoaded();
+        IntlTestHelper::requireFullIntl($this);
 
         parent::setUp();
     }

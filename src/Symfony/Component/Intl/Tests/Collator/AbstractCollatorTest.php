@@ -13,14 +13,13 @@ namespace Symfony\Component\Intl\Tests\Collator;
 
 use Symfony\Component\Intl\Collator\StubCollator;
 use Symfony\Component\Intl\Locale;
-use Symfony\Component\Intl\Tests\IntlTestCase;
 
 /**
  * Test case for Collator implementations.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractCollatorTest extends IntlTestCase
+abstract class AbstractCollatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider asortProvider

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\Tests\Globals\Verification;
 
 use Symfony\Component\Intl\Tests\Globals\AbstractIntlGlobalsTest;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
  * Verifies that {@link AbstractIntlGlobalsTest} matches the behavior of the
@@ -23,7 +24,7 @@ class IntlGlobalsTest extends AbstractIntlGlobalsTest
 {
     protected function setUp()
     {
-        $this->skipIfIntlExtensionNotLoaded();
+        IntlTestHelper::requireFullIntl($this);
 
         parent::setUp();
     }

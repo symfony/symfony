@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\Tests\Locale\Verification;
 
 use Symfony\Component\Intl\Tests\Locale\AbstractLocaleTest;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
  * Verifies that {@link AbstractLocaleTest} matches the behavior of the
@@ -23,7 +24,7 @@ class LocaleTest extends AbstractLocaleTest
 {
     protected function setUp()
     {
-        $this->skipIfIntlExtensionNotLoaded();
+        IntlTestHelper::requireFullIntl($this);
 
         parent::setUp();
     }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Intl\Tests\DateFormatter\Verification;
 
 use Symfony\Component\Intl\DateFormatter\StubIntlDateFormatter;
 use Symfony\Component\Intl\Tests\DateFormatter\AbstractIntlDateFormatterTest;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
  * Verifies that {@link AbstractIntlDateFormatterTest} matches the behavior of
@@ -24,7 +25,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 {
     protected function setUp()
     {
-        $this->skipIfIntlExtensionNotLoaded();
+        IntlTestHelper::requireFullIntl($this);
 
         parent::setUp();
     }

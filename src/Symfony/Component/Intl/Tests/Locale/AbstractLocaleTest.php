@@ -12,14 +12,13 @@
 namespace Symfony\Component\Intl\Tests\Locale;
 
 use Symfony\Component\Intl\Stub\StubLocale;
-use Symfony\Component\Intl\Tests\IntlTestCase;
 
 /**
  * Test case for Locale implementations.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractLocaleTest extends IntlTestCase
+abstract class AbstractLocaleTest extends \PHPUnit_Framework_TestCase
 {
     public function testSetDefault()
     {

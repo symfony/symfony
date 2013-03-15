@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl\Tests\NumberFormatter\Verification;
 
 use Symfony\Component\Intl\Tests\NumberFormatter\AbstractNumberFormatterTest;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
  * Note that there are some values written like -2147483647 - 1. This is the lower 32bit int max and is a known
@@ -21,7 +22,7 @@ class NumberFormatterTest extends AbstractNumberFormatterTest
 {
     protected function setUp()
     {
-        $this->skipIfIntlExtensionNotLoaded();
+        IntlTestHelper::requireFullIntl($this);
 
         parent::setUp();
     }

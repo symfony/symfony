@@ -109,7 +109,11 @@ class CookieJar
         }
 
         foreach ($cookies as $cookie) {
-            $this->set(Cookie::fromString($cookie, $uri));
+            try {
+                $this->set(Cookie::fromString($cookie, $uri));
+            } catch (\InvalidArgumentException $e) {
+                // invalid cookies are just ignored
+            }
         }
     }
 

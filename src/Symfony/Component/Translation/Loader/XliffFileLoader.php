@@ -45,10 +45,14 @@ class XliffFileLoader implements LoaderInterface
 
         $catalogue = new MessageCatalogue($locale);
         foreach ($xml->xpath('//xliff:trans-unit') as $translation) {
-            if (!isset($translation->source) || !isset($translation->target)) {
+            $attributes = $translation->attributes();
+
+            if (!(isset($attributes['resname']) || isset($translation->source)) || !isset($translation->target)) {
                 continue;
             }
-            $catalogue->set((string) $translation->source, (string) $translation->target, $domain);
+
+            $source = isset($attributes['resname']) && $attributes['resname'] ? $attributes['resname'] : $translation->source;
+            $catalogue->set((string) $source, (string) $translation->target, $domain);
         }
         $catalogue->addResource(new FileResource($resource));
 
@@ -59,6 +63,8 @@ class XliffFileLoader implements LoaderInterface
      * Validates and parses the given file into a SimpleXMLElement
      *
      * @param string $file
+     *
+     * @throws \RuntimeException
      *
      * @return \SimpleXMLElement
      *

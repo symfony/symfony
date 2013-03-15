@@ -24,7 +24,7 @@ class CountryType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'choices' => Intl::getRegionBundle()->getCountryNames(\Locale::getDefault()),
+            'choices' => Intl::getRegionBundle()->getCountryNames(),
         ));
     }
 

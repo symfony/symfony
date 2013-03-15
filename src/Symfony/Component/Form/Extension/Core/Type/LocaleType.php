@@ -24,7 +24,7 @@ class LocaleType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'choices' => Intl::getLocaleBundle()->getLocaleNames(\Locale::getDefault()),
+            'choices' => Intl::getLocaleBundle()->getLocaleNames(),
         ));
     }
 

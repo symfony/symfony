@@ -24,7 +24,7 @@ class LanguageType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'choices' => Intl::getLanguageBundle()->getLanguageNames(\Locale::getDefault()),
+            'choices' => Intl::getLanguageBundle()->getLanguageNames(),
         ));
     }
 

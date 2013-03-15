@@ -55,13 +55,13 @@ Numbers can be formatted with the [`\NumberFormatter`] [3] class. The following
 methods are supported. All other methods are not supported and will throw an
 exception when used.
 
-##### __construct($locale = 'en', $style = null, $pattern = null)
+##### __construct($locale = $style = null, $pattern = null)
 
 The only supported locale is "en". The supported styles are
 `\NumberFormatter::DECIMAL` and `\NumberFormatter::CURRENCY`. The argument
 `$pattern` may not be used.
 
-##### ::create($locale = 'en', $style = null, $pattern = null)
+##### ::create($locale = $style = null, $pattern = null)
 
 See `__construct()`.
 
@@ -115,19 +115,19 @@ Languages and Scripts
 The translations of language and script names can be found in the language
 bundle.
 
-    $languages = Intl::getLanguageBundle()->getLanguageNames('en');
+    $languages = Intl::getLanguageBundle()->getLanguageNames();
     // => array('ab' => 'Abkhazian', ...)
 
-    $language = Intl::getLanguageBundle()->getLanguageName('en', 'de');
+    $language = Intl::getLanguageBundle()->getLanguageName('de');
     // => 'German'
 
-    $language = Intl::getLanguageBundle()->getLanguageName('en', 'de', 'AT);
+    $language = Intl::getLanguageBundle()->getLanguageName('de', 'AT);
     // => 'Austrian German'
 
-    $scripts = Intl::getLanguageBundle()->getScriptNames('en');
+    $scripts = Intl::getLanguageBundle()->getScriptNames();
     // => array('Arab' => 'Arabic', ...)
 
-    $script = Intl::getLanguageBundle()->getScriptName('en', 'Hans');
+    $script = Intl::getLanguageBundle()->getScriptName('Hans');
     // => 'Simplified'
 
 Countries
@@ -135,10 +135,10 @@ Countries
 
 The translations of country names can be found in the region bundle.
 
-    $countries = Intl::getRegionBundle()->getCountryNames('en');
+    $countries = Intl::getRegionBundle()->getCountryNames();
     // => array('AF' => 'Afghanistan', ...)
 
-    $country = Intl::getRegionBundle()->getCountryName('en', 'GB');
+    $country = Intl::getRegionBundle()->getCountryName('GB');
     // => 'United Kingdom'
 
 Locales
@@ -146,10 +146,10 @@ Locales
 
 The translations of locale names can be found in the locale bundle.
 
-    $locales = Intl::getLocaleBundle()->getLocaleNames('en');
+    $locales = Intl::getLocaleBundle()->getLocaleNames();
     // => array('af' => 'Afrikaans', ...)
 
-    $locale = Intl::getLocaleBundle()->getLocaleName('en', 'zh_Hans_MO');
+    $locale = Intl::getLocaleBundle()->getLocaleName('zh_Hans_MO');
     // => 'Chinese (Simplified, Macau SAR China)'
 
 Currencies
@@ -158,13 +158,13 @@ Currencies
 The translations of currency names and other currency-related information can
 be found in the currency bundle.
 
-    $currencies = Intl::getCurrencyBundle()->getCurrencyNames('en');
+    $currencies = Intl::getCurrencyBundle()->getCurrencyNames();
     // => array('AFN' => 'Afghan Afghani', ...)
 
-    $currency = Intl::getCurrencyBundle()->getCurrencyNames('en', 'INR');
+    $currency = Intl::getCurrencyBundle()->getCurrencyNames('INR');
     // => 'Indian Rupee'
 
-    $symbol = Intl::getCurrencyBundle()->getCurrencyNames('en', 'INR');
+    $symbol = Intl::getCurrencyBundle()->getCurrencyNames('INR');
     // => '₹'
 
     $fractionDigits = Intl::getCurrencyBundle()->getFractionDigits('INR');

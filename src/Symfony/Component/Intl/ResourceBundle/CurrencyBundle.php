@@ -29,24 +29,36 @@ class CurrencyBundle extends AbstractBundle implements CurrencyBundleInterface
     /**
      * {@inheritdoc}
      */
-    public function getCurrencySymbol($locale, $currency)
+    public function getCurrencySymbol($currency, $locale = null)
     {
+        if (null === $locale) {
+            $locale = \Locale::getDefault();
+        }
+
         return $this->readEntry($locale, array('Currencies', $currency, static::INDEX_SYMBOL));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCurrencyName($locale, $currency)
+    public function getCurrencyName($currency, $locale = null)
     {
+        if (null === $locale) {
+            $locale = \Locale::getDefault();
+        }
+
         return $this->readEntry($locale, array('Currencies', $currency, static::INDEX_NAME));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCurrencyNames($locale)
+    public function getCurrencyNames($locale = null)
     {
+        if (null === $locale) {
+            $locale = \Locale::getDefault();
+        }
+
         if (null === ($currencies = $this->readEntry($locale, array('Currencies')))) {
             return array();
         }

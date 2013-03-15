@@ -44,7 +44,7 @@ class LocaleBundleTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('German (Austria)'));
 
 
-        $this->assertSame('German (Austria)', $this->bundle->getLocaleName('en', 'de_AT'));
+        $this->assertSame('German (Austria)', $this->bundle->getLocaleName('de_AT', 'en'));
     }
 
     public function testGetLocaleNames()

@@ -21,16 +21,24 @@ class LocaleBundle extends AbstractBundle implements LocaleBundleInterface
     /**
      * {@inheritdoc}
      */
-    public function getLocaleName($locale, $ofLocale)
+    public function getLocaleName($ofLocale, $locale = null)
     {
+        if (null === $locale) {
+            $locale = \Locale::getDefault();
+        }
+
         return $this->readEntry($locale, array('Locales', $ofLocale));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLocaleNames($locale)
+    public function getLocaleNames($locale = null)
     {
+        if (null === $locale) {
+            $locale = \Locale::getDefault();
+        }
+
         if (null === ($locales = $this->readEntry($locale, array('Locales')))) {
             return array();
         }

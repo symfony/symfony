@@ -21,19 +21,21 @@ interface RegionBundleInterface extends ResourceBundleInterface
     /**
      * Returns the name of a country.
      *
-     * @param string $locale  The locale to return the name in.
      * @param string $country A country code (e.g. "US").
+     * @param string $locale  Optional. The locale to return the name in.
+     *                        Defaults to {@link \Locale::getLocale()}.
      *
      * @return string|null The name of the country or NULL if not found.
      */
-    public function getCountryName($locale, $country);
+    public function getCountryName($country, $locale = null);
 
     /**
      * Returns the names of all known countries.
      *
-     * @param string $locale The locale to return the names in.
+     * @param string $locale Optional. The locale to return the names in.
+     *                       Defaults to {@link \Locale::getLocale()}.
      *
      * @return string[] A list of country names indexed by country codes.
      */
-    public function getCountryNames($locale);
+    public function getCountryNames($locale = null);
 }

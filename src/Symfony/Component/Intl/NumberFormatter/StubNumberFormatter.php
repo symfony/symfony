@@ -300,7 +300,7 @@ class StubNumberFormatter
             return $this->format($value);
         }
 
-        $symbol = Intl::getCurrencyBundle()->getCurrencySymbol('en', $currency);
+        $symbol = Intl::getCurrencyBundle()->getCurrencySymbol($currency, 'en');
         $fractionDigits = Intl::getCurrencyBundle()->getFractionDigits($currency);
 
         $value = $this->roundCurrency($value, $currency);

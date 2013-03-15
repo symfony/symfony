@@ -21,16 +21,24 @@ class RegionBundle extends AbstractBundle implements RegionBundleInterface
     /**
      * {@inheritdoc}
      */
-    public function getCountryName($locale, $country)
+    public function getCountryName($country, $locale = null)
     {
+        if (null === $locale) {
+            $locale = \Locale::getDefault();
+        }
+
         return $this->readEntry($locale, array('Countries', $country));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCountryNames($locale)
+    public function getCountryNames($locale = null)
     {
+        if (null === $locale) {
+            $locale = \Locale::getDefault();
+        }
+
         if (null === ($countries = $this->readEntry($locale, array('Countries')))) {
             return array();
         }

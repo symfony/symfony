@@ -21,8 +21,12 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
     /**
      * {@inheritdoc}
      */
-    public function getLanguageName($locale, $lang, $region = null)
+    public function getLanguageName($lang, $region = null, $locale = null)
     {
+        if (null === $locale) {
+            $locale = \Locale::getDefault();
+        }
+
         if (null === ($languages = $this->readEntry($locale, array('Languages')))) {
             return array();
         }
@@ -39,8 +43,12 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
     /**
      * {@inheritdoc}
      */
-    public function getLanguageNames($locale)
+    public function getLanguageNames($locale = null)
     {
+        if (null === $locale) {
+            $locale = \Locale::getDefault();
+        }
+
         if (null === ($languages = $this->readEntry($locale, array('Languages')))) {
             return array();
         }
@@ -55,8 +63,12 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
     /**
      * {@inheritdoc}
      */
-    public function getScriptName($locale, $script, $lang = null)
+    public function getScriptName($script, $lang = null, $locale = null)
     {
+        if (null === $locale) {
+            $locale = \Locale::getDefault();
+        }
+
         $data = $this->read($locale);
 
         // Some languages are translated together with their script,
@@ -84,8 +96,12 @@ class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
     /**
      * {@inheritdoc}
      */
-    public function getScriptNames($locale)
+    public function getScriptNames($locale = null)
     {
+        if (null === $locale) {
+            $locale = \Locale::getDefault();
+        }
+
         if (null === ($scripts = $this->readEntry($locale, array('Scripts')))) {
             return array();
         }

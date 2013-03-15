@@ -48,7 +48,7 @@ class LanguageBundleTest extends \PHPUnit_Framework_TestCase
             ->with(self::RES_DIR, 'en', array('Languages'))
             ->will($this->returnValue($languages));
 
-        $this->assertSame('German', $this->bundle->getLanguageName('en', 'de'));
+        $this->assertSame('German', $this->bundle->getLanguageName('de', 'en'));
     }
 
     public function testGetLanguageNameWithRegion()
@@ -64,7 +64,7 @@ class LanguageBundleTest extends \PHPUnit_Framework_TestCase
             ->with(self::RES_DIR, 'en', array('Languages'))
             ->will($this->returnValue($languages));
 
-        $this->assertSame('British English', $this->bundle->getLanguageName('en', 'en', 'GB'));
+        $this->assertSame('British English', $this->bundle->getLanguageName('en', 'GB', 'en'));
     }
 
     public function testGetLanguageNameWithUntranslatedRegion()
@@ -79,7 +79,7 @@ class LanguageBundleTest extends \PHPUnit_Framework_TestCase
             ->with(self::RES_DIR, 'en', array('Languages'))
             ->will($this->returnValue($languages));
 
-        $this->assertSame('English', $this->bundle->getLanguageName('en', 'en', 'US'));
+        $this->assertSame('English', $this->bundle->getLanguageName('en', 'US', 'en'));
     }
 
     public function testGetLanguageNames()
@@ -115,7 +115,7 @@ class LanguageBundleTest extends \PHPUnit_Framework_TestCase
             ->with(self::RES_DIR, 'en')
             ->will($this->returnValue($data));
 
-        $this->assertSame('latin', $this->bundle->getScriptName('en', 'Latn'));
+        $this->assertSame('latin', $this->bundle->getScriptName('Latn', 'en'));
     }
 
     public function testGetScriptNameIncludedInLanguage()
@@ -138,7 +138,7 @@ class LanguageBundleTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($data));
 
         // Null because the script is included in the language anyway
-        $this->assertNull($this->bundle->getScriptName('en', 'Hans', 'zh'));
+        $this->assertNull($this->bundle->getScriptName('Hans', 'zh', 'en'));
     }
 
     public function testGetScriptNameIncludedInLanguageInBraces()
@@ -160,7 +160,7 @@ class LanguageBundleTest extends \PHPUnit_Framework_TestCase
             ->with(self::RES_DIR, 'en')
             ->will($this->returnValue($data));
 
-        $this->assertSame('simplified', $this->bundle->getScriptName('en', 'Hans', 'zh'));
+        $this->assertSame('simplified', $this->bundle->getScriptName('Hans', 'zh', 'en'));
     }
 
     public function testGetScriptNameNoScriptsBlock()
@@ -177,7 +177,7 @@ class LanguageBundleTest extends \PHPUnit_Framework_TestCase
             ->with(self::RES_DIR, 'en')
             ->will($this->returnValue($data));
 
-        $this->assertNull($this->bundle->getScriptName('en', 'Latn'));
+        $this->assertNull($this->bundle->getScriptName('Latn', 'en'));
     }
 
     public function testGetScriptNames()

@@ -14,6 +14,7 @@ namespace Symfony\Component\Intl\ResourceBundle\Transformer\Rule;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContextInterface;
 use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContextInterface;
+use Symfony\Component\Intl\Util\IcuVersion;
 
 /**
  * The rule for compiling the language bundle.
@@ -36,7 +37,7 @@ class LanguageBundleTransformationRule implements TransformationRuleInterface
     public function beforeCompile(CompilationContextInterface $context)
     {
         // The language data is contained in the locales bundle in ICU <= 4.2
-        if (version_compare($context->getIcuVersion(), '4.2', '<=')) {
+        if (IcuVersion::compare($context->getIcuVersion(), '4.2', '<=', 1)) {
             return $context->getSourceDir() . '/locales';
         }
 

@@ -15,6 +15,7 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundle;
 use Symfony\Component\Intl\ResourceBundle\Transformer\CompilationContextInterface;
 use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContextInterface;
+use Symfony\Component\Intl\Util\IcuVersion;
 
 /**
  * The rule for compiling the currency bundle.
@@ -38,7 +39,7 @@ class CurrencyBundleTransformationRule implements TransformationRuleInterface
     {
         // The currency data is contained in the locales and misc bundles
         // in ICU <= 4.2
-        if (version_compare($context->getIcuVersion(), '4.2', '<=')) {
+        if (IcuVersion::compare($context->getIcuVersion(), '4.2', '<=', 1)) {
             return array(
                 $context->getSourceDir() . '/misc/supplementalData.txt',
                 $context->getSourceDir() . '/locales'

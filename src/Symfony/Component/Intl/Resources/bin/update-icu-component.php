@@ -24,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
 require_once __DIR__ . '/common.php';
 require_once __DIR__ . '/autoload.php';
 
-if ($GLOBALS['argc'] > 3) {
+if ($GLOBALS['argc'] > 3 || 2 === $GLOBALS['argc'] && '-h' === $GLOBALS['argv'][1]) {
     bailout(<<<MESSAGE
 Usage: php update-icu-component.php <path/to/icu/source> <path/to/icu/build>
 

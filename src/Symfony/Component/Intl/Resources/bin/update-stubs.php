@@ -61,6 +61,11 @@ if ($shortIcuVersionInIntlComponent !== $shortIcuVersionInIcuComponent) {
     bailout("The ICU version of the component ($shortIcuVersionInIcuComponent) does not match the ICU version of the stub classes in the Intl component ($shortIcuVersionInIntlComponent).");
 }
 
+echo wordwrap("Make sure that you don't have any ICU development files " .
+    "installed. If the build fails, try to run:\n", LINE_WIDTH);
+
+echo "\n    sudo apt-get remove libicu-dev\n\n";
+
 $icuVersionInIcuComponent = IcuData::getVersion();
 
 echo "Compiling stubs for ICU version $icuVersionInIcuComponent.\n";

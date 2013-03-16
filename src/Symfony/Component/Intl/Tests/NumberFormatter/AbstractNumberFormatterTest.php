@@ -91,12 +91,10 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function formatCurrencyWithCurrencyStyleCostaRicanColonsRoundingProvider()
     {
-        $crc = Intl::isExtensionLoaded() && IcuVersion::compare(Intl::getIcuVersion(), '4.8', '>=') ? 'CRC' : '₡';
-
         return array(
-            array(100, 'CRC', $crc, '%s100'),
-            array(-100, 'CRC', $crc, '(%s100)'),
-            array(1000.12, 'CRC', $crc, '%s1,000'),
+            array(100, 'CRC', 'CRC', '%s100'),
+            array(-100, 'CRC', 'CRC', '(%s100)'),
+            array(1000.12, 'CRC', 'CRC', '%s1,000'),
         );
     }
 
@@ -138,29 +136,23 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function formatCurrencyWithCurrencyStyleSwissRoundingProvider()
     {
-        // The currency symbol was updated from 4.2 to the 4.4 version. The ICU CLDR data was updated in 2010-03-03,
-        // the 4.2 release is from 2009-05-08 and the 4.4 from 2010-03-17. It's ugly we want to compare if the
-        // stub implementation is behaving like the intl one
-        // http://bugs.icu-project.org/trac/changeset/27776/icu/trunk/source/data/curr/en.txt
-        $chf = Intl::isExtensionLoaded() && IcuVersion::compare(Intl::getIcuVersion(), '4.4', '<') ? 'Fr.' : 'CHF';
-
         return array(
-            array(100, 'CHF', $chf, '%s100.00'),
-            array(-100, 'CHF', $chf, '(%s100.00)'),
-            array(1000.12, 'CHF', $chf, '%s1,000.10'),
-            array('1000.12', 'CHF', $chf, '%s1,000.10'),
+            array(100, 'CHF', 'CHF', '%s100.00'),
+            array(-100, 'CHF', 'CHF', '(%s100.00)'),
+            array(1000.12, 'CHF', 'CHF', '%s1,000.10'),
+            array('1000.12', 'CHF', 'CHF', '%s1,000.10'),
 
             // Rounding checks
-            array(1000.121, 'CHF', $chf, '%s1,000.10'),
-            array(1000.123, 'CHF', $chf, '%s1,000.10'),
-            array(1000.125, 'CHF', $chf, '%s1,000.10'),
-            array(1000.127, 'CHF', $chf, '%s1,000.15'),
-            array(1000.129, 'CHF', $chf, '%s1,000.15'),
+            array(1000.121, 'CHF', 'CHF', '%s1,000.10'),
+            array(1000.123, 'CHF', 'CHF', '%s1,000.10'),
+            array(1000.125, 'CHF', 'CHF', '%s1,000.10'),
+            array(1000.127, 'CHF', 'CHF', '%s1,000.15'),
+            array(1000.129, 'CHF', 'CHF', '%s1,000.15'),
 
-            array(1200000.00, 'CHF', $chf, '%s1,200,000.00'),
-            array(1200000.1, 'CHF', $chf, '%s1,200,000.10'),
-            array(1200000.10, 'CHF', $chf, '%s1,200,000.10'),
-            array(1200000.101, 'CHF', $chf, '%s1,200,000.10')
+            array(1200000.00, 'CHF', 'CHF', '%s1,200,000.00'),
+            array(1200000.1, 'CHF', 'CHF', '%s1,200,000.10'),
+            array(1200000.10, 'CHF', 'CHF', '%s1,200,000.10'),
+            array(1200000.101, 'CHF', 'CHF', '%s1,200,000.10')
         );
     }
 

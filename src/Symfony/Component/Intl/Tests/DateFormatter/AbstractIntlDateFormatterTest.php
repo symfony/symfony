@@ -222,21 +222,18 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('s', 3601, '1'),
             array('s', 3630, '30'),
             array('s', 43200, '0'), // 12 hours
-        );
 
-        // Timezone
-        if (Intl::isExtensionLoaded() && IcuVersion::compare(Intl::getIcuVersion(), '4.8', '>=')) {
             // general
-            $formatData[] = array("yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 GMT');
-            $formatData[] = array('K:mm a, z', 0, '0:00 AM, GMT');
+            array("yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 GMT'),
+            array('K:mm a, z', 0, '0:00 AM, GMT'),
 
             // timezone
-            $formatData[] = array('z', 0, 'GMT');
-            $formatData[] = array('zz', 0, 'GMT');
-            $formatData[] = array('zzz', 0, 'GMT');
-            $formatData[] = array('zzzz', 0, 'GMT');
-            $formatData[] = array('zzzzz', 0, 'GMT');
-        }
+            array('z', 0, 'GMT'),
+            array('zz', 0, 'GMT'),
+            array('zzz', 0, 'GMT'),
+            array('zzzz', 0, 'GMT'),
+            array('zzzzz', 0, 'GMT'),
+        );
 
         // As of PHP 5.3.4, IntlDateFormatter::format() accepts DateTime instances
         if (version_compare(PHP_VERSION, '5.3.4', '>=')) {
@@ -248,10 +245,8 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             $formatData[] = array('h:mm a', $dateTime, '12:00 AM');
             $formatData[] = array('yyyyy.MMMM.dd hh:mm aaa', $dateTime, '01970.January.01 12:00 AM');
 
-            if (Intl::isExtensionLoaded() && IcuVersion::compare(Intl::getIcuVersion(), '4.8', '>=')) {
-                $formatData[] = array("yyyy.MM.dd 'at' HH:mm:ss zzz", $dateTime, '1970.01.01 at 00:00:00 GMT');
-                $formatData[] = array('K:mm a, z', $dateTime, '0:00 AM, GMT');
-            }
+            $formatData[] = array("yyyy.MM.dd 'at' HH:mm:ss zzz", $dateTime, '1970.01.01 at 00:00:00 GMT');
+            $formatData[] = array('K:mm a, z', $dateTime, '0:00 AM, GMT');
         }
 
         return $formatData;
@@ -446,22 +441,16 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function dateAndTimeTypeProvider()
     {
-        $data = array(
+        return array(
             array(0, StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, 'Thursday, January 1, 1970'),
             array(0, StubIntlDateFormatter::LONG, StubIntlDateFormatter::NONE, 'January 1, 1970'),
             array(0, StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::NONE, 'Jan 1, 1970'),
             array(0, StubIntlDateFormatter::SHORT, StubIntlDateFormatter::NONE, '1/1/70'),
+            array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::FULL, '12:00:00 AM GMT'),
+            array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::LONG, '12:00:00 AM GMT'),
+            array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::MEDIUM, '12:00:00 AM'),
+            array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::SHORT, '12:00 AM'),
         );
-
-        if (Intl::isExtensionLoaded() && IcuVersion::compare(Intl::getIcuVersion(), '4.8', '>=')) {
-            $data[] = array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::FULL, '12:00:00 AM GMT');
-            $data[] = array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::LONG, '12:00:00 AM GMT');
-        }
-
-        $data[] = array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::MEDIUM, '12:00:00 AM');
-        $data[] = array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::SHORT, '12:00 AM');
-
-        return $data;
     }
 
     public function testGetCalendar()
@@ -808,7 +797,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function parseErrorProvider()
     {
-        $data = array(
+        return array(
             // 1 char month
             array('y-MMMMM-d', '1970-J-1'),
             array('y-MMMMM-d', '1970-S-1'),
@@ -817,13 +806,6 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
             array('y-LLLLL-d', '1970-J-1'),
             array('y-LLLLL-d', '1970-S-1'),
         );
-
-        if (!Intl::isExtensionLoaded() || IcuVersion::compare(Intl::getIcuVersion(), '4.8', '<')) {
-            $data[] = array('y-M-d', '1970/1/1');
-            $data[] = array('yy-M-d', '70/1/1');
-        }
-
-        return $data;
     }
 
     /*

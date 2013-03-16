@@ -11,17 +11,18 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Language;
 use Symfony\Component\Validator\Constraints\LanguageValidator;
 
-class LanguageValidatorTest extends LocalizedTestCase
+class LanguageValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $context;
     protected $validator;
 
     protected function setUp()
     {
-        parent::setUp();
+        IntlTestHelper::requireIntl($this);
 
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new LanguageValidator();

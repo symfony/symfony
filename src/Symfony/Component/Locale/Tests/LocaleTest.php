@@ -12,8 +12,8 @@
 namespace Symfony\Component\Locale\Tests;
 
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\Tests\IntlTestCase;
 use Symfony\Component\Intl\Util\IcuVersion;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Locale\Locale;
 
 /**
@@ -21,18 +21,12 @@ use Symfony\Component\Locale\Locale;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class LocaleTest extends IntlTestCase
+class LocaleTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        // This class extends from \Ļocale, so we need the extension
-        if (!Intl::isExtensionLoaded()) {
-            $this->markTestSkipped('The intl extension is not available.');
-        }
-
-        Intl::setDataSource(Intl::STUB);
-
-        Locale::setDefault('en');
+        // Locale extends \Locale, so intl must be present
+        IntlTestHelper::requireIntl($this);
     }
 
     public function testGetDisplayCountries()

@@ -22,7 +22,10 @@ class StubLocaleTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
+        // Force the use of stub data to have consistent results
         Intl::setDataSource(Intl::STUB);
+
+        parent::setUp();
     }
 
     public function testGetCurrenciesData()

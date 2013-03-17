@@ -573,30 +573,6 @@ class FinderTest extends RealIteratorTestCase
         count($finder);
     }
 
-    protected function toAbsolute($files)
-    {
-        $f = array();
-        foreach ($files as $file) {
-            $f[] = self::$tmpDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file);
-        }
-
-        return $f;
-    }
-
-    protected function toAbsoluteFixtures($files)
-    {
-        $f = array();
-        foreach ($files as $file) {
-            $prefix = '';
-            if (false !== strpos($file, 'phar')) {
-                $prefix = 'phar://';
-            }
-            $f[] = $prefix.__DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/Fixtures/'.$file);
-        }
-
-        return $f;
-    }
-
     /**
      * @dataProvider getContainsTestData
      * @group grep

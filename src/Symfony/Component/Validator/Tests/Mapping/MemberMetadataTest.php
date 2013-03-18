@@ -77,7 +77,7 @@ class TestMemberMetadata extends MemberMetadata
     {
     }
 
-    protected function newReflectionMember()
+    protected function newReflectionMember($object)
     {
     }
 }

@@ -26,12 +26,30 @@ class MemoryDataCollectorTest extends \PHPUnit_Framework_TestCase
 
     public function testCollect()
     {
-        $c = new MemoryDataCollector();
+        $collector = new MemoryDataCollector();
+        $collector->collect(new Request(), new Response());
 
-        $c->collect(new Request(), new Response());
-
-        $this->assertInternalType('integer',$c->getMemory());
-        $this->assertSame('memory',$c->getName());
+        $this->assertInternalType('integer', $collector->getMemory());
+        $this->assertInternalType('integer', $collector->getMemoryLimit());
+        $this->assertSame('memory', $collector->getName());
     }
 
+    /** @dataProvider getBytesConversionTestData */
+    public function testBytesConversion($limit, $bytes)
+    {
+        $collector = new MemoryDataCollector();
+        $method = new \ReflectionMethod($collector, 'convertToBytes');
+        $method->setAccessible(true);
+        $this->assertEquals($bytes, $method->invoke($collector, $limit));
+    }
+
+    public function getBytesConversionTestData()
+    {
+        return array(
+            array('-1', -1),
+            array('2k', 2048),
+            array('2K', 2048),
+            array('1g', 1024 * 1024 * 1024),
+        );
+    }
 }

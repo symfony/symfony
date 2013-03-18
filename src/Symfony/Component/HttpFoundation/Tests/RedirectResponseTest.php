@@ -80,4 +80,12 @@ class RedirectResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
         $this->assertEquals(301, $response->getStatusCode());
     }
+
+    public function testInvalidMultibyteCharacters()
+    {
+        # This is necessary due to http://www.php.net/manual/en/function.htmlspecialchars.php#102871:
+        ini_set('display_errors', false);
+
+        $response = RedirectResponse::create(urldecode('foo/bar/%A0'));
+    }
 }

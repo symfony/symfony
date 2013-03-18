@@ -105,7 +105,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             ErrorHandler::register($this->errorReportingLevel);
             if ('cli' !== php_sapi_name()) {
                 ExceptionHandler::register();
-            } else {
+            } elseif (!ini_get('log_errors') || ini_get('error_log')) {
                 ini_set('display_errors', 1);
             }
         }

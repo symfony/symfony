@@ -235,13 +235,9 @@ class UploadedFile extends File
             return PHP_INT_MAX;
         }
 
-        switch (strtolower(substr($max, -1))) {
-            case 'g':
-                $max *= 1024;
-            case 'm':
-                $max *= 1024;
-            case 'k':
-                $max *= 1024;
+        if (preg_match('#^(\d+)([bkmgt])#i', $max, $match)) {
+            $shift = array('b' => 0, 'k' => 10, 'm' => 20, 'g' => 30, 't' => 40);
+            $max = ($match[1] * (1 << $shift[strtolower($match[2])]));
         }
 
         return (integer) $max;

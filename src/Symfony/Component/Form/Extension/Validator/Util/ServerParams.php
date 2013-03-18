@@ -29,18 +29,12 @@ class ServerParams
             return null;
         }
 
-        $max = (int) $iniMax;
-
-        switch (substr($iniMax, -1)) {
-            case 'G':
-                $max *= 1024;
-            case 'M':
-                $max *= 1024;
-            case 'K':
-                $max *= 1024;
+        if (preg_match('#^(\d+)([bkmgt])#i', $iniMax, $match)) {
+            $shift = array('b' => 0, 'k' => 10, 'm' => 20, 'g' => 30, 't' => 40);
+            $iniMax = ($match[1] * (1 << $shift[strtolower($match[2])]));
         }
 
-        return $max;
+        return (int) $iniMax;
     }
 
     /**

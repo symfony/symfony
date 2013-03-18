@@ -66,10 +66,16 @@ class StoreTest extends \PHPUnit_Framework_TestCase
     {
         $request = Request::create('/foo');
         $this->store->write($request, new Response('foo'));
-        $this->assertNotEmpty($this->getStoreMetadata($request));
+
+        $metadata = $this->getStoreMetadata($request);
+        $this->assertNotEmpty($metadata);
 
         $this->assertTrue($this->store->purge('/foo'));
         $this->assertEmpty($this->getStoreMetadata($request));
+
+        // cached content should be kept after purging
+        $path = $this->store->getPath($metadata[0][1]['x-content-digest'][0]);
+        $this->assertTrue(is_file($path));
 
         $this->assertFalse($this->store->purge('/bar'));
     }

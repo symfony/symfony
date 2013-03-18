@@ -56,15 +56,15 @@ class Translator implements TranslatorInterface
     /**
      * Constructor.
      *
-     * @param string          $locale   The locale
-     * @param MessageSelector $selector The message selector for pluralization
+     * @param string               $locale   The locale
+     * @param MessageSelector|null $selector The message selector for pluralization
      *
      * @api
      */
     public function __construct($locale, MessageSelector $selector = null)
     {
         $this->locale = $locale;
-        $this->selector = null === $selector ? new MessageSelector() : $selector;
+        $this->selector = $selector ?: new MessageSelector();
     }
 
     /**
@@ -129,7 +129,7 @@ class Translator implements TranslatorInterface
         // needed as the fallback locales are linked to the already loaded catalogues
         $this->catalogues = array();
 
-        $this->fallbackLocales = is_array($locales) ? $locales : array($locales);
+        $this->fallbackLocales = (array) $locales;
     }
 
     /**
@@ -139,7 +139,7 @@ class Translator implements TranslatorInterface
      */
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
     {
-        if (!isset($locale)) {
+        if (null === $locale) {
             $locale = $this->getLocale();
         }
 
@@ -157,7 +157,7 @@ class Translator implements TranslatorInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
     {
-        if (!isset($locale)) {
+        if (null === $locale) {
             $locale = $this->getLocale();
         }
 
@@ -177,7 +177,7 @@ class Translator implements TranslatorInterface
             }
         }
 
-        return strtr($this->selector->choose($catalogue->get($id, $domain), (float) $number, $locale), $parameters);
+        return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
     }
 
     protected function loadCatalogue($locale)

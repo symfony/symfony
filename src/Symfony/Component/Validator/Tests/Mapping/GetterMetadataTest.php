@@ -35,4 +35,12 @@ class GetterMetadataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('foobar from getter', $metadata->getPropertyValue($entity));
     }
+
+    public function testGetPropertyValueFromOverriddenPublicGetter()
+    {
+        $entity = new Entity();
+        $metadata = new GetterMetadata(self::CLASSNAME, 'data');
+
+        $this->assertEquals('Overridden data', $metadata->getPropertyValue($entity));
+    }
 }

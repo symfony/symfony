@@ -131,7 +131,12 @@ class Link
         }
 
         // relative path
-        return substr($this->currentUri, 0, strrpos($this->currentUri, '/') + 1).$uri;
+        $currentUri = $this->currentUri;
+        if (false !== ($pos = strpos($currentUri, '?'))) {
+            $currentUri = substr($currentUri, 0, $pos);
+        }
+
+        return substr($currentUri, 0, strrpos($currentUri, '/') + 1).$uri;
     }
 
     /**

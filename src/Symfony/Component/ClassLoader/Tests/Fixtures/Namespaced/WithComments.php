@@ -19,13 +19,14 @@ class WithComments
 
 $string = 'string shoult not be   modified {$string}';
 
-$heredoc = <<<HD
+$heredoc = (<<<HD
 
 
 Heredoc should not be   modified {$string}
 
 
-HD;
+HD
+);
 
 $nowdoc = <<<'ND'
 

@@ -178,6 +178,7 @@ class ClassCollectionLoader
                     $token = next($tokens);
                     $output .= is_string($token) ? $token : $token[1];
                 } while ($token[0] !== T_END_HEREDOC);
+                $output .= "\n";
                 $rawChunk = '';
             } elseif (T_CONSTANT_ENCAPSED_STRING === $token[0]) {
                 $output .= self::compressCode($rawChunk).$token[1];

@@ -17,12 +17,12 @@ class WithComments
     public static $loaded = true;
 }
 
-$string = 'string shoult not be   modified';
+$string = 'string shoult not be   modified {$string}';
 
 $heredoc = <<<HD
 
 
-Heredoc should not be   modified
+Heredoc should not be   modified {$string}
 
 
 HD;
@@ -30,7 +30,7 @@ HD;
 $nowdoc = <<<'ND'
 
 
-Nowdoc should not be   modified
+Nowdoc should not be   modified {$string}
 
 
 ND;

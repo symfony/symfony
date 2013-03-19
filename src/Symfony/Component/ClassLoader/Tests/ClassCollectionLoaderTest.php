@@ -228,20 +228,22 @@ class WithComments
 public static \$loaded = true;
 }
 \$string ='string shoult not be   modified {\$string}';
-\$heredoc =<<<HD
+\$heredoc = (<<<HD
 
 
 Heredoc should not be   modified {\$string}
 
 
-HD;
+HD
+);
 \$nowdoc =<<<'ND'
 
 
 Nowdoc should not be   modified {\$string}
 
 
-ND;
+ND
+;
 }
 namespace
 {

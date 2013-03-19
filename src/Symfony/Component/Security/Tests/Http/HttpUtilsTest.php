@@ -137,16 +137,16 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         $utils->checkRequestPath($this->getRequest(), 'foobar');
     }
 
-    public function testGenerateUrlRemovesQueryString()
+    public function testGenerateUriRemovesQueryString()
     {
-        $method = new \ReflectionMethod('Symfony\Component\Security\Http\HttpUtils', 'generateUrl');
+        $method = new \ReflectionMethod('Symfony\Component\Security\Http\HttpUtils', 'generateUri');
         $method->setAccessible(true);
 
         $utils = new HttpUtils($this->getUrlGenerator());
-        $this->assertEquals('/foo/bar', $method->invoke($utils, 'route_name'));
+        $this->assertEquals('/foo/bar', $method->invoke($utils, new Request(), 'route_name'));
 
         $utils = new HttpUtils($this->getUrlGenerator('/foo/bar?param=value'));
-        $this->assertEquals('/foo/bar', $method->invoke($utils, 'route_name'));
+        $this->assertEquals('/foo/bar', $method->invoke($utils, new Request(), 'route_name'));
     }
 
     private function getUrlGenerator($generatedUrl = '/foo/bar')

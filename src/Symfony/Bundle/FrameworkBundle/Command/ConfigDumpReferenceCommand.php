@@ -25,7 +25,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class ConfigDumpReferenceCommand extends ContainerDebugCommand
 {
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -53,7 +53,9 @@ EOF
     }
 
     /**
-     * @see Command
+     * {@inheritdoc}
+     *
+     * @throws \LogicException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

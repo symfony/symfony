@@ -76,9 +76,9 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
     public function getFixOptionsData()
     {
         return array(
-            array(array('renderer' => 'esi'), array('standalone' => true)),
-            array(array('renderer' => 'esi'), array('standalone' => 'esi')),
-            array(array('renderer' => 'hinclude'), array('standalone' => 'js')),
+            array(array('strategy' => 'esi'), array('standalone' => true)),
+            array(array('strategy' => 'esi'), array('standalone' => 'esi')),
+            array(array('strategy' => 'hinclude'), array('standalone' => 'js')),
         );
     }
 

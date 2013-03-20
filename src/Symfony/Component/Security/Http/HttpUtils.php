@@ -70,7 +70,7 @@ class HttpUtils
      */
     public function createRequest(Request $request, $path)
     {
-        $newRequest = Request::create($this->generateUri($request, $path), 'get', array(), $request->cookies->all(), array(), $request->server->all());
+        $newRequest = $request::create($this->generateUri($request, $path), 'get', array(), $request->cookies->all(), array(), $request->server->all());
         if ($request->hasSession()) {
             $newRequest->setSession($request->getSession());
         }
@@ -140,6 +140,16 @@ class HttpUtils
             throw new \LogicException('You must provide a UrlGeneratorInterface instance to be able to use routes.');
         }
 
-        return $this->urlGenerator->generate($path, array(), UrlGeneratorInterface::ABSOLUTE_URL);
+        $url = $this->urlGenerator->generate($path, $request->attributes->all(), UrlGeneratorInterface::ABSOLUTE_URL);
+
+        // unnecessary query string parameters must be removed from url
+        // (ie. query parameters that are presents in $attributes)
+        // fortunately, they all are, so we have to remove entire query string
+        $position = strpos($url, '?');
+        if (false !== $position) {
+            $url = substr($url, 0, $position);
+        }
+
+        return $url;
     }
 }

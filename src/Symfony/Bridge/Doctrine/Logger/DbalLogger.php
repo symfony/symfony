@@ -22,6 +22,9 @@ use Doctrine\DBAL\Logging\SQLLogger;
  */
 class DbalLogger implements SQLLogger
 {
+    const MAX_STRING_LENGTH = 32;
+    const BINARY_DATA_VALUE = '(binary value)';
+
     protected $logger;
     protected $stopwatch;
 
@@ -44,6 +47,26 @@ class DbalLogger implements SQLLogger
     {
         if (null !== $this->stopwatch) {
             $this->stopwatch->start('doctrine', 'doctrine');
+        }
+
+        if (is_array($params)) {
+            foreach ($params as $index => $param) {
+                if (!is_string($params[$index])) {
+                    continue;
+                }
+
+                // non utf-8 strings break json encoding
+                if (!preg_match('#[\p{L}\p{N} ]#u', $params[$index])) {
+                    $params[$index] = self::BINARY_DATA_VALUE;
+                    continue;
+                }
+
+                // too long string must be shorten
+                if (self::MAX_STRING_LENGTH < strlen($params[$index])) {
+                    $params[$index] = substr($params[$index], self::MAX_STRING_LENGTH - 6).' [...]';
+                    continue;
+                }
+            }
         }
 
         if (null !== $this->logger) {

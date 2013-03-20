@@ -250,7 +250,7 @@ class Store implements StoreInterface
         // As per the RFC, invalidate Location and Content-Location URLs if present
         foreach (array('Location', 'Content-Location') as $header) {
             if ($uri = $request->headers->get($header)) {
-                $subRequest = Request::create($uri, 'get', array(), array(), array(), $request->server->all());
+                $subRequest = $request::create($uri, 'get', array(), array(), array(), $request->server->all());
 
                 $this->invalidate($subRequest);
             }

@@ -17,14 +17,6 @@ use Symfony\Component\Finder\Tests\FakeAdapter;
 
 class FinderTest extends Iterator\RealIteratorTestCase
 {
-    protected static $tmpDir;
-
-    public static function setUpBeforeClass()
-    {
-        parent::setUpBeforeClass();
-
-        self::$tmpDir = realpath(sys_get_temp_dir().'/symfony2_finder');
-    }
 
     public function testCreate()
     {
@@ -503,26 +495,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         count($finder);
     }
 
-    protected function toAbsolute($files)
-    {
-        $f = array();
-        foreach ($files as $file) {
-            $f[] = self::$tmpDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file);
-        }
-
-        return $f;
-    }
-
-    protected function toAbsoluteFixtures($files)
-    {
-        $f = array();
-        foreach ($files as $file) {
-            $f[] = __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$file;
-        }
-
-        return $f;
-    }
-
     /**
      * @dataProvider getContainsTestData
      * @group grep
@@ -733,6 +705,11 @@ class FinderTest extends Iterator\RealIteratorTestCase
                     'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat',
                     'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'ab.dat.copy',
                     'copy'.DIRECTORY_SEPARATOR.'A'.DIRECTORY_SEPARATOR.'B'.DIRECTORY_SEPARATOR.'C'.DIRECTORY_SEPARATOR.'abc.dat.copy',
+                )
+            ),
+            array('/^with space\//', 'foobar',
+                array(
+                    'with space'.DIRECTORY_SEPARATOR.'foo.txt',
                 )
             ),
         );

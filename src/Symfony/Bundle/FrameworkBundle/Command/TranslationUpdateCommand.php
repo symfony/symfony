@@ -29,7 +29,7 @@ use Symfony\Component\Yaml\Yaml;
 class TranslationUpdateCommand extends ContainerAwareCommand
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -74,7 +74,7 @@ EOF
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

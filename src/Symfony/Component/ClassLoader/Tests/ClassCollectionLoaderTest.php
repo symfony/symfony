@@ -206,7 +206,9 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
             unlink($file);
         }
         spl_autoload_register($r = function ($class) {
-            require_once __DIR__.'/Fixtures/'.str_replace(array('\\', '_'), '/', $class).'.php';
+            if (0 === strpos($class, 'Namespaced') || 0 === strpos($class, 'Pearlike_')) {
+                require_once __DIR__.'/Fixtures/'.str_replace(array('\\', '_'), '/', $class).'.php';
+            }
         });
 
         ClassCollectionLoader::load(
@@ -225,21 +227,23 @@ class WithComments
 {
 public static \$loaded = true;
 }
-\$string ='string shoult not be   modified';
-\$heredoc =<<<HD
+\$string ='string shoult not be   modified {\$string}';
+\$heredoc = (<<<HD
 
 
-Heredoc should not be   modified
+Heredoc should not be   modified {\$string}
 
 
-HD;
+HD
+);
 \$nowdoc =<<<'ND'
 
 
-Nowdoc should not be   modified
+Nowdoc should not be   modified {\$string}
 
 
-ND;
+ND
+;
 }
 namespace
 {

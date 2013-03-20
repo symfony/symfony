@@ -105,6 +105,23 @@ class LinkTest extends \PHPUnit_Framework_TestCase
             array('?foo=2', 'http://localhost/bar?foo=1', 'http://localhost/bar?foo=2'),
             array('?foo=2', 'http://localhost/bar/?foo=1', 'http://localhost/bar/?foo=2'),
             array('?bar=2', 'http://localhost?foo=1', 'http://localhost?bar=2'),
+
+            array('foo', 'http://login.foo.com/bar/baz?/query/string', 'http://login.foo.com/bar/foo'),
+
+            array('.', 'http://localhost/foo/bar/baz', 'http://localhost/foo/bar/'),
+            array('./', 'http://localhost/foo/bar/baz', 'http://localhost/foo/bar/'),
+            array('./foo', 'http://localhost/foo/bar/baz', 'http://localhost/foo/bar/foo'),
+            array('..', 'http://localhost/foo/bar/baz', 'http://localhost/foo/'),
+            array('../', 'http://localhost/foo/bar/baz', 'http://localhost/foo/'),
+            array('../foo', 'http://localhost/foo/bar/baz', 'http://localhost/foo/foo'),
+            array('../..', 'http://localhost/foo/bar/baz', 'http://localhost/'),
+            array('../../', 'http://localhost/foo/bar/baz', 'http://localhost/'),
+            array('../../foo', 'http://localhost/foo/bar/baz', 'http://localhost/foo'),
+            array('../../foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
+            array('../bar/../../foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
+            array('../bar/./../../foo', 'http://localhost/bar/foo/', 'http://localhost/foo'),
+            array('../../', 'http://localhost/', 'http://localhost/'),
+            array('../../', 'http://localhost', 'http://localhost/'),
         );
     }
 }

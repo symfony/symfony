@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Logger;
 
+use Symfony\Bridge\Doctrine\Logger\DbalLogger;
+
 class DbalLoggerTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -59,12 +61,38 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
         $dbalLogger
             ->expects($this->once())
             ->method('log')
-            ->with('SQL', array('utf8' => 'foo', 'nonutf8' => "\x7F\xFF"))
+            ->with('SQL', array('utf8' => 'foo', 'nonutf8' => DbalLogger::BINARY_DATA_VALUE))
         ;
 
         $dbalLogger->startQuery('SQL', array(
             'utf8'    => 'foo',
-            'nonutf8' => "\x7F\xFF"
+            'nonutf8' => "\x7F\xFF",
+        ));
+    }
+
+    public function testLogLongString()
+    {
+        $logger = $this->getMock('Symfony\\Component\\HttpKernel\\Log\\LoggerInterface');
+
+        $dbalLogger = $this
+            ->getMockBuilder('Symfony\\Bridge\\Doctrine\\Logger\\DbalLogger')
+            ->setConstructorArgs(array($logger, null))
+            ->setMethods(array('log'))
+            ->getMock()
+        ;
+
+        $shortString = str_repeat('a', DbalLogger::MAX_STRING_LENGTH);
+        $longString = str_repeat('a', DbalLogger::MAX_STRING_LENGTH + 1);
+
+        $dbalLogger
+            ->expects($this->once())
+            ->method('log')
+            ->with('SQL', array('short' => $shortString, 'long' => substr($longString, DbalLogger::MAX_STRING_LENGTH - 6).' [...]'))
+        ;
+
+        $dbalLogger->startQuery('SQL', array(
+            'short' => $shortString,
+            'long'  => $longString,
         ));
     }
 }

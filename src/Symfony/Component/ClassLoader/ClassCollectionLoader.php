@@ -169,18 +169,19 @@ class ClassCollectionLoader
                     $inNamespace = false;
                     prev($tokens);
                 } else {
-                    $rawChunk = rtrim($rawChunk) . "\n{";
+                    $rawChunk = rtrim($rawChunk)."\n{";
                     $inNamespace = true;
                 }
             } elseif (T_START_HEREDOC === $token[0]) {
-                $output .= self::compressCode($rawChunk) . $token[1];
+                $output .= self::compressCode($rawChunk).$token[1];
                 do {
                     $token = next($tokens);
-                    $output .= $token[1];
+                    $output .= is_string($token) ? $token : $token[1];
                 } while ($token[0] !== T_END_HEREDOC);
+                $output .= "\n";
                 $rawChunk = '';
             } elseif (T_CONSTANT_ENCAPSED_STRING === $token[0]) {
-                $output .= self::compressCode($rawChunk) . $token[1];
+                $output .= self::compressCode($rawChunk).$token[1];
                 $rawChunk = '';
             } else {
                 $rawChunk .= $token[1];
@@ -191,7 +192,7 @@ class ClassCollectionLoader
             $rawChunk .= "}\n";
         }
 
-        return $output . self::compressCode($rawChunk);
+        return $output.self::compressCode($rawChunk);
     }
 
     /**

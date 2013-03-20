@@ -13,54 +13,96 @@ namespace Symfony\Component\Finder\Tests\Iterator;
 
 abstract class RealIteratorTestCase extends IteratorTestCase
 {
+
+    protected static $tmpDir;
     protected static $files;
 
     public static function setUpBeforeClass()
     {
-        $tmpDir = sys_get_temp_dir().'/symfony2_finder';
+        self::$tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'symfony2_finder';
+
         self::$files = array(
-            $tmpDir.'/.git/',
-            $tmpDir.'/.foo/',
-            $tmpDir.'/.foo/.bar',
-            $tmpDir.'/.foo/bar',
-            $tmpDir.'/.bar',
-            $tmpDir.'/test.py',
-            $tmpDir.'/foo/',
-            $tmpDir.'/foo/bar.tmp',
-            $tmpDir.'/test.php',
-            $tmpDir.'/toto/',
-            $tmpDir.'/foo bar',
+            '.git/',
+            '.foo/',
+            '.foo/.bar',
+            '.foo/bar',
+            '.bar',
+            'test.py',
+            'foo/',
+            'foo/bar.tmp',
+            'test.php',
+            'toto/',
+            'foo bar'
         );
 
-        if (is_dir($tmpDir)) {
+        self::$files = self::toAbsolute(self::$files);
+
+        if (is_dir(self::$tmpDir)) {
             self::tearDownAfterClass();
         } else {
-            mkdir($tmpDir);
+            mkdir(self::$tmpDir);
         }
 
         foreach (self::$files as $file) {
-            if ('/' === $file[strlen($file) - 1]) {
+            if (DIRECTORY_SEPARATOR === $file[strlen($file) - 1]) {
                 mkdir($file);
             } else {
                 touch($file);
             }
         }
 
-        file_put_contents($tmpDir.'/test.php', str_repeat(' ', 800));
-        file_put_contents($tmpDir.'/test.py', str_repeat(' ', 2000));
+        file_put_contents(self::toAbsolute('test.php'), str_repeat(' ', 800));
+        file_put_contents(self::toAbsolute('test.py'), str_repeat(' ', 2000));
 
-        touch($tmpDir.'/foo/bar.tmp', strtotime('2005-10-15'));
-        touch($tmpDir.'/test.php', strtotime('2005-10-15'));
+        touch(self::toAbsolute('foo/bar.tmp'), strtotime('2005-10-15'));
+        touch(self::toAbsolute('test.php'), strtotime('2005-10-15'));
     }
 
     public static function tearDownAfterClass()
     {
         foreach (array_reverse(self::$files) as $file) {
-            if ('/' === $file[strlen($file) - 1]) {
+            if (DIRECTORY_SEPARATOR === $file[strlen($file) - 1]) {
                 @rmdir($file);
             } else {
                 @unlink($file);
             }
         }
     }
+
+    protected static function toAbsolute($files = null)
+    {
+        /*
+         * Without the call to setUpBeforeClass() property can be null.
+         */
+        if (!self::$tmpDir) {
+            self::$tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'symfony2_finder';
+        }
+
+        if (is_array($files)) {
+            $f = array();
+            foreach ($files as $file) {
+                $f[] = self::$tmpDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file);
+            }
+
+            return $f;
+        }
+
+        if (is_string($files)) {
+
+            return self::$tmpDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $files);
+        }
+
+        return self::$tmpDir;
+    }
+
+    protected static function toAbsoluteFixtures($files)
+    {
+        $f = array();
+        foreach ($files as $file) {
+            $f[] = realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$file);
+        }
+
+        return $f;
+    }
+
 }

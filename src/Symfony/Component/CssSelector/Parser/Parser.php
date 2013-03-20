@@ -42,11 +42,19 @@ class Parser implements ParserInterface
     public function __construct()
     {
         $this->tokenizer = new Tokenizer();
-        $this->shortcuts = array(
-            new Shortcut\ElementParser(),
-            new Shortcut\HashParser(),
-            new Shortcut\ClassParser(),
-        );
+        $this->shortcuts = array();
+    }
+
+    /**
+     * @param ParserInterface $shortcut
+     *
+     * @return Parser
+     */
+    public function registerShortcut(ParserInterface $shortcut)
+    {
+        $this->shortcuts[] = $shortcut;
+
+        return $this;
     }
 
     /**
@@ -81,13 +89,21 @@ class Parser implements ParserInterface
     {
         foreach ($tokens as $token) {
             if ($token->isString()) {
-                throw new SyntaxErrorException('String not allowed as function argument.');
+                throw SyntaxErrorException::stringAsFunctionArgument();
             }
         }
 
         $joined = trim(implode('', array_map(function (Token $token) {
             return $token->getValue();
         }, $tokens)));
+
+        $int = function ($string) {
+            if (!is_numeric($string)) {
+                throw SyntaxErrorException::stringAsFunctionArgument();
+            }
+
+            return (int) $string;
+        };
 
         switch (true) {
             case 'odd' === $joined:
@@ -97,15 +113,15 @@ class Parser implements ParserInterface
             case 'n' === $joined:
                 return array(1, 0);
             case false === strpos($joined, 'n'):
-                return array(0, (int) $joined);
+                return array(0, $int($joined));
         }
 
         $split = explode('n', $joined);
         $first = isset($split[0]) ? $split[0] : null;
 
         return array(
-            $first ? ('-' === $first || '+' === $first ? 1 + (int) $first : (int) $first) : 1,
-            isset($split[1]) && $split[1] ? (int) $split[1] : 0
+            $first ? ('-' === $first || '+' === $first ? $int($first.'1') : $int($first)) : 1,
+            isset($split[1]) && $split[1] ? $int($split[1]) : 0
         );
     }
 
@@ -157,7 +173,7 @@ class Parser implements ParserInterface
             }
 
             if (null !== $pseudoElement) {
-                throw new SyntaxErrorException('Got pseudo-element "::'.$pseudoElement.'" not at the end of a selector');
+                throw SyntaxErrorException::pseudoElementFound($pseudoElement, 'not at the end of a selector');
             }
 
             if ($peek->isDelimiter(array('+', '>', '~'))) {
@@ -203,7 +219,7 @@ class Parser implements ParserInterface
             }
 
             if (null !== $pseudoElement) {
-                throw new SyntaxErrorException('Got pseudo-element "::'.$pseudoElement.'" not at the end of a selector');
+                throw SyntaxErrorException::pseudoElementFound($pseudoElement, 'not at the end of a selector');
             }
 
             if ($peek->isHash()) {
@@ -235,6 +251,8 @@ class Parser implements ParserInterface
 
                 if (!$stream->getPeek()->isDelimiter(array('('))) {
                     $result = new Node\PseudoNode($result, $identifier);
+
+                    continue;
                 }
 
                 $stream->getNext();
@@ -242,22 +260,18 @@ class Parser implements ParserInterface
 
                 if ('not' === strtolower($identifier)) {
                     if ($insideNegation) {
-                        throw new SyntaxErrorException('Got nested :not()');
+                        throw SyntaxErrorException::nestedNot();
                     }
 
                     list($argument, $argumentPseudoElement) = $this->parseSimpleSelector($stream, true);
                     $next = $stream->getNext();
 
                     if (null !== $argumentPseudoElement) {
-                        throw new SyntaxErrorException(sprintf(
-                            'Got pseudo-element ::%s inside ::not() at %s',
-                            $argumentPseudoElement,
-                            $next->getPosition()
-                        ));
+                        throw SyntaxErrorException::pseudoElementFound($argumentPseudoElement, 'inside ::not()');
                     }
 
                     if (!$next->isDelimiter(array(')'))) {
-                        throw new SyntaxErrorException(sprintf('Expected ")", got %s', $next));
+                        throw SyntaxErrorException::unexpectedToken('")"', $next);
                     }
 
                     $result = new Node\NegationNode($result, $argument);
@@ -278,23 +292,23 @@ class Parser implements ParserInterface
                         } elseif ($next->isDelimiter(array(')'))) {
                             break;
                         } else {
-                            throw new SyntaxErrorException(sprintf('Expected an argument, got %s', $next));
+                            throw SyntaxErrorException::unexpectedToken('an argument', $next);
                         }
                     }
 
                     if (empty($arguments)) {
-                        throw new SyntaxErrorException(sprintf('Expected at least an argument, got %s', $next));
+                        throw SyntaxErrorException::unexpectedToken('at least an argument', $next);
                     }
 
                     $result = new Node\FunctionNode($result, $identifier, $arguments);
                 }
             } else {
-                throw new SyntaxErrorException(sprintf('Expected selector, got %s', $peek));
+                throw SyntaxErrorException::unexpectedToken('selector', $peek);
             }
         }
 
         if (count($stream->getUsed()) === $selectorStart) {
-            throw new SyntaxErrorException('Expected selector, got '.$stream->getPeek());
+            throw SyntaxErrorException::unexpectedToken('selector', $stream->getPeek());
         }
 
         return array($result, $pseudoElement);
@@ -348,8 +362,8 @@ class Parser implements ParserInterface
         $stream->skipWhitespace();
         $attribute = $stream->getNextIdentifierOrStar();
 
-        if (null === $attribute || !$stream->getPeek()->isDelimiter(array('|'))) {
-            throw new SyntaxErrorException(sprintf('Expected "|", got %s', $stream->getPeek()));
+        if (null === $attribute && !$stream->getPeek()->isDelimiter(array('|'))) {
+            throw SyntaxErrorException::unexpectedToken('"|"', $stream->getPeek());
         }
 
         if ($stream->getPeek()->isDelimiter(array('|'))) {
@@ -382,7 +396,7 @@ class Parser implements ParserInterface
                 $operator = $next->getValue().'=';
                 $stream->getNext();
             } else {
-                throw new SyntaxErrorException(sprintf('Operator expected, got %s', $next));
+                throw SyntaxErrorException::unexpectedToken('operator', $next);
             }
         }
 
@@ -390,14 +404,14 @@ class Parser implements ParserInterface
         $value = $stream->getNext();
 
         if (!($value->isIdentifier() || $value->isString())) {
-            throw new SyntaxErrorException(sprintf('Expected string or identifier, got %s', $value));
+            throw SyntaxErrorException::unexpectedToken('string or identifier', $next);
         }
 
         $stream->skipWhitespace();
         $next = $stream->getNext();
 
         if (!$next->isDelimiter(array(']'))) {
-            throw new SyntaxErrorException(sprintf('Expected "]", got %s', $next));
+            throw SyntaxErrorException::unexpectedToken('"]",', $next);
         }
 
         return new Node\AttributeNode($selector, $namespace, $attribute, $operator, $value->getValue());

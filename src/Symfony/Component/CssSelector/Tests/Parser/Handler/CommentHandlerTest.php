@@ -10,7 +10,7 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
 class CommentHandlerTest extends AbstractHandlerTest
 {
     /** @dataProvider getHandleValueTestData */
-    public function testHandleValue($value, $remainingContent)
+    public function testHandleValue($value, Token $unusedArgument, $remainingContent)
     {
         $reader = new Reader($value);
         $stream = new TokenStream();
@@ -24,8 +24,9 @@ class CommentHandlerTest extends AbstractHandlerTest
     public function getHandleValueTestData()
     {
         return array(
-            array('/* comment */', ''),
-            array('/* comment */foo', 'foo'),
+            // 2nd argument only exists for inherited method compatibility
+            array('/* comment */', new Token(null, null, null), ''),
+            array('/* comment */foo', new Token(null, null, null), 'foo'),
         );
     }
 

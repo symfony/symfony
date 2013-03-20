@@ -140,7 +140,7 @@ class TokenStream
         $next = $this->getNext();
 
         if (!$next->isIdentifier()) {
-            throw new SyntaxErrorException('Expected identifier, got '.$next);
+            throw SyntaxErrorException::unexpectedToken('identifier', $next);
         }
 
         return $next->getValue();
@@ -165,7 +165,7 @@ class TokenStream
             return null;
         }
 
-        throw new SyntaxErrorException('Expected identifier or *, got '.$next);
+        throw SyntaxErrorException::unexpectedToken('identifier or "*"', $next);
     }
 
     /**

@@ -63,7 +63,7 @@ class DbalLogger implements SQLLogger
 
                 // too long string must be shorten
                 if (self::MAX_STRING_LENGTH < strlen($params[$index])) {
-                    $params[$index] = substr($params[$index], self::MAX_STRING_LENGTH - 6).' [...]';
+                    $params[$index] = substr($params[$index], 0, self::MAX_STRING_LENGTH - 6).' [...]';
                     continue;
                 }
             }

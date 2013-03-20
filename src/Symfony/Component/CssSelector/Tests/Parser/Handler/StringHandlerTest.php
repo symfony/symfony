@@ -3,49 +3,26 @@
 namespace Symfony\Component\CssSelector\Tests\Handler;
 
 use Symfony\Component\CssSelector\Parser\Handler\StringHandler;
-use Symfony\Component\CssSelector\Parser\Reader;
 use Symfony\Component\CssSelector\Parser\Token;
-use Symfony\Component\CssSelector\Parser\TokenStream;
 use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
 use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerEscaping;
 
-class StringHandlerTest extends \PHPUnit_Framework_TestCase
+class StringHandlerTest extends AbstractHandlerTest
 {
-    /** @dataProvider getHandledValueTestData */
-    public function testHandledValue($value)
-    {
-        $patterns = new TokenizerPatterns();
-        $handler = new StringHandler($patterns, new TokenizerEscaping($patterns));
-        $stream = new TokenStream();
-
-        $this->assertTrue($handler->handle(new Reader($value), $stream));
-        $this->assertEquals(new Token(Token::TYPE_STRING, substr($value, 1, -1), 1), $stream->getNext());
-    }
-
-    /** @dataProvider getUnhandledValueTestData */
-    public function testUnhandledValue($value)
-    {
-        $patterns = new TokenizerPatterns();
-        $handler = new StringHandler($patterns, new TokenizerEscaping($patterns));
-        $stream = new TokenStream();
-
-        $this->assertFalse($handler->handle(new Reader($value), $stream));
-        $this->setExpectedException('Symfony\Component\CssSelector\Exception\InternalErrorException');
-        $stream->getNext();
-    }
-
-    public function getHandledValueTestData()
+    public function getHandleValueTestData()
     {
         return array(
-            array('"hello"'),
-            array('"1"'),
-            array('" "'),
-            array('""'),
-            array("'hello'"),
+            array('"hello"', new Token(Token::TYPE_STRING, 'hello', 1), ''),
+            array('"1"', new Token(Token::TYPE_STRING, '1', 1), ''),
+            array('" "', new Token(Token::TYPE_STRING, ' ', 1), ''),
+            array('""', new Token(Token::TYPE_STRING, '', 1), ''),
+            array("'hello'", new Token(Token::TYPE_STRING, 'hello', 1), ''),
+
+            array("'foo'bar", new Token(Token::TYPE_STRING, 'foo', 1), 'bar'),
         );
     }
 
-    public function getUnhandledValueTestData()
+    public function getDontHandleValueTestData()
     {
         return array(
             array('hello'),
@@ -53,5 +30,12 @@ class StringHandlerTest extends \PHPUnit_Framework_TestCase
             array('1'),
             array(' '),
         );
+    }
+
+    protected function generateHandler()
+    {
+        $patterns = new TokenizerPatterns();
+
+        return new StringHandler($patterns, new TokenizerEscaping($patterns));
     }
 }

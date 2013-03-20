@@ -63,7 +63,7 @@ class Tokenizer
         while (!$reader->isEOF()) {
             foreach ($this->handlers as $handler) {
                 if ($handler->handle($reader, $stream)) {
-                    continue;
+                    continue 2;
                 }
             }
 

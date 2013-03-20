@@ -11,8 +11,8 @@ class AttributeNodeTest extends AbstractNodeTest
     {
         return array(
             array(new AttributeNode(new ElementNode(), null, 'attribute', 'exists', null), 'Attribute[Element[*][attribute]]'),
-            array(new AttributeNode(new ElementNode(), null, 'attribute', '$=', 'value'), 'Attribute[Element[*][attribute $= value]]'),
-            array(new AttributeNode(new ElementNode(), 'namespace', 'attribute', '$=', 'value'), 'Attribute[Element[*][namespace|attribute $= value]]'),
+            array(new AttributeNode(new ElementNode(), null, 'attribute', '$=', 'value'), "Attribute[Element[*][attribute $= 'value']]"),
+            array(new AttributeNode(new ElementNode(), 'namespace', 'attribute', '$=', 'value'), "Attribute[Element[*][namespace|attribute $= 'value']]"),
         );
     }
 

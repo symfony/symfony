@@ -349,7 +349,7 @@ class Parser implements ParserInterface
         $attribute = $stream->getNextIdentifierOrStar();
 
         if (null === $attribute || !$stream->getPeek()->isDelimiter(array('|'))) {
-            throw new SyntaxErrorException(sprintf('Expected '|', got %s', $stream->getPeek()));
+            throw new SyntaxErrorException(sprintf('Expected "|", got %s', $stream->getPeek()));
         }
 
         if ($stream->getPeek()->isDelimiter(array('|'))) {

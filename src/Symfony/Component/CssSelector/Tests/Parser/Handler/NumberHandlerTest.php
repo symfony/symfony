@@ -3,48 +3,26 @@
 namespace Symfony\Component\CssSelector\Tests\Handler;
 
 use Symfony\Component\CssSelector\Parser\Handler\NumberHandler;
-use Symfony\Component\CssSelector\Parser\Reader;
 use Symfony\Component\CssSelector\Parser\Token;
-use Symfony\Component\CssSelector\Parser\TokenStream;
 use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
 use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerEscaping;
 
-class NumberHandlerTest extends \PHPUnit_Framework_TestCase
+class NumberHandlerTest extends AbstractHandlerTest
 {
-    /** @dataProvider getHandledValueTestData */
-    public function testHandledValue($value)
-    {
-        $patterns = new TokenizerPatterns();
-        $handler = new NumberHandler($patterns, new TokenizerEscaping($patterns));
-        $stream = new TokenStream();
-
-        $this->assertTrue($handler->handle(new Reader($value), $stream));
-        $this->assertEquals(new Token(Token::TYPE_NUMBER, $value, 0), $stream->getNext());
-    }
-
-    /** @dataProvider getUnhandledValueTestData */
-    public function testUnhandledValue($value)
-    {
-        $patterns = new TokenizerPatterns();
-        $handler = new NumberHandler($patterns, new TokenizerEscaping($patterns));
-        $stream = new TokenStream();
-
-        $this->assertFalse($handler->handle(new Reader($value), $stream));
-        $this->setExpectedException('Symfony\Component\CssSelector\Exception\InternalErrorException');
-        $stream->getNext();
-    }
-
-    public function getHandledValueTestData()
+    public function getHandleValueTestData()
     {
         return array(
-            array('12'),
-            array('12.52'),
-            array('+12.52'),
-            array('-12.52'),
+            array('12', new Token(Token::TYPE_NUMBER, '12', 0), ''),
+            array('12.34', new Token(Token::TYPE_NUMBER, '12.34', 0), ''),
+            array('+12.34', new Token(Token::TYPE_NUMBER, '+12.34', 0), ''),
+            array('-12.34', new Token(Token::TYPE_NUMBER, '-12.34', 0), ''),
+
+            array('12 arg', new Token(Token::TYPE_NUMBER, '12', 0), ' arg'),
+            array('12]', new Token(Token::TYPE_NUMBER, '12', 0), ']'),
         );
     }
 
-    public function getUnhandledValueTestData()
+    public function getDontHandleValueTestData()
     {
         return array(
             array('hello'),
@@ -53,5 +31,12 @@ class NumberHandlerTest extends \PHPUnit_Framework_TestCase
             array(' '),
             array('/* comment */'),
         );
+    }
+
+    protected function generateHandler()
+    {
+        $patterns = new TokenizerPatterns();
+
+        return new NumberHandler($patterns, new TokenizerEscaping($patterns));
     }
 }

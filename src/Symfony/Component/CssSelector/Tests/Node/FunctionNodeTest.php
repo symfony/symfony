@@ -14,11 +14,11 @@ class FunctionNodeTest extends AbstractNodeTest
             array(new FunctionNode(new ElementNode(), 'function'), 'Function[Element[*]:function()]'),
             array(new FunctionNode(new ElementNode(), 'function', array(
                 new Token(Token::TYPE_IDENTIFIER, 'value', 0),
-            )), 'Function[Element[*]:function(identifier)]'),
+            )), "Function[Element[*]:function(['value'])]"),
             array(new FunctionNode(new ElementNode(), 'function', array(
                 new Token(Token::TYPE_STRING, 'value1', 0),
                 new Token(Token::TYPE_NUMBER, 'value2', 0),
-            )), 'Function[Element[*]:function(string, number)]'),
+            )), "Function[Element[*]:function(['value1', 'value2'])]"),
         );
     }
 

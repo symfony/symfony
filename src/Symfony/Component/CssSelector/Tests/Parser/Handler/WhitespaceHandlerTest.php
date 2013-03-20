@@ -3,48 +3,33 @@
 namespace Symfony\Component\CssSelector\Tests\Handler;
 
 use Symfony\Component\CssSelector\Parser\Handler\WhitespaceHandler;
-use Symfony\Component\CssSelector\Parser\Reader;
 use Symfony\Component\CssSelector\Parser\Token;
-use Symfony\Component\CssSelector\Parser\TokenStream;
 
-class WhitespaceHandlerTest extends \PHPUnit_Framework_TestCase
+class WhitespaceHandlerTest extends AbstractHandlerTest
 {
-    /** @dataProvider getHandledValueTestData */
-    public function testHandledValue($value)
-    {
-        $handler = new WhitespaceHandler();
-        $stream = new TokenStream();
-
-        $this->assertTrue($handler->handle(new Reader($value), $stream));
-        $this->assertEquals(new Token(Token::TYPE_WHITESPACE, $value, 0), $stream->getNext());
-    }
-
-    /** @dataProvider getUnhandledValueTestData */
-    public function testUnhandledValue($value)
-    {
-        $handler = new WhitespaceHandler();
-        $stream = new TokenStream();
-
-        $this->assertFalse($handler->handle(new Reader($value), $stream));
-        $this->setExpectedException('Symfony\Component\CssSelector\Exception\InternalErrorException');
-        $stream->getNext();
-    }
-
-    public function getHandledValueTestData()
+    public function getHandleValueTestData()
     {
         return array(
-            array(' '),
-            array("\n"),
-            array("\t"),
+            array(' ', new Token(Token::TYPE_WHITESPACE, ' ', 0), ''),
+            array("\n", new Token(Token::TYPE_WHITESPACE, "\n", 0), ''),
+            array("\t", new Token(Token::TYPE_WHITESPACE, "\t", 0), ''),
+
+            array(' foo', new Token(Token::TYPE_WHITESPACE, ' ', 0), 'foo'),
+            array(' .foo', new Token(Token::TYPE_WHITESPACE, ' ', 0), '.foo'),
         );
     }
 
-    public function getUnhandledValueTestData()
+    public function getDontHandleValueTestData()
     {
         return array(
             array('>'),
             array('1'),
             array('a'),
         );
+    }
+
+    protected function generateHandler()
+    {
+        return new WhitespaceHandler();
     }
 }

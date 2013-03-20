@@ -119,6 +119,6 @@ class AttributeNode extends AbstractNode
 
         return 'exists' === $this->operator
             ? sprintf('%s[%s[%s]]', $this->getNodeName(), $this->selector, $attribute)
-            : sprintf('%s[%s[%s %s %s]]', $this->getNodeName(), $this->selector, $attribute, $this->operator, $this->value);
+            : sprintf("%s[%s[%s %s '%s']]", $this->getNodeName(), $this->selector, $attribute, $this->operator, $this->value);
     }
 }

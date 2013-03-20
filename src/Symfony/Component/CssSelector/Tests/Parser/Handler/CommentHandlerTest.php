@@ -7,43 +7,39 @@ use Symfony\Component\CssSelector\Parser\Reader;
 use Symfony\Component\CssSelector\Parser\Token;
 use Symfony\Component\CssSelector\Parser\TokenStream;
 
-class CommentHandlerTest extends \PHPUnit_Framework_TestCase
+class CommentHandlerTest extends AbstractHandlerTest
 {
-    /** @dataProvider getHandledValueTestData */
-    public function testHandledValue($value)
+    /** @dataProvider getHandleValueTestData */
+    public function testHandleValue($value, $remainingContent)
     {
-        $handler = new CommentHandler();
+        $reader = new Reader($value);
         $stream = new TokenStream();
 
-        $this->assertTrue($handler->handle(new Reader($value), $stream));
-        $this->setExpectedException('Symfony\Component\CssSelector\Exception\InternalErrorException');
-        $stream->getNext();
+        $this->assertTrue($this->generateHandler()->handle($reader, $stream));
+        // comments are ignored (not pushed as token in stream)
+        $this->assertStreamEmpty($stream);
+        $this->assertRemainingContent($reader, $remainingContent);
     }
 
-    /** @dataProvider getUnhandledValueTestData */
-    public function testUnhandledValue($value)
-    {
-        $handler = new CommentHandler();
-        $stream = new TokenStream();
-
-        $this->assertFalse($handler->handle(new Reader($value), $stream));
-        $this->setExpectedException('Symfony\Component\CssSelector\Exception\InternalErrorException');
-        $stream->getNext();
-    }
-
-    public function getHandledValueTestData()
+    public function getHandleValueTestData()
     {
         return array(
-            array('/* comment */'),
+            array('/* comment */', ''),
+            array('/* comment */foo', 'foo'),
         );
     }
 
-    public function getUnhandledValueTestData()
+    public function getDontHandleValueTestData()
     {
         return array(
             array('>'),
             array('+'),
             array(' '),
         );
+    }
+
+    protected function generateHandler()
+    {
+        return new CommentHandler();
     }
 }

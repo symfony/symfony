@@ -881,6 +881,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
         $this->assertEquals('en', $request->getPreferredLanguage(array('fr', 'en')));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8');
+        $this->assertEquals('en', $request->getPreferredLanguage(array('fr', 'en')));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, fr-fr; q=0.6, fr; q=0.5');
+        $this->assertEquals('en', $request->getPreferredLanguage(array('fr', 'en')));
     }
 
     public function testIsXmlHttpRequest()

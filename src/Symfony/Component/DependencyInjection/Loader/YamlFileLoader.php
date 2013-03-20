@@ -26,6 +26,7 @@ use Symfony\Component\Yaml\Yaml;
  * The YAML format does not support anonymous services (cf. the XML loader).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class YamlFileLoader extends FileLoader
 {
@@ -298,14 +299,20 @@ class YamlFileLoader extends FileLoader
                 $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
             }
 
+            $strict = true;
             if ('=' === substr($value, -1)) {
                 $value = substr($value, 0, -1);
                 $strict = false;
-            } else {
-                $strict = true;
+            }
+
+            $lazy = false;
+            if ('~' === substr($value, -1)) {
+                $value = substr($value, 0, -1);
+                $lazy = true;
             }
 
             $value = new Reference($value, $invalidBehavior, $strict);
+            $value->setLazy($lazy);
         }
 
         return $value;

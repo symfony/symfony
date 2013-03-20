@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * YamlDumper dumps a service container as a YAML string.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * @api
  */
@@ -208,7 +209,15 @@ class YamlDumper extends Dumper
 
             return $code;
         } elseif ($value instanceof Reference) {
-            return $this->getServiceCall((string) $value, $value);
+            $call = $this->getServiceCall((string) $value, $value);
+            if ($value->isLazy()) {
+                $call .= '~';
+            }
+            if ( ! $value->isStrict()) {
+                $call .= '=';
+            }
+
+            return $call;
         } elseif ($value instanceof Parameter) {
             return $this->getParameterCall((string) $value);
         } elseif (is_object($value) || is_resource($value)) {

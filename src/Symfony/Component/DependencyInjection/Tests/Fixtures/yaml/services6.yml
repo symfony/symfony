@@ -24,3 +24,5 @@ services:
         alias: foo
         public: false
     factory_service: { class: BazClass, factory_method: getInstance, factory_service: baz_factory }
+    lazy_deps_service:
+        arguments: ["@foo~", "@bar"]

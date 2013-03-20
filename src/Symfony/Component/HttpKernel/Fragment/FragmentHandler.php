@@ -93,6 +93,10 @@ class FragmentHandler
             throw new \InvalidArgumentException(sprintf('The "%s" renderer does not exist.', $renderer));
         }
 
+        if (null === $this->request) {
+            throw new \LogicException('Rendering a fragment can only be done when handling a master Request.');
+        }
+
         return $this->deliver($this->renderers[$renderer]->render($uri, $this->request, $options));
     }
 

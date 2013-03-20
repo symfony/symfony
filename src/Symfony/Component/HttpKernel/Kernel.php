@@ -27,13 +27,10 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
-use Symfony\Component\HttpKernel\Debug\ErrorHandler;
-use Symfony\Component\HttpKernel\Debug\ExceptionHandler;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
-use Symfony\Component\ClassLoader\DebugClassLoader;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -94,21 +91,11 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $this->init();
     }
 
+    /**
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Move your logic in the constructor instead.
+     */
     public function init()
     {
-        ini_set('display_errors', 0);
-
-        if ($this->debug) {
-            error_reporting(-1);
-
-            DebugClassLoader::enable();
-            ErrorHandler::register($this->errorReportingLevel);
-            if ('cli' !== php_sapi_name()) {
-                ExceptionHandler::register();
-            } elseif (!ini_get('log_errors') || ini_get('error_log')) {
-                ini_set('display_errors', 1);
-            }
-        }
     }
 
     public function __clone()

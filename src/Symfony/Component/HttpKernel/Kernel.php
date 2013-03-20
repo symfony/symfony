@@ -554,6 +554,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $fresh = true;
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
+            $container->compile();
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 
             $fresh = false;
@@ -644,7 +645,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         }
 
         $container->addCompilerPass(new AddClassesToCachePass($this));
-        $container->compile();
 
         return $container;
     }

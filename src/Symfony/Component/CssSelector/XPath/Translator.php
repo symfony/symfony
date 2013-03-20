@@ -22,8 +22,8 @@ use Symfony\Component\CssSelector\XPath\Extension;
 /**
  * XPath expression translator interface.
  *
- * This component is a port of the Python lxml library,
- * which is copyright Infrae and distributed under the BSD license.
+ * This component is a port of the Python cssselector library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
@@ -75,10 +75,10 @@ class Translator implements TranslatorInterface
 
         $this
             ->registerExtension(new Extension\NodeExtension($this))
-            ->registerExtension(new Extension\CombinationExtension($this))
-            ->registerExtension(new Extension\FunctionExtension($this))
-            ->registerExtension(new Extension\PseudoClassExtension($this))
-            ->registerExtension(new Extension\AttributeMatchingExtension($this))
+            ->registerExtension(new Extension\CombinationExtension())
+            ->registerExtension(new Extension\FunctionExtension())
+            ->registerExtension(new Extension\PseudoClassExtension())
+            ->registerExtension(new Extension\AttributeMatchingExtension())
         ;
     }
 
@@ -154,12 +154,12 @@ class Translator implements TranslatorInterface
      *
      * @return XPathExpr
      *
-     * @throws \InvalidArgumentException
+     * @throws ExpressionErrorException
      */
     public function nodeToXPath(NodeInterface $node)
     {
         if (!isset($this->nodeTranslators[$node->getNodeName()])) {
-            throw new \InvalidArgumentException();
+            throw new ExpressionErrorException('Node "'.$node->getNodeName().'" not supported.');
         }
 
         return call_user_func($this->nodeTranslators[$node->getNodeName()], $node);
@@ -172,12 +172,12 @@ class Translator implements TranslatorInterface
      *
      * @return XPathExpr
      *
-     * @throws \InvalidArgumentException
+     * @throws ExpressionErrorException
      */
     public function addCombination($combiner, NodeInterface $xpath, NodeInterface $combinedXpath)
     {
         if (!isset($this->combinationTranslators[$combiner])) {
-            throw new \InvalidArgumentException();
+            throw new ExpressionErrorException('Combiner "'.$combiner.'" not supported.');
         }
 
         return call_user_func($this->combinationTranslators[$combiner], $xpath, $combinedXpath);
@@ -189,12 +189,12 @@ class Translator implements TranslatorInterface
      *
      * @return XPathExpr
      *
-     * @throws \InvalidArgumentException
+     * @throws ExpressionErrorException
      */
     public function addFunction(XPathExpr $xpath, FunctionNode $function)
     {
         if (!isset($this->functionTranslators[$function->getName()])) {
-            throw new \InvalidArgumentException();
+            throw new ExpressionErrorException('Function "'.$function->getName().'" not supported.');
         }
 
         return call_user_func($this->functionTranslators[$function->getName()], $xpath, $function);
@@ -206,12 +206,12 @@ class Translator implements TranslatorInterface
      *
      * @return XPathExpr
      *
-     * @throws \InvalidArgumentException
+     * @throws ExpressionErrorException
      */
     public function addPseudoClass(XPathExpr $xpath, $pseudoClass)
     {
         if (!isset($this->pseudoClassTranslators[$pseudoClass])) {
-            throw new \InvalidArgumentException();
+            throw new ExpressionErrorException('Pseudo-class "'.$pseudoClass.'" not supported.');
         }
 
         return call_user_func($this->pseudoClassTranslators[$pseudoClass], $xpath);
@@ -223,14 +223,14 @@ class Translator implements TranslatorInterface
      * @param string    $attribute
      * @param string    $value
      *
-     * @throws \InvalidArgumentException
+     * @throws ExpressionErrorException
      *
      * @return XPathExpr
      */
     public function addAttributeMatching(XPathExpr $xpath, $operator, $attribute, $value)
     {
         if (!isset($this->attributeMatchingTranslators[$operator])) {
-            throw new \InvalidArgumentException();
+            throw new ExpressionErrorException('Attribute matcher operator "'.$operator.'" not supported.');
         }
 
         return call_user_func($this->attributeMatchingTranslators[$operator], $xpath, $attribute, $value);

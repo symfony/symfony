@@ -26,6 +26,7 @@ class HashParserTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('#id', 'Hash[Element[*]#id]'),
+            array('h1#main', 'Hash[Element[h1]#main]'),
         );
     }
 }

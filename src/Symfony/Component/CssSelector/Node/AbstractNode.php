@@ -12,10 +12,18 @@
 namespace Symfony\Component\CssSelector\Node;
 
 /**
+ * Abstract base node class.
+ *
+ * This component is a port of the Python cssselector library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
+ *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
 abstract class AbstractNode implements NodeInterface
 {
+    /**
+     * @var string
+     */
     private $nodeName;
 
     /**
@@ -28,15 +36,5 @@ abstract class AbstractNode implements NodeInterface
         }
 
         return $this->nodeName;
-    }
-
-    /**
-     * @param string $input
-     *
-     * @return string
-     */
-    protected function getLowerAscii($input)
-    {
-        return strtolower(iconv(mb_detect_encoding($input), 'us-ascii//TRANSLIT', $input));
     }
 }

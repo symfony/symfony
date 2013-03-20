@@ -20,8 +20,8 @@ use Symfony\Component\CssSelector\Parser\Token;
 /**
  * CSS selector hash parser shortcut.
  *
- * This component is a port of the Python lxml library,
- * which is copyright Infrae and distributed under the BSD license.
+ * This component is a port of the Python cssselector library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
@@ -33,7 +33,7 @@ class HashParser implements ParserInterface
     public function parse($source)
     {
         // matches "<selector>#<id>"
-        if (preg_match('~^[ \t\r\n\f]*([a-zA-Z]*)#([a-zA-Z0-9_-]+)[ \t\r\n\f]*$~', $source, $matches)) {
+        if (preg_match('~^[ \t\r\n\f]*([a-zA-Z][a-zA-Z0-9_-]*|\\*)#([a-zA-Z0-9_-]+)[ \t\r\n\f]*$~', $source, $matches)) {
             return array(new SelectorNode(new HashNode(new ElementNode($matches[1] ?: null), $matches[2])));
         }
 

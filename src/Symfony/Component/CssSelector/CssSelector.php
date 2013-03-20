@@ -21,8 +21,8 @@ use Symfony\Component\CssSelector\XPath\Translator;
  *
  * $xpath = CssSelector::toXpath('h1.foo');
  *
- * This component is a port of the Python lxml library,
- * which is copyright Infrae and distributed under the BSD license.
+ * This component is a port of the Python cssselector library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
@@ -48,16 +48,8 @@ class CssSelector
     {
         $translator = new Translator();
         // todo: add a way to switch on/off HTML extension without BC break
-        $translator->registerExtension(new HtmlExtension($translator));
+        $translator->registerExtension(new HtmlExtension());
 
-        try {
-            return $translator->cssToXPath($cssExpr, $prefix);
-        } catch (Exception\SyntaxErrorException $e) {
-            throw new Exception\ParseException('Syntax error: '.$e->getMessage(), 0, $e);
-        } catch (Exception\ExpressionErrorException $e) {
-            throw new Exception\ParseException('Expression error: '.$e->getMessage(), 0, $e);
-        } catch (Exception\InternalErrorException $e) {
-            throw new Exception\ParseException('Internal error: '.$e->getMessage(), 0, $e);
-        }
+        return $translator->cssToXPath($cssExpr, $prefix);
     }
 }

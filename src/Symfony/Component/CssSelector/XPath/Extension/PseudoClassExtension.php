@@ -17,8 +17,8 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 /**
  * XPath expression translator pseudo-class extension.
  *
- * This component is a port of the Python lxml library,
- * which is copyright Infrae and distributed under the BSD license.
+ * This component is a port of the Python cssselector library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */

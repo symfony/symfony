@@ -14,8 +14,8 @@ namespace Symfony\Component\CssSelector\Node;
 /**
  * Represents a "<selector>(::|:)<pseudoElement>" node.
  *
- * This component is a port of the Python lxml library,
- * which is copyright Infrae and distributed under the BSD license.
+ * This component is a port of the Python cssselector library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
@@ -38,7 +38,7 @@ class SelectorNode extends AbstractNode
     public function __construct(NodeInterface $tree, $pseudoElement = null)
     {
         $this->tree = $tree;
-        $this->pseudoElement = $pseudoElement ? $this->getLowerAscii($pseudoElement) : null;
+        $this->pseudoElement = $pseudoElement ? strtolower($pseudoElement) : null;
     }
 
     /**

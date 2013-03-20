@@ -18,13 +18,28 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 /**
  * XPath expression translator node extension.
  *
- * This component is a port of the Python lxml library,
- * which is copyright Infrae and distributed under the BSD license.
+ * This component is a port of the Python cssselector library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
 class NodeExtension extends AbstractExtension
 {
+    /**
+     * @var Translator
+     */
+    protected $translator;
+
+    /**
+     * Constructor.
+     *
+     * @param Translator $translator
+     */
+    public function __construct(Translator $translator)
+    {
+        $this->translator = $translator;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -171,5 +186,17 @@ class NodeExtension extends AbstractExtension
         }
 
         return $xpath;
+    }
+
+    /**
+     * Tests if given name is safe.
+     *
+     * @param string $name
+     *
+     * @return boolean
+     */
+    private function isSafeName($name)
+    {
+        return 0 < preg_match('~^[a-zA-Z_][a-zA-Z0-9_.-]*$~', $name);
     }
 }

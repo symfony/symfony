@@ -19,8 +19,8 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 /**
  * XPath expression translator HTML extension.
  *
- * This component is a port of the Python lxml library,
- * which is copyright Infrae and distributed under the BSD license.
+ * This component is a port of the Python cssselector library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
@@ -38,6 +38,8 @@ class HtmlExtension extends AbstractExtension
             'link'     => array($this, 'translateLink'),
             'disabled' => array($this, 'translateDisabled'),
             'enabled'  => array($this, 'translateEnabled'),
+            'selected' => array($this, 'translateSelected'),
+            'invalid'  => array($this, 'translateInvalid'),
         );
     }
 
@@ -59,8 +61,7 @@ class HtmlExtension extends AbstractExtension
     public function translateChecked(XPathExpr $xpath)
     {
         $xpath->addCondition(
-            "(@selected and name(.) = 'option')"
-            ." or (@checked "
+            '(@checked '
             ."and (name(.) = 'input' or name(.) = 'command')"
             ."and (@type = 'checkbox' or @type = 'radio'))"
         );
@@ -135,5 +136,25 @@ class HtmlExtension extends AbstractExtension
             $this->langAttribute,
             Translator::getXpathLiteral(strtolower($arguments[0]->getValue()).'-')
         ));
+    }
+
+    /**
+     * @param XPathExpr $xpath
+     *
+     * @return XPathExpr
+     */
+    public function translateSelected(XPathExpr $xpath)
+    {
+        $xpath->addCondition("(@selected and name(.) = 'option')");
+    }
+
+    /**
+     * @param XPathExpr $xpath
+     *
+     * @return XPathExpr
+     */
+    public function translateInvalid(XPathExpr $xpath)
+    {
+        // TODO: implement this method.
     }
 }

@@ -20,8 +20,8 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 /**
  * XPath expression translator function extension.
  *
- * This component is a port of the Python lxml library,
- * which is copyright Infrae and distributed under the BSD license.
+ * This component is a port of the Python cssselector library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
@@ -57,7 +57,7 @@ class FunctionExtension extends AbstractExtension
         try {
             list ($a, $b) = $function->getArguments();
         } catch (SyntaxErrorException $e) {
-            throw new ExpressionErrorException('Invalid series: '.implode(', ', $function->getArguments()));
+            throw new ExpressionErrorException('Invalid series: '.implode(', ', $function->getArguments()), 0, $e);
         }
 
         $xpath->addStarPrefix();

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\CssSelector\Parser;
 
-use Symfony\Component\CssSelector\Node\NodeInterface;
+use Symfony\Component\CssSelector\Node\SelectorNode;
 
 /**
  * CSS selector parser interface.
@@ -28,7 +28,7 @@ interface ParserInterface
      *
      * @param string $source
      *
-     * @return NodeInterface[]
+     * @return SelectorNode[]
      */
     public function parse($source);
 }

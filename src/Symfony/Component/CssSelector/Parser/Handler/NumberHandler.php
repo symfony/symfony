@@ -44,7 +44,7 @@ class NumberHandler implements HandlerInterface
      */
     public function handle(Reader $reader, TokenStream $stream)
     {
-        $match = $reader->findPattern($this->patterns->getHashPattern());
+        $match = $reader->findPattern($this->patterns->getNumberPattern());
 
         if (!$match) {
             return false;

@@ -86,16 +86,16 @@ class TokenizerPatterns
      */
     public function __construct()
     {
-        $this->unicodeEscapePattern = '\\([0-9a-f]{1,6})(?:\r\n|[ \n\r\t\f])?';
-        $this->simpleEscapePattern = '\\(.)';
-        $this->newLineEscapePattern = '\\(?:\n|\r\n|\r|\f)';
-        $this->escapePattern = $this->unicodeEscapePattern.'|\\[^\n\r\f0-9a-f]';
+        $this->unicodeEscapePattern = '\\\\([0-9a-f]{1,6})(?:\r\n|[ \n\r\t\f])?';
+        $this->simpleEscapePattern = '\\\\(.)';
+        $this->newLineEscapePattern = '\\\\(?:\n|\r\n|\r|\f)';
+        $this->escapePattern = $this->unicodeEscapePattern.'|\\\\[^\n\r\f0-9a-f]';
         $this->stringEscapePattern = $this->newLineEscapePattern.'|'.$this->escapePattern;
-        $this->nonAsciiPattern = '[^\0-\177]';
+        $this->nonAsciiPattern = '[^\x00-\x7F]';
         $this->nmCharPattern = '[_a-z0-9-]|'.$this->escapePattern.'|'.$this->nonAsciiPattern;
         $this->nmStartPattern = '[_a-z]|'.$this->escapePattern.'|'.$this->nonAsciiPattern;
         $this->identifierPattern = '(?:'.$this->nmStartPattern.')(?:'.$this->nmCharPattern.')*';
-        $this->hashPattern = '#(?:'.$this->nmCharPattern.')+';
+        $this->hashPattern = '#((?:'.$this->nmCharPattern.')+)';
         $this->numberPattern = '[+-]?(?:[0-9]*\.[0-9]+|[0-9]+)';
         $this->quotedStringPattern = '([^\n\r\f%s]|'.$this->stringEscapePattern.')*';
     }
@@ -121,7 +121,7 @@ class TokenizerPatterns
      */
     public function getUnicodeEscapePattern()
     {
-        return '~'.$this->unicodeEscapePattern.'~iU';
+        return '~'.$this->unicodeEscapePattern.'~i';
     }
 
     /**
@@ -137,7 +137,7 @@ class TokenizerPatterns
      */
     public function getHashPattern()
     {
-        return '~'.$this->hashPattern.'~iU';
+        return '~'.$this->hashPattern.'~i';
     }
 
     /**
@@ -155,6 +155,6 @@ class TokenizerPatterns
      */
     public function getQuotedStringPattern($quote)
     {
-        return '~'.sprintf($this->quotedStringPattern, $quote).'~iU';
+        return '~'.sprintf($this->quotedStringPattern, $quote).'~i';
     }
 }

@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\CssSelector\Parser;
 
+use Symfony\Component\CssSelector\Exception\InternalErrorException;
+use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
+
 /**
  * CSS selector token stream.
  *
@@ -19,53 +22,37 @@ namespace Symfony\Component\CssSelector\Parser;
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
-use Symfony\Component\CssSelector\Exception\InternalErrorException;
-use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
-
 class TokenStream
 {
     /**
      * @var Token[]
      */
-    private $tokens;
+    private $tokens = array();
 
     /**
      * @var boolean
      */
-    private $frozen;
+    private $frozen = false;
 
     /**
      * @var Token[]
      */
-    private $used;
+    private $used = array();
 
     /**
      * @var int
      */
-    private $cursor;
+    private $cursor = 0;
 
     /**
      * @var Token|null
      */
-    private $peeked;
+    private $peeked = null;
 
     /**
      * @var boolean
      */
-    private $peeking;
-
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->tokens = array();
-        $this->frozen = false;
-        $this->used = array();
-        $this->cursor = 0;
-        $this->peeked = null;
-        $this->peeking = false;
-    }
+    private $peeking = false;
 
     /**
      * Pushes a token.
@@ -109,7 +96,7 @@ class TokenStream
             return $this->peeked;
         }
 
-        if (isset($this->tokens[$this->cursor])) {
+        if (!isset($this->tokens[$this->cursor])) {
             throw new InternalErrorException('Unexpected token stream end.');
         }
 
@@ -152,7 +139,7 @@ class TokenStream
     {
         $next = $this->getNext();
 
-        if (!$next->isDelimiter()) {
+        if (!$next->isIdentifier()) {
             throw new SyntaxErrorException('Expected identifier, got '.$next);
         }
 

@@ -93,7 +93,9 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
             $content = $template;
         }
 
-        return new Response(sprintf('<hx:include src="%s">%s</hx:include>', $uri, $content));
+        $id = isset($options['id']) ? $options['id'] : null;
+
+        return new Response(sprintf('<hx:include src="%s" id="%s">%s</hx:include>', $uri, $id, $content));
     }
 
     private function templateExists($template)

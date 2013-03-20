@@ -297,7 +297,7 @@ class Parser implements ParserInterface
                     }
 
                     if (empty($arguments)) {
-                        throw SyntaxErrorException::unexpectedToken('at least an argument', $next);
+                        throw SyntaxErrorException::unexpectedToken('at least one argument', $next);
                     }
 
                     $result = new Node\FunctionNode($result, $identifier, $arguments);
@@ -411,7 +411,7 @@ class Parser implements ParserInterface
         $next = $stream->getNext();
 
         if (!$next->isDelimiter(array(']'))) {
-            throw SyntaxErrorException::unexpectedToken('"]",', $next);
+            throw SyntaxErrorException::unexpectedToken('"]"', $next);
         }
 
         return new Node\AttributeNode($selector, $namespace, $attribute, $operator, $value->getValue());

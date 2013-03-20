@@ -32,8 +32,8 @@ class ElementParser implements ParserInterface
     public function parse($source)
     {
         // matches "<element>"
-        if (preg_match('~^[ \t\r\n\f]*([a-zA-Z]+)[ \t\r\n\f]*$~', $source, $matches)) {
-            return array(new SelectorNode(new ElementNode($matches[1])));
+        if (preg_match('~^[ \t\r\n\f]*([a-zA-Z][a-zA-Z0-9_-]*|\\*)[ \t\r\n\f]*$~', $source, $matches)) {
+            return array(new SelectorNode(new ElementNode(null, $matches[1])));
         }
 
         return array();

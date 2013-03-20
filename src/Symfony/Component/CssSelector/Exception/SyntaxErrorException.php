@@ -31,7 +31,7 @@ class SyntaxErrorException extends \Exception
      */
     public static function unexpectedToken($expectedValue, Token $foundToken)
     {
-        return new self(sprintf('Unexpected token, "%s" expected but "%s" found.', $expectedValue, $foundToken));
+        return new self(sprintf('Expected %s, but %s found.', $expectedValue, $foundToken));
     }
 
     /**
@@ -43,6 +43,16 @@ class SyntaxErrorException extends \Exception
     public static function pseudoElementFound($pseudoElement, $unexpectedLocation)
     {
         return new self(sprintf('Unexpected pseudo-element "::%s" found %s.', $pseudoElement, $unexpectedLocation));
+    }
+
+    /**
+     * @param int $position
+     *
+     * @return SyntaxErrorException
+     */
+    public static function unclosedString($position)
+    {
+        return new self(sprintf('Unclosed/invalid string at %s.', $position));
     }
 
     /**

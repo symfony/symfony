@@ -12,6 +12,7 @@
 namespace Symfony\Component\CssSelector\Parser\Handler;
 
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
+use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
 use Symfony\Component\CssSelector\Parser\Reader;
 use Symfony\Component\CssSelector\Parser\Token;
 use Symfony\Component\CssSelector\Parser\TokenStream;
@@ -68,12 +69,12 @@ class StringHandler implements HandlerInterface
 
         // check unclosed strings
         if (strlen($match[0]) === $reader->getRemainingLength()) {
-            throw new InternalErrorException('Unclosed string at '.$reader->getPosition().'.');
+            throw SyntaxErrorException::unclosedString($reader->getPosition() - 1);
         }
 
         // check quotes pairs validity
         if ($quote !== $reader->getSubstring(1, strlen($match[0]))) {
-            throw new InternalErrorException('Invalid string at '.$reader->getPosition().'.');
+            throw SyntaxErrorException::unclosedString($reader->getPosition() - 1);
         }
 
         $string = $this->escaping->escapeUnicodeAndNewLine($match[0]);

@@ -29,7 +29,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             $parser->parse($source);
             $this->fail('Parser should throw a SyntaxErrorException.');
         } catch (SyntaxErrorException $e) {
-            $this->assertEquals($e->getMessage(), $message);
+            $this->assertEquals($message, $e->getMessage());
         }
     }
 
@@ -139,21 +139,21 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             array('p, , div', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, ',', 3))->getMessage()),
             array('div > ', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_FILE_END, '', 6))->getMessage()),
             array('  > div', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '>', 2))->getMessage()),
-            array('foo|#bar', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_HASH, 'bar', 4))->getMessage()),
+            array('foo|#bar', SyntaxErrorException::unexpectedToken('identifier or "*"', new Token(Token::TYPE_HASH, 'bar', 4))->getMessage()),
             array('#.foo', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '#', 0))->getMessage()),
-//            array('.#foo', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '', 1))->getMessage()),
-//            array(':#foo', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '', 1))->getMessage()),
-//            array('[*]', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '', 1))->getMessage()),
-//            array('[foo|]', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '', 1))->getMessage()),
-//            array('[#]', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '', 1))->getMessage()),
-//            array('[foo=#]', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '', 1))->getMessage()),
-//            array(':nth-child()', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '', 1))->getMessage()),
-//            array('[href]a', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '', 1))->getMessage()),
-//            array('[rel:stylesheet]', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '', 1))->getMessage()),
-//            array('[rel=stylesheet', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '', 1))->getMessage()),
-//            array(':lang(fr', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '', 1))->getMessage()),
-//            array(':contains("foo', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '', 1))->getMessage()),
-//            array('foo!', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '', 1))->getMessage()),
+            array('.#foo', SyntaxErrorException::unexpectedToken('identifier', new Token(Token::TYPE_HASH, 'foo', 1))->getMessage()),
+            array(':#foo', SyntaxErrorException::unexpectedToken('identifier', new Token(Token::TYPE_HASH, 'foo', 1))->getMessage()),
+            array('[*]', SyntaxErrorException::unexpectedToken('"|"', new Token(Token::TYPE_DELIMITER, ']', 2))->getMessage()),
+            array('[foo|]', SyntaxErrorException::unexpectedToken('identifier', new Token(Token::TYPE_DELIMITER, ']', 5))->getMessage()),
+            array('[#]', SyntaxErrorException::unexpectedToken('identifier or "*"', new Token(Token::TYPE_DELIMITER, '#', 1))->getMessage()),
+            array('[foo=#]', SyntaxErrorException::unexpectedToken('string or identifier', new Token(Token::TYPE_DELIMITER, '#', 5))->getMessage()),
+            array(':nth-child()', SyntaxErrorException::unexpectedToken('at least one argument', new Token(Token::TYPE_DELIMITER, ')', 11))->getMessage()),
+            array('[href]a', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_IDENTIFIER, 'a', 6))->getMessage()),
+            array('[rel:stylesheet]', SyntaxErrorException::unexpectedToken('operator', new Token(Token::TYPE_DELIMITER, ':', 4))->getMessage()),
+            array('[rel=stylesheet', SyntaxErrorException::unexpectedToken('"]"', new Token(Token::TYPE_FILE_END, '', 15))->getMessage()),
+            array(':lang(fr', SyntaxErrorException::unexpectedToken('an argument', new Token(Token::TYPE_FILE_END, '', 8))->getMessage()),
+            array(':contains("foo', SyntaxErrorException::unclosedString(10)->getMessage()),
+            array('foo!', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '!', 3))->getMessage()),
         );
     }
 

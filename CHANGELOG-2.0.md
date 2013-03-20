@@ -7,6 +7,22 @@ in 2.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.0.0...v2.0.1
 
+* 2.0.23 (2013-03-20)
+
+ * f8812b2: [Form] Fixed "label" option to accept the value "0"
+ * cb03074: [DomCrawler] lowered parsed protocol string (fixes #6986)
+ * 179cd58: [Process] Fix regression introduced in #6620 / 880da01c49a9255f5022ab7e18bca38c18f56370, fixes #7082
+ * 87f3db7: [EventDispathcer] Fix removeListener
+ * bd0ad92: [DependencyInjection] Allow frozen containers to be dumped to graphviz
+ * a12744e: Add dot character `.` to legal mime subtype regular expression
+ * ddf4678: [HttpFoundation] fixed the creation of sub-requests under some circumstancies (closes #6923, closes #6936)
+ * 74f2fcf: fixed a circular call (closes #6864)
+ * 4119caf: [DependencyInjection] fixed the creation of synthetic services in ContainerBuilder
+ * ce38069: [FrameworkBundle] fixed Client::doRequest that must call its parent method (closes #6737)
+ * 53ccc2c: [Yaml] fixed ignored text when parsing an inlined mapping or sequence (closes #6786)
+ * ab0385c: [Yaml] fixed #6773
+ * fea20b7: [Yaml] fixed #6770
+
 * 2.0.22 (2013-01-17)
 
  * 3c87e2e: Added Yaml\Dumper::setIndentation() method to allow a custom indentation level of nested nodes.

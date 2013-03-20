@@ -257,7 +257,7 @@ class TimeTypeTest extends LocalizedTestCase
             'with_seconds' => true,
         ));
 
-        $dateTime = new \DateTime('12:04:05');
+        $dateTime = new \DateTime('2013-01-01 12:04:05');
         $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
 
         $form->setData($dateTime->format('H:i:s'));

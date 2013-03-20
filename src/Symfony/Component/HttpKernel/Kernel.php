@@ -636,6 +636,26 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         }
 
         $container = $this->getContainerBuilder();
+        $container->addObjectResource($this);
+        $this->prepareContainer($container);
+
+        if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
+            $container->merge($cont);
+        }
+
+        $container->addCompilerPass(new AddClassesToCachePass($this));
+        $container->compile();
+
+        return $container;
+    }
+
+    /**
+     * Prepares the ContainerBuilder before it is compiled.
+     *
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     */
+    protected function prepareContainer(ContainerBuilder $container)
+    {
         $extensions = array();
         foreach ($this->bundles as $bundle) {
             if ($extension = $bundle->getContainerExtension()) {
@@ -651,19 +671,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $bundle->build($container);
         }
 
-        $container->addObjectResource($this);
-
         // ensure these extensions are implicitly loaded
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
-
-        if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
-            $container->merge($cont);
-        }
-
-        $container->addCompilerPass(new AddClassesToCachePass($this));
-        $container->compile();
-
-        return $container;
     }
 
     /**

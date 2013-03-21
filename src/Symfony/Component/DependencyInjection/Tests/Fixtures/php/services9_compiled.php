@@ -81,7 +81,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['depends_on_request'] = $instance = new \stdClass();
 
-        $instance->setRequest($this->get('request'));
+        $instance->setRequest($this->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
 
         return $instance;
     }
@@ -220,7 +220,7 @@ class ProjectServiceContainer extends Container
     protected function synchronizeRequestService()
     {
         if ($this->initialized('depends_on_request')) {
-            $this->get('depends_on_request')->setRequest($this->get('request'));
+            $this->get('depends_on_request')->setRequest($this->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
         }
     }
 

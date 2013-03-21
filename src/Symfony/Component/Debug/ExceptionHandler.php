@@ -57,13 +57,46 @@ class ExceptionHandler
     }
 
     /**
-     * Sends a Response for the given Exception.
+     * Sends a response for the given Exception.
+     *
+     * If you have the Symfony HttpFoundation component installed,
+     * this method will use it to create and send the response. If not,
+     * it will fallback to plain PHP functions.
      *
      * @param \Exception $exception An \Exception instance
+     *
+     * @see sendPhpResponse
+     * @see createResponse
      */
     public function handle(\Exception $exception)
     {
-        $this->createResponse($exception)->send();
+        if (class_exists('Symfony\Component\HttpFoundation\Response')) {
+            $this->createResponse($exception)->send();
+        } else {
+            $this->sendPhpResponse($exception);
+        }
+    }
+
+    /**
+     * Sends the error associated with the given Exception as a plain PHP response.
+     *
+     * This method uses plain PHP functions like header() and echo to output
+     * the response.
+     *
+     * @param \Exception|FlattenException $exception An \Exception instance
+     */
+    public function sendPhpResponse($exception)
+    {
+        if (!$exception instanceof FlattenException) {
+            $exception = FlattenException::create($exception);
+        }
+
+        header(sprintf('HTTP/1.0 %s', $exception->getStatusCode()));
+        foreach ($exception->getHeaders() as $name => $value) {
+            header($name.': '.$value, false);
+        }
+
+        echo $this->decorate($this->getContent($exception), $this->getStylesheet($exception));
     }
 
     /**

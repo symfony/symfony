@@ -18,9 +18,15 @@
     "require": {
         "php": ">=5.3.3"
     },
+    "require-dev": {
+        "symfony/http-kernel": "2.2.*",
+        "symfony/http-foundation": "2.2.*"
+    },
     "suggest": {
+        "symfony/http-foundation": "2.2.*",
+        "symfony/http-kernel": "2.2.*",
         "symfony/class-loader": "2.2.*"
-    }
+    },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Debug\\": "" }
     },

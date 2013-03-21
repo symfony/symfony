@@ -48,6 +48,8 @@ class PathPackage extends Package
             return $path;
         }
 
+        $path = $this->applyRegex($path);
+
         $url = $this->applyVersion($path);
 
         // apply the base path
@@ -56,6 +58,31 @@ class PathPackage extends Package
         }
 
         return $url;
+    }
+
+    /**
+     * Returns assets path which matches by $path simple regex.
+     * Applies to paths with .js or .css ending and * suffix.
+     *
+     * For example :
+     *     js/jquery*.js => js/jquery-1.8.0.js (jquery-1.8.0.js should be in the /web/js folder)
+     *
+     * @param string   $path      A path
+     * @param callback $globFunc Optional callback to use as php glob function, defaults to glob($pattern)
+     *
+     * @return string The regex matched path
+     */
+    public function applyRegex($path, $globFunc = null)
+    {
+        if (!is_callable($globFunc)) {
+            $globFunc = function ($pattern) { return glob($pattern); };
+        }
+
+        if (substr_count($path, '*') === 1 && preg_match("/.(js|css)$/i", $path) && $files = $globFunc($path)) {
+            $path = $files[0];
+        }
+
+        return $path;
     }
 
     /**

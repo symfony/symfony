@@ -41,7 +41,6 @@ class Debug
         static::$enabled = true;
 
         error_reporting(-1);
-        ini_set('display_errors', 0);
 
         ErrorHandler::register($errorReportingLevel);
         if ('cli' !== php_sapi_name()) {

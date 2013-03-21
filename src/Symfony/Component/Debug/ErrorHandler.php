@@ -47,7 +47,7 @@ class ErrorHandler
     private static $logger;
 
     /**
-     * Register the error handler.
+     * Registers the error handler.
      *
      * @param integer $level The level at which the conversion to Exception is done (null to use the error_reporting() value and 0 to disable)
      *

@@ -41,7 +41,7 @@ class ExceptionHandler
     }
 
     /**
-     * Register the exception handler.
+     * Registers the exception handler.
      *
      * @param Boolean $debug
      *

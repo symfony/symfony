@@ -20,8 +20,26 @@ use Symfony\Component\ClassLoader\DebugClassLoader;
  */
 class Debug
 {
+    private static $enabled = false;
+
+    /**
+     * Enables the debug tools.
+     *
+     * This method registers an error handler and an exception handler.
+     *
+     * If the Symfony ClassLoader component is available, a special
+     * class loader is also registered.
+     *
+     * @param integer $errorReportingLevel The level of error reporting you wan
+     */
     public static function enable($errorReportingLevel = null)
     {
+        if (static::$enabled) {
+            return;
+        }
+
+        static::$enabled = true;
+
         error_reporting(-1);
         ini_set('display_errors', 0);
 

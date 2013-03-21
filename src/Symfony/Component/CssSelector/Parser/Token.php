@@ -151,6 +151,10 @@ class Token
      */
     public function __toString()
     {
-        return sprintf('<%s "%s" at %s>', $this->type, $this->value, $this->position);
+        if ($this->value) {
+            return sprintf('<%s "%s" at %s>', $this->type, $this->value, $this->position);
+        }
+
+        return sprintf('<%s at %s>', $this->type, $this->position);
     }
 }

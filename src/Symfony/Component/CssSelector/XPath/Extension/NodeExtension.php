@@ -46,6 +46,7 @@ class NodeExtension extends AbstractExtension
     public function getNodeTranslators()
     {
         return array(
+            'Selector'         => array($this, 'translateSelector'),
             'CombinedSelector' => array($this, 'translateCombinedSelector'),
             'Negation'         => array($this, 'translateNegation'),
             'Function'         => array($this, 'translateFunction'),
@@ -55,6 +56,16 @@ class NodeExtension extends AbstractExtension
             'Hash'             => array($this, 'translateHash'),
             'Element'          => array($this, 'translateElement'),
         );
+    }
+
+    /**
+     * @param Node\SelectorNode $node
+     *
+     * @return XPathExpr
+     */
+    public function translateSelector(Node\SelectorNode $node)
+    {
+        return $this->translator->nodeToXPath($node->getTree());
     }
 
     /**

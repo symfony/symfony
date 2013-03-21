@@ -97,9 +97,20 @@ class Translator implements TranslatorInterface
             return '"'.$element.'"';
         }
 
-        return sprintf('concat(%s)', implode(',', function ($part) {
-            return Translator::getXpathLiteral($part);
-        }, preg_split("('+)", $element)));
+        $string = $element;
+        $parts = array();
+        while (true) {
+            if (false !== $pos = strpos($string, "'")) {
+                $parts[] = sprintf("'%s'", substr($string, 0, $pos));
+                $parts[] = "\"'\"";
+                $string = substr($string, $pos + 1);
+            } else {
+                $parts[] = "'$string'";
+                break;
+            }
+        }
+
+        return sprintf('concat(%s)', implode($parts, ', '));
     }
 
     /**
@@ -180,7 +191,7 @@ class Translator implements TranslatorInterface
             throw new ExpressionErrorException('Combiner "'.$combiner.'" not supported.');
         }
 
-        return call_user_func($this->combinationTranslators[$combiner], $xpath, $combinedXpath);
+        return call_user_func($this->combinationTranslators[$combiner], $this->nodeToXPath($xpath), $this->nodeToXPath($combinedXpath));
     }
 
     /**

@@ -55,7 +55,7 @@ class FunctionExtension extends AbstractExtension
     public function translateNthChild(XPathExpr $xpath, FunctionNode $function, $last = false, $addNameTest = true)
     {
         try {
-            list ($a, $b) = $function->getArguments();
+            $arguments = $function->getArguments();
         } catch (SyntaxErrorException $e) {
             throw new ExpressionErrorException('Invalid series: '.implode(', ', $function->getArguments()), 0, $e);
         }
@@ -64,6 +64,9 @@ class FunctionExtension extends AbstractExtension
         if ($addNameTest) {
             $xpath->addNameTest();
         }
+
+        $a = isset($arguments[0]) ? $arguments[0]->getValue() : 0;
+        $b = isset($arguments[1]) ? $arguments[1]->getValue() : 0;
 
         if (0 === $a) {
             return $xpath->addCondition('position() = '.($last ? 'last() - '.$b : $b));

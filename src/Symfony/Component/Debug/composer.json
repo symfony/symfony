@@ -18,6 +18,9 @@
     "require": {
         "php": ">=5.3.3"
     },
+    "suggest": {
+        "symfony/class-loader": "2.2.*"
+    }
     "autoload": {
         "psr-0": { "Symfony\\Component\\Debug\\": "" }
     },

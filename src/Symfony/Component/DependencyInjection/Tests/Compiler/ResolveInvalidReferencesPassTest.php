@@ -73,6 +73,7 @@ class ResolveInvalidReferencesPassTest extends \PHPUnit_Framework_TestCase
         $this->process($container);
 
         $this->assertFalse($def->getArgument(0)->isStrict());
+        $this->assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $def->getArgument(0)->getInvalidBehavior());
     }
 
     protected function process(ContainerBuilder $container)

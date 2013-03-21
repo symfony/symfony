@@ -32,51 +32,49 @@ class Translator implements TranslatorInterface
     /**
      * @var ParserInterface
      */
-    private $parser;
+    private $mainParser;
+
+    /**
+     * @var ParserInterface[]
+     */
+    private $shortcutParsers = array();
 
     /**
      * @var Extension\ExtensionInterface
      */
-    private $extensions;
+    private $extensions = array();
 
     /**
      * @var array
      */
-    private $nodeTranslators;
+    private $nodeTranslators = array();
 
     /**
      * @var array
      */
-    private $combinationTranslators;
+    private $combinationTranslators = array();
 
     /**
      * @var array
      */
-    private $functionTranslators;
+    private $functionTranslators = array();
 
     /**
      * @var array
      */
-    private $pseudoClassTranslators;
+    private $pseudoClassTranslators = array();
 
     /**
      * @var array
      */
-    private $attributeMatchingTranslators;
+    private $attributeMatchingTranslators = array();
 
     /**
      * Constructor.
-     *
-     * @param ParserInterface|null $parser
      */
     public function __construct(ParserInterface $parser = null)
     {
-        $this->parser = $parser ?: new Parser();
-        $this->nodeTranslators = array();
-        $this->combinationTranslators = array();
-        $this->functionTranslators = array();
-        $this->pseudoClassTranslators = array();
-        $this->attributeMatchingTranslators = array();
+        $this->mainParser = $parser ?: new Parser();
 
         $this
             ->registerExtension(new Extension\NodeExtension($this))
@@ -123,7 +121,7 @@ class Translator implements TranslatorInterface
      */
     public function cssToXPath($cssExpr, $prefix = 'descendant-or-self::')
     {
-        $selectors = $this->parser->parse($cssExpr);
+        $selectors = $this->parseSelectors($cssExpr);
 
         /** @var SelectorNode $selector */
         foreach ($selectors as $selector) {
@@ -181,6 +179,20 @@ class Translator implements TranslatorInterface
         }
 
         return $this->extensions[$name];
+    }
+
+    /**
+     * Registers a shortcut parser.
+     *
+     * @param ParserInterface $shortcut
+     *
+     * @return Translator
+     */
+    public function registerParserShortcut(ParserInterface $shortcut)
+    {
+        $this->shortcutParsers[] = $shortcut;
+
+        return $this;
     }
 
     /**
@@ -268,5 +280,23 @@ class Translator implements TranslatorInterface
         }
 
         return call_user_func($this->attributeMatchingTranslators[$operator], $xpath, $attribute, $value);
+    }
+
+    /**
+     * @param string $css
+     *
+     * @return SelectorNode[]
+     */
+    private function parseSelectors($css)
+    {
+        foreach ($this->shortcutParsers as $shortcut) {
+            $tokens = $shortcut->parse($css);
+
+            if (!empty($tokens)) {
+                return $tokens;
+            }
+        }
+
+        return $this->mainParser->parse($css);
     }
 }

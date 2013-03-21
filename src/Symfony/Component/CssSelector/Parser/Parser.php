@@ -32,29 +32,13 @@ class Parser implements ParserInterface
     private $tokenizer;
 
     /**
-     * @var ParserInterface[]
-     */
-    private $shortcuts;
-
-    /**
      * Constructor.
-     */
-    public function __construct()
-    {
-        $this->tokenizer = new Tokenizer();
-        $this->shortcuts = array();
-    }
-
-    /**
-     * @param ParserInterface $shortcut
      *
-     * @return Parser
+     * @param null|Tokenizer $tokenizer
      */
-    public function registerShortcut(ParserInterface $shortcut)
+    public function __construct(Tokenizer $tokenizer = null)
     {
-        $this->shortcuts[] = $shortcut;
-
-        return $this;
+        $this->tokenizer = $tokenizer ?: new Tokenizer();
     }
 
     /**
@@ -62,14 +46,6 @@ class Parser implements ParserInterface
      */
     public function parse($source)
     {
-        foreach ($this->shortcuts as $shortcut) {
-            $tokens = $shortcut->parse($source);
-
-            if (!empty($tokens)) {
-                return $tokens;
-            }
-        }
-
         $reader = new Reader($source);
         $stream = $this->tokenizer->tokenize($reader);
 
@@ -404,7 +380,7 @@ class Parser implements ParserInterface
         $value = $stream->getNext();
 
         if (!($value->isIdentifier() || $value->isString())) {
-            throw SyntaxErrorException::unexpectedToken('string or identifier', $next);
+            throw SyntaxErrorException::unexpectedToken('string or identifier', $value);
         }
 
         $stream->skipWhitespace();

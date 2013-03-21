@@ -197,7 +197,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array('ol:first-of-type', array('first-ol')),
             array('ol:nth-child(1)', array()),
             array('ol:nth-of-type(2)', array('second-ol')),
-            // FIXME: like above', '(1) or (2)?
+            // FIXME: like above (1) or (2)?
             array('ol:nth-last-of-type(1)', array('first-ol')),
             array('span:only-child', array('foobar-span')),
             array('li div:only-child', array('li-div')),

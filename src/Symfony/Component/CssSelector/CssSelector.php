@@ -12,6 +12,10 @@
 namespace Symfony\Component\CssSelector;
 
 use Symfony\Component\CssSelector\Exception;
+use Symfony\Component\CssSelector\Parser\Shortcut\ClassParser;
+use Symfony\Component\CssSelector\Parser\Shortcut\ElementParser;
+use Symfony\Component\CssSelector\Parser\Shortcut\EmptyStringParser;
+use Symfony\Component\CssSelector\Parser\Shortcut\HashParser;
 use Symfony\Component\CssSelector\XPath\Extension\HtmlExtension;
 use Symfony\Component\CssSelector\XPath\Translator;
 
@@ -35,20 +39,28 @@ class CssSelector
      * Optionally, a prefix can be added to the resulting XPath
      * expression with the $prefix parameter.
      *
-     * @param mixed  $cssExpr The CSS expression.
-     * @param string $prefix  An optional prefix for the XPath expression.
+     * @param mixed   $cssExpr The CSS expression.
+     * @param string  $prefix  An optional prefix for the XPath expression.
+     * @param boolean $html    Enables HTML extension.
      *
      * @return string
      *
-     * @throws Exception\ParseException When got null for xpath expression
-     *
      * @api
      */
-    public static function toXPath($cssExpr, $prefix = 'descendant-or-self::')
+    public static function toXPath($cssExpr, $prefix = 'descendant-or-self::', $html = true)
     {
         $translator = new Translator();
-        // todo: add a way to switch on/off HTML extension without BC break
-        $translator->registerExtension(new HtmlExtension());
+
+        if ($html) {
+            $translator->registerExtension(new HtmlExtension($translator));
+        }
+
+        $translator
+            ->registerParserShortcut(new EmptyStringParser())
+            ->registerParserShortcut(new ElementParser())
+            ->registerParserShortcut(new ClassParser())
+            ->registerParserShortcut(new HashParser())
+        ;
 
         return $translator->cssToXPath($cssExpr, $prefix);
     }

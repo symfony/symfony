@@ -87,7 +87,7 @@ class XPathExpr
     public function addNameTest()
     {
         if ('*' !== $this->element) {
-            $this->addCondition('name()='.Translator::getXpathLiteral($this->element));
+            $this->addCondition('name() = '.Translator::getXpathLiteral($this->element));
             $this->element = '*';
         }
 
@@ -133,7 +133,7 @@ class XPathExpr
     public function __toString()
     {
         $path = $this->path.$this->element;
-        $condition = $this->condition ? '['.$this->condition.']' : '';
+        $condition = null === $this->condition || '' === $this->condition ? '' : '['.$this->condition.']';
 
         return $path.$condition;
     }

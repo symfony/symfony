@@ -82,4 +82,12 @@ class CombinationExtension extends AbstractExtension
     {
         return $xpath->join('/following-sibling::', $combinedXpath);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'combination';
+    }
 }

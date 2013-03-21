@@ -151,4 +151,12 @@ class PseudoClassExtension extends AbstractExtension
     {
         return $xpath->addCondition('not(*) and not(string-length())');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'pseudo-class';
+    }
 }

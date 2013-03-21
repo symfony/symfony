@@ -33,8 +33,8 @@ class HashParser implements ParserInterface
     public function parse($source)
     {
         // matches "<selector>#<id>"
-        if (preg_match('~^[ \t\r\n\f]*([a-zA-Z][a-zA-Z0-9_-]*|\\*)#([a-zA-Z0-9_-]+)[ \t\r\n\f]*$~', $source, $matches)) {
-            return array(new SelectorNode(new HashNode(new ElementNode($matches[1] ?: null), $matches[2])));
+        if (preg_match('~^[ \t\r\n\f]*([a-zA-Z][a-zA-Z0-9_-]*|\\*)?#([a-zA-Z0-9_-]+)[ \t\r\n\f]*$~', $source, $matches)) {
+            return array(new SelectorNode(new HashNode(new ElementNode(null, $matches[1] ?: null), $matches[2])));
         }
 
         return array();

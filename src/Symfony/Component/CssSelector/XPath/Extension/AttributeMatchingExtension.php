@@ -162,4 +162,12 @@ class AttributeMatchingExtension extends AbstractExtension
             Translator::getXpathLiteral($value)
         ));
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'attribute-matching';
+    }
 }

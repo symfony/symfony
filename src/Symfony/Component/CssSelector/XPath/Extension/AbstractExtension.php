@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\CssSelector\XPath\Extension;
 
-use Symfony\Component\CssSelector\XPath\Translator;
-
 /**
  * XPath expression translator abstract extension.
  *
@@ -21,7 +19,7 @@ use Symfony\Component\CssSelector\XPath\Translator;
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
-class AbstractExtension implements ExtensionInterface
+abstract class AbstractExtension implements ExtensionInterface
 {
     /**
      * {@inheritdoc}

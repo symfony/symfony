@@ -26,7 +26,18 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  */
 class HtmlExtension extends AbstractExtension
 {
-    private $langAttribute = 'lang';
+    /**
+     * Constructor.
+     *
+     * @param Translator $translator
+     */
+    public function __construct(Translator $translator)
+    {
+        $translator
+            ->getExtension('node')
+            ->setFlag(NodeExtension::ELEMENT_NAME_IN_LOWER_CASE, true)
+            ->setFlag(NodeExtension::ATTRIBUTE_NAME_IN_LOWER_CASE, true);
+    }
 
     /**
      * {@inheritdoc}
@@ -40,6 +51,8 @@ class HtmlExtension extends AbstractExtension
             'enabled'  => array($this, 'translateEnabled'),
             'selected' => array($this, 'translateSelected'),
             'invalid'  => array($this, 'translateInvalid'),
+            'hover'    => array($this, 'translateHover'),
+            'visited'  => array($this, 'translateVisited'),
         );
     }
 
@@ -60,7 +73,7 @@ class HtmlExtension extends AbstractExtension
      */
     public function translateChecked(XPathExpr $xpath)
     {
-        $xpath->addCondition(
+        return $xpath->addCondition(
             '(@checked '
             ."and (name(.) = 'input' or name(.) = 'command')"
             ."and (@type = 'checkbox' or @type = 'radio'))"
@@ -74,7 +87,7 @@ class HtmlExtension extends AbstractExtension
      */
     public function translateLink(XPathExpr $xpath)
     {
-        $xpath->addCondition("@href and (name(.) = 'a' or name(.) = 'link' or name(.) = 'area')");
+        return $xpath->addCondition("@href and (name(.) = 'a' or name(.) = 'link' or name(.) = 'area')");
     }
 
     /**
@@ -84,29 +97,66 @@ class HtmlExtension extends AbstractExtension
      */
     public function translateDisabled(XPathExpr $xpath)
     {
-        $xpath->addCondition(
+        return $xpath->addCondition(
             "("
                 ."@disabled and"
-                    ."("
-                        ."(name(.) = 'input' and @type != 'hidden')"
-                        ." or name(.) = 'button'"
-                        ." or name(.) = 'select'"
-                        ." or name(.) = 'textarea'"
-                        ." or name(.) = 'command'"
-                        ." or name(.) = 'fieldset'"
-                        ." or name(.) = 'optgroup'"
-                        ." or name(.) = 'option'"
-                    .")"
-                .") or ("
+                ."("
                     ."(name(.) = 'input' and @type != 'hidden')"
                     ." or name(.) = 'button'"
                     ." or name(.) = 'select'"
                     ." or name(.) = 'textarea'"
+                    ." or name(.) = 'command'"
+                    ." or name(.) = 'fieldset'"
+                    ." or name(.) = 'optgroup'"
+                    ." or name(.) = 'option'"
                 .")"
-                ." and ancestor::fieldset[@disabled])"
+            .") or ("
+                ."(name(.) = 'input' and @type != 'hidden')"
+                ." or name(.) = 'button'"
+                ." or name(.) = 'select'"
+                ." or name(.) = 'textarea'"
             .")"
+            ." and ancestor::fieldset[@disabled]"
         );
         // todo: in the second half, add "and is not a descendant of that fieldset element's first legend element child, if any."
+    }
+
+    /**
+     * @param XPathExpr $xpath
+     *
+     * @return XPathExpr
+     */
+    public function translateEnabled(XPathExpr $xpath)
+    {
+        return $xpath->addCondition(
+            '('
+                .'@href and ('
+                    ."name(.) = 'a'"
+                    ." or name(.) = 'link'"
+                    ." or name(.) = 'area'"
+                .')'
+            .') or ('
+                .'('
+                    ."name(.) = 'command'"
+                    ." or name(.) = 'fieldset'"
+                    ." or name(.) = 'optgroup'"
+                .')'
+                .' and not(@disabled)'
+            .') or ('
+                .'('
+                    ."(name(.) = 'input' and @type != 'hidden')"
+                    ." or name(.) = 'button'"
+                    ." or name(.) = 'select'"
+                    ." or name(.) = 'textarea'"
+                    ." or name(.) = 'keygen'"
+                .')'
+                ." and not (@disabled or ancestor::fieldset[@disabled])"
+            .') or ('
+                ."name(.) = 'option' and not("
+                    ."@disabled or ancestor::optgroup[@disabled]"
+                .')'
+            .')'
+        );
     }
 
     /**
@@ -133,7 +183,7 @@ class HtmlExtension extends AbstractExtension
             'ancestor-or-self::*[@lang][1][starts-with(concat('
             ."translate(@%s, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '-')"
             .', %s)]',
-            $this->langAttribute,
+            'lang',
             Translator::getXpathLiteral(strtolower($arguments[0]->getValue()).'-')
         ));
     }
@@ -145,7 +195,7 @@ class HtmlExtension extends AbstractExtension
      */
     public function translateSelected(XPathExpr $xpath)
     {
-        $xpath->addCondition("(@selected and name(.) = 'option')");
+        return $xpath->addCondition("(@selected and name(.) = 'option')");
     }
 
     /**
@@ -155,6 +205,34 @@ class HtmlExtension extends AbstractExtension
      */
     public function translateInvalid(XPathExpr $xpath)
     {
-        // TODO: implement this method.
+        return $xpath->addCondition('0');
+    }
+
+    /**
+     * @param XPathExpr $xpath
+     *
+     * @return XPathExpr
+     */
+    public function translateHover(XPathExpr $xpath)
+    {
+        return $xpath->addCondition('0');
+    }
+
+    /**
+     * @param XPathExpr $xpath
+     *
+     * @return XPathExpr
+     */
+    public function translateVisited(XPathExpr $xpath)
+    {
+        return $xpath->addCondition('0');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'html';
     }
 }

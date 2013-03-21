@@ -46,7 +46,7 @@ class FunctionNode extends AbstractNode
     public function __construct(NodeInterface $selector, $name, array $arguments = array())
     {
         $this->selector = $selector;
-        $this->name = $name;
+        $this->name = strtolower($name);
         $this->arguments = $arguments;
     }
 

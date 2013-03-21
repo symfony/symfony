@@ -55,4 +55,11 @@ interface ExtensionInterface
      * @return callable[]
      */
     public function getAttributeMatchingTranslators();
+
+    /**
+     * Returns extension name.
+     *
+     * @return string
+     */
+    public function getName();
 }

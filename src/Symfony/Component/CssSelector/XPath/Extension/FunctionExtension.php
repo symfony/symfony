@@ -14,6 +14,7 @@ namespace Symfony\Component\CssSelector\XPath\Extension;
 use Symfony\Component\CssSelector\Exception\ExpressionErrorException;
 use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
 use Symfony\Component\CssSelector\Node\FunctionNode;
+use Symfony\Component\CssSelector\Parser\Parser;
 use Symfony\Component\CssSelector\XPath\Translator;
 use Symfony\Component\CssSelector\XPath\XPathExpr;
 
@@ -33,12 +34,12 @@ class FunctionExtension extends AbstractExtension
     public function getFunctionTranslators()
     {
         return array(
-            'nth-child'              => array($this, 'translateNthChild'),
-            'nth-last-child'         => array($this, 'translateNthLastChild'),
-            'nth-of-type'            => array($this, 'translateNthOfType'),
-            'nth-last-child-of-type' => array($this, 'translateNthLastChildOfType'),
-            'contains'               => array($this, 'translateContains'),
-            'lang'                   => array($this, 'translateLang'),
+            'nth-child'        => array($this, 'translateNthChild'),
+            'nth-last-child'   => array($this, 'translateNthLastChild'),
+            'nth-of-type'      => array($this, 'translateNthOfType'),
+            'nth-last-of-type' => array($this, 'translateNthLastOfType'),
+            'contains'         => array($this, 'translateContains'),
+            'lang'             => array($this, 'translateLang'),
         );
     }
 
@@ -55,7 +56,7 @@ class FunctionExtension extends AbstractExtension
     public function translateNthChild(XPathExpr $xpath, FunctionNode $function, $last = false, $addNameTest = true)
     {
         try {
-            $arguments = $function->getArguments();
+            list($a, $b) = Parser::parseSeries($function->getArguments());
         } catch (SyntaxErrorException $e) {
             throw new ExpressionErrorException('Invalid series: '.implode(', ', $function->getArguments()), 0, $e);
         }
@@ -64,9 +65,6 @@ class FunctionExtension extends AbstractExtension
         if ($addNameTest) {
             $xpath->addNameTest();
         }
-
-        $a = isset($arguments[0]) ? $arguments[0]->getValue() : 0;
-        $b = isset($arguments[1]) ? $arguments[1]->getValue() : 0;
 
         if (0 === $a) {
             return $xpath->addCondition('position() = '.($last ? 'last() - '.$b : $b));
@@ -129,7 +127,7 @@ class FunctionExtension extends AbstractExtension
      *
      * @throws ExpressionErrorException
      */
-    public function translateNthLastChildOfType(XPathExpr $xpath, FunctionNode $function)
+    public function translateNthLastOfType(XPathExpr $xpath, FunctionNode $function)
     {
         if ('*' === $xpath->getElement()) {
             throw new ExpressionErrorException('"*:nth-of-type()" is not implemented.');
@@ -188,5 +186,13 @@ class FunctionExtension extends AbstractExtension
             'lang(%s)',
             Translator::getXpathLiteral($arguments[0]->getValue())
         ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'function';
     }
 }

@@ -25,19 +25,59 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  */
 class NodeExtension extends AbstractExtension
 {
+    const ELEMENT_NAME_IN_LOWER_CASE    = 1;
+    const ATTRIBUTE_NAME_IN_LOWER_CASE  = 2;
+    const ATTRIBUTE_VALUE_IN_LOWER_CASE = 4;
+
     /**
      * @var Translator
      */
-    protected $translator;
+    private $translator;
+
+    /**
+     * @var int
+     */
+    private $flags;
 
     /**
      * Constructor.
      *
      * @param Translator $translator
+     * @param int        $flags
      */
-    public function __construct(Translator $translator)
+    public function __construct(Translator $translator, $flags = 0)
     {
         $this->translator = $translator;
+        $this->flags = $flags;
+    }
+
+    /**
+     * @param int     $flag
+     * @param boolean $on
+     *
+     * @return NodeExtension
+     */
+    public function setFlag($flag, $on)
+    {
+        if ($on && !$this->hasFlag($flag)) {
+            $this->flags += $flag;
+        }
+
+        if (!$on && $this->hasFlag($flag)) {
+            $this->flags -= $flag;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param int $flag
+     *
+     * @return boolean
+     */
+    public function hasFlag($flag)
+    {
+        return $this->flags & $flag;
     }
 
     /**
@@ -127,9 +167,12 @@ class NodeExtension extends AbstractExtension
      */
     public function translateAttribute(Node\AttributeNode $node)
     {
-        // todo: lowercase name in html
         $name = $node->getAttribute();
         $safe = $this->isSafeName($name);
+
+        if ($this->hasFlag(self::ATTRIBUTE_NAME_IN_LOWER_CASE)) {
+            $name = strtolower($name);
+        }
 
         if ($node->getNamespace()) {
             $name = sprintf('%s:%s', $node->getNamespace(), $name);
@@ -137,9 +180,12 @@ class NodeExtension extends AbstractExtension
         }
 
         $attribute = $safe ? '@'.$name : sprintf('attribute::*[name() = %s]', Translator::getXpathLiteral($name));
-        // todo: lowercase value in html
         $value = $node->getValue();
         $xpath = $this->translator->nodeToXPath($node->getSelector());
+
+        if ($this->hasFlag(self::ATTRIBUTE_VALUE_IN_LOWER_CASE)) {
+            $value = strtolower($value);
+        }
 
         return $this->translator->addAttributeMatching($xpath, $node->getOperator(), $attribute, $value);
     }
@@ -177,8 +223,11 @@ class NodeExtension extends AbstractExtension
     {
         $element = $node->getElement();
 
+        if ($this->hasFlag(self::ELEMENT_NAME_IN_LOWER_CASE)) {
+            $element = strtolower($element);
+        }
+
         if ($element) {
-            // todo: lowercase in html
             $safe = $this->isSafeName($element);
         } else {
             $element = '*';
@@ -197,6 +246,14 @@ class NodeExtension extends AbstractExtension
         }
 
         return $xpath;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'node';
     }
 
     /**

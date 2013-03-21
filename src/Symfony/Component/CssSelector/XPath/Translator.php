@@ -35,6 +35,11 @@ class Translator implements TranslatorInterface
     private $parser;
 
     /**
+     * @var Extension\ExtensionInterface
+     */
+    private $extensions;
+
+    /**
      * @var array
      */
     private $nodeTranslators;
@@ -151,6 +156,8 @@ class Translator implements TranslatorInterface
      */
     public function registerExtension(Extension\ExtensionInterface $extension)
     {
+        $this->extensions[$extension->getName()] = $extension;
+
         $this->nodeTranslators = array_merge($this->nodeTranslators, $extension->getNodeTranslators());
         $this->combinationTranslators = array_merge($this->combinationTranslators, $extension->getCombinationTranslators());
         $this->functionTranslators = array_merge($this->functionTranslators, $extension->getFunctionTranslators());
@@ -158,6 +165,22 @@ class Translator implements TranslatorInterface
         $this->attributeMatchingTranslators = array_merge($this->attributeMatchingTranslators, $extension->getAttributeMatchingTranslators());
 
         return $this;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Extension\ExtensionInterface
+     *
+     * @throws ExpressionErrorException
+     */
+    public function getExtension($name)
+    {
+        if (!isset($this->extensions[$name])) {
+            throw new ExpressionErrorException('Extension "'.$name.'" not registered.');
+        }
+
+        return $this->extensions[$name];
     }
 
     /**

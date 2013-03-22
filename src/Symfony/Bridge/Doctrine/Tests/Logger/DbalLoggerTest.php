@@ -87,7 +87,7 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
         $dbalLogger
             ->expects($this->once())
             ->method('log')
-            ->with('SQL', array('short' => $shortString, 'long' => substr($longString, DbalLogger::MAX_STRING_LENGTH - 6).' [...]'))
+            ->with('SQL', array('short' => $shortString, 'long' => substr($longString, 0, DbalLogger::MAX_STRING_LENGTH - 6).' [...]'))
         ;
 
         $dbalLogger->startQuery('SQL', array(

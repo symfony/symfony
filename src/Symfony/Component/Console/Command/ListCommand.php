@@ -15,15 +15,13 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputDefinition;
 
 /**
  * ListCommand displays the list of all available commands for the application.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ListCommand extends Command
+class ListCommand extends AbstractDescriptorCommand
 {
     /**
      * {@inheritdoc}
@@ -32,7 +30,6 @@ class ListCommand extends Command
     {
         $this
             ->setName('list')
-            ->setDefinition($this->createDefinition())
             ->setDescription('Lists commands')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lists all commands:
@@ -58,6 +55,17 @@ EOF
     /**
      * {@inheritdoc}
      */
+    protected function createDefinition()
+    {
+        $definition = parent::createDefinition();
+        $definition->addArgument(new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'));
+
+        return $definition;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getNativeDefinition()
     {
         return $this->createDefinition();
@@ -68,19 +76,6 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($input->getOption('xml')) {
-            $output->writeln($this->getApplication()->asXml($input->getArgument('namespace')), OutputInterface::OUTPUT_RAW);
-        } else {
-            $output->writeln($this->getApplication()->asText($input->getArgument('namespace'), $input->getOption('raw')));
-        }
-    }
-
-    private function createDefinition()
-    {
-        return new InputDefinition(array(
-            new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
-            new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
-            new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
-        ));
+        $this->getHelper('descriptor')->describe($output, $this->getApplication(), $input->getArgument('format'), $input->getOption('raw'));
     }
 }

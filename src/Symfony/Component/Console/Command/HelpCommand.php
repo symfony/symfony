@@ -15,14 +15,13 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
 
 /**
  * HelpCommand displays the help for a given command.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HelpCommand extends Command
+class HelpCommand extends AbstractDescriptorCommand
 {
     private $command;
 
@@ -35,10 +34,6 @@ class HelpCommand extends Command
 
         $this
             ->setName('help')
-            ->setDefinition(array(
-                new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
-                new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
-            ))
             ->setDescription('Displays help for a command')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command displays help for a given command:
@@ -68,17 +63,24 @@ EOF
     /**
      * {@inheritdoc}
      */
+    protected function createDefinition()
+    {
+        $definition = parent::createDefinition();
+        $definition->addArgument(new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'));
+
+        return $definition;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (null === $this->command) {
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
 
-        if ($input->getOption('xml')) {
-            $output->writeln($this->command->asXml(), OutputInterface::OUTPUT_RAW);
-        } else {
-            $output->writeln($this->command->asText());
-        }
+        $this->getHelper('descriptor')->describe($output, $this->command, $input->getArgument('format'), $input->getOption('raw'));
 
         $this->command = null;
     }

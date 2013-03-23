@@ -94,7 +94,7 @@ class Router extends BaseRouter implements WarmableInterface
                 foreach ($route->getRequirements() as $name => $value) {
                      $route->setRequirement($name, $this->resolveString($value));
                 }
-
+                $collection->setPrefix('/'.ltrim($this->resolveString($collection->getPrefix()), '/'));
                 $route->setPattern($this->resolveString($route->getPattern()));
             }
         }

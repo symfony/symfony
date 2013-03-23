@@ -10,6 +10,7 @@
         <parameter key="filesystem.class">Symfony\Component\Filesystem\Filesystem</parameter>
         <parameter key="cache_warmer.class">Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate</parameter>
         <parameter key="cache_clearer.class">Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer</parameter>
+        <parameter key="request_factory.class">Symfony\Component\HttpFoundation\Factory\RequestFactory</parameter>
         <parameter key="file_locator.class">Symfony\Component\HttpKernel\Config\FileLocator</parameter>
         <parameter key="uri_signer.class">Symfony\Component\HttpKernel\UriSigner</parameter>
     </parameters>
@@ -41,6 +42,10 @@
             It is used to check references scope.
         -->
         <service id="request" scope="request" synthetic="true" synchronized="true" />
+
+        <service id="request_factory" class="%request_factory.class%">
+            <argument>%kernel.request_class%</argument>
+        </service>
 
         <service id="service_container" synthetic="true" />
 

@@ -14,6 +14,8 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpFoundation\Factory\RequestFactory;
+use Symfony\Component\HttpFoundation\Factory\RequestFactoryInterface;
 
 /**
  * Esi implements the ESI capabilities to Request and Response instances.
@@ -29,16 +31,19 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class Esi
 {
     private $contentTypes;
+    private $requestFactory;
 
     /**
      * Constructor.
      *
-     * @param array $contentTypes An array of content-type that should be parsed for ESI information.
-     *                           (default: text/html, text/xml, application/xhtml+xml, and application/xml)
+     * @param array                        $contentTypes   An array of content-type that should be parsed for ESI information.
+     *                                                     (default: text/html, text/xml, application/xhtml+xml, and application/xml)
+     * @param \Symfony\Component\HttpFoundation\Factory\RequestFactoryInterface|null $requestFactory
      */
-    public function __construct(array $contentTypes = array('text/html', 'text/xml', 'application/xhtml+xml', 'application/xml'))
+    public function __construct(array $contentTypes = array('text/html', 'text/xml', 'application/xhtml+xml', 'application/xml'), RequestFactoryInterface $requestFactory = null)
     {
         $this->contentTypes = $contentTypes;
+        $this->requestFactory = $requestFactory ?: new RequestFactory();
     }
 
     /**
@@ -194,7 +199,7 @@ class Esi
      */
     public function handle(HttpCache $cache, $uri, $alt, $ignoreErrors)
     {
-        $subRequest = Request::create($uri, 'get', array(), $cache->getRequest()->cookies->all(), array(), $cache->getRequest()->server->all());
+        $subRequest = $this->requestFactory->create($uri, 'get', array(), $cache->getRequest()->cookies->all(), array(), $cache->getRequest()->server->all());
 
         try {
             $response = $cache->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);

@@ -16,6 +16,8 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Factory\RequestFactory;
+use Symfony\Component\HttpFoundation\Factory\RequestFactoryInterface;
 
 /**
  * Store implements all the logic for storing cache metadata (Request and Response headers).
@@ -27,18 +29,21 @@ class Store implements StoreInterface
     protected $root;
     private $keyCache;
     private $locks;
+    private $requestFactory;
 
     /**
      * Constructor.
      *
-     * @param string $root The path to the cache directory
+     * @param string                       $root           The path to the cache directory
+     * @param RequestFactoryInterface|null $requestFactory
      */
-    public function __construct($root)
+    public function __construct($root, RequestFactoryInterface $requestFactory = null)
     {
         $this->root = $root;
         if (!is_dir($this->root)) {
             mkdir($this->root, 0777, true);
         }
+        $this->requestFactory = $requestFactory ?: new RequestFactory();
         $this->keyCache = new \SplObjectStorage();
         $this->locks = array();
     }
@@ -303,7 +308,7 @@ class Store implements StoreInterface
      */
     public function purge($url)
     {
-        if (is_file($path = $this->getPath($this->getCacheKey(Request::create($url))))) {
+        if (is_file($path = $this->getPath($this->getCacheKey($this->requestFactory->create($url))))) {
             unlink($path);
 
             return true;

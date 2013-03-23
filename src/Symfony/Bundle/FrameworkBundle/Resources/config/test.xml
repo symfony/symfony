@@ -18,6 +18,7 @@
             <argument>%test.client.parameters%</argument>
             <argument type="service" id="test.client.history" />
             <argument type="service" id="test.client.cookiejar" />
+            <argument type="service" id="request_factory" />
         </service>
 
         <service id="test.client.history" class="%test.client.history.class%" scope="prototype" />

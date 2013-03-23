@@ -84,7 +84,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services2.yml');
-        $this->assertEquals(array('foo' => 'bar', 'mixedcase' => array('MixedCaseKey' => 'value'), 'values' => array(true, false, 0, 1000.3), 'bar' => 'foo', 'foo_bar' => new Reference('foo_bar')), $container->getParameterBag()->all(), '->load() converts YAML keys to lowercase');
+        $this->assertEquals(array('foo' => 'bar', 'mixedcase' => array('MixedCaseKey' => 'value'), 'values' => array(true, false, 0, 1000.3), 'bar' => 'foo', 'escape' => '@escapeme', 'foo_bar' => new Reference('foo_bar')), $container->getParameterBag()->all(), '->load() converts YAML keys to lowercase');
     }
 
     public function testLoadImports()
@@ -99,7 +99,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services4.yml');
 
         $actual = $container->getParameterBag()->all();
-        $expected = array('foo' => 'bar', 'values' => array(true, false), 'bar' => '%foo%', 'foo_bar' => new Reference('foo_bar'), 'mixedcase' => array('MixedCaseKey' => 'value'), 'imported_from_ini' => true, 'imported_from_xml' => true);
+        $expected = array('foo' => 'bar', 'values' => array(true, false), 'bar' => '%foo%', 'escape' => '@escapeme', 'foo_bar' => new Reference('foo_bar'), 'mixedcase' => array('MixedCaseKey' => 'value'), 'imported_from_ini' => true, 'imported_from_xml' => true);
         $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
 
         // Bad import throws no exception due to ignore_errors value.

@@ -290,7 +290,10 @@ class YamlFileLoader extends FileLoader
         if (is_array($value)) {
             $value = array_map(array($this, 'resolveServices'), $value);
         } elseif (is_string($value) &&  0 === strpos($value, '@')) {
-            if (0 === strpos($value, '@?')) {
+            if (0 === strpos($value, '@@')) {
+                $value = substr($value, 1);
+                $invalidBehavior = null;
+            } elseif (0 === strpos($value, '@?')) {
                 $value = substr($value, 2);
                 $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
             } else {
@@ -305,7 +308,9 @@ class YamlFileLoader extends FileLoader
                 $strict = true;
             }
 
-            $value = new Reference($value, $invalidBehavior, $strict);
+            if (null !== $invalidBehavior) {
+                $value = new Reference($value, $invalidBehavior, $strict);
+            }
         }
 
         return $value;

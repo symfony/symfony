@@ -414,64 +414,61 @@ class Parser
      */
     private function parseFoldedScalar($separator, $indicator = '', $indentation = 0)
     {
-        $separator = '|' == $separator ? "\n" : ' ';
-        $text = '';
-
         $notEOF = $this->moveToNextLine();
-
-        while ($notEOF && $this->isCurrentLineBlank()) {
-            $text .= "\n";
-
-            $notEOF = $this->moveToNextLine();
-        }
-
         if (!$notEOF) {
             return '';
         }
 
-        if (!preg_match('#^(?P<indent>'.($indentation ? str_repeat(' ', $indentation) : ' +').')(?P<text>.*)$#u', $this->currentLine, $matches)) {
-            $this->moveToPreviousLine();
-
-            return '';
-        }
-
-        $textIndent = $matches['indent'];
-        $previousIndent = 0;
-
-        $text .= $matches['text'].$separator;
-        while ($this->currentLineNb + 1 < count($this->lines)) {
-            $this->moveToNextLine();
-
-            if (preg_match('#^(?P<indent> {'.strlen($textIndent).',})(?P<text>.+)$#u', $this->currentLine, $matches)) {
-                if (' ' == $separator && $previousIndent != $matches['indent']) {
-                    $text = substr($text, 0, -1)."\n";
-                }
-                $previousIndent = $matches['indent'];
-
-                $text .= str_repeat(' ', $diff = strlen($matches['indent']) - strlen($textIndent)).$matches['text'].($diff ? "\n" : $separator);
-            } elseif (preg_match('#^(?P<text> *)$#', $this->currentLine, $matches)) {
-                $text .= preg_replace('#^ {1,'.strlen($textIndent).'}#', '', $matches['text'])."\n";
-            } else {
-                $this->moveToPreviousLine();
-
-                break;
+        // determine indentation if not specified
+        if (0 === $indentation) {
+            if (preg_match('/^ +/', $this->currentLine, $matches)) {
+                $indentation = strlen($matches[0]);
             }
         }
 
-        if (' ' == $separator) {
-            // replace last separator by a newline
-            $text = preg_replace('/ (\n*)$/', "\n$1", $text);
+        $text = '';
+        if ($indentation > 0) {
+            $pattern = sprintf('/^ {%d}(.*)$/', $indentation);
+
+            $isCurrentLineBlank = $this->isCurrentLineBlank();
+            while (
+                $notEOF && (
+                    $isCurrentLineBlank ||
+                    preg_match($pattern, $this->currentLine, $matches)
+                )
+            ) {
+                if ($isCurrentLineBlank) {
+                    $text .= substr($this->currentLine, $indentation);
+                } else {
+                    $text .= $matches[1];
+                }
+
+                // newline only if not EOF
+                if ($notEOF = $this->moveToNextLine()) {
+                    $text .= "\n";
+                    $isCurrentLineBlank = $this->isCurrentLineBlank();
+                }
+            }
+        } elseif ($notEOF) {
+            $text .= "\n";
         }
 
-        switch ($indicator) {
-            case '':
-                $text = preg_replace('#\n+$#s', "\n", $text);
-                break;
-            case '+':
-                break;
-            case '-':
-                $text = preg_replace('#\n+$#s', '', $text);
-                break;
+        if ($notEOF) {
+            $this->moveToPreviousLine();
+        }
+
+        // replace all non-trailing single newlines with spaces in folded blocks
+        if ('>' === $separator) {
+            preg_match('/(\n*)$/', $text, $matches);
+            $text = preg_replace('/(?<!\n)\n(?!\n)/', ' ', rtrim($text, "\n"));
+            $text .= $matches[1];
+        }
+
+        // deal with trailing newlines as indicated
+        if ('' === $indicator) {
+            $text = preg_replace('/\n+$/s', "\n", $text);
+        } elseif ('-' === $indicator) {
+            $text = preg_replace('/\n+$/s', '', $text);
         }
 
         return $text;

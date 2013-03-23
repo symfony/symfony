@@ -1013,6 +1013,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
         $this->assertEquals('en', $request->getPreferredLanguage(array('fr', 'en')));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8');
+        $this->assertEquals('en', $request->getPreferredLanguage(array('fr', 'en')));
+
+        $request = new Request();
+        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, fr-fr; q=0.6, fr; q=0.5');
+        $this->assertEquals('en', $request->getPreferredLanguage(array('fr', 'en')));
     }
 
     public function testIsXmlHttpRequest()
@@ -1083,8 +1091,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
-        $this->assertEquals(array('zh', 'en', 'en_US'), $request->getLanguages());
-        $this->assertEquals(array('zh', 'en', 'en_US'), $request->getLanguages());
+        $this->assertEquals(array('zh', 'en_US', 'en'), $request->getLanguages());
+        $this->assertEquals(array('zh', 'en_US', 'en'), $request->getLanguages());
 
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, en-us; q=0.6, en; q=0.8');
@@ -1101,10 +1109,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->headers->set('Accept-language', 'zh, i-cherokee; q=0.6');
         $this->assertEquals(array('zh', 'cherokee'), $request->getLanguages());
-
-        $request = new Request();
-        $request->headers->set('Accept-language', 'en-us');
-        $this->assertEquals(array('en', 'en_US'), $request->getLanguages());
     }
 
     public function testGetRequestFormat()

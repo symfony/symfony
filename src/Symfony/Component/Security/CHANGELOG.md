@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added a `require_previous_session` option to `AbstractAuthenticationListener`
+
 2.2.0
 -----
 

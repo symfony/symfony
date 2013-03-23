@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by Strate at 2013-03-21T08:44:14Z
+
+I'm really need this feature in 2.2 branch.
+Unfortunatelly I can't extend YamlFileLoader because method is private.
+Please merge in 2.2 branch!

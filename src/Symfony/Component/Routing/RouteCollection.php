@@ -260,6 +260,16 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Sets the prefix (used to resolve placeholders).
+     *
+     * @param string The prefix
+     */
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
+    }
+
+    /**
      * Returns an array of resources loaded to build this collection.
      *
      * @return ResourceInterface[] An array of resources

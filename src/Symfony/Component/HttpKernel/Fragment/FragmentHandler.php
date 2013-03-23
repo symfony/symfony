@@ -143,33 +143,4 @@ class FragmentHandler implements EventSubscriberInterface
             KernelEvents::RESPONSE => 'onKernelResponse',
         );
     }
-
-    // to be removed in 2.3
-    public function fixOptions(array $options)
-    {
-        // support for the standalone option is @deprecated in 2.2 and replaced with the strategy option
-        if (isset($options['standalone'])) {
-            trigger_error('The "standalone" option is deprecated in version 2.2 and replaced with the "strategy" option.', E_USER_DEPRECATED);
-
-            // support for the true value is @deprecated in 2.2, will be removed in 2.3
-            if (true === $options['standalone']) {
-                trigger_error('The "true" value for the "standalone" option is deprecated in version 2.2 and replaced with the "esi" value.', E_USER_DEPRECATED);
-
-                $options['standalone'] = 'esi';
-            } elseif (false === $options['standalone']) {
-                trigger_error('The "false" value for the "standalone" option is deprecated in version 2.2 and replaced with the "inline" value.', E_USER_DEPRECATED);
-
-                $options['standalone'] = 'inline';
-            } elseif ('js' === $options['standalone']) {
-                trigger_error('The "js" value for the "standalone" option is deprecated in version 2.2 and replaced with the "hinclude" value.', E_USER_DEPRECATED);
-
-                $options['standalone'] = 'hinclude';
-            }
-
-            $options['strategy'] = $options['standalone'];
-            unset($options['standalone']);
-        }
-
-        return $options;
-    }
 }

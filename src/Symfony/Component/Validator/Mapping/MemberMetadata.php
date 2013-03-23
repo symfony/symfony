@@ -189,23 +189,6 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * Returns the value of this property in the given object
-     *
-     * @param object $object The object
-     *
-     * @return mixed The property value
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use the
-     *             method {@link getPropertyValue} instead.
-     */
-    public function getValue($object)
-    {
-        trigger_error('getValue() is deprecated since version 2.2 and will be removed in 2.3. Use getPropertyValue() instead.', E_USER_DEPRECATED);
-
-        return $this->getPropertyValue($object);
-    }
-
-    /**
      * Returns the Reflection instance of the member
      *
      * @param object|string $objectOrClassName The object or the class name

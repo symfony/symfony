@@ -114,22 +114,6 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertFalse($this->form->isValid());
     }
 
-    public function testHasChildren()
-    {
-        $this->form->add($this->getBuilder()->getForm());
-
-        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
-        $this->assertTrue($this->form->hasChildren());
-        restore_error_handler();
-    }
-
-    public function testHasNoChildren()
-    {
-        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
-        $this->assertFalse($this->form->hasChildren());
-        restore_error_handler();
-    }
-
     public function testAdd()
     {
         $child = $this->getBuilder('foo')->getForm();

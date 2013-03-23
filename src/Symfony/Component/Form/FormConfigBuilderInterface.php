@@ -41,17 +41,6 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function addEventSubscriber(EventSubscriberInterface $subscriber);
 
     /**
-     * Adds a validator to the form.
-     *
-     * @param FormValidatorInterface $validator The validator.
-     *
-     * @return self The configuration object.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function addValidator(FormValidatorInterface $validator);
-
-    /**
      * Appends / prepends a transformer to the view transformer chain.
      *
      * The transform method of the transformer is used to convert data from the

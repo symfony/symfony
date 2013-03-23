@@ -44,45 +44,5 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $defaults = $this->getDefaultOptions(array());
-        $allowedTypes = $this->getAllowedOptionValues(array());
-
-        if (!empty($defaults)) {
-            trigger_error('getDefaultOptions() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
-
-            $resolver->setDefaults($defaults);
-        }
-
-        if (!empty($allowedTypes)) {
-            trigger_error('getAllowedOptionValues() is deprecated since version 2.1 and will be removed in 2.3. Use setDefaultOptions() instead.', E_USER_DEPRECATED);
-
-            $resolver->addAllowedValues($allowedTypes);
-        }
-    }
-
-    /**
-     * Overrides the default options form the extended type.
-     *
-     * @return array
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     *             Use {@link setDefaultOptions()} instead.
-     */
-    public function getDefaultOptions()
-    {
-        return array();
-    }
-
-    /**
-     * Returns the allowed option values for each option (if any).
-     *
-     * @return array The allowed option values
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     *             Use {@link setDefaultOptions()} instead.
-     */
-    public function getAllowedOptionValues()
-    {
-        return array();
     }
 }

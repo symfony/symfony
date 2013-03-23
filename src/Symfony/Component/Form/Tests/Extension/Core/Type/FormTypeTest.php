@@ -598,19 +598,6 @@ class FormTypeTest extends TypeTestCase
         $this->assertTrue($form->getConfig()->getMapped());
     }
 
-    // BC
-    public function testPropertyPathFalseImpliesDefaultNotMapped()
-    {
-        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
-        $form = $this->factory->createNamed('name', 'form', null, array(
-            'property_path' => false,
-        ));
-        restore_error_handler();
-
-        $this->assertEquals(new PropertyPath('name'), $form->getPropertyPath());
-        $this->assertFalse($form->getConfig()->getMapped());
-    }
-
     public function testNotMapped()
     {
         $form = $this->factory->create('form', null, array(

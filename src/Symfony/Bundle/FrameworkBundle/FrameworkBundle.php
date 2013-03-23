@@ -43,8 +43,6 @@ class FrameworkBundle extends Bundle
     {
         if ($trustedProxies = $this->container->getParameter('kernel.trusted_proxies')) {
             Request::setTrustedProxies($trustedProxies);
-        } elseif ($this->container->getParameter('kernel.trust_proxy_headers')) {
-            Request::trustProxyData(); // @deprecated, to be removed in 2.3
         }
 
         if ($this->container->getParameter('kernel.http_method_override')) {

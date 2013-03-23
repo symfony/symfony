@@ -640,27 +640,6 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertEquals('bar', $form->getData());
     }
 
-    public function testBindValidatesAfterTransformation()
-    {
-        $test = $this;
-        $validator = $this->getFormValidator();
-        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
-        $form = $this->getBuilder()
-            ->addValidator($validator)
-            ->getForm();
-
-        $validator->expects($this->once())
-            ->method('validate')
-            ->with($form)
-            ->will($this->returnCallback(function ($form) use ($test) {
-            $test->assertEquals('foobar', $form->getData());
-        }));
-
-        $form->bind('foobar');
-
-        restore_error_handler();
-    }
-
     public function testBindResetsErrors()
     {
         $this->form->addError(new FormError('Error!'));

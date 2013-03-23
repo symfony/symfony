@@ -69,10 +69,6 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.http_method_override', $config['http_method_override']);
 
         $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
-
-        // @deprecated, to be removed in 2.3
-        $container->setParameter('kernel.trust_proxy_headers', $config['trust_proxy_headers']);
-
         $container->setParameter('kernel.default_locale', $config['default_locale']);
 
         if (!empty($config['test'])) {
@@ -312,13 +308,6 @@ class FrameworkExtension extends Extension
             }
         }
 
-        //we deprecated session options without cookie_ prefix, but we are still supporting them,
-        //Let's merge the ones that were supplied without prefix
-        foreach (array('lifetime', 'path', 'domain', 'secure', 'httponly') as $key) {
-            if (!isset($options['cookie_'.$key]) && isset($config[$key])) {
-                $options['cookie_'.$key] = $config[$key];
-            }
-        }
         $container->setParameter('session.storage.options', $options);
 
         // session handler (the internal callback registered with PHP session management)

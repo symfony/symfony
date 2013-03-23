@@ -12,7 +12,7 @@
 namespace Symfony\Component\ClassLoader;
 
 /**
- * WinCacheClassLoader implements a wrapping autoloader cached in WinCache for PHP 5.3.
+ * WinCacheClassLoader implements a wrapping autoloader cached in WinCache.
  *
  * It expects an object implementing a findFile method to find the file. This
  * allow using it as a wrapper around the other loaders of the component (the
@@ -37,8 +37,6 @@ namespace Symfony\Component\ClassLoader;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
  * @author Artem Ryzhkov <artem@smart-core.org>
- *
- * @api
  */
 class WinCacheClassLoader
 {
@@ -60,8 +58,6 @@ class WinCacheClassLoader
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     *
-     * @api
      */
     public function __construct($prefix, $decorated)
     {
@@ -134,5 +130,4 @@ class WinCacheClassLoader
     {
         return call_user_func_array(array($this->decorated, $method), $args);
     }
-
 }

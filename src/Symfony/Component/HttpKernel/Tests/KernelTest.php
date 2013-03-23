@@ -592,7 +592,7 @@ EOF;
         $kernel->initializeBundles();
 
         $map = $kernel->getBundleMap();
-        $this->assertEquals(array($child, $parent), $map['ParentABundle']);
+        $this->assertEquals(array($parent, $child), $map['ParentABundle']);
     }
 
     public function testInitializeBundlesSupportInheritanceCascade()
@@ -611,8 +611,8 @@ EOF;
         $kernel->initializeBundles();
 
         $map = $kernel->getBundleMap();
-        $this->assertEquals(array($child, $parent, $grandparent), $map['GrandParentBBundle']);
-        $this->assertEquals(array($child, $parent), $map['ParentBBundle']);
+        $this->assertEquals(array($grandparent, $parent, $child), $map['GrandParentBBundle']);
+        $this->assertEquals(array($parent, $child), $map['ParentBBundle']);
         $this->assertEquals(array($child), $map['ChildBBundle']);
     }
 
@@ -648,8 +648,9 @@ EOF;
         $kernel->initializeBundles();
 
         $map = $kernel->getBundleMap();
-        $this->assertEquals(array($child, $parent, $grandparent), $map['GrandParentCCundle']);
-        $this->assertEquals(array($child, $parent), $map['ParentCCundle']);
+		
+        $this->assertEquals(array($grandparent, $parent, $child), $map['GrandParentCCundle']);
+        $this->assertEquals(array($parent, $child), $map['ParentCCundle']);
         $this->assertEquals(array($child), $map['ChildCCundle']);
     }
 
@@ -702,6 +703,27 @@ EOF;
             ->will($this->returnValue(array($circularRef)))
         ;
         $kernel->initializeBundles();
+    }
+	
+    public function testGetBundleSupportInheritanceCascade()
+    {
+        $grandparent = $this->getBundle(null, null, 'GrandParentEBundle');
+        $parent = $this->getBundle(null, 'GrandParentEBundle', 'ParentEBundle');
+        $child = $this->getBundle(null, 'ParentEBundle', 'ChildEBundle');
+
+        $kernel = $this->getKernel();
+        $kernel
+            ->expects($this->once())
+            ->method('registerBundles')
+            ->will($this->returnValue(array($grandparent, $parent, $child)))
+        ;
+
+        $kernel->initializeBundles();
+
+        $map = $kernel->getBundleMap();
+		$this->assertEquals($grandparent, $kernel->getBundleByName('GrandParentEBundle'));
+		$this->assertEquals($parent, $kernel->getBundleByName('ParentEBundle'));
+		$this->assertEquals($child, $kernel->getBundleByName('ChildEBundle'));
     }
 
     public function testTerminateReturnsSilentlyIfKernelIsNotBooted()

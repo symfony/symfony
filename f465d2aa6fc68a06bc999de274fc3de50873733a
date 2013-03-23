@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-02-04T13:43:34Z
+
+ping @Seldaek, @lsmith77
+
+---------------------------------------------------------------------------
+
+by marcosQuesada at 2013-02-05T16:18:57Z
+
+ I understand the mission of format on normalize method, but in  denormalize case I  don't see it as crearly, cause as a result we obtain an hydrated object, so i understand that has nothing to do with Json or Xml.
+ Anyway, I understand that normalize & denormalize uses the same base concepts.... so, when you say to use something like ignoredAttributes, did you mean to use a setter on camelizedAttributes?, and that way, using it on formatAttribute removing dependence from format, isn't it?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-02-05T16:34:31Z
+
+yes.
+
+---------------------------------------------------------------------------
+
+by marcosQuesada at 2013-02-05T16:46:08Z
+
+Ok I agree with that! , I expect to have this PR updated as you say as soon as posible, possibly, tonight!
+
+---------------------------------------------------------------------------
+
+by marcosQuesada at 2013-02-05T19:09:09Z
+
+Done!, now it's using camelizedAttributes, that if needed, has to be set before invoking  denormalize , I think that is a cleanner implementation.
+
+---------------------------------------------------------------------------
+
+by ricardclau at 2013-02-05T19:52:43Z
+
+I agree with @marcosQuesada when he says that it seems there is no point in having a format parameter when  denormalizing. What is the point of having it? I don't see a clear use case
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-02-05T22:37:12Z
+
+@ricardclau: there might be some case where the decoder cannot do a perfect job. f.e. i could imagine some edge case situations with dashes and underscores. but yeah i am not aware of any core denormalizer using this parameter.
+
+---------------------------------------------------------------------------
+
+by marcosQuesada at 2013-02-05T22:51:45Z
+
+Done! Interesting case @lsmith77.
+
+---------------------------------------------------------------------------
+
+by marcosQuesada at 2013-02-06T09:47:47Z
+
+Updated readability on closure, did you mean that? let me now if there's anything more to correct
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-02-06T15:43:31Z
+
+thx .. looks good to me now @fabpot
+
+---------------------------------------------------------------------------
+
+by marcosQuesada at 2013-02-13T13:56:50Z
+
+@fabpot Is there anything else to add? Maybe, I have to prepare documentation about that ..?  thx @lsmith77
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-02-13T19:56:02Z
+
+I guess this should go into 2.3
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-02-13T19:57:48Z
+
+Indeed, this will be considered for 2.3. In the meantime, you should send a pull request to the documentation repository.
+
+---------------------------------------------------------------------------
+
+by marcosQuesada at 2013-02-13T20:05:10Z
+
+ok, i will work on it! thx

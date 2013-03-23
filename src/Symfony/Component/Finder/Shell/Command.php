@@ -32,6 +32,11 @@ class Command
     private $labels;
 
     /**
+     * @var \Closure|null
+     */
+    private $errorHandler;
+
+    /**
      * Constructor.
      *
      * @param Command $parent Parent command
@@ -215,6 +220,26 @@ class Command
     }
 
     /**
+     * @param \Closure $errorHandler
+     *
+     * @return Command
+     */
+    public function setErrorHandler(\Closure $errorHandler)
+    {
+        $this->errorHandler = $errorHandler;
+
+        return $this;
+    }
+
+    /**
+     * @return callable|null
+     */
+    public function getErrorHandler()
+    {
+        return $this->errorHandler;
+    }
+
+    /**
      * Executes current command.
      *
      * @return array The command result
@@ -223,10 +248,17 @@ class Command
      */
     public function execute()
     {
-        exec($this->join(), $output, $code);
+        if (null === $this->errorHandler) {
+            exec($this->join(), $output);
+        } else {
+            $process = proc_open($this->join(), array(0 => array('pipe', 'r'), 1 => array('pipe', 'w'), 2 => array('pipe', 'w')), $pipes);
+            $output = preg_split('~(\r\n|\r|\n)~', stream_get_contents($pipes[1]), -1, PREG_SPLIT_NO_EMPTY);
 
-        if (0 !== $code) {
-            throw new \RuntimeException('Execution failed with return code: '.$code.'.');
+            if ($error = stream_get_contents($pipes[2])) {
+                call_user_func($this->errorHandler, $error);
+            }
+
+            proc_close($process);
         }
 
         return $output ?: array();

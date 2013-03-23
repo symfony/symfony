@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Iterator;
 
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
@@ -37,5 +38,19 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     public function current()
     {
         return new SplFileInfo(parent::current()->getPathname(), $this->getSubPath(), $this->getSubPathname());
+    }
+
+    /**
+     * @return mixed object
+     *
+     * @throws AccessDeniedException
+     */
+    public function getChildren()
+    {
+        try {
+            return parent::getChildren();
+        } catch (\UnexpectedValueException $e) {
+            throw new AccessDeniedException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 }

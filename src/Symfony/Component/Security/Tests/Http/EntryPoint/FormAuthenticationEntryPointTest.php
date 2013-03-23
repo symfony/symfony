@@ -50,7 +50,7 @@ class FormAuthenticationEntryPointTest extends \PHPUnit_Framework_TestCase
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request', array(), array(), '', false, false);
         $subRequest = $this->getMock('Symfony\Component\HttpFoundation\Request', array(), array(), '', false, false);
-        $response = $this->getMock('Symfony\Component\HttpFoundation\Response');
+        $response = new \Symfony\Component\HttpFoundation\Response('', 200);
 
         $httpUtils = $this->getMock('Symfony\Component\Security\Http\HttpUtils');
         $httpUtils
@@ -70,6 +70,9 @@ class FormAuthenticationEntryPointTest extends \PHPUnit_Framework_TestCase
 
         $entryPoint = new FormAuthenticationEntryPoint($httpKernel, $httpUtils, '/the/login/path', true);
 
-        $this->assertEquals($response, $entryPoint->start($request));
+        $entryPointResponse = $entryPoint->start($request);
+
+        $this->assertEquals($response, $entryPointResponse);
+        $this->assertEquals(401, $entryPointResponse->headers->get('X-Status-Code'));
     }
 }

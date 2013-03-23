@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by pborreli at 2013-03-08T11:18:07Z
+
+did you test on Windows ?
+
+---------------------------------------------------------------------------
+
+by pkruithof at 2013-03-08T11:20:57Z
+
+I don't have a Windows VM, is there an easy way to test on Windows?
+
+---------------------------------------------------------------------------
+
+by pborreli at 2013-03-08T11:25:02Z
+
+I will test it ASAP
+
+---------------------------------------------------------------------------
+
+by pborreli at 2013-03-08T12:51:12Z
+
+```
+phpunit src\Symfony\Component\Console\Tests\Helper\ProgressHelperTest.php
+PHPUnit 3.7.18 by Sebastian Bergmann.
+
+Configuration read from C:\Users\pascal\console\symfony\phpunit.xml.dist
+
+.........
+
+Time: 0 seconds, Memory: 4.50Mb
+
+OK (9 tests, 11 assertions)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-08T13:27:00Z
+
+We do not require mbstring, but we use it optionally when available. See https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Application.php#L784-L794 for instance.
+
+---------------------------------------------------------------------------
+
+by pkruithof at 2013-03-12T20:29:53Z
+
+@fabpot is this good to merge? The failed Travis build seems to come from a different component.

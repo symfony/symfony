@@ -18,9 +18,10 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Scope;
 
 /**
- * This HttpKernel is used to manage scope changes of the DI container.
+ * Adds a managed request scope.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
@@ -41,6 +42,7 @@ class ContainerAwareHttpKernel extends HttpKernel
         parent::__construct($dispatcher, $controllerResolver);
 
         $this->container = $container;
+        $container->addScope(new Scope('request'));
     }
 
     /**

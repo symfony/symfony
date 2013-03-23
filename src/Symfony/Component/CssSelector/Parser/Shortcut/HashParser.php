@@ -15,7 +15,6 @@ use Symfony\Component\CssSelector\Node\ElementNode;
 use Symfony\Component\CssSelector\Node\HashNode;
 use Symfony\Component\CssSelector\Node\SelectorNode;
 use Symfony\Component\CssSelector\Parser\ParserInterface;
-use Symfony\Component\CssSelector\Parser\Token;
 
 /**
  * CSS selector hash parser shortcut.

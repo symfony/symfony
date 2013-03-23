@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\CssSelector;
 
-use Symfony\Component\CssSelector\Exception;
 use Symfony\Component\CssSelector\Parser\Shortcut\ClassParser;
 use Symfony\Component\CssSelector\Parser\Shortcut\ElementParser;
 use Symfony\Component\CssSelector\Parser\Shortcut\EmptyStringParser;

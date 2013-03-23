@@ -13,7 +13,6 @@ namespace Symfony\Component\CssSelector\Parser;
 
 use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
 use Symfony\Component\CssSelector\Node;
-use Symfony\Component\CssSelector\Parser\Shortcut;
 use Symfony\Component\CssSelector\Parser\Tokenizer\Tokenizer;
 
 /**

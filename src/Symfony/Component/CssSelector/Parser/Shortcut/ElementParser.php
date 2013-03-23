@@ -14,7 +14,6 @@ namespace Symfony\Component\CssSelector\Parser\Shortcut;
 use Symfony\Component\CssSelector\Node\ElementNode;
 use Symfony\Component\CssSelector\Node\SelectorNode;
 use Symfony\Component\CssSelector\Parser\ParserInterface;
-use Symfony\Component\CssSelector\Parser\Token;
 
 /**
  * CSS selector element parser shortcut.

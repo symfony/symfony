@@ -177,8 +177,8 @@ class ProgressHelper extends Helper
     /**
      * Starts the progress output.
      *
-     * @param OutputInterface $output  An Output instance
-     * @param integer         $max     Maximum steps
+     * @param OutputInterface $output An Output instance
+     * @param integer         $max    Maximum steps
      */
     public function start(OutputInterface $output, $max = null)
     {
@@ -237,6 +237,36 @@ class ProgressHelper extends Helper
     }
 
     /**
+     * Sets the current progress.
+     *
+     * @param integer $current The current progress
+     * @param Boolean $redraw  Whether to redraw or not
+     *
+     * @throws \LogicException
+     */
+    public function setCurrent($current, $redraw = false)
+    {
+        if (null === $this->startTime) {
+            throw new \LogicException('You must start the progress bar before calling setCurrent().');
+        }
+
+        $current = (int) $current;
+
+        if ($current < $this->current) {
+            throw new \LogicException('You can\'t regress the progress bar');
+        }
+
+        if ($this->current === 0) {
+            $redraw = true;
+        }
+
+        $this->current = $current;
+        if ($redraw || $this->current % $this->redrawFreq === 0) {
+            $this->display();
+        }
+    }
+
+    /**
      * Outputs the current progress string.
      *
      * @param Boolean $finish Forces the end result
@@ -289,7 +319,7 @@ class ProgressHelper extends Helper
         }
 
         if ($this->max > 0) {
-            $this->widths['max']     = strlen($this->max);
+            $this->widths['max']     = $this->getLength($this->max);
             $this->widths['current'] = $this->widths['max'];
         } else {
             $this->barCharOriginal = $this->barChar;
@@ -325,7 +355,7 @@ class ProgressHelper extends Helper
                 }
             }
 
-            $emptyBars = $this->barWidth - $completeBars - strlen($this->progressChar);
+            $emptyBars = $this->barWidth - $completeBars - $this->getLength($this->progressChar);
             $bar = str_repeat($this->barChar, $completeBars);
             if ($completeBars < $this->barWidth) {
                 $bar .= $this->progressChar;
@@ -384,21 +414,41 @@ class ProgressHelper extends Helper
      * Overwrites a previous message to the output.
      *
      * @param OutputInterface $output   An Output instance
-     * @param string|array    $messages The message as an array of lines or a single string
+     * @param string          $messages The message
      */
-    private function overwrite(OutputInterface $output, $messages)
+    private function overwrite(OutputInterface $output, $message)
     {
+        $length = $this->getLength($message);
+
+        // append whitespace to match the last line's length
+        if (($this->lastMessagesLength !== null) && ($this->lastMessagesLength > $length)) {
+            $message = str_pad($message, $this->lastMessagesLength, "\x20", STR_PAD_RIGHT);
+        }
+
         // carriage return
         $output->write("\x0D");
-        if ($this->lastMessagesLength!==null) {
-            // clear the line with the length of the last message
-            $output->write(str_repeat("\x20", $this->lastMessagesLength));
-            // carriage return
-            $output->write("\x0D");
-        }
-        $output->write($messages);
+        $output->write($message);
 
-        $this->lastMessagesLength=strlen($messages);
+        $this->lastMessagesLength = $this->getLength($message);
+    }
+
+    /**
+     * Wrapper arround strlen: uses multi-byte function if available
+     *
+     * @param  string $string
+     * @return integer
+     */
+    private function getLength($string)
+    {
+        if (!function_exists('mb_strlen')) {
+            return strlen($string);
+        }
+
+        if (false === $encoding = mb_detect_encoding($string)) {
+            return strlen($string);
+        }
+
+        return mb_strlen($string, $encoding);
     }
 
     /**

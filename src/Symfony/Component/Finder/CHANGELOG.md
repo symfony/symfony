@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * unified the way subfolders that are not executable are handled by always throwing an AccessDeniedException exception
+
 2.2.0
 -----
 

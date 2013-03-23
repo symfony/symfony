@@ -21,3 +21,18 @@ session_showflash:
 profiler:
     path:     /profiler
     defaults: { _controller: TestBundle:Profiler:index }
+
+subrequest_index:
+    path:     /subrequest/{_locale}.{_format}
+    defaults: { _controller: TestBundle:SubRequest:index, _format: "html" }
+    schemes:  [https]
+
+subrequest_fragment_error:
+    path:     /subrequest/fragment/error/{_locale}.{_format}
+    defaults: { _controller: TestBundle:SubRequest:fragmentError, _format: "html" }
+    schemes:  [http]
+
+subrequest_fragment:
+    path:     /subrequest/fragment/{_locale}.{_format}
+    defaults: { _controller: TestBundle:SubRequest:fragment, _format: "html" }
+    schemes:  [http]

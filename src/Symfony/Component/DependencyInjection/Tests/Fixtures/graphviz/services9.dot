@@ -12,6 +12,8 @@ digraph sc {
   node_foo_with_inline [label="foo_with_inline\nFoo\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_inlined [label="inlined\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_baz [label="baz\nBaz\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_request [label="request\nRequest\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_depends_on_request [label="depends_on_request\nstdClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_service_container [label="service_container\nSymfony\\Component\\DependencyInjection\\ContainerBuilder\n", shape=record, fillcolor="#9999ff", style="filled"];
   node_foo2 [label="foo2\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foo3 [label="foo3\n\n", shape=record, fillcolor="#ff9999", style="filled"];
@@ -28,4 +30,5 @@ digraph sc {
   node_foo_with_inline -> node_inlined [label="setBar()" style="dashed"];
   node_inlined -> node_baz [label="setBaz()" style="dashed"];
   node_baz -> node_foo_with_inline [label="setFoo()" style="dashed"];
+  node_depends_on_request -> node_request [label="setRequest()" style="dashed"];
 }

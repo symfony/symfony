@@ -36,6 +36,7 @@ class Definition
     private $public;
     private $synthetic;
     private $abstract;
+    private $synchronized;
 
     protected $arguments;
 
@@ -56,6 +57,7 @@ class Definition
         $this->tags = array();
         $this->public = true;
         $this->synthetic = false;
+        $this->synchronized = false;
         $this->abstract = false;
         $this->properties = array();
     }
@@ -567,6 +569,34 @@ class Definition
     public function isPublic()
     {
         return $this->public;
+    }
+
+    /**
+     * Sets the synchronized flag of this service.
+     *
+     * @param Boolean $boolean
+     *
+     * @return Definition The current instance
+     *
+     * @api
+     */
+    public function setSynchronized($boolean)
+    {
+        $this->synchronized = (Boolean) $boolean;
+
+        return $this;
+    }
+
+    /**
+     * Whether this service is synchronized.
+     *
+     * @return Boolean
+     *
+     * @api
+     */
+    public function isSynchronized()
+    {
+        return $this->synchronized;
     }
 
     /**

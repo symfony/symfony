@@ -13,6 +13,11 @@ class BarClass
     {
         $this->baz = $baz;
     }
+
+    public function getBaz()
+    {
+        return $this->baz;
+    }
 }
 
 class BazClass

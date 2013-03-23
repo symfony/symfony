@@ -57,4 +57,13 @@ services:
         calls:
             - [setFoo, ['@foo_with_inline']]
 
+    request:
+        class: Request
+        synthetic: true
+        synchronized: true
+    depends_on_request:
+        class: stdClass
+        calls:
+            - [setRequest, ['@?request']]
+
     alias_for_foo: @foo

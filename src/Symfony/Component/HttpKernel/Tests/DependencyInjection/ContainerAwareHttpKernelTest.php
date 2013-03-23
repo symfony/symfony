@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Tests;
+namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel;
@@ -54,9 +54,14 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('request'))
         ;
         $container
-            ->expects($this->once())
+            ->expects($this->at(1))
             ->method('set')
             ->with($this->equalTo('request'), $this->equalTo($request), $this->equalTo('request'))
+        ;
+        $container
+            ->expects($this->at(2))
+            ->method('set')
+            ->with($this->equalTo('request'), $this->equalTo(null), $this->equalTo('request'))
         ;
 
         $dispatcher = new EventDispatcher();
@@ -101,9 +106,14 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('request'))
         ;
         $container
-            ->expects($this->once())
+            ->expects($this->at(1))
             ->method('set')
             ->with($this->equalTo('request'), $this->equalTo($request), $this->equalTo('request'))
+        ;
+        $container
+            ->expects($this->at(2))
+            ->method('set')
+            ->with($this->equalTo('request'), $this->equalTo(null), $this->equalTo('request'))
         ;
 
         $dispatcher = new EventDispatcher();

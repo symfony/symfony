@@ -94,6 +94,7 @@
             <argument type="service" id="router" />
             <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <call method="setRequest"><argument type="service" id="request" on-invalid="null" strict="false" /></call>
         </service>
     </services>
 </container>

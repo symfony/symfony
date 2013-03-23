@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-20T16:57:01Z
+
+Now that ZendOptimizer is in core, I don't think we need to add this one too.
+
+---------------------------------------------------------------------------
+
+by Koc at 2013-03-20T18:05:11Z
+
+ZendOptimizer provide only opcode cache without avability storing variables.

@@ -33,10 +33,10 @@ class TimedPhpEngine extends PhpEngine
      * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
      * @param ContainerInterface          $container   A ContainerInterface instance
      * @param LoaderInterface             $loader      A LoaderInterface instance
-     * @param Stopwatch                   $stopwatch   A Stopwatch instance
      * @param GlobalVariables             $globals     A GlobalVariables instance
+     * @param Stopwatch                   $stopwatch   A Stopwatch instance
      */
-    public function __construct(TemplateNameParserInterface $parser, ContainerInterface $container, LoaderInterface $loader, Stopwatch $stopwatch, GlobalVariables $globals = null)
+    public function __construct(TemplateNameParserInterface $parser, ContainerInterface $container, LoaderInterface $loader, GlobalVariables $globals, Stopwatch $stopwatch)
     {
         parent::__construct($parser, $container, $loader, $globals);
 

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added a way to set the progress bar progress via the `setCurrent` method
+
 2.2.0
 -----
 

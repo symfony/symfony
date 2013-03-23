@@ -91,10 +91,10 @@ class ProgressHelper extends Helper
      * @var array
      */
     private $widths = array(
-        'current'   => 4,
-        'max'       => 4,
-        'percent'   => 3,
-        'elapsed'   => 6,
+        'current' => 4,
+        'max'     => 4,
+        'percent' => 3,
+        'elapsed' => 6,
     );
 
     /**
@@ -227,11 +227,12 @@ class ProgressHelper extends Helper
             throw new \LogicException('You must start the progress bar before calling advance().');
         }
 
-        if ($this->current === 0) {
+        if (0 === $this->current) {
             $redraw = true;
         }
+
         $this->current += $step;
-        if ($redraw || $this->current % $this->redrawFreq === 0) {
+        if ($redraw || 0 === $this->current % $this->redrawFreq) {
             $this->display();
         }
     }
@@ -256,12 +257,12 @@ class ProgressHelper extends Helper
             throw new \LogicException('You can\'t regress the progress bar');
         }
 
-        if ($this->current === 0) {
+        if (0 === $this->current) {
             $redraw = true;
         }
 
         $this->current = $current;
-        if ($redraw || $this->current % $this->redrawFreq === 0) {
+        if ($redraw || 0 === $this->current % $this->redrawFreq) {
             $this->display();
         }
     }
@@ -295,7 +296,7 @@ class ProgressHelper extends Helper
             throw new \LogicException('You must start the progress bar before calling finish().');
         }
 
-        if ($this->startTime !== null) {
+        if (null !== $this->startTime) {
             if (!$this->max) {
                 $this->barChar = $this->barCharOriginal;
                 $this->display(true);
@@ -313,7 +314,7 @@ class ProgressHelper extends Helper
     {
         $this->formatVars = array();
         foreach ($this->defaultFormatVars as $var) {
-            if (strpos($this->format, "%{$var}%") !== false) {
+            if (false !== strpos($this->format, "%{$var}%")) {
                 $this->formatVars[$var] = true;
             }
         }
@@ -344,7 +345,7 @@ class ProgressHelper extends Helper
 
         if (isset($this->formatVars['bar'])) {
             $completeBars = 0;
-            $emptyBars    = 0;
+            $emptyBars = 0;
             if ($this->max > 0) {
                 $completeBars = floor($percent * $this->barWidth);
             } else {
@@ -421,7 +422,7 @@ class ProgressHelper extends Helper
         $length = $this->getLength($message);
 
         // append whitespace to match the last line's length
-        if (($this->lastMessagesLength !== null) && ($this->lastMessagesLength > $length)) {
+        if (null !== $this->lastMessagesLength && $this->lastMessagesLength > $length) {
             $message = str_pad($message, $this->lastMessagesLength, "\x20", STR_PAD_RIGHT);
         }
 

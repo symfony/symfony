@@ -70,6 +70,23 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the 'depends_on_request' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return stdClass A stdClass instance.
+     */
+    protected function getDependsOnRequestService()
+    {
+        $this->services['depends_on_request'] = $instance = new \stdClass();
+
+        $instance->setRequest($this->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+
+        return $instance;
+    }
+
+    /**
      * Gets the 'factory_service' service.
      *
      * This service is shared.
@@ -175,6 +192,19 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the 'request' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @throws RuntimeException always since this service is expected to be injected dynamically
+     */
+    protected function getRequestService()
+    {
+        throw new RuntimeException('You have requested a synthetic service ("request"). The DIC does not know how to construct this service.');
+    }
+
+    /**
      * Gets the alias_for_foo service alias.
      *
      * @return FooClass An instance of the foo service
@@ -182,6 +212,16 @@ class ProjectServiceContainer extends Container
     protected function getAliasForFooService()
     {
         return $this->get('foo');
+    }
+
+    /**
+     * Updates the 'request' service.
+     */
+    protected function synchronizeRequestService()
+    {
+        if ($this->initialized('depends_on_request')) {
+            $this->get('depends_on_request')->setRequest($this->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+        }
     }
 
     /**

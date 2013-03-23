@@ -24,3 +24,7 @@ services:
         alias: foo
         public: false
     factory_service: { class: BazClass, factory_method: getInstance, factory_service: baz_factory }
+    request:
+        class: Request
+        synthetic: true
+        synchronized: true

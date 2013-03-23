@@ -38,6 +38,7 @@
             <tag name="kernel.event_subscriber" />
             <argument>%kernel.default_locale%</argument>
             <argument type="service" id="router" on-invalid="ignore" />
+            <call method="setRequest"><argument type="service" id="request" on-invalid="null" strict="false" /></call>
         </service>
     </services>
 </container>

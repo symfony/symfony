@@ -58,11 +58,13 @@ class ContainerAwareHttpKernel extends HttpKernel
         try {
             $response = parent::handle($request, $type, $catch);
         } catch (\Exception $e) {
+            $this->container->set('request', null, 'request');
             $this->container->leaveScope('request');
 
             throw $e;
         }
 
+        $this->container->set('request', null, 'request');
         $this->container->leaveScope('request');
 
         return $response;

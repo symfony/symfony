@@ -337,7 +337,28 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             'one' => true,
         ), $this->resolver->resolve($options));
     }
+    
+    public function testResolveSucceedsIfOptionTypeAllowedPassClosure()
+    {
+        $this->resolver->setDefaults(array(
+            'one' => '1',
+        ));
 
+        $this->resolver->setAllowedTypes(array(
+            'one' => function($value) {
+                return is_string($value);
+            }
+        ));
+
+        $options = array(
+            'one' => 'one',
+        );
+
+        $this->assertEquals(array(
+            'one' => 'one',
+        ), $this->resolver->resolve($options));
+    }
+    
     public function testResolveSucceedsIfOptionTypeAllowedPassObject()
     {
         $this->resolver->setDefaults(array(

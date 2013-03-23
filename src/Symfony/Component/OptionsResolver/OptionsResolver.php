@@ -319,10 +319,13 @@ class OptionsResolver implements OptionsResolverInterface
             $value = $options[$option];
             $allowedTypes = (array) $allowedTypes;
 
-            foreach ($allowedTypes as $type) {
-                $isFunction = 'is_' . $type;
-
-                if (function_exists($isFunction) && $isFunction($value)) {
+            foreach ($allowedTypes as &$type) {
+                if ($type instanceof \Closure) {
+                    if (true === $type($value)) {
+                        continue 2;
+                    }
+                    $type = 'Closure';
+                } elseif (function_exists($isFunction = 'is_' . $type) && $isFunction($value)) {
                     continue 2;
                 } elseif ($value instanceof $type) {
                     continue 2;

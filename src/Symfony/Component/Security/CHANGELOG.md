@@ -4,6 +4,7 @@ CHANGELOG
 2.3.0
 -----
 
+ * [BC BREAK] return 401 instead of 500 when using use_forward during for form authentication
  * added a `require_previous_session` option to `AbstractAuthenticationListener`
 
 2.2.0

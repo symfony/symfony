@@ -131,8 +131,13 @@ class Process
 
         $this->commandline = $commandline;
         $this->cwd = $cwd;
+
         // on windows, if the cwd changed via chdir(), proc_open defaults to the dir where php was started
-        if (null === $this->cwd && defined('PHP_WINDOWS_VERSION_BUILD')) {
+        // on gnu/linux, PHP builds with --enable-maintainer-zts are also affected
+        // @see : https://bugs.php.net/bug.php?id=51800
+        // @see : https://bugs.php.net/bug.php?id=50524
+
+        if (null === $this->cwd && (defined('ZEND_THREAD_SAFE') || defined('PHP_WINDOWS_VERSION_BUILD'))) {
             $this->cwd = getcwd();
         }
         if (null !== $env) {

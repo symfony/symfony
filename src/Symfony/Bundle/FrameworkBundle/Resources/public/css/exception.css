@@ -1,7 +1,3 @@
-.sf-reset pre {
-    white-space: pre;
-    font-size: 12px;
-}
 .sf-reset .traces {
     padding-bottom: 14px;
 }
@@ -109,4 +105,9 @@
 .sf-reset #output-content {
     color: #000;
     font-size: 12px;
+}
+.sf-reset #traces-text pre {
+    white-space: pre;
+    font-size: 12px;
+    font-family: monospace;
 }

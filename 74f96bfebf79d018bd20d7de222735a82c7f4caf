@@ -1,0 +1,225 @@
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-02-07T17:24:00Z
+
+will review the PR in more detail when I get home but I think proxy objects might be a better solution. we could support automatically "unloading" of predict loaded proxies referencing request scoped services when we enter/leave the given sub request.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-02-07T17:25:20Z
+
+This PR is transparent as far as the services are concerned, which is one of the primary characteristics of the service container, the objects must not know that they are managed by the service container. How would proxy objects work with listeners?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-02-07T17:42:42Z
+
+As the DIC is the one that creates the proxies, it would it could track them and therefore ensure that the state is managed.
+
+So when I access the request proxy for the first time in a service it would fetch the request service from the DIC instance inside the proxy and so the proxy would become initialized. Then when I leave the scope/enter a new scope the DIC can automatically revert the back to the uninitialized state, ensuring that the service would be initialized again based on the now current state of the DIC.
+
+---------------------------------------------------------------------------
+
+by nomack84 at 2013-02-07T17:47:25Z
+
+@fabpot By the way, the example you put about the locales, is currently an issue in the 2.2 branch, but not in the 2.1.
+I switch back to 2.1 just because of this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-02-07T17:52:11Z
+
+On Twitter, someone suggested volatile instead of contagious?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-02-07T17:53:52Z
+
+@lsmith77: Have a look at the PR, my solution is much simpler than that, no moving parts.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-02-07T18:04:15Z
+
+Well I dont think my proposal is anymore complicated, especially of we add support for proxied services anyway.
+
+My concern is mostly about "propagating" or "recalling" the setters, because in theory the service could have assigned a request scoped service to another dependency and it may not be practical to have to write logic in the setter to then propagate this as well.
+
+Now in my proposal instead of recalling the setters, you simply iterate over the proxies and reset their state. this will then also update any dependency that are not managed by the DIC.
+
+from a users perspective its more reliable and i think from the DIC point of view its not any more complex either. again assuming we want to add proxy support anyway.
+
+---------------------------------------------------------------------------
+
+by sstok at 2013-02-07T18:50:06Z
+
+Is using array_key_exists() really needed here? I know isset() is (was??) faster then array_key_exists().
+And I'm pretty sure using null service names is not allowed.
+
+About the naming +1 for volatile.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-02-07T19:28:12Z
+
+volatile indeed sounds better .. does Spring not have similar needs?
+
+---------------------------------------------------------------------------
+
+by jorgelbg at 2013-02-07T19:40:03Z
+
+I think that the volatile name does not make justice, yes the service will be volatile changing with each request, but it will be fixed to the request itself, so it will not be available outside the scope of the request which will kind of confusing?.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-02-07T21:38:55Z
+
+On Twitter still, someone suggests "synchronized"
+
+---------------------------------------------------------------------------
+
+by merk at 2013-02-07T22:01:59Z
+
+Looks excellent.
+
+May I suggest `Propagate`, given the name is already in use in the code?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-02-07T22:13:44Z
+
+@merk: `isSynchronized()` sounds good to me but `isPropagatable()` sounds weird, no?
+
+---------------------------------------------------------------------------
+
+by merk at 2013-02-07T22:23:05Z
+
+You're right. It sounds weird.
+
+The correct way of saying it is `isPropagable` -- https://en.wiktionary.org/wiki/propagable
+
+Another suggestion: isInfectious() :smirk:
+
+---------------------------------------------------------------------------
+
+by marcospassos at 2013-02-07T22:45:46Z
+
+Synchronized sounds good! :+1:
+
+---------------------------------------------------------------------------
+
+by marcospassos at 2013-02-07T22:58:55Z
+
+I think that @lsmith77 solution may solve the issue #6985.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-02-08T06:56:22Z
+
+how about "scopeSafe"?
+
+---------------------------------------------------------------------------
+
+by drm at 2013-02-08T11:34:58Z
+
+I suggested synchronized on twitter, because for some reason I couldn't comment here with my phone...
+
+The reason I think it is a good name is because it implies that the container does some work for you.
+
+(edit:) And volatile has an "unstable" ring to it, but that's of course a matter of taste.
+
+---------------------------------------------------------------------------
+
+by jorgelbg at 2013-02-08T13:25:21Z
+
+What about "Scoped Services" for the new concept?
+
+On 2/8/13, Gerard van Helden <notifications@github.com> wrote:
+> I suggested synchronized on twitter, because for some reason I couldn't
+> comment here with my phone...
+>
+> The reason I think it is a good name is because it implies that the
+> container does some work for you.
+>
+> ---
+> Reply to this email directly or view it on GitHub:
+> https://github.com/symfony/symfony/pull/7007#issuecomment-13286732
+>
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-02-09T14:12:17Z
+
+I've just updated the code to use synchronized instead of contagious.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-02-11T13:23:27Z
+
+@nomack84 if you want the issue in 2.1, consider the case of using the Intl locale after the subrequest, and you face it too (see my report in #6932)
+
+---------------------------------------------------------------------------
+
+by Crell at 2013-02-12T07:14:15Z
+
+Overall I think this looks like a solid approach, and would resolve the issues we ran into in Drupal.  It should be fairly easy for us (and anyone else using the DI component) to adapt to it.  Nice work, Fabien!
+
+"synchronized" sounds like a fine name to me.
+
+I think this works better than proxy objects per @lsmith's suggestion, since it avoids new object instantiation entirely.  It looks like existing constructor-based dependencies would still reinitialize, though, which gives developers a choice of whether or not it makes sense to reinitialize their services.
+
+---------------------------------------------------------------------------
+
+by Crell at 2013-03-14T05:33:54Z
+
+Is this on the agenda for Symfony 2.3?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-03-14T09:54:27Z
+
+@crell: @fabpot's approach might not require creation of proxy services however it requires one call per "synchronized" service. however a proxy would only require one call per sub-request per synchronized service. so i suspect that in a complex application, the proxy solution could very well outperform this proposal. but i do not have data to backup this claim.
+
+furthermore like i explained, we should imho add support for proxies anyway and so adding support for synchronized services based on proxies would be almost no additional code. finally it will work more reliably than expecting the service itself to provide the necessary setters and ensure propagation to dependencies. furthermore it would not force the use of setter injection.
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-03-14T10:08:35Z
+
+@lsmith77 The proxies are also very useful for lazy-loading services. Changing the proxied object using this synchronized approach seems very in-transparent for me.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-03-14T10:10:40Z
+
+well it is just as in-transparent as the entire scope system. actually it would only affect services that are scoped.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-14T10:22:36Z
+
+@lsmith77: I don't understand what you are saying. The goal of this PR is simple: be sure that a service depending on the Request object always has the right/current one. To achieve this, each time the Request changes, one method is called on each object depending on the Request to update it. That's it. You can't do less than that, right? So, I fail to see how proxy services could be faster than that.
+
+Another advantage of this PR is that we can do something similar in Pimple (fabpot/Pimple#64), so that these services could work out of the box with both the Symfony DIC and Pimple. That's a big win too.
+
+I'm not saying that proxies are not useful, but that's a totally different topic for me.
+
+Am I missing something here?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-03-14T10:24:49Z
+
+You need to call one method per service. However with my approach you only need one such proxy per sub-request, an so you only need to update a single proxy object, no matter how many services reference said proxy.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-14T10:31:35Z
+
+You might have one proxy, but each call to a method on this proxy is then forwarded to the real object, right?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-14T10:32:28Z
+
+@lsmith77 but you have extra method calls when proxying them, so you are probably not winning on the method call count. Thus, building a proxy object for the Request will be a pain as it uses public properties, not only methods

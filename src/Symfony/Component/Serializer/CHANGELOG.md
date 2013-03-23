@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added `GetSetMethodNormalizer::setCamelizedAttributes` to allow calling
+   camel cased methods for underscored properties
+
 2.2.0
 -----
 

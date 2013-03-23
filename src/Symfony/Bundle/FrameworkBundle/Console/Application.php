@@ -15,9 +15,12 @@ use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Bundle\FrameworkBundle\Console\ConsoleEvents;
+use Symfony\Bundle\FrameworkBundle\Console\Event\ConsoleEvent;
+use Symfony\Bundle\FrameworkBundle\Console\Event\ConsoleTerminateEvent;
 
 /**
  * Application.
@@ -75,7 +78,17 @@ class Application extends BaseApplication
             return 0;
         }
 
-        return parent::doRun($input, $output);
+        $dispatcher = $this->kernel->getContainer()->get('event_dispatcher');
+
+        $initEvent = new ConsoleEvent($input, $output);
+        $dispatcher->dispatch(ConsoleEvents::INIT, $initEvent);
+
+        $exitCode = parent::doRun($input, $output);
+
+        $terminateEvent = new ConsoleTerminateEvent($input, $output, $exitCode);
+        $dispatcher->dispatch(ConsoleEvents::TERMINATE, $terminateEvent);
+
+        return $exitCode;
     }
 
     protected function registerCommands()

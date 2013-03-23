@@ -47,6 +47,19 @@ class ApplicationTest extends TestCase
             ->method('getBundles')
             ->will($this->returnValue($bundles))
         ;
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        $container
+            ->expects($this->any())
+            ->method('get')
+            ->with($this->equalTo('event_dispatcher'))
+            ->will($this->returnValue($eventDispatcher));
+        $kernel
+            ->expects($this->any())
+            ->method('getContainer')
+            ->will($this->returnValue($container))
+        ;
 
         return $kernel;
     }

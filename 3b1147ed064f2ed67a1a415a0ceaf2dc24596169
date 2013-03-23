@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-02-04T10:05:50Z
+
+I don't see why you would want that as the route matches. I might understand adding that to the other cases, when there is a problem, but then, why nor use the router:debug command?
+
+---------------------------------------------------------------------------
+
+by inmarelibero at 2013-02-04T10:14:47Z
+
+because when url does not match any route, no route is found and it's not possible to run `router:debug` on a non-existent route.
+but if the given url matches a route (eg '_demo_hello') and I want more info about the pattern, it is displayed subsequently instead of executing another command in the console. it seems a useful information to me when matching a route
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-02-07T13:41:39Z
+
+well i think its a common enough use case, that supporting it would make sense .. but i would limit it to enabling an optional parameter
+
+---------------------------------------------------------------------------
+
+by inmarelibero at 2013-02-07T18:27:34Z
+
+imho I find it sufficiently useful to be integrated as is, but if you say I can introduce an option to the command

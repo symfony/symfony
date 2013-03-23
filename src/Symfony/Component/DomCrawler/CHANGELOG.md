@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added schema relative URL support to links
+
 2.2.0
 -----
 

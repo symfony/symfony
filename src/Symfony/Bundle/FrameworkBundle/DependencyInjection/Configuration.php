@@ -67,6 +67,7 @@ class Configuration implements ConfigurationInterface
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
         $this->addAnnotationsSection($rootNode);
+        $this->addSerializerSection($rootNode);
 
         return $treeBuilder;
     }
@@ -378,6 +379,18 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
                         ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                     ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addSerializerSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('serializer')
+                    ->info('serializer configuration')
+                    ->canBeEnabled()
                 ->end()
             ->end()
         ;

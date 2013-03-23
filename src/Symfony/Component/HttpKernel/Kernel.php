@@ -90,10 +90,15 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         if ($this->debug) {
             $this->startTime = microtime(true);
         }
-
-        $this->init();
     }
 
+    /**
+     * Initialize the Kernel.
+     * 
+     * This is the right place to deal with PHP ini settings, debugging tools, etc.
+     *
+     * @api
+     */
     public function init()
     {
         ini_set('display_errors', 0);

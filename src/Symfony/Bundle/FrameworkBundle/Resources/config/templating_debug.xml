@@ -18,8 +18,8 @@
             <argument type="service" id="templating.name_parser" />
             <argument type="service" id="service_container" />
             <argument type="service" id="templating.loader" />
-            <argument type="service" id="debug.stopwatch" />
             <argument type="service" id="templating.globals" />
+            <argument type="service" id="debug.stopwatch" />
         </service>
     </services>
 </container>

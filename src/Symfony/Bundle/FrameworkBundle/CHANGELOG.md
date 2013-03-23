@@ -4,6 +4,7 @@ CHANGELOG
 2.3.0
 -----
 
+ * added `TimedPhpEngine`
  * added `--clean` option the the `translation:update` command
  * added `http_method_override` option
 

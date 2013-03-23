@@ -14,14 +14,20 @@ namespace Symfony\Component\CssSelector\Tests\Node;
 use Symfony\Component\CssSelector\Node\ClassNode;
 use Symfony\Component\CssSelector\Node\ElementNode;
 
-class ClassNodeTest extends \PHPUnit_Framework_TestCase
+class ClassNodeTest extends AbstractNodeTest
 {
-    public function testToXpath()
+    public function getToStringConversionTestData()
     {
-        // h1.foo
-        $element = new ElementNode('*', 'h1');
-        $class = new ClassNode($element, 'foo');
+        return array(
+            array(new ClassNode(new ElementNode(), 'class'), 'Class[Element[*].class]'),
+        );
+    }
 
-        $this->assertEquals("h1[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]", (string) $class->toXpath(), '->toXpath() returns the xpath representation of the node');
+    public function getSpecificityValueTestData()
+    {
+        return array(
+            array(new ClassNode(new ElementNode(), 'class'), 10),
+            array(new ClassNode(new ElementNode(null, 'element'), 'class'), 11),
+        );
     }
 }

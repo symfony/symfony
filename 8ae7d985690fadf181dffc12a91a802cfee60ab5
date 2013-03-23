@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-03-05T09:39:12Z
+
+Maybe it would be better to backport some changes in 2.2 to 2.1 to fix it.
+But the current approach is probably easier and must only go in 2.1.

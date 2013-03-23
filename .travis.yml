@@ -12,6 +12,7 @@ matrix:
 
 before_script:
     - echo '' > ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
+    - echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install
     - php src/Symfony/Component/Locale/Resources/data/build-data.php
     - export USE_INTL_ICU_DATA_VERSION=1

@@ -179,13 +179,15 @@ class UploadedFile extends File
     /**
      * Returns whether the file was uploaded successfully.
      *
-     * @return Boolean True if no error occurred during uploading
+     * @return Boolean True if the file has been uploaded with HTTP and no error occurred.
      *
      * @api
      */
     public function isValid()
     {
-        return $this->error === UPLOAD_ERR_OK;
+        $isOk = $this->error === UPLOAD_ERR_OK;
+
+        return $this->test ? $isOk : $isOk && is_uploaded_file($this->getPathname());
     }
 
     /**
@@ -196,7 +198,7 @@ class UploadedFile extends File
      *
      * @return File A File object representing the new file
      *
-     * @throws FileException if the file has not been uploaded via Http
+     * @throws FileException if, for any reason, the file could not have been moved
      *
      * @api
      */
@@ -205,21 +207,21 @@ class UploadedFile extends File
         if ($this->isValid()) {
             if ($this->test) {
                 return parent::move($directory, $name);
-            } elseif (is_uploaded_file($this->getPathname())) {
-                $target = $this->getTargetFile($directory, $name);
-
-                if (!@move_uploaded_file($this->getPathname(), $target)) {
-                    $error = error_get_last();
-                    throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
-                }
-
-                @chmod($target, 0666 & ~umask());
-
-                return $target;
             }
+
+            $target = $this->getTargetFile($directory, $name);
+
+            if (!@move_uploaded_file($this->getPathname(), $target)) {
+                $error = error_get_last();
+                throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
+            }
+
+            @chmod($target, 0666 & ~umask());
+
+            return $target;
         }
 
-        throw new FileException(sprintf('The file "%s" has not been uploaded via Http', $this->getPathname()));
+        throw new FileException(sprintf('The file "%s" is not valid', $this->getPathname()));
     }
 
     /**

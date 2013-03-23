@@ -114,7 +114,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $files = array(
             array('tmp_name' => $source, 'name' => 'original', 'type' => 'mime/original', 'size' => 123, 'error' => UPLOAD_ERR_OK),
-            new UploadedFile($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK),
+            new UploadedFile($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK, true),
         );
 
         foreach ($files as $file) {
@@ -147,7 +147,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
-            ->setConstructorArgs(array($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK))
+            ->setConstructorArgs(array($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK, true))
             ->setMethods(array('getSize'))
             ->getMock()
         ;

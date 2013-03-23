@@ -33,6 +33,8 @@ use Symfony\Component\CssSelector\XPath\Translator;
  */
 class CssSelector
 {
+    private static $html = true;
+
     /**
      * Translates a CSS expression to its XPath equivalent.
      * Optionally, a prefix can be added to the resulting XPath
@@ -40,17 +42,16 @@ class CssSelector
      *
      * @param mixed   $cssExpr The CSS expression.
      * @param string  $prefix  An optional prefix for the XPath expression.
-     * @param boolean $html    Enables HTML extension.
      *
      * @return string
      *
      * @api
      */
-    public static function toXPath($cssExpr, $prefix = 'descendant-or-self::', $html = true)
+    public static function toXPath($cssExpr, $prefix = 'descendant-or-self::')
     {
         $translator = new Translator();
 
-        if ($html) {
+        if (self::$html) {
             $translator->registerExtension(new HtmlExtension($translator));
         }
 
@@ -62,5 +63,21 @@ class CssSelector
         ;
 
         return $translator->cssToXPath($cssExpr, $prefix);
+    }
+
+    /**
+     * Enables the HTML extension.
+     */
+    public static function enableHtmlExtension()
+    {
+        self::$html = true;
+    }
+
+    /**
+     * Disables the HTML extension.
+     */
+    public static function disableHtmlExtension()
+    {
+        self::$html = false;
     }
 }

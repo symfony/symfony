@@ -24,7 +24,6 @@ class CoreExtension extends AbstractExtension
     protected function loadTypes()
     {
         return array(
-            new Type\FieldType(),
             new Type\FormType(PropertyAccess::getPropertyAccessor()),
             new Type\BirthdayType(),
             new Type\CheckboxType(),

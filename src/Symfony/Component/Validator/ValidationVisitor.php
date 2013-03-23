@@ -64,13 +64,6 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
     private $validatedObjects = array();
 
     /**
-     * @var GraphWalker
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3.
-     */
-    private $graphWalker;
-
-    /**
      * Creates a new validation visitor.
      *
      * @param mixed                               $root               The value passed to the validator.
@@ -168,20 +161,6 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
         } else {
             $this->metadataFactory->getMetadataFor($value)->accept($this, $value, $group, $propertyPath);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getGraphWalker()
-    {
-        trigger_error('getGraphWalker() is deprecated since version 2.2 and will be removed in 2.3.', E_USER_DEPRECATED);
-
-        if (null === $this->graphWalker) {
-            $this->graphWalker = new GraphWalker($this, $this->metadataFactory, $this->translator, $this->translationDomain, $this->validatedObjects);
-        }
-
-        return $this->graphWalker;
     }
 
     /**

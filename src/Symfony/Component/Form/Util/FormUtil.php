@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form\Util;
 
-use Symfony\Component\PropertyAccess\StringUtil;
-
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -22,19 +20,6 @@ class FormUtil
      * This class should not be instantiated
      */
     private function __construct() {}
-
-    /**
-     * Alias for {@link StringUtil::singularify()}
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
-     *             {@link StringUtil::singularify()} instead.
-     */
-    public static function singularify($plural)
-    {
-        trigger_error('\Symfony\Component\Form\Util\FormUtil::singularify() is deprecated since version 2.2 and will be removed in 2.3. Use \Symfony\Component\PropertyAccess\StringUtil::singularify() in the PropertyAccess component instead.', E_USER_DEPRECATED);
-
-        return StringUtil::singularify($plural);
-    }
 
     /**
      * Returns whether the given data is empty.

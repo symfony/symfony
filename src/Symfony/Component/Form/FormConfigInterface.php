@@ -105,15 +105,6 @@ interface FormConfigInterface
     public function getDataMapper();
 
     /**
-     * Returns the validators of the form.
-     *
-     * @return FormValidatorInterface The form validator.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function getValidators();
-
-    /**
      * Returns whether the form is required.
      *
      * @return Boolean Whether the form is required.

@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ClassMetadataFactory implements ClassMetadataFactoryInterface, MetadataFactoryInterface
+class ClassMetadataFactory implements MetadataFactoryInterface
 {
     /**
      * The loader for loading the class metadata
@@ -108,18 +108,5 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface, MetadataFac
         }
 
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
-     *             {@link getMetadataFor} instead.
-     */
-    public function getClassMetadata($class)
-    {
-        trigger_error('getClassMetadata() is deprecated since version 2.2 and will be removed in 2.3. Use getMetadataFor() instead.', E_USER_DEPRECATED);
-
-        return $this->getMetadataFor($class);
     }
 }

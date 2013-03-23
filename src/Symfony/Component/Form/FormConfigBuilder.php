@@ -198,22 +198,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function addValidator(FormValidatorInterface $validator)
-    {
-        trigger_error('addValidator() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        $this->validators[] = $validator;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function addViewTransformer(DataTransformerInterface $viewTransformer, $forcePrepend = false)
     {
         if ($this->locked) {
@@ -241,72 +225,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         $this->viewTransformers = array();
 
         return $this;
-    }
-
-    /**
-     * Alias of {@link addViewTransformer()}.
-     *
-     * @param DataTransformerInterface $viewTransformer
-     *
-     * @return FormConfigBuilder The configuration object.
-     *
-     * @throws BadMethodCallException if the form configuration is locked
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link addViewTransformer()} instead.
-     */
-    public function appendClientTransformer(DataTransformerInterface $viewTransformer)
-    {
-        trigger_error('appendClientTransformer() is deprecated since version 2.1 and will be removed in 2.3. Use addViewTransformer() instead.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->addViewTransformer($viewTransformer);
-    }
-
-    /**
-     * Prepends a transformer to the client transformer chain.
-     *
-     * @param DataTransformerInterface $viewTransformer
-     *
-     * @return FormConfigBuilder The configuration object.
-     *
-     * @throws BadMethodCallException if the form configuration is locked
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function prependClientTransformer(DataTransformerInterface $viewTransformer)
-    {
-        trigger_error('prependClientTransformer() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->addViewTransformer($viewTransformer, true);
-    }
-
-    /**
-     * Alias of {@link resetViewTransformers()}.
-     *
-     * @return FormConfigBuilder The configuration object.
-     *
-     * @throws BadMethodCallException if the form configuration is locked
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link resetViewTransformers()} instead.
-     */
-    public function resetClientTransformers()
-    {
-        trigger_error('resetClientTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use resetViewTransformers() instead.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->resetViewTransformers();
     }
 
     /**
@@ -339,72 +257,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         $this->modelTransformers = array();
 
         return $this;
-    }
-
-    /**
-     * Appends a transformer to the normalization transformer chain
-     *
-     * @param DataTransformerInterface $modelTransformer
-     *
-     * @return FormConfigBuilder The configuration object.
-     *
-     * @throws BadMethodCallException if the form configuration is locked
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function appendNormTransformer(DataTransformerInterface $modelTransformer)
-    {
-        trigger_error('appendNormTransformer() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->addModelTransformer($modelTransformer, true);
-    }
-
-    /**
-     * Alias of {@link addModelTransformer()}.
-     *
-     * @param DataTransformerInterface $modelTransformer
-     *
-     * @return FormConfigBuilder The configuration object.
-     *
-     * @throws BadMethodCallException if the form configuration is locked
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link addModelTransformer()} instead.
-     */
-    public function prependNormTransformer(DataTransformerInterface $modelTransformer)
-    {
-        trigger_error('prependNormTransformer() is deprecated since version 2.1 and will be removed in 2.3. Use addModelTransformer() instead.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->addModelTransformer($modelTransformer);
-    }
-
-    /**
-     * Alias of {@link resetModelTransformers()}.
-     *
-     * @return FormConfigBuilder The configuration object.
-     *
-     * @throws BadMethodCallException if the form configuration is locked
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link resetModelTransformers()} instead.
-     */
-    public function resetNormTransformers()
-    {
-        trigger_error('resetNormTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use resetModelTransformers() instead.', E_USER_DEPRECATED);
-
-        if ($this->locked) {
-            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->resetModelTransformers();
     }
 
     /**
@@ -480,21 +332,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     }
 
     /**
-     * Alias of {@link getViewTransformers()}.
-     *
-     * @return array The view transformers.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link getViewTransformers()} instead.
-     */
-    public function getClientTransformers()
-    {
-        trigger_error('getClientTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use getViewTransformers() instead.', E_USER_DEPRECATED);
-
-        return $this->getViewTransformers();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getModelTransformers()
@@ -503,36 +340,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     }
 
     /**
-     * Alias of {@link getModelTransformers()}.
-     *
-     * @return array The model transformers.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3. Use
-     *             {@link getModelTransformers()} instead.
-     */
-    public function getNormTransformers()
-    {
-        trigger_error('getNormTransformers() is deprecated since version 2.1 and will be removed in 2.3. Use getModelTransformers() instead.', E_USER_DEPRECATED);
-
-        return $this->getModelTransformers();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getDataMapper()
     {
         return $this->dataMapper;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getValidators()
-    {
-        trigger_error('getValidators() is deprecated since version 2.1 and will be removed in 2.3.', E_USER_DEPRECATED);
-
-        return $this->validators;
     }
 
     /**

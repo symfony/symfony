@@ -23,10 +23,10 @@ class NotFoundHttpException extends HttpException
      *
      * @param string     $message  The internal exception message
      * @param \Exception $previous The previous exception
-     * @param integer    $code     The internal exception code
+     * @param array      $headers  An array of HTTP headers
      */
-    public function __construct($message = null, \Exception $previous = null, $code = 0)
+    public function __construct($message = null, \Exception $previous = null, array $headers = array())
     {
-        parent::__construct(404, $message, $previous, array(), $code);
+        parent::__construct(404, $message, $previous, $headers);
     }
 }

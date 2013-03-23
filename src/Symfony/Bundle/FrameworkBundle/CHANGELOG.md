@@ -4,6 +4,7 @@ CHANGELOG
 2.3.0
 -----
 
+ * added possibility to load the serializer component in the service container
  * added route debug information when using the `router:match` command
  * added `TimedPhpEngine`
  * added `--clean` option the the `translation:update` command

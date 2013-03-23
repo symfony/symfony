@@ -82,7 +82,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->never())
             ->method('addViolation');
 
-        $file = new UploadedFile($this->path, 'originalName');
+        $file = new UploadedFile($this->path, 'originalName', null, null, null, true);
         $this->validator->validate($file, new File());
     }
 

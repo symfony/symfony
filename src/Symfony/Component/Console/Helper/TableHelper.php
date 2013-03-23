@@ -35,10 +35,10 @@ class TableHelper extends Helper
     private $rows = array();
 
     // Rendering options
-    private $backgroundChar  = ' ';
+    private $paddingChar  = ' ';
     private $horizontalBorderChar = '-';
     private $verticalBorderChar = '|';
-    private $edgeChar = '+';
+    private $crossingChar = '+';
     private $cellHeaderFormat = '<info>%s</info>';
     private $cellRowFormat = '<comment>%s</comment>';
     private $borderFormat = '%s';
@@ -74,11 +74,7 @@ class TableHelper extends Helper
     {
         $this->rows = array();
 
-        foreach ($rows as $row) {
-            $this->addRow($row);
-        }
-
-        return $this;
+        return $this->addRows($rows);
     }
 
     public function addRows(array $rows)
@@ -97,7 +93,7 @@ class TableHelper extends Helper
         return $this;
     }
 
-    public function setRow(array $row, $column)
+    public function setRow($column, array $row)
     {
         $this->rows[$column] = $row;
 
@@ -105,15 +101,15 @@ class TableHelper extends Helper
     }
 
     /**
-     * Sets background character, used for cell padding.
+     * Sets padding character, used for cell padding.
      *
-     * @param string $backgroundChar
+     * @param string $paddingChar
      *
      * @return TableHelper
      */
-    public function setBackgroundChar($backgroundChar)
+    public function setPaddingChar($paddingChar)
     {
-        $this->backgroundChar = $backgroundChar;
+        $this->paddingChar = $paddingChar;
 
         return $this;
     }
@@ -147,15 +143,15 @@ class TableHelper extends Helper
     }
 
     /**
-     * Sets edge character.
+     * Sets crossing character.
      *
-     * @param string $edgeChar
+     * @param string $crossingChar
      *
      * @return TableHelper
      */
-    public function setEdgeChar($edgeChar)
+    public function setCrossingChar($crossingChar)
     {
-        $this->edgeChar = $edgeChar;
+        $this->crossingChar = $crossingChar;
 
         return $this;
     }
@@ -246,15 +242,7 @@ class TableHelper extends Helper
             $this->renderRowSeparator();
         }
 
-        $this->afterRender();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getName()
-    {
-        return 'table';
+        $this->cleanup();
     }
 
     /**
@@ -268,10 +256,10 @@ class TableHelper extends Helper
             return;
         }
 
-        $markup = $this->edgeChar;
+        $markup = $this->crossingChar;
         for ($column = 0; $column < $count; $column++) {
             $markup .= str_repeat($this->horizontalBorderChar, $this->getColumnWidth($column))
-                    .$this->edgeChar
+                    .$this->crossingChar
             ;
         }
 
@@ -322,9 +310,9 @@ class TableHelper extends Helper
         $this->output->write(sprintf(
             $cellFormat,
             str_pad(
-                $this->backgroundChar.$cell.$this->backgroundChar,
+                $this->paddingChar.$cell.$this->paddingChar,
                 $this->getColumnWidth($column),
-                $this->backgroundChar,
+                $this->paddingChar,
                 $this->padType
             )
         ));
@@ -387,7 +375,7 @@ class TableHelper extends Helper
         }
 
         if (isset($row[$column])) {
-            return mb_strlen($row[$column]);
+            return $this->strlen($row[$column]);
         }
 
         return $this->getCellWidth($row, $column - 1);
@@ -396,9 +384,17 @@ class TableHelper extends Helper
     /**
      * Called after rendering to cleanup cache data.
      */
-    private function afterRender()
+    private function cleanup()
     {
         $this->columnWidths = array();
         $this->numberOfColumns = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getName()
+    {
+        return 'table';
     }
 }

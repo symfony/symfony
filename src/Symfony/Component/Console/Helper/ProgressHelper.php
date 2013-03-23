@@ -320,7 +320,7 @@ class ProgressHelper extends Helper
         }
 
         if ($this->max > 0) {
-            $this->widths['max']     = $this->getLength($this->max);
+            $this->widths['max']     = $this->strlen($this->max);
             $this->widths['current'] = $this->widths['max'];
         } else {
             $this->barCharOriginal = $this->barChar;
@@ -356,7 +356,7 @@ class ProgressHelper extends Helper
                 }
             }
 
-            $emptyBars = $this->barWidth - $completeBars - $this->getLength($this->progressChar);
+            $emptyBars = $this->barWidth - $completeBars - $this->strlen($this->progressChar);
             $bar = str_repeat($this->barChar, $completeBars);
             if ($completeBars < $this->barWidth) {
                 $bar .= $this->progressChar;
@@ -419,7 +419,7 @@ class ProgressHelper extends Helper
      */
     private function overwrite(OutputInterface $output, $message)
     {
-        $length = $this->getLength($message);
+        $length = $this->strlen($message);
 
         // append whitespace to match the last line's length
         if (null !== $this->lastMessagesLength && $this->lastMessagesLength > $length) {
@@ -430,26 +430,7 @@ class ProgressHelper extends Helper
         $output->write("\x0D");
         $output->write($message);
 
-        $this->lastMessagesLength = $this->getLength($message);
-    }
-
-    /**
-     * Wrapper arround strlen: uses multi-byte function if available
-     *
-     * @param  string $string
-     * @return integer
-     */
-    private function getLength($string)
-    {
-        if (!function_exists('mb_strlen')) {
-            return strlen($string);
-        }
-
-        if (false === $encoding = mb_detect_encoding($string)) {
-            return strlen($string);
-        }
-
-        return mb_strlen($string, $encoding);
+        $this->lastMessagesLength = $this->strlen($message);
     }
 
     /**

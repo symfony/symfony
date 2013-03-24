@@ -1,3 +1,0 @@
-imports:
-    - { resource: framework.yml }
-    - { resource: twig.yml }

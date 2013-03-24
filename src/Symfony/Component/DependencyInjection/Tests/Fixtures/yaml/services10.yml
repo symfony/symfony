@@ -1,9 +1,0 @@
-parameters:
-    project.parameter.foo: BAR
-
-services:
-    project.service.foo:
-        class: BAR
-
-project:
-    test: %project.parameter.foo%

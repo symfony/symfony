@@ -356,7 +356,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $application->setCatchExceptions(true);
         $tester->run(array('command' => 'foo'), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->setCatchExceptions() sets the catch exception flag');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getDisplay(true), '->setCatchExceptions() sets the catch exception flag');
 
         $application->setCatchExceptions(false);
         try {
@@ -396,18 +396,18 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->renderException() renders a pretty exception');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception1.txt', $tester->getDisplay(true), '->renderException() renders a pretty exception');
 
         $tester->run(array('command' => 'foo'), array('decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));
         $this->assertContains('Exception trace', $tester->getDisplay(), '->renderException() renders a pretty exception with a stack trace when verbosity is verbose');
 
         $tester->run(array('command' => 'list', '--foo' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception2.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->renderException() renders the command synopsis when an exception occurs in the context of a command');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception2.txt', $tester->getDisplay(true), '->renderException() renders the command synopsis when an exception occurs in the context of a command');
 
         $application->add(new \Foo3Command);
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo3:bar'), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->renderException() renders a pretty exceptions with previous exceptions');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception3.txt', $tester->getDisplay(true), '->renderException() renders a pretty exceptions with previous exceptions');
 
         $application = $this->getMock('Symfony\Component\Console\Application', array('getTerminalWidth'));
         $application->setAutoExit(false);
@@ -417,7 +417,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception4.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->renderException() wraps messages when they are bigger than the terminal');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception4.txt', $tester->getDisplay(true), '->renderException() wraps messages when they are bigger than the terminal');
     }
 
     public function testRun()
@@ -443,19 +443,19 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester = new ApplicationTester($application);
 
         $tester->run(array(), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run1.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() runs the list command if no argument is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run1.txt', $tester->getDisplay(true), '->run() runs the list command if no argument is passed');
 
         $tester->run(array('--help' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() runs the help command if --help is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $tester->getDisplay(true), '->run() runs the help command if --help is passed');
 
         $tester->run(array('-h' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() runs the help command if -h is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run2.txt', $tester->getDisplay(true), '->run() runs the help command if -h is passed');
 
         $tester->run(array('command' => 'list', '--help' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() displays the help if --help is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $tester->getDisplay(true), '->run() displays the help if --help is passed');
 
         $tester->run(array('command' => 'list', '-h' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() displays the help if -h is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run3.txt', $tester->getDisplay(true), '->run() displays the help if -h is passed');
 
         $tester->run(array('--ansi' => true));
         $this->assertTrue($tester->getOutput()->isDecorated(), '->run() forces color output if --ansi is passed');
@@ -464,10 +464,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($tester->getOutput()->isDecorated(), '->run() forces color output to be disabled if --no-ansi is passed');
 
         $tester->run(array('--version' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() displays the program version if --version is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $tester->getDisplay(true), '->run() displays the program version if --version is passed');
 
         $tester->run(array('-V' => true), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $this->normalizeLineBreaks($tester->getDisplay()), '->run() displays the program version if -v is passed');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_run4.txt', $tester->getDisplay(true), '->run() displays the program version if -v is passed');
 
         $tester->run(array('command' => 'list', '--quiet' => true));
         $this->assertSame('', $tester->getDisplay(), '->run() removes all output if --quiet is passed');

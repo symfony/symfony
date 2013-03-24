@@ -9,16 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Fixtures;
+namespace Symfony\Component\Console\Event;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class FooCommand extends ContainerAwareCommand
+/**
+ * Allows to do things before the command is executed.
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ */
+class ConsoleCommandEvent extends ConsoleEvent
 {
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        return 0;
-    }
 }

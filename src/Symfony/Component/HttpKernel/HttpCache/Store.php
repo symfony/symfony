@@ -137,7 +137,7 @@ class Store implements StoreInterface
         }
 
         list($req, $headers) = $match;
-        if (is_file($body = $this->getPath($headers['x-content-digest'][0]))) {
+        if ($body = $this->load($headers['x-content-digest'][0])) {
             return $this->restoreResponse($headers, $body);
         }
 
@@ -424,14 +424,10 @@ class Store implements StoreInterface
      *
      * @return Response
      */
-    private function restoreResponse($headers, $body = null)
+    private function restoreResponse($headers, $body = '')
     {
         $status = $headers['X-Status'][0];
         unset($headers['X-Status']);
-
-        if (null !== $body) {
-            $headers['X-Body-File'] = array($body);
-        }
 
         return new Response($body, $status, $headers);
     }

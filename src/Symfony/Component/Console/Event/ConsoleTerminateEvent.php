@@ -9,13 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Event;
+namespace Symfony\Component\Console\Event;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Allows to receive the exit code of a command after its execution.
+ * Allows to manipulate the exit code of a command after its execution.
  *
  * @author Francesco Levorato <git@flevour.net>
  */
@@ -28,16 +29,27 @@ class ConsoleTerminateEvent extends ConsoleEvent
      */
     private $exitCode;
 
-    public function __construct(InputInterface $input, OutputInterface $output, $exitCode)
+    public function __construct(Command $command, InputInterface $input, OutputInterface $output, $exitCode)
     {
-        parent::__construct($input, $output);
+        parent::__construct($command, $input, $output);
+
+        $this->setExitCode($exitCode);
+    }
+
+    /**
+     * Sets the exit code.
+     *
+     * @param integer $exitCode The command exit code
+     */
+    public function setExitCode($exitCode)
+    {
         $this->exitCode = $exitCode;
     }
 
     /**
-     * Returns the exit code.
+     * Gets the exit code.
      *
-     * @return integer
+     * @return integer The command exit code
      */
     public function getExitCode()
     {

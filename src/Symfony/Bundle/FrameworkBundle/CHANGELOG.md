@@ -4,7 +4,6 @@ CHANGELOG
 2.3.0
 -----
 
- * added an init and terminate event dispatched by CLI commands
  * added `--clean` option the the `translation:update` command
  * added `http_method_override` option
 

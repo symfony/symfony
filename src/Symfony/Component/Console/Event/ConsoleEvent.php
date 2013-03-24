@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Event;
+namespace Symfony\Component\Console\Event;
 
-use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
@@ -23,42 +23,32 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class ConsoleEvent extends Event
 {
-    private $input;
+    protected $command;
 
+    private $input;
     private $output;
 
-    private $helperSet;
-
-    public function __construct(InputInterface $input, OutputInterface $output)
+    public function __construct(Command $command, InputInterface $input, OutputInterface $output)
     {
+        $this->command = $command;
         $this->input = $input;
         $this->output = $output;
     }
 
     /**
-     * Sets the helper set.
+     * Gets the command that is executed.
      *
-     * @param HelperSet $helperSet A HelperSet instance
+     * @return Command A Command instance
      */
-    public function setHelperSet(HelperSet $helperSet)
+    public function getCommand()
     {
-        $this->helperSet = $helperSet;
+        return $this->command;
     }
 
     /**
-     * Gets the helper set.
+     * Gets the input instance.
      *
-     * @return HelperSet A HelperSet instance
-     */
-    public function getHelperSet()
-    {
-        return $this->helperSet;
-    }
-
-    /**
-     * Returns the input object
-     *
-     * @return InputInterface
+     * @return InputInterface An InputInterface instance
      */
     public function getInput()
     {
@@ -66,9 +56,9 @@ class ConsoleEvent extends Event
     }
 
     /**
-     * Returns the output object
+     * Gets the output instance.
      *
-     * @return OutputInterface
+     * @return OutputInterface An OutputInterface instance
      */
     public function getOutput()
     {

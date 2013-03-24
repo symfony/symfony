@@ -103,7 +103,7 @@ class Application
         }
 
         try {
-            $statusCode = $this->doRun($input, $output);
+            $exitCode = $this->doRun($input, $output);
         } catch (\Exception $e) {
             if (!$this->catchExceptions) {
                 throw $e;
@@ -114,21 +114,21 @@ class Application
             } else {
                 $this->renderException($e, $output);
             }
-            $statusCode = $e->getCode();
+            $exitCode = $e->getCode();
 
-            $statusCode = is_numeric($statusCode) && $statusCode ? $statusCode : 1;
+            $exitCode = is_numeric($exitCode) && $exitCode ? $exitCode : 1;
         }
 
         if ($this->autoExit) {
-            if ($statusCode > 255) {
-                $statusCode = 255;
+            if ($exitCode > 255) {
+                $exitCode = 255;
             }
             // @codeCoverageIgnoreStart
-            exit($statusCode);
+            exit($exitCode);
             // @codeCoverageIgnoreEnd
         }
 
-        return $statusCode;
+        return $exitCode;
     }
 
     /**
@@ -190,10 +190,10 @@ class Application
         $command = $this->find($name);
 
         $this->runningCommand = $command;
-        $statusCode = $command->run($input, $output);
+        $exitCode = $this->doRunCommand($command, $input, $output);
         $this->runningCommand = null;
 
-        return is_numeric($statusCode) ? $statusCode : 0;
+        return is_numeric($exitCode) ? $exitCode : 0;
     }
 
     /**
@@ -909,6 +909,11 @@ class Application
         }
 
         return array(null, null);
+    }
+
+    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
+    {
+        return $command->run($input, $output);
     }
 
     /**

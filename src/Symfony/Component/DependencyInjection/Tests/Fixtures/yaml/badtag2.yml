@@ -1,6 +1,0 @@
-services:
-    foo_service:
-        class:    FooClass
-        tags:
-          # tag is missing the name key
-          foo_tag:   { foo: bar }

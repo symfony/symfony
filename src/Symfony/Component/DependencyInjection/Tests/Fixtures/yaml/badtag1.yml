@@ -1,5 +1,0 @@
-services:
-    foo_service:
-        class:    FooClass
-        # tags is not an array
-        tags:     string

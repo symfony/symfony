@@ -1,6 +1,0 @@
-framework:
-    secret: s3cr3t
-    form: ~
-    session: ~
-    # CSRF should be enabled by default
-    # csrf_protection: ~

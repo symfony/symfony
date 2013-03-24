@@ -27,6 +27,10 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleForExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * An Application is the container for a collection of commands.
@@ -56,6 +60,7 @@ class Application
     private $autoExit;
     private $definition;
     private $helperSet;
+    private $dispatcher;
 
     /**
      * Constructor.
@@ -78,6 +83,11 @@ class Application
         foreach ($this->getDefaultCommands() as $command) {
             $this->add($command);
         }
+    }
+
+    public function setDispatcher(EventDispatcher $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -913,7 +923,31 @@ class Application
 
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
     {
-        return $command->run($input, $output);
+        if (null === $this->dispatcher) {
+            return $command->run($input, $output);
+        }
+
+        $event = new ConsoleCommandEvent($command, $input, $output);
+        $this->dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
+
+        $command = $event->getCommand();
+
+        try {
+            $exitCode = $command->run($input, $output);
+        } catch (\Exception $e) {
+            $event = new ConsoleTerminateEvent($command, $input, $output, $e->getCode());
+            $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
+
+            $event = new ConsoleForExceptionEvent($command, $input, $output, $e, $event->getExitCode());
+            $this->dispatcher->dispatch(ConsoleEvents::EXCEPTION, $event);
+
+            throw $event->getException();
+        }
+
+        $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);
+        $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
+
+        return $event->getExitCode();
     }
 
     /**

@@ -189,7 +189,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $haveFallbackLocale = false;
         foreach ($container->getDefinition('translator.default')->getMethodCalls() as $call) {
-            if ('setFallbackLocales' == $call[0] && 'fr' == $call[1][0]) {
+            if ('setFallbackLocales' == $call[0] && array('fr') == $call[1][0]) {
                 $haveFallbackLocale = true;
             }
         }

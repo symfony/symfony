@@ -232,7 +232,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function addResource(ResourceInterface $resource)
     {
-        $this->resources[$resource->__toString()] = $resource;
+        $this->resources[] = $resource;
     }
 
     /**

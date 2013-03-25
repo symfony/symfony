@@ -15,12 +15,18 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleForExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ApplicationTest extends \PHPUnit_Framework_TestCase
 {
@@ -633,6 +639,89 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($inputDefinition->hasOption('no-interaction'));
 
         $this->assertTrue($inputDefinition->hasOption('custom'));
+    }
+
+    public function testRunWithDispatcher()
+    {
+        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
+            $this->markTestSkipped('The "EventDispatcher" component is not available');
+        }
+
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setDispatcher($this->getDispatcher());
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('foo.');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo'));
+        $this->assertEquals('before.foo.after.', $tester->getDisplay());
+    }
+
+    /**
+     * @expectedException        \LogicException
+     * @expectedExceptionMessage caught
+     */
+    public function testRunWithExceptionAndDispatcher()
+    {
+        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
+            $this->markTestSkipped('The "EventDispatcher" component is not available');
+        }
+
+        $application = new Application();
+        $application->setDispatcher($this->getDispatcher());
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            throw new \RuntimeException('foo');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo'));
+    }
+
+    public function testRunDispatchesAllEventsWithException()
+    {
+        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
+            $this->markTestSkipped('The "EventDispatcher" component is not available');
+        }
+
+        $application = new Application();
+        $application->setDispatcher($this->getDispatcher());
+        $application->setAutoExit(false);
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('foo.');
+
+            throw new \RuntimeException('foo');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo'));
+        $this->assertContains('before.foo.after.caught.', $tester->getDisplay());
+    }
+
+    protected function getDispatcher()
+    {
+        $dispatcher = new EventDispatcher;
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) {
+            $event->getOutput()->write('before.');
+        });
+        $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) {
+            $event->getOutput()->write('after.');
+
+            $event->setExitCode(128);
+        });
+        $dispatcher->addListener('console.exception', function (ConsoleForExceptionEvent $event) {
+            $event->getOutput()->writeln('caught.');
+
+            $event->setException(new \LogicException('caught.', $event->getExitCode(), $event->getException()));
+        });
+
+        return $dispatcher;
     }
 }
 

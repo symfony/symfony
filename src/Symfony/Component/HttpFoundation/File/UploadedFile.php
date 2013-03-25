@@ -231,17 +231,19 @@ class UploadedFile extends File
      */
     public static function getMaxFilesize()
     {
-        $max = trim(ini_get('upload_max_filesize'));
+        $max = strtolower(ini_get('upload_max_filesize'));
 
         if ('' === $max) {
             return PHP_INT_MAX;
         }
 
-        if (preg_match('#^(\d+)([bkmgt])#i', $max, $match)) {
-            $shift = array('b' => 0, 'k' => 10, 'm' => 20, 'g' => 30, 't' => 40);
-            $max = ($match[1] * (1 << $shift[strtolower($match[2])]));
+        if (preg_match('#^\+?(0x?)?([^kmg]*)([kmg]?)#', $max, $match)) {
+            $shifts = array('' => 0, 'k' => 10, 'm' => 20, 'g' => 30);
+            $bases = array('' => 10, '0' => 8, '0x' => 16);
+
+            return (intval($match[2], $bases[$match[1]]) * (1 << $shifts[$match[3]]));
         }
 
-        return (integer) $max;
+        return 0;
     }
 }

@@ -29,12 +29,14 @@ class ServerParams
             return null;
         }
 
-        if (preg_match('#^(\d+)([bkmgt])#i', $iniMax, $match)) {
-            $shift = array('b' => 0, 'k' => 10, 'm' => 20, 'g' => 30, 't' => 40);
-            $iniMax = ($match[1] * (1 << $shift[strtolower($match[2])]));
+        if (preg_match('#^\+?(0x?)?([^kmg]*)([KMG]?)#', $iniMax, $match)) {
+            $shifts = array('' => 0, 'K' => 10, 'M' => 20, 'G' => 30);
+            $bases = array('' => 10, '0' => 8, '0x' => 16);
+
+            return (intval($match[2], $bases[$match[1]]) * (1 << $shifts[$match[3]]));
         }
 
-        return (int) $iniMax;
+        return 0;
     }
 
     /**

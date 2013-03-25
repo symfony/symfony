@@ -18,6 +18,8 @@
             <framework:loader>loader.bar</framework:loader>
             <framework:engine>php</framework:engine>
             <framework:engine>twig</framework:engine>
+            <framework:engine>default</framework:engine>
+            <framework:default-engine>php</framework:default-engine>
             <framework:assets-base-url>http://cdn.example.com</framework:assets-base-url>
             <framework:package name="images" version="1.0.0">
                 <framework:base-url>http://images1.example.com</framework:base-url>

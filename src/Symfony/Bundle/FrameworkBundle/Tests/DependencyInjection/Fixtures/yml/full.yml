@@ -31,7 +31,8 @@ framework:
     templating:
         assets_version:   SomeVersionScheme
         assets_base_urls: http://cdn.example.com
-        engines:          [php, twig]
+        engines:          [php, twig, default]
+        default_engine:   php
         loader:           [loader.foo, loader.bar]
         cache:            /path/to/cache
         packages:

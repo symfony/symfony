@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by vicb at 2013-03-23T08:30:44Z
+
+@jfsimon, you probably mis-read my comment, the code needs **to be reverted.**
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-03-23T08:38:27Z
+
+@vicb What's wrong with this solution? I need to understand.
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-03-23T08:48:25Z
+
+- What was wrong with the previous (working) solution ?
+- The current look of your code.
+
+I don't think anybody will ever use a form to upload TB of data, but anyway "t" is not supported (I think the sames goes for "b")
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-03-23T09:06:21Z
+
+Okay. What about octal/hexadecimal values? Don't they need to be supported?
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-03-23T09:13:21Z
+
+Good point. You should ask @fabpot.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-23T09:33:09Z
+
+I'm the one who asked @jfsimon to use this new way. Before the last comment of @jfsimon, I was inclined to agree with @vicb and revert the change. But @jfsimon had a good point, so I think the new way is indeed better as it covers more cases.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-25T20:06:02Z
+
+Is it ready to be merged?
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-03-25T20:19:18Z
+
+@fabpot Yes.

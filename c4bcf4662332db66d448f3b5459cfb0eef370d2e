@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xkobal at 2013-03-20T11:12:18Z
+
+Another problem (maybe an issue ?) which is new in Symfony 2.2, it is the security.secure_random service. This service produce a good encryption, but in bytes when it is used with openssl_random_pseudo_bytes. The problem is that bytes is inusable as it in databases, without being encoded with bin2hex.
+
+Maybe the security.secure_random need to have an option to encode in hexa instead of binary ?
+
+---------------------------------------------------------------------------
+
+by xkobal at 2013-03-21T11:27:05Z
+
+Maybe tests have failed because I have reverted a commit ?

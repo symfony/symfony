@@ -51,7 +51,7 @@ class ConfigDataCollector extends DataCollector
             'apc_enabled'      => extension_loaded('apc') && ini_get('apc.enabled'),
             'xcache_enabled'   => extension_loaded('xcache') && ini_get('xcache.cacher'),
             'wincache_enabled' => extension_loaded('wincache') && ini_get('wincache.ocenabled'),
-            'zendopt+_enabled' => extension_loaded('Zend Optimizer+') && ini_get('zend_optimizerplus.enable'),
+            'opcache_enabled'  => extension_loaded('Zend OPcache') && ini_get('opcache.enable'),
             'bundles'          => array(),
             'sapi_name'        => php_sapi_name(),
         );
@@ -152,11 +152,11 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
-     * @return Boolean Whether Zend Optimizer+ is enabled
+     * @return Boolean Whether Zend OPcache is enabled
      */
-    public function hasZendOptimizerPlus()
+    public function hasOpcache()
     {
-        return $this->isExtensionEnabled('zendopt+');
+        return $this->isExtensionEnabled('opcache');
     }
 
     /**
@@ -164,7 +164,7 @@ class ConfigDataCollector extends DataCollector
      */
     public function hasAccelerator()
     {
-        return $this->hasApc() || $this->hasEAccelerator() || $this->hasXCache() || $this->hasWinCache() || $this->hasZendOptimizerPlus();
+        return $this->hasApc() || $this->hasEAccelerator() || $this->hasXCache() || $this->hasWinCache() || $this->hasOpcache();
     }
 
     /**
@@ -192,7 +192,9 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
-     * @return Boolean whether the given opcode cache is enabled
+     * @param string $name The name of the extension
+     *
+     * @return Boolean whether the given extension is enabled
      */
     protected function isExtensionEnabled($name)
     {

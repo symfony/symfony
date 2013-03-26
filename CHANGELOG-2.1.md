@@ -7,6 +7,41 @@ in 2.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.1.0...v2.1.1
 
+* 2.1.9 (2013-03-26)
+
+ * 9875c4b: Added '@@' escaping strategy for YamlFileLoader and YamlDumper
+ * bbcdfe2: [Yaml] fixed bugs with folded scalar parsing
+ * 5afea04: [Form] made DefaultCsrfProvider using session_status() when available
+ * c928ddc: [HttpFoudantion] fixed Request::getPreferredLanguage()
+ * e6b7515: [DomCrawler] added support for query string with slash
+ * 17dc2ff: [HttpRequest] fixes Request::getLanguages() bug
+ * e51432a: sub-requests are now created with the same class as their parent
+ * ef53456: [DoctrineBridge] Avoids blob values to be logged by doctrine
+ * 6575df6: [Security] use current request attributes to generate redirect url?
+ * 7216cb0: [Validator] fix showing wrong max file size for upload errors
+ * c423f16: [2.1][TwigBridge] Fixes Issue #7342 in TwigBridge
+ * 7d87ecd: [FrameworkBundle] fixed cahe:clear command's warmup
+ * fe4cc24: [TwigBridge] fixed fixed scope & trans_default_domain node visitor
+ * fc47589: [BrowserKit] added ability to ignored malformed set-cookie header
+ * 5bc30bb: [Translation] added xliff loader/dumper with resname support
+ * 7241be9: [Finder] fixed a potential issue on Solaris where INF value is wrong (refs #7269)
+ * 1d3da29: [FrameworkBundle] avoids cache:clear to break if new/old folders already exist
+ * b9cdb9a: [HttpKernel] Fixed possible profiler token collision (closes #7272, closes #7171)
+ * d1f5d25: [FrameworkBundle] Fixes invalid serialized objects in cache
+ * c82c754: RedisProfilerStorage wrong db-number/index-number selected
+ * e86fefa: Unset loading[$id] in ContainerBuilder on exception
+ * 73bead7: [ClassLoader] made DebugClassLoader idempotent
+ * a4ec677: [DomCrawler] Fix relative path handling in links
+ * 6681df0: [Console] fixed StringInput binding
+ * 5b19c89: [Console] fixed unparsed StringInput tokens
+ * bae83c7: [TwigBridge] fixed trans twig extractor
+ * 8f8ba38: [DomCrawler] fix handling of schemes by Link::getUri()
+ * 83382bc: [TwigBridge] fixed the translator extractor that were not trimming the text in trans tags (closes #7056)
+ * b1ea8e5: Fixed handling absent href attribute in base tag
+ * 8d9cd42: Routing issue with installation in a sub-directory ref: https://github.com/symfony/symfony/issues/7129
+ * 0690709: added a DebuClassLoader::findFile() method to make the wrapping less invasive
+ * 635b1fc: StringInput resets the given options.
+
 * 2.1.8 (2013-02-23)
 
  * b2080c4: [HttpFoundation] Remove Cache-Control when using https download via IE<9 (fixes #6750)

@@ -56,8 +56,26 @@ class FileFormFieldTest extends FormFieldTestCase
         $this->assertEquals(basename(__FILE__), $value['name'], "->$method() sets the name of the file field");
         $this->assertEquals('', $value['type'], "->$method() sets the type of the file field");
         $this->assertInternalType('string', $value['tmp_name'], "->$method() sets the tmp_name of the file field");
+        $this->assertFileExists($value['tmp_name'], "->$method() creates a copy of the file at the tmp_name path");
         $this->assertEquals(0, $value['error'], "->$method() sets the error of the file field");
         $this->assertEquals(filesize(__FILE__), $value['size'], "->$method() sets the size of the file field");
+
+        $origInfo = pathinfo(__FILE__);
+        $tmpInfo = pathinfo($value['tmp_name']);
+        $this->assertEquals(
+            $origInfo['extension'],
+            $tmpInfo['extension'],
+            "->$method() keeps the same file extension in the tmp_name copy"
+        );
+
+        $field->$method(__DIR__.'/../Fixtures/no-extension');
+        $value = $field->getValue();
+
+        $this->assertArrayNotHasKey(
+            'extension',
+            pathinfo($value['tmp_name']),
+            "->$method() does not add a file extension in the tmp_name copy"
+        );
     }
 
     public function getSetValueMethods()

@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by pborreli at 2013-03-26T12:34:23Z
+
+please add some tests, at least the failing case of #7480
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-03-26T12:38:16Z
+
+@pborreli `ini_set()` does not work for `post_max_size` value, so I cant't test this feature.
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-03-26T12:42:06Z
+
+@jfsimon but you can extend/mock class `ServerParams` and overwrite the `getNormalizedIniPostMaxSize()` method, so it will be able to return anything.
+
+---------------------------------------------------------------------------
+
+by pborreli at 2013-03-26T12:42:26Z
+
+@jfsimon then maybe overwrite getNormalizedIniPostMaxSize ?
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-03-26T12:45:08Z
+
+@stloyd right, let's go.
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-03-26T13:03:46Z
+
+@stloyd @pborreli really better with some tests, thanks.
+
+---------------------------------------------------------------------------
+
+by lazyhammer at 2013-03-26T13:06:23Z
+
+@jfsimon How about adding `i` modifier, so we can have the same regex in all places and don't rely on `strto(upper|lower)`?
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-03-26T13:08:50Z
+
+@lazyhammer I'd like to knwo what does @vicb think about that.
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-03-26T13:14:32Z
+
+I don't care.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-26T13:47:11Z
+
+I think it's time to admit that this new way is just a fail and we need to revert to the previous way.
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-03-26T13:56:45Z
+
+@fabpot we wont surrender now! everything is okay now.

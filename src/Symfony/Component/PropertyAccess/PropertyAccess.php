@@ -21,7 +21,7 @@ final class PropertyAccess
     /**
      * Creates a property accessor with the default configuration.
      *
-     * @return PropertyAccessor The new property accessor.
+     * @return PropertyAccessor The new property accessor
      */
     public static function getPropertyAccessor()
     {

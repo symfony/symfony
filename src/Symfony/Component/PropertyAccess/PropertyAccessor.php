@@ -96,9 +96,9 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Reads the path from an object up to a given path index.
      *
-     * @param object|array          $objectOrArray The object or array to read from.
-     * @param PropertyPathInterface $propertyPath  The property path to read.
-     * @param integer               $lastIndex     The integer up to which should be read.
+     * @param object|array          $objectOrArray The object or array to read from
+     * @param PropertyPathInterface $propertyPath  The property path to read
+     * @param integer               $lastIndex     The index up to which should be read
      *
      * @return array The values read in the path.
      *
@@ -139,12 +139,12 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Reads a key from an array-like structure.
      *
-     * @param \ArrayAccess|array $array The array or \ArrayAccess object to read from.
-     * @param string|integer     $index The key to read.
+     * @param \ArrayAccess|array $array The array or \ArrayAccess object to read from
+     * @param string|integer     $index The key to read
      *
      * @return mixed The value of the key
      *
-     * @throws NoSuchPropertyException If the array does not implement \ArrayAccess or it is not an array.
+     * @throws NoSuchPropertyException If the array does not implement \ArrayAccess or it is not an array
      */
     private function &readIndex(&$array, $index)
     {
@@ -180,9 +180,9 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @return mixed The value of the read property
      *
-     * @throws NoSuchPropertyException       If the property does not exist.
+     * @throws NoSuchPropertyException       If the property does not exist
      * @throws PropertyAccessDeniedException If the property cannot be accessed due to
-     *                                       access restrictions (private or protected).
+     *                                       access restrictions (private or protected)
      */
     private function &readProperty(&$object, $property)
     {
@@ -250,11 +250,11 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Sets the value of the property at the given index in the path
      *
-     * @param \ArrayAccess|array $array An array or \ArrayAccess object to write to.
-     * @param string|integer     $index The index to write at.
-     * @param mixed              $value The value to write.
+     * @param \ArrayAccess|array $array An array or \ArrayAccess object to write to
+     * @param string|integer     $index The index to write at
+     * @param mixed              $value The value to write
      *
-     * @throws NoSuchPropertyException If the array does not implement \ArrayAccess or it is not an array.
+     * @throws NoSuchPropertyException If the array does not implement \ArrayAccess or it is not an array
      */
     private function writeIndex(&$array, $index, $value)
     {
@@ -268,14 +268,14 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Sets the value of the property at the given index in the path
      *
-     * @param object|array          $object   The object or array to write to.
-     * @param string                $property The property to write.
-     * @param string|null           $singular The singular form of the property name or null.
-     * @param mixed                 $value    The value to write.
+     * @param object|array          $object   The object or array to write to
+     * @param string                $property The property to write
+     * @param string|null           $singular The singular form of the property name or null
+     * @param mixed                 $value    The value to write
      *
-     * @throws NoSuchPropertyException       If the property does not exist.
+     * @throws NoSuchPropertyException       If the property does not exist
      * @throws PropertyAccessDeniedException If the property cannot be accessed due to
-     *                                       access restrictions (private or protected).
+     *                                       access restrictions (private or protected)
      */
     private function writeProperty(&$object, $property, $singular, $value)
     {
@@ -368,9 +368,9 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Camelizes a given string.
      *
-     * @param  string $string Some string.
+     * @param  string $string Some string
      *
-     * @return string The camelized version of the string.
+     * @return string The camelized version of the string
      */
     private function camelize($string)
     {
@@ -381,11 +381,11 @@ class PropertyAccessor implements PropertyAccessorInterface
      * Searches for add and remove methods.
      *
      * @param \ReflectionClass $reflClass The reflection class for the given object
-     * @param array            $singulars The singular form of the property name or null.
+     * @param array            $singulars The singular form of the property name or null
      *
-     * @return array|null An array containing the adder and remover when found, null otherwise.
+     * @return array|null An array containing the adder and remover when found, null otherwise
      *
-     * @throws NoSuchPropertyException If the property does not exist.
+     * @throws NoSuchPropertyException If the property does not exist
      */
     private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars)
     {
@@ -416,12 +416,12 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Returns whether a method is public and has a specific number of required parameters.
      *
-     * @param  \ReflectionClass $class      The class of the method.
-     * @param  string           $methodName The method name.
-     * @param  integer          $parameters The number of parameters.
+     * @param  \ReflectionClass $class      The class of the method
+     * @param  string           $methodName The method name
+     * @param  integer          $parameters The number of parameters
      *
      * @return Boolean Whether the method is public and has $parameters
-     *                                      required parameters.
+     *                                      required parameters
      */
     private function isAccessible(\ReflectionClass $class, $methodName, $parameters)
     {

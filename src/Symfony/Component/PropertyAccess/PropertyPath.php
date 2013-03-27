@@ -62,10 +62,10 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * Constructs a property path from a string.
      *
-     * @param PropertyPath|string $propertyPath The property path as string or instance.
+     * @param PropertyPath|string $propertyPath The property path as string or instance
      *
-     * @throws UnexpectedTypeException      If the given path is not a string.
-     * @throws InvalidPropertyPathException If the syntax of the property path is not valid.
+     * @throws UnexpectedTypeException      If the given path is not a string
+     * @throws InvalidPropertyPathException If the syntax of the property path is not valid
      */
     public function __construct($propertyPath)
     {

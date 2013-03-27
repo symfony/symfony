@@ -23,10 +23,6 @@ class RepeatedType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // Overwrite required option for child fields
-        $options['first_options']['required']  = $options['required'];
-        $options['second_options']['required'] = $options['required'];
-
         if (!isset($options['options']['error_bubbling'])) {
             $options['options']['error_bubbling'] = $options['error_bubbling'];
         }

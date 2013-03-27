@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by vicb at 2013-03-27T09:06:01Z
+
+To be really perfect, I would write
+
+`return (intval($match[2], $bases[$match[1]]) * (1 << $shifts[$match[3]]));`
+
+as
+
+`return intval($match[2], $bases[$match[1]]) << $shifts[$match[3]];`
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-03-27T09:07:51Z
+
+and btw, great you've opened a ticket on php.net.
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-03-27T09:11:10Z
+
+@vicb I just amended my commit which is now perfect, thanks!

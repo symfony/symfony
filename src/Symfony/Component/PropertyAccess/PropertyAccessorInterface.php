@@ -72,8 +72,8 @@ interface PropertyAccessorInterface
      *
      * If none of them are found, an exception is thrown.
      *
-     * @param object|array                 $objectOrArray The object or array to traverse
-     * @param string|PropertyPathInterface $propertyPath  The property path to modify.
+     * @param object|array                 $objectOrArray The object or array to traverse.
+     * @param string|PropertyPathInterface $propertyPath  The property path to read.
      *
      * @return mixed The value at the end of the property path
      *

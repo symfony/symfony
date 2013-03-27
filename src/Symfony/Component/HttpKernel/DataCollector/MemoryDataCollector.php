@@ -79,11 +79,11 @@ class MemoryDataCollector extends DataCollector
             return -1;
         }
 
-        if (preg_match('#^\+?(0x?)?([^kmg]*)([kmg]?)#', $memoryLimit, $match)) {
+        if (preg_match('#^\+?(0x?)?(.*?)([kmg]?)$#', $memoryLimit, $match)) {
             $shifts = array('' => 0, 'k' => 10, 'm' => 20, 'g' => 30);
             $bases = array('' => 10, '0' => 8, '0x' => 16);
 
-            return (intval($match[2], $bases[$match[1]]) * (1 << $shifts[$match[3]]));
+            return intval($match[2], $bases[$match[1]]) << $shifts[$match[3]];
         }
 
         return 0;

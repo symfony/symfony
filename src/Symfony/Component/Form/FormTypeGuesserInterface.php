@@ -21,30 +21,33 @@ interface FormTypeGuesserInterface
      *
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
+     * @param array  $options  The current configuration options for guessed field
      *
      * @return Guess\TypeGuess A guess for the field's type and options
      */
-    public function guessType($class, $property);
+    public function guessType($class, $property, array $options = array());
 
     /**
      * Returns a guess whether a property of a class is required
      *
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
+     * @param array  $options  The current configuration options for guessed field
      *
      * @return Guess\Guess A guess for the field's required setting
      */
-    public function guessRequired($class, $property);
+    public function guessRequired($class, $property, array $options = array());
 
     /**
      * Returns a guess about the field's maximum length
      *
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
+     * @param array  $options  The current configuration options for guessed field
      *
      * @return Guess\Guess A guess for the field's maximum length
      */
-    public function guessMaxLength($class, $property);
+    public function guessMaxLength($class, $property, array $options = array());
 
     /**
      * Returns a guess about the field's pattern
@@ -57,8 +60,9 @@ interface FormTypeGuesserInterface
      *
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
+     * @param array  $options  The current configuration options for guessed field
      *
      * @return Guess\Guess A guess for the field's required pattern
      */
-    public function guessPattern($class, $property);
+    public function guessPattern($class, $property, array $options = array());
 }

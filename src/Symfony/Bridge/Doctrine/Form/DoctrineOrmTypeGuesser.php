@@ -35,7 +35,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessType($class, $property)
+    public function guessType($class, $property, array $options = array())
     {
         if (!$ret = $this->getMetadata($class)) {
             return new TypeGuess('text', array(), Guess::LOW_CONFIDENCE);
@@ -82,7 +82,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessRequired($class, $property)
+    public function guessRequired($class, $property, array $options = array())
     {
         $classMetadatas = $this->getMetadata($class);
 
@@ -122,7 +122,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessMaxLength($class, $property)
+    public function guessMaxLength($class, $property, array $options = array())
     {
         $ret = $this->getMetadata($class);
         if ($ret && $ret[0]->hasField($property) && !$ret[0]->hasAssociation($property)) {
@@ -141,7 +141,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessPattern($class, $property)
+    public function guessPattern($class, $property, array $options = array())
     {
         $ret = $this->getMetadata($class);
         if ($ret && $ret[0]->hasField($property) && !$ret[0]->hasAssociation($property)) {

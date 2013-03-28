@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Validator;
 
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
@@ -30,19 +31,19 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     /**
      * {@inheritDoc}
      */
-    public function guessType($class, $property)
+    public function guessType($class, $property, array $options = array())
     {
         $guesser = $this;
 
         return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
             return $guesser->guessTypeForConstraint($constraint);
-        });
+        }, null, $options);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function guessRequired($class, $property)
+    public function guessRequired($class, $property, array $options = array())
     {
         $guesser = $this;
 
@@ -50,31 +51,31 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             return $guesser->guessRequiredForConstraint($constraint);
         // If we don't find any constraint telling otherwise, we can assume
         // that a field is not required (with LOW_CONFIDENCE)
-        }, false);
+        }, false, $options);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function guessMaxLength($class, $property)
+    public function guessMaxLength($class, $property, array $options = array())
     {
         $guesser = $this;
 
         return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
             return $guesser->guessMaxLengthForConstraint($constraint);
-        });
+        }, null, $options);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function guessPattern($class, $property)
+    public function guessPattern($class, $property, array $options = array())
     {
         $guesser = $this;
 
         return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
             return $guesser->guessPatternForConstraint($constraint);
-        });
+        }, null, $options);
     }
 
     /**
@@ -258,10 +259,22 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return Guess The guessed value with the highest confidence
      */
-    protected function guess($class, $property, \Closure $closure, $defaultValue = null)
+    protected function guess($class, $property, \Closure $closure, $defaultValue = null, array $options = array())
     {
         $guesses = array();
         $classMetadata = $this->metadataFactory->getMetadataFor($class);
+
+        if (array_key_exists('validation_groups', $options)) {
+            $groups = $options['validation_groups'];
+        } else {
+            $groups = array(Constraint::DEFAULT_GROUP);
+        }
+
+        if (!empty($groups) && is_callable($groups)) {
+            throw new InvalidConfigurationException(sprintf(
+                'Type guessers cannot guess type for form that has validation groups as a callable.'
+            ));
+        }
 
         if ($classMetadata->hasMemberMetadatas($property)) {
             $memberMetadatas = $classMetadata->getMemberMetadatas($property);
@@ -270,7 +283,16 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 $constraints = $memberMetadata->getConstraints();
 
                 foreach ($constraints as $constraint) {
-                    if ($guess = $closure($constraint)) {
+                    // Check that all groups defined on form are defined for this
+                    // constraint
+                    $match = true;
+                    foreach ($groups as $group) {
+                        if (!in_array($group, $constraint->groups)) {
+                            $match = false;
+                        }
+                    }
+
+                    if ($match && $guess = $closure($constraint)) {
                         $guesses[] = $guess;
                     }
                 }

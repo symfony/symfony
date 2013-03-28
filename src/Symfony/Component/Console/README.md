@@ -10,8 +10,20 @@ The Application object manages the CLI application:
     $console = new Application();
     $console->run();
 
+
 The ``run()`` method parses the arguments and options passed on the command
 line and executes the right command.
+You can also use diferent input interfaces:
+
+    use Symfony\Component\Console\Application;
+    use Symfony\Component\Console\Input\StringInput;
+
+    $console = new Application();
+    $console->run(new StringInput('example arguments'));
+    
+    // or
+    
+    $console->run(new ArgvInput($_SERVER['argv']));  
 
 Registering a new command can easily be done via the ``register()`` method,
 which returns a ``Command`` instance:

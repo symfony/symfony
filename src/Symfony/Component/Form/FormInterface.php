@@ -152,6 +152,14 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the field is bound.
      *
+     * @param  mixed $submittedData The data to bind the Form with
+     * @return FormInterface The Form
+     */
+    public function bind($submittedData);
+
+    /**
+     * Returns whether the field is bound.
+     *
      * @return Boolean true if the form is bound to input values, false otherwise
      */
     public function isBound();

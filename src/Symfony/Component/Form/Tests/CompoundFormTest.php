@@ -679,10 +679,10 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('')
-        ->setCompound(true)
-        ->setDataMapper($this->getDataMapper())
-        ->addEventSubscriber(new BindRequestListener())
-        ->getForm();
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->addEventSubscriber(new BindRequestListener())
+            ->getForm();
 
         $firstName = $this->getBuilder('firstName')->getForm();
 

@@ -90,7 +90,7 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matchIp($ip)
     {
-	$this->matchIps($ip);
+        $this->matchIps($ip);
     }
 
     /**
@@ -153,19 +153,15 @@ class RequestMatcher implements RequestMatcherInterface
             return false;
         }
 
-        if (0 !== count($this->ips)) {
-            $foundWhitelistedIp = false;
-            foreach($this->ips as $ip) { 
-                if (IpUtils::checkIp($request->getClientIp(), $ip)) {
-                    $foundWhitelistedIp = true;
-                    break;
-                }
+        foreach($this->ips as $ip) { 
+            if (IpUtils::checkIp($request->getClientIp(), $ip)) {
+                return true;
             }
-
-            if (!$foundWhitelistedIp)
-                return false;
         }
 
-        return true;
+        // Note to future implementors: add additional checks above the 
+        // foreach above or else your check might not be run!
+
+        return false;
     }
 }

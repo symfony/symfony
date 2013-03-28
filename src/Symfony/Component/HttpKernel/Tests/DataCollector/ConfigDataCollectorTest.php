@@ -40,26 +40,6 @@ class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(PHP_VERSION,$c->getPhpVersion());
         $this->assertSame(Kernel::VERSION,$c->getSymfonyVersion());
         $this->assertNull($c->getToken());
-
-        // if else clause because we don't know it
-        if (extension_loaded('xdebug')) {
-            $this->assertTrue($c->hasXdebug());
-        } else {
-            $this->assertFalse($c->hasXdebug());
-        }
-
-        // if else clause because we don't know it
-        if (((extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'))
-                ||
-                (extension_loaded('apc') && ini_get('apc.enabled'))
-                ||
-                (extension_loaded('xcache') && ini_get('xcache.cacher'))
-                ||
-                (extension_loaded('wincache') && ini_get('wincache.ocenabled')))) {
-            $this->assertTrue($c->hasAccelerator());
-        } else {
-            $this->assertFalse($c->hasAccelerator());
-        }
     }
 }
 

@@ -144,12 +144,8 @@
             <td>{{ collector.hasxdebug ? 'enabled' : 'disabled' }}</td>
         </tr>
         <tr>
-            <th>PHP acceleration</th>
+            <th>PHP acceleration (opcode cache)</th>
             <td>{{ collector.hasaccelerator ? 'enabled' : 'disabled' }}</td>
-        </tr>
-        <tr>
-            <th>XCache</th>
-            <td>{{ collector.hasxcache ? 'enabled' : 'disabled' }}</td>
         </tr>
         <tr>
             <th>APC</th>
@@ -158,6 +154,14 @@
         <tr>
             <th>EAccelerator</th>
             <td>{{ collector.haseaccelerator ? 'enabled' : 'disabled' }}</td>
+        </tr>
+        <tr>
+            <th>XCache</th>
+            <td>{{ collector.hasxcache ? 'enabled' : 'disabled' }}</td>
+        </tr>
+        <tr>
+            <th>OPcache</th>
+            <td>{{ collector.hasopcache ? 'enabled' : 'disabled' }}</td>
         </tr>
         <tr>
             <th>Full PHP configuration</th>

@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * ConfigDataCollector.
+ * ConfigDataCollector holds information about the configuration.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -27,8 +27,6 @@ class ConfigDataCollector extends DataCollector
     private $kernel;
 
     /**
-     * Constructor.
-     *
      * @param KernelInterface $kernel A KernelInterface instance
      */
     public function setKernel(KernelInterface $kernel = null)
@@ -53,8 +51,9 @@ class ConfigDataCollector extends DataCollector
             'apc_enabled'      => extension_loaded('apc') && ini_get('apc.enabled'),
             'xcache_enabled'   => extension_loaded('xcache') && ini_get('xcache.cacher'),
             'wincache_enabled' => extension_loaded('wincache') && ini_get('wincache.ocenabled'),
+            'opcache_enabled'  => extension_loaded('Zend OPcache') && ini_get('opcache.enable'),
             'bundles'          => array(),
-            'sapi_name'        => php_sapi_name()
+            'sapi_name'        => php_sapi_name(),
         );
 
         if (isset($this->kernel)) {
@@ -65,8 +64,6 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
-     * Gets the token.
-     *
      * @return string The token
      */
     public function getToken()
@@ -75,8 +72,6 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
-     * Gets the Symfony version.
-     *
      * @return string The Symfony version
      */
     public function getSymfonyVersion()
@@ -85,8 +80,6 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
-     * Gets the PHP version.
-     *
      * @return string The PHP version
      */
     public function getPhpVersion()
@@ -95,8 +88,6 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
-     * Gets the application name.
-     *
      * @return string The application name
      */
     public function getAppName()
@@ -105,8 +96,6 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
-     * Gets the environment.
-     *
      * @return string The environment
      */
     public function getEnv()
@@ -115,9 +104,7 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
-     * Returns true if the debug is enabled.
-     *
-     * @return Boolean true if debug is enabled, false otherwise
+     * @return Boolean Whether debug is enabled
      */
     public function isDebug()
     {
@@ -125,74 +112,71 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
-     * Returns true if the XDebug is enabled.
-     *
-     * @return Boolean true if XDebug is enabled, false otherwise
+     * @return Boolean Whether XDebug is enabled
      */
     public function hasXDebug()
     {
-        return $this->data['xdebug_enabled'];
+        return $this->isExtensionEnabled('xdebug');
     }
 
     /**
-     * Returns true if EAccelerator is enabled.
-     *
-     * @return Boolean true if EAccelerator is enabled, false otherwise
+     * @return Boolean Whether EAccelerator is enabled
      */
     public function hasEAccelerator()
     {
-        return $this->data['eaccel_enabled'];
+        return $this->isExtensionEnabled('eaccel');
     }
 
     /**
-     * Returns true if APC is enabled.
-     *
-     * @return Boolean true if APC is enabled, false otherwise
+     * @return Boolean Whether APC is enabled, false otherwise
      */
     public function hasApc()
     {
-        return $this->data['apc_enabled'];
+        return $this->isExtensionEnabled('apc');
     }
 
     /**
-     * Returns true if XCache is enabled.
-     *
-     * @return Boolean true if XCache is enabled, false otherwise
+     * @return Boolean Whether XCache is enabled
      */
     public function hasXCache()
     {
-        return $this->data['xcache_enabled'];
+        return $this->isExtensionEnabled('xcache');
     }
 
     /**
-     * Returns true if WinCache is enabled.
-     *
-     * @return Boolean true if WinCache is enabled, false otherwise
+     * @return Boolean Whether WinCache is enabled
      */
     public function hasWinCache()
     {
-        return $this->data['wincache_enabled'];
+        return $this->isExtensionEnabled('wincache');
     }
 
     /**
-     * Returns true if any accelerator is enabled.
-     *
-     * @return Boolean true if any accelerator is enabled, false otherwise
+     * @return Boolean Whether Zend OPcache is enabled
+     */
+    public function hasOpcache()
+    {
+        return $this->isExtensionEnabled('opcache');
+    }
+
+    /**
+     * @return Boolean Whether any opcode cache is enabled.
      */
     public function hasAccelerator()
     {
-        return $this->hasApc() || $this->hasEAccelerator() || $this->hasXCache() || $this->hasWinCache();
+        return $this->hasApc() || $this->hasEAccelerator() || $this->hasXCache() || $this->hasWinCache() || $this->hasOpcache();
     }
 
+    /**
+     * @return array An associative array of bundles (name => root path)
+     */
     public function getBundles()
     {
         return $this->data['bundles'];
     }
 
     /**
-     * Gets the PHP SAPI name.
-     *
-     * @return string The environment
+     * @return string the PHP SAPI name
      */
     public function getSapiName()
     {
@@ -205,5 +189,17 @@ class ConfigDataCollector extends DataCollector
     public function getName()
     {
         return 'config';
+    }
+
+    /**
+     * @param string $name The name of the extension
+     *
+     * @return Boolean whether the given extension is enabled
+     */
+    protected function isExtensionEnabled($name)
+    {
+        $ext = $name.'_enabled';
+        // return false when not set to keep BC
+        return isset($this->data[$ext]) ? (Boolean) $this->data[$ext] : false;
     }
 }

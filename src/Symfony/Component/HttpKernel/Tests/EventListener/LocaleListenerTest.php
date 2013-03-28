@@ -68,6 +68,17 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($this->getEvent($request));
     }
 
+    public function testRequestLocaleIsNotOverridden()
+    {
+        $request = Request::create('/');
+        $request->setLocale('de');
+        $listener = new LocaleListener('fr');
+        $event = $this->getEvent($request);
+
+        $listener->onKernelRequest($event);
+        $this->assertEquals('de', $request->getLocale());
+    }
+
     private function getEvent(Request $request)
     {
         return new GetResponseEvent($this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'), $request, HttpKernelInterface::MASTER_REQUEST);

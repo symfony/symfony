@@ -88,7 +88,6 @@ class FormExtension extends \Twig_Extension
     {
         return array(
             'selectedchoice' => new \Twig_Test_Method($this, 'isSelectedChoice'),
-            'choicedisabled' => new \Twig_Test_Method($this, 'isChoiceDisabled'),
         );
     }
 
@@ -122,11 +121,6 @@ class FormExtension extends \Twig_Extension
         }
 
         return $choice->value === $selectedValue;
-    }
-
-    public function isChoiceDisabled(ChoiceView $choice)
-    {
-        return $choice->disabled;
     }
 
     /**

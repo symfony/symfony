@@ -37,6 +37,7 @@ class Definition
     private $synthetic;
     private $abstract;
     private $synchronized;
+    private $lazy;
 
     protected $arguments;
 
@@ -58,6 +59,7 @@ class Definition
         $this->public = true;
         $this->synthetic = false;
         $this->synchronized = false;
+        $this->lazy = false;
         $this->abstract = false;
         $this->properties = array();
     }
@@ -597,6 +599,30 @@ class Definition
     public function isSynchronized()
     {
         return $this->synchronized;
+    }
+
+    /**
+     * Sets the lazy flag of this service.
+     *
+     * @param Boolean $lazy
+     *
+     * @return Definition The current instance
+     */
+    public function setLazy($lazy)
+    {
+        $this->lazy = (Boolean) $lazy;
+
+        return $this;
+    }
+
+    /**
+     * Whether this service is lazy.
+     *
+     * @return Boolean
+     */
+    public function isLazy()
+    {
+        return $this->lazy;
     }
 
     /**

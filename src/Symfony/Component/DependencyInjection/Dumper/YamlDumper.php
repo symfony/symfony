@@ -106,6 +106,10 @@ class YamlDumper extends Dumper
             $code .= sprintf("        factory_class: %s\n", $definition->getFactoryClass());
         }
 
+        if ($definition->isLazy()) {
+            $code .= sprintf("        lazy: true\n");
+        }
+
         if ($definition->getFactoryMethod()) {
             $code .= sprintf("        factory_method: %s\n", $definition->getFactoryMethod());
         }

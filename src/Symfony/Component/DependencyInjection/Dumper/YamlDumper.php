@@ -219,6 +219,8 @@ class YamlDumper extends Dumper
             return $this->getServiceCall((string) $value, $value);
         } elseif ($value instanceof Parameter) {
             return $this->getParameterCall((string) $value);
+        } elseif ($value instanceof Definition) {
+            return $this->getDefinitionCall($value);
         } elseif (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
         }
@@ -241,6 +243,18 @@ class YamlDumper extends Dumper
         }
 
         return sprintf('@%s', $id);
+    }
+
+    /**
+     * Gets definition class.
+     *
+     * @param Definition $definition
+     *
+     * @return string
+     */
+    private function getDefinitionCall(Definition $definition)
+    {
+        return sprintf('+%s', $definition->getClass());
     }
 
     /**

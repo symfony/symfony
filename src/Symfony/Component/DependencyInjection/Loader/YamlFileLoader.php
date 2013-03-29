@@ -315,6 +315,8 @@ class YamlFileLoader extends FileLoader
             if (null !== $invalidBehavior) {
                 $value = new Reference($value, $invalidBehavior, $strict);
             }
+        } elseif (is_string($value) &&  0 === strpos($value, '+')) {
+            $value = new Definition(substr($value, 1));
         }
 
         return $value;

@@ -725,16 +725,34 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder($adapter);
         $finder->files()->in(self::$tmpDir);
 
-        // make 'foo' directory non-openable
+        // make 'foo' directory non-readable
         chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0333);
 
         try {
-            $this->assertIterator($this->toAbsolute(array('test.php', 'test.py')), $finder->getIterator());
+            $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
             $this->fail('Finder should throw an exception when opening a non-readable directory.');
         } catch (\Exception $e) {
             $this->assertEquals('Symfony\\Component\\Finder\\Exception\\AccessDeniedException', get_class($e));
         }
 
+        // restore original permissions
+        chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0777);
+    }
+
+    /**
+     * @dataProvider getAdaptersTestData
+     */
+    public function testIgnoredAccessDeniedException(Adapter\AdapterInterface $adapter)
+    {
+        $finder = $this->buildFinder($adapter);
+        $finder->files()->ignoreUnreadableDirs()->in(self::$tmpDir);
+
+        // make 'foo' directory non-readable
+        chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0333);
+
+        $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
+
+        // restore original permissions
         chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0777);
     }
 

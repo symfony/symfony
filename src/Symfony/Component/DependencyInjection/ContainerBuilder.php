@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use ProxyManager\Configuration;
+use ProxyManager\Factory\LazyLoadingValueHolderFactory;
+use ProxyManager\Proxy\LazyLoadingInterface;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -873,8 +876,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws RuntimeException When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
      */
-    private function createService(Definition $definition, $id)
+    public function createService(Definition $definition, $id, $tryProxy = true)
     {
+        if ($tryProxy && ($className = $definition->getClass()) && $definition->isLazy()) {
+            $factory   = new LazyLoadingValueHolderFactory(new Configuration());
+            $container = $this;
+
+            return $factory->createProxy(
+                $className,
+                function (& $wrappedInstance, LazyLoadingInterface $proxy) use ($container, $definition, $id) {
+                    $proxy->setProxyInitializer(null);
+
+                    $wrappedInstance = $container->createService($definition, $id, false);
+                }
+            );
+        }
+
         if ($definition->isSynthetic()) {
             throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The DIC does not know how to construct this service.', $id));
         }

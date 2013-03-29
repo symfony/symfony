@@ -61,6 +61,7 @@
         "symfony/yaml": "self.version"
     },
     "require-dev": {
+        "ocramius/proxy-manager": "0.2.*",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",
         "doctrine/orm": "~2.2,>=2.2.3",

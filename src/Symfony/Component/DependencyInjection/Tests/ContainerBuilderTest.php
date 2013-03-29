@@ -266,6 +266,30 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
      */
+    public function testCreateServiceWithDelegateFactory()
+    {
+        $builder = new ContainerBuilder();
+
+        $builder->register('foo1', 'FooClass')->setFile(__DIR__.'/Fixtures/includes/foo.php');
+        $builder->getDefinition('foo1')->setLazy(true);
+
+        /* @var $foo1 \ProxyManager\Proxy\LazyLoadingInterface|\ProxyManager\Proxy\ValueHolderInterface */
+        $foo1 = $builder->get('foo1');
+
+        $this->assertInstanceOf('\FooClass', $foo1);
+        $this->assertInstanceOf('\ProxyManager\Proxy\LazyLoadingInterface', $foo1);
+        $this->assertFalse($foo1->isProxyInitialized());
+
+        $foo1->initializeProxy();
+
+        $this->assertTrue($foo1->isProxyInitialized());
+        $this->assertInstanceOf('\FooClass', $foo1->getWrappedValueHolderValue());
+        $this->assertNotInstanceOf('\ProxyManager\Proxy\LazyLoadingInterface', $foo1->getWrappedValueHolderValue());
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
+     */
     public function testCreateServiceClass()
     {
         $builder = new ContainerBuilder();

@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use CG\Core\DefaultGeneratorStrategy;
+use CG\Generator\PhpClass;
+use ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator;
+use ReflectionClass;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -94,7 +98,8 @@ class PhpDumper extends Dumper
         $code .=
             $this->addServices().
             $this->addDefaultParametersMethod().
-            $this->endClass()
+            $this->endClass().
+            $this->addProxyClasses()
         ;
 
         return $code;
@@ -172,14 +177,13 @@ class PhpDumper extends Dumper
         // @todo this should happen directly through the factory class, but we have to ensure that the proxy
         // @todo class is generated during the dump process
         $methodName = 'get' . Container::camelize($id) . 'Service';
+        $proxyClass = str_replace('\\', '', $definition->getClass()) . '_' . md5(spl_object_hash($definition));
 
         return <<<EOF
         if (\$lazyLoad) {
-            \$factory   = new \ProxyManager\Factory\LazyLoadingValueHolderFactory(new \ProxyManager\Configuration());
             \$container = \$this;
 
-            return \$factory->createProxy(
-                $class,
+            return new $proxyClass(
                 function (& \$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) use (\$container) {
                     \$proxy->setProxyInitializer(null);
 
@@ -192,6 +196,42 @@ class PhpDumper extends Dumper
 
 
 EOF;
+    }
+
+    /**
+     * Generates code for the proxy classes to be attached after the container class
+     *
+     * @return string
+     */
+    private function addProxyClasses()
+    {
+        $definitions = $this->container->getDefinitions();
+
+        ksort($definitions);
+
+        $proxyDefinitions = array_filter(
+            $this->container->getDefinitions(),
+            function (Definition $definition) {
+                return $definition->isLazy() && $definition->getClass();
+            }
+        );
+
+        $proxyGenerator = new LazyLoadingValueHolderGenerator();
+        $classGenerator = new DefaultGeneratorStrategy();
+        $code           = '';
+
+        /* @var $proxyDefinitions Definition[] */
+        foreach ($proxyDefinitions as $definition) {
+            $phpClass = new PhpClass(
+                str_replace('\\', '', $definition->getClass()) . '_' . md5(spl_object_hash($definition))
+            );
+
+            $proxyGenerator->generate(new ReflectionClass($definition->getClass()), $phpClass);
+
+            $code .= "\n" . $classGenerator->generate($phpClass);
+        }
+
+        return $code;
     }
 
     /**

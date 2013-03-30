@@ -63,7 +63,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new PhpDumper($container);
 
         $dumpedString = $dumper->dump();
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/lazy_service.php', $dumpedString, '->dump() does generate proxy lazy loading logic.');
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/lazy_service.txt', $dumpedString, '->dump() does generate proxy lazy loading logic.');
     }
 
     public function testDumpOptimizationString()

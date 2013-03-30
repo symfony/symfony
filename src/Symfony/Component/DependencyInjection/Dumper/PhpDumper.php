@@ -150,6 +150,51 @@ class PhpDumper extends Dumper
     }
 
     /**
+     * Generates the logic required for proxy lazy loading
+     *
+     * @param string     $id         The service id
+     * @param Definition $definition
+     *
+     * @return string
+     */
+    private function addProxyLoading($id, Definition $definition)
+    {
+        if (!($definition->isLazy() && $definition->getClass())) {
+            return '';
+        }
+
+        $class = $this->dumpValue($definition->getClass());
+
+        if (0 === strpos($class, "'") && !preg_match('/^\'[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\\{2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*\'$/', $class)) {
+            return '';
+        }
+
+        // @todo this should happen directly through the factory class, but we have to ensure that the proxy
+        // @todo class is generated during the dump process
+        $methodName = 'get' . Container::camelize($id) . 'Service';
+
+        return <<<EOF
+        if (\$lazyLoad) {
+            \$factory   = new \ProxyManager\Factory\LazyLoadingValueHolderFactory(new \ProxyManager\Configuration());
+            \$container = \$this;
+
+            return \$factory->createProxy(
+                $class,
+                function (& \$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) use (\$container) {
+                    \$proxy->setProxyInitializer(null);
+
+                    \$wrappedInstance = \$container->$methodName(false);
+
+                    return true;
+                }
+            );
+        }
+
+
+EOF;
+    }
+
+    /**
      * Generates the require_once statement for service includes.
      *
      * @param string     $id         The service id
@@ -483,17 +528,28 @@ EOF;
 EOF;
         }
 
-        $code = <<<EOF
+        if ($definition->isLazy()) {
+            $lazyInitialization    = '$lazyLoad = true';
+            $lazyInitializationDoc = "\n     * @param boolean \$lazyLoad whether to try lazy-loading the"
+                . " service with a proxy\n     *";
+        } else {
+            $lazyInitialization    = '';
+            $lazyInitializationDoc = '';
+        }
+
+        $code               = <<<EOF
 
     /**
      * Gets the '$id' service.$doc
-     *
+     *$lazyInitializationDoc
      * $return
      */
-    protected function get{$name}Service()
+    protected function get{$name}Service($lazyInitialization)
     {
 
 EOF;
+
+        $code .= $this->addProxyLoading($id, $definition);
 
         if (!in_array($scope, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE))) {
             $code .= <<<EOF

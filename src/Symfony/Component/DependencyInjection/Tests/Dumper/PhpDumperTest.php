@@ -52,6 +52,20 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertNotRegexp("/function getDefaultParameters\(/", $dumpedString, '->dump() does not add getDefaultParameters() method definition.');
     }
 
+    public function testDumpContainerWithProxyService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass');
+        $container->getDefinition('foo')->setLazy(true);
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $dumpedString = $dumper->dump();
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/lazy_service.php', $dumpedString, '->dump() does generate proxy lazy loading logic.');
+    }
+
     public function testDumpOptimizationString()
     {
         $definition = new Definition();

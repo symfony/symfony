@@ -888,6 +888,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                     $proxy->setProxyInitializer(null);
 
                     $wrappedInstance = $container->createService($definition, $id, false);
+
+                    return true;
                 }
             );
         }

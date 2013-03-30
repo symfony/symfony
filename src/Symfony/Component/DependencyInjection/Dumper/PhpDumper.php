@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
-use CG\Core\DefaultGeneratorStrategy;
-use CG\Generator\PhpClass;
+use ProxyManager\Generator\ClassGenerator;
+use ProxyManager\GeneratorStrategy\BaseGeneratorStrategy;
 use ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator;
 use ReflectionClass;
 use Symfony\Component\DependencyInjection\Variable;
@@ -216,13 +216,18 @@ EOF;
             }
         );
 
+        if (empty($proxyDefinitions)) {
+            // avoids hard dependency to ProxyManager
+            return '';
+        }
+
         $proxyGenerator = new LazyLoadingValueHolderGenerator();
-        $classGenerator = new DefaultGeneratorStrategy();
+        $classGenerator = new BaseGeneratorStrategy();
         $code           = '';
 
         /* @var $proxyDefinitions Definition[] */
         foreach ($proxyDefinitions as $definition) {
-            $phpClass = new PhpClass(
+            $phpClass = new ClassGenerator(
                 str_replace('\\', '', $definition->getClass()) . '_' . md5(spl_object_hash($definition))
             );
 

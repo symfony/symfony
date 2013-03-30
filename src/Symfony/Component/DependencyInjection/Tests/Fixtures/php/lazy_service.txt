@@ -63,80 +63,37 @@ class ProjectServiceContainer extends Container
     }
 }
 
-class %s extends \stdClass implements \ProxyManager\Proxy\LazyLoadingInterface, \ProxyManager\Proxy\ValueHolderInterface
+class stdClass_%s extends \stdClass implements \ProxyManager\Proxy\LazyLoadingInterface, \ProxyManager\Proxy\ValueHolderInterface
 {
-    /**
-     * @var \Closure|null initializer responsible for generating the wrapped object
-     */
-    private $%s;
-    /**
-     * @var \Closure|null initializer responsible for generating the wrapped object
-     */
-    private $%s;
 
     /**
-     * {@inheritDoc}
+     * @var \Closure|null initializer responsible for generating the wrapped object
      */
-    public function setProxyInitializer(\Closure $initializer = NULL)
+    private %s = null;
+
+    /**
+     * @var \Closure|null initializer responsible for generating the wrapped object
+     */
+    private %s = null;
+
+    /**
+     * @override constructor for lazy initialization
+     *
+     * @param \Closure|null $initializer
+     */
+    public function __construct($initializer)
     {
         $this->%s = $initializer;
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function isProxyInitialized()
-    {
-        return null !== $this->%s;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function initializeProxy()
-    {
-        return $this->%s && $this->%s->__invoke($this->%s, $this, 'initializeProxy', array());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getWrappedValueHolderValue()
-    {
-        return $this->%s;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getProxyInitializer()
-    {
-        return $this->%s;
-    }
-
-    /**
-     */
-    public function __wakeup()
-    {
-    }
-
-    /**
      * @param string $name
      */
-    public function __unset($name)
+    public function __get($name)
     {
-        $this->%s && $this->%s->__invoke($this->%s, $this, '__unset', array('name' => $name));
+        $this->%s && $this->%s->__invoke($this->%s, $this, '__get', array('name' => $name));
 
-        unset($this->%s->$name);
-    }
-
-    /**
-     */
-    public function __sleep()
-    {
-        $this->%s && $this->%s->__invoke($this->%s, $this, '__sleep', array());
-
-        return array('%s');
+        return $this->%s->$name;
     }
 
     /**
@@ -163,23 +120,15 @@ class %s extends \stdClass implements \ProxyManager\Proxy\LazyLoadingInterface, 
     /**
      * @param string $name
      */
-    public function __get($name)
+    public function __unset($name)
     {
-        $this->%s && $this->%s->__invoke($this->%s, $this, '__get', array('name' => $name));
+        $this->%s && $this->%s->__invoke($this->%s, $this, '__unset', array('name' => $name));
 
-        return $this->%s->$name;
+        unset($this->%s->$name);
     }
 
     /**
-     * @override constructor for lazy initialization
-     * @param \Closure|null $initializer
-     */
-    public function __construct($initializer)
-    {
-        $this->%s = $initializer;
-    }
-
-    /**
+     *
      */
     public function __clone()
     {
@@ -187,4 +136,63 @@ class %s extends \stdClass implements \ProxyManager\Proxy\LazyLoadingInterface, 
 
         $this->%s = clone $this->%s;
     }
+
+    /**
+     *
+     */
+    public function __sleep()
+    {
+        $this->%s && $this->%s->__invoke($this->%s, $this, '__sleep', array());
+
+        return array('%s');
+    }
+
+    /**
+     *
+     */
+    public function __wakeup()
+    {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setProxyInitializer(\Closure $initializer = null)
+    {
+        $this->%s = $initializer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getProxyInitializer()
+    {
+        return $this->%s;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeProxy()
+    {
+        return $this->%s && $this->%s->__invoke($this->%s, $this, 'initializeProxy', array());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isProxyInitialized()
+    {
+        return null !== $this->%s;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getWrappedValueHolderValue()
+    {
+        return $this->%s;
+    }
+
+
 }

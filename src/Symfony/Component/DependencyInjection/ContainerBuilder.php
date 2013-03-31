@@ -898,8 +898,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
             $factory   = new LazyLoadingValueHolderFactory($config);
             $container = $this;
-
-            return $factory->createProxy(
+            $proxy     = $factory->createProxy(
                 $className,
                 function (& $wrappedInstance, LazyLoadingInterface $proxy) use ($container, $definition, $id) {
                     $proxy->setProxyInitializer(null);
@@ -909,6 +908,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                     return true;
                 }
             );
+
+            $this->shareService($definition, $proxy, $id);
+
+            return $proxy;
         }
 
         $parameterBag = $this->getParameterBag();
@@ -935,16 +938,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
         }
 
-        if (self::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
-            if (self::SCOPE_CONTAINER !== $scope && !isset($this->scopedServices[$scope])) {
-                throw new InactiveScopeException($id, $scope);
-            }
-
-            $this->services[$lowerId = strtolower($id)] = $service;
-
-            if (self::SCOPE_CONTAINER !== $scope) {
-                $this->scopedServices[$scope][$lowerId] = $service;
-            }
+        if (!$definition->isLazy()) {
+            $this->shareService($definition, $service, $id);
         }
 
         foreach ($definition->getMethodCalls() as $call) {
@@ -1088,5 +1083,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         call_user_func_array(array($service, $call[0]), $this->resolveServices($this->getParameterBag()->resolveValue($call[1])));
+    }
+
+    private function shareService(Definition $definition, $service, $id)
+    {
+        if (self::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+            if (self::SCOPE_CONTAINER !== $scope && !isset($this->scopedServices[$scope])) {
+                throw new InactiveScopeException($id, $scope);
+            }
+
+            $this->services[$lowerId = strtolower($id)] = $service;
+
+            if (self::SCOPE_CONTAINER !== $scope) {
+                $this->scopedServices[$scope][$lowerId] = $service;
+            }
+        }
     }
 }

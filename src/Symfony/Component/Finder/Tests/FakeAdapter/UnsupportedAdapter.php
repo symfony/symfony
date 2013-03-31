@@ -41,4 +41,12 @@ class UnsupportedAdapter extends AbstractAdapter
     {
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function canBeUsedOnPath($path)
+    {
+        return false;
+    }
 }

@@ -13,13 +13,12 @@ namespace Symfony\Component\Finder\Tests\Iterator;
 
 abstract class RealIteratorTestCase extends IteratorTestCase
 {
-
-    protected static $tmpDir;
     protected static $files;
+    protected static $tmpDir;
 
     public static function setUpBeforeClass()
     {
-        self::$tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'symfony2_finder';
+        self::$tmpDir = sys_get_temp_dir().'/symfony2_finder';
 
         self::$files = array(
             '.git/',
@@ -99,10 +98,15 @@ abstract class RealIteratorTestCase extends IteratorTestCase
     {
         $f = array();
         foreach ($files as $file) {
-            $f[] = realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$file);
+            $prefix = '';
+            $path = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$file;
+            if (false !== strpos($file, '.phar')) {
+                $f[] = 'phar://'.$path;
+            } else {
+                $f[] = realpath($path);
+            }
         }
 
         return $f;
     }
-
 }

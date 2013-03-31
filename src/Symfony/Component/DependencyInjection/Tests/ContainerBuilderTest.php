@@ -276,12 +276,14 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         /* @var $foo1 \ProxyManager\Proxy\LazyLoadingInterface|\ProxyManager\Proxy\ValueHolderInterface */
         $foo1 = $builder->get('foo1');
 
+        $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
         $this->assertInstanceOf('\FooClass', $foo1);
         $this->assertInstanceOf('\ProxyManager\Proxy\LazyLoadingInterface', $foo1);
         $this->assertFalse($foo1->isProxyInitialized());
 
         $foo1->initializeProxy();
 
+        $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved after initialization');
         $this->assertTrue($foo1->isProxyInitialized());
         $this->assertInstanceOf('\FooClass', $foo1->getWrappedValueHolderValue());
         $this->assertNotInstanceOf('\ProxyManager\Proxy\LazyLoadingInterface', $foo1->getWrappedValueHolderValue());

@@ -171,11 +171,10 @@ class PhpDumper extends Dumper
         $class = $this->dumpValue($definition->getClass());
 
         if (0 === strpos($class, "'") && !preg_match('/^\'[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\\{2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*\'$/', $class)) {
+            // provided class name is not valid
             return '';
         }
 
-        // @todo this should happen directly through the factory class, but we have to ensure that the proxy
-        // @todo class is generated during the dump process
         $methodName = 'get' . Container::camelize($id) . 'Service';
         $proxyClass = str_replace('\\', '', $definition->getClass()) . '_' . md5(spl_object_hash($definition));
 
@@ -205,10 +204,6 @@ EOF;
      */
     private function addProxyClasses()
     {
-        $definitions = $this->container->getDefinitions();
-
-        ksort($definitions);
-
         $proxyDefinitions = array_filter(
             $this->container->getDefinitions(),
             function (Definition $definition) {
@@ -216,8 +211,8 @@ EOF;
             }
         );
 
-        if (empty($proxyDefinitions)) {
-            // avoids hard dependency to ProxyManager
+        // avoids hard dependency to ProxyManager
+        if (empty($proxyDefinitions) || !class_exists('ProxyManager\\GeneratorStrategy\\BaseGeneratorStrategy')) {
             return '';
         }
 

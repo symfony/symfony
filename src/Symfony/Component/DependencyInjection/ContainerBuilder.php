@@ -1086,6 +1086,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         call_user_func_array(array($service, $call[0]), $this->resolveServices($this->getParameterBag()->resolveValue($call[1])));
     }
 
+    /**
+     * Shares a given service in the container
+     *
+     * @param Definition $definition
+     * @param mixed      $service
+     * @param string     $id
+     *
+     * @throws Exception\RuntimeException
+     */
     private function shareService(Definition $definition, $service, $id)
     {
         if (self::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {

@@ -164,15 +164,16 @@ class PhpDumper extends Dumper
      */
     private function addProxyLoading($id, Definition $definition)
     {
-        if (!($definition->isLazy() && $definition->getClass())) {
+        if (!$this->isProxyCandidate($definition)) {
             return '';
         }
 
-        $class = $this->dumpValue($definition->getClass());
+        $instantiation = 'return';
 
-        if (0 === strpos($class, "'") && !preg_match('/^\'[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\\{2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*\'$/', $class)) {
-            // provided class name is not valid
-            return '';
+        if (ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
+            $instantiation .= " \$this->services['$id'] =";
+        } elseif (ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+            $instantiation .= " \$this->services['$id'] = \$this->scopedServices['$scope']['$id'] =";
         }
 
         $methodName = 'get' . Container::camelize($id) . 'Service';
@@ -182,7 +183,7 @@ class PhpDumper extends Dumper
         if (\$lazyLoad) {
             \$container = \$this;
 
-            return new $proxyClass(
+            $instantiation new $proxyClass(
                 function (& \$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) use (\$container) {
                     \$proxy->setProxyInitializer(null);
 
@@ -222,13 +223,13 @@ EOF;
 
         /* @var $proxyDefinitions Definition[] */
         foreach ($proxyDefinitions as $definition) {
-            $phpClass = new ClassGenerator(
+            $generatedClass = new ClassGenerator(
                 str_replace('\\', '', $definition->getClass()) . '_' . md5(spl_object_hash($definition))
             );
 
-            $proxyGenerator->generate(new ReflectionClass($definition->getClass()), $phpClass);
+            $proxyGenerator->generate(new ReflectionClass($definition->getClass()), $generatedClass);
 
-            $code .= "\n" . $classGenerator->generate($phpClass);
+            $code .= "\n" . $classGenerator->generate($generatedClass);
         }
 
         return $code;
@@ -368,9 +369,10 @@ EOF;
         $simple = $this->isSimpleInstance($id, $definition);
 
         $instantiation = '';
-        if (ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
+
+        if (!$this->isProxyCandidate($definition) && ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
             $instantiation = "\$this->services['$id'] = ".($simple ? '' : '$instance');
-        } elseif (ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+        } elseif (!$this->isProxyCandidate($definition) && ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
             $instantiation = "\$this->services['$id'] = \$this->scopedServices['$scope']['$id'] = ".($simple ? '' : '$instance');
         } elseif (!$simple) {
             $instantiation = '$instance';
@@ -1272,6 +1274,24 @@ EOF;
 
             return sprintf('$this->get(\'%s\')', $id);
         }
+    }
+
+    /**
+     * Tells if the given definitions are to be used for proxying
+     *
+     * @param Definition $definition
+     *
+     * @return bool
+     */
+    private function isProxyCandidate(Definition $definition)
+    {
+        if (!($definition->isLazy() && $definition->getClass())) {
+            return false;
+        }
+
+        $class = $this->dumpValue($definition->getClass());
+
+        return (boolean) preg_match('/^\'[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\\{2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*\'$/', $class);
     }
 
     /**

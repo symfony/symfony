@@ -938,7 +938,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
         }
 
-        if (!$definition->isLazy()) {
+        if ($tryProxy || !$definition->isLazy()) {
+            // share only if proxying failed, or if not a proxy
             $this->shareService($definition, $service, $id);
         }
 

@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class YamlDumper extends Dumper
 {
+    private $indentation = 4;
     private $dumper;
 
     /**
@@ -56,6 +57,7 @@ class YamlDumper extends Dumper
      */
     public function dump(array $options = array())
     {
+        $this->indentation = isset($options['indent']) ? (int) $options['indent'] : 4;
         return $this->addParameters()."\n".$this->addServices();
     }
 
@@ -64,14 +66,18 @@ class YamlDumper extends Dumper
      *
      * @param string     $id
      * @param Definition $definition
+     * @param string     $prefix
      *
      * @return string
      */
-    private function addService($id, $definition)
+    private function addService($id, $definition, $indent = 1)
     {
-        $code = "    $id:\n";
+        $prefix1 = str_repeat(' ', $indent * $this->indentation);
+        $prefix2 = str_repeat(' ', $this->indentation);
+        $prefix = $prefix1 . $prefix2;
+        $code = sprintf("%s%s:\n", $prefix1, $id);
         if ($definition->getClass()) {
-            $code .= sprintf("        class: %s\n", $definition->getClass());
+            $code .= sprintf("%sclass: %s\n", $prefix, $definition->getClass());
         }
 
         $tagsCode = '';
@@ -83,47 +89,47 @@ class YamlDumper extends Dumper
                 }
                 $att = $att ? ', '.implode(' ', $att) : '';
 
-                $tagsCode .= sprintf("            - { name: %s%s }\n", $this->dumper->dump($name), $att);
+                $tagsCode .= sprintf("%s- { name: %s%s }\n", $prefix . $prefix2, $this->dumper->dump($name), $att);
             }
         }
         if ($tagsCode) {
-            $code .= "        tags:\n".$tagsCode;
+            $code .= sprintf("%stags:\n%s", $prefix, $tagsCode);
         }
 
         if ($definition->getFile()) {
-            $code .= sprintf("        file: %s\n", $definition->getFile());
+            $code .= sprintf("%sfile: %s\n", $prefix, $definition->getFile());
         }
 
         if ($definition->isSynthetic()) {
-            $code .= sprintf("        synthetic: true\n");
+            $code .= sprintf("%ssynthetic: true\n", $prefix);
         }
 
         if ($definition->isSynchronized()) {
-            $code .= sprintf("        synchronized: true\n");
+            $code .= sprintf("%ssynchronized: true\n", $prefix);
         }
 
         if ($definition->getFactoryMethod()) {
-            $code .= sprintf("        factory_method: %s\n", $definition->getFactoryMethod());
+            $code .= sprintf("%sfactory_method: %s\n", $prefix, $definition->getFactoryMethod());
         }
 
         if ($definition->getFactoryService()) {
-            $code .= sprintf("        factory_service: %s\n", $definition->getFactoryService());
+            $code .= sprintf("%sfactory_service: %s\n", $prefix, $definition->getFactoryService());
         }
 
         if ($definition->getArguments()) {
-            $code .= sprintf("        arguments: %s\n", $this->dumper->dump($this->dumpValue($definition->getArguments()), 0));
+            $code .= sprintf("%sarguments: %s\n", $prefix, $this->dumper->dump($this->dumpValue($definition->getArguments(), $indent), 0));
         }
 
         if ($definition->getProperties()) {
-            $code .= sprintf("        properties: %s\n", $this->dumper->dump($this->dumpValue($definition->getProperties()), 0));
+            $code .= sprintf("%sproperties: %s\n", $prefix, $this->dumper->dump($this->dumpValue($definition->getProperties(), $indent), 0));
         }
 
         if ($definition->getMethodCalls()) {
-            $code .= sprintf("        calls:\n%s\n", $this->dumper->dump($this->dumpValue($definition->getMethodCalls()), 1, 12));
+            $code .= sprintf("%scalls:\n%s\n", $prefix, $this->dumper->dump($this->dumpValue($definition->getMethodCalls(), $indent), 1, 12));
         }
 
         if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
-            $code .= sprintf("        scope: %s\n", $scope);
+            $code .= sprintf("%sscope: %s\n", $prefix, $scope);
         }
 
         if ($callable = $definition->getConfigurator()) {
@@ -135,7 +141,7 @@ class YamlDumper extends Dumper
                 }
             }
 
-            $code .= sprintf("        configurator: %s\n", $this->dumper->dump($callable, 0));
+            $code .= sprintf("%sconfigurator: %s\n", $prefix, $this->dumper->dump($callable, 0));
         }
 
         return $code;
@@ -151,10 +157,12 @@ class YamlDumper extends Dumper
      */
     private function addServiceAlias($alias, $id)
     {
+        $prefix = str_repeat(' ', $this->indentation);
         if ($id->isPublic()) {
-            return sprintf("    %s: @%s\n", $alias, $id);
+            return sprintf("%s%s: @%s\n", $prefix, $alias, $id);
         } else {
-            return sprintf("    %s:\n        alias: %s\n        public: false", $alias, $id);
+            $double_prefix = $prefix . $prefix;
+            return sprintf("%s%s:\n%salias: %s\n%spublic: false", $prefix, $alias, $double_prefix, $id, $double_prefix);
         }
     }
 
@@ -206,12 +214,12 @@ class YamlDumper extends Dumper
      *
      * @throws RuntimeException When trying to dump object or resource
      */
-    private function dumpValue($value)
+    private function dumpValue($value, $indent)
     {
         if (is_array($value)) {
             $code = array();
             foreach ($value as $k => $v) {
-                $code[$k] = $this->dumpValue($v);
+                $code[$k] = $this->dumpValue($v, $indent);
             }
 
             return $code;
@@ -220,7 +228,7 @@ class YamlDumper extends Dumper
         } elseif ($value instanceof Parameter) {
             return $this->getParameterCall((string) $value);
         } elseif ($value instanceof Definition) {
-            return $this->getDefinitionCall($value);
+            return $this->addService('+', $value, $indent + 1);
         } elseif (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
         }
@@ -238,23 +246,11 @@ class YamlDumper extends Dumper
      */
     private function getServiceCall($id, Reference $reference = null)
     {
-        if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
+        if (NULL !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             return sprintf('@?%s', $id);
         }
 
         return sprintf('@%s', $id);
-    }
-
-    /**
-     * Gets definition class.
-     *
-     * @param Definition $definition
-     *
-     * @return string
-     */
-    private function getDefinitionCall(Definition $definition)
-    {
-        return sprintf('+%s', $definition->getClass());
     }
 
     /**

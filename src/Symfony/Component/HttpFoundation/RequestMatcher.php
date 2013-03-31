@@ -162,6 +162,6 @@ class RequestMatcher implements RequestMatcherInterface
         // Note to future implementors: add additional checks above the 
         // foreach above or else your check might not be run!
 
-        return false;
+        return count($this->ips) === 0;
     }
 }

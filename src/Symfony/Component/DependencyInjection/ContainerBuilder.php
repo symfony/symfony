@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection;
 
 use ProxyManager\Configuration;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
+use ProxyManager\GeneratorStrategy\EvaluatingGeneratorStrategy;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -868,6 +869,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param Definition $definition A service definition instance
      * @param string     $id         The service identifier
+     * @param Boolean    $tryProxy   Whether to try proxying the service with a lazy proxy
      *
      * @return object The service described by the service definition
      *
@@ -875,11 +877,26 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws RuntimeException When the factory definition is incomplete
      * @throws RuntimeException When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
+     *
+     * @internal this method is public because of PHP 5.3 limitations, do not use it explicitly in your code
      */
     public function createService(Definition $definition, $id, $tryProxy = true)
     {
-        if ($tryProxy && ($className = $definition->getClass()) && $definition->isLazy()) {
-            $factory   = new LazyLoadingValueHolderFactory(new Configuration());
+        if ($definition->isSynthetic()) {
+            throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The DIC does not know how to construct this service.', $id));
+        }
+
+        if (
+            $tryProxy
+            && ($className = $definition->getClass())
+            && $definition->isLazy()
+            && class_exists('ProxyManager\\Factory\\LazyLoadingValueHolderFactory')
+        ) {
+            $config = new Configuration();
+
+            $config->setGeneratorStrategy(new EvaluatingGeneratorStrategy());
+
+            $factory   = new LazyLoadingValueHolderFactory($config);
             $container = $this;
 
             return $factory->createProxy(
@@ -892,10 +909,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                     return true;
                 }
             );
-        }
-
-        if ($definition->isSynthetic()) {
-            throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The DIC does not know how to construct this service.', $id));
         }
 
         $parameterBag = $this->getParameterBag();

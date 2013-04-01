@@ -17,6 +17,15 @@ namespace Symfony\Component\Console\Descriptor;
 interface DescriptorInterface
 {
     /**
+     * Configures descriptor with description options.
+     *
+     * @param array $options Description options
+     *
+     * @return DescriptorInterface
+     */
+    public function configure(array $options);
+
+    /**
      * Returns given object's representation.
      *
      * @param object  $object The object to describe

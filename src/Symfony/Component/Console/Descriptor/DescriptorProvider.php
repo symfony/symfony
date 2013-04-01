@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\Console\Descriptor;
 
+use Symfony\Component\Console\Descriptor\Json;
+
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
@@ -13,18 +15,29 @@ class DescriptorProvider
     private $descriptors = array();
 
     /**
-     * @var string
+     * @var array
      */
-    private $defaultFormat;
+    private $options = array(
+        'default_format' => 'txt',
+        'json_encoding'  => 0,
+        'namespace'      => null,
+    );
 
     /**
      * Constructor.
      *
-     * @param string $defaultFormat
+     * @param array $options
      */
-    public function __construct($defaultFormat = 'txt')
+    public function __construct(array $options = array())
     {
-        $this->defaultFormat = $defaultFormat;
+        $this
+            ->configure($options)
+            ->add(new Json\ApplicationJsonDescriptor())
+            ->add(new Json\CommandJsonDescriptor())
+            ->add(new Json\InputDefinitionJsonDescriptor())
+            ->add(new Json\InputArgumentJsonDescriptor())
+            ->add(new Json\InputOptionJsonDescriptor())
+        ;
     }
 
     /**
@@ -36,7 +49,26 @@ class DescriptorProvider
      */
     public function add(DescriptorInterface $descriptor)
     {
+        $descriptor->configure($this->options);
         $this->descriptors[] = $descriptor;
+
+        return $this;
+    }
+
+    /**
+     * Configures provider with options.
+     *
+     * @param array $options
+     *
+     * @return DescriptorProvider
+     */
+    public function configure(array $options)
+    {
+        $this->options = array_replace($this->options, $options);
+
+        foreach ($this->descriptors as $descriptor) {
+            $descriptor->configure($this->options);
+        }
 
         return $this;
     }
@@ -69,7 +101,7 @@ class DescriptorProvider
      */
     public function getDefaultFormat()
     {
-        return $this->defaultFormat;
+        return $this->options['default_format'];
     }
 
     /**

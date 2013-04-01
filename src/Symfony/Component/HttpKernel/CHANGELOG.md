@@ -4,6 +4,7 @@ CHANGELOG
 2.3.0
 -----
 
+ * added the possibility to specify an id an extra attributes to hinclude tags
  * added the collect of data if a controller is a Closure in the Request collector
 
 2.2.0

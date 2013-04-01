@@ -81,18 +81,13 @@ EOF
         $env = $this->getContainer()->getParameter('kernel.environment');
 
         if ('prod' === $env) {
-            $output->writeln(
-                '<error>Running PHP built-in server in production environment is NOT secure!</error>'
-            );
+            $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
         }
 
         $router = $input->getOption('router') ?: $this
             ->getContainer()
             ->get('kernel')
-            ->locateResource(sprintf(
-                '@FrameworkBundle/Resources/config/router_%s.php',
-                $env
-            ))
+            ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
         ;
 
         $output->writeln(sprintf("Server running on <info>%s</info>\n", $input->getArgument('address')));

@@ -99,7 +99,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         }
 
         $series = $persistentToken->getSeries();
-        $tokenValue = $this->secureRandom->nextBytes(64);
+        $tokenValue = base64_encode($this->secureRandom->nextBytes(64));
         $this->tokenProvider->updateToken($series, $tokenValue, new \DateTime());
         $request->attributes->set(self::COOKIE_ATTR_NAME,
             new Cookie(
@@ -121,8 +121,8 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
     {
-        $series = $this->secureRandom->nextBytes(64);
-        $tokenValue = $this->secureRandom->nextBytes(64);
+        $series = base64_encode($this->secureRandom->nextBytes(64));
+        $tokenValue = base64_encode($this->secureRandom->nextBytes(64));
 
         $this->tokenProvider->createNewToken(
             new PersistentToken(

@@ -21,10 +21,11 @@ class SelfValidatingResourceValidator implements ResourceValidatorInterface
 {
     public function isFresh(ResourceInterface $resource)
     {
-        if ($resource instanceof SelfValidatingResourceInterface) {
-            return $resource->isFresh();
-        }
-
-        return null;
+        return $resource->isFresh();
     }
+
+    public function supports(ResourceInterface $resource) {
+        return ($resource instanceof SelfValidatingResourceInterface);
+    }
+
 }

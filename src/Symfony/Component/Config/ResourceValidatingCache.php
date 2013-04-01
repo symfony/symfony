@@ -67,15 +67,21 @@ class ResourceValidatingCache extends NonvalidatingCache
         $resources = unserialize(file_get_contents($this->getMetaFile()));
         foreach ($resources as $resource) {
             foreach ($this->resourceValidators as $validator) {
+
+                if (!$validator->supports($resource)) {
+                    continue;
+                }
+
                 $check = $validator->isFresh($resource);
+
                 if (true === $check) {
                     continue 2; // next resource
                 } elseif (false === $check) {
                     return false; // this resource is stale
-                }
+                } // else null -> validator can't tell
             }
 
-            // TBD: What if no validator knows how to check the resource?
+            // It should not happen that we have Resources that no validator can check.
             return false;
         }
 
@@ -95,7 +101,22 @@ class ResourceValidatingCache extends NonvalidatingCache
         CacheFileUtils::dumpInFile($this->file, $content);
 
         if (null !== $metadata) {
-            CacheFileUtils::dumpInFile($this->getMetaFile(), serialize(array_unique($metadata, SORT_REGULAR)));
+            CacheFileUtils::dumpInFile($this->getMetaFile(), serialize($this->getSupportedResources($metadata)));
         }
+    }
+
+    protected function getSupportedResources(array $resources) {
+        $r = array();
+
+        foreach (array_unique($resources, SORT_REGULAR) as $resource) {
+            foreach ($this->resourceValidators as $validator) {
+                if ($validator->supports($resource)) {
+                    $r[] = $resource;
+                    break;
+                }
+            }
+        }
+
+        return $r;
     }
 }

@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\Fragment;
 
+if (!defined('ENT_SUBSTITUTE')) {
+    define('ENT_SUBSTITUTE', 8);
+}
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Templating\EngineInterface;
@@ -27,6 +31,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     private $globalDefaultTemplate;
     private $signer;
     private $templating;
+    private $charset;
 
     /**
      * Constructor.
@@ -34,18 +39,22 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      * @param EngineInterface|\Twig_Environment $templating            An EngineInterface or a \Twig_Environment instance
      * @param UriSigner                         $signer                A UriSigner instance
      * @param string                            $globalDefaultTemplate The global default content (it can be a template name or the content)
+     * @param string                            $charset
      */
-    public function __construct($templating = null, UriSigner $signer = null, $globalDefaultTemplate = null)
+    public function __construct($templating = null, UriSigner $signer = null, $globalDefaultTemplate = null, $charset = 'utf-8')
     {
         $this->setTemplating($templating);
         $this->globalDefaultTemplate = $globalDefaultTemplate;
         $this->signer = $signer;
+        $this->charset = $charset;
     }
 
     /**
      * Sets the templating engine to use to render the default content.
      *
      * @param EngineInterface|\Twig_Environment|null $templating An EngineInterface or a \Twig_Environment instance
+     *
+     * @throws \InvalidArgumentException
      */
     public function setTemplating($templating)
     {
@@ -71,7 +80,9 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      *
      * Additional available options:
      *
-     *  * default: The default content (it can be a template name or the content)
+     *  * default:    The default content (it can be a template name or the content)
+     *  * id:         An optional hx:include tag id attribute
+     *  * attributes: An optional array of hx:include tag attributes
      */
     public function render($uri, Request $request, array $options = array())
     {
@@ -93,9 +104,29 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
             $content = $template;
         }
 
-        return new Response(sprintf('<hx:include src="%s">%s</hx:include>', $uri, $content));
+        $attributes = isset($options['attributes']) && is_array($options['attributes']) ? $options['attributes'] : array();
+        if (isset($options['id']) && $options['id']) {
+            $attributes['id'] = $options['id'];
+        }
+        $renderedAttributes = '';
+        if (count($attributes) > 0) {
+            foreach($attributes as $attribute => $value) {
+                $renderedAttributes .= sprintf(
+                    ' %s="%s"',
+                    htmlspecialchars($attribute, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset, false),
+                    htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset, false)
+                );
+            }
+        }
+
+        return new Response(sprintf('<hx:include src="%s"%s>%s</hx:include>', $uri, $renderedAttributes, $content));
     }
 
+    /**
+     * @param string $template
+     *
+     * @return boolean
+     */
     private function templateExists($template)
     {
         if ($this->templating instanceof EngineInterface) {

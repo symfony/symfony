@@ -25,9 +25,23 @@ use Symfony\Component\HttpFoundation\Response;
 class ConfigDataCollector extends DataCollector
 {
     private $kernel;
+    private $name;
+    private $version;
 
     /**
      * Constructor.
+     *
+     * @param string $name    The name of the application using the web profiler
+     * @param string $version The version of the application using the web profiler
+     */
+    public function __construct($name = null, $version = null)
+    {
+        $this->name = $name;
+        $this->version = $version;
+    }
+
+    /**
+     * Sets the Kernel associated with this Request.
      *
      * @param KernelInterface $kernel A KernelInterface instance
      */
@@ -42,6 +56,8 @@ class ConfigDataCollector extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data = array(
+            'app_name'         => $this->name,
+            'app_version'      => $this->version,
             'token'            => $response->headers->get('X-Debug-Token'),
             'symfony_version'  => Kernel::VERSION,
             'name'             => isset($this->kernel) ? $this->kernel->getName() : 'n/a',
@@ -62,6 +78,16 @@ class ConfigDataCollector extends DataCollector
                 $this->data['bundles'][$name] = $bundle->getPath();
             }
         }
+    }
+
+    public function getApplicationName()
+    {
+        return $this->data['app_name'];
+    }
+
+    public function getApplicationVersion()
+    {
+        return $this->data['app_version'];
     }
 
     /**

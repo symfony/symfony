@@ -61,10 +61,17 @@ class DbalLogger implements SQLLogger
                     continue;
                 }
 
-                // too long string must be shorten
-                if (self::MAX_STRING_LENGTH < strlen($params[$index])) {
-                    $params[$index] = substr($params[$index], self::MAX_STRING_LENGTH - 6).' [...]';
-                    continue;
+                // detect if the too long string must be shorten
+                if (function_exists('mb_detect_encoding') && false !== $encoding = mb_detect_encoding($params[$index])) {
+                    if (self::MAX_STRING_LENGTH < mb_strlen($params[$index], $encoding)) {
+                        $params[$index] = mb_substr($params[$index], 0, self::MAX_STRING_LENGTH - 6, $encoding).' [...]';
+                        continue;
+                    }
+                } else {
+                    if (self::MAX_STRING_LENGTH < strlen($params[$index])) {
+                        $params[$index] = substr($params[$index], 0, self::MAX_STRING_LENGTH - 6).' [...]';
+                        continue;
+                    }
                 }
             }
         }

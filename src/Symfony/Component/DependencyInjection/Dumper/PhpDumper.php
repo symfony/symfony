@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 use ProxyManager\Generator\ClassGenerator;
 use ProxyManager\GeneratorStrategy\BaseGeneratorStrategy;
 use ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator;
-use ReflectionClass;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -227,7 +226,7 @@ EOF;
                 str_replace('\\', '', $definition->getClass()) . '_' . md5(spl_object_hash($definition))
             );
 
-            $proxyGenerator->generate(new ReflectionClass($definition->getClass()), $generatedClass);
+            $proxyGenerator->generate(new \ReflectionClass($definition->getClass()), $generatedClass);
 
             $code .= "\n" . $classGenerator->generate($generatedClass);
         }

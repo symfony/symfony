@@ -5,6 +5,9 @@ CHANGELOG
 2.3.0
 ------
 
+ * added "hidden" and "hidden_single_text" on widget option of DateTimeType, DateType and TimeType
+   "hidden" value will generate separates hidden inputs (day, month, year...) for rendering the formType
+   "hidden_single_text" value will generate a single hidden input for rendering the formType
  * changed FormRenderer::humanize() to humanize also camel cased field name
 
 2.2.0

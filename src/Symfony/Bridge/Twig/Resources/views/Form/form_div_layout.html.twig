@@ -113,8 +113,11 @@
 
 {% block datetime_widget %}
 {% spaceless %}
-    {% if widget == 'single_text' %}
+    {% if widget == 'single_text' or widget == 'hidden_single_text' %}
         {{ block('form_widget_simple') }}
+    {% elseif widget == 'hidden' %}
+        {{ form_widget(form.date) }}
+        {{ form_widget(form.time) }}
     {% else %}
         <div {{ block('widget_container_attributes') }}>
             {{ form_errors(form.date) }}
@@ -128,8 +131,14 @@
 
 {% block date_widget %}
 {% spaceless %}
-    {% if widget == 'single_text' %}
+    {% if widget == 'single_text' or widget == 'hidden_single_text' %}
         {{ block('form_widget_simple') }}
+    {% elseif widget == 'hidden' %}
+        {{ date_pattern|replace({
+            '{{ year }}':  form_widget(form.year),
+            '{{ month }}': form_widget(form.month),
+            '{{ day }}':   form_widget(form.day),
+        })|raw }}
     {% else %}
         <div {{ block('widget_container_attributes') }}>
             {{ date_pattern|replace({
@@ -144,8 +153,10 @@
 
 {% block time_widget %}
 {% spaceless %}
-    {% if widget == 'single_text' %}
+    {% if widget == 'single_text' or widget == 'hidden_single_text' %}
         {{ block('form_widget_simple') }}
+    {% elseif widget == 'hidden' %}
+        {{ form_widget(form.hour) }}{% if with_minutes %}{{ form_widget(form.minute) }}{% endif %}{% if with_seconds %}{{ form_widget(form.second) }}{% endif %}
     {% else %}
         {% set vars = widget == 'text' ? { 'attr': { 'size': 1 }} : {} %}
         <div {{ block('widget_container_attributes') }}>

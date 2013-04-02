@@ -92,7 +92,7 @@ class DateTimeType extends AbstractType
             throw new InvalidOptionsException('The "date_format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
         }
 
-        if ('single_text' === $options['widget']) {
+        if (false !== strpos($options['widget'], 'single_text')) {
             if (self::HTML5_FORMAT === $pattern) {
                 $builder->addViewTransformer(new DateTimeToRfc3339Transformer(
                     $options['model_timezone'],
@@ -185,6 +185,10 @@ class DateTimeType extends AbstractType
         //  * the format matches the one expected by HTML5
         if ('single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
             $view->vars['type'] = 'datetime';
+        } else if ('hidden_single_text' === $options['widget']) {
+            $view->vars['type'] = 'hidden';
+        } else if (strpos($options['widget'], 'hidden') !== false || (strpos($options['date_widget'], 'hidden') !== false && strpos($options['time_widget'], 'hidden') !== false)) {
+            $view->vars['widget'] = 'hidden';
         }
     }
 
@@ -194,7 +198,42 @@ class DateTimeType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $compound = function (Options $options) {
-            return $options['widget'] !== 'single_text';
+            return strpos($options['widget'], 'single_text') === false;
+        };
+
+        $isEntirelyHidden = function (Options $options)
+        {
+            if (strpos($options['widget'], 'hidden') !== false
+            || (strpos($options['date_widget'], 'hidden') !== false
+                && strpos($options['time_widget'], 'hidden') !== false)) {
+
+                return true;
+            }
+            return false;
+        };
+
+        $requiredNormalizer = function (Options $options, $required) {
+            if ('hidden_single_text' === $options['widget']) {
+                return false;
+            }
+
+            return $required;
+        };
+
+        $errorBubblingNormalizer = function (Options $options, $errorBubbling) use ($isEntirelyHidden) {
+            if ($isEntirelyHidden($options)) {
+                return true;
+            }
+
+            return $errorBubbling;
+        };
+
+        $labelNormalizer = function (Options $options, $label) use ($isEntirelyHidden) {
+            if ($isEntirelyHidden($options)) {
+                return false;
+            }
+
+            return $label;
         };
 
         // Defaults to the value of "widget"
@@ -243,6 +282,12 @@ class DateTimeType extends AbstractType
             'compound'       => $compound,
         ));
 
+        $resolver->setNormalizers(array(
+            'required' => $requiredNormalizer,
+            'label' => $labelNormalizer,
+            'error_bubbling' => $errorBubblingNormalizer,
+        ));
+
         // Don't add some defaults in order to preserve the defaults
         // set in DateType and TimeType
         $resolver->setOptional(array(
@@ -265,20 +310,26 @@ class DateTimeType extends AbstractType
             'date_widget' => array(
                 null, // inherit default from DateType
                 'single_text',
+                'hidden_single_text',
                 'text',
+                'hidden',
                 'choice',
             ),
             'time_widget' => array(
                 null, // inherit default from TimeType
                 'single_text',
+                'hidden_single_text',
                 'text',
+                'hidden',
                 'choice',
             ),
             // This option will overwrite "date_widget" and "time_widget" options
             'widget'     => array(
                 null, // default, don't overwrite options
                 'single_text',
+                'hidden_single_text',
                 'text',
+                'hidden',
                 'choice',
             ),
         ));

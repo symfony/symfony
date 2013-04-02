@@ -47,7 +47,7 @@ class TimeType extends AbstractType
             $parts[] = 'second';
         }
 
-        if ('single_text' === $options['widget']) {
+        if (false !== strpos($options['widget'], 'single_text')) {
             $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
         } else {
             $hourOptions = $minuteOptions = $secondOptions = array(
@@ -140,6 +140,8 @@ class TimeType extends AbstractType
 
         if ('single_text' === $options['widget']) {
             $view->vars['type'] = 'time';
+        } else if ('hidden_single_text' === $options['widget']) {
+            $view->vars['type'] = 'hidden';
         }
     }
 
@@ -149,7 +151,7 @@ class TimeType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $compound = function (Options $options) {
-            return $options['widget'] !== 'single_text';
+            return strpos($options['widget'], 'single_text') === false;
         };
 
         $emptyValue = $emptyValueDefault = function (Options $options) {
@@ -171,6 +173,30 @@ class TimeType extends AbstractType
                 'minute' => $emptyValue,
                 'second' => $emptyValue
             );
+        };
+
+        $requiredNormalizer = function (Options $options, $required) {
+            if ('hidden_single_text' === $options['widget']) {
+                return false;
+            }
+
+            return $required;
+        };
+
+        $errorBubblingNormalizer = function (Options $options, $errorBubbling) {
+            if (false !== strpos($options['widget'], 'hidden')) {
+                return true;
+            }
+
+            return $errorBubbling;
+        };
+
+        $labelNormalizer = function (Options $options, $label) {
+            if (false !== strpos($options['widget'], 'hidden')) {
+                return false;
+            }
+
+            return $label;
         };
 
         // BC until Symfony 2.3
@@ -211,6 +237,9 @@ class TimeType extends AbstractType
 
         $resolver->setNormalizers(array(
             'empty_value' => $emptyValueNormalizer,
+            'required' => $requiredNormalizer,
+            'label' => $labelNormalizer,
+            'error_bubbling' => $errorBubblingNormalizer,
         ));
 
         $resolver->setAllowedValues(array(
@@ -222,7 +251,9 @@ class TimeType extends AbstractType
             ),
             'widget' => array(
                 'single_text',
+                'hidden_single_text',
                 'text',
+                'hidden',
                 'choice',
             ),
         ));

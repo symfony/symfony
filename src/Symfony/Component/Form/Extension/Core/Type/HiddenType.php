@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\Options;
 
 class HiddenType extends AbstractType
 {
@@ -21,12 +22,22 @@ class HiddenType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        //force required attribute to false
+        $requiredNormalizer = function (Options $options, $required)
+        {
+            return false;
+        };
+
         $resolver->setDefaults(array(
             // hidden fields cannot have a required attribute
             'required'       => false,
             // Pass errors to the parent
             'error_bubbling' => true,
             'compound'       => false,
+        ));
+
+        $resolver->setNormalizers(array(
+            'required' => $requiredNormalizer,
         ));
     }
 

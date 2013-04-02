@@ -55,7 +55,7 @@ class DateType extends AbstractType
             throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" and "d". Its current value is "%s".', $pattern));
         }
 
-        if ('single_text' === $options['widget']) {
+        if (strpos($options['widget'], 'single_text') !== false) {
             $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
                 $options['model_timezone'],
                 $options['view_timezone'],
@@ -132,6 +132,8 @@ class DateType extends AbstractType
         //  * the format matches the one expected by HTML5
         if ('single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
             $view->vars['type'] = 'date';
+        } else if ('hidden_single_text' === $options['widget']) {
+            $view->vars['type'] = 'hidden';
         }
 
         if ($form->getConfig()->hasAttribute('formatter')) {
@@ -161,7 +163,7 @@ class DateType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $compound = function (Options $options) {
-            return $options['widget'] !== 'single_text';
+            return strpos($options['widget'], 'single_text') === false;
         };
 
         $emptyValue = $emptyValueDefault = function (Options $options) {
@@ -185,8 +187,32 @@ class DateType extends AbstractType
             );
         };
 
+        $requiredNormalizer = function (Options $options, $required) {
+            if ('hidden_single_text' === $options['widget']) {
+                return false;
+            }
+
+            return $required;
+        };
+
+        $errorBubblingNormalizer = function (Options $options, $errorBubbling) {
+            if (false !== strpos($options['widget'], 'hidden')) {
+                return true;
+            }
+
+            return $errorBubbling;
+        };
+
+        $labelNormalizer = function (Options $options, $label) {
+            if (false !== strpos($options['widget'], 'hidden')) {
+                return false;
+            }
+
+            return $label;
+        };
+
         $format = function (Options $options) {
-            return $options['widget'] === 'single_text' ? DateType::HTML5_FORMAT : DateType::DEFAULT_FORMAT;
+            return strpos($options['widget'], 'single_text') !== false ? DateType::HTML5_FORMAT : DateType::DEFAULT_FORMAT;
         };
 
         // BC until Symfony 2.3
@@ -226,6 +252,9 @@ class DateType extends AbstractType
 
         $resolver->setNormalizers(array(
             'empty_value' => $emptyValueNormalizer,
+            'required' => $requiredNormalizer,
+            'label' => $labelNormalizer,
+            'error_bubbling' => $errorBubblingNormalizer,
         ));
 
         $resolver->setAllowedValues(array(
@@ -237,7 +266,9 @@ class DateType extends AbstractType
             ),
             'widget'    => array(
                 'single_text',
+                'hidden_single_text',
                 'text',
+                'hidden',
                 'choice',
             ),
         ));

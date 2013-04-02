@@ -51,7 +51,7 @@ class DoctrineValidationPass implements CompilerPassInterface
      */
     private function updateValidatorMappingFiles(ContainerBuilder $container, $mapping, $extension)
     {
-        if ( ! $container->hasParameter('validator.mapping.loader.'.$mapping.'_files_loader.mapping_files')) {
+        if (!$container->hasParameter('validator.mapping.loader.'.$mapping.'_files_loader.mapping_files')) {
             return;
         }
 

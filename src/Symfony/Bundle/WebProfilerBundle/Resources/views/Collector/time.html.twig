@@ -249,7 +249,7 @@
 
                 // Filter for main events.
                 mainEvents = drawableEvents.filter(function(event) {
-                    return ! isChildEvent(event)
+                    return !isChildEvent(event)
                 });
 
                 // For each main event, draw the visual presentation of timelines.
@@ -274,7 +274,7 @@
                         // Draw the timeline
                         var timelineHeadPosition = x + period.start * ratio;
 
-                        if ( ! isSectionEvent(event)) {
+                        if (!isSectionEvent(event)) {
                             ctx.fillRect(timelineHeadPosition, h + 3, 2, 6);
                             ctx.fillRect(timelineHeadPosition, h, (period.end - period.start) * ratio || 2, 6);
                         } else {

@@ -22,7 +22,7 @@
         "symfony/event-dispatcher": "~2.1"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Console\\": "" }
+        "psr-0": { "Symfony\\Component\\Console": "" }
     },
     "target-dir": "Symfony/Component/Console",
     "minimum-stability": "dev",

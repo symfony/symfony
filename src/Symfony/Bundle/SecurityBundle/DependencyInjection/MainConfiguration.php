@@ -162,7 +162,6 @@ class MainConfiguration implements ConfigurationInterface
                             ->end()
                             ->scalarNode('host')->defaultNull()->end()
                             ->arrayNode('ips')
-                                ->defaultValue(array())
                                 ->beforeNormalization()->ifString()->then(function($v) { return array($v); })->end()
                                 ->prototype('scalar')->end()
                             ->end()

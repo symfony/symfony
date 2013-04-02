@@ -154,10 +154,10 @@ class ExecutionContext implements ExecutionContextInterface
     public function getPropertyPath($subPath = '')
     {
         if ('' != $subPath && '' !== $this->propertyPath && '[' !== $subPath[0]) {
-            return $this->propertyPath . '.' . $subPath;
+            return $this->propertyPath.'.'.$subPath;
         }
 
-        return $this->propertyPath . $subPath;
+        return $this->propertyPath.$subPath;
     }
 
     /**

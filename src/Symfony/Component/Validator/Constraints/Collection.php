@@ -43,7 +43,7 @@ class Collection extends Constraint
         parent::__construct($options);
 
         if (!is_array($this->fields)) {
-            throw new ConstraintDefinitionException('The option "fields" is expected to be an array in constraint ' . __CLASS__);
+            throw new ConstraintDefinitionException('The option "fields" is expected to be an array in constraint '.__CLASS__);
         }
 
         foreach ($this->fields as $fieldName => $field) {
@@ -57,11 +57,11 @@ class Collection extends Constraint
 
             foreach ($field->constraints as $constraint) {
                 if (!$constraint instanceof Constraint) {
-                    throw new ConstraintDefinitionException('The value ' . $constraint . ' of the field ' . $fieldName . ' is not an instance of Constraint in constraint ' . __CLASS__);
+                    throw new ConstraintDefinitionException('The value '.$constraint.' of the field '.$fieldName.' is not an instance of Constraint in constraint '.__CLASS__);
                 }
 
                 if ($constraint instanceof Valid) {
-                    throw new ConstraintDefinitionException('The constraint Valid cannot be nested inside constraint ' . __CLASS__ . '. You can only declare the Valid constraint directly on a field or method.');
+                    throw new ConstraintDefinitionException('The constraint Valid cannot be nested inside constraint '.__CLASS__.'. You can only declare the Valid constraint directly on a field or method.');
                 }
             }
         }

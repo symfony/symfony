@@ -43,7 +43,7 @@ class Entity extends EntityParent implements EntityInterface
 
     public function getInternal()
     {
-        return $this->internal . ' from getter';
+        return $this->internal.' from getter';
     }
 
     /**

@@ -84,7 +84,7 @@ class ModelChoiceList extends ObjectChoiceList
     {
         $this->class        = $class;
 
-        $queryClass         = $this->class . 'Query';
+        $queryClass         = $this->class.'Query';
         $query              = new $queryClass();
 
         $this->identifier   = $query->getTableMap()->getPrimaryKeys();
@@ -198,7 +198,7 @@ class ModelChoiceList extends ObjectChoiceList
     {
         if (!$this->loaded) {
             if (1 === count($this->identifier)) {
-                $filterBy = 'filterBy' . current($this->identifier)->getPhpName();
+                $filterBy = 'filterBy'.current($this->identifier)->getPhpName();
 
                 return (array) $this->query->create()
                     ->$filterBy($values)

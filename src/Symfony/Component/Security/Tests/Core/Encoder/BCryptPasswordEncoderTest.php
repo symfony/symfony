@@ -105,7 +105,7 @@ class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
         $prefix = '$'.(version_compare(phpversion(), '5.3.7', '>=')
                        ? '2y' : '2a').'$';
         $salt = 'MDEyMzQ1Njc4OWFiY2RlZe';
-        $expected = crypt(self::PASSWORD, $prefix . self::VALID_COST . '$' . $salt);
+        $expected = crypt(self::PASSWORD, $prefix.self::VALID_COST.'$'.$salt);
 
         $this->assertEquals($expected, $result);
     }

@@ -72,7 +72,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
         $assertIndex = function ($index) use (&$i, $test) {
             return function () use (&$i, $test, $index) {
                 /* @var \PHPUnit_Framework_TestCase $test */
-                $test->assertEquals($index, $i, 'Executed at index ' . $index);
+                $test->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;
             };
@@ -170,7 +170,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
         $assertIndexAndNbOfChildViews = function ($index, $nbOfChildViews) use (&$i, $test) {
             return function (FormView $view) use (&$i, $test, $index, $nbOfChildViews) {
                 /* @var \PHPUnit_Framework_TestCase $test */
-                $test->assertEquals($index, $i, 'Executed at index ' . $index);
+                $test->assertEquals($index, $i, 'Executed at index '.$index);
                 $test->assertCount($nbOfChildViews, $view);
 
                 ++$i;

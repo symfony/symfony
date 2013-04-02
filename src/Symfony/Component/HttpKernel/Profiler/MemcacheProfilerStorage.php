@@ -105,6 +105,6 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
         //simulate append in Memcache <3.0
         $content = $memcache->get($key);
 
-        return $memcache->set($key, $content . $value, false, $expiration);
+        return $memcache->set($key, $content.$value, false, $expiration);
     }
 }

@@ -101,10 +101,10 @@ class LogoutUrlHelper extends Helper
         if ('/' === $logoutPath[0]) {
             $request = $this->container->get('request');
 
-            $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($logoutPath) : $request->getBasePath() . $logoutPath;
+            $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($logoutPath) : $request->getBasePath().$logoutPath;
 
             if (!empty($parameters)) {
-                $url .= '?' . http_build_query($parameters);
+                $url .= '?'.http_build_query($parameters);
             }
         } else {
             $url = $this->router->generate($logoutPath, $parameters, $referenceType);

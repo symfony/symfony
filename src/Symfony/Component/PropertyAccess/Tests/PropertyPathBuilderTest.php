@@ -50,7 +50,7 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->builder->appendIndex('new1');
 
-        $path = new PropertyPath(self::PREFIX . '[new1]');
+        $path = new PropertyPath(self::PREFIX.'[new1]');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
@@ -59,7 +59,7 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->builder->appendProperty('new1');
 
-        $path = new PropertyPath(self::PREFIX . '.new1');
+        $path = new PropertyPath(self::PREFIX.'.new1');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
@@ -68,7 +68,7 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->builder->append(new PropertyPath('new1[new2]'));
 
-        $path = new PropertyPath(self::PREFIX . '.new1[new2]');
+        $path = new PropertyPath(self::PREFIX.'.new1[new2]');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
@@ -77,7 +77,7 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->builder->append(new PropertyPath('new1[new2].new3'), 1);
 
-        $path = new PropertyPath(self::PREFIX . '[new2].new3');
+        $path = new PropertyPath(self::PREFIX.'[new2].new3');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }
@@ -86,7 +86,7 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->builder->append(new PropertyPath('new1[new2].new3'), 1, 1);
 
-        $path = new PropertyPath(self::PREFIX . '[new2]');
+        $path = new PropertyPath(self::PREFIX.'[new2]');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }

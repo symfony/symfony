@@ -304,7 +304,7 @@ abstract class AbstractDoctrineExtension extends Extension
     protected function loadObjectManagerCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName)
     {
         $cacheDriver = $objectManager[$cacheName.'_driver'];
-        $cacheDriverService = $this->getObjectManagerElementName($objectManager['name'] . '_' . $cacheName);
+        $cacheDriverService = $this->getObjectManagerElementName($objectManager['name'].'_'.$cacheName);
 
         switch ($cacheDriver['type']) {
             case 'service':

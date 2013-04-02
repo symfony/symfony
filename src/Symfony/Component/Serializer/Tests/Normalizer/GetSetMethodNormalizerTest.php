@@ -218,7 +218,7 @@ class GetSetDummy
 
     public function getFooBar()
     {
-        return $this->foo . $this->bar;
+        return $this->foo.$this->bar;
     }
 
     public function getCamelCase()

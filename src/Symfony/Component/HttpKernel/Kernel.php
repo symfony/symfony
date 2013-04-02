@@ -749,7 +749,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             if (is_string($token)) {
                 $rawChunk .= $token;
             } elseif (T_START_HEREDOC === $token[0]) {
-                $output .= preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $rawChunk) . $token[1];
+                $output .= preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $rawChunk).$token[1];
                 do {
                     $token = next($tokens);
                     $output .= $token[1];

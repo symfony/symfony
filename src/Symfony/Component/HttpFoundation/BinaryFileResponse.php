@@ -183,7 +183,7 @@ class BinaryFileResponse extends Response
                         $pathPrefix = trim($mapping[1]);
 
                         if (substr($path, 0, strlen($pathPrefix)) == $pathPrefix) {
-                            $path = $location . substr($path, strlen($pathPrefix));
+                            $path = $location.substr($path, strlen($pathPrefix));
                             break;
                         }
                     }

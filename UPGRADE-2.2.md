@@ -464,7 +464,7 @@
                $path .= '.';
            }
 
-           $context->getGraphWalker()->walkReference($someObject, $group, $path . 'myProperty', false);
+           $context->getGraphWalker()->walkReference($someObject, $group, $path.'myProperty', false);
        }
    }
    ```

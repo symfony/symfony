@@ -390,8 +390,8 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars)
     {
         foreach ($singulars as $singular) {
-            $addMethod = 'add' . $singular;
-            $removeMethod = 'remove' . $singular;
+            $addMethod = 'add'.$singular;
+            $removeMethod = 'remove'.$singular;
 
             $addMethodFound = $this->isAccessible($reflClass, $addMethod, 1);
             $removeMethodFound = $this->isAccessible($reflClass, $removeMethod, 1);

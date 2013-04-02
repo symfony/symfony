@@ -105,10 +105,10 @@ class Validator implements ValidatorInterface
 
         if (!$metadata instanceof PropertyMetadataContainerInterface) {
             $valueAsString = is_scalar($containingValue)
-                ? '"' . $containingValue . '"'
-                : 'the value of type ' . gettype($containingValue);
+                ? '"'.$containingValue.'"'
+                : 'the value of type '.gettype($containingValue);
 
-            throw new ValidatorException(sprintf('The metadata for ' . $valueAsString . ' does not support properties.'));
+            throw new ValidatorException(sprintf('The metadata for '.$valueAsString.' does not support properties.'));
         }
 
         foreach ($this->resolveGroups($groups) as $group) {
@@ -136,10 +136,10 @@ class Validator implements ValidatorInterface
 
         if (!$metadata instanceof PropertyMetadataContainerInterface) {
             $valueAsString = is_scalar($containingValue)
-                ? '"' . $containingValue . '"'
-                : 'the value of type ' . gettype($containingValue);
+                ? '"'.$containingValue.'"'
+                : 'the value of type '.gettype($containingValue);
 
-            throw new ValidatorException(sprintf('The metadata for ' . $valueAsString . ' does not support properties.'));
+            throw new ValidatorException(sprintf('The metadata for '.$valueAsString.' does not support properties.'));
         }
 
         foreach ($this->resolveGroups($groups) as $group) {

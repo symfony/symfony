@@ -155,7 +155,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
         }
 
         foreach ($this->routes as $route) {
-            $route->setPath('/' . $prefix . $route->getPath());
+            $route->setPath('/'.$prefix.$route->getPath());
             $route->addDefaults($defaults);
             $route->addRequirements($requirements);
         }

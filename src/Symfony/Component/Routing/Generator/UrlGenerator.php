@@ -196,9 +196,9 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // otherwise we would generate a URI that, when followed by a user agent (e.g. browser), does not match this route
         $url = strtr($url, array('/../' => '/%2E%2E/', '/./' => '/%2E/'));
         if ('/..' === substr($url, -3)) {
-            $url = substr($url, 0, -2) . '%2E%2E';
+            $url = substr($url, 0, -2).'%2E%2E';
         } elseif ('/.' === substr($url, -2)) {
-            $url = substr($url, 0, -1) . '%2E';
+            $url = substr($url, 0, -1).'%2E';
         }
 
         $schemeAuthority = '';
@@ -309,7 +309,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         $targetDirs[] = $targetFile;
-        $path = str_repeat('../', count($sourceDirs)) . implode('/', $targetDirs);
+        $path = str_repeat('../', count($sourceDirs)).implode('/', $targetDirs);
 
         // A reference to the same base directory or an empty subdirectory must be prefixed with "./".
         // This also applies to a segment with a colon character (e.g., "file:colon") that cannot be used

@@ -82,7 +82,7 @@ class FormType extends AbstractType
             } else {
                 $id = $name;
                 $fullName = $name;
-                $uniqueBlockPrefix = '_' . $blockName;
+                $uniqueBlockPrefix = '_'.$blockName;
             }
 
             // Complex fields are read-only if they themselves or their parents are.
@@ -96,7 +96,7 @@ class FormType extends AbstractType
         } else {
             $id = $name;
             $fullName = $name;
-            $uniqueBlockPrefix = '_' . $blockName;
+            $uniqueBlockPrefix = '_'.$blockName;
 
             // Strip leading underscores and digits. These are allowed in
             // form names, but not in HTML4 ID attributes.
@@ -143,7 +143,7 @@ class FormType extends AbstractType
             // collection form have different types (dynamically), they should
             // be rendered differently.
             // https://github.com/symfony/symfony/issues/5038
-            'cache_key'           => $uniqueBlockPrefix . '_' . $form->getConfig()->getType()->getName(),
+            'cache_key'           => $uniqueBlockPrefix.'_'.$form->getConfig()->getType()->getName(),
         ));
     }
 

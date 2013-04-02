@@ -531,7 +531,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->filesystem->symlink($file, $link);
 
-        $this->filesystem->chown($link, 'user' . time() . mt_rand(1000, 9999));
+        $this->filesystem->chown($link, 'user'.time().mt_rand(1000, 9999));
     }
 
     /**
@@ -544,7 +544,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
         mkdir($dir);
 
-        $this->filesystem->chown($dir, 'user' . time() . mt_rand(1000, 9999));
+        $this->filesystem->chown($dir, 'user'.time().mt_rand(1000, 9999));
     }
 
     public function testChgrp()
@@ -597,7 +597,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->filesystem->symlink($file, $link);
 
-        $this->filesystem->chgrp($link, 'user' . time() . mt_rand(1000, 9999));
+        $this->filesystem->chgrp($link, 'user'.time().mt_rand(1000, 9999));
     }
 
     /**
@@ -610,7 +610,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
         mkdir($dir);
 
-        $this->filesystem->chgrp($dir, 'user' . time() . mt_rand(1000, 9999));
+        $this->filesystem->chgrp($dir, 'user'.time().mt_rand(1000, 9999));
     }
 
     public function testRename()
@@ -843,7 +843,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
 
-        mkdir($sourcePath . 'nested/', 0777, true);
+        mkdir($sourcePath.'nested/', 0777, true);
         file_put_contents($sourcePath.'/nested/file1.txt', 'FILE1');
         // Note: We symlink directory, not file
         symlink($sourcePath.'nested', $sourcePath.'link1');

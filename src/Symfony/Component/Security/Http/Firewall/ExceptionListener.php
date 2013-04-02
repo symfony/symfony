@@ -181,7 +181,7 @@ class ExceptionListener
     {
         // session isn't required when using http basic authentication mechanism for example
         if ($request->hasSession() && $request->isMethodSafe()) {
-            $request->getSession()->set('_security.' . $this->providerKey . '.target_path', $request->getUri());
+            $request->getSession()->set('_security.'.$this->providerKey.'.target_path', $request->getUri());
         }
     }
 }

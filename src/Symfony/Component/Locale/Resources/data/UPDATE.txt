@@ -33,8 +33,8 @@ Once it is, the following steps have to be followed to build the .dat-file:
 
 3. Package the resource bundles into a single file
 
-   $ find . -name *.res | sed -e "s/\.\///g" > packagelist.txt
-   $ pkgdata -p region -T build -d . packagelist.txt
+   $ find.-name *.res | sed -e "s/\.\///g" > packagelist.txt
+   $ pkgdata -p region -T build -d.packagelist.txt
 
 4. Clean up
 

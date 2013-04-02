@@ -225,7 +225,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         $this->reading = true;
 
         if (!array_key_exists($option, $this->options)) {
-            throw new \OutOfBoundsException('The option "' . $option . '" does not exist.');
+            throw new \OutOfBoundsException('The option "'.$option.'" does not exist.');
         }
 
         if (isset($this->lazy[$option])) {
@@ -459,7 +459,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
                 }
             }
 
-            throw new OptionDefinitionException('The options "' . implode('", "', $conflicts) . '" have a cyclic dependency.');
+            throw new OptionDefinitionException('The options "'.implode('", "', $conflicts).'" have a cyclic dependency.');
         }
 
         $this->lock[$option] = true;
@@ -497,7 +497,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
                 }
             }
 
-            throw new OptionDefinitionException('The options "' . implode('", "', $conflicts) . '" have a cyclic dependency.');
+            throw new OptionDefinitionException('The options "'.implode('", "', $conflicts).'" have a cyclic dependency.');
         }
 
         /** @var \Closure $normalizer */

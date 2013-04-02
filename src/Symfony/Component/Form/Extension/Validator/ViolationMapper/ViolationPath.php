@@ -155,7 +155,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function getElement($index)
     {
         if (!isset($this->elements[$index])) {
-            throw new \OutOfBoundsException('The index ' . $index . ' is not within the violation path');
+            throw new \OutOfBoundsException('The index '.$index.' is not within the violation path');
         }
 
         return $this->elements[$index];
@@ -167,7 +167,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function isProperty($index)
     {
         if (!isset($this->isIndex[$index])) {
-            throw new \OutOfBoundsException('The index ' . $index . ' is not within the violation path');
+            throw new \OutOfBoundsException('The index '.$index.' is not within the violation path');
         }
 
         return !$this->isIndex[$index];
@@ -179,7 +179,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function isIndex($index)
     {
         if (!isset($this->isIndex[$index])) {
-            throw new \OutOfBoundsException('The index ' . $index . ' is not within the violation path');
+            throw new \OutOfBoundsException('The index '.$index.' is not within the violation path');
         }
 
         return $this->isIndex[$index];
@@ -206,7 +206,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function mapsForm($index)
     {
         if (!isset($this->mapsForm[$index])) {
-            throw new \OutOfBoundsException('The index ' . $index . ' is not within the violation path');
+            throw new \OutOfBoundsException('The index '.$index.' is not within the violation path');
         }
 
         return $this->mapsForm[$index];
@@ -234,7 +234,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
             if ($this->mapsForm[$index]) {
                 $this->pathAsString .= ".children[$element]";
             } elseif (!$data) {
-                $this->pathAsString .= '.data' . ($this->isIndex[$index] ? "[$element]" : ".$element");
+                $this->pathAsString .= '.data'.($this->isIndex[$index] ? "[$element]" : ".$element");
                 $data = true;
             } else {
                 $this->pathAsString .= $this->isIndex[$index] ? "[$element]" : ".$element";

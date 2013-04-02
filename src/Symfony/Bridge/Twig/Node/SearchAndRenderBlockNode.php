@@ -29,7 +29,7 @@ class SearchAndRenderBlockNode extends \Twig_Node_Expression_Function
 
         if (isset($arguments[0])) {
             $compiler->subcompile($arguments[0]);
-            $compiler->raw(', \'' . $blockNameSuffix . '\'');
+            $compiler->raw(', \''.$blockNameSuffix.'\'');
 
             if (isset($arguments[1])) {
                 if ('label' === $blockNameSuffix) {

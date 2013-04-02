@@ -269,7 +269,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      */
     private function getItemName($token)
     {
-        $name = self::TOKEN_PREFIX . $token;
+        $name = self::TOKEN_PREFIX.$token;
 
         if ($this->isItemNameValid($name)) {
             return $name;
@@ -285,7 +285,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      */
     private function getIndexName()
     {
-        $name = self::TOKEN_PREFIX . 'index';
+        $name = self::TOKEN_PREFIX.'index';
 
         if ($this->isItemNameValid($name)) {
             return $name;

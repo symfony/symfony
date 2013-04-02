@@ -15,7 +15,7 @@ translated strings from these including support for pluralization.
         'Hello World!' => 'Bonjour',
     ), 'fr');
 
-    echo $translator->trans('Hello World!') . "\n";
+    echo $translator->trans('Hello World!')."\n";
 
 Resources
 ---------

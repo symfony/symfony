@@ -184,7 +184,7 @@ EOF
         $string = '';
         ksort($array);
         foreach ($array as $name => $value) {
-            $string .= ($string ? "\n" . str_repeat(' ', 13) : '') . $name . ': ' . $this->formatValue($value);
+            $string .= ($string ? "\n".str_repeat(' ', 13) : '').$name.': '.$this->formatValue($value);
         }
 
         return $string;

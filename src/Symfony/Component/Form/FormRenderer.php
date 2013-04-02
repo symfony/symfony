@@ -138,7 +138,7 @@ class FormRenderer implements FormRendererInterface
 
         // The cache key for storing the variables and types
         $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
-        $viewAndSuffixCacheKey = $viewCacheKey . $blockNameSuffix;
+        $viewAndSuffixCacheKey = $viewCacheKey.$blockNameSuffix;
 
         // In templates, we have to deal with two kinds of block hierarchies:
         //
@@ -173,7 +173,7 @@ class FormRenderer implements FormRendererInterface
             // the bottom level of the hierarchy (= "_<id>_<section>" block)
             $blockNameHierarchy = array();
             foreach ($view->vars['block_prefixes'] as $blockNamePrefix) {
-                $blockNameHierarchy[] = $blockNamePrefix . '_' . $blockNameSuffix;
+                $blockNameHierarchy[] = $blockNamePrefix.'_'.$blockNameSuffix;
             }
             $hierarchyLevel = count($blockNameHierarchy) - 1;
 

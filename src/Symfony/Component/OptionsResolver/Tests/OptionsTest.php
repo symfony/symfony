@@ -225,7 +225,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->options->set('foo', 'bar');
 
         $this->options->setNormalizer('foo', function (Options $options, $value) {
-            return 'normalized[' . $value . ']';
+            return 'normalized['.$value.']';
         });
 
         $this->assertEquals('normalized[bar]', $this->options->get('foo'));

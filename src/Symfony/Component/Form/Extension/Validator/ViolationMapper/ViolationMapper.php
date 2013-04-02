@@ -174,9 +174,9 @@ class ViolationMapper implements ViolationMapperInterface
             }
 
             if ($it->isIndex()) {
-                $chunk .= '[' . $it->current() . ']';
+                $chunk .= '['.$it->current().']';
             } else {
-                $chunk .= ('' === $chunk ? '' : '.') . $it->current();
+                $chunk .= ('' === $chunk ? '' : '.').$it->current();
             }
 
             // Test mapping rules as long as we have any

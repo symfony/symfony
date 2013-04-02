@@ -194,7 +194,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if ($this->parent && null === $this->parent->getConfig()->getDataClass()) {
-            return new PropertyPath('[' . $this->getName() . ']');
+            return new PropertyPath('['.$this->getName().']');
         }
 
         return new PropertyPath($this->getName());
@@ -314,27 +314,27 @@ class Form implements \IteratorAggregate, FormInterface
         if (!FormUtil::isEmpty($viewData)) {
             $dataClass = $this->config->getDataClass();
 
-            $actualType = is_object($viewData) ? 'an instance of class ' . get_class($viewData) : ' a(n) ' . gettype($viewData);
+            $actualType = is_object($viewData) ? 'an instance of class '.get_class($viewData) : ' a(n) '.gettype($viewData);
 
             if (null === $dataClass && is_object($viewData) && !$viewData instanceof \ArrayAccess) {
                 $expectedType = 'scalar, array or an instance of \ArrayAccess';
 
                 throw new Exception(
-                    'The form\'s view data is expected to be of type ' . $expectedType . ', ' .
-                    'but is ' . $actualType . '. You ' .
+                    'The form\'s view data is expected to be of type '.$expectedType.', ' .
+                    'but is '.$actualType.'. You ' .
                     'can avoid this error by setting the "data_class" option to ' .
-                    '"' . get_class($viewData) . '" or by adding a view transformer ' .
-                    'that transforms ' . $actualType . ' to ' . $expectedType . '.'
+                    '"'.get_class($viewData).'" or by adding a view transformer ' .
+                    'that transforms '.$actualType.' to '.$expectedType.'.'
                 );
             }
 
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
                 throw new Exception(
                     'The form\'s view data is expected to be an instance of class ' .
-                    $dataClass . ', but is '. $actualType . '. You can avoid this error ' .
+                    $dataClass.', but is '. $actualType.'. You can avoid this error ' .
                     'by setting the "data_class" option to null or by adding a view ' .
-                    'transformer that transforms ' . $actualType . ' to an instance of ' .
-                    $dataClass . '.'
+                    'transformer that transforms '.$actualType.' to an instance of ' .
+                    $dataClass.'.'
                 );
             }
         }

@@ -97,7 +97,7 @@ class PropertyPathBuilder
     public function remove($offset, $length = 1)
     {
         if (!isset($this->elements[$offset])) {
-            throw new OutOfBoundsException('The offset ' . $offset . ' is not within the property path');
+            throw new OutOfBoundsException('The offset '.$offset.' is not within the property path');
         }
 
         $this->resize($offset, $length, 0);
@@ -119,7 +119,7 @@ class PropertyPathBuilder
     public function replace($offset, $length, PropertyPathInterface $path, $pathOffset = 0, $pathLength = 0)
     {
         if (!isset($this->elements[$offset])) {
-            throw new OutOfBoundsException('The offset ' . $offset . ' is not within the property path');
+            throw new OutOfBoundsException('The offset '.$offset.' is not within the property path');
         }
 
         if (0 === $pathLength) {
@@ -145,7 +145,7 @@ class PropertyPathBuilder
     public function replaceByIndex($offset, $name = null)
     {
         if (!isset($this->elements[$offset])) {
-            throw new OutOfBoundsException('The offset ' . $offset . ' is not within the property path');
+            throw new OutOfBoundsException('The offset '.$offset.' is not within the property path');
         }
 
         if (null !== $name) {
@@ -166,7 +166,7 @@ class PropertyPathBuilder
     public function replaceByProperty($offset, $name = null)
     {
         if (!isset($this->elements[$offset])) {
-            throw new OutOfBoundsException('The offset ' . $offset . ' is not within the property path');
+            throw new OutOfBoundsException('The offset '.$offset.' is not within the property path');
         }
 
         if (null !== $name) {
@@ -209,7 +209,7 @@ class PropertyPathBuilder
 
         foreach ($this->elements as $offset => $element) {
             if ($this->isIndex[$offset]) {
-                $element = '[' . $element . ']';
+                $element = '['.$element.']';
             } elseif ('' !== $string) {
                 $string .= '.';
             }

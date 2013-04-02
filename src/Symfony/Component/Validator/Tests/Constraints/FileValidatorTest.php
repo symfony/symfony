@@ -31,7 +31,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new FileValidator();
         $this->validator->initialize($this->context);
-        $this->path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'FileValidatorTest';
+        $this->path = sys_get_temp_dir().DIRECTORY_SEPARATOR.'FileValidatorTest';
         $this->file = fopen($this->path, 'w');
     }
 

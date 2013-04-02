@@ -185,8 +185,8 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
 
     public function testSetValueCallsAdderAndRemoverForNestedCollections()
     {
-        $car = $this->getMock(__CLASS__ . '_CompositeCar');
-        $structure = $this->getMock(__CLASS__ . '_CarStructure');
+        $car = $this->getMock(__CLASS__.'_CompositeCar');
+        $structure = $this->getMock(__CLASS__.'_CarStructure');
         $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
         $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
@@ -214,7 +214,7 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
     {
         $this->markTestSkipped('This feature is temporarily disabled as of 2.1');
 
-        $car = $this->getMock(__CLASS__ . '_CarCustomSingular');
+        $car = $this->getMock(__CLASS__.'_CarCustomSingular');
         $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
         $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
@@ -239,7 +239,7 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
      */
     public function testSetValueFailsIfOnlyAdderFound()
     {
-        $car = $this->getMock(__CLASS__ . '_CarOnlyAdder');
+        $car = $this->getMock(__CLASS__.'_CarOnlyAdder');
         $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
         $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
@@ -255,7 +255,7 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
      */
     public function testSetValueFailsIfOnlyRemoverFound()
     {
-        $car = $this->getMock(__CLASS__ . '_CarOnlyRemover');
+        $car = $this->getMock(__CLASS__.'_CarOnlyRemover');
         $axesBefore = $this->getCollection(array(1 => 'second', 3 => 'fourth'));
         $axesAfter = $this->getCollection(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
@@ -285,13 +285,13 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
     {
         $data = array();
 
-        $car = $this->getMock(__CLASS__ . '_CarNoAdderAndRemover');
+        $car = $this->getMock(__CLASS__.'_CarNoAdderAndRemover');
         $propertyPath = 'axes';
         $expectedMessage = sprintf(
             'Neither element "axes" nor method "setAxes()" exists in class '
                 .'"%s", nor could adders and removers be found based on the '
                 .'guessed singulars: %s'
-//                . '(provide a singular by suffixing the '
+//               .'(provide a singular by suffixing the '
 //                .'property path with "|{singular}" to override the guesser)'
                 ,
             get_class($car),
@@ -313,14 +313,14 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
         $data[] = array($car, $propertyPath, $expectedMessage);
          */
 
-        $car = $this->getMock(__CLASS__ . '_CarNoAdderAndRemoverWithProperty');
+        $car = $this->getMock(__CLASS__.'_CarNoAdderAndRemoverWithProperty');
         $propertyPath = 'axes';
         $expectedMessage = sprintf(
             'Property "axes" is not public in class "%s", nor could adders and '
                 .'removers be found based on the guessed singulars: %s'
 //                .' (provide a singular by suffixing the property path with '
 //                .'"|{singular}" to override the guesser)'
-                . '. Maybe you should '
+               .'. Maybe you should '
                 .'create the method "setAxes()"?',
             get_class($car),
             implode(', ', (array) $singulars = StringUtil::singularify('Axes'))

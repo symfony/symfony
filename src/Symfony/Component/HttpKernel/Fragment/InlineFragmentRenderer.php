@@ -86,9 +86,6 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $cookies = $request->cookies->all();
         $server = $request->server->all();
 
-        // the sub-request is internal
-        $server['REMOTE_ADDR'] = '127.0.0.1';
-
         $subRequest = $request::create($uri, 'get', array(), $cookies, array(), $server);
         if ($session = $request->getSession()) {
             $subRequest->setSession($session);

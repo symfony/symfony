@@ -696,6 +696,21 @@ class Request
         $clientIps[] = $ip;
 
         $trustedProxies = self::$trustProxy && !self::$trustedProxies ? array($ip) : self::$trustedProxies;
+
+        //If is there any forward_for IP address, this is the real client IP address
+        if ($this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
+            $forwarded  = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP]);
+            $forwarded  = explode(",",$forwarded);
+            $forwarded  = trim($forwarded[0]);
+
+
+            return $forwarded;
+        }
+
+        //If it is not a forwarded IP, the Client IP should be in the trusted proxies
+        array_push($trustedProxies, $this->getClientIp());
+        $this->setTrustedProxies($trustedProxies);
+
         $clientIps = array_diff($clientIps, $trustedProxies);
 
         return array_pop($clientIps);

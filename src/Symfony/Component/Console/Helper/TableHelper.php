@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Helper;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use InvalidArgumentException;
 
 /**
  * Provides helpers to display table output.
@@ -20,6 +21,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class TableHelper extends Helper
 {
+    const LAYOUT_DEFAULT = 0;
+    const LAYOUT_BORDERLESS = 1;
+
     /**
      * Table headers.
      *
@@ -35,14 +39,14 @@ class TableHelper extends Helper
     private $rows = array();
 
     // Rendering options
-    private $paddingChar  = ' ';
-    private $horizontalBorderChar = '-';
-    private $verticalBorderChar = '|';
-    private $crossingChar = '+';
-    private $cellHeaderFormat = '<info>%s</info>';
-    private $cellRowFormat = '<comment>%s</comment>';
-    private $borderFormat = '%s';
-    private $padType = STR_PAD_RIGHT;
+    private $paddingChar;
+    private $horizontalBorderChar;
+    private $verticalBorderChar;
+    private $crossingChar;
+    private $cellHeaderFormat;
+    private $cellRowFormat;
+    private $borderFormat;
+    private $padType;
 
     /**
      * Column widths cache.
@@ -62,6 +66,55 @@ class TableHelper extends Helper
      * @var OutputInterface
      */
     private $output;
+
+    public function __construct()
+    {
+        $this->setLayout(self::LAYOUT_DEFAULT);
+    }
+
+    /**
+     * Sets table layout type.
+     *
+     * @param int $layout self::LAYOUT_*
+     *
+     * @return TableHelper
+     */
+    public function setLayout($layout)
+    {
+        switch ($layout) {
+            case self::LAYOUT_BORDERLESS:
+                $this
+                    ->setPaddingChar(' ')
+                    ->setHorizontalBorderChar('=')
+                    ->setVerticalBorderChar(' ')
+                    ->setCrossingChar(' ')
+                    ->setCellHeaderFormat('<info>%s</info>')
+                    ->setCellRowFormat('<comment>%s</comment>')
+                    ->setBorderFormat('%s')
+                    ->setPadType(STR_PAD_RIGHT)
+                ;
+                break;
+
+            case self::LAYOUT_DEFAULT:
+                $this
+                    ->setPaddingChar(' ')
+                    ->setHorizontalBorderChar('-')
+                    ->setVerticalBorderChar('|')
+                    ->setCrossingChar('+')
+                    ->setCellHeaderFormat('<info>%s</info>')
+                    ->setCellRowFormat('<comment>%s</comment>')
+                    ->setBorderFormat('%s')
+                    ->setPadType(STR_PAD_RIGHT)
+                ;
+                break;
+
+            default:
+                throw new InvalidArgumentException(sprintf('Invalid table layout "%s".', $layout));
+                break;
+        };
+
+        return $this;
+    }
 
     public function setHeaders(array $headers)
     {

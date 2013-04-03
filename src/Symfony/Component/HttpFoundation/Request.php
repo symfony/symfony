@@ -708,10 +708,8 @@ class Request
         }
 
         //If it is not a forwarded IP, the Client IP should be in the trusted proxies
-        if (!$this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
-            array_push($trustedProxies, $this->getClientIp());
-            $this->setTrustedProxies($trustedProxies); 
-        }
+        array_push($trustedProxies, $this->getClientIp());
+        $this->setTrustedProxies($trustedProxies);
 
         $clientIps = array_diff($clientIps, $trustedProxies);
 

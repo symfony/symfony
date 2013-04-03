@@ -30,6 +30,8 @@ class HelpCommand extends AbstractDescriptorCommand
      */
     protected function configure()
     {
+        parent::configure();
+
         $this->ignoreValidationErrors();
 
         $this
@@ -66,6 +68,7 @@ EOF
     protected function createDefinition()
     {
         $definition = parent::createDefinition();
+        
         $definition->addArgument(new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'));
 
         return $definition;
@@ -76,6 +79,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        parent::execute($input, $output);
+
         if (null === $this->command) {
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }

@@ -28,6 +28,8 @@ class ListCommand extends AbstractDescriptorCommand
      */
     protected function configure()
     {
+        parent::configure();
+
         $this
             ->setName('list')
             ->setDescription('Lists commands')
@@ -76,6 +78,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        parent::execute($input, $output);
+
         $this->getHelper('descriptor')->describe($output, $this->getApplication(), $input->getArgument('format'), $input->getOption('raw'));
     }
 }

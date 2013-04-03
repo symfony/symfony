@@ -1,20 +1,13 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Descriptor\DescriptorProvider;
 use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Base class for descriptor commands.
@@ -33,10 +26,7 @@ abstract class AbstractDescriptorCommand extends Command
      */
     protected function configure()
     {
-        $descriptorProvider = new DescriptorProvider();
-        $this->supportedFormats = $descriptorProvider->getSupportedFormats();
         $this->setDefinition($this->createDefinition());
-        $this->getHelperSet()->set(new DescriptorHelper($descriptorProvider));
     }
 
     /**
@@ -50,5 +40,16 @@ abstract class AbstractDescriptorCommand extends Command
             new InputOption('format', null, InputOption::VALUE_OPTIONAL, 'Output format ('.implode(', ', $this->supportedFormats).')'),
             new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
         ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $descriptorProvider = new DescriptorProvider();
+        $this->supportedFormats = $descriptorProvider->getSupportedFormats();
+        $this->setDefinition($this->createDefinition());
+        $this->getHelperSet()->set(new DescriptorHelper($descriptorProvider));
     }
 }

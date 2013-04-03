@@ -769,9 +769,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('127.0.0.1',                false, '127.0.0.1',    '88.88.88.88',                         null),
             array('88.88.88.88',              true,  '127.0.0.1',    '88.88.88.88',                         null),
             array('2620:0:1cfe:face:b00c::3', true,  '::1',          '2620:0:1cfe:face:b00c::3',            null),
-            array('88.88.88.88',              true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', null),
-            array('87.65.43.21',              true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
-            array('87.65.43.21',              false, '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
+            array('127.0.0.1',                true,  '123.45.67.89', '127.0.0.1, 88.88.88.88, 87.65.43.21', null),
+            array('127.0.0.1',                true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
+            array('127.0.0.1',                false, '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
         );
     }
 
@@ -1281,7 +1281,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('X_FORWARDED_HOST', 'foo.example.com, real.example.com:8080');
         $request->headers->set('X_FORWARDED_PROTO', 'https');
         $request->headers->set('X_FORWARDED_PORT', 443);
-        $request->headers->set('X_MY_FOR', '3.3.3.3, 4.4.4.4');
+        $request->headers->set('X_MY_FOR', '3.3.3.3, 4.4.4.4');//X-Forwarded-For: client[3.3.3.3], proxy1, proxy2
         $request->headers->set('X_MY_HOST', 'my.example.com');
         $request->headers->set('X_MY_PROTO', 'http');
         $request->headers->set('X_MY_PORT', 81);
@@ -1306,12 +1306,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(443, $request->getPort());
         $this->assertTrue($request->isSecure());
 
-        // custom header names
+        // custom header names : X-Forwarded-For: client[3.3.3.3], proxy1, proxy2
         Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, 'X_MY_FOR');
         Request::setTrustedHeaderName(Request::HEADER_CLIENT_HOST, 'X_MY_HOST');
         Request::setTrustedHeaderName(Request::HEADER_CLIENT_PORT, 'X_MY_PORT');
         Request::setTrustedHeaderName(Request::HEADER_CLIENT_PROTO, 'X_MY_PROTO');
-        $this->assertEquals('4.4.4.4', $request->getClientIp());
+        $this->assertEquals('3.3.3.3', $request->getClientIp());
         $this->assertEquals('my.example.com', $request->getHost());
         $this->assertEquals(81, $request->getPort());
         $this->assertFalse($request->isSecure());

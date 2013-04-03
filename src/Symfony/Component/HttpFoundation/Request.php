@@ -699,7 +699,12 @@ class Request
 
         //If is there any forward_for IP address, this is the real client IP address
         if ($this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
-            return $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP]);
+            $forwarded  = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP]);
+            $forwarded  = explode(",",$forwarded);
+            $forwarded  = trim($forwarded[0]);
+
+
+            return $forwarded;
         }
 
         //If it is not a forwarded IP, the Client IP should be in the trusted proxies

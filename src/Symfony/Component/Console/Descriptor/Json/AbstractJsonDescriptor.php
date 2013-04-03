@@ -12,7 +12,7 @@ abstract class AbstractJsonDescriptor implements DescriptorInterface
     /**
      * @var int
      */
-    private $encodingOptions = 0;
+    private $encodingOptions;
 
     /**
      * @param int $encodingOptions

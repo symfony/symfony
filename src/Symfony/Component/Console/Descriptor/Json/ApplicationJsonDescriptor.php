@@ -3,7 +3,7 @@
 namespace Symfony\Component\Console\Descriptor\Json;
 
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Descriptor\ApplicationDescription;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -15,12 +15,15 @@ class ApplicationJsonDescriptor extends AbstractJsonDescriptor
      */
     private $namespace;
 
+    /**
+     * @param string|null $namespace
+     * @param int         $encodingOptions
+     */
     public function __construct($namespace = null, $encodingOptions = 0)
     {
         $this->namespace = $namespace;
         parent::__construct($encodingOptions);
     }
-
 
     /**
      * {@inheritdoc}
@@ -37,33 +40,14 @@ class ApplicationJsonDescriptor extends AbstractJsonDescriptor
      */
     public function getData($object)
     {
-        $commandDescriptor = $this->build(new CommandJsonDescriptor());
-
         /** @var Application $object */
-        $commands = $object->all($this->namespace ? $object->findNamespace($this->namespace) : null);
-        $data = array('commands' => array(), 'namespaces' => array());
+        $description = new ApplicationDescription($object, $this->namespace);
+        $descriptor = $this->build(new CommandJsonDescriptor());
+        $commands = array_map(array($descriptor, 'getData'), $description->getCommands());
 
-        foreach ($this->sortCommands($object, $commands) as $space => $commands) {
-            $namespaceData = array('id' => $space, 'commands' => array());
-
-            /** @var Command $command */
-            foreach ($commands as $command) {
-                if (!$command->getName()) {
-                    continue;
-                }
-
-                $data['commands'][] = $commandDescriptor->getData($command);
-                $namespaceData['commands'][] = $command->getName();
-            }
-
-            $data['namespaces'][] = $namespaceData;
-        }
-
-        if ($this->namespace) {
-            $data['namespace'] = $this->namespace;
-        }
-
-        return $data;
+        return null === $this->namespace
+            ? array('commands' => $commands, 'namespaces' => $description->getNamespaces())
+            : array('commands' => $commands, 'namespace' => $this->namespace);
     }
 
     /**
@@ -72,19 +56,5 @@ class ApplicationJsonDescriptor extends AbstractJsonDescriptor
     public function supports($object)
     {
         return $object instanceof Application;
-    }
-
-    /**
-     * @param Application $application
-     * @param Command[]   $commands
-     *
-     * @return array
-     */
-    private function sortCommands(Application $application, array $commands)
-    {
-        $method = new \ReflectionMethod($application, 'sortCommands');
-        $method->setAccessible(true);
-
-        return $method->invoke($application, $commands);
     }
 }

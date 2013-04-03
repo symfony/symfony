@@ -28,8 +28,9 @@ class DescriptorProvider
      */
     private $options = array(
         'default_format' => 'txt',
-        'json_encoding'  => 0,
         'namespace'      => null,
+        'json_encoding'  => 0,
+        'markdown_width' => 120,
     );
 
     /**
@@ -46,6 +47,11 @@ class DescriptorProvider
             ->add(new Json\InputDefinitionJsonDescriptor())
             ->add(new Json\InputArgumentJsonDescriptor())
             ->add(new Json\InputOptionJsonDescriptor())
+            ->add(new Markdown\ApplicationMarkdownDescriptor())
+            ->add(new Markdown\CommandMarkdownDescriptor())
+            ->add(new Markdown\InputDefinitionMarkdownDescriptor())
+            ->add(new Markdown\InputArgumentMarkdownDescriptor())
+            ->add(new Markdown\InputOptionMarkdownDescriptor())
         ;
     }
 
@@ -125,6 +131,9 @@ class DescriptorProvider
             $supportedFormats[] = $descriptor->getFormat();
         }
 
-        return array_unique($supportedFormats);
+        $supportedFormats = array_unique($supportedFormats);
+        sort($supportedFormats);
+
+        return $supportedFormats;
     }
 }

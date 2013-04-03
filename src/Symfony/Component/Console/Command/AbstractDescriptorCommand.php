@@ -17,15 +17,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 abstract class AbstractDescriptorCommand extends Command
 {
     /**
-     * @var array
+     * @var DescriptorProvider
      */
-    private $supportedFormats;
+    private $provider;
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
+        $this->provider = new DescriptorProvider();
         $this->setDefinition($this->createDefinition());
     }
 
@@ -37,7 +38,7 @@ abstract class AbstractDescriptorCommand extends Command
     protected function createDefinition()
     {
         return new InputDefinition(array(
-            new InputOption('format', null, InputOption::VALUE_OPTIONAL, 'Output format ('.implode(', ', $this->supportedFormats).')'),
+            new InputOption('format', null, InputOption::VALUE_OPTIONAL, 'Output format ('.implode(', ', $this->provider->getSupportedFormats()).')'),
             new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
         ));
     }
@@ -47,9 +48,6 @@ abstract class AbstractDescriptorCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $descriptorProvider = new DescriptorProvider();
-        $this->supportedFormats = $descriptorProvider->getSupportedFormats();
-        $this->setDefinition($this->createDefinition());
-        $this->getHelperSet()->set(new DescriptorHelper($descriptorProvider));
+        $this->getHelperSet()->set(new DescriptorHelper($this->provider));
     }
 }

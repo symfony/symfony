@@ -80,6 +80,6 @@ EOF
     {
         parent::execute($input, $output);
 
-        $this->getHelper('descriptor')->describe($output, $this->getApplication(), $input->getArgument('format'), $input->getOption('raw'));
+        $this->getHelper('descriptor')->describe($output, $this->getApplication(), $input->getOption('format'), $input->getOption('raw'));
     }
 }

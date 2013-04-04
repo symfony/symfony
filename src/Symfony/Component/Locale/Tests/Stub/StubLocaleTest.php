@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Locale\Tests\Stub;
 
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Util\IcuVersion;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Locale\Stub\StubLocale;
 
 /**
@@ -22,8 +22,7 @@ class StubLocaleTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        // Force the use of stub data to have consistent results
-        Intl::setDataSource(Intl::STUB);
+        IntlTestHelper::requireIntl($this);
 
         parent::setUp();
     }

@@ -34,35 +34,10 @@ use Symfony\Component\Intl\ResourceBundle\Stub\StubRegionBundle;
 class Intl
 {
     /**
-     * Load data from the Icu component.
-     */
-    const ICU = 0;
-
-    /**
-     * Load data from the stub files of the Intl component.
-     */
-    const STUB = 1;
-
-    /**
      * The number of resource bundles to buffer. Loading the same resource
      * bundle for n locales takes up n spots in the buffer.
      */
     const BUFFER_SIZE = 10;
-
-    /**
-     * The accepted values for the {@link $dataSource} property.
-     *
-     * @var array
-     */
-    private static $allowedDataSources = array(
-        self::ICU => 'Intl::ICU',
-        self::STUB => 'Intl::STUB',
-    );
-
-    /**
-     * @var integer
-     */
-    private static $dataSource;
 
     /**
      * @var ResourceBundle\CurrencyBundleInterface
@@ -97,12 +72,7 @@ class Intl
     /**
      * @var ResourceBundle\Reader\StructuredBundleReaderInterface
      */
-    private static $phpReader;
-
-    /**
-     * @var ResourceBundle\Reader\StructuredBundleReaderInterface
-     */
-    private static $binaryReader;
+    private static $bundleReader;
 
     /**
      * Returns whether the intl extension is installed.
@@ -111,66 +81,7 @@ class Intl
      */
     public static function isExtensionLoaded()
     {
-        return IcuData::isLoadable();
-    }
-
-    /**
-     * Sets the data source from which to load the resource bundles.
-     *
-     * @param integer $dataSource One of the constants {@link Intl::ICU} or
-     *                            {@link Intl::STUB}.
-     *
-     * @throws InvalidArgumentException If the data source is invalid.
-     *
-     * @see getData>Source
-     */
-    public static function setDataSource($dataSource)
-    {
-        if (!isset(self::$allowedDataSources[$dataSource])) {
-            throw new InvalidArgumentException(sprintf(
-                'The data sources should be one of %s',
-                implode(', ', self::$allowedDataSources)
-            ));
-        }
-
-        if (self::ICU === $dataSource && !IcuData::isLoadable()) {
-            throw new InvalidArgumentException(
-                'The data source cannot be set to Intl::ICU if the intl ' .
-                'extension is not installed.'
-            );
-        }
-
-        if ($dataSource !== self::$dataSource) {
-            self::$currencyBundle = null;
-            self::$languageBundle = null;
-            self::$localeBundle = null;
-            self::$regionBundle = null;
-        }
-
-        self::$dataSource = $dataSource;
-    }
-
-    /**
-     * Returns the data source from which to load the resource bundles.
-     *
-     * If {@link setDataSource()} has not been called, the data source will be
-     * chosen depending on whether the intl extension is installed or not:
-     *
-     *   * If the extension is present, the bundles will be loaded from the Icu
-     *     component;
-     *   * Otherwise, the bundles will be loaded from the stub files in the
-     *     Intl component.
-     *
-     * @return integer One of the constants {@link Intl::ICU} or
-     *                 {@link Intl::STUB}.
-     */
-    public static function getDataSource()
-    {
-        if (null === self::$dataSource) {
-            self::$dataSource = IcuData::isLoadable() ? self::ICU : self::STUB;
-        }
-
-        return self::$dataSource;
+        return class_exists('\ResourceBundle');
     }
 
     /**
@@ -181,9 +92,7 @@ class Intl
     public static function getCurrencyBundle()
     {
         if (null === self::$currencyBundle) {
-            self::$currencyBundle = self::ICU === self::getDataSource()
-                ? new IcuCurrencyBundle(self::getBinaryReader())
-                : new StubCurrencyBundle(self::getPhpReader());
+            self::$currencyBundle = new IcuCurrencyBundle(self::getBundleReader());
         }
 
         return self::$currencyBundle;
@@ -197,9 +106,7 @@ class Intl
     public static function getLanguageBundle()
     {
         if (null === self::$languageBundle) {
-            self::$languageBundle = self::ICU === self::getDataSource()
-                ? new IcuLanguageBundle(self::getBinaryReader())
-                : new StubLanguageBundle(self::getPhpReader());
+            self::$languageBundle = new IcuLanguageBundle(self::getBundleReader());
         }
 
         return self::$languageBundle;
@@ -213,9 +120,7 @@ class Intl
     public static function getLocaleBundle()
     {
         if (null === self::$localeBundle) {
-            self::$localeBundle = self::ICU === self::getDataSource()
-                ? new IcuLocaleBundle(self::getBinaryReader())
-                : new StubLocaleBundle(self::getPhpReader());
+            self::$localeBundle = new IcuLocaleBundle(self::getBundleReader());
         }
 
         return self::$localeBundle;
@@ -229,9 +134,7 @@ class Intl
     public static function getRegionBundle()
     {
         if (null === self::$regionBundle) {
-            self::$regionBundle = self::ICU === self::getDataSource()
-                ? new IcuRegionBundle(self::getBinaryReader())
-                : new StubRegionBundle(self::getPhpReader());
+            self::$regionBundle = new IcuRegionBundle(self::getBundleReader());
         }
 
         return self::$regionBundle;
@@ -275,9 +178,7 @@ class Intl
     public static function getIcuDataVersion()
     {
         if (false === self::$icuDataVersion) {
-            self::$icuDataVersion = self::ICU === self::getDataSource()
-                ? IcuData::getVersion()
-                : file_get_contents(__DIR__ . '/Resources/version.txt');
+            self::$icuDataVersion = IcuData::getVersion();
         }
 
         return self::$icuDataVersion;
@@ -298,33 +199,16 @@ class Intl
      *
      * @return ResourceBundle\Reader\StructuredBundleReaderInterface The resource reader.
      */
-    private static function getPhpReader()
+    private static function getBundleReader()
     {
-        if (null === self::$phpReader) {
-            self::$phpReader = new StructuredBundleReader(new BufferedBundleReader(
-                new PhpBundleReader(),
+        if (null === self::$bundleReader) {
+            self::$bundleReader = new StructuredBundleReader(new BufferedBundleReader(
+                IcuData::isLoadable() ? new BinaryBundleReader() : new PhpBundleReader(),
                 self::BUFFER_SIZE
             ));
         }
 
-        return self::$phpReader;
-    }
-
-    /**
-     * Returns a resource bundle reader for binary .res resource bundle files.
-     *
-     * @return ResourceBundle\Reader\StructuredBundleReaderInterface The resource reader.
-     */
-    private static function getBinaryReader()
-    {
-        if (null === self::$binaryReader) {
-            self::$binaryReader = new StructuredBundleReader(new BufferedBundleReader(
-                new BinaryBundleReader(),
-                self::BUFFER_SIZE
-            ));
-        }
-
-        return self::$binaryReader;
+        return self::$bundleReader;
     }
 
     /**

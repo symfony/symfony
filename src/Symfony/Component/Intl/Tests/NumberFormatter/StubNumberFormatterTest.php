@@ -12,8 +12,8 @@
 namespace Symfony\Component\Intl\Tests\NumberFormatter;
 
 use Symfony\Component\Intl\Globals\StubIntlGlobals;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\NumberFormatter\StubNumberFormatter;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
  * Note that there are some values written like -2147483647 - 1. This is the lower 32bit int max and is a known
@@ -23,8 +23,7 @@ class StubNumberFormatterTest extends AbstractNumberFormatterTest
 {
     protected function setUp()
     {
-        // Force the use of stub data to have consistent results
-        Intl::setDataSource(Intl::STUB);
+        IntlTestHelper::requireIntl($this);
 
         parent::setUp();
     }

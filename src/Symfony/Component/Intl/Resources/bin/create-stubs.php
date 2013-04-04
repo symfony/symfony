@@ -24,7 +24,7 @@ require_once __DIR__ . '/autoload.php';
 
 if (1 !== $GLOBALS['argc']) {
     bailout(<<<MESSAGE
-Usage: php update-stubs.php
+Usage: php create-stubs.php
 
 Creates resource bundle stubs from the resource bundles in the Icu component.
 
@@ -47,6 +47,10 @@ if (!Intl::isExtensionLoaded()) {
 
 if (!class_exists('\Symfony\Component\Icu\IcuData')) {
     bailout('You must run "composer update --dev" before running this script.');
+}
+
+if (IcuData::isStubbed()) {
+    bailout('You should load a version of the Icu component that does not contain stub files (i.e. not *.0.x).');
 }
 
 $shortIcuVersionInPhp = strip_minor_versions(Intl::getIcuVersion());
@@ -72,9 +76,11 @@ echo "Compiling stubs for ICU version $icuVersionInIcuComponent.\n";
 
 echo "Preparing stub creation...\n";
 
+$targetDir = sys_get_temp_dir() . '/icu-stubs';
+
 $context = new StubbingContext(
     IcuData::getResourceDirectory(),
-    realpath(__DIR__ . '/../data'),
+    $targetDir,
     new Filesystem(),
     $icuVersionInIcuComponent
 );
@@ -89,7 +95,7 @@ echo "Starting stub creation...\n";
 
 $transformer->createStubs($context);
 
-echo "Stub creation complete.\n";
+echo "Wrote stubs to $targetDir.\n";
 
 $versionFile = $context->getStubDir() . '/version.txt';
 
@@ -98,3 +104,7 @@ file_put_contents($versionFile, "$icuVersionInIcuComponent\n");
 echo "Wrote $versionFile.\n";
 
 echo "Done.\n";
+
+echo wordwrap("Please change the Icu component to branch 1.0.x now and run:\n", LINE_WIDTH);
+
+echo "\n    php copy-stubs-to-component.php\n";

@@ -87,9 +87,15 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $server = $request->server->all();
 
         // the sub-request is internal
+        $originalXForwardedFor = isset($server['HTTP_X_FORWARDED_FOR'])
+            ? $server['HTTP_X_FORWARDED_FOR'] . ', '
+            : '';
+
+        $server['HTTP_X_FORWARDED_FOR'] = $originalXForwardedFor . $server['REMOTE_ADDR'];
         $server['REMOTE_ADDR'] = '127.0.0.1';
 
         $subRequest = $request::create($uri, 'get', array(), $cookies, array(), $server);
+
         if ($session = $request->getSession()) {
             $subRequest->setSession($session);
         }

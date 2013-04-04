@@ -696,7 +696,7 @@ class Request
         $clientIps[] = $ip;
 
         $trustedProxies = self::$trustProxy && !self::$trustedProxies ? array($ip) : self::$trustedProxies;
-        $clientIps = array_diff($clientIps, $trustedProxies);
+        $clientIps = array_diff($clientIps, array_merge($trustedProxies, $this->getLocalIpAddresses()));
 
         return array_pop($clientIps);
     }
@@ -1611,6 +1611,16 @@ class Request
             'atom' => array('application/atom+xml'),
             'rss'  => array('application/rss+xml'),
         );
+    }
+
+    /**
+     * Return a list of local IP addresses.
+     *
+     * @return array
+     */
+    protected function getLocalIpAddresses()
+    {
+        return array('127.0.0.1', 'fe80::1', '::1');
     }
 
     /**

@@ -203,7 +203,7 @@ class Intl
     {
         if (null === self::$bundleReader) {
             self::$bundleReader = new StructuredBundleReader(new BufferedBundleReader(
-                IcuData::isLoadable() ? new BinaryBundleReader() : new PhpBundleReader(),
+                IcuData::getBundleReader(),
                 self::BUFFER_SIZE
             ));
         }

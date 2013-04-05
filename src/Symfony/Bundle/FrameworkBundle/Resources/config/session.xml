@@ -9,6 +9,7 @@
         <parameter key="session.flashbag.class">Symfony\Component\HttpFoundation\Session\Flash\FlashBag</parameter>
         <parameter key="session.attribute_bag.class">Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag</parameter>
         <parameter key="session.storage.native.class">Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage</parameter>
+        <parameter key="session.storage.php_bridge.class">Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage</parameter>
         <parameter key="session.storage.mock_file.class">Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage</parameter>
         <parameter key="session.handler.native_file.class">Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler</parameter>
         <parameter key="session_listener.class">Symfony\Bundle\FrameworkBundle\EventListener\SessionListener</parameter>
@@ -23,6 +24,10 @@
 
         <service id="session.storage.native" class="%session.storage.native.class%">
             <argument>%session.storage.options%</argument>
+            <argument type="service" id="session.handler" />
+        </service>
+
+        <service id="session.storage.php_bridge" class="%session.storage.php_bridge.class%">
             <argument type="service" id="session.handler" />
         </service>
 

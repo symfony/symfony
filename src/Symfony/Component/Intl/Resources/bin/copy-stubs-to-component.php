@@ -45,8 +45,10 @@ if (!class_exists('\Symfony\Component\Icu\IcuData')) {
     bailout('You must run "composer update --dev" before running this script.');
 }
 
+$stubBranch = '1.0.x';
+
 if (!IcuData::isStubbed()) {
-    bailout('You should load a version of the Icu component contains stub files (i.e. *.0.x).');
+    bailout("Please switch to the Icu component branch $stubBranch.");
 }
 
 $filesystem = new Filesystem();

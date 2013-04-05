@@ -49,8 +49,10 @@ if (!class_exists('\Symfony\Component\Icu\IcuData')) {
     bailout('You must run "composer update --dev" before running this script.');
 }
 
+$stubBranch = '1.0.x';
+
 if (IcuData::isStubbed()) {
-    bailout('You should load a version of the Icu component that does not contain stub files (i.e. not *.0.x).');
+    bailout("Please switch to a branch of the Icu component that contains .res files (anything but $stubBranch).");
 }
 
 $shortIcuVersionInPhp = strip_minor_versions(Intl::getIcuVersion());
@@ -105,6 +107,6 @@ echo "Wrote $versionFile.\n";
 
 echo "Done.\n";
 
-echo wordwrap("Please change the Icu component to branch 1.0.x now and run:\n", LINE_WIDTH);
+echo wordwrap("Please change the Icu component to branch $stubBranch now and run:\n", LINE_WIDTH);
 
 echo "\n    php copy-stubs-to-component.php\n";

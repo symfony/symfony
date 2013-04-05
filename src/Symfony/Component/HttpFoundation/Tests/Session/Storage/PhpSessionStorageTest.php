@@ -79,12 +79,28 @@ class PhpSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($_SESSION));
         // in PHP 5.4 we can reliably detect a session started
         $this->assertTrue($storage->getSaveHandler()->isActive());
-        // PHP sesion might have started, but the storage driver has not, so false is correct here
+        // PHP session might have started, but the storage driver has not, so false is correct here
         $this->assertFalse($storage->isStarted());
 
         $key = $storage->getMetadataBag()->getStorageKey();
         $this->assertFalse(isset($_SESSION[$key]));
         $storage->start();
         $this->assertTrue(isset($_SESSION[$key]));
+    }
+
+    public function testClear()
+    {
+        $storage = $this->getStorage();
+        session_start();
+        $_SESSION['drak'] = 'loves symfony';
+        $storage->getBag('attributes')->set('symfony', 'greatness');
+        $key = $storage->getBag('attributes')->getStorageKey();
+        $this->assertEquals($_SESSION[$key], array('symfony' => 'greatness'));
+        $this->assertEquals($_SESSION['drak'], 'loves symfony');
+        $storage->clear();
+        $this->assertEquals($_SESSION[$key], array());
+        $this->assertEquals($_SESSION['drak'], 'loves symfony');
+
+
     }
 }

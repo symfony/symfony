@@ -132,10 +132,10 @@ class NativeSessionStorage implements SessionStorageInterface
             return true;
         }
 
-        if (version_compare(phpversion(), '5.4.0', '>=') && session_status() === \PHP_SESSION_ACTIVE) {
+        if (version_compare(phpversion(), '5.4.0', '>=') && \PHP_SESSION_ACTIVE === session_status()) {
             throw new \RuntimeException('Failed to start the session: already started by PHP');
         } elseif (version_compare(phpversion(), '5.4.0', '<') && isset($_SESSION) && session_id()) {
-            // while not fullproof, this is the most reliable way of determining if a session really exists in PHP 5.3
+            // not 100% fool-proof, but is the most reliable way to determine if a session is active in PHP 5.3
             throw new \RuntimeException('Failed to start the session: already started by PHP ($_SESSION is set)');
         }
 

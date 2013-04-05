@@ -73,7 +73,7 @@ abstract class AbstractProxy
     public function isActive()
     {
         if (version_compare(phpversion(), '5.4.0', '>=')) {
-            return $this->active = session_status() === \PHP_SESSION_ACTIVE ? true : false;
+            return $this->active = \PHP_SESSION_ACTIVE === session_status();
         }
 
         return $this->active;

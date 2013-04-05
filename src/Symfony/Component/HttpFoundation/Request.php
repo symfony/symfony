@@ -516,6 +516,24 @@ class Request
     }
 
     /**
+     * Gets the trusted proxy header name.
+     *
+     * @param string $key The header key
+     *
+     * @return string The header name
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function getTrustedHeaderName($key)
+    {
+        if (!array_key_exists($key, self::$trustedHeaders)) {
+            throw new \InvalidArgumentException(sprintf('Unable to get the trusted header name for key "%s".', $key));
+        }
+
+        return self::$trustedHeaders[$key];
+    }
+
+    /**
      * Normalizes a query string.
      *
      * It builds a normalized query string, where keys/value pairs are alphabetized,
@@ -696,7 +714,7 @@ class Request
         $clientIps[] = $ip;
 
         $trustedProxies = self::$trustProxy && !self::$trustedProxies ? array($ip) : self::$trustedProxies;
-        $clientIps = array_diff($clientIps, array_merge($trustedProxies, $this->getLocalIpAddresses()));
+        $clientIps = array_diff($clientIps, $trustedProxies);
 
         return array_pop($clientIps);
     }
@@ -1611,16 +1629,6 @@ class Request
             'atom' => array('application/atom+xml'),
             'rss'  => array('application/rss+xml'),
         );
-    }
-
-    /**
-     * Return a list of local IP addresses.
-     *
-     * @return array
-     */
-    protected function getLocalIpAddresses()
-    {
-        return array('127.0.0.1', 'fe80::1', '::1');
     }
 
     /**

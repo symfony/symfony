@@ -664,6 +664,15 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($response->isOk());
     }
 
+    public function testIsError()
+    {
+        $response = new Response('', 404);
+        $this->assertTrue($response->isError());
+
+        $response = new Response('', 500);
+        $this->assertTrue($response->isError());
+    }
+
     public function testIsServerOrClientError()
     {
         $response = new Response('', 404);

@@ -4,7 +4,8 @@ CHANGELOG
 2.3.0
 
  * `UploadedFile::isValid` now returns false if the file was not uploaded via HTTP (in a non-test mode)
-
+ * allow control over session start on demand and emulation mode allowing access to session bags
+   before session initialization.
 2.2.0
 -----
 

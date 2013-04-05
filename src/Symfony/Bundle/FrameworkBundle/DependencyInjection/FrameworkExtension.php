@@ -314,6 +314,18 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('session.storage.options', $options);
 
+        // this controls the SessionListener to start session
+        $container->setParameter('session.auto_start', $config['auto_start']);
+
+        // this controls the session start on demand feature
+        $container->setParameter('session.storage.start_on_demand', $config['start_on_demand']);
+
+        // this controls if an exception is thrown when an inactive session with start_on_demand=false
+        // when trying to access session bags or just returns the inactive
+        $container->setParameter('session.storage.emulation_mode', $config['emulation_mode']);
+
+        $container->setParameter('session.storage.mock_name', $config['mock_name']);
+
         // session handler (the internal callback registered with PHP session management)
         if (null == $config['handler_id']) {
             // Set the handler class to be null

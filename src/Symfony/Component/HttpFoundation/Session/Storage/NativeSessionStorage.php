@@ -92,10 +92,9 @@ class NativeSessionStorage implements SessionStorageInterface
      * upload_progress.min-freq, "1"
      * url_rewriter.tags, "a=href,area=href,frame=src,form=,fieldset="
      *
-     * @param array       $options Session configuration options.
-     * @param object|null $handler Must be instance of AbstractProxy or NativeSessionHandler;
-     *                             implement \SessionHandlerInterface; or be null.
-     * @param MetadataBag $metaBag MetadataBag.
+     * @param array                                                            $options Session configuration options.
+     * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $handler
+     * @param MetadataBag                                                      $metaBag MetadataBag.
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
@@ -133,14 +132,16 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         if (version_compare(phpversion(), '5.4.0', '>=') && \PHP_SESSION_ACTIVE === session_status()) {
-            throw new \RuntimeException('Failed to start the session: already started by PHP');
-        } elseif (version_compare(phpversion(), '5.4.0', '<') && isset($_SESSION) && session_id()) {
+            throw new \RuntimeException('Failed to start the session: already started by PHP.');
+        }
+
+        if (version_compare(phpversion(), '5.4.0', '<') && isset($_SESSION) && session_id()) {
             // not 100% fool-proof, but is the most reliable way to determine if a session is active in PHP 5.3
-            throw new \RuntimeException('Failed to start the session: already started by PHP ($_SESSION is set)');
+            throw new \RuntimeException('Failed to start the session: already started by PHP ($_SESSION is set).');
         }
 
         if (ini_get('session.use_cookies') && headers_sent()) {
-            throw new \RuntimeException('Failed to start the session because headers have already been sent');
+            throw new \RuntimeException('Failed to start the session because headers have already been sent.');
         }
 
         // ok to try and start the session
@@ -149,7 +150,7 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         $this->loadSession();
-        if (!$this->saveHandler->isWrapper() && !$this->getSaveHandler()->isSessionHandlerInterface()) {
+        if (!$this->saveHandler->isWrapper() && !$this->saveHandler->isSessionHandlerInterface()) {
             // This condition matches only PHP 5.3 with internal save handlers
             $this->saveHandler->setActive(true);
         }
@@ -216,7 +217,7 @@ class NativeSessionStorage implements SessionStorageInterface
     {
         session_write_close();
 
-        if (!$this->saveHandler->isWrapper() && !$this->getSaveHandler()->isSessionHandlerInterface()) {
+        if (!$this->saveHandler->isWrapper() && !$this->saveHandler->isSessionHandlerInterface()) {
             // This condition matches only PHP 5.3 with internal save handlers
             $this->saveHandler->setActive(false);
         }
@@ -348,8 +349,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * @see http://php.net/sessionhandler
      * @see http://github.com/drak/NativeSession
      *
-     * @param object|null $saveHandler Must be instance of AbstractProxy or NativeSessionHandler;
-     *                                 implement \SessionHandlerInterface; or be null.
+     * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $saveHandler
      *
      * @throws \InvalidArgumentException
      */
@@ -358,8 +358,8 @@ class NativeSessionStorage implements SessionStorageInterface
         if (!$saveHandler instanceof AbstractProxy &&
             !$saveHandler instanceof NativeSessionHandler &&
             !$saveHandler instanceof \SessionHandlerInterface &&
-            $saveHandler !== null) {
-            throw new \InvalidArgumentException('Must be instance of AbstractProxy or NativeSessionHandler; implement \SessionHandlerInterface; or be null');
+            null !== $saveHandler) {
+            throw new \InvalidArgumentException('Must be instance of AbstractProxy or NativeSessionHandler; implement \SessionHandlerInterface; or be null.');
         }
 
         // Wrap $saveHandler in proxy and prevent double wrapping of proxy

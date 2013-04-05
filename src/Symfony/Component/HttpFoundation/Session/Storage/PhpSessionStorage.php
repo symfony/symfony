@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
+use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
 
 /**
  * Allows session to be started by PHP and managed by Symfony2
@@ -23,9 +25,8 @@ class PhpSessionStorage extends NativeSessionStorage
     /**
      * Constructor.
      *
-     * @param object|null $handler Must be instance of AbstractProxy or NativeSessionHandler;
-     *                             implement \SessionHandlerInterface; or be null.
-     * @param MetadataBag $metaBag MetadataBag.
+     * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $handler
+     * @param MetadataBag                                                      $metaBag MetadataBag
      */
     public function __construct($handler = null, MetadataBag $metaBag = null)
     {
@@ -43,7 +44,7 @@ class PhpSessionStorage extends NativeSessionStorage
         }
 
         $this->loadSession();
-        if (!$this->saveHandler->isWrapper() && !$this->getSaveHandler()->isSessionHandlerInterface()) {
+        if (!$this->saveHandler->isWrapper() && !$this->saveHandler->isSessionHandlerInterface()) {
             // This condition matches only PHP 5.3 + internal save handlers
             $this->saveHandler->setActive(true);
         }

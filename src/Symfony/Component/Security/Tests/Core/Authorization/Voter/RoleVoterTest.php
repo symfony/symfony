@@ -34,16 +34,43 @@ class RoleVoterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
     }
 
+    /**
+     * @dataProvider getVoteAbstainTests
+     */
+    public function testVoteAbstain($attributes)
+    {
+        $voter = new RoleVoter();
+
+        $this->assertSame(VoterInterface::ACCESS_ABSTAIN, $voter->vote($this->getDummyToken(), null, $attributes));
+    }
+
+    public function getVoteAbstainTests()
+    {
+        return array(
+            array(array()),
+            array(array('FOO')),
+        );
+    }
+
     public function getVoteTests()
     {
         return array(
-            array(array(), array(), VoterInterface::ACCESS_ABSTAIN),
-            array(array(), array('FOO'), VoterInterface::ACCESS_ABSTAIN),
             array(array(), array('ROLE_FOO'), VoterInterface::ACCESS_DENIED),
             array(array('ROLE_FOO'), array('ROLE_FOO'), VoterInterface::ACCESS_GRANTED),
             array(array('ROLE_FOO'), array('FOO', 'ROLE_FOO'), VoterInterface::ACCESS_GRANTED),
             array(array('ROLE_BAR', 'ROLE_FOO'), array('ROLE_FOO'), VoterInterface::ACCESS_GRANTED),
         );
+    }
+
+    protected function getDummyToken()
+    {
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token
+            ->expects($this->never())
+            ->method('getRoles')
+        ;
+
+        return $token;
     }
 
     protected function getToken(array $roles)
@@ -52,9 +79,10 @@ class RoleVoterTest extends \PHPUnit_Framework_TestCase
             $roles[$i] = new Role($role);
         }
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->once())
-              ->method('getRoles')
-              ->will($this->returnValue($roles));
+        $token
+            ->expects($this->once())
+            ->method('getRoles')
+            ->will($this->returnValue($roles))
         ;
 
         return $token;

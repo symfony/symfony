@@ -171,6 +171,8 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process = $this->getProcess('echo "a" >> /dev/null');
         $process->setTTY(true);
         $process->run();
+
+        $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
     }
 
     public function testExitCodeText()

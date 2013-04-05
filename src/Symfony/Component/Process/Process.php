@@ -985,7 +985,13 @@ class Process
         return $this;
     }
 
-    protected function getDescriptors() {
+    /**
+     * Create the descriptors needed by the proc_open
+     *
+     * @return array
+     */
+    private function getDescriptors()
+    {
         //Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
         //Workaround for this problem is to use temporary files instead of pipes on Windows platform.
         //@see https://bugs.php.net/bug.php?id=51800
@@ -999,28 +1005,29 @@ class Process
             $this->readBytes = array(
                 self::STDOUT => 0,
             );
-            $descriptors = array(array('pipe', 'r'), $this->fileHandles[self::STDOUT], array('pipe', 'w'));
+            
+            return array(array('pipe', 'r'), $this->fileHandles[self::STDOUT], array('pipe', 'w'));
+        } 
+
+        if ($this->tty) {
+            $descriptors = array(
+                array('file', '/dev/tty', 'r'),
+                array('file', '/dev/tty', 'w'),
+                array('file', '/dev/tty', 'w'),
+            );
         } else {
-            if ($this->tty) {
-                $descriptors = array(
-                    array('file', '/dev/tty', 'r'),
-                    array('file', '/dev/tty', 'w'),
-                    array('file', '/dev/tty', 'w'),
-                );
-            } else {
-               $descriptors = array(
-                    array('pipe', 'r'), // stdin
-                    array('pipe', 'w'), // stdout
-                    array('pipe', 'w'), // stderr
-                );
-            }
+           $descriptors = array(
+                array('pipe', 'r'), // stdin
+                array('pipe', 'w'), // stdout
+                array('pipe', 'w'), // stderr
+            );
+        }
 
-            if ($this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-                // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
-                $descriptors = array_merge($descriptors, array(array('pipe', 'w')));
+        if ($this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+            // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
+            $descriptors = array_merge($descriptors, array(array('pipe', 'w')));
 
-                $this->commandline = '('.$this->commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
-            }
+            $this->commandline = '('.$this->commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
         }
 
         return $descriptors;

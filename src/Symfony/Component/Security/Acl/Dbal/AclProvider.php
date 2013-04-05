@@ -263,9 +263,6 @@ SELECTCLAUSE;
         for ($i = 0; $i < $count; $i++) {
             if (!isset($types[$batch[$i]->getType()])) {
                 $types[$batch[$i]->getType()] = true;
-                if ($count > 1) {
-                    break;
-                }
             }
         }
 

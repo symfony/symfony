@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
@@ -92,7 +93,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * url_rewriter.tags, "a=href,area=href,frame=src,form=,fieldset="
      *
      * @param array       $options Session configuration options.
-     * @param object      $handler SessionHandlerInterface.
+     * @param object|null $handler Must be instance of AbstractProxy or NativeSessionHandler;
+     *                             implement \SessionHandlerInterface; or be null.
      * @param MetadataBag $metaBag MetadataBag.
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
@@ -130,27 +132,26 @@ class NativeSessionStorage implements SessionStorageInterface
             return true;
         }
 
-        // catch condition where session was started automatically by PHP
-        if (!$this->started && !$this->closed && $this->saveHandler->isActive()
-            && $this->saveHandler->isSessionHandlerInterface()) {
-            $this->loadSession();
-
-            return true;
+        if (version_compare(phpversion(), '5.4.0', '>=') && session_status() === \PHP_SESSION_ACTIVE) {
+            throw new \RuntimeException('Failed to start the session: already started by PHP');
+        } elseif (version_compare(phpversion(), '5.4.0', '<') && isset($_SESSION) && session_id()) {
+            // while not fullproof, this is the most reliable way of determining if a session really exists in PHP 5.3
+            throw new \RuntimeException('Failed to start the session: already started by PHP ($_SESSION is set)');
         }
 
         if (ini_get('session.use_cookies') && headers_sent()) {
-            throw new \RuntimeException('Failed to start the session because headers have already been sent.');
+            throw new \RuntimeException('Failed to start the session because headers have already been sent');
         }
 
-        // start the session
+        // ok to try and start the session
         if (!session_start()) {
             throw new \RuntimeException('Failed to start the session');
         }
 
         $this->loadSession();
-
-        if (!$this->saveHandler->isWrapper() && !$this->saveHandler->isSessionHandlerInterface()) {
-            $this->saveHandler->setActive(false);
+        if (!$this->saveHandler->isWrapper() && !$this->getSaveHandler()->isSessionHandlerInterface()) {
+            // This condition matches only PHP 5.3 with internal save handlers
+            $this->saveHandler->setActive(true);
         }
 
         return true;
@@ -216,6 +217,7 @@ class NativeSessionStorage implements SessionStorageInterface
         session_write_close();
 
         if (!$this->saveHandler->isWrapper() && !$this->getSaveHandler()->isSessionHandlerInterface()) {
+            // This condition matches only PHP 5.3 with internal save handlers
             $this->saveHandler->setActive(false);
         }
 
@@ -329,7 +331,7 @@ class NativeSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * Registers save handler as a PHP session handler.
+     * Registers session save handler as a PHP session handler.
      *
      * To use internal PHP session save handlers, override this method using ini_set with
      * session.save_handler and session.save_path e.g.
@@ -337,21 +339,36 @@ class NativeSessionStorage implements SessionStorageInterface
      *     ini_set('session.save_handler', 'files');
      *     ini_set('session.save_path', /tmp');
      *
+     * or pass in a NativeSessionHandler instance which configures session.save_handler in the
+     * constructor, for a template see NativeFileSessionHandler or use handlers in
+     * composer package drak/native-session
+     *
      * @see http://php.net/session-set-save-handler
      * @see http://php.net/sessionhandlerinterface
      * @see http://php.net/sessionhandler
+     * @see http://github.com/drak/NativeSession
      *
-     * @param object $saveHandler Default null means NativeProxy.
+     * @param object|null $saveHandler Must be instance of AbstractProxy or NativeSessionHandler;
+     *                                 implement \SessionHandlerInterface; or be null.
+     *
+     * @throws \InvalidArgumentException
      */
     public function setSaveHandler($saveHandler = null)
     {
-        // Wrap $saveHandler in proxy
+        if (!$saveHandler instanceof AbstractProxy &&
+            !$saveHandler instanceof NativeSessionHandler &&
+            !$saveHandler instanceof \SessionHandlerInterface &&
+            $saveHandler !== null) {
+            throw new \InvalidArgumentException('Must be instance of AbstractProxy or NativeSessionHandler; implement \SessionHandlerInterface; or be null');
+        }
+
+        // Wrap $saveHandler in proxy and prevent double wrapping of proxy
         if (!$saveHandler instanceof AbstractProxy && $saveHandler instanceof \SessionHandlerInterface) {
             $saveHandler = new SessionHandlerProxy($saveHandler);
         } elseif (!$saveHandler instanceof AbstractProxy) {
-            $saveHandler = new NativeProxy();
+            $saveHandler = version_compare(phpversion(), '5.4.0', '>=') ?
+                new SessionHandlerProxy(new \SessionHandler()) : new NativeProxy();
         }
-
         $this->saveHandler = $saveHandler;
 
         if ($this->saveHandler instanceof \SessionHandlerInterface) {

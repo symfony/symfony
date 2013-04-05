@@ -82,19 +82,19 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Finds the value of configuration flag from cli
+     * Finds the value of the CLI configuration option.
      *
      * PHPUnit will use the last configuration argument on the command line, so this only returns
-     * the last configuration argument
+     * the last configuration argument.
      *
-     * @return string The value of the phpunit cli configuration option
+     * @return string The value of the PHPUnit cli configuration option
      */
     private static function getPhpUnitCliConfigArgument()
     {
         $dir = null;
         $reversedArgs = array_reverse($_SERVER['argv']);
         foreach ($reversedArgs as $argIndex => $testArg) {
-            if ($testArg === '-c' || $testArg === '--configuration') {
+            if (preg_match('/^-[^ \-]*c$/', $testArg) || $testArg === '--configuration') {
                 $dir = realpath($reversedArgs[$argIndex - 1]);
                 break;
             } elseif (strpos($testArg, '--configuration=') === 0) {

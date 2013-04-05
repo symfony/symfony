@@ -162,6 +162,17 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertGreaterThan(0, $process->getExitCode());
     }
 
+    public function testTTYCommand()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('Windows does have /dev/tty support');
+        }
+
+        $process = $this->getProcess('echo "a" >> /dev/null');
+        $process->setTTY(true);
+        $process->run();
+    }
+
     public function testExitCodeText()
     {
         $process = $this->getProcess('');
@@ -334,13 +345,13 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     {
         $variations = array(
             'fwrite(STDOUT, $in = file_get_contents(\'php://stdin\')); fwrite(STDERR, $in);',
-            'include \''.__DIR__.'/ProcessTestHelper.php\';',
+            'include \'' . __DIR__ . '/ProcessTestHelper.php\';',
         );
         $baseData = str_repeat('*', 1024);
 
         $codes = array();
         foreach (array(1, 16, 64, 1024, 4096) as $size) {
-            $data = str_repeat($baseData, $size).'!';
+            $data = str_repeat($baseData, $size) . '!';
             foreach ($variations as $code) {
                 $codes[] = array($data, $code);
             }

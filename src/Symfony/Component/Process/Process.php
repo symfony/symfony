@@ -257,7 +257,7 @@ class Process
         }
 
 
-        if ( $this->tty ) {
+        if ($this->tty) {
             $this->status = self::STATUS_TERMINATED;
             return;
         }
@@ -1001,7 +1001,7 @@ class Process
             );
             $descriptors = array(array('pipe', 'r'), $this->fileHandles[self::STDOUT], array('pipe', 'w'));
         } else {
-            if ( $this->tty ) {
+            if ($this->tty) {
                 $descriptors = array(
                     array('file', '/dev/tty', 'r'),
                     array('file', '/dev/tty', 'w'),

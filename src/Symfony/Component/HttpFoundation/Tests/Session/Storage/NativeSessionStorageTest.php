@@ -159,7 +159,7 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testtStartOnDemandException()
+    public function testStartOnDemandException()
     {
         $storage = new NativeSessionStorage(array(), null, null, NativeSessionStorage::NO_START_ON_DEMAND_STRICT);
         $storage->registerBag(new AttributeBag);

@@ -127,7 +127,7 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testtStartOnDemandException()
+    public function testStartOnDemandException()
     {
         $storage = new MockFileSessionStorage($this->sessionDir, 'MOCKSESSID', null, MockFileSessionStorage::NO_START_ON_DEMAND_STRICT);
         $storage->registerBag(new AttributeBag);

@@ -102,10 +102,10 @@ class NativeSessionStorage implements SessionStorageInterface
      * upload_progress.min-freq, "1"
      * url_rewriter.tags, "a=href,area=href,frame=src,form=,fieldset="
      *
-     * @param array       $options Session configuration options.
-     * @param object      $handler SessionHandlerInterface.
-     * @param MetadataBag $metaBag MetadataBag.
-     * @param integer     $mode    Start on demand mode.
+     * @param array       $options Session configuration options
+     * @param object      $handler SessionHandlerInterface
+     * @param MetadataBag $metaBag MetadataBag
+     * @param integer     $mode    Start on demand mode
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null, $mode = self::START_ON_DEMAND)
     {
@@ -157,7 +157,7 @@ class NativeSessionStorage implements SessionStorageInterface
 
         // start the session
         if (!session_start()) {
-            throw new \RuntimeException('Failed to start the session');
+            throw new \RuntimeException('Failed to start the session.');
         }
 
         $this->loadSession();
@@ -266,13 +266,13 @@ class NativeSessionStorage implements SessionStorageInterface
     public function getBag($name)
     {
         if (!isset($this->bags[$name])) {
-            throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered', $name));
+            throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered.', $name));
         }
 
         if (!$this->started && self::START_ON_DEMAND === $this->mode) {
             $this->start();
         } elseif (!$this->started && self::NO_START_ON_DEMAND_STRICT === $this->mode) {
-            throw new \RuntimeException('Cannot access session bags because the session has been started');
+            throw new \RuntimeException('Cannot access session bags because the session has not been started.');
         }
 
         return $this->bags[$name];
@@ -316,7 +316,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * For convenience we omit 'session.' from the beginning of the keys.
      * Explicitly ignores other ini keys.
      *
-     * @param array $options Session ini directives array(key => value).
+     * @param array $options Session ini directives array(key => value)
      *
      * @see http://php.net/session.configuration
      */
@@ -354,7 +354,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * @see http://php.net/sessionhandlerinterface
      * @see http://php.net/sessionhandler
      *
-     * @param object $saveHandler Default null means NativeProxy.
+     * @param object $saveHandler Default null means NativeProxy
      */
     public function setSaveHandler($saveHandler = null)
     {

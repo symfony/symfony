@@ -27,6 +27,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleForExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
@@ -1013,6 +1014,7 @@ class Application
             new FormatterHelper(),
             new DialogHelper(),
             new ProgressHelper(),
+            new TableHelper(),
         ));
     }
 

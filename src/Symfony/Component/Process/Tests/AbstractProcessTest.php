@@ -35,13 +35,13 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p->setTimeout(-1);
     }
 
-    public function testNullTimeout()
+    public function testDisableTimeout()
     {
         $p = $this->getProcess('');
         $p->setTimeout(10);
-        $p->setTimeout(null);
+        $p->setTimeout(0);
 
-        $this->assertNull($p->getTimeout());
+        $this->assertEquals(0, $p->getTimeout());
     }
 
     /**

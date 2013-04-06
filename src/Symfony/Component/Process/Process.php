@@ -145,8 +145,6 @@ class Process
             foreach ($env as $key => $value) {
                 $this->env[(binary) $key] = (binary) $value;
             }
-        } else {
-            $this->env = null;
         }
         $this->stdin = $stdin;
         $this->setTimeout($timeout);
@@ -304,7 +302,7 @@ class Process
             $w = $writePipes;
             $e = null;
 
-            $n = @stream_select($r, $w, $e, $this->timeout);
+            $n = @stream_select($r, $w, $e, 0 === $this->timeout ? null : $this->timeout);
 
             if (false === $n) {
                 break;
@@ -352,15 +350,15 @@ class Process
      *
      * @return Process The new process
      *
-     * @throws \RuntimeException When process can't be launch or is stopped
-     * @throws \RuntimeException When process is already running
+     * @throws RuntimeException When process can't be launch or is stopped
+     * @throws RuntimeException When process is already running
      *
      * @see start()
      */
     public function restart($callback = null)
     {
         if ($this->isRunning()) {
-            throw new \RuntimeException('Process is already running');
+            throw new RuntimeException('Process is already running');
         }
 
         $process = clone $this;
@@ -397,7 +395,7 @@ class Process
                 $w = null;
                 $e = null;
 
-                if (false === $n = @stream_select($r, $w, $e, $this->timeout)) {
+                if (false === $n = @stream_select($r, $w, $e, 0 === $this->timeout ? null : $this->timeout)) {
                     $lastError = error_get_last();
 
                     // stream_select returns false when the `select` system call is interrupted by an incoming signal
@@ -420,7 +418,7 @@ class Process
                     if (strlen($data) > 0) {
                         // last exit code is output and caught to work around --enable-sigchild
                         if (3 == $type) {
-                            $this->fallbackExitcode = (int) $data;
+                            $this->fallbackExitcode = (integer) $data;
                         } else {
                             call_user_func($callback, $type == 1 ? self::OUT : self::ERR, $data);
                         }
@@ -437,9 +435,7 @@ class Process
             throw new RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->processInformation['stopsig']));
         }
 
-        $time = 0;
-        while ($this->isRunning() && $time < 1000000) {
-            $time += 1000;
+        for ($time = 0; $this->isRunning() && $time < 1000000; $time += 1000) {
             usleep(1000);
         }
 
@@ -712,12 +708,10 @@ class Process
      */
     public function stop($timeout = 10)
     {
-        $timeoutMicro = (int) $timeout*10E6;
+        $timeoutMicro = (integer) $timeout * 10E6;
         if ($this->isRunning()) {
             proc_terminate($this->process);
-            $time = 0;
-            while (1 == $this->isRunning() && $time < $timeoutMicro) {
-                $time += 1000;
+            for ($time = 0; $this->isRunning() && $time < $timeoutMicro; $time += 1000) {
                 usleep(1000);
             }
 
@@ -788,7 +782,7 @@ class Process
     /**
      * Gets the process timeout.
      *
-     * @return integer|null The timeout in seconds or null if it's disabled
+     * @return integer The timeout in seconds or 0 if it's disabled
      */
     public function getTimeout()
     {
@@ -798,9 +792,7 @@ class Process
     /**
      * Sets the process timeout.
      *
-     * To disable the timeout, set this value to null.
-     *
-     * @param integer|null $timeout The timeout in seconds
+     * @param integer $timeout The timeout in seconds (0 to disable)
      *
      * @return self The current Process instance
      *
@@ -808,19 +800,11 @@ class Process
      */
     public function setTimeout($timeout)
     {
-        if (null === $timeout) {
-            $this->timeout = null;
+        $this->timeout = (integer) $timeout;
 
-            return $this;
-        }
-
-        $timeout = (integer) $timeout;
-
-        if ($timeout < 0) {
+        if ($this->timeout < 0) {
             throw new InvalidArgumentException('The timeout value must be a valid positive integer.');
         }
-
-        $this->timeout = $timeout;
 
         return $this;
     }

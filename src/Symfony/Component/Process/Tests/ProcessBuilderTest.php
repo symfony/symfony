@@ -15,69 +15,62 @@ use Symfony\Component\Process\ProcessBuilder;
 
 class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @test
-     */
-    public function shouldInheritEnvironmentVars()
+    public function testShouldInheritEnvironmentVars()
     {
         $snapshot = $_ENV;
         $_ENV = $expected = array('foo' => 'bar');
 
-        $pb = new ProcessBuilder();
-        $pb->add('foo')->inheritEnvironmentVariables();
-        $proc = $pb->getProcess();
+        $proc = ProcessBuilder::create()
+            ->add('foo')
+            ->inheritEnvironmentVariables()
+            ->getProcess()
+        ;
 
         $this->assertNull($proc->getEnv(), '->inheritEnvironmentVariables() copies $_ENV');
 
         $_ENV = $snapshot;
     }
 
-    /**
-     * @test
-     */
-    public function shouldInheritAndOverrideEnvironmentVars()
+    public function testShouldInheritAndOverrideEnvironmentVars()
     {
         $snapshot = $_ENV;
         $_ENV = array('foo' => 'bar', 'bar' => 'baz');
         $expected = array('foo' => 'foo', 'bar' => 'baz');
 
-        $pb = new ProcessBuilder();
-        $pb->add('foo')->inheritEnvironmentVariables()
-            ->setEnv('foo', 'foo');
-        $proc = $pb->getProcess();
+        $proc= ProcessBuilder::create()
+            ->add('foo')
+            ->inheritEnvironmentVariables()
+            ->setEnv('foo', 'foo')
+            ->getProcess()
+        ;
 
         $this->assertEquals($expected, $proc->getEnv(), '->inheritEnvironmentVariables() copies $_ENV');
 
         $_ENV = $snapshot;
     }
 
-    /**
-     * @test
-     */
-    public function shouldInheritEnvironmentVarsByDefault()
+    public function testShouldInheritEnvironmentVarsByDefault()
     {
-        $pb = new ProcessBuilder();
-        $proc = $pb->add('foo')->getProcess();
+        $proc = ProcessBuilder::create()
+            ->add('foo')
+            ->getProcess()
+        ;
 
         $this->assertNull($proc->getEnv());
     }
 
-    /**
-     * @test
-     */
-    public function shouldNotReplaceExplicitlySetVars()
+    public function testShouldNotReplaceExplicitlySetVars()
     {
         $snapshot = $_ENV;
         $_ENV = array('foo' => 'bar');
         $expected = array('foo' => 'baz');
 
-        $pb = new ProcessBuilder();
-        $pb
+        $proc = ProcessBuilder::create()
             ->setEnv('foo', 'baz')
             ->inheritEnvironmentVariables()
             ->add('foo')
+            ->getProcess()
         ;
-        $proc = $pb->getProcess();
 
         $this->assertEquals($expected, $proc->getEnv(), '->inheritEnvironmentVariables() copies $_ENV');
 
@@ -89,30 +82,58 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testNegativeTimeoutFromSetter()
     {
-        $pb = new ProcessBuilder();
-        $pb->setTimeout(-1);
+        ProcessBuilder::create()->setTimeout(-1);
     }
 
     public function testNullTimeout()
     {
-        $pb = new ProcessBuilder();
-        $pb->setTimeout(10);
-        $pb->setTimeout(null);
+        $proc = ProcessBuilder::create()
+            ->add('foo')
+            ->setTimeout(10)
+            ->setTimeout(0)
+            ->getProcess()
+        ;
 
-        $r = new \ReflectionObject($pb);
-        $p = $r->getProperty('timeout');
-        $p->setAccessible(true);
-
-        $this->assertNull($p->getValue($pb));
+        $this->assertEquals(0, $proc->getTimeout());
     }
 
     public function testShouldSetArguments()
     {
-        $pb = new ProcessBuilder(array('initial'));
-        $pb->setArguments(array('second'));
+        $proc = ProcessBuilder::create(array('initial'))
+            ->setArguments(array('second'))
+            ->getProcess()
+        ;
 
-        $proc = $pb->getProcess();
+        $this->assertContains('second', $proc->getCommandLine());
+    }
 
-        $this->assertContains("second", $proc->getCommandLine());
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
+     */
+    public function testAddAcceptStringOnly()
+    {
+        ProcessBuilder::create()->add(array());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
+     */
+    public function testSetArgumentsAcceptStringOnly()
+    {
+        ProcessBuilder::create()->setArguments(array(array()));
+    }
+
+    public function testAddUnescapedArguments()
+    {
+        $proc = ProcessBuilder::create(array('fooEscaped'))
+            ->add('barEscaped')
+            ->add('FooUnescaped', false)
+            ->getProcess()
+        ;
+
+        $this->assertContains(
+            escapeshellarg('fooEscaped') . ' ' . escapeshellarg('barEscaped') . ' FooUnescaped',
+            $proc->getCommandLine()
+        );
     }
 }

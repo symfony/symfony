@@ -319,18 +319,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.auto_start', $config['auto_start']);
 
         // this controls the session start on demand feature
-        switch ($config['on_demand_mode']) {
-            // already validated
-            case 'on':
-                $demand = SessionStorageInterface::START_ON_DEMAND;
-                break;
-            case 'off':
-                $demand = SessionStorageInterface::NO_START_ON_DEMAND_STRICT;
-                break;
-            case 'off_lax':
-                $demand = SessionStorageInterface::NO_START_ON_DEMAND_LAX;
-        }
-        $container->setParameter('session.storage.on_demand_mode', $demand);
+        $container->setParameter('session.storage.on_demand_mode', $config['on_demand_mode']);
 
         $container->setParameter('session.storage.mock_name', $config['mock_name']);
 

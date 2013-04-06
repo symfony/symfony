@@ -185,7 +185,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeUnset()
                     ->children()
                         ->booleanNode('auto_start')
-                            ->defaultTrue()
+                            ->defaultFalse()
                             ->info('Flag for SessionListener to start session')
                         ->end()
                         ->enumNode('on_demand_mode')

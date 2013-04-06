@@ -28,24 +28,24 @@ interface SessionStorageInterface
      * Do not start session on demand and throw exception if attempt
      * is make to read or write bag data.
      */
-    const NO_START_ON_DEMAND_STRICT = 0;
+    const NO_START_ON_DEMAND_STRICT = 'off';
 
     /**
      * Start the session on demand when accessing bag data.
      */
-    const START_ON_DEMAND = 1;
+    const START_ON_DEMAND = 'on';
 
     /**
      * Do not start session on demand but allow access to session bags.
      */
-    const NO_START_ON_DEMAND_LAX = 2;
+    const NO_START_ON_DEMAND_LAX = 'off_lax';
 
     /**
      * Starts the session.
      *
-     * @throws \RuntimeException If something goes wrong starting the session.
+     * @throws \RuntimeException If something goes wrong starting the session
      *
-     * @return boolean True if started.
+     * @return boolean True if started
      *
      * @api
      */
@@ -54,14 +54,14 @@ interface SessionStorageInterface
     /**
      * Checks if the session is started.
      *
-     * @return boolean True if started, false otherwise.
+     * @return boolean True if started, false otherwise
      */
     public function isStarted();
 
     /**
      * Returns the session ID
      *
-     * @return string The session ID or empty.
+     * @return string The session ID or empty
      *
      * @api
      */
@@ -79,7 +79,7 @@ interface SessionStorageInterface
     /**
      * Returns the session name
      *
-     * @return mixed The session name.
+     * @return mixed The session name
      *
      * @api
      */
@@ -105,11 +105,11 @@ interface SessionStorageInterface
      * Note regenerate+destroy should not clear the session data in memory
      * only delete the session data from persistent storage.
      *
-     * @param Boolean $destroy  Destroy session when regenerating?
+     * @param Boolean $destroy  Flag true to destroy session when regenerating
      * @param integer $lifetime Sets the cookie lifetime for the session cookie. A null value
      *                          will leave the system settings unchanged, 0 sets the cookie
      *                          to expire with browser session. Time is in seconds, and is
-     *                          not a Unix timestamp.
+     *                          not a Unix timestamp
      *
      * @return Boolean True if session regenerated, false if error
      *
@@ -128,7 +128,7 @@ interface SessionStorageInterface
      * it should actually persist the session data if required.
      *
      * @throws \RuntimeException If the session is saved without being started, or if the session
-     *                           is already closed.
+     *                           is already closed
      */
     public function save();
 

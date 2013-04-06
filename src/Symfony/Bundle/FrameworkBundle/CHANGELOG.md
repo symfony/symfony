@@ -9,6 +9,9 @@ CHANGELOG
  * added `TimedPhpEngine`
  * added `--clean` option the the `translation:update` command
  * added `http_method_override` option
+ * Reintroduce `auto_start` session config flag which control to `SessionListener` to manually start sessions
+   during framework request cycle.
+ * Added session config option `on_demand_mode` to control session start on demand.
 
 2.2.0
 -----

@@ -25,8 +25,8 @@ class InputDefinitionJsonDescriptor extends AbstractJsonDescriptor
      */
     public function getData($object)
     {
-        $argumentDescriptor = $this->build(new InputArgumentJsonDescriptor());
-        $optionDescriptor = $this->build(new InputOptionJsonDescriptor());
+        $argumentDescriptor = new InputArgumentJsonDescriptor();
+        $optionDescriptor = new InputOptionJsonDescriptor();
 
         /** @var InputDefinition $object */
         return array(

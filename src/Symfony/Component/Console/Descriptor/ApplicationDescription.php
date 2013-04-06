@@ -21,17 +21,41 @@ class ApplicationDescription
 {
     const GLOBAL_NAMESPACE = '_global';
 
+    /**
+     * @var Application
+     */
     private $application;
+
+    /**
+     * @var null|string
+     */
     private $namespace;
+
+    /**
+     * @var array
+     */
     private $namespaces;
+
+    /**
+     * @var Command[]
+     */
     private $commands;
 
+    /**
+     * Constructor.
+     *
+     * @param Application $application
+     * @param string|null $namespace
+     */
     public function __construct(Application $application, $namespace = null)
     {
         $this->application = $application;
         $this->namespace = $namespace;
     }
 
+    /**
+     * @return array
+     */
     public function getNamespaces()
     {
         if (null === $this->namespaces) {
@@ -41,6 +65,9 @@ class ApplicationDescription
         return $this->namespaces;
     }
 
+    /**
+     * @return Command[]
+     */
     public function getCommands()
     {
         if (null === $this->commands) {
@@ -48,6 +75,22 @@ class ApplicationDescription
         }
 
         return $this->commands;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Command
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function getCommand($name)
+    {
+        if (!isset($this->commands[$name])) {
+            throw new \InvalidArgumentException('Command "'.$name.'" does not exist.');
+        }
+
+        return $this->commands[$name];
     }
 
     private function inspectApplication()
@@ -67,16 +110,21 @@ class ApplicationDescription
 
                 // aliases must be skipped in commands list
                 if ($name === $command->getName()) {
-                    $this->commands[] = $command;
+                    $this->commands[$name] = $command;
                 }
 
                 $names[] = $name;
             }
 
-            $this->namespaces[] = array('id' => $namespace, 'commands' => $names);
+            $this->namespaces[$namespace] = array('id' => $namespace, 'commands' => $names);
         }
     }
 
+    /**
+     * @param array $commands
+     *
+     * @return array
+     */
     private function sortCommands(array $commands)
     {
         $method = new \ReflectionMethod($this->application, 'sortCommands');

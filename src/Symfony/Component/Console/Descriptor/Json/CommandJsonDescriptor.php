@@ -23,7 +23,7 @@ class CommandJsonDescriptor extends AbstractJsonDescriptor
      */
     public function getData($object)
     {
-        $definitionDescriptor = $this->build(new InputDefinitionJsonDescriptor());
+        $definitionDescriptor = new InputDefinitionJsonDescriptor();
 
         /** @var Command $object */
         return array(

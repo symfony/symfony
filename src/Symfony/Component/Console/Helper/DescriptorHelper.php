@@ -47,10 +47,10 @@ class DescriptorHelper extends Helper
     public function describe(OutputInterface $output, $object, $format = null, $raw = false)
     {
         $format = $format ?: $this->provider->getDefaultFormat();
-        $descriptor = $this->provider->get($object, $format);
+        $descriptor = $this->provider->configure(array('raw_text' => $raw))->get($object, $format);
         $type = $raw && $descriptor->useFormatting() ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW;
 
-        $output->writeln($descriptor->describe($object, $format, $raw), $type);
+        $output->writeln($descriptor->describe($object), $type);
     }
 
     /**

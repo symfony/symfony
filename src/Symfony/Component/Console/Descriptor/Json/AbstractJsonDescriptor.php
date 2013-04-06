@@ -46,7 +46,7 @@ abstract class AbstractJsonDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describe($object, $raw = false)
+    public function describe($object)
     {
         return json_encode($this->getData($object), $this->encodingOptions);
     }
@@ -74,19 +74,5 @@ abstract class AbstractJsonDescriptor implements DescriptorInterface
     public function useFormatting()
     {
         return false;
-    }
-
-    /**
-     * Builds a JSON descriptor.
-     *
-     * @param AbstractJsonDescriptor $descriptor
-     *
-     * @return AbstractJsonDescriptor
-     */
-    protected function build(AbstractJsonDescriptor $descriptor)
-    {
-        $descriptor->configure(array('json_encoding' => $this->encodingOptions));
-
-        return $descriptor;
     }
 }

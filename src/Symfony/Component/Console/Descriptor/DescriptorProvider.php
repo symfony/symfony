@@ -29,6 +29,7 @@ class DescriptorProvider
     private $options = array(
         'default_format' => 'txt',
         'namespace'      => null,
+        'raw_text'       => false,
         'json_encoding'  => 0,
         'markdown_width' => 120,
     );
@@ -42,6 +43,11 @@ class DescriptorProvider
     {
         $this
             ->configure($options)
+            ->add(new Xml\ApplicationXmlDescriptor())
+            ->add(new Xml\CommandXmlDescriptor())
+            ->add(new Xml\InputDefinitionXmlDescriptor())
+            ->add(new Xml\InputArgumentXmlDescriptor())
+            ->add(new Xml\InputOptionXmlDescriptor())
             ->add(new Json\ApplicationJsonDescriptor())
             ->add(new Json\CommandJsonDescriptor())
             ->add(new Json\InputDefinitionJsonDescriptor())

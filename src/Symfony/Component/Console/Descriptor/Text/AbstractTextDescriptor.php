@@ -9,26 +9,26 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Console\Descriptor\Markdown;
+namespace Symfony\Component\Console\Descriptor\Text;
 
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-abstract class AbstractMarkdownDescriptor implements DescriptorInterface
+abstract class AbstractTextDescriptor implements DescriptorInterface
 {
     /**
-     * @var int
+     * @var boolean
      */
-    private $maxWidth;
+    private $raw;
 
     /**
-     * @param int $maxWidth
+     * @param boolean $raw
      */
-    public function __construct($maxWidth = 120)
+    public function __construct($raw = false)
     {
-        $this->maxWidth = $maxWidth;
+        $this->raw = $raw;
     }
 
     /**
@@ -36,8 +36,8 @@ abstract class AbstractMarkdownDescriptor implements DescriptorInterface
      */
     public function configure(array $options)
     {
-        if (isset($options['markdown_width'])) {
-            $this->maxWidth = $options['markdown_width'];
+        if (isset($options['raw_text'])) {
+            $this->raw = $options['raw_text'];
         }
 
         return $this;
@@ -48,24 +48,33 @@ abstract class AbstractMarkdownDescriptor implements DescriptorInterface
      */
     public function describe($object)
     {
-        return $this->getDocument($object)->format(new Document\Formatter($this->maxWidth));
+        return $this->raw ? $this->getRawText($object) : $this->getFormattedText($object);
     }
 
     /**
-     * Returns object document to format.
+     * Returns object's raw text description.
      *
      * @param object $object
      *
-     * @return Document\Document
+     * @return string
      */
-    abstract public function getDocument($object);
+    abstract public function getRawText($object);
+
+    /**
+     * Returns object's formatted text description.
+     *
+     * @param object $object
+     *
+     * @return string
+     */
+    abstract public function getFormattedText($object);
 
     /**
      * {@inheritdoc}
      */
     public function getFormat()
     {
-        return 'md';
+        return 'txt';
     }
 
     /**

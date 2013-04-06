@@ -29,11 +29,10 @@ interface DescriptorInterface
      * Returns given object's representation.
      *
      * @param object  $object The object to describe
-     * @param boolean $raw    No additional markers if true
      *
      * @return string The object formatted description
      */
-    public function describe($object, $raw = false);
+    public function describe($object);
 
     /**
      * Tests if this descriptor supports given object.

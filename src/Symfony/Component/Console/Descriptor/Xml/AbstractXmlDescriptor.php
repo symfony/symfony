@@ -29,7 +29,7 @@ abstract class AbstractXmlDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describe($object, $raw = false)
+    public function describe($object)
     {
         $document = new \DOMDocument('1.0', 'UTF-8');
         $document->formatOutput = true;

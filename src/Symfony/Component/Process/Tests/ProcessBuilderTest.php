@@ -115,4 +115,16 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertContains("second", $proc->getCommandLine());
     }
+
+    public function testPrefixIsPrependedToAllGeneratedProcess()
+    {
+        $pb = new ProcessBuilder();
+        $pb->setPrefix('/usr/bin/php');
+
+        $proc = $pb->setArguments(array('-v'))->getProcess();
+        $this->assertEquals("'/usr/bin/php' '-v'", $proc->getCommandLine());
+
+        $proc = $pb->setArguments(array('-i'))->getProcess();
+        $this->assertEquals("'/usr/bin/php' '-i'", $proc->getCommandLine());
+    }
 }

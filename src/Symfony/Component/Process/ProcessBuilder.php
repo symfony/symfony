@@ -28,6 +28,7 @@ class ProcessBuilder
     private $timeout;
     private $options;
     private $inheritEnv;
+    private $prefix;
 
     public function __construct(array $arguments = array())
     {
@@ -54,6 +55,22 @@ class ProcessBuilder
     public function add($argument)
     {
         $this->arguments[] = $argument;
+
+        return $this;
+    }
+
+    /**
+     * Adds an unescaped prefix to the command string.
+     *
+     * The prefix is preserved when reseting arguments.
+     *
+     * @param string $prefix A command prefix
+     *
+     * @return ProcessBuilder
+     */
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
 
         return $this;
     }
@@ -143,7 +160,8 @@ class ProcessBuilder
 
         $options = $this->options;
 
-        $script = implode(' ', array_map('escapeshellarg', $this->arguments));
+        $script = ($this->prefix ? escapeshellarg($this->prefix) . ' ' : '')
+            . implode(' ', array_map('escapeshellarg', $this->arguments));
 
         if ($this->inheritEnv) {
             $env = $this->env ? $this->env + $_ENV : null;

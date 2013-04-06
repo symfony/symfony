@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ListCommand extends AbstractDescriptorCommand
+class ListCommand extends AbstractDescriptionCommand
 {
     /**
      * {@inheritdoc}
@@ -42,9 +42,9 @@ You can also display the commands for a specific namespace:
 
   <info>php %command.full_name% test</info>
 
-You can also output the information as XML by using the <comment>--xml</comment> option:
+You can also output the information in other formats by using the <comment>--format</comment> option:
 
-  <info>php %command.full_name% --xml</info>
+  <info>php %command.full_name% --format=xml</info>
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 

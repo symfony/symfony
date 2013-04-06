@@ -9,37 +9,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Console\Descriptor\Markdown;
+namespace Symfony\Component\Console\Descriptor\Xml;
 
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-abstract class AbstractMarkdownDescriptor implements DescriptorInterface
+abstract class AbstractXmlDescriptor implements DescriptorInterface
 {
-    /**
-     * @var int
-     */
-    private $maxWidth;
-
-    /**
-     * @param int $maxWidth
-     */
-    public function __construct($maxWidth = 120)
-    {
-        $this->maxWidth = $maxWidth;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function configure(array $options)
     {
-        if (isset($options['markdown_width'])) {
-            $this->maxWidth = $options['markdown_width'];
-        }
-
         return $this;
     }
 
@@ -48,24 +31,27 @@ abstract class AbstractMarkdownDescriptor implements DescriptorInterface
      */
     public function describe($object, $raw = false)
     {
-        return $this->getDocument($object)->format(new Document\Formatter($this->maxWidth));
+        $document = new \DOMDocument('1.0', 'UTF-8');
+        $document->formatOutput = true;
+        $this->buildDocument($document, $object);
+
+        return $document->saveXML();
     }
 
     /**
-     * Returns object document to format.
+     * Builds DOM document with object.
      *
-     * @param object $object
-     *
-     * @return Document\Document
+     * @param \DOMNode $parent
+     * @param object   $object
      */
-    abstract public function getDocument($object);
+    abstract public function buildDocument(\DOMNode $parent, $object);
 
     /**
      * {@inheritdoc}
      */
     public function getFormat()
     {
-        return 'md';
+        return 'xml';
     }
 
     /**

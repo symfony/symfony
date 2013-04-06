@@ -39,7 +39,9 @@ class ApplicationJsonDescriptor extends AbstractJsonDescriptor
      */
     public function configure(array $options)
     {
-        $this->namespace = $options['namespace'];
+        if (isset($options['namespace'])) {
+            $this->namespace = $options['namespace'];
+        }
 
         return parent::configure($options);
     }

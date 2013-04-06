@@ -36,7 +36,9 @@ abstract class AbstractJsonDescriptor implements DescriptorInterface
      */
     public function configure(array $options)
     {
-        $this->encodingOptions = $options['json_encoding'];
+        if (isset($options['json_encoding'])) {
+            $this->encodingOptions = $options['json_encoding'];
+        }
 
         return $this;
     }

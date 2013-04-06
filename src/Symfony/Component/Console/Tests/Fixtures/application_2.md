@@ -15,16 +15,16 @@ help
 ----
 
 * Description: Displays help for a command
-* Usage: `help [--format[="..."]] [--raw] [command_name]`
+* Usage: `help [--format="..."] [--raw] [command_name]`
 * Aliases: <none>
 
 The <info>help</info> command displays help for a given command:
 
-  <info>php /usr/bin/phpunit help list</info>
+  <info>php app/console help list</info>
 
-You can also output the help as XML by using the <comment>--xml</comment> option:
+You can also output the help in other formats by using the <comment>--format</comment> option:
 
-  <info>php /usr/bin/phpunit help --xml list</info>
+  <info>php app/console help --format=xml list</info>
 
 To display the list of available commands, please use the <info>list</info> command.
 
@@ -45,9 +45,9 @@ To display the list of available commands, please use the <info>list</info> comm
 * Name: `--format`
 * Shortcut: <none>
 * Accept value: yes
-* Is value required: no
+* Is value required: yes
 * Is multiple: no
-* Description: Output format (json, md)
+* Description: To output help in other formats
 * Default: `NULL`
 
 **raw:**
@@ -64,24 +64,24 @@ list
 ----
 
 * Description: Lists commands
-* Usage: `list [--format[="..."]] [--raw] [namespace]`
+* Usage: `list [--format="..."] [--raw] [namespace]`
 * Aliases: <none>
 
 The <info>list</info> command lists all commands:
 
-  <info>php /usr/bin/phpunit list</info>
+  <info>php app/console list</info>
 
 You can also display the commands for a specific namespace:
 
-  <info>php /usr/bin/phpunit list test</info>
+  <info>php app/console list test</info>
 
-You can also output the information as XML by using the <comment>--xml</comment> option:
+You can also output the information in other formats by using the <comment>--format</comment> option:
 
-  <info>php /usr/bin/phpunit list --xml</info>
+  <info>php app/console list --format=xml</info>
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
-  <info>php /usr/bin/phpunit list --raw</info>
+  <info>php app/console list --raw</info>
 
 ### Arguments:
 
@@ -100,9 +100,9 @@ It's also possible to get raw list of commands (useful for embedding command run
 * Name: `--format`
 * Shortcut: <none>
 * Accept value: yes
-* Is value required: no
+* Is value required: yes
 * Is multiple: no
-* Description: Output format (json, md)
+* Description: To output help in other formats
 * Default: `NULL`
 
 **raw:**

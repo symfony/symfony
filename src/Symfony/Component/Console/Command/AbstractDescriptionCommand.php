@@ -10,11 +10,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Base class for descriptor commands.
+ * Base class for description commands.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-abstract class AbstractDescriptorCommand extends Command
+abstract class AbstractDescriptionCommand extends Command
 {
     /**
      * @var DescriptorProvider
@@ -38,7 +38,7 @@ abstract class AbstractDescriptorCommand extends Command
     protected function createDefinition()
     {
         return new InputDefinition(array(
-            new InputOption('format', null, InputOption::VALUE_OPTIONAL, 'Output format ('.implode(', ', $this->provider->getSupportedFormats()).')'),
+            new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output help in other formats'),
             new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
         ));
     }

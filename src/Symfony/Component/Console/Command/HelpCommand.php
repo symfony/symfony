@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HelpCommand extends AbstractDescriptorCommand
+class HelpCommand extends AbstractDescriptionCommand
 {
     private $command;
 
@@ -41,9 +41,9 @@ The <info>%command.name%</info> command displays help for a given command:
 
   <info>php %command.full_name% list</info>
 
-You can also output the help as XML by using the <comment>--xml</comment> option:
+You can also output the help in other formats by using the <comment>--format</comment> option:
 
-  <info>php %command.full_name% --xml list</info>
+  <info>php %command.full_name% --format=xml list</info>
 
 To display the list of available commands, please use the <info>list</info> command.
 EOF
@@ -77,14 +77,12 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        parent::execute($input, $output);
-
         if (null === $this->command) {
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
 
+        parent::execute($input, $output);
         $this->getHelper('descriptor')->describe($output, $this->command, $input->getOption('format'), $input->getOption('raw'));
-
         $this->command = null;
     }
 }

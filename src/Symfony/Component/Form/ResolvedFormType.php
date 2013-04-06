@@ -293,8 +293,8 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
         $weights = array();
         $afterGapWeights = array();
-        $firstFormWeigth = 0;
-        $lastFormWeigth = 0;
+        $firstFormWeight = 0;
+        $lastFormWeight = 0;
 
         $differredBefores = array();
         $differredAfters = array();
@@ -311,28 +311,28 @@ class ResolvedFormType implements ResolvedFormTypeInterface
                 if ($position === 'first') {
                     if (isset($differredBefores[$child->getName()])) {
                         foreach ($differredBefores[$child->getName()] as $differredBefore) {
-                            $weights = $this->incrementWeights($weights, $firstFormWeigth);
-                            $weights[$differredBefore] = $firstFormWeigth++;
-                            $lastFormWeigth++;
+                            $weights = $this->incrementWeights($weights, $firstFormWeight);
+                            $weights[$differredBefore] = $firstFormWeight++;
+                            $lastFormWeight++;
                         }
                     }
 
-                    $weights = $this->incrementWeights($weights, $firstFormWeigth);
-                    $weights[$child->getName()] = $firstFormWeigth++;
-                    $lastFormWeigth++;
+                    $weights = $this->incrementWeights($weights, $firstFormWeight);
+                    $weights[$child->getName()] = $firstFormWeight++;
+                    $lastFormWeight++;
 
                     if (isset($differredAfters[$child->getName()])) {
                         foreach ($differredAfters[$child->getName()] as $differredAfter) {
-                            $weights = $this->incrementWeights($weights, $firstFormWeigth);
-                            $weights[$differredAfter] = $firstFormWeigth++;
-                            $lastFormWeigth++;
+                            $weights = $this->incrementWeights($weights, $firstFormWeight);
+                            $weights[$differredAfter] = $firstFormWeight++;
+                            $lastFormWeight++;
                         }
                     }
                 } else {
                     if (isset($differredBefores[$child->getName()])) {
                         foreach ($differredBefores[$child->getName()] as $differredBefore) {
                             $weights[$differredBefore] = empty($weights) ? 0 : max($weights) + 1;
-                            $lastFormWeigth++;
+                            $lastFormWeight++;
                         }
                     }
 
@@ -341,7 +341,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
                     if (isset($differredAfters[$child->getName()])) {
                         foreach ($differredAfters[$child->getName()] as $differredAfter) {
                             $weights[$differredAfter] = empty($weights) ? 0 : max($weights) + 1;
-                            $lastFormWeigth++;
+                            $lastFormWeight++;
                         }
                     }
                 }
@@ -380,7 +380,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
                         $beforeOrder = $weights[$before];
                         $weights = $this->incrementWeights($weights, $weights[$before]);
                         $weights[$child->getName()] = $beforeOrder;
-                        $lastFormWeigth++;
+                        $lastFormWeight++;
                     } else {
                         if (isset($differredBefores[$before])) {
                             $differredBefores[$before][] = $child->getName();
@@ -402,7 +402,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
                         $newOrder = $weights[$after] + $afterGapWeights[$after] + 1;
                         $weights = $this->incrementWeights($weights, $newOrder);
                         $weights[$child->getName()] = $newOrder;
-                        $lastFormWeigth++;
+                        $lastFormWeight++;
 
                         $afterGapWeights[$after]++;
                     } else {
@@ -419,18 +419,18 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
             if (isset($differredBefores[$child->getName()])) {
                 foreach ($differredBefores[$child->getName()] as $differredBefore) {
-                    $weights = $this->incrementWeights($weights, $lastFormWeigth);
-                    $weights[$differredBefore] = $lastFormWeigth++;
+                    $weights = $this->incrementWeights($weights, $lastFormWeight);
+                    $weights[$differredBefore] = $lastFormWeight++;
                 }
             }
 
-            $weights = $this->incrementWeights($weights, $lastFormWeigth);
-            $weights[$child->getName()] = $lastFormWeigth++;
+            $weights = $this->incrementWeights($weights, $lastFormWeight);
+            $weights[$child->getName()] = $lastFormWeight++;
 
             if (isset($differredAfters[$child->getName()])) {
                 foreach ($differredAfters[$child->getName()] as $differredAfter) {
-                    $weights = $this->incrementWeights($weights, $lastFormWeigth);
-                    $weights[$differredAfter] = $lastFormWeigth++;
+                    $weights = $this->incrementWeights($weights, $lastFormWeight);
+                    $weights[$differredAfter] = $lastFormWeight++;
                 }
             }
         }
@@ -443,7 +443,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     /**
      * Increments all fields weights greater than start.
      *
-     * @param array   $weights The form weigths.
+     * @param array   $weights The form weights.
      * @param integer $start   The start.
      *
      * @return array The form weights incremented.
@@ -451,9 +451,9 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     private function incrementWeights(array $weights, $start)
     {
         if (!empty($weights) && (max($weights) >= $start)) {
-            foreach ($weights as &$weigth) {
-                if ($weigth >= $start) {
-                    $weigth++;
+            foreach ($weights as &$weight) {
+                if ($weight >= $start) {
+                    $weight++;
                 }
             }
         }

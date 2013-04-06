@@ -12,6 +12,7 @@
 namespace Symfony\Component\Process\Tests;
 
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
@@ -253,6 +254,47 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process->start();
 
         // PHP will deadlock when it tries to cleanup $process
+    }
+
+    public function testRunProcessWithTimeout()
+    {
+        $timeout = 0.5;
+        $process = $this->getProcess('sleep 3');
+        $process->setTimeout($timeout);
+        $start = microtime(true);
+        try {
+            $process->run();
+            $this->fail('A RuntimeException should have been raised');
+        } catch (RuntimeException $e) {
+
+        }
+        $duration = microtime(true) - $start;
+
+        $this->assertLessThan($timeout + Process::TIMEOUT_PRECISION, $duration);
+    }
+
+    public function testCheckTimeoutOnStartedProcess()
+    {
+        $timeout = 0.5;
+        $precision = 100000;
+        $process = $this->getProcess('sleep 3');
+        $process->setTimeout($timeout);
+        $start = microtime(true);
+
+        $process->start();
+
+        try {
+            while ($process->isRunning()) {
+                $process->checkTimeout();
+                usleep($precision);
+            }
+            $this->fail('A RuntimeException should have been raised');
+        } catch (RuntimeException $e) {
+
+        }
+        $duration = microtime(true) - $start;
+
+        $this->assertLessThan($timeout + $precision, $duration);
     }
 
     public function responsesCodeProvider()

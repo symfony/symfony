@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Mapping;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 use Symfony\Component\Validator\Mapping\ElementMetadata;
+use Symfony\Component\Validator\Constraints\Group;
 
 class ElementMetadataTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,6 +47,25 @@ class ElementMetadataTest extends \PHPUnit_Framework_TestCase
         $this->metadata->addConstraint($constraint2);
 
         $this->assertEquals(array($constraint1, $constraint2), $this->metadata->getConstraints());
+    }
+
+    public function testAddGroupConstraint()
+    {
+        $constraintA = new ConstraintA();
+        $constraintB = new ConstraintB(array('groups' => 'TestGroupB'));
+
+        $constraint = new Group(array(
+            'groups' => 'TestGroupA',
+            'constraints' => array($constraintA, $constraintB),
+        ));
+
+        $metadata = $this->metadata->addConstraint($constraint);
+
+        $this->assertSame($this->metadata, $metadata);
+        $this->assertCount(2, $this->metadata->getConstraints());
+        $this->assertSame(array($constraintA, $constraintB), $this->metadata->getConstraints());
+        $this->assertSame(array($constraintA, $constraintB), $this->metadata->findConstraints('TestGroupA'));
+        $this->assertSame(array($constraintB), $this->metadata->findConstraints('TestGroupB'));
     }
 
     public function testFindConstraintsByGroup()

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Mapping;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Group;
 
 abstract class ElementMetadata
 {
@@ -62,10 +63,31 @@ abstract class ElementMetadata
      */
     public function addConstraint(Constraint $constraint)
     {
-        $this->constraints[] = $constraint;
+        if ($constraint instanceof Group) {
+            return $this->addGroupConstraint($constraint);
+        }
 
+        $this->constraints[] = $constraint;
         foreach ($constraint->groups as $group) {
             $this->constraintsByGroup[$group][] = $constraint;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Adds a Group constraint to this element.
+     *
+     * @param Group $groupConstraint The Group constraint
+     *
+     * @return ElementMetadata
+     */
+    protected function addGroupConstraint(Group $groupConstraint)
+    {
+        $groups = $groupConstraint->groups;
+        foreach ($groupConstraint->constraints as $constraint) {
+            $constraint->groups = array_merge($constraint->groups, $groups);
+            $this->addConstraint($constraint);
         }
 
         return $this;

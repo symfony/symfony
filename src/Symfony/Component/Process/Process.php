@@ -591,13 +591,17 @@ class Process
      */
     public function stop($timeout=10)
     {
-        $timeoutMicro = (int) $timeout*10E6;
+        $timeoutMicro = (int) $timeout*1E6;
         if ($this->isRunning()) {
             proc_terminate($this->process);
             $time = 0;
             while (1 == $this->isRunning() && $time < $timeoutMicro) {
                 $time += 1000;
                 usleep(1000);
+            }
+
+            if (!defined('PHP_WINDOWS_VERSION_BUILD') && $this->isRunning()) {
+                proc_terminate($this->process, SIGKILL);
             }
 
             foreach ($this->pipes as $pipe) {

@@ -97,10 +97,38 @@ class MockArraySessionStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testUnstartedSave()
     {
         $this->storage->save();
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testtStartOnDemandException()
+    {
+        $storage = new MockArraySessionStorage('MOCKSESSID', null, MockArraySessionStorage::NO_START_ON_DEMAND_STRICT);
+        $storage->registerBag(new AttributeBag);
+        $this->assertFalse($storage->isStarted());
+        $storage->getBag('attributes');
+    }
+
+    public function testStartOnDemandDefaults()
+    {
+        $storage = new MockArraySessionStorage('MOCKSESSID');
+        $storage->registerBag(new AttributeBag);
+        $storage->getBag('attributes');
+        $this->assertTrue($storage->isStarted());
+    }
+
+    public function testNoStartOnDemandLax()
+    {
+        $storage = new MockArraySessionStorage('MOCKSESSID', null, MockArraySessionStorage::NO_START_ON_DEMAND_LAX);
+        $storage->registerBag($bag = new AttributeBag);
+        $bag->set('foo', 'bar');
+        $storage->getBag('attributes');
+        $this->assertEquals(array('foo' => 'bar'), $storage->getBag('attributes')->all());
     }
 }

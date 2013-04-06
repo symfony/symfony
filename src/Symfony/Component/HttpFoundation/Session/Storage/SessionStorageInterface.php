@@ -25,6 +25,22 @@ use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 interface SessionStorageInterface
 {
     /**
+     * Do not start session on demand and throw exception if attempt
+     * is make to read or write bag data.
+     */
+    const NO_START_ON_DEMAND_STRICT = 0;
+
+    /**
+     * Start the session on demand when accessing bag data.
+     */
+    const START_ON_DEMAND = 1;
+
+    /**
+     * Do not start session on demand but allow access to session bags.
+     */
+    const NO_START_ON_DEMAND_LAX = 2;
+
+    /**
      * Starts the session.
      *
      * @throws \RuntimeException If something goes wrong starting the session.

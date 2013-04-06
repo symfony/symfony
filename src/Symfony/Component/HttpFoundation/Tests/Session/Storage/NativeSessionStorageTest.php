@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHa
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
+use Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler\NativeSessionHandlerTest;
 
 /**
  * Test class for NativeSessionStorage.
@@ -153,5 +154,33 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage = $this->getStorage();
         $storage->setSaveHandler(new NullSessionHandler());
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testtStartOnDemandException()
+    {
+        $storage = new NativeSessionStorage(array(), null, null, NativeSessionStorage::NO_START_ON_DEMAND_STRICT);
+        $storage->registerBag(new AttributeBag);
+        $this->assertFalse($storage->isStarted());
+        $storage->getBag('attributes');
+    }
+
+    public function testStartOnDemandDefaults()
+    {
+        $storage = new NativeSessionStorage();
+        $storage->registerBag(new AttributeBag);
+        $storage->getBag('attributes');
+        $this->assertTrue($storage->isStarted());
+    }
+
+    public function testNoStartOnDemandLax()
+    {
+        $storage = new NativeSessionStorage(array(), null, null, NativeSessionStorage::NO_START_ON_DEMAND_LAX);
+        $storage->registerBag($bag = new AttributeBag);
+        $bag->set('foo', 'bar');
+        $storage->getBag('attributes');
+        $this->assertEquals(array('foo' => 'bar'), $storage->getBag('attributes')->all());
     }
 }

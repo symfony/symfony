@@ -28,7 +28,7 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
     private $sessionDir;
 
     /**
-     * @var FileMockSessionStorage
+     * @var MockFileSessionStorage
      */
     protected $storage;
 
@@ -107,7 +107,7 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testSaveWithoutStart()
     {
@@ -122,5 +122,33 @@ class MockFileSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage->registerBag(new AttributeBag());
 
         return $storage;
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testtStartOnDemandException()
+    {
+        $storage = new MockFileSessionStorage($this->sessionDir, 'MOCKSESSID', null, MockFileSessionStorage::NO_START_ON_DEMAND_STRICT);
+        $storage->registerBag(new AttributeBag);
+        $this->assertFalse($storage->isStarted());
+        $storage->getBag('attributes');
+    }
+
+    public function testStartOnDemandDefaults()
+    {
+        $storage = new MockFileSessionStorage($this->sessionDir, 'MOCKSESSID');
+            $storage->registerBag(new AttributeBag);
+        $storage->getBag('attributes');
+        $this->assertTrue($storage->isStarted());
+    }
+
+    public function testNoStartOnDemandLax()
+    {
+        $storage = new MockFileSessionStorage($this->sessionDir, 'MOCKSESSID', null, MockFileSessionStorage::NO_START_ON_DEMAND_LAX);
+        $storage->registerBag($bag = new AttributeBag);
+        $bag->set('foo', 'bar');
+        $storage->getBag('attributes');
+        $this->assertEquals(array('foo' => 'bar'), $storage->getBag('attributes')->all());
     }
 }

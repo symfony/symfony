@@ -52,14 +52,25 @@ class NativeSessionStorage implements SessionStorageInterface
     protected $metadataBag;
 
     /**
+     * @var Boolean
+     */
+    protected $mode;
+
+    /**
+     * @var Boolean
+     */
+    protected $emulatePhp;
+
+    /**
      * Constructor.
      *
      * Depending on how you want the storage driver to behave you probably
      * want to override this constructor entirely.
      *
      * List of options for $options array with their defaults.
+     *
      * @see http://php.net/session.configuration for options
-     * but we omit 'session.' from the beginning of the keys for convenience.
+     *      but we omit 'session.' from the beginning of the keys for convenience.
      *
      * ("auto_start", is not supported as it tells PHP to start a session before
      * PHP starts to execute user-land code. Setting during runtime has no effect).
@@ -94,8 +105,9 @@ class NativeSessionStorage implements SessionStorageInterface
      * @param array       $options Session configuration options.
      * @param object      $handler SessionHandlerInterface.
      * @param MetadataBag $metaBag MetadataBag.
+     * @param integer     $mode    Start on demand mode.
      */
-    public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
+    public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null, $mode = self::START_ON_DEMAND)
     {
         ini_set('session.cache_limiter', ''); // disable by default because it's managed by HeaderBag (if used)
         ini_set('session.use_cookies', 1);
@@ -109,6 +121,7 @@ class NativeSessionStorage implements SessionStorageInterface
         $this->setMetadataBag($metaBag);
         $this->setOptions($options);
         $this->setSaveHandler($handler);
+        $this->mode = $mode;
     }
 
     /**
@@ -253,13 +266,13 @@ class NativeSessionStorage implements SessionStorageInterface
     public function getBag($name)
     {
         if (!isset($this->bags[$name])) {
-            throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered.', $name));
+            throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered', $name));
         }
 
-        if ($this->saveHandler->isActive() && !$this->started) {
-            $this->loadSession();
-        } elseif (!$this->started) {
+        if (!$this->started && self::START_ON_DEMAND === $this->mode) {
             $this->start();
+        } elseif (!$this->started && self::NO_START_ON_DEMAND_STRICT === $this->mode) {
+            throw new \RuntimeException('Cannot access session bags because the session has been started');
         }
 
         return $this->bags[$name];

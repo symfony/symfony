@@ -64,15 +64,22 @@ class MockArraySessionStorage implements SessionStorageInterface
     protected $bags;
 
     /**
+     * @var Boolean
+     */
+    protected $mode;
+
+    /**
      * Constructor.
      *
-     * @param string      $name    Session name
+     * @param string      $name    Session name.
      * @param MetadataBag $metaBag MetadataBag instance.
+     * @param integer     $mode    Session on demand mode.
      */
-    public function __construct($name = 'MOCKSESSID', MetadataBag $metaBag = null)
+    public function __construct($name = 'MOCKSESSID', MetadataBag $metaBag = null, $mode = self::START_ON_DEMAND)
     {
         $this->name = $name;
         $this->setMetadataBag($metaBag);
+        $this->mode = $mode;
     }
 
     /**
@@ -197,11 +204,13 @@ class MockArraySessionStorage implements SessionStorageInterface
     public function getBag($name)
     {
         if (!isset($this->bags[$name])) {
-            throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered.', $name));
+            throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered', $name));
         }
 
-        if (!$this->started) {
+        if (!$this->started && self::START_ON_DEMAND === $this->mode) {
             $this->start();
+        } elseif (!$this->started && self::NO_START_ON_DEMAND_STRICT === $this->mode) {
+            throw new \RuntimeException('Cannot access session bags because the session has been started');
         }
 
         return $this->bags[$name];

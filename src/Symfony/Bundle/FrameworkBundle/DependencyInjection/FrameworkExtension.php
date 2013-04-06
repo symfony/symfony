@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
 
@@ -318,7 +319,18 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.auto_start', $config['auto_start']);
 
         // this controls the session start on demand feature
-        $container->setParameter('session.storage.on_demand_mode', $config['on_demand_mode']);
+        switch ($config['on_demand_mode']) {
+            // already validated
+            case 'on':
+                $demand = SessionStorageInterface::START_ON_DEMAND;
+                break;
+            case 'off':
+                $demand = SessionStorageInterface::NO_START_ON_DEMAND_STRICT;
+                break;
+            case 'off_lax':
+                $demand = SessionStorageInterface::NO_START_ON_DEMAND_LAX;
+        }
+        $container->setParameter('session.storage.on_demand_mode', $demand);
 
         $container->setParameter('session.storage.mock_name', $config['mock_name']);
 

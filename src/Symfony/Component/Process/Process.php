@@ -34,10 +34,14 @@ class Process
     const STDOUT = 1;
     const STDERR = 2;
 
+    // Timeout Precision in seconds.
+    CONST TIMEOUT_PRECISION = 0.2;
+
     private $commandline;
     private $cwd;
     private $env;
     private $stdin;
+    private $starttime;
     private $timeout;
     private $options;
     private $exitcode;
@@ -211,6 +215,7 @@ class Process
             throw new \RuntimeException('Process is already running');
         }
 
+        $this->starttime = microtime(true);
         $this->stdout = '';
         $this->stderr = '';
         $callback = $this->buildCallback($callback);
@@ -285,7 +290,7 @@ class Process
             $w = $writePipes;
             $e = null;
 
-            $n = @stream_select($r, $w, $e, $this->timeout);
+            $n = @stream_select($r, $w, $e, 0, ceil(static::TIMEOUT_PRECISION * 1E6));
 
             if (false === $n) {
                 break;
@@ -318,6 +323,8 @@ class Process
                     unset($this->pipes[$type]);
                 }
             }
+
+            $this->checkTimeout();
         }
 
         $this->updateStatus();
@@ -345,13 +352,15 @@ class Process
             if (defined('PHP_WINDOWS_VERSION_BUILD') && $this->fileHandles) {
                 $this->processFileHandles($callback, !$this->pipes);
             }
+            $this->checkTimeout();
 
             if ($this->pipes) {
                 $r = $this->pipes;
                 $w = null;
                 $e = null;
 
-                if (false === $n = @stream_select($r, $w, $e, $this->timeout)) {
+                // let's have a look if something changed in streams
+                if (false === $n = @stream_select($r, $w, $e, 0, ceil(static::TIMEOUT_PRECISION * 1E6))) {
                     $lastError = error_get_last();
 
                     // stream_select returns false when the `select` system call is interrupted by an incoming signal
@@ -361,10 +370,11 @@ class Process
 
                     continue;
                 }
-                if (0 === $n) {
-                    proc_terminate($this->process);
 
-                    throw new \RuntimeException('The process timed out.');
+
+                // nothing has changed
+                if (0 === $n) {
+                    continue;
                 }
 
                 foreach ($r as $pipe) {
@@ -675,7 +685,7 @@ class Process
      *
      * To disable the timeout, set this value to null.
      *
-     * @param integer|null $timeout The timeout in seconds
+     * @param float|null $timeout The timeout in seconds
      *
      * @throws \InvalidArgumentException if the timeout is negative
      */
@@ -687,10 +697,10 @@ class Process
             return;
         }
 
-        $timeout = (integer) $timeout;
+        $timeout = (float) $timeout;
 
         if ($timeout < 0) {
-            throw new \InvalidArgumentException('The timeout value must be a valid positive integer.');
+            throw new \InvalidArgumentException('The timeout value must be a valid positive integer or float number.');
         }
 
         $this->timeout = $timeout;
@@ -827,6 +837,23 @@ class Process
     public function setEnhanceSigchildCompatibility($enhance)
     {
         $this->enhanceSigchildCompatibility = (Boolean) $enhance;
+    }
+
+    /**
+     * Performs a check between the timeout definition and the time the process
+     * started
+     *
+     * In case you run a background process (with the start method), you should
+     * trigger this method regularly to ensure the process timeout
+     *
+     * @throws RuntimeException In case the timeout was reached
+     */
+    public function checkTimeout()
+    {
+        if (0 < $this->timeout && $this->timeout < (microtime(true) - $this->starttime)) {
+            $this->stop(0);
+            throw new RuntimeException('Process timed-out.');
+        }
     }
 
     /**

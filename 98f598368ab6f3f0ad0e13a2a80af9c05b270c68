@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-01T07:53:46Z
+
+I don't understand why this is needed as there is a test checking for the existence of the constant.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2013-04-01T15:17:48Z
+
+You're right, one of the checks was not needed.

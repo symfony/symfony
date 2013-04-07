@@ -3,8 +3,8 @@ UPGRADE FROM 2.x to 3.0
 
 ### ClassLoader
 
- * The `UniversalClassLoader` class has been removed in favor of `ClassLoader`. The only difference is that some method
-    names are different:
+ * The `UniversalClassLoader` class has been removed in favor of
+   `ClassLoader`. The only difference is that some method names are different:
 
       * `registerNamespaces()` -> `addPrefixes()`
       * `registerPrefixes()` -> `addPrefixes()`
@@ -33,6 +33,16 @@ UPGRADE FROM 2.x to 3.0
 
      * `Symfony\Bridge\Monolog\Logger`
      * `Symfony\Component\HttpKernel\Log\NullLogger`
+
+ * The `Symfony\Component\HttpKernel\Kernel::init()` method has been removed.
+
+ * The following classes have been renamed as they have been moved to the
+   Debug component:
+
+    * `Symfony\Component\HttpKernel\Debug\ErrorHandler` -> `Symfony\Component\Debug\ErrorHandler`
+    * `Symfony\Component\HttpKernel\Debug\ExceptionHandler` -> `Symfony\Component\Debug\ExceptionHandler`
+    * `Symfony\Component\HttpKernel\Exception\FatalErrorException` -> `Symfony\Component\Debug\Exception\FatalErrorException`
+    * `Symfony\Component\HttpKernel\Exception\FlattenException` -> `Symfony\Component\Debug\Exception\FlattenException`
 
 ### Routing
 

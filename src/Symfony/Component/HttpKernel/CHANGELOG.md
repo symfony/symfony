@@ -4,6 +4,9 @@ CHANGELOG
 2.3.0
 -----
 
+ * deprecated `Symfony\Component\HttpKernel\Debug\ErrorHandler`, `Symfony\Component\HttpKernel\Debug\ExceptionHandler`,
+   `Symfony\Component\HttpKernel\Exception\FatalErrorException`, and `Symfony\Component\HttpKernel\Exception\FlattenException`
+ * deprecated `Symfony\Component\HttpKernel\Kernel::init()``
  * added the possibility to specify an id an extra attributes to hinclude tags
  * added the collect of data if a controller is a Closure in the Request collector
 

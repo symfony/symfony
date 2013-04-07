@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-04-02T03:27:32Z
+
+Please add a unit test
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2013-04-02T19:48:49Z
+
+@stof there's no API method for the `\FileLocator::$paths` property.. so testing the sub class constructor seems somewhat problematic... i.e. i don't know how to test `parent::__construct` properly without reflection magic..
+
+how about the initial unit test?

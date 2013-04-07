@@ -30,7 +30,7 @@ class Debug
      * If the Symfony ClassLoader component is available, a special
      * class loader is also registered.
      *
-     * @param integer $errorReportingLevel The level of error reporting you wan
+     * @param integer $errorReportingLevel The level of error reporting you want
      */
     public static function enable($errorReportingLevel = null)
     {

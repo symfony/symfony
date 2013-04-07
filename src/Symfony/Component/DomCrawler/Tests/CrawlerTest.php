@@ -393,6 +393,9 @@ EOF
         $this->assertEquals(1, $crawler->selectButton('BarValue')->count(), '->selectButton() selects buttons');
         $this->assertEquals(1, $crawler->selectButton('BarName')->count(), '->selectButton() selects buttons');
         $this->assertEquals(1, $crawler->selectButton('BarId')->count(), '->selectButton() selects buttons');
+
+        $this->assertEquals(1, $crawler->selectButton('FooBarValue')->count(), '->selectButton() selects buttons with form attribute too');
+        $this->assertEquals(1, $crawler->selectButton('FooBarName')->count(), '->selectButton() selects buttons with form attribute too');
     }
 
     public function testLink()
@@ -427,10 +430,17 @@ EOF
 
     public function testForm()
     {
-        $crawler = $this->createTestCrawler('http://example.com/bar/')->selectButton('FooValue');
+        $testCrawler = $this->createTestCrawler('http://example.com/bar/');
+        $crawler = $testCrawler->selectButton('FooValue');
+        $crawler2 = $testCrawler->selectButton('FooBarValue');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Form', $crawler->form(), '->form() returns a Form instance');
+        $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Form', $crawler2->form(), '->form() returns a Form instance');
 
-        $this->assertEquals(array('FooName' => 'FooBar'), $crawler->form(array('FooName' => 'FooBar'))->getValues(), '->form() takes an array of values to submit as its first argument');
+        $this->assertEquals($crawler->form()->getFormNode()->getAttribute('id'), $crawler2->form()->getFormNode()->getAttribute('id'), '->form() works on elements with form attribute');
+
+        $this->assertEquals(array('FooName' => 'FooBar', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler->form(array('FooName' => 'FooBar'))->getValues(), '->form() takes an array of values to submit as its first argument');
+        $this->assertEquals(array('FooName' => 'FooValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler->form()->getValues(), '->form() takes an array of values to submit as its first argument');
+        $this->assertEquals(array('FooBarName' => 'FooBarValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler2->form()->getValues(), '->form() takes an array of values to submit as its first argument');
 
         try {
             $this->createTestCrawler()->filterXPath('//ol')->form();
@@ -576,11 +586,15 @@ EOF
 
                     <a href="?get=param">GetLink</a>
 
-                    <form action="foo">
+                    <form action="foo" id="FooFormId">
+                        <input type="text" value="TextValue" name="TextName" />
                         <input type="submit" value="FooValue" name="FooName" id="FooId" />
                         <input type="button" value="BarValue" name="BarName" id="BarId" />
                         <button value="ButtonValue" name="ButtonName" id="ButtonId" />
                     </form>
+
+                    <input type="submit" value="FooBarValue" name="FooBarName" form="FooFormId" />
+                    <input type="text" value="FooTextValue" name="FooTextName" form="FooFormId" />
 
                     <ul class="first">
                         <li class="first">One</li>

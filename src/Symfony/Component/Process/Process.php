@@ -35,7 +35,7 @@ class Process
     const STDERR = 2;
 
     // Timeout Precision in seconds.
-    CONST TIMEOUT_PRECISION = 0.2;
+    const TIMEOUT_PRECISION = 0.2;
 
     private $commandline;
     private $cwd;
@@ -850,9 +850,10 @@ class Process
      */
     public function checkTimeout()
     {
-        if (0 < $this->timeout && $this->timeout < (microtime(true) - $this->starttime)) {
+        if (0 < $this->timeout && $this->timeout < microtime(true) - $this->starttime) {
             $this->stop(0);
-            throw new RuntimeException('Process timed-out.');
+
+            throw new RuntimeException('The process timed-out.');
         }
     }
 

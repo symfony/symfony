@@ -207,6 +207,10 @@ EOF
         $crawler = new Crawler();
         $crawler->addContent('foo bar', 'text/plain');
         $this->assertCount(0, $crawler, '->addContent() does nothing if the type is not (x|ht)ml');
+
+        $crawler = new Crawler();
+        $crawler->addContent('<html><div class="foo"></html>', 'charset=UTF-8');
+        $this->assertCount(1, $crawler, '->addContent() defaults to text/html when no MIME is specified');
     }
 
     /**

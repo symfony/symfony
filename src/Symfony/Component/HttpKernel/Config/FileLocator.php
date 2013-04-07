@@ -34,7 +34,7 @@ class FileLocator extends BaseFileLocator
     public function __construct(KernelInterface $kernel, $path = null, array $paths = array())
     {
         $this->kernel = $kernel;
-        if(null !== $path) {
+        if (null !== $path) {
             $this->path = $path;
             $paths[] = $path;
         }

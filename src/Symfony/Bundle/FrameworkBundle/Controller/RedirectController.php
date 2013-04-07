@@ -32,19 +32,26 @@ class RedirectController extends ContainerAware
      * In case the route name is empty, the status code will be 404 when permanent is false
      * and 410 otherwise.
      *
-     * @param string  $route     The route name to redirect to
-     * @param Boolean $permanent Whether the redirection is permanent
+     * @param string        $route            The route name to redirect to
+     * @param Boolean       $permanent        Whether the redirection is permanent
+     * @param Boolean|array $ignoreAttributes Whether to ignore attributes or an array of attributes to ignore
      *
      * @return Response A Response instance
      */
-    public function redirectAction($route, $permanent = false)
+    public function redirectAction($route, $permanent = false, $ignoreAttributes = false)
     {
         if ('' == $route) {
             return new Response(null, $permanent ? 410 : 404);
         }
 
-        $attributes = $this->container->get('request')->attributes->get('_route_params');
-        unset($attributes['route'], $attributes['permanent']);
+        $attributes = array();
+        if (false === $ignoreAttributes || is_array($ignoreAttributes)) {
+            $attributes = $this->container->get('request')->attributes->get('_route_params');
+            unset($attributes['route'], $attributes['permanent']);
+            if ($ignoreAttributes) {
+                $attributes = array_diff_key($attributes, array_flip($ignoreAttributes));
+            }
+        }
 
         return new RedirectResponse($this->container->get('router')->generate($route, $attributes, UrlGeneratorInterface::ABSOLUTE_URL), $permanent ? 301 : 302);
     }

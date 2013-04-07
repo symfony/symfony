@@ -69,6 +69,9 @@ class StringUtil
         // atlases (atlas), kisses (kiss)
         array('ses', 3, true, true, array('s', 'se', 'sis')),
 
+        // objectives (objective), alternative (alternatives)
+        array('sevit', 5, true, true, 'tive'),
+
         // lives (life), wives (wife)
         array('sevi', 4, false, true, 'ife'),
 

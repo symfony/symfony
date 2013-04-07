@@ -117,6 +117,7 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('bees', array('be', 'bee')),
             array('cheeses', array('chees', 'cheese', 'cheesis')),
             array('radii', 'radius'),
+            array('objectives', 'objective'),
 
             // test casing: if the first letter was uppercase, it should remain so
             array('Men', 'Man'),

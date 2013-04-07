@@ -290,7 +290,7 @@ class Process
             $w = $writePipes;
             $e = null;
 
-            $n = @stream_select($r, $w, $e, 0, static::TIMEOUT_PRECISION * 1E6);
+            $n = @stream_select($r, $w, $e, 0, ceil(static::TIMEOUT_PRECISION * 1E6));
 
             if (false === $n) {
                 break;
@@ -360,7 +360,7 @@ class Process
                 $e = null;
 
                 // let's have a look if something changed in streams
-                if (false === $n = @stream_select($r, $w, $e, 0, static::TIMEOUT_PRECISION * 1E6)) {
+                if (false === $n = @stream_select($r, $w, $e, 0, ceil(static::TIMEOUT_PRECISION * 1E6))) {
                     $lastError = error_get_last();
 
                     // stream_select returns false when the `select` system call is interrupted by an incoming signal

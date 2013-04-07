@@ -72,6 +72,23 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($oids[1]->equals($acl1->getObjectIdentity()));
     }
 
+    public function testFindAclsWithDifferentTypes()
+    {
+        $oids = array();
+        $oids[] = new ObjectIdentity('123', 'Bundle\SomeVendor\MyBundle\Entity\SomeEntity');
+        $oids[] = new ObjectIdentity('123', 'Bundle\MyBundle\Entity\AnotherEntity');
+
+        $provider = $this->getProvider();
+
+        $acls = $provider->findAcls($oids);
+        $this->assertInstanceOf('SplObjectStorage', $acls);
+        $this->assertCount(2, $acls);
+        $this->assertInstanceOf('Symfony\Component\Security\Acl\Domain\Acl', $acl0 = $acls->offsetGet($oids[0]));
+        $this->assertInstanceOf('Symfony\Component\Security\Acl\Domain\Acl', $acl1 = $acls->offsetGet($oids[1]));
+        $this->assertTrue($oids[0]->equals($acl0->getObjectIdentity()));
+        $this->assertTrue($oids[1]->equals($acl1->getObjectIdentity()));
+    }
+
     public function testFindAclCachesAclInMemory()
     {
         $oid = new ObjectIdentity('1', 'foo');

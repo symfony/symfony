@@ -342,6 +342,16 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFindNamespaceDoesNotFailOnDeepSimilarNamespaces()
+    {
+        $application = $this->getMock('Symfony\Component\Console\Application', array('getNamespaces'));
+        $application->expects($this->once())
+            ->method('getNamespaces')
+            ->will($this->returnValue(array('foo:sublong', 'bar:sub')));
+
+        $this->assertEquals('foo:sublong', $application->findNamespace('f:sub'));
+    }
+
     public function testSetCatchExceptions()
     {
         $application = $this->getMock('Symfony\Component\Console\Application', array('getTerminalWidth'));

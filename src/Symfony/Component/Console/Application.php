@@ -478,20 +478,24 @@ class Application
      */
     public function findNamespace($namespace)
     {
-        $allNamespaces = array();
-        foreach ($this->getNamespaces() as $n) {
-            $allNamespaces[$n] = explode(':', $n);
-        }
-
-        $found = array();
+        $allNamespaces = $this->getNamespaces();
+        $found = '';
         foreach (explode(':', $namespace) as $i => $part) {
-            $abbrevs = static::getAbbreviations(array_unique(array_values(array_filter(array_map(function ($p) use ($i) { return isset($p[$i]) ? $p[$i] : ''; }, $allNamespaces)))));
+            // select sub-namespaces matching the current namespace we found
+            $namespaces = array();
+            foreach ($allNamespaces as $n) {
+                if ('' === $found || 0 === strpos($n, $found)) {
+                    $namespaces[$n] = explode(':', $n);
+                }
+            }
+
+            $abbrevs = static::getAbbreviations(array_unique(array_values(array_filter(array_map(function ($p) use ($i) { return isset($p[$i]) ? $p[$i] : ''; }, $namespaces)))));
 
             if (!isset($abbrevs[$part])) {
                 $message = sprintf('There are no commands defined in the "%s" namespace.', $namespace);
 
                 if (1 <= $i) {
-                    $part = implode(':', $found).':'.$part;
+                    $part = $found.':'.$part;
                 }
 
                 if ($alternatives = $this->findAlternativeNamespace($part, $abbrevs)) {
@@ -507,14 +511,19 @@ class Application
                 throw new \InvalidArgumentException($message);
             }
 
+            // there are multiple matches, but $part is an exact match of one of them so we select it
+            if (in_array($part, $abbrevs[$part])) {
+                $abbrevs[$part] = array($part);
+            }
+
             if (count($abbrevs[$part]) > 1) {
                 throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($abbrevs[$part])));
             }
 
-            $found[] = $abbrevs[$part][0];
+            $found .= $found ? ':' . $abbrevs[$part][0] : $abbrevs[$part][0];
         }
 
-        return implode(':', $found);
+        return $found;
     }
 
     /**
@@ -637,19 +646,10 @@ class Application
     {
         $abbrevs = array();
         foreach ($names as $name) {
-            for ($len = strlen($name) - 1; $len > 0; --$len) {
+            for ($len = strlen($name); $len > 0; --$len) {
                 $abbrev = substr($name, 0, $len);
-                if (!isset($abbrevs[$abbrev])) {
-                    $abbrevs[$abbrev] = array($name);
-                } else {
-                    $abbrevs[$abbrev][] = $name;
-                }
+                $abbrevs[$abbrev][] = $name;
             }
-        }
-
-        // Non-abbreviations always get entered, even if they aren't unique
-        foreach ($names as $name) {
-            $abbrevs[$name] = array($name);
         }
 
         return $abbrevs;

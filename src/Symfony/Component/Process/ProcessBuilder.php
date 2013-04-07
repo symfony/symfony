@@ -86,7 +86,7 @@ class ProcessBuilder
      *
      * To disable the timeout, set this value to null.
      *
-     * @param integer|null
+     * @param float|null
      */
     public function setTimeout($timeout)
     {
@@ -96,10 +96,10 @@ class ProcessBuilder
             return $this;
         }
 
-        $timeout = (integer) $timeout;
+        $timeout = (float) $timeout;
 
         if ($timeout < 0) {
-            throw new \InvalidArgumentException('The timeout value must be a valid positive integer.');
+            throw new \InvalidArgumentException('The timeout value must be a valid positive integer or float number.');
         }
 
         $this->timeout = $timeout;

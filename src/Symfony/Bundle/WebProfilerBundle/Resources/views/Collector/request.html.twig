@@ -9,7 +9,7 @@
                 {{ collector.controller.method }}
             </span>
         {% else %}
-            <span class="sf-toolbar-info-class sf-toolbar-info-with-next-pointer">{{ collector.controller }}</span>
+            <span class="sf-toolbar-info-class">{{ collector.controller }}</span>
         {% endif %}
     {% endset %}
     {% set request_status_code_color = (400 > collector.statuscode) ? ((200 == collector.statuscode) ? 'green' : 'yellow') : 'red'%}

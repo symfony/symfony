@@ -89,6 +89,10 @@ class Crawler extends \SplObjectStorage
             $type = 'text/html';
         }
 
+        if (false !== strpos($type, 'charset=')) {
+            $type = 'text/html';
+        }
+
         // DOM only for HTML/XML content
         if (!preg_match('/(x|ht)ml/i', $type, $matches)) {
             return null;

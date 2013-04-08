@@ -184,7 +184,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $name The helper name
      *
-     * @return mixed The helper value
+     * @return HelperInterface The helper value
      *
      * @throws \InvalidArgumentException if the helper is not defined
      *

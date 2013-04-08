@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Tests\Debug;
+namespace Symfony\Component\Debug\Tests;
 
-use Symfony\Component\HttpKernel\Debug\ErrorHandler;
+use Symfony\Component\Debug\ErrorHandler;
 
 /**
  * ErrorHandlerTest

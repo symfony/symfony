@@ -32,7 +32,7 @@ class ConfigDumpReferenceCommand extends ContainerDebugCommand
         $this
             ->setName('config:dump-reference')
             ->setDefinition(array(
-                new InputArgument('name', InputArgument::REQUIRED, 'The Bundle or extension alias')
+                new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle or extension alias')
             ))
             ->setDescription('Dumps default configuration for an extension')
             ->setHelp(<<<EOF
@@ -63,6 +63,16 @@ EOF
         $containerBuilder = $this->getContainerBuilder();
 
         $name = $input->getArgument('name');
+
+        if (empty($name)) {
+            $output->writeln('Available registered bundles with their extension alias if available:');
+            foreach ($bundles as $bundle) {
+                $extension = $bundle->getContainerExtension();
+                $output->writeln($bundle->getName().($extension ? ': '.$extension->getAlias() : ''));
+            }
+
+            return;
+        }
 
         $extension = null;
 

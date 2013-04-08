@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Tests\Debug;
+namespace Symfony\Component\Debug\Tests;
 
-use Symfony\Component\HttpKernel\Debug\ExceptionHandler;
+use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 

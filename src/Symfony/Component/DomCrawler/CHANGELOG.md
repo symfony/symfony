@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added schema relative URL support to links
+ * added support for HTML5 'form' attribute
 
 2.2.0
 -----

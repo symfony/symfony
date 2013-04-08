@@ -62,6 +62,10 @@ class IpUtilsTest extends \PHPUnit_Framework_TestCase
      */
     public function testAnIpv6WithOptionDisabledIpv6()
     {
+        if (!extension_loaded('sockets')) {
+            $this->markTestSkipped('Only works when the socket extension is enabled');
+        }
+
         if (defined('AF_INET6')) {
             $this->markTestSkipped('Only works when PHP is compiled with the option "disable-ipv6".');
         }

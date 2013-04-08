@@ -1231,6 +1231,95 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         // reset
         Request::setTrustedProxies(array());
     }
+
+    /**
+     * @dataProvider iisRequestUriProvider
+     */
+    public function testIISRequestUri($headers, $server, $expectedRequestUri)
+    {
+        $request = new Request();
+        $request->headers->replace($headers);
+        $request->server->replace($server);
+
+        $this->assertEquals($expectedRequestUri, $request->getRequestUri(), '->getRequestUri() is correct');
+
+        $subRequestUri = '/bar/foo';
+        $subRequest = $request::create($subRequestUri, 'get', array(), array(), array(), $request->server->all());
+        $this->assertEquals($subRequestUri, $subRequest->getRequestUri(), '->getRequestUri() is correct in sub request');
+    }
+
+    public function iisRequestUriProvider()
+    {
+        return array(
+            array(
+                array(
+                    'X_ORIGINAL_URL' => '/foo/bar',
+                ),
+                array(),
+                '/foo/bar'
+            ),
+            array(
+                array(
+                    'X_REWRITE_URL' => '/foo/bar',
+                ),
+                array(),
+                '/foo/bar'
+            ),
+            array(
+                array(),
+                array(
+                    'IIS_WasUrlRewritten' => '1',
+                    'UNENCODED_URL' => '/foo/bar'
+                ),
+                '/foo/bar'
+            ),
+            array(
+                array(
+                    'X_ORIGINAL_URL' => '/foo/bar',
+                ),
+                array(
+                    'HTTP_X_ORIGINAL_URL' => '/foo/bar'
+                ),
+                '/foo/bar'
+            ),
+            array(
+                array(
+                    'X_ORIGINAL_URL' => '/foo/bar',
+                ),
+                array(
+                    'IIS_WasUrlRewritten' => '1',
+                    'UNENCODED_URL' => '/foo/bar'
+                ),
+                '/foo/bar'
+            ),
+            array(
+                array(
+                    'X_ORIGINAL_URL' => '/foo/bar',
+                ),
+                array(
+                    'HTTP_X_ORIGINAL_URL' => '/foo/bar',
+                    'IIS_WasUrlRewritten' => '1',
+                    'UNENCODED_URL' => '/foo/bar'
+                ),
+                '/foo/bar'
+            ),
+            array(
+                array(),
+                array(
+                    'ORIG_PATH_INFO' => '/foo/bar',
+                ),
+                '/foo/bar'
+            ),
+            array(
+                array(),
+                array(
+                    'ORIG_PATH_INFO' => '/foo/bar',
+                    'QUERY_STRING' => 'foo=bar',
+                ),
+                '/foo/bar?foo=bar'
+            )
+        );
+    }
 }
 
 class RequestContentProxy extends Request

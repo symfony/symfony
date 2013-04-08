@@ -194,7 +194,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Windows does have /dev/tty support');
         }
 
-        $process = $this->getProcess('echo "a" >> /dev/null');
+        $process = $this->getProcess('echo "foo" >> /dev/null');
         $process->setTTY(true);
         $process->run();
 

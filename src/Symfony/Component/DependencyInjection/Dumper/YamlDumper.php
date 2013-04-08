@@ -102,6 +102,10 @@ class YamlDumper extends Dumper
             $code .= sprintf("        synchronized: true\n");
         }
 
+        if ($definition->getFactoryClass()) {
+            $code .= sprintf("        factory_class: %s\n", $definition->getFactoryClass());
+        }
+
         if ($definition->getFactoryMethod()) {
             $code .= sprintf("        factory_method: %s\n", $definition->getFactoryMethod());
         }

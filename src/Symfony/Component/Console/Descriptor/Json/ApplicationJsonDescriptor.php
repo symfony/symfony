@@ -54,10 +54,10 @@ class ApplicationJsonDescriptor extends AbstractJsonDescriptor
         /** @var Application $object */
         $description = new ApplicationDescription($object, $this->namespace);
         $descriptor = new CommandJsonDescriptor();
-        $commands = array_map(array($descriptor, 'getData'), $description->getCommands());
+        $commands = array_values(array_map(array($descriptor, 'getData'), $description->getCommands()));
 
         return null === $this->namespace
-            ? array('commands' => $commands, 'namespaces' => $description->getNamespaces())
+            ? array('commands' => $commands, 'namespaces' => array_values($description->getNamespaces()))
             : array('commands' => $commands, 'namespace' => $this->namespace);
     }
 

@@ -42,6 +42,11 @@ class ApplicationDescription
     private $commands;
 
     /**
+     * @var Command[]
+     */
+    private $aliases;
+
+    /**
      * Constructor.
      *
      * @param Application $application
@@ -86,11 +91,11 @@ class ApplicationDescription
      */
     public function getCommand($name)
     {
-        if (!isset($this->commands[$name])) {
+        if (!isset($this->commands[$name]) && !isset($this->aliases[$name])) {
             throw new \InvalidArgumentException('Command "'.$name.'" does not exist.');
         }
 
-        return $this->commands[$name];
+        return isset($this->commands[$name]) ? $this->commands[$name] : $this->aliases[$name];
     }
 
     private function inspectApplication()
@@ -108,9 +113,10 @@ class ApplicationDescription
                     continue;
                 }
 
-                // aliases must be skipped in commands list
-                if ($name === $command->getName()) {
+                if ($command->getName() === $name) {
                     $this->commands[$name] = $command;
+                } else {
+                    $this->aliases[$name] = $command;
                 }
 
                 $names[] = $name;

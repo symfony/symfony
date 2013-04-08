@@ -27,10 +27,12 @@ class ApplicationTextDescriptor extends AbstractTextDescriptor
 
     /**
      * @param string|null $namespace
+     * @param bool        $raw
      */
-    public function __construct($namespace = null)
+    public function __construct($namespace = null, $raw = false)
     {
         $this->namespace = $namespace;
+        parent::__construct($raw);
     }
 
     /**

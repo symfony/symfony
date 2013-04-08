@@ -43,6 +43,11 @@ class DescriptorProvider
     {
         $this
             ->configure($options)
+            ->add(new Text\ApplicationTextDescriptor())
+            ->add(new Text\CommandTextDescriptor())
+            ->add(new Text\InputDefinitionTextDescriptor())
+            ->add(new Text\InputArgumentTextDescriptor())
+            ->add(new Text\InputOptionTextDescriptor())
             ->add(new Xml\ApplicationXmlDescriptor())
             ->add(new Xml\CommandXmlDescriptor())
             ->add(new Xml\InputDefinitionXmlDescriptor())

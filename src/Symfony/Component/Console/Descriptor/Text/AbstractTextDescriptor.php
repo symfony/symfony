@@ -84,4 +84,13 @@ abstract class AbstractTextDescriptor implements DescriptorInterface
     {
         return false;
     }
+
+    protected function formatDefaultValue($default)
+    {
+        if (version_compare(PHP_VERSION, '5.4', '<')) {
+            return str_replace('\/', '/', json_encode($default));
+        }
+
+        return json_encode($default, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
 }

@@ -4,6 +4,7 @@ namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Descriptor\DescriptorProvider;
 use Symfony\Component\Console\Helper\DescriptorHelper;
+use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -48,6 +49,10 @@ abstract class AbstractDescriptionCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (null === $this->getHelperSet()) {
+            $this->setHelperSet(new HelperSet());
+        }
+
         $this->getHelperSet()->set(new DescriptorHelper($this->provider));
     }
 }

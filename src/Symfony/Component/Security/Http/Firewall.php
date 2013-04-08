@@ -63,7 +63,7 @@ class Firewall implements EventSubscriberInterface
 
         // initiate the listener chain
         foreach ($listeners as $listener) {
-            $response = $listener->handle($event);
+            $listener->handle($event);
 
             if ($event->hasResponse()) {
                 break;

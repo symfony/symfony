@@ -702,9 +702,11 @@ class Request
     }
 
     /**
-     * Returns the client IP address. See getClientIps() for more information.
+     * Returns the client IP address.
      *
      * @return string The client IP address
+     *
+     * @see getClientIps()
      *
      * @api
      */

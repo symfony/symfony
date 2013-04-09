@@ -30,9 +30,15 @@ class ElementParser implements ParserInterface
      */
     public function parse($source)
     {
-        // matches "<element>"
-        if (preg_match('~^[ \t\r\n\f]*([a-zA-Z][a-zA-Z0-9_-]*|\\*)[ \t\r\n\f]*$~', $source, $matches)) {
-            return array(new SelectorNode(new ElementNode(null, $matches[1])));
+        // Matches an optional namespace, required element or `*`
+        // $source = 'testns|testel';
+        // $matches = array (size=4)
+        //     0 => string 'testns:testel' (length=13)
+        //     1 => string 'testns:' (length=7)
+        //     2 => string 'testns' (length=6)
+        //     3 => string 'testel' (length=6)
+        if (preg_match('/^(([a-z]+)\|)?([\w-]+|\*)$/i', trim($source), $matches)) {
+            return array(new SelectorNode(new ElementNode($matches[2] ?: null, $matches[3])));
         }
 
         return array();

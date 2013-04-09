@@ -34,8 +34,8 @@ class EmptyStringParser implements ParserInterface
      */
     public function parse($source)
     {
-        // matches ""
-        if (preg_match('~^$~', $source, $matches)) {
+        // Matches an empty string
+        if ($source == '') {
             return array(new SelectorNode(new ElementNode(null, '*')));
         }
 

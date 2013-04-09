@@ -135,14 +135,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($foo, $application->get('foo:bar'), '->get() returns a command by name');
         $this->assertEquals($foo, $application->get('afoobar'), '->get() returns a command by alias');
 
-        try {
-            $application->get('foofoo');
-            $this->fail('->get() throws an \InvalidArgumentException if the command does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws an \InvalidArgumentException if the command does not exist');
-            $this->assertEquals('The command "foofoo" does not exist.', $e->getMessage(), '->get() throws an \InvalidArgumentException if the command does not exist');
-        }
-
         $application = new Application();
         $application->add($foo = new \FooCommand());
         // simulate --help
@@ -151,7 +143,17 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $p->setAccessible(true);
         $p->setValue($application, true);
         $command = $application->get('foo:bar');
-        $this->assertEquals('Symfony\Component\Console\Command\HelpCommand', get_class($command), '->get() returns the help command if --help is provided as the input');
+        $this->assertInstanceOf('Symfony\Component\Console\Command\HelpCommand', $command, '->get() returns the help command if --help is provided as the input');
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage The command "foofoo" does not exist.
+     */
+    public function testGetInvalidCommand()
+    {
+        $application = new Application();
+        $application->get('foofoo');
     }
 
     public function testGetNamespaces()
@@ -170,84 +172,90 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $application->findNamespace('f'), '->findNamespace() finds a namespace given an abbreviation');
         $application->add(new \Foo2Command());
         $this->assertEquals('foo', $application->findNamespace('foo'), '->findNamespace() returns the given namespace if it exists');
-        try {
-            $application->findNamespace('f');
-            $this->fail('->findNamespace() throws an \InvalidArgumentException if the abbreviation is ambiguous');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->findNamespace() throws an \InvalidArgumentException if the abbreviation is ambiguous');
-            $this->assertEquals('The namespace "f" is ambiguous (foo, foo1).', $e->getMessage(), '->findNamespace() throws an \InvalidArgumentException if the abbreviation is ambiguous');
-        }
+    }
 
-        try {
-            $application->findNamespace('bar');
-            $this->fail('->findNamespace() throws an \InvalidArgumentException if no command is in the given namespace');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->findNamespace() throws an \InvalidArgumentException if no command is in the given namespace');
-            $this->assertEquals('There are no commands defined in the "bar" namespace.', $e->getMessage(), '->findNamespace() throws an \InvalidArgumentException if no command is in the given namespace');
-        }
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage The namespace "f" is ambiguous (foo, foo1).
+     */
+    public function testFindAmbiguousNamespace()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $application->add(new \Foo2Command());
+        $application->findNamespace('f');
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage There are no commands defined in the "bar" namespace.
+     */
+    public function testFindInvalidNamespace()
+    {
+        $application = new Application();
+        $application->findNamespace('bar');
     }
 
     public function testFind()
     {
         $application = new Application();
         $application->add(new \FooCommand());
-        $this->assertEquals('FooCommand', get_class($application->find('foo:bar')), '->find() returns a command if its name exists');
-        $this->assertEquals('Symfony\Component\Console\Command\HelpCommand', get_class($application->find('h')), '->find() returns a command if its name exists');
-        $this->assertEquals('FooCommand', get_class($application->find('f:bar')), '->find() returns a command if the abbreviation for the namespace exists');
-        $this->assertEquals('FooCommand', get_class($application->find('f:b')), '->find() returns a command if the abbreviation for the namespace and the command name exist');
-        $this->assertEquals('FooCommand', get_class($application->find('a')), '->find() returns a command if the abbreviation exists for an alias');
 
+        $this->assertInstanceOf('FooCommand', $application->find('foo:bar'), '->find() returns a command if its name exists');
+        $this->assertInstanceOf('Symfony\Component\Console\Command\HelpCommand', $application->find('h'), '->find() returns a command if its name exists');
+        $this->assertInstanceOf('FooCommand', $application->find('f:bar'), '->find() returns a command if the abbreviation for the namespace exists');
+        $this->assertInstanceOf('FooCommand', $application->find('f:b'), '->find() returns a command if the abbreviation for the namespace and the command name exist');
+        $this->assertInstanceOf('FooCommand', $application->find('a'), '->find() returns a command if the abbreviation exists for an alias');
+    }
+
+    /**
+     * @dataProvider provideAmbiguousAbbreviations
+     */
+    public function testFindWithAmbiguousAbbreviations($abbreviation, $expectedExceptionMessage)
+    {
+        $this->setExpectedException('InvalidArgumentException', $expectedExceptionMessage);
+
+        $application = new Application();
+        $application->add(new \FooCommand());
         $application->add(new \Foo1Command());
         $application->add(new \Foo2Command());
 
-        try {
-            $application->find('f');
-            $this->fail('->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
-            $this->assertRegExp('/Command "f" is not defined./', $e->getMessage(), '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a namespace');
-        }
-
-        try {
-            $application->find('a');
-            $this->fail('->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
-            $this->assertEquals('Command "a" is ambiguous (afoobar, afoobar1 and 1 more).', $e->getMessage(), '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for an alias');
-        }
-
-        try {
-            $application->find('foo:b');
-            $this->fail('->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
-            $this->assertEquals('Command "foo:b" is ambiguous (foo:bar, foo:bar1).', $e->getMessage(), '->find() throws an \InvalidArgumentException if the abbreviation is ambiguous for a command');
-        }
+        $application->find($abbreviation);
     }
 
-    public function testFindAlternativeExceptionMessage()
+    public function provideAmbiguousAbbreviations()
+    {
+        return array(
+            array('f', 'Command "f" is not defined.'),
+            array('a', 'Command "a" is ambiguous (afoobar, afoobar1 and 1 more).'),
+            array('foo:b', 'Command "foo:b" is ambiguous (foo:bar, foo:bar1).')
+        );
+    }
+
+    /**
+     * @dataProvider             provideInvalidCommandNamesSingle
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Did you mean this
+     */
+    public function testFindAlternativeExceptionMessageSingle($name)
     {
         $application = new Application();
         $application->add(new \FooCommand());
+        $application->find($name);
+    }
 
-        // Command + singular
-        try {
-            $application->find('foo:baR');
-            $this->fail('->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
-            $this->assertRegExp('/Did you mean this/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
-        }
+    public function provideInvalidCommandNamesSingle()
+    {
+        return array(
+            array('foo:baR'),
+            array('foO:bar')
+        );
+    }
 
-        // Namespace + singular
-        try {
-            $application->find('foO:bar');
-            $this->fail('->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
-            $this->assertRegExp('/Did you mean this/', $e->getMessage(), '->find() throws an \InvalidArgumentException if command does not exist, with one alternative');
-        }
-
+    public function testFindAlternativeExceptionMessageMultiple()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
         $application->add(new \Foo1Command());
         $application->add(new \Foo2Command());
 

@@ -19,8 +19,10 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
     {
         $argument = new InputArgument('foo');
         $this->assertEquals('foo', $argument->getName(), '__construct() takes a name as its first argument');
+    }
 
-        // mode argument
+    public function testModes()
+    {
         $argument = new InputArgument('foo');
         $this->assertFalse($argument->isRequired(), '__construct() gives a "InputArgument::OPTIONAL" mode by default');
 
@@ -32,21 +34,24 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
 
         $argument = new InputArgument('foo', InputArgument::REQUIRED);
         $this->assertTrue($argument->isRequired(), '__construct() can take "InputArgument::REQUIRED" as its mode');
+    }
 
-        try {
-            $argument = new InputArgument('foo', 'ANOTHER_ONE');
-            $this->fail('__construct() throws an \InvalidArgumentException if the mode is not valid');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the mode is not valid');
-            $this->assertEquals('Argument mode "ANOTHER_ONE" is not valid.', $e->getMessage());
-        }
-        try {
-            $argument = new InputArgument('foo', -1);
-            $this->fail('__construct() throws an \InvalidArgumentException if the mode is not valid');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException if the mode is not valid');
-            $this->assertEquals('Argument mode "-1" is not valid.', $e->getMessage());
-        }
+    /**
+     * @dataProvider provideInvalidModes
+     */
+    public function testInvalidModes($mode)
+    {
+        $this->setExpectedException('InvalidArgumentException', sprintf('Argument mode "%s" is not valid.', $mode));
+
+        new InputArgument('foo', $mode);
+    }
+
+    public function provideInvalidModes()
+    {
+        return array(
+            array('ANOTHER_ONE'),
+            array(-1)
+        );
     }
 
     public function testIsArray()
@@ -82,23 +87,25 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
         $argument = new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
         $argument->setDefault(array(1, 2));
         $this->assertEquals(array(1, 2), $argument->getDefault(), '->setDefault() changes the default value');
+    }
 
-        try {
-            $argument = new InputArgument('foo', InputArgument::REQUIRED);
-            $argument->setDefault('default');
-            $this->fail('->setDefault() throws a \LogicException if you give a default value for a required argument');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '->setDefault() throws a \LogicException exception if an invalid option is passed');
-            $this->assertEquals('Cannot set a default value except for InputArgument::OPTIONAL mode.', $e->getMessage());
-        }
+    /**
+     * @expectedException        \LogicException
+     * @expectedExceptionMessage Cannot set a default value except for InputArgument::OPTIONAL mode.
+     */
+    public function testSetDefaultWithRequiredArgument()
+    {
+        $argument = new InputArgument('foo', InputArgument::REQUIRED);
+        $argument->setDefault('default');
+    }
 
-        try {
-            $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
-            $argument->setDefault('default');
-            $this->fail('->setDefault() throws a \LogicException if you give a default value which is not an array for a IS_ARRAY option');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('\LogicException', $e, '->setDefault() throws a \LogicException if you give a default value which is not an array for a IS_ARRAY option');
-            $this->assertEquals('A default value for an array argument must be an array.', $e->getMessage());
-        }
+    /**
+     * @expectedException        \LogicException
+     * @expectedExceptionMessage A default value for an array argument must be an array.
+     */
+    public function testSetDefaultWithArrayArgument()
+    {
+        $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
+        $argument->setDefault('default');
     }
 }

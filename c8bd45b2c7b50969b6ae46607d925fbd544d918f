@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by igorw at 2013-03-31T19:06:44Z
+
+This condition should never happen. If you received a direct request from a proxy, that means it's not a proxy but a client. Am I missing something?
+
+---------------------------------------------------------------------------
+
+by denvned at 2013-04-01T07:35:35Z
+
+It will happen if the HTTP request is initiated by the trusted proxy itself, but not by its client. In this case the initiator doesn't act as a proxy but as an ordinary HTTP client, and evidently getClientIp should return its IP. And getClientIp should never return null if the request is an real HTTP request!
+
+---------------------------------------------------------------------------
+
+by denvned at 2013-04-01T07:40:59Z
+
+> If you received a direct request from a proxy, that means it's not a proxy but a client. Am I missing something?
+
+Yes, in that case the trusted proxy is a client, but if there is an another trusted proxy as an intermediate, getClientIp throws out the initiator's IP from the intermediate trusted proxy's X-Forwarded-For and returns null. That is wrong.

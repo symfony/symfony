@@ -1130,6 +1130,16 @@ class RequestTest extends \PHPUnit_Framework_TestCase
                 '/foo',
                 '/bar+baz',
             ),
+            array(
+                '/foobar/index.php',
+                array(
+                    'SCRIPT_FILENAME' => '/foo/bar/web/index.php',
+                    'SCRIPT_NAME'     => '/web/index.php',
+                    'PHP_SELF'        => '/web/index.php',
+                ),
+                '',            //getBaseUrl    Fails, '/web/index.php' returned
+                '/foobar/index.php',  //getPathInfo   Fails, 'php' returned
+            )
         );
     }
 

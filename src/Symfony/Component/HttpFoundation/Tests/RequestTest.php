@@ -739,9 +739,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testGetClientIpProvider
+     * @dataProvider testGetClientIpsProvider
      */
-    public function testGetClientIp($expected, $proxy, $remoteAddr, $httpForwardedFor, $trustedProxies)
+    public function testGetClientIps($expected, $proxy, $remoteAddr, $httpForwardedFor, $trustedProxies, $multiple = false)
     {
         $request = new Request();
 
@@ -755,14 +755,24 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         }
 
         $request->initialize(array(), array(), array(), array(), array(), $server);
-        $this->assertEquals($expected, $request->getClientIp());
+        $result = $multiple ? $request->getClientIps() : $request->getClientIp();
+        $this->assertEquals($expected, $result);
 
         Request::setTrustedProxies(array());
     }
 
-    public function testGetClientIpProvider()
+    public function testGetClientIpsProvider()
     {
         return array(
+            array(array('88.88.88.88'),                             false, '88.88.88.88',  null,                                  null,                                 true),
+            array(array('127.0.0.1'),                               false, '127.0.0.1',    null,                                  null,                                 true),
+            array(array('::1'),                                     false, '::1',          null,                                  null,                                 true),
+            array(array('127.0.0.1'),                               false, '127.0.0.1',    '88.88.88.88',                         null,                                 true),
+            array(array('88.88.88.88'),                             true,  '127.0.0.1',    '88.88.88.88',                         null,                                 true),
+            array(array('2620:0:1cfe:face:b00c::3'),                true,  '::1',          '2620:0:1cfe:face:b00c::3',            null,                                 true),
+            array(array('127.0.0.1', '87.65.43.21', '88.88.88.88'), true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', null,                                 true),
+            array(array('127.0.0.1', '87.65.43.21'),                true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88'), true),
+            array(array('127.0.0.1', '87.65.43.21'),                false, '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88'), true),
             array('88.88.88.88',              false, '88.88.88.88',  null,                                  null),
             array('127.0.0.1',                false, '127.0.0.1',    null,                                  null),
             array('::1',                      false, '::1',          null,                                  null),

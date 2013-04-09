@@ -662,7 +662,7 @@ class Request
     }
 
     /**
-     * Returns the client IP address.
+     * Returns the client IP addresses.
      *
      * This method can read the client IP address from the "X-Forwarded-For" header
      * when trusted proxies were set via "setTrustedProxies()". The "X-Forwarded-For"
@@ -674,22 +674,22 @@ class Request
      * ("Client-Ip" for instance), configure it via "setTrustedHeaderName()" with
      * the "client-ip" key.
      *
-     * @return string The client IP address
+     * @return array The client IP addresses
      *
      * @see http://en.wikipedia.org/wiki/X-Forwarded-For
      *
      * @api
      */
-    public function getClientIp()
+    public function getClientIps()
     {
         $ip = $this->server->get('REMOTE_ADDR');
 
         if (!self::$trustProxy) {
-            return $ip;
+            return array($ip);
         }
 
         if (!self::$trustedHeaders[self::HEADER_CLIENT_IP] || !$this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
-            return $ip;
+            return array($ip);
         }
 
         $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
@@ -698,7 +698,19 @@ class Request
         $trustedProxies = self::$trustProxy && !self::$trustedProxies ? array($ip) : self::$trustedProxies;
         $clientIps = array_diff($clientIps, $trustedProxies);
 
-        return array_pop($clientIps);
+        return $clientIps;
+    }
+
+    /**
+     * Returns the client IP address. See getClientIps() for more information.
+     *
+     * @return string The client IP address
+     *
+     * @api
+     */
+    public function getClientIp()
+    {
+        return array_pop($this->getClientIps());
     }
 
     /**

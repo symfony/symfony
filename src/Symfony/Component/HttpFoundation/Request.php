@@ -710,7 +710,9 @@ class Request
      */
     public function getClientIp()
     {
-        return array_pop($this->getClientIps());
+        $ipAddresses = $this->getClientIps();
+
+        return array_pop($ipAddresses);
     }
 
     /**

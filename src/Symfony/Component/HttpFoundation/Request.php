@@ -677,8 +677,6 @@ class Request
      * @return array The client IP addresses
      *
      * @see http://en.wikipedia.org/wiki/X-Forwarded-For
-     *
-     * @api
      */
     public function getClientIps()
     {

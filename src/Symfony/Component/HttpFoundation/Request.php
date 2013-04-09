@@ -695,10 +695,19 @@ class Request
         $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
         $clientIps[] = $ip;
 
-        $trustedProxies = self::$trustProxy && !self::$trustedProxies ? array($ip) : self::$trustedProxies;
-        $clientIps = array_diff($clientIps, $trustedProxies);
+        $trustedProxies = self::$trustedProxies ?: array($ip);
 
-        return array_pop($clientIps);
+        foreach (array_reverse($clientIps) as $clientIp) {
+            foreach ($trustedProxies as $trustedProxy) {
+                if (IpUtils::checkIp($clientIp, $trustedProxy)) {
+                    continue 2;
+                }
+            }
+
+            return $clientIp;
+        }
+
+        return $clientIp;
     }
 
     /**

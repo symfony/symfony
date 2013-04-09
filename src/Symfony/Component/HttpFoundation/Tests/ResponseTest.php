@@ -624,6 +624,16 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $response = new Response('', 301, array('Location' => '/good-uri'));
         $this->assertFalse($response->isRedirect('/bad-uri'));
         $this->assertTrue($response->isRedirect('/good-uri'));
+
+        $response = new Response('', 201, array('Location' => '/good-uri'));
+        $this->assertFalse($response->isRedirection());
+        $this->assertFalse($response->isRedirect('/bad-uri'));
+        $this->assertTrue($response->isRedirect('/good-uri'));
+
+        $response = new Response('', 204, array('Location' => '/good-uri'));
+        $this->assertFalse($response->isRedirection());
+        $this->assertFalse($response->isRedirect('/bad-uri'));
+        $this->assertTrue($response->isRedirect('/good-uri'));
     }
 
     public function testIsNotFound()

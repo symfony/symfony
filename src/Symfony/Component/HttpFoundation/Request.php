@@ -1279,7 +1279,7 @@ class Request
         }
 
         $basename = basename($baseUrl);
-        if (empty($basename) || !strpos($truncatedRequestUri, $basename)) {
+        if (empty($basename) || !strpos($truncatedRequestUri, $baseUrl)) {
             // no match whatsoever; set it blank
             return '';
         }

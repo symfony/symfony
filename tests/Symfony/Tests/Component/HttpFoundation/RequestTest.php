@@ -917,6 +917,33 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         // reset
         Request::setTrustedProxies(array());
     }
+
+    /**
+     * @dataProvider getBaseUrlData
+     */
+    public function testGetBaseUrl($uri, $server, $expectedBaseUrl, $expectedPathInfo)
+    {
+        $request = Request::create($uri, 'GET', array(), array(), array(), $server);
+
+        $this->assertSame($expectedBaseUrl, $request->getBaseUrl(), 'baseUrl');
+        $this->assertSame($expectedPathInfo, $request->getPathInfo(), 'pathInfo');
+    }
+
+    public function getBaseUrlData()
+    {
+        return array(
+            array(
+                '/foobar/index.php',
+                array(
+                    'SCRIPT_FILENAME' => '/foo/bar/web/index.php',
+                    'SCRIPT_NAME'     => '/web/index.php',
+                    'PHP_SELF'        => '/web/index.php',
+                ),
+                '',
+                '/foobar/index.php',
+            ),
+        );
+    }
 }
 
 class RequestContentProxy extends Request

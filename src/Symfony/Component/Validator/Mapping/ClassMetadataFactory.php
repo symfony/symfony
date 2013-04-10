@@ -49,7 +49,7 @@ class ClassMetadataFactory implements MetadataFactoryInterface
     public function getMetadataFor($value)
     {
         if (!is_object($value) && !is_string($value)) {
-            throw new NoSuchMetadataException('Cannot create metadata for non-objects. Got: '.gettype($value));
+            throw new NoSuchMetadataException(sprintf('Cannot create metadata for non-objects. Got: %s', gettype($value)));
         }
 
         $class = ltrim(is_object($value) ? get_class($value) : $value, '\\');
@@ -63,7 +63,7 @@ class ClassMetadataFactory implements MetadataFactoryInterface
         }
 
         if (!class_exists($class) && !interface_exists($class)) {
-            throw new NoSuchMetadataException('The class or interface "'.$class.'" does not exist.');
+            throw new NoSuchMetadataException(sprintf('The class or interface "%s" does not exist.', $class));
         }
 
         $metadata = new ClassMetadata($class);

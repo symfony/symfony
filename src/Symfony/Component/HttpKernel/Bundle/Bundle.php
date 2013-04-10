@@ -171,6 +171,9 @@ abstract class Bundle extends ContainerAware implements BundleInterface
      * * Commands are in the 'Command' sub-directory
      * * Commands extend Symfony\Component\Console\Command\Command
      *
+     * If your commands follow these conventions but are registered in another way, override
+     * Bundle::autoRegisterCommands instead.
+     *
      * @param Application $application An Application instance
      */
     public function registerCommands(Application $application)
@@ -193,5 +196,18 @@ abstract class Bundle extends ContainerAware implements BundleInterface
                 $application->add($r->newInstance());
             }
         }
+    }
+
+    /**
+     * Returns whether this bundle's Bundle::registerCommands method should be called. If true, registerCommands should
+     * add all commands of the bundle to the application.
+     *
+     * Override this method and return false if you are using an alternative way for registering commands.
+     *
+     * @return bool
+     */
+    public function autoRegisterCommands()
+    {
+        return true;
     }
 }

@@ -83,7 +83,7 @@ class Application extends BaseApplication
         $this->kernel->boot();
 
         foreach ($this->kernel->getBundles() as $bundle) {
-            if ($bundle instanceof Bundle) {
+            if ($bundle instanceof Bundle && $bundle->autoRegisterCommands()) {
                 $bundle->registerCommands($this);
             }
         }

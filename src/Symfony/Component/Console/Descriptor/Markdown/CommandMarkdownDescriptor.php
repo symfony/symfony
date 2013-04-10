@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Descriptor\Markdown;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Descriptor\CommandDescription;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -23,20 +24,19 @@ class CommandMarkdownDescriptor extends AbstractMarkdownDescriptor
      */
     public function getDocument($object)
     {
+        /** @var Command $object */
+        $description = new CommandDescription($object);
         $definitionDescriptor = new InputDefinitionMarkdownDescriptor();
 
-        $object->getProcessedHelp();
-
-        /** @var Command $object */
         return new Document\Document(array(
-            new Document\Title($object->getName(), 2),
+            new Document\Title($description->getName(), 2),
             new Document\UnorderedList(array(
-                'Description: '.($object->getDescription() ?: '<none>'),
-                'Usage: `'.$object->getSynopsis().'`',
-                'Aliases: '.(count($object->getAliases()) ? '`'.implode('`, `', $object->getAliases()).'`' : '<none>'),
+                'Description: '.($description->getDescription() ?: '<none>'),
+                'Usage: `'.$description->getSynopsis().'`',
+                'Aliases: '.(count($description->getAliases()) ? '`'.implode('`, `', $description->getAliases()).'`' : '<none>'),
             )),
-            new Document\Paragraph($object->getProcessedHelp()),
-            $definitionDescriptor->getDocument($object->getDefinition()),
+            new Document\Paragraph($description->getHelp()),
+            $definitionDescriptor->getDocument($description->getDefinition()),
         ));
     }
 

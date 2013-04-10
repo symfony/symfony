@@ -39,8 +39,8 @@ abstract class AbstractDescriptionCommand extends Command
     protected function createDefinition()
     {
         return new InputDefinition(array(
-            new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output help in other formats'),
-            new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
+            new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output help in other formats.'),
+            new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list.'),
         ));
     }
 

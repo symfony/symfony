@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Descriptor\Xml;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Descriptor\CommandDescription;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -27,26 +28,28 @@ class CommandXmlDescriptor extends AbstractXmlDescriptor
         $parent->appendChild($commandXML = $dom->createElement('command'));
 
         /** @var Command $object */
-        $commandXML->setAttribute('id', $object->getName());
-        $commandXML->setAttribute('name', $object->getName());
+        $description = new CommandDescription($object);
+        
+        $commandXML->setAttribute('id', $description->getName());
+        $commandXML->setAttribute('name', $description->getName());
 
         $commandXML->appendChild($usageXML = $dom->createElement('usage'));
-        $usageXML->appendChild($dom->createTextNode(sprintf($object->getSynopsis(), '')));
+        $usageXML->appendChild($dom->createTextNode(sprintf($description->getSynopsis(), '')));
 
         $commandXML->appendChild($descriptionXML = $dom->createElement('description'));
-        $descriptionXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $object->getDescription())));
+        $descriptionXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $description->getDescription())));
 
         $commandXML->appendChild($helpXML = $dom->createElement('help'));
-        $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $object->getProcessedHelp())));
+        $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $description->getHelp())));
 
         $commandXML->appendChild($aliasesXML = $dom->createElement('aliases'));
-        foreach ($object->getAliases() as $alias) {
+        foreach ($description->getAliases() as $alias) {
             $aliasesXML->appendChild($aliasXML = $dom->createElement('alias'));
             $aliasXML->appendChild($dom->createTextNode($alias));
         }
 
         $descriptor = new InputDefinitionXmlDescriptor();
-        $descriptor->buildDocument($commandXML, $object->getDefinition());
+        $descriptor->buildDocument($commandXML, $description->getDefinition());
     }
 
     /**

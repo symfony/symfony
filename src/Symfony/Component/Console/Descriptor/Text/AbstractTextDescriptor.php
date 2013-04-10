@@ -82,7 +82,7 @@ abstract class AbstractTextDescriptor implements DescriptorInterface
      */
     public function useFormatting()
     {
-        return false;
+        return true;
     }
 
     protected function formatDefaultValue($default)

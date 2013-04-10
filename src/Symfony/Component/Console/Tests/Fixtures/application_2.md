@@ -47,7 +47,7 @@ To display the list of available commands, please use the <info>list</info> comm
 * Accept value: yes
 * Is value required: yes
 * Is multiple: no
-* Description: To output help in other formats
+* Description: To output help in other formats.
 * Default: `NULL`
 
 **raw:**
@@ -57,7 +57,7 @@ To display the list of available commands, please use the <info>list</info> comm
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: To output raw command list
+* Description: To output raw command list.
 * Default: `false`
 
 list
@@ -102,7 +102,7 @@ It's also possible to get raw list of commands (useful for embedding command run
 * Accept value: yes
 * Is value required: yes
 * Is multiple: no
-* Description: To output help in other formats
+* Description: To output help in other formats.
 * Default: `NULL`
 
 **raw:**
@@ -112,7 +112,7 @@ It's also possible to get raw list of commands (useful for embedding command run
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: To output raw command list
+* Description: To output raw command list.
 * Default: `false`
 
 descriptor:command1

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Descriptor\Json;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Descriptor\CommandDescription;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -24,15 +25,16 @@ class CommandJsonDescriptor extends AbstractJsonDescriptor
     public function getData($object)
     {
         $definitionDescriptor = new InputDefinitionJsonDescriptor();
-
         /** @var Command $object */
+        $description = new CommandDescription($object);
+
         return array(
-            'name'        => $object->getName(),
-            'usage'       => $object->getSynopsis(),
-            'description' => $object->getDescription(),
-            'help'        => $object->getProcessedHelp(),
-            'aliases'     => $object->getAliases(),
-            'definition'  => $definitionDescriptor->getData($object->getDefinition()),
+            'name'        => $description->getName(),
+            'usage'       => $description->getSynopsis(),
+            'description' => $description->getDescription(),
+            'help'        => $description->getHelp(),
+            'aliases'     => $description->getAliases(),
+            'definition'  => $definitionDescriptor->getData($description->getDefinition()),
         );
     }
 

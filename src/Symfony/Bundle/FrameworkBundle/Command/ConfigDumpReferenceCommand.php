@@ -109,13 +109,11 @@ EOF
         $configuration = $extension->getConfiguration(array(), $containerBuilder);
 
         if (!$configuration) {
-            throw new \LogicException('The extension with alias "'.$extension->getAlias().
-                    '" does not have it\'s getConfiguration() method setup');
+            throw new \LogicException(sprintf('The extension with alias "%s" does not have it\'s getConfiguration() method setup', $extension->getAlias()));
         }
 
         if (!$configuration instanceof ConfigurationInterface) {
-            throw new \LogicException(sprintf(
-                'Configuration class "%s" should implement ConfigurationInterface in order to be dumpable', get_class($configuration)));
+            throw new \LogicException(sprintf('Configuration class "%s" should implement ConfigurationInterface in order to be dumpable', get_class($configuration)));
         }
 
         $output->writeln($message);

@@ -143,7 +143,7 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         // start the session
-        if (!session_start()) {
+        if ('' == session_id() && !session_start()) {
             throw new \RuntimeException('Failed to start the session');
         }
 

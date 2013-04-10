@@ -114,9 +114,8 @@ EOF
         }
 
         if (!$configuration instanceof ConfigurationInterface) {
-            throw new \LogicException(
-                'Configuration class "'.get_class($configuration).
-                '" should implement ConfigurationInterface in order to be dumpable');
+            throw new \LogicException(sprintf(
+                'Configuration class "%s" should implement ConfigurationInterface in order to be dumpable', get_class($configuration)));
         }
 
         $output->writeln($message);

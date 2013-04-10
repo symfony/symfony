@@ -54,7 +54,7 @@ class GnuFindAdapter extends AbstractFindAdapter
                 $format = '%T@';
                 break;
             default:
-                throw new \InvalidArgumentException('Unknown sort options: '.$sort.'.');
+                throw new \InvalidArgumentException(sprintf('Unknown sort options: %s.', $sort));
         }
 
         $command

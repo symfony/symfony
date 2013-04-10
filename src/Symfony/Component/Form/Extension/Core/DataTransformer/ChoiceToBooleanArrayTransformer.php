@@ -98,7 +98,7 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
                 if (isset($choices[$i])) {
                     return $choices[$i] === '' ? null : $choices[$i];
                 } else {
-                    throw new TransformationFailedException('The choice "'.$i.'" does not exist');
+                    throw new TransformationFailedException(sprintf('The choice "%s" does not exist', $i));
                 }
             }
         }

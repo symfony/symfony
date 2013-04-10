@@ -84,7 +84,7 @@ EOF
             }
 
             if (!$extension) {
-                throw new \LogicException('No extensions with configuration available for "'.$name.'"');
+                throw new \LogicException(sprintf('No extensions with configuration available for "%s"', $name));
             }
 
             $message = 'Default configuration for "'.$name.'"';
@@ -100,7 +100,7 @@ EOF
             }
 
             if (!$extension) {
-                throw new \LogicException('No extension with alias "'.$name.'" is enabled');
+                throw new \LogicException(sprintf('No extension with alias "%s" is enabled', $name));
             }
 
             $message = 'Default configuration for extension with alias: "'.$name.'"';

@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
  * ErrorHandler.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Konstantin Myakshin <koc-dp@yandex.ru>
  */
 class ErrorHandler
 {
@@ -43,8 +44,10 @@ class ErrorHandler
 
     private $reservedMemory;
 
-    /** @var LoggerInterface */
-    private static $logger;
+    /**
+     * @var LoggerInterface[] Loggers for channels
+     */
+    private static $loggers = array();
 
     /**
      * Registers the error handler.
@@ -71,9 +74,9 @@ class ErrorHandler
         $this->level = null === $level ? error_reporting() : $level;
     }
 
-    public static function setLogger(LoggerInterface $logger)
+    public static function setLogger($channel, LoggerInterface $logger)
     {
-        self::$logger = $logger;
+        self::$loggers[$channel] = $logger;
     }
 
     /**
@@ -86,7 +89,7 @@ class ErrorHandler
         }
 
         if ($level & (E_USER_DEPRECATED | E_DEPRECATED)) {
-            if (null !== self::$logger) {
+            if (isset(self::$loggers['deprecation'])) {
                 if (version_compare(PHP_VERSION, '5.4', '<')) {
                     $stack = array_map(
                         function ($row) {
@@ -99,7 +102,7 @@ class ErrorHandler
                     $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
                 }
 
-                self::$logger->warning($message, array('type' => self::TYPE_DEPRECATION, 'stack' => $stack));
+                self::$loggers['deprecation']->warning($message, array('type' => self::TYPE_DEPRECATION, 'stack' => $stack));
             }
 
             return true;
@@ -122,6 +125,16 @@ class ErrorHandler
         $type = $error['type'];
         if (0 === $this->level || !in_array($type, array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE))) {
             return;
+        }
+
+        if (isset(self::$loggers['emergency'])) {
+            $fatal = array(
+                'type' => $type,
+                'file' => $error['file'],
+                'line' => $error['line'],
+            );
+
+            self::$loggers['emergency']->emerg($error['message'], $fatal);
         }
 
         // get current exception handler

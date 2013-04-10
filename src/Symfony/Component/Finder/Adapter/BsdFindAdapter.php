@@ -62,7 +62,7 @@ class BsdFindAdapter extends AbstractFindAdapter
                 $format = '%m';
                 break;
             default:
-                throw new \InvalidArgumentException('Unknown sort options: '.$sort.'.');
+                throw new \InvalidArgumentException(sprintf('Unknown sort options: %s.', $sort));
         }
 
         $command

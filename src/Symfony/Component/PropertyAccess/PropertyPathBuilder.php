@@ -97,7 +97,7 @@ class PropertyPathBuilder
     public function remove($offset, $length = 1)
     {
         if (!isset($this->elements[$offset])) {
-            throw new OutOfBoundsException('The offset '.$offset.' is not within the property path');
+            throw new OutOfBoundsException(sprintf('The offset %s is not within the property path', $offset));
         }
 
         $this->resize($offset, $length, 0);
@@ -119,7 +119,7 @@ class PropertyPathBuilder
     public function replace($offset, $length, PropertyPathInterface $path, $pathOffset = 0, $pathLength = 0)
     {
         if (!isset($this->elements[$offset])) {
-            throw new OutOfBoundsException('The offset '.$offset.' is not within the property path');
+            throw new OutOfBoundsException(sprintf('The offset %s is not within the property path', $offset));
         }
 
         if (0 === $pathLength) {
@@ -145,7 +145,7 @@ class PropertyPathBuilder
     public function replaceByIndex($offset, $name = null)
     {
         if (!isset($this->elements[$offset])) {
-            throw new OutOfBoundsException('The offset '.$offset.' is not within the property path');
+            throw new OutOfBoundsException(sprintf('The offset %s is not within the property path', $offset));
         }
 
         if (null !== $name) {
@@ -166,7 +166,7 @@ class PropertyPathBuilder
     public function replaceByProperty($offset, $name = null)
     {
         if (!isset($this->elements[$offset])) {
-            throw new OutOfBoundsException('The offset '.$offset.' is not within the property path');
+            throw new OutOfBoundsException(sprintf('The offset %s is not within the property path', $offset));
         }
 
         if (null !== $name) {

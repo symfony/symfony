@@ -345,13 +345,13 @@ class ChoiceList implements ChoiceListInterface
         $index = $this->createIndex($choice);
 
         if ('' === $index || null === $index || !FormConfigBuilder::isValidName((string) $index)) {
-            throw new InvalidConfigurationException('The index "'.$index.'" created by the choice list is invalid. It should be a valid, non-empty Form name.');
+            throw new InvalidConfigurationException(sprintf('The index "%s" created by the choice list is invalid. It should be a valid, non-empty Form name.', $index));
         }
 
         $value = $this->createValue($choice);
 
         if (!is_string($value)) {
-            throw new InvalidConfigurationException('The value created by the choice list is of type "'.gettype($value).'", but should be a string.');
+            throw new InvalidConfigurationException(sprintf('The value created by the choice list is of type "%s", but should be a string.', gettype($value)));
         }
 
         $view = new ChoiceView($choice, $value, $label);

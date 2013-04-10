@@ -141,7 +141,7 @@ abstract class LazyChoiceList implements ChoiceListInterface
         $choiceList = $this->loadChoiceList();
 
         if (!$choiceList instanceof ChoiceListInterface) {
-            throw new Exception('loadChoiceList() should return a ChoiceListInterface instance. Got '.gettype($choiceList));
+            throw new Exception(sprintf('loadChoiceList() should return a ChoiceListInterface instance. Got %s', gettype($choiceList)));
         }
 
         $this->choiceList = $choiceList;

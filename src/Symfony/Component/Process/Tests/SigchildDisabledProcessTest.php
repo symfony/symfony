@@ -128,12 +128,9 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
         parent::testProcessWithoutTermSignalIsNotSignaled();
     }
 
-    /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
-     */
     public function testStopWithTimeoutIsActuallyWorking()
     {
-        parent::testStopWithTimeoutIsActuallyWorking();
+        $this->markTestSkipped('Stopping with signal is not supported in sigchild environment');
     }
 
     /**

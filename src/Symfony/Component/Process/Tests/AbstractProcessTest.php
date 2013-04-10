@@ -50,9 +50,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $this->markTestSkipped('Stop with timeout does not work on windows, it requires posix signals');
         }
-        if (!function_exists('pcntl_signal')) {
-            $this->markTestSkipped('This test require pcntl_signal function');
-        }
 
         // exec is mandatory here since we send a signal to the process
         // see https://github.com/symfony/symfony/issues/5030 about prepending

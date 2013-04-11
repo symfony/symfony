@@ -16,19 +16,23 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 
 /**
- * Provides a stub Locale for the 'en' locale.
+ * Replacement for PHP's native {@link \Locale} class.
+ *
+ * The only method supported in this class is {@link getDefault}. This method
+ * will always return "en". All other methods will throw an exception when used.
  *
  * @author Eriksen Costa <eriksen.costa@infranology.com.br>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class StubLocale
 {
     const DEFAULT_LOCALE = null;
 
-    /** Locale method constants */
+    /* Locale method constants */
     const ACTUAL_LOCALE = 0;
     const VALID_LOCALE  = 1;
 
-    /** Language tags constants */
+    /* Language tags constants */
     const LANG_TAG               = 'language';
     const EXTLANG_TAG            = 'extlang';
     const SCRIPT_TAG             = 'script';
@@ -38,7 +42,7 @@ class StubLocale
     const PRIVATE_TAG            = 'private';
 
     /**
-     * Returns the best available locale based on HTTP "Accept-Language" header according to RFC 2616
+     * Not supported. Returns the best available locale based on HTTP "Accept-Language" header according to RFC 2616
      *
      * @param string $header The string containing the "Accept-Language" header value
      *
@@ -54,7 +58,7 @@ class StubLocale
     }
 
     /**
-     * Returns a correctly ordered and delimited locale code
+     * Not supported. Returns a correctly ordered and delimited locale code
      *
      * @param array $subtags A keyed array where the keys identify the particular locale code subtag
      *
@@ -70,7 +74,7 @@ class StubLocale
     }
 
     /**
-     * Checks if a language tag filter matches with locale
+     * Not supported. Checks if a language tag filter matches with locale
      *
      * @param string  $langtag      The language tag to check
      * @param string  $locale       The language range to check against
@@ -88,7 +92,7 @@ class StubLocale
     }
 
     /**
-     * Returns the variants for the input locale
+     * Not supported. Returns the variants for the input locale
      *
      * @param string $locale The locale to extract the variants from
      *
@@ -109,8 +113,6 @@ class StubLocale
      * @return string The default locale code. Always returns 'en'
      *
      * @see http://www.php.net/manual/en/locale.getdefault.php
-     *
-     * @throws MethodNotImplementedException
      */
     public static function getDefault()
     {
@@ -118,7 +120,7 @@ class StubLocale
     }
 
     /**
-     * Returns the localized display name for the locale language
+     * Not supported. Returns the localized display name for the locale language
      *
      * @param string $locale   The locale code to return the display language from
      * @param string $inLocale Optional format locale code to use to display the language name
@@ -135,7 +137,7 @@ class StubLocale
     }
 
     /**
-     * Returns the localized display name for the locale
+     * Not supported. Returns the localized display name for the locale
      *
      * @param string $locale   The locale code to return the display locale name from
      * @param string $inLocale Optional format locale code to use to display the locale name
@@ -152,7 +154,7 @@ class StubLocale
     }
 
     /**
-     * Returns the localized display name for the locale region
+     * Not supported. Returns the localized display name for the locale region
      *
      * @param string $locale   The locale code to return the display region from
      * @param string $inLocale Optional format locale code to use to display the region name
@@ -169,7 +171,7 @@ class StubLocale
     }
 
     /**
-     * Returns the localized display name for the locale script
+     * Not supported. Returns the localized display name for the locale script
      *
      * @param string $locale   The locale code to return the display script from
      * @param string $inLocale Optional format locale code to use to display the script name
@@ -186,7 +188,7 @@ class StubLocale
     }
 
     /**
-     * Returns the localized display name for the locale variant
+     * Not supported. Returns the localized display name for the locale variant
      *
      * @param string $locale   The locale code to return the display variant from
      * @param string $inLocale Optional format locale code to use to display the variant name
@@ -203,7 +205,7 @@ class StubLocale
     }
 
     /**
-     * Returns the keywords for the locale
+     * Not supported. Returns the keywords for the locale
      *
      * @param string $locale The locale code to extract the keywords from
      *
@@ -219,7 +221,7 @@ class StubLocale
     }
 
     /**
-     * Returns the primary language for the locale
+     * Not supported. Returns the primary language for the locale
      *
      * @param string $locale The locale code to extract the language code from
      *
@@ -235,7 +237,7 @@ class StubLocale
     }
 
     /**
-     * Returns the region for the locale
+     * Not supported. Returns the region for the locale
      *
      * @param string $locale The locale code to extract the region code from
      *
@@ -251,7 +253,7 @@ class StubLocale
     }
 
     /**
-     * Returns the script for the locale
+     * Not supported. Returns the script for the locale
      *
      * @param string $locale The locale code to extract the script code from
      *
@@ -267,7 +269,7 @@ class StubLocale
     }
 
     /**
-     * Returns the closest language tag for the locale
+     * Not supported. Returns the closest language tag for the locale
      *
      * @param array   $langtag      A list of the language tags to compare to locale
      * @param string  $locale       The locale to use as the language range when matching
@@ -284,7 +286,7 @@ class StubLocale
     }
 
     /**
-     * Returns an associative array of locale identifier subtags
+     * Not supported. Returns an associative array of locale identifier subtags
      *
      * @param string $locale The locale code to extract the subtag array from
      *
@@ -300,7 +302,7 @@ class StubLocale
     }
 
     /**
-     * Sets the default runtime locale
+     * Not supported. Sets the default runtime locale
      *
      * @param string $locale The locale code
      *

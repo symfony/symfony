@@ -17,13 +17,23 @@ use Symfony\Component\Intl\Globals\StubIntlGlobals;
 use Symfony\Component\Intl\Locale\StubLocale;
 
 /**
- * Provides a stub Collator for the 'en' locale.
+ * Replacement for PHP's native {@link \Collator} class.
+ *
+ * The only methods currently supported in this class are:
+ *
+ *  - {@link \__construct}
+ *  - {@link create}
+ *  - {@link asort}
+ *  - {@link getErrorCode}
+ *  - {@link getErrorMessage}
+ *  - {@link getLocale}
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class StubCollator
 {
-    /** Attribute constants */
+    /* Attribute constants */
     const FRENCH_COLLATION = 0;
     const ALTERNATE_HANDLING = 1;
     const CASE_FIRST = 2;
@@ -33,7 +43,7 @@ class StubCollator
     const HIRAGANA_QUATERNARY_MODE = 6;
     const NUMERIC_COLLATION = 7;
 
-    /** Attribute constants values */
+    /* Attribute constants values */
     const DEFAULT_VALUE = -1;
 
     const PRIMARY = 0;
@@ -52,7 +62,7 @@ class StubCollator
     const LOWER_FIRST = 24;
     const UPPER_FIRST = 25;
 
-    /** Sorting options */
+    /* Sorting options */
     const SORT_REGULAR = 0;
     const SORT_NUMERIC = 2;
     const SORT_STRING = 1;
@@ -60,25 +70,25 @@ class StubCollator
     /**
      * Constructor
      *
-     * @param string $locale The locale code
+     * @param string $locale The locale code. The only currently supported locale is "en".
      *
-     * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
+     * @throws MethodArgumentValueNotImplementedException  When $locale different than "en" is passed
      */
     public function __construct($locale)
     {
         if ('en' != $locale) {
-            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the \'en\' locale is supported');
+            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the locale "en" is supported');
         }
     }
 
     /**
      * Static constructor
      *
-     * @param string $locale The locale code
+     * @param string $locale The locale code. The only currently supported locale is "en".
      *
      * @return StubCollator
      *
-     * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
+     * @throws MethodArgumentValueNotImplementedException  When $locale different than "en" is passed
      */
     public static function create($locale)
     {
@@ -110,7 +120,7 @@ class StubCollator
     }
 
     /**
-     * Compare two Unicode strings
+     * Not supported. Compare two Unicode strings
      *
      * @param string $str1 The first string to compare
      * @param string $str2 The second string to compare
@@ -130,7 +140,7 @@ class StubCollator
     }
 
     /**
-     * Get a value of an integer collator attribute
+     * Not supported. Get a value of an integer collator attribute
      *
      * @param int $attr An attribute specifier, one of the attribute constants
      *
@@ -168,9 +178,10 @@ class StubCollator
     /**
      * Returns the collator's locale
      *
-     * @param int $type The locale name type to return between valid or actual (StubLocale::VALID_LOCALE or StubLocale::ACTUAL_LOCALE, respectively)
+     * @param int $type Not supported. The locale name type to return (Locale::VALID_LOCALE or Locale::ACTUAL_LOCALE)
      *
-     * @return string The locale name used to create the collator
+     * @return string The locale used to create the collator. Currently always
+     *                returns "en".
      */
     public function getLocale($type = StubLocale::ACTUAL_LOCALE)
     {
@@ -178,7 +189,7 @@ class StubCollator
     }
 
     /**
-     * Get sorting key for a string
+     * Not supported. Get sorting key for a string
      *
      * @param string $string The string to produce the key from
      *
@@ -194,7 +205,7 @@ class StubCollator
     }
 
     /**
-     * Get current collator's strength
+     * Not supported. Get current collator's strength
      *
      * @return Boolean|int   The current collator's strength or false on failure
      *
@@ -208,7 +219,7 @@ class StubCollator
     }
 
     /**
-     * Set a collator's attribute
+     * Not supported. Set a collator's attribute
      *
      * @param int $attr An attribute specifier, one of the attribute constants
      * @param int $val  The attribute value, one of the attribute value constants
@@ -225,7 +236,7 @@ class StubCollator
     }
 
     /**
-     * Set the collator's strength
+     * Not supported. Set the collator's strength
      *
      * @param int $strength Strength to set, possible values:
      *                           StubCollator::PRIMARY
@@ -247,7 +258,7 @@ class StubCollator
     }
 
     /**
-     * Sort array using specified collator and sort keys
+     * Not supported. Sort array using specified collator and sort keys
      *
      * @param  array   &$arr   Array of strings to sort
      *
@@ -263,7 +274,7 @@ class StubCollator
     }
 
     /**
-     * Sort array using specified collator
+     * Not supported. Sort array using specified collator
      *
      * @param  array   &$arr       Array of string to sort
      * @param int $sortFlag Optional sorting type, one of the following:

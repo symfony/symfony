@@ -20,13 +20,27 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Locale\StubLocale;
 
 /**
- * Provides a stub NumberFormatter for the 'en' locale.
+ * Replacement for PHP's native {@link \NumberFormatter} class.
+ *
+ * The only methods currently supported in this class are:
+ *
+ *  - {@link __construct}
+ *  - {@link create}
+ *  - {@link formatCurrency}
+ *  - {@link format}
+ *  - {@link getAttribute}
+ *  - {@link getErrorCode}
+ *  - {@link getErrorMessage}
+ *  - {@link getLocale}
+ *  - {@link parse}
+ *  - {@link setAttribute}
  *
  * @author Eriksen Costa <eriksen.costa@infranology.com.br>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class StubNumberFormatter
 {
-    /** Format style constants */
+    /* Format style constants */
     const PATTERN_DECIMAL   = 0;
     const DECIMAL           = 1;
     const CURRENCY          = 2;
@@ -39,14 +53,14 @@ class StubNumberFormatter
     const IGNORE            = 0;
     const DEFAULT_STYLE     = 1;
 
-    /** Format type constants */
+    /* Format type constants */
     const TYPE_DEFAULT  = 0;
     const TYPE_INT32    = 1;
     const TYPE_INT64    = 2;
     const TYPE_DOUBLE   = 3;
     const TYPE_CURRENCY = 4;
 
-    /** Numeric attribute constants */
+    /* Numeric attribute constants */
     const PARSE_INT_ONLY          = 0;
     const GROUPING_USED           = 1;
     const DECIMAL_ALWAYS_SHOWN    = 2;
@@ -68,7 +82,7 @@ class StubNumberFormatter
     const MAX_SIGNIFICANT_DIGITS  = 18;
     const LENIENT_PARSE           = 19;
 
-    /** Text attribute constants */
+    /* Text attribute constants */
     const POSITIVE_PREFIX   = 0;
     const POSITIVE_SUFFIX   = 1;
     const NEGATIVE_PREFIX   = 2;
@@ -78,7 +92,7 @@ class StubNumberFormatter
     const DEFAULT_RULESET   = 6;
     const PUBLIC_RULESETS   = 7;
 
-    /** Format symbol constants */
+    /* Format symbol constants */
     const DECIMAL_SEPARATOR_SYMBOL           = 0;
     const GROUPING_SEPARATOR_SYMBOL          = 1;
     const PATTERN_SEPARATOR_SYMBOL           = 2;
@@ -98,7 +112,7 @@ class StubNumberFormatter
     const SIGNIFICANT_DIGIT_SYMBOL           = 16;
     const MONETARY_GROUPING_SEPARATOR_SYMBOL = 17;
 
-    /** Rounding mode values used by NumberFormatter::setAttribute() with NumberFormatter::ROUNDING_MODE attribute */
+    /* Rounding mode values used by NumberFormatter::setAttribute() with NumberFormatter::ROUNDING_MODE attribute */
     const ROUND_CEILING  = 0;
     const ROUND_FLOOR    = 1;
     const ROUND_DOWN     = 2;
@@ -107,7 +121,7 @@ class StubNumberFormatter
     const ROUND_HALFDOWN = 5;
     const ROUND_HALFUP   = 6;
 
-    /** Pad position values used by NumberFormatter::setAttribute() with NumberFormatter::PADDING_POSITION attribute */
+    /* Pad position values used by NumberFormatter::setAttribute() with NumberFormatter::PADDING_POSITION attribute */
     const PAD_BEFORE_PREFIX = 0;
     const PAD_AFTER_PREFIX  = 1;
     const PAD_BEFORE_SUFFIX = 2;
@@ -126,11 +140,6 @@ class StubNumberFormatter
      * @var string
      */
     protected $errorMessage = 'U_ZERO_ERROR';
-
-    /**
-     * @var string
-     */
-    private $locale;
 
     /**
      * @var int
@@ -224,26 +233,28 @@ class StubNumberFormatter
     );
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param string $locale  The locale code
-     * @param int    $style   Style of the formatting, one of the format style constants
-     * @param string $pattern A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
-     *                           NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
-     *                           described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
+     * @param string $locale  The locale code. The only currently supported locale is "en".
+     * @param int    $style   Style of the formatting, one of the format style constants.
+     *                        The only supported styles are NumberFormatter::DECIMAL
+     *                        and NumberFormatter::CURRENCY.
+     * @param string $pattern Not supported. A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
+     *                        NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
+     *                        described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
      *
      * @see http://www.php.net/manual/en/numberformatter.create.php
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
      *
-     * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
+     * @throws MethodArgumentValueNotImplementedException  When $locale different than "en" is passed
      * @throws MethodArgumentValueNotImplementedException  When the $style is not supported
      * @throws MethodArgumentNotImplementedException       When the pattern value is different than null
      */
     public function __construct($locale = 'en', $style = null, $pattern = null)
     {
         if ('en' != $locale) {
-            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the \'en\' locale is supported');
+            throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the locale "en" is supported');
         }
 
         if (!in_array($style, self::$supportedStyles)) {
@@ -255,18 +266,19 @@ class StubNumberFormatter
             throw new MethodArgumentNotImplementedException(__METHOD__, 'pattern');
         }
 
-        $this->locale = $locale;
         $this->style  = $style;
     }
 
     /**
-     * Static constructor
+     * Static constructor.
      *
-     * @param string $locale  The locale code
-     * @param int    $style   Style of the formatting, one of the format style constants
-     * @param string $pattern A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
-     *                           NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
-     *                           described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
+     * @param string $locale  The locale code. The only supported locale is "en".
+     * @param int    $style   Style of the formatting, one of the format style constants.
+     *                        The only currently supported styles are NumberFormatter::DECIMAL
+     *                        and NumberFormatter::CURRENCY.
+     * @param string $pattern Not supported. A pattern string in case $style is NumberFormat::PATTERN_DECIMAL or
+     *                        NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
+     *                        described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
      *
      * @return StubNumberFormatter
      *
@@ -274,7 +286,7 @@ class StubNumberFormatter
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
      *
-     * @throws MethodArgumentValueNotImplementedException  When $locale different than 'en' is passed
+     * @throws MethodArgumentValueNotImplementedException  When $locale different than "en" is passed
      * @throws MethodArgumentValueNotImplementedException  When the $style is not supported
      * @throws MethodArgumentNotImplementedException       When the pattern value is different than null
      */
@@ -322,14 +334,15 @@ class StubNumberFormatter
      * Format a number
      *
      * @param number $value The value to format
-     * @param int    $type  Type of the formatting, one of the format type constants
+     * @param int    $type  Type of the formatting, one of the format type constants.
+     *                      Only type NumberFormatter::TYPE_DEFAULT is currently supported.
      *
-     * @return Boolean|string                         The formatted value or false on error
+     * @return Boolean|string The formatted value or false on error
      *
      * @see http://www.php.net/manual/en/numberformatter.format.php
      *
-     * @throws \RuntimeException                       If the method is called with the class $style 'CURRENCY'
-     * @throws MethodArgumentNotImplementedException  If the $type is different than TYPE_DEFAULT
+     * @throws NotImplementedException                    If the method is called with the class $style 'CURRENCY'
+     * @throws MethodArgumentValueNotImplementedException If the $type is different than TYPE_DEFAULT
      */
     public function format($value, $type = self::TYPE_DEFAULT)
     {
@@ -368,7 +381,7 @@ class StubNumberFormatter
      *
      * @param int $attr An attribute specifier, one of the numeric attribute constants
      *
-     * @return Boolean|int       The attribute value on success or false on error
+     * @return Boolean|int The attribute value on success or false on error
      *
      * @see http://www.php.net/manual/en/numberformatter.getattribute.php
      */
@@ -404,19 +417,22 @@ class StubNumberFormatter
     /**
      * Returns the formatter's locale
      *
-     * @param int $type The locale name type to return between valid or actual (StubLocale::VALID_LOCALE or StubLocale::ACTUAL_LOCALE, respectively)
+     * The parameter $type is currently ignored.
      *
-     * @return string The locale name used to create the formatter
+     * @param int $type Not supported. The locale name type to return (Locale::VALID_LOCALE or Locale::ACTUAL_LOCALE)
+     *
+     * @return string The locale used to create the formatter. Currently always
+     *                returns "en".
      *
      * @see http://www.php.net/manual/en/numberformatter.getlocale.php
      */
     public function getLocale($type = StubLocale::ACTUAL_LOCALE)
     {
-        return $this->locale;
+        return 'en';
     }
 
     /**
-     * Returns the formatter's pattern
+     * Not supported. Returns the formatter's pattern
      *
      * @return Boolean|string     The pattern string used by the formatter or false on error
      *
@@ -430,7 +446,7 @@ class StubNumberFormatter
     }
 
     /**
-     * Returns a formatter symbol value
+     * Not supported. Returns a formatter symbol value
      *
      * @param int $attr A symbol specifier, one of the format symbol constants
      *
@@ -446,7 +462,7 @@ class StubNumberFormatter
     }
 
     /**
-     * Returns a formatter text attribute value
+     * Not supported. Returns a formatter text attribute value
      *
      * @param int $attr An attribute specifier, one of the text attribute constants
      *
@@ -462,7 +478,7 @@ class StubNumberFormatter
     }
 
     /**
-     * Parse a currency number
+     * Not supported. Parse a currency number
      *
      * @param string $value    The value to parse
      * @param string $currency Parameter to receive the currency name (reference)
@@ -483,8 +499,10 @@ class StubNumberFormatter
      * Parse a number
      *
      * @param string $value    The value to parse
-     * @param int    $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
-     * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
+     * @param int    $type     Type of the formatting, one of the format type constants.
+     *                         The only currently supported types are NumberFormatter::TYPE_DOUBLE,
+     *                         NumberFormatter::TYPE_INT32 and NumberFormatter::TYPE_INT64.
+     * @param int    $position Not supported. Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
      * @return Boolean|string                               The parsed value of false on error
      *
@@ -529,8 +547,12 @@ class StubNumberFormatter
     /**
      * Set an attribute
      *
-     * @param int $attr  An attribute specifier, one of the numeric attribute constants
-     * @param int $value The attribute value
+     * @param int $attr  An attribute specifier, one of the numeric attribute constants.
+     *                   The only currently supported attributes are NumberFormatter::FRACTION_DIGITS,
+     *                   NumberFormatter::GROUPING_USED and NumberFormatter::ROUNDING_MODE.
+     * @param int $value The attribute value. The only currently supported rounding modes are
+     *                   NumberFormatter::ROUND_HALFEVEN, NumberFormatter::ROUND_HALFDOWN and
+     *                   NumberFormatter::ROUND_HALFUP.
      *
      * @return Boolean true on success or false on failure
      *
@@ -574,7 +596,7 @@ class StubNumberFormatter
     }
 
     /**
-     * Set the formatter's pattern
+     * Not supported. Set the formatter's pattern
      *
      * @param string $pattern A pattern string in conformance with the ICU DecimalFormat documentation
      *
@@ -591,7 +613,7 @@ class StubNumberFormatter
     }
 
     /**
-     * Set the formatter's symbol
+     * Not supported. Set the formatter's symbol
      *
      * @param int    $attr  A symbol specifier, one of the format symbol constants
      * @param string $value The value for the symbol
@@ -608,7 +630,7 @@ class StubNumberFormatter
     }
 
     /**
-     * Set a text attribute
+     * Not supported. Set a text attribute
      *
      * @param int $attr  An attribute specifier, one of the text attribute constants
      * @param int $value The attribute value

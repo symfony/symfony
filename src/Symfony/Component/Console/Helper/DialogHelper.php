@@ -102,7 +102,9 @@ class DialogHelper extends Helper
             $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
 
             // Read a keypress
-            while ($c = fread($inputStream, 1)) {
+            while (!feof($inputStream)) {
+                $c = fread($inputStream, 1);
+
                 // Backspace Character
                 if ("\177" === $c) {
                     if (0 === $numMatches && 0 !== $i) {

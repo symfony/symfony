@@ -15,24 +15,50 @@ use Symfony\Component\HttpKernel\Kernel;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-
-use FOS\UserBundle\DependencyInjection\OrmMappingBundleInterface;
 
 /**
  * Base class for the doctrine bundles to provide a compiler pass class that
- * helps to register doctrine mappings.
+ * helps to register doctrine mappings. For concrete implementations that are
+ * easy to use, see the RegisterXyMappingsPass classes in the DoctrineBundle
+ * resp. DoctrineMongodbBundle, DoctrineCouchdbBundle and DoctrinePhpcrBundle.
  *
  * @author David Buchmann <david@liip.ch>
  */
 abstract class RegisterMappingsPass implements CompilerPassInterface
 {
+    /**
+     * Hashmap of directory path ot namespace
+     * @var array
+     */
     protected $mappings;
-    protected $extension = '.orm.xml';
-    protected $managersParameter = 'doctrine.entity_managers';
-    protected $driverClass = 'Doctrine\ORM\Mapping\Driver\XmlDriver';
-    protected $driverPattern = 'doctrine.orm.%s_metadata_driver';
+    /**
+     * Mapping file extension, for example '.orm.xml'
+     * @var string
+     */
+    protected $extension;
+    /**
+     * Parameter name of the entity managers list in the service container.
+     * For example 'doctrine.entity_managers'
+     * @var string
+     */
+    protected $managersParameter;
+    /**
+     * Mapping driver class to use, for example 'Doctrine\ORM\Mapping\Driver\XmlDriver'
+     * @var string
+     */
+    protected $driverClass;
+    /**
+     * Naming pattern of the metadata service ids, for example 'doctrine.orm.%s_metadata_driver'
+     * @var string
+     */
+    protected $driverPattern;
+    /**
+     * A name for a parameter in the container. If set, this compiler pass will
+     * only do anything if the parameter is present. (But regardless of the
+     * value of that parameter.
+     * @var string
+     */
     protected $enabledParameter;
 
     /**
@@ -41,17 +67,11 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @param string $managersParameter service container parameter name for the managers list
      * @param string $driverClass       name of the mapping driver to instantiate
      * @param string $driverPattern     pattern to get the metadata driver service names
-     * @param string $enableParameter   service container parameter that must
-     *      be present to enable the mapping. Set to false to not do any check.
+     * @param string $enableParameter   service container parameter that must be
+     *      present to enable the mapping. Set to false to not do any check, optional.
      */
-    public function __construct(
-        array $mappings,
-        $extension,
-        $managersParameter,
-        $driverClass,
-        $driverPattern,
-        $enableParameter
-    ) {
+    public function __construct(array $mappings, $extension, $managersParameter, $driverClass, $driverPattern, $enableParameter = false)
+    {
         $this->mappings = $mappings;
         $this->extension = $extension;
         $this->managersParameter = $managersParameter;
@@ -67,7 +87,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (! $this->enabled($container)) {
+        if (!$this->enabled($container)) {
             return;
         }
 
@@ -84,7 +104,8 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     /**
      * Create the service definition for the metadata driver.
      *
-     * @param ContainerBuilder $container
+     * @param ContainerBuilder $container passed on in case an extending class
+     *      needs access to the container.
      *
      * @return Definition the metadata driver to add to all chain drivers
      */
@@ -96,17 +117,18 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     }
 
     /**
-     * Determine whether this mapping should be activated or not.
+     * Determine whether this mapping should be activated or not. This allows
+     * to take this decision with the container builder available.
      *
-     * Checks if the container contains the parameter with the name
-     * enabledParameter.
+     * This default implementation checks if the class has the enabledParameter
+     * configured and if so if that parameter is present in the container.
      *
      * @param ContainerBuilder $container
      *
-     * @return boolean whether this pass should register the mappings
+     * @return boolean whether this compiler pass really should register the mappings
      */
     protected function enabled(ContainerBuilder $container)
     {
-        return ! $this->enabledParameter || $container->hasParameter($this->enabledParameter);
+        return !$this->enabledParameter || $container->hasParameter($this->enabledParameter);
     }
 }

@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Intl\Tests\NumberFormatter;
 
-use Symfony\Component\Intl\Globals\StubIntlGlobals;
-use Symfony\Component\Intl\NumberFormatter\StubNumberFormatter;
+use Symfony\Component\Intl\Globals\IntlGlobals;
+use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 /**
  * Note that there are some values written like -2147483647 - 1. This is the lower 32bit int max and is a known
  * behavior of PHP.
  */
-class StubNumberFormatterTest extends AbstractNumberFormatterTest
+class NumberFormatterTest extends AbstractNumberFormatterTest
 {
     protected function setUp()
     {
@@ -33,7 +33,7 @@ class StubNumberFormatterTest extends AbstractNumberFormatterTest
      */
     public function testConstructorWithUnsupportedLocale()
     {
-        new StubNumberFormatter('pt_BR');
+        new NumberFormatter('pt_BR');
     }
 
     /**
@@ -41,7 +41,7 @@ class StubNumberFormatterTest extends AbstractNumberFormatterTest
      */
     public function testConstructorWithUnsupportedStyle()
     {
-        new StubNumberFormatter('en', StubNumberFormatter::PATTERN_DECIMAL);
+        new NumberFormatter('en', NumberFormatter::PATTERN_DECIMAL);
     }
 
     /**
@@ -49,7 +49,7 @@ class StubNumberFormatterTest extends AbstractNumberFormatterTest
      */
     public function testConstructorWithPatternDifferentThanNull()
     {
-        new StubNumberFormatter('en', StubNumberFormatter::DECIMAL, '');
+        new NumberFormatter('en', NumberFormatter::DECIMAL, '');
     }
 
     /**
@@ -57,8 +57,8 @@ class StubNumberFormatterTest extends AbstractNumberFormatterTest
      */
     public function testSetAttributeWithUnsupportedAttribute()
     {
-        $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
-        $formatter->setAttribute(StubNumberFormatter::LENIENT_PARSE, null);
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::LENIENT_PARSE, null);
     }
 
     /**
@@ -66,15 +66,15 @@ class StubNumberFormatterTest extends AbstractNumberFormatterTest
      */
     public function testSetAttributeInvalidRoundingMode()
     {
-        $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
-        $formatter->setAttribute(StubNumberFormatter::ROUNDING_MODE, null);
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, null);
     }
 
     public function testCreate()
     {
         $this->assertInstanceOf(
-            'Symfony\Component\Intl\NumberFormatter\StubNumberFormatter',
-            StubNumberFormatter::create('en', StubNumberFormatter::DECIMAL)
+            '\Symfony\Component\Intl\NumberFormatter\NumberFormatter',
+            NumberFormatter::create('en', NumberFormatter::DECIMAL)
         );
     }
 
@@ -145,7 +145,7 @@ class StubNumberFormatterTest extends AbstractNumberFormatterTest
      */
     public function testGetPattern()
     {
-        $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->getPattern();
     }
 
@@ -154,7 +154,7 @@ class StubNumberFormatterTest extends AbstractNumberFormatterTest
      */
     public function testGetSymbol()
     {
-        $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->getSymbol(null);
     }
 
@@ -163,14 +163,14 @@ class StubNumberFormatterTest extends AbstractNumberFormatterTest
      */
     public function testGetTextAttribute()
     {
-        $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->getTextAttribute(null);
     }
 
     public function testGetErrorCode()
     {
-        $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
-        $this->assertEquals(StubIntlGlobals::U_ZERO_ERROR, $formatter->getErrorCode());
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
+        $this->assertEquals(IntlGlobals::U_ZERO_ERROR, $formatter->getErrorCode());
     }
 
     /**
@@ -178,7 +178,7 @@ class StubNumberFormatterTest extends AbstractNumberFormatterTest
      */
     public function testParseCurrency()
     {
-        $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parseCurrency(null, $currency);
     }
 
@@ -195,7 +195,7 @@ class StubNumberFormatterTest extends AbstractNumberFormatterTest
      */
     public function testSetPattern()
     {
-        $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setPattern(null);
     }
 
@@ -204,7 +204,7 @@ class StubNumberFormatterTest extends AbstractNumberFormatterTest
      */
     public function testSetSymbol()
     {
-        $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setSymbol(null, null);
     }
 
@@ -213,27 +213,27 @@ class StubNumberFormatterTest extends AbstractNumberFormatterTest
      */
     public function testSetTextAttribute()
     {
-        $formatter = $this->getNumberFormatter('en', StubNumberFormatter::DECIMAL);
+        $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setTextAttribute(null, null);
     }
 
     protected function getNumberFormatter($locale = 'en', $style = null, $pattern = null)
     {
-        return new StubNumberFormatter($locale, $style, $pattern);
+        return new NumberFormatter($locale, $style, $pattern);
     }
 
     protected function getIntlErrorMessage()
     {
-        return StubIntlGlobals::getErrorMessage();
+        return IntlGlobals::getErrorMessage();
     }
 
     protected function getIntlErrorCode()
     {
-        return StubIntlGlobals::getErrorCode();
+        return IntlGlobals::getErrorCode();
     }
 
     protected function isIntlFailure($errorCode)
     {
-        return StubIntlGlobals::isFailure($errorCode);
+        return IntlGlobals::isFailure($errorCode);
     }
 }

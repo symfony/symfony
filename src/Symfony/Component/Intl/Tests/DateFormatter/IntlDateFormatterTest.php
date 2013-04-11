@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Intl\Tests\DateFormatter;
 
-use Symfony\Component\Intl\DateFormatter\StubIntlDateFormatter;
-use Symfony\Component\Intl\Globals\StubIntlGlobals;
+use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
+use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\Util\Version;
 
-class StubIntlDateFormatterTest extends AbstractIntlDateFormatterTest
+class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 {
     public function testConstructor()
     {
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, 'y-M-d');
+        $formatter = new IntlDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC', IntlDateFormatter::GREGORIAN, 'y-M-d');
         $this->assertEquals('y-M-d', $formatter->getPattern());
     }
 
@@ -28,13 +28,13 @@ class StubIntlDateFormatterTest extends AbstractIntlDateFormatterTest
      */
     public function testConstructorWithUnsupportedLocale()
     {
-        new StubIntlDateFormatter('pt_BR', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        new IntlDateFormatter('pt_BR', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
     }
 
     public function testStaticCreate()
     {
-        $formatter = StubIntlDateFormatter::create('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
-        $this->assertInstanceOf('Symfony\Component\Intl\DateFormatter\StubIntlDateFormatter', $formatter);
+        $formatter = IntlDateFormatter::create('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
+        $this->assertInstanceOf('\Symfony\Component\Intl\DateFormatter\IntlDateFormatter', $formatter);
     }
 
     public function testFormatWithUnsupportedTimestampArgument()
@@ -72,7 +72,7 @@ class StubIntlDateFormatterTest extends AbstractIntlDateFormatterTest
     public function testFormatWithUnimplementedChars()
     {
         $pattern = 'Y';
-        $formatter = new StubIntlDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
+        $formatter = new IntlDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC', IntlDateFormatter::GREGORIAN, $pattern);
         $formatter->format(0);
     }
 
@@ -88,13 +88,13 @@ class StubIntlDateFormatterTest extends AbstractIntlDateFormatterTest
     public function testGetErrorCode()
     {
         $formatter = $this->getDefaultDateFormatter();
-        $this->assertEquals(StubIntlGlobals::getErrorCode(), $formatter->getErrorCode());
+        $this->assertEquals(IntlGlobals::getErrorCode(), $formatter->getErrorCode());
     }
 
     public function testGetErrorMessage()
     {
         $formatter = $this->getDefaultDateFormatter();
-        $this->assertEquals(StubIntlGlobals::getErrorMessage(), $formatter->getErrorMessage());
+        $this->assertEquals(IntlGlobals::getErrorMessage(), $formatter->getErrorMessage());
     }
 
     public function testIsLenient()
@@ -128,7 +128,7 @@ class StubIntlDateFormatterTest extends AbstractIntlDateFormatterTest
     public function testSetCalendar()
     {
         $formatter = $this->getDefaultDateFormatter();
-        $formatter->setCalendar(StubIntlDateFormatter::GREGORIAN);
+        $formatter->setCalendar(IntlDateFormatter::GREGORIAN);
     }
 
     /**
@@ -176,24 +176,24 @@ class StubIntlDateFormatterTest extends AbstractIntlDateFormatterTest
         return $this->notImplemented(parent::parseQuarterProvider());
     }
 
-    protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = StubIntlDateFormatter::GREGORIAN, $pattern = null)
+    protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null)
     {
-        return new StubIntlDateFormatter($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
+        return new IntlDateFormatter($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
     }
 
     protected function getIntlErrorMessage()
     {
-        return StubIntlGlobals::getErrorMessage();
+        return IntlGlobals::getErrorMessage();
     }
 
     protected function getIntlErrorCode()
     {
-        return StubIntlGlobals::getErrorCode();
+        return IntlGlobals::getErrorCode();
     }
 
     protected function isIntlFailure($errorCode)
     {
-        return StubIntlGlobals::isFailure($errorCode);
+        return IntlGlobals::isFailure($errorCode);
     }
 
     /**

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Locale;
 
-use Symfony\Component\Intl\Locale;
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 
@@ -24,7 +23,7 @@ use Symfony\Component\Intl\Exception\MethodNotImplementedException;
  * @author Eriksen Costa <eriksen.costa@infranology.com.br>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class StubLocale
+class Locale
 {
     const DEFAULT_LOCALE = null;
 

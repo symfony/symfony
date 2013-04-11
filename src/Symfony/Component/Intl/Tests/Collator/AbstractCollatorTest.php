@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\Collator;
 
-use Symfony\Component\Intl\Collator\StubCollator;
+use Symfony\Component\Intl\Collator\Collator;
 use Symfony\Component\Intl\Locale;
 
 /**
@@ -37,17 +37,17 @@ abstract class AbstractCollatorTest extends \PHPUnit_Framework_TestCase
             /* array, sortFlag, expected */
             array(
                 array('a', 'b', 'c'),
-                StubCollator::SORT_REGULAR,
+                Collator::SORT_REGULAR,
                 array('a', 'b', 'c'),
             ),
             array(
                 array('c', 'b', 'a'),
-                StubCollator::SORT_REGULAR,
+                Collator::SORT_REGULAR,
                 array(2 => 'a', 1 => 'b',  0 => 'c'),
             ),
             array(
                 array('b', 'c', 'a'),
-                StubCollator::SORT_REGULAR,
+                Collator::SORT_REGULAR,
                 array(2 => 'a', 0 => 'b', 1 => 'c'),
             ),
         );

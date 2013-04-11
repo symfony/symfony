@@ -9,15 +9,13 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Component\Intl\DateFormatter\StubIntlDateFormatter;
-
 /**
  * Stub implementation for the IntlDateFormatter class of the intl extension
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @see Symfony\Component\Intl\DateFormatter\StubIntlDateFormatter
+ * @see \Symfony\Component\Intl\DateFormatter\IntlDateFormatter
  */
-class IntlDateFormatter extends StubIntlDateFormatter
+class IntlDateFormatter extends \Symfony\Component\Intl\DateFormatter\IntlDateFormatter
 {
 }

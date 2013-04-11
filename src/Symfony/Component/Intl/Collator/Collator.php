@@ -13,8 +13,8 @@ namespace Symfony\Component\Intl\Collator;
 
 use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException;
-use Symfony\Component\Intl\Globals\StubIntlGlobals;
-use Symfony\Component\Intl\Locale\StubLocale;
+use Symfony\Component\Intl\Globals\IntlGlobals;
+use Symfony\Component\Intl\Locale\Locale;
 
 /**
  * Replacement for PHP's native {@link \Collator} class.
@@ -31,7 +31,7 @@ use Symfony\Component\Intl\Locale\StubLocale;
  * @author Igor Wiedler <igor@wiedler.ch>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class StubCollator
+class Collator
 {
     /* Attribute constants */
     const FRENCH_COLLATION = 0;
@@ -86,7 +86,7 @@ class StubCollator
      *
      * @param string $locale The locale code. The only currently supported locale is "en".
      *
-     * @return StubCollator
+     * @return Collator
      *
      * @throws MethodArgumentValueNotImplementedException  When $locale different than "en" is passed
      */
@@ -100,9 +100,9 @@ class StubCollator
      *
      * @param array   &$array    Input array
      * @param integer $sortFlag  Flags for sorting, can be one of the following:
-     *                           StubCollator::SORT_REGULAR - compare items normally (don't change types)
-     *                           StubCollator::SORT_NUMERIC - compare items numerically
-     *                           StubCollator::SORT_STRING - compare items as strings
+     *                           Collator::SORT_REGULAR - compare items normally (don't change types)
+     *                           Collator::SORT_NUMERIC - compare items numerically
+     *                           Collator::SORT_STRING - compare items as strings
      *
      * @return Boolean True on success or false on failure
      */
@@ -162,7 +162,7 @@ class StubCollator
      */
     public function getErrorCode()
     {
-        return StubIntlGlobals::U_ZERO_ERROR;
+        return IntlGlobals::U_ZERO_ERROR;
     }
 
     /**
@@ -183,7 +183,7 @@ class StubCollator
      * @return string The locale used to create the collator. Currently always
      *                returns "en".
      */
-    public function getLocale($type = StubLocale::ACTUAL_LOCALE)
+    public function getLocale($type = Locale::ACTUAL_LOCALE)
     {
         return 'en';
     }
@@ -239,12 +239,12 @@ class StubCollator
      * Not supported. Set the collator's strength
      *
      * @param int $strength Strength to set, possible values:
-     *                           StubCollator::PRIMARY
-     *                           StubCollator::SECONDARY
-     *                           StubCollator::TERTIARY
-     *                           StubCollator::QUATERNARY
-     *                           StubCollator::IDENTICAL
-     *                           StubCollator::DEFAULT
+     *                           Collator::PRIMARY
+     *                           Collator::SECONDARY
+     *                           Collator::TERTIARY
+     *                           Collator::QUATERNARY
+     *                           Collator::IDENTICAL
+     *                           Collator::DEFAULT
      *
      * @return Boolean True on success or false on failure
      *
@@ -278,9 +278,9 @@ class StubCollator
      *
      * @param  array   &$arr       Array of string to sort
      * @param int $sortFlag Optional sorting type, one of the following:
-     *                             StubCollator::SORT_REGULAR
-     *                             StubCollator::SORT_NUMERIC
-     *                             StubCollator::SORT_STRING
+     *                             Collator::SORT_REGULAR
+     *                             Collator::SORT_NUMERIC
+     *                             Collator::SORT_STRING
      *
      * @return Boolean True on success or false on failure
      *

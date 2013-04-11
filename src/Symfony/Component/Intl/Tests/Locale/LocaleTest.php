@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\Locale;
 
-class StubLocaleTest extends AbstractLocaleTest
+class LocaleTest extends AbstractLocaleTest
 {
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MethodNotImplementedException
@@ -154,6 +154,6 @@ class StubLocaleTest extends AbstractLocaleTest
     {
         $args = array_slice(func_get_args(), 1);
 
-        return call_user_func_array(array('Symfony\Component\Intl\Locale\StubLocale', $methodName), $args);
+        return call_user_func_array(array('Symfony\Component\Intl\Locale\Locale', $methodName), $args);
     }
 }

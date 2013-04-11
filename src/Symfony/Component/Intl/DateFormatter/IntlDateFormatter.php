@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Intl\DateFormatter;
 
-use Symfony\Component\Intl\Globals\StubIntlGlobals;
+use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\DateFormatter\DateFormat\FullTransformer;
 use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException;
-use Symfony\Component\Intl\Locale\StubLocale;
+use Symfony\Component\Intl\Locale\Locale;
 
 /**
  * Replacement for PHP's native {@link \IntlDateFormatter} class.
@@ -44,14 +44,14 @@ use Symfony\Component\Intl\Locale\StubLocale;
  * @author Igor Wiedler <igor@wiedler.ch>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class StubIntlDateFormatter
+class IntlDateFormatter
 {
     /**
      * The error code from the last operation
      *
      * @var integer
      */
-    protected $errorCode = StubIntlGlobals::U_ZERO_ERROR;
+    protected $errorCode = IntlGlobals::U_ZERO_ERROR;
 
     /**
      * The error message from the last operation
@@ -171,7 +171,7 @@ class StubIntlDateFormatter
      *                           One of the calendar constants.
      * @param string $pattern Optional pattern to use when formatting
      *
-     * @return StubIntlDateFormatter
+     * @return IntlDateFormatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.create.php
      * @see http://userguide.icu-project.org/formatparse/datetime
@@ -219,9 +219,9 @@ class StubIntlDateFormatter
         }
 
         if (null !== $argumentError) {
-            StubIntlGlobals::setError(StubIntlGlobals::U_ILLEGAL_ARGUMENT_ERROR, $argumentError);
-            $this->errorCode = StubIntlGlobals::getErrorCode();
-            $this->errorMessage = StubIntlGlobals::getErrorMessage();
+            IntlGlobals::setError(IntlGlobals::U_ILLEGAL_ARGUMENT_ERROR, $argumentError);
+            $this->errorCode = IntlGlobals::getErrorCode();
+            $this->errorMessage = IntlGlobals::getErrorMessage();
 
             return false;
         }
@@ -235,9 +235,9 @@ class StubIntlDateFormatter
         $formatted = $transformer->format($this->createDateTime($timestamp));
 
         // behave like the intl extension
-        StubIntlGlobals::setError(StubIntlGlobals::U_ZERO_ERROR);
-        $this->errorCode = StubIntlGlobals::getErrorCode();
-        $this->errorMessage = StubIntlGlobals::getErrorMessage();
+        IntlGlobals::setError(IntlGlobals::U_ZERO_ERROR);
+        $this->errorCode = IntlGlobals::getErrorCode();
+        $this->errorMessage = IntlGlobals::getErrorMessage();
 
         return $formatted;
     }
@@ -333,7 +333,7 @@ class StubIntlDateFormatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.getlocale.php
      */
-    public function getLocale($type = StubLocale::ACTUAL_LOCALE)
+    public function getLocale($type = Locale::ACTUAL_LOCALE)
     {
         return 'en';
     }
@@ -459,8 +459,8 @@ class StubIntlDateFormatter
         $timestamp = $transformer->parse($dateTime, $value);
 
         // behave like the intl extension. FullTransformer::parse() set the proper error
-        $this->errorCode = StubIntlGlobals::getErrorCode();
-        $this->errorMessage = StubIntlGlobals::getErrorMessage();
+        $this->errorCode = IntlGlobals::getErrorCode();
+        $this->errorMessage = IntlGlobals::getErrorMessage();
 
         return $timestamp;
     }

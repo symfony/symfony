@@ -11,17 +11,17 @@
 
 namespace Symfony\Component\Intl\Tests\Collator;
 
-use Symfony\Component\Intl\Collator\StubCollator;
-use Symfony\Component\Intl\Globals\StubIntlGlobals;
+use Symfony\Component\Intl\Collator\Collator;
+use Symfony\Component\Intl\Globals\IntlGlobals;
 
-class StubCollatorTest extends AbstractCollatorTest
+class CollatorTest extends AbstractCollatorTest
 {
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException
      */
     public function testConstructorWithUnsupportedLocale()
     {
-        new StubCollator('pt_BR');
+        new Collator('pt_BR');
     }
 
     /**
@@ -39,13 +39,13 @@ class StubCollatorTest extends AbstractCollatorTest
     public function testGetAttribute()
     {
         $collator = $this->getCollator('en');
-        $collator->getAttribute(StubCollator::NUMERIC_COLLATION);
+        $collator->getAttribute(Collator::NUMERIC_COLLATION);
     }
 
     public function testGetErrorCode()
     {
         $collator = $this->getCollator('en');
-        $this->assertEquals(StubIntlGlobals::U_ZERO_ERROR, $collator->getErrorCode());
+        $this->assertEquals(IntlGlobals::U_ZERO_ERROR, $collator->getErrorCode());
     }
 
     public function testGetErrorMessage()
@@ -84,7 +84,7 @@ class StubCollatorTest extends AbstractCollatorTest
     public function testSetAttribute()
     {
         $collator = $this->getCollator('en');
-        $collator->setAttribute(StubCollator::NUMERIC_COLLATION, StubCollator::ON);
+        $collator->setAttribute(Collator::NUMERIC_COLLATION, Collator::ON);
     }
 
     /**
@@ -93,17 +93,17 @@ class StubCollatorTest extends AbstractCollatorTest
     public function testSetStrength()
     {
         $collator = $this->getCollator('en');
-        $collator->setStrength(StubCollator::PRIMARY);
+        $collator->setStrength(Collator::PRIMARY);
     }
 
     public function testStaticCreate()
     {
-        $collator = StubCollator::create('en');
-        $this->assertInstanceOf('Symfony\Component\Intl\Collator\StubCollator', $collator);
+        $collator = Collator::create('en');
+        $this->assertInstanceOf('\Symfony\Component\Intl\Collator\Collator', $collator);
     }
 
     protected function getCollator($locale)
     {
-        return new StubCollator($locale);
+        return new Collator($locale);
     }
 }

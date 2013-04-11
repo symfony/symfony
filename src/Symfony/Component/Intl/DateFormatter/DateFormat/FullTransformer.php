@@ -12,7 +12,7 @@
 namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
-use Symfony\Component\Intl\Globals\StubIntlGlobals;
+use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\DateFormatter\DateFormat\MonthTransformer;
 
 /**
@@ -156,13 +156,13 @@ class FullTransformer
             }
 
             // reset error code and message
-            StubIntlGlobals::setError(StubIntlGlobals::U_ZERO_ERROR);
+            IntlGlobals::setError(IntlGlobals::U_ZERO_ERROR);
 
             return $this->calculateUnixTimestamp($dateTime, $options);
         }
 
         // behave like the intl extension
-        StubIntlGlobals::setError(StubIntlGlobals::U_PARSE_ERROR, 'Date parsing failed');
+        IntlGlobals::setError(IntlGlobals::U_PARSE_ERROR, 'Date parsing failed');
 
         return false;
     }
@@ -303,7 +303,7 @@ class FullTransformer
 
         // If month is false, return immediately (intl behavior)
         if (false === $month) {
-            StubIntlGlobals::setError(StubIntlGlobals::U_PARSE_ERROR, 'Date parsing failed');
+            IntlGlobals::setError(IntlGlobals::U_PARSE_ERROR, 'Date parsing failed');
 
             return false;
         }

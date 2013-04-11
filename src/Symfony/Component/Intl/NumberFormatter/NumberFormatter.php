@@ -15,9 +15,9 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Intl\Exception\MethodNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentNotImplementedException;
 use Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException;
-use Symfony\Component\Intl\Globals\StubIntlGlobals;
+use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\Locale\StubLocale;
+use Symfony\Component\Intl\Locale\Locale;
 
 /**
  * Replacement for PHP's native {@link \NumberFormatter} class.
@@ -38,7 +38,7 @@ use Symfony\Component\Intl\Locale\StubLocale;
  * @author Eriksen Costa <eriksen.costa@infranology.com.br>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class StubNumberFormatter
+class NumberFormatter
 {
     /* Format style constants */
     const PATTERN_DECIMAL   = 0;
@@ -132,7 +132,7 @@ class StubNumberFormatter
      *
      * @var integer
      */
-    protected $errorCode = StubIntlGlobals::U_ZERO_ERROR;
+    protected $errorCode = IntlGlobals::U_ZERO_ERROR;
 
     /**
      * The error message from the last operation
@@ -187,8 +187,8 @@ class StubNumberFormatter
 
     /**
      * The available rounding modes for setAttribute() usage with
-     * StubNumberFormatter::ROUNDING_MODE. StubNumberFormatter::ROUND_DOWN
-     * and StubNumberFormatter::ROUND_UP does not have a PHP only equivalent
+     * NumberFormatter::ROUNDING_MODE. NumberFormatter::ROUND_DOWN
+     * and NumberFormatter::ROUND_UP does not have a PHP only equivalent
      *
      * @var array
      */
@@ -280,7 +280,7 @@ class StubNumberFormatter
      *                        NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
      *                        described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
      *
-     * @return StubNumberFormatter
+     * @return NumberFormatter
      *
      * @see http://www.php.net/manual/en/numberformatter.create.php
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
@@ -426,7 +426,7 @@ class StubNumberFormatter
      *
      * @see http://www.php.net/manual/en/numberformatter.getlocale.php
      */
-    public function getLocale($type = StubLocale::ACTUAL_LOCALE)
+    public function getLocale($type = Locale::ACTUAL_LOCALE)
     {
         return 'en';
     }
@@ -527,9 +527,9 @@ class StubNumberFormatter
 
         // Any string before the numeric value causes error in the parsing
         if (isset($matches[1]) && !empty($matches[1])) {
-            StubIntlGlobals::setError(StubIntlGlobals::U_PARSE_ERROR, 'Number parsing failed');
-            $this->errorCode = StubIntlGlobals::getErrorCode();
-            $this->errorMessage = StubIntlGlobals::getErrorMessage();
+            IntlGlobals::setError(IntlGlobals::U_PARSE_ERROR, 'Number parsing failed');
+            $this->errorCode = IntlGlobals::getErrorCode();
+            $this->errorMessage = IntlGlobals::getErrorMessage();
 
             return false;
         }
@@ -651,9 +651,9 @@ class StubNumberFormatter
      */
     protected function resetError()
     {
-        StubIntlGlobals::setError(StubIntlGlobals::U_ZERO_ERROR);
-        $this->errorCode = StubIntlGlobals::getErrorCode();
-        $this->errorMessage = StubIntlGlobals::getErrorMessage();
+        IntlGlobals::setError(IntlGlobals::U_ZERO_ERROR);
+        $this->errorCode = IntlGlobals::getErrorCode();
+        $this->errorMessage = IntlGlobals::getErrorMessage();
     }
 
     /**

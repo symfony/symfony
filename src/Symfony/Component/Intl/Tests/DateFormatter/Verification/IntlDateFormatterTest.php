@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\DateFormatter\Verification;
 
-use Symfony\Component\Intl\DateFormatter\StubIntlDateFormatter;
+use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
 use Symfony\Component\Intl\Tests\DateFormatter\AbstractIntlDateFormatterTest;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
@@ -42,7 +42,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         parent::testFormatWithTimezoneFromEnvironmentVariable();
     }
 
-    protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = StubIntlDateFormatter::GREGORIAN, $pattern = null)
+    protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null)
     {
         return new \IntlDateFormatter($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
     }

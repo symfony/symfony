@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Intl\Tests\Globals;
 
-use Symfony\Component\Intl\Globals\StubIntlGlobals;
+use Symfony\Component\Intl\Globals\IntlGlobals;
 
-class StubIntlGlobalsTest extends AbstractIntlGlobalsTest
+class IntlGlobalsTest extends AbstractIntlGlobalsTest
 {
     protected function getIntlErrorName($errorCode)
     {
-        return StubIntlGlobals::getErrorName($errorCode);
+        return IntlGlobals::getErrorName($errorCode);
     }
 }

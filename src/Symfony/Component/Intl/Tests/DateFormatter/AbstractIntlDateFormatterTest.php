@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Intl\Tests\DateFormatter;
 
-use Symfony\Component\Intl\DateFormatter\StubIntlDateFormatter;
-use Symfony\Component\Intl\Globals\StubIntlGlobals;
+use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
+use Symfony\Component\Intl\Globals\IntlGlobals;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Util\IcuVersion;
 use Symfony\Component\Intl\Util\Version;
@@ -32,7 +32,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructorDefaultTimeZone()
     {
-        $formatter = $this->getDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
 
         // In PHP 5.5 default timezone depends on `date_default_timezone_get()` method
         if (version_compare(PHP_VERSION, '5.5.0-dev', '>=')) {
@@ -47,7 +47,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormat($pattern, $timestamp, $expected)
     {
-        $errorCode = StubIntlGlobals::U_ZERO_ERROR;
+        $errorCode = IntlGlobals::U_ZERO_ERROR;
         $errorMessage = 'U_ZERO_ERROR';
 
         $formatter = $this->getDefaultDateFormatter($pattern);
@@ -257,7 +257,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatIllegalArgumentError($pattern, $timestamp, $errorMessage)
     {
-        $errorCode = StubIntlGlobals::U_ILLEGAL_ARGUMENT_ERROR;
+        $errorCode = IntlGlobals::U_ILLEGAL_ARGUMENT_ERROR;
 
         $formatter = $this->getDefaultDateFormatter($pattern);
         $this->assertFalse($formatter->format($timestamp));
@@ -291,7 +291,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     public function testFormatWithTimezone($timestamp, $timezone, $expected)
     {
         $pattern = 'yyyy-MM-dd HH:mm:ss';
-        $formatter = $this->getDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, $timezone, StubIntlDateFormatter::GREGORIAN, $pattern);
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, $timezone, IntlDateFormatter::GREGORIAN, $pattern);
         $this->assertSame($expected, $formatter->format($timestamp));
     }
 
@@ -375,7 +375,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function testFormatWithConstructorTimezone()
     {
-        $formatter = $this->getDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC');
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC');
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
         $this->assertEquals(
@@ -393,7 +393,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         $tz = getenv('TZ');
         putenv('TZ=Europe/London');
 
-        $formatter = $this->getDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
         $this->assertEquals(
@@ -416,7 +416,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         $tz = date_default_timezone_get();
         date_default_timezone_set('Europe/London');
 
-        $formatter = $this->getDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT);
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
         $formatter->setPattern('yyyy-MM-dd HH:mm:ss');
 
         $this->assertEquals(
@@ -442,27 +442,27 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     public function dateAndTimeTypeProvider()
     {
         return array(
-            array(0, StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, 'Thursday, January 1, 1970'),
-            array(0, StubIntlDateFormatter::LONG, StubIntlDateFormatter::NONE, 'January 1, 1970'),
-            array(0, StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::NONE, 'Jan 1, 1970'),
-            array(0, StubIntlDateFormatter::SHORT, StubIntlDateFormatter::NONE, '1/1/70'),
-            array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::FULL, '12:00:00 AM GMT'),
-            array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::LONG, '12:00:00 AM GMT'),
-            array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::MEDIUM, '12:00:00 AM'),
-            array(0, StubIntlDateFormatter::NONE, StubIntlDateFormatter::SHORT, '12:00 AM'),
+            array(0, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Thursday, January 1, 1970'),
+            array(0, IntlDateFormatter::LONG, IntlDateFormatter::NONE, 'January 1, 1970'),
+            array(0, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'Jan 1, 1970'),
+            array(0, IntlDateFormatter::SHORT, IntlDateFormatter::NONE, '1/1/70'),
+            array(0, IntlDateFormatter::NONE, IntlDateFormatter::FULL, '12:00:00 AM GMT'),
+            array(0, IntlDateFormatter::NONE, IntlDateFormatter::LONG, '12:00:00 AM GMT'),
+            array(0, IntlDateFormatter::NONE, IntlDateFormatter::MEDIUM, '12:00:00 AM'),
+            array(0, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, '12:00 AM'),
         );
     }
 
     public function testGetCalendar()
     {
         $formatter = $this->getDefaultDateFormatter();
-        $this->assertEquals(StubIntlDateFormatter::GREGORIAN, $formatter->getCalendar());
+        $this->assertEquals(IntlDateFormatter::GREGORIAN, $formatter->getCalendar());
     }
 
     public function testGetDateType()
     {
-        $formatter = $this->getDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE);
-        $this->assertEquals(StubIntlDateFormatter::FULL, $formatter->getDateType());
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+        $this->assertEquals(IntlDateFormatter::FULL, $formatter->getDateType());
     }
 
     public function testGetLocale()
@@ -473,14 +473,14 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPattern()
     {
-        $formatter = $this->getDateFormatter('en', StubIntlDateFormatter::FULL, StubIntlDateFormatter::NONE, 'UTC', StubIntlDateFormatter::GREGORIAN, 'yyyy-MM-dd');
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'UTC', IntlDateFormatter::GREGORIAN, 'yyyy-MM-dd');
         $this->assertEquals('yyyy-MM-dd', $formatter->getPattern());
     }
 
     public function testGetTimeType()
     {
-        $formatter = $this->getDateFormatter('en', StubIntlDateFormatter::NONE, StubIntlDateFormatter::FULL);
-        $this->assertEquals(StubIntlDateFormatter::FULL, $formatter->getTimeType());
+        $formatter = $this->getDateFormatter('en', IntlDateFormatter::NONE, IntlDateFormatter::FULL);
+        $this->assertEquals(IntlDateFormatter::FULL, $formatter->getTimeType());
     }
 
     /**
@@ -488,7 +488,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testParse($pattern, $value, $expected)
     {
-        $errorCode = StubIntlGlobals::U_ZERO_ERROR;
+        $errorCode = IntlGlobals::U_ZERO_ERROR;
         $errorMessage = 'U_ZERO_ERROR';
 
         $formatter = $this->getDefaultDateFormatter($pattern);
@@ -787,7 +787,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseError($pattern, $value)
     {
-        $errorCode = StubIntlGlobals::U_PARSE_ERROR;
+        $errorCode = IntlGlobals::U_PARSE_ERROR;
         $errorMessage = 'Date parsing failed: U_PARSE_ERROR';
 
         $formatter = $this->getDefaultDateFormatter($pattern);
@@ -876,7 +876,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
     protected function getDefaultDateFormatter($pattern = null)
     {
-        return $this->getDateFormatter('en', StubIntlDateFormatter::MEDIUM, StubIntlDateFormatter::SHORT, 'UTC', StubIntlDateFormatter::GREGORIAN, $pattern);
+        return $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC', IntlDateFormatter::GREGORIAN, $pattern);
     }
 
     protected function getDateTime($timestamp = null)
@@ -906,7 +906,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 
     protected function assertIsIntlSuccess($formatter, $errorMessage, $errorCode)
     {
-        /* @var StubIntlDateFormatter $formatter */
+        /* @var IntlDateFormatter $formatter */
         $this->assertSame($errorMessage, $this->getIntlErrorMessage());
         $this->assertSame($errorCode, $this->getIntlErrorCode());
         $this->assertFalse($this->isIntlFailure($this->getIntlErrorCode()));
@@ -925,7 +925,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
      *
      * @return mixed
      */
-    abstract protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = StubIntlDateFormatter::GREGORIAN, $pattern = null);
+    abstract protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null);
 
     /**
      * @return string

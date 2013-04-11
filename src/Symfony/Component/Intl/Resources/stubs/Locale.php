@@ -9,15 +9,13 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Component\Intl\Locale\StubLocale;
-
 /**
  * Stub implementation for the Locale class of the intl extension
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @see Symfony\Component\Intl\Locale\StubLocale
+ * @see \Symfony\Component\Intl\Locale\Locale
  */
-class Locale extends StubLocale
+class Locale extends \Symfony\Component\Intl\Locale\Locale
 {
 }

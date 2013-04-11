@@ -16,7 +16,7 @@ namespace Symfony\Component\Intl\Globals;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class StubIntlGlobals
+abstract class IntlGlobals
 {
     /**
      * Indicates that no error occurred
@@ -67,7 +67,7 @@ abstract class StubIntlGlobals
     /**
      * Returns whether the error code indicates a failure
      *
-     * @param integer $errorCode The error code returned by StubIntlGlobals::getErrorCode()
+     * @param integer $errorCode The error code returned by IntlGlobals::getErrorCode()
      *
      * @return Boolean
      */
@@ -80,7 +80,7 @@ abstract class StubIntlGlobals
     /**
      * Returns the error code of the last operation
      *
-     * Returns StubIntlGlobals::U_ZERO_ERROR if no error occurred.
+     * Returns IntlGlobals::U_ZERO_ERROR if no error occurred.
      *
      * @return integer
      */
@@ -104,7 +104,7 @@ abstract class StubIntlGlobals
     /**
      * Returns the symbolic name for a given error code
      *
-     * @param integer $code The error code returned by StubIntlGlobals::getErrorCode()
+     * @param integer $code The error code returned by IntlGlobals::getErrorCode()
      *
      * @return string
      */

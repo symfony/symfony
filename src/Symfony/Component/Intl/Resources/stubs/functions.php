@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Component\Intl\Globals\StubIntlGlobals;
+use Symfony\Component\Intl\Globals\IntlGlobals;
 
 if (!function_exists('intl_is_failure')) {
 
@@ -27,7 +27,7 @@ if (!function_exists('intl_is_failure')) {
      */
     function intl_is_failure($errorCode)
     {
-        return StubIntlGlobals::isFailure($errorCode);
+        return IntlGlobals::isFailure($errorCode);
     }
 
     /**
@@ -37,13 +37,13 @@ if (!function_exists('intl_is_failure')) {
      * @author Bernhard Schussek <bschussek@gmail.com>
      *
      * @return Boolean The error code of the last intl function call or
-     *                 StubIntlGlobals::U_ZERO_ERROR if no error occurred.
+     *                 IntlGlobals::U_ZERO_ERROR if no error occurred.
      *
      * @see \Symfony\Component\Intl\Globals\StubIntlGlobals::getErrorCode
      */
     function intl_get_error_code()
     {
-        return StubIntlGlobals::getErrorCode();
+        return IntlGlobals::getErrorCode();
     }
 
     /**
@@ -59,7 +59,7 @@ if (!function_exists('intl_is_failure')) {
      */
     function intl_get_error_message()
     {
-        return StubIntlGlobals::getErrorMessage();
+        return IntlGlobals::getErrorMessage();
     }
 
     /**
@@ -74,7 +74,7 @@ if (!function_exists('intl_is_failure')) {
      */
     function intl_error_name($errorCode)
     {
-        return StubIntlGlobals::getErrorName($errorCode);
+        return IntlGlobals::getErrorName($errorCode);
     }
 
 }

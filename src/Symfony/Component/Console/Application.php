@@ -188,14 +188,6 @@ class Application
             $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
         }
 
-        if (true === $input->hasParameterOption('-vv')) {
-            $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
-        }
-
-        if (true === $input->hasParameterOption('-vvv')) {
-            $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
-        }
-
         if (true === $input->hasParameterOption('--verbose')) {
             switch ($input->getParameterOption('--verbose', 1)) {
                 case 1: $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE); break;

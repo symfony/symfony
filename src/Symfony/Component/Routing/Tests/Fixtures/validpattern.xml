@@ -6,6 +6,7 @@
 
     <route id="blog_show" pattern="/blog/{slug}">
         <default key="_controller">MyBundle:Blog:show</default>
+        <default key="slug" xsi:nil="true" />
         <requirement key="_method">GET</requirement>
         <option key="compiler_class">RouteCompiler</option>
     </route>

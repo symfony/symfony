@@ -16,7 +16,7 @@
 
   <xsd:complexType name="route">
     <xsd:sequence>
-      <xsd:element name="default" type="element" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="default" nillable="true" type="element" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="requirement" type="element" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="option" type="element" minOccurs="0" maxOccurs="unbounded" />
     </xsd:sequence>

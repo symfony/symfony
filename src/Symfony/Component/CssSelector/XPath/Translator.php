@@ -175,7 +175,7 @@ class Translator implements TranslatorInterface
     public function getExtension($name)
     {
         if (!isset($this->extensions[$name])) {
-            throw new ExpressionErrorException('Extension "'.$name.'" not registered.');
+            throw new ExpressionErrorException(sprintf('Extension "%s" not registered.', $name));
         }
 
         return $this->extensions[$name];
@@ -205,7 +205,7 @@ class Translator implements TranslatorInterface
     public function nodeToXPath(NodeInterface $node)
     {
         if (!isset($this->nodeTranslators[$node->getNodeName()])) {
-            throw new ExpressionErrorException('Node "'.$node->getNodeName().'" not supported.');
+            throw new ExpressionErrorException(sprintf('Node "%s" not supported.', $node->getNodeName()));
         }
 
         return call_user_func($this->nodeTranslators[$node->getNodeName()], $node);
@@ -223,7 +223,7 @@ class Translator implements TranslatorInterface
     public function addCombination($combiner, NodeInterface $xpath, NodeInterface $combinedXpath)
     {
         if (!isset($this->combinationTranslators[$combiner])) {
-            throw new ExpressionErrorException('Combiner "'.$combiner.'" not supported.');
+            throw new ExpressionErrorException(sprintf('Combiner "%s" not supported.', $combiner));
         }
 
         return call_user_func($this->combinationTranslators[$combiner], $this->nodeToXPath($xpath), $this->nodeToXPath($combinedXpath));
@@ -240,7 +240,7 @@ class Translator implements TranslatorInterface
     public function addFunction(XPathExpr $xpath, FunctionNode $function)
     {
         if (!isset($this->functionTranslators[$function->getName()])) {
-            throw new ExpressionErrorException('Function "'.$function->getName().'" not supported.');
+            throw new ExpressionErrorException(sprintf('Function "%s" not supported.', $function->getName()));
         }
 
         return call_user_func($this->functionTranslators[$function->getName()], $xpath, $function);
@@ -257,7 +257,7 @@ class Translator implements TranslatorInterface
     public function addPseudoClass(XPathExpr $xpath, $pseudoClass)
     {
         if (!isset($this->pseudoClassTranslators[$pseudoClass])) {
-            throw new ExpressionErrorException('Pseudo-class "'.$pseudoClass.'" not supported.');
+            throw new ExpressionErrorException(sprintf('Pseudo-class "%s" not supported.', $pseudoClass));
         }
 
         return call_user_func($this->pseudoClassTranslators[$pseudoClass], $xpath);
@@ -276,7 +276,7 @@ class Translator implements TranslatorInterface
     public function addAttributeMatching(XPathExpr $xpath, $operator, $attribute, $value)
     {
         if (!isset($this->attributeMatchingTranslators[$operator])) {
-            throw new ExpressionErrorException('Attribute matcher operator "'.$operator.'" not supported.');
+            throw new ExpressionErrorException(sprintf('Attribute matcher operator "%s" not supported.', $operator));
         }
 
         return call_user_func($this->attributeMatchingTranslators[$operator], $xpath, $attribute, $value);

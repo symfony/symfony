@@ -184,7 +184,7 @@ class TwigExtensionTest extends TestCase
                 $loader = new YamlFileLoader($container, $locator);
                 break;
             default:
-                throw new \InvalidArgumentException('Unsupported format: '.$format);
+                throw new \InvalidArgumentException(sprintf('Unsupported format: %s', $format));
         }
 
         $loader->load($file.'.'.$format);

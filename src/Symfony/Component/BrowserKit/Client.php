@@ -293,7 +293,7 @@ abstract class Client
         $process->run();
 
         if (!$process->isSuccessful() || !preg_match('/^O\:\d+\:/', $process->getOutput())) {
-            throw new \RuntimeException('OUTPUT: '.$process->getOutput().' ERROR OUTPUT: '.$process->getErrorOutput());
+            throw new \RuntimeException(sprintf('OUTPUT: %s ERROR OUTPUT: %s', $process->getOutput(), $process->getErrorOutput()));
         }
 
         return unserialize($process->getOutput());

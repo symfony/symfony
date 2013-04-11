@@ -98,7 +98,9 @@ class NativeSessionStorage implements SessionStorageInterface
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
         session_cache_limiter('');
-        if (ini_get('session.use_cookies') != 1) ini_set('session.use_cookies', 1);
+        if (ini_get('session.use_cookies') != 1) {
+             ini_set('session.use_cookies', 1);
+        }
 
         if (version_compare(phpversion(), '5.4.0', '>=')) {
             session_register_shutdown();

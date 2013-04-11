@@ -22,6 +22,12 @@
     <option name="--verbose" shortcut="-v" accept_value="0" is_value_required="0" is_multiple="0">
       <description>Increase verbosity of messages.</description>
     </option>
+    <option name="--verbose-very" shortcut="-vv" accept_value="0" is_value_required="0" is_multiple="0">
+      <description>Increase verbosity of messages to display even more verbose messages.</description>
+    </option>
+    <option name="--verbose-debug" shortcut="-vvv" accept_value="0" is_value_required="0" is_multiple="0">
+      <description>Increase verbosity of messages to debug level.</description>
+    </option>
     <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
       <description>Display this application version.</description>
     </option>

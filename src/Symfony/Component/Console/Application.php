@@ -182,8 +182,18 @@ class Application
 
         if (true === $input->hasParameterOption(array('--quiet', '-q'))) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
-        } elseif (true === $input->hasParameterOption(array('--verbose', '-v'))) {
+        }
+
+        if (true === $input->hasParameterOption(array('--verbose', '-v'))) {
             $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+        }
+
+        if (true === $input->hasParameterOption(array('--verbose-very', '-vv'))) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
+        }
+
+        if (true === $input->hasParameterOption(array('--verbose-debug', '-vvv'))) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
         }
 
         if (true === $input->hasParameterOption(array('--version', '-V'))) {
@@ -981,15 +991,16 @@ class Application
     protected function getDefaultInputDefinition()
     {
         return new InputDefinition(array(
-            new InputArgument('command', InputArgument::REQUIRED, 'The command to execute'),
-
-            new InputOption('--help',           '-h', InputOption::VALUE_NONE, 'Display this help message.'),
-            new InputOption('--quiet',          '-q', InputOption::VALUE_NONE, 'Do not output any message.'),
-            new InputOption('--verbose',        '-v', InputOption::VALUE_NONE, 'Increase verbosity of messages.'),
-            new InputOption('--version',        '-V', InputOption::VALUE_NONE, 'Display this application version.'),
-            new InputOption('--ansi',           '',   InputOption::VALUE_NONE, 'Force ANSI output.'),
-            new InputOption('--no-ansi',        '',   InputOption::VALUE_NONE, 'Disable ANSI output.'),
-            new InputOption('--no-interaction', '-n', InputOption::VALUE_NONE, 'Do not ask any interactive question.'),
+            new InputArgument('command',                InputArgument::REQUIRED, 'The command to execute'),
+            new InputOption('--help',           '-h',   InputOption::VALUE_NONE, 'Display this help message.'),
+            new InputOption('--quiet',          '-q',   InputOption::VALUE_NONE, 'Do not output any message.'),
+            new InputOption('--verbose',        '-v',   InputOption::VALUE_NONE, 'Increase verbosity of messages.'),
+            new InputOption('--verbose-very',   '-vv',  InputOption::VALUE_NONE, 'Increase verbosity of messages to display even more verbose messages.'),
+            new InputOption('--verbose-debug',  '-vvv', InputOption::VALUE_NONE, 'Increase verbosity of messages to debug level.'),
+            new InputOption('--version',        '-V',   InputOption::VALUE_NONE, 'Display this application version.'),
+            new InputOption('--ansi',           '',     InputOption::VALUE_NONE, 'Force ANSI output.'),
+            new InputOption('--no-ansi',        '',     InputOption::VALUE_NONE, 'Disable ANSI output.'),
+            new InputOption('--no-interaction', '-n',   InputOption::VALUE_NONE, 'Do not ask any interactive question.'),
         ));
     }
 

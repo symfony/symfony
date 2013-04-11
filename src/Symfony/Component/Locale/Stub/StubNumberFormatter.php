@@ -11,17 +11,17 @@
 
 namespace Symfony\Component\Locale\Stub;
 
-use Symfony\Component\Intl\NumberFormatter\StubNumberFormatter as BaseStubNumberFormatter;
+use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
 
 /**
- * Alias of {@link \Symfony\Component\Intl\NumberFormatter\StubNumberFormatter}.
+ * Alias of {@link \Symfony\Component\Intl\NumberFormatter\NumberFormatter}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\NumberFormatter\StubNumberFormatter}
+ *             {@link \Symfony\Component\Intl\NumberFormatter\NumberFormatter}
  *             instead.
  */
-class StubNumberFormatter extends BaseStubNumberFormatter
+class StubNumberFormatter extends NumberFormatter
 {
 }

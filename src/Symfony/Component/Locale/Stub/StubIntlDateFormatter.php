@@ -11,17 +11,17 @@
 
 namespace Symfony\Component\Locale\Stub;
 
-use Symfony\Component\Intl\DateFormatter\StubIntlDateFormatter as BaseStubIntlDateFormatter;
+use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
 
 /**
- * Alias of {@link \Symfony\Component\Intl\DateFormatter\StubIntlDateFormatter}.
+ * Alias of {@link \Symfony\Component\Intl\DateFormatter\IntlDateFormatter}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\DateFormatter\StubIntlDateFormatter}
+ *             {@link \Symfony\Component\Intl\DateFormatter\IntlDateFormatter}
  *             instead.
  */
-class StubIntlDateFormatter extends BaseStubIntlDateFormatter
+class StubIntlDateFormatter extends IntlDateFormatter
 {
 }

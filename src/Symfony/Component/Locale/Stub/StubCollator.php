@@ -11,16 +11,16 @@
 
 namespace Symfony\Component\Locale\Stub;
 
-use Symfony\Component\Intl\Collator\StubCollator as BaseStubCollator;
+use Symfony\Component\Intl\Collator\Collator;
 
 /**
- * Alias of {@link \Symfony\Component\Intl\Collator\StubCollator}.
+ * Alias of {@link \Symfony\Component\Intl\Collator\Collator}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\Collator\StubCollator} instead.
+ *             {@link \Symfony\Component\Intl\Collator\Collator} instead.
  */
-class StubCollator extends BaseStubCollator
+class StubCollator extends Collator
 {
 }

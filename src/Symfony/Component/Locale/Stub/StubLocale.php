@@ -13,18 +13,18 @@ namespace Symfony\Component\Locale\Stub;
 
 use Symfony\Component\Icu\IcuData;
 use Symfony\Component\Intl\Intl;
-use Symfony\Component\Intl\Locale\StubLocale as BaseStubLocale;
+use Symfony\Component\Intl\Locale\Locale;
 
 /**
- * Alias of {@link \Symfony\Component\Intl\Locale\StubLocale}.
+ * Alias of {@link \Symfony\Component\Intl\Locale\Locale}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\Locale\StubLocale} and
+ *             {@link \Symfony\Component\Intl\Locale\Locale} and
  *             {@link \Symfony\Component\Intl\Intl} instead.
  */
-class StubLocale extends BaseStubLocale
+class StubLocale extends Locale
 {
     /**
      * Caches the currencies

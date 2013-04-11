@@ -88,10 +88,18 @@ class Event
      *
      * @return EventDispatcherInterface
      *
+     * @deprecated The dispatcher is now the second argument passed to each listener
+     *
      * @api
      */
     public function getDispatcher()
     {
+        trigger_error(
+            'Calling getDispatcher() on the event object is deprecated. '.
+            'The dispatcher is now the second argument passed to your listener.',
+            E_USER_DEPRECATED
+        );
+
         return $this->dispatcher;
     }
 
@@ -100,10 +108,18 @@ class Event
      *
      * @return string
      *
+     * @deprecated The name is now the third argument passed to each listener
+     *
      * @api
      */
     public function getName()
     {
+        trigger_error(
+            'Calling getName() on the event object is deprecated. '.
+            'The event name is now the third argument passed to your listener.',
+            E_USER_DEPRECATED
+        );
+
         return $this->name;
     }
 

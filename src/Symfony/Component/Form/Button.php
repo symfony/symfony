@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 
 /**
- * Default implementation of {@link ButtonInterface}.
+ * A form button.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

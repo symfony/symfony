@@ -98,7 +98,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('session.handler.native_file', (string) $container->getAlias('session.handler'));
 
         $this->assertTrue($container->getParameter('session.auto_start'));
-        $this->assertEquals($container->getParameter('session.storage.on_demand_mode'), 1);
+        $this->assertEquals($container->getParameter('session.storage.on_demand_mode'), 'on');
 
         $options = $container->getParameter('session.storage.options');
         $this->assertEquals('_SYMFONY', $options['name']);

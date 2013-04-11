@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Exception\FormException;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
  * A builder for {@link Button} instances.
@@ -62,7 +63,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     public function __construct($name, array $options)
     {
         if (empty($name) && 0 != $name) {
-            throw new FormException('Buttons cannot have empty names.');
+            throw new InvalidArgumentException('Buttons cannot have empty names.');
         }
 
         $this->name = (string) $name;

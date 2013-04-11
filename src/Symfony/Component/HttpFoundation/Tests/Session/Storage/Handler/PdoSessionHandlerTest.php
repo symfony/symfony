@@ -24,8 +24,46 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->pdo = new \PDO("sqlite::memory:");
+        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $sql = "CREATE TABLE sessions (sess_id VARCHAR(255) PRIMARY KEY, sess_data TEXT, sess_time INTEGER)";
         $this->pdo->exec($sql);
+    }
+
+    public function testIncompleteOptions()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+        $storage = new PdoSessionHandler($this->pdo, array(), array());
+    }
+
+    public function testWrongPdoErrMode()
+    {
+        $pdo = new \PDO("sqlite::memory:");
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
+        $pdo->exec("CREATE TABLE sessions (sess_id VARCHAR(255) PRIMARY KEY, sess_data TEXT, sess_time INTEGER)");
+
+        $this->setExpectedException('InvalidArgumentException');
+        $storage = new PdoSessionHandler($pdo, array('db_table' => 'sessions'), array());
+    }
+
+    public function testWrongTableOptionsWrite()
+    {
+        $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'bad_name'), array());
+        $this->setExpectedException('RuntimeException');
+        $storage->write('foo', 'bar');
+    }
+
+    public function testWrongTableOptionsRead()
+    {
+        $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'bad_name'), array());
+        $this->setExpectedException('RuntimeException');
+        $storage->read('foo', 'bar');
+    }
+
+    public function testWriteRead()
+    {
+        $storage = new PdoSessionHandler($this->pdo, array('db_table' => 'sessions'), array());
+        $storage->write('foo', 'bar');
+        $this->assertEquals('bar', $storage->read('foo'), 'written value can be read back correctly');
     }
 
     public function testMultipleInstances()

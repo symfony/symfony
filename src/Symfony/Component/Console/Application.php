@@ -182,8 +182,28 @@ class Application
 
         if (true === $input->hasParameterOption(array('--quiet', '-q'))) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
-        } elseif (true === $input->hasParameterOption(array('--verbose', '-v'))) {
+        }
+
+        if (true === $input->hasParameterOption('-v')) {
             $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+        }
+
+        if (true === $input->hasParameterOption('-vv')) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
+        }
+
+        if (true === $input->hasParameterOption('-vvv')) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
+        }
+
+        if (true === $input->hasParameterOption('--verbose')) {
+            switch ($input->getParameterOption('--verbose', 1)) {
+                case 1: $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE); break;
+                case 2: $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE); break;
+                case 3: $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG); break;
+
+                default: $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+            }
         }
 
         if (true === $input->hasParameterOption(array('--version', '-V'))) {
@@ -985,7 +1005,7 @@ class Application
 
             new InputOption('--help',           '-h', InputOption::VALUE_NONE, 'Display this help message.'),
             new InputOption('--quiet',          '-q', InputOption::VALUE_NONE, 'Do not output any message.'),
-            new InputOption('--verbose',        '-v', InputOption::VALUE_NONE, 'Increase verbosity of messages.'),
+            new InputOption('--verbose',        '-v', InputOption::VALUE_OPTIONAL, 'Increase verbosity of messages. Can be between 1 (normal, default), 2 (more verbose) and 3 (maximum)', 1),
             new InputOption('--version',        '-V', InputOption::VALUE_NONE, 'Display this application version.'),
             new InputOption('--ansi',           '',   InputOption::VALUE_NONE, 'Force ANSI output.'),
             new InputOption('--no-ansi',        '',   InputOption::VALUE_NONE, 'Disable ANSI output.'),

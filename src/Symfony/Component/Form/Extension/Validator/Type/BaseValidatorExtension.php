@@ -30,6 +30,10 @@ abstract class BaseValidatorExtension extends AbstractTypeExtension
     {
         // Make sure that validation groups end up as null, closure or array
         $validationGroupsNormalizer = function (Options $options, $groups) {
+            if (false === $groups) {
+                return array();
+            }
+
             if (empty($groups)) {
                 return null;
             }

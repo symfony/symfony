@@ -170,6 +170,51 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($form, new Form());
     }
 
+    public function testDontValidateIfNoValidationGroups()
+    {
+        $context = $this->getMockExecutionContext();
+        $object = $this->getMock('\stdClass');
+
+        $form = $this->getBuilder('name', '\stdClass', array(
+                'validation_groups' => array(),
+            ))
+            ->setData($object)
+            ->getForm();
+
+        $form->setData($object);
+
+        $context->expects($this->never())
+            ->method('validate');
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
+    public function testDontValidateConstraintsIfNoValidationGroups()
+    {
+        $context = $this->getMockExecutionContext();
+        $object = $this->getMock('\stdClass');
+        $constraint1 = $this->getMock('Symfony\Component\Validator\Constraint');
+        $constraint2 = $this->getMock('Symfony\Component\Validator\Constraint');
+
+        $options = array(
+            'validation_groups' => array(),
+            'constraints' => array($constraint1, $constraint2),
+        );
+        $form = $this->getBuilder('name', '\stdClass', $options)
+            ->setData($object)
+            ->getForm();
+
+        // Launch transformer
+        $form->bind(array());
+
+        $context->expects($this->never())
+            ->method('validate');
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
     public function testDontValidateIfNotSynchronized()
     {
         $context = $this->getMockExecutionContext();
@@ -187,6 +232,46 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
                 function ($data) { return $data; },
                 function () { throw new TransformationFailedException(); }
             ))
+            ->getForm();
+
+        // Launch transformer
+        $form->bind('foo');
+
+        $context->expects($this->never())
+            ->method('validate');
+
+        $context->expects($this->once())
+            ->method('addViolation')
+            ->with(
+                'invalid_message_key',
+                array('{{ value }}' => 'foo', '{{ foo }}' => 'bar'),
+                'foo'
+            );
+        $context->expects($this->never())
+            ->method('addViolationAt');
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
+    public function testAddInvalidErrorEvenIfNoValidationGroups()
+    {
+        $context = $this->getMockExecutionContext();
+        $object = $this->getMock('\stdClass');
+
+        $form = $this->getBuilder('name', '\stdClass', array(
+                'invalid_message' => 'invalid_message_key',
+                // Invalid message parameters must be supported, because the
+                // invalid message can be a translation key
+                // see https://github.com/symfony/symfony/issues/5144
+                'invalid_message_parameters' => array('{{ foo }}' => 'bar'),
+                'validation_groups' => array(),
+            ))
+            ->setData($object)
+            ->addViewTransformer(new CallbackTransformer(
+                    function ($data) { return $data; },
+                    function () { throw new TransformationFailedException(); }
+                ))
             ->getForm();
 
         // Launch transformer

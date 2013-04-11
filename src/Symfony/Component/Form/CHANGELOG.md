@@ -28,6 +28,8 @@ CHANGELOG
  * added an optional PropertyAccessorInterface parameter to FormType,
    ObjectChoiceList and PropertyPathMapper
  * [BC BREAK] PropertyPathMapper and FormType now have a constructor
+ * [BC BREAK] setting the option "validation_groups" to ``false`` now disables validation
+   instead of assuming group "Default"
 
 2.1.0
 -----

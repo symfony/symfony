@@ -40,7 +40,7 @@ class DialogHelper extends Helper
      *
      * @throws \InvalidArgumentException
      */
-    public function select(OutputInterface $output, $question, $choices, $default = null, $attempts = false, $multiselect = false, $errorMessage = 'Value "%s" is invalid')
+    public function select(OutputInterface $output, $question, $choices, $default = null, $attempts = false, $errorMessage = 'Value "%s" is invalid', $multiselect = false)
     {
         $width = max(array_map('strlen', array_keys($choices)));
 
@@ -62,14 +62,13 @@ class DialogHelper extends Helper
                     throw new \InvalidArgumentException(sprintf($errorMessage, $picked));
                 }
                 $selectedChoices = explode(",", $selectedChoices);
-            }
-            else {
+            } else {
                 $selectedChoices = array($picked);
             }
 
             $multiselectChoices = array();
 
-            foreach ($selectedChoices as $key => $value) {
+            foreach ($selectedChoices as $value) {
                 if (empty($choices[$value])) {
                     throw new \InvalidArgumentException(sprintf($errorMessage, $value));
                 }
@@ -78,9 +77,9 @@ class DialogHelper extends Helper
 
             if ($multiselect){
                 return $multiselectChoices;
-            } else {
-                return $picked;
-            }
+            } 
+            
+            return $picked;
 
         }, $attempts, $default);
 

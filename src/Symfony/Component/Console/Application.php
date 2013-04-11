@@ -185,9 +185,9 @@ class Application
         if (true === $input->hasParameterOption(array('--quiet', '-q'))) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
         } elseif($input->hasParameterOption('--verbose')) {
-            if ($input->hasParameterOption('-vvv') || $input->getParameterOption('--verbose') === 3) {
+            if ($input->getParameterOption('--verbose') === 3) {
                 $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
-            } elseif ($input->hasParameterOption('-vv') || $input->getParameterOption('--verbose') === 2) {
+            } elseif ($input->getParameterOption('--verbose') === 2) {
                 $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
             } else {
                 $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);

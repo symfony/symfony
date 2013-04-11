@@ -1425,44 +1425,46 @@ class Request
     }
 
     /*
-     * The following methods are derived from code of the Zend Framework (1.10dev - 2010-01-24)
+     * The following methods starting with `prepare*` are derived from code of the Zend Framework.
      *
-     * Code subject to the new BSD license (http://framework.zend.com/license/new-bsd).
+     * Code subject to the new BSD license (http://framework.zend.com/license/).
      *
-     * Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+     * Copyright (c) 2005-2013, Zend Technologies USA, Inc. (http://www.zend.com)
      */
 
+    /**
+     * Detects the request URI (path + query string) based on the server variables.
+     *
+     * @return string The request URI
+     */
     protected function prepareRequestUri()
     {
-        $requestUri = '';
-
-        if ($this->headers->has('X_ORIGINAL_URL') && false !== stripos(PHP_OS, 'WIN')) {
-            // IIS with Microsoft Rewrite Module
+        if ($this->headers->has('X_ORIGINAL_URL')) {
+            // IIS 7.0 or later with Microsoft Rewrite Module
             $requestUri = $this->headers->get('X_ORIGINAL_URL');
             $this->headers->remove('X_ORIGINAL_URL');
-        } elseif ($this->headers->has('X_REWRITE_URL') && false !== stripos(PHP_OS, 'WIN')) {
+        } elseif ($this->headers->has('X_REWRITE_URL')) {
             // IIS with ISAPI_Rewrite
             $requestUri = $this->headers->get('X_REWRITE_URL');
             $this->headers->remove('X_REWRITE_URL');
-        } elseif ($this->server->get('IIS_WasUrlRewritten') == '1' && $this->server->get('UNENCODED_URL') != '') {
+        } elseif ('1' == $this->server->get('IIS_WasUrlRewritten') && '' !== $this->server->get('UNENCODED_URL', '')) {
             // IIS7 with URL Rewrite: make sure we get the unencoded url (double slash problem)
             $requestUri = $this->server->get('UNENCODED_URL');
             $this->server->remove('UNENCODED_URL');
             $this->server->remove('IIS_WasUrlRewritten');
         } elseif ($this->server->has('REQUEST_URI')) {
             $requestUri = $this->server->get('REQUEST_URI');
-            // HTTP proxy reqs setup request uri with scheme and host [and port] + the url path, only use url path
-            $schemeAndHttpHost = $this->getSchemeAndHttpHost();
-            if (strpos($requestUri, $schemeAndHttpHost) === 0) {
-                $requestUri = substr($requestUri, strlen($schemeAndHttpHost));
-            }
+            // HTTP proxy reqs setup request uri with scheme and host [and port] + the url path; only use url path and query string
+            $requestUri = preg_replace('#^[^/:]++://[^/]++#', '', $requestUri);
         } elseif ($this->server->has('ORIG_PATH_INFO')) {
             // IIS 5.0, PHP as CGI
             $requestUri = $this->server->get('ORIG_PATH_INFO');
-            if ('' != $this->server->get('QUERY_STRING')) {
+            if ('' !== $this->server->get('QUERY_STRING', '')) {
                 $requestUri .= '?'.$this->server->get('QUERY_STRING');
             }
             $this->server->remove('ORIG_PATH_INFO');
+        } else {
+            $requestUri = '/';
         }
 
         // normalize the request URI to ease creating sub-requests from this request
@@ -1472,9 +1474,9 @@ class Request
     }
 
     /**
-     * Prepares the base URL.
+     * Detects the base URL of the request based on the server variables.
      *
-     * @return string
+     * @return string The base URL
      */
     protected function prepareBaseUrl()
     {
@@ -1517,19 +1519,19 @@ class Request
         }
 
         $truncatedRequestUri = $requestUri;
-        if (($pos = strpos($requestUri, '?')) !== false) {
+        if (false !== ($pos = strpos($requestUri, '?'))) {
             $truncatedRequestUri = substr($requestUri, 0, $pos);
         }
 
         $basename = basename($baseUrl);
-        if (empty($basename) || !strpos(rawurldecode($truncatedRequestUri), $basename)) {
+        if ('' === $basename || false === strpos($truncatedRequestUri, $basename)) {
             // no match whatsoever; set it blank
             return '';
         }
 
         // If using mod_rewrite or ISAPI_Rewrite strip the script filename
         // out of baseUrl. $pos !== 0 makes sure it is not matching a value
-        // from PATH_INFO or QUERY_STRING
+        // from PATH_INFO or QUERY_STRING.
         if ((strlen($requestUri) >= strlen($baseUrl)) && ((false !== ($pos = strpos($requestUri, $baseUrl))) && ($pos !== 0))) {
             $baseUrl = substr($requestUri, 0, $pos + strlen($baseUrl));
         }
@@ -1538,59 +1540,51 @@ class Request
     }
 
     /**
-     * Prepares the base path.
+     * Detects the base path of the request based on the server variables.
      *
-     * @return string base path
+     * @return string The base path
      */
     protected function prepareBasePath()
     {
-        $filename = basename($this->server->get('SCRIPT_FILENAME'));
         $baseUrl = $this->getBaseUrl();
-        if (empty($baseUrl)) {
+        if ('' === $baseUrl) {
             return '';
         }
 
+        $filename = basename($this->server->get('SCRIPT_FILENAME'));
+        // basename() matches the script filename; return the directory
         if (basename($baseUrl) === $filename) {
-            $basePath = dirname($baseUrl);
-        } else {
-            $basePath = $baseUrl;
+            return str_replace('\\', '/', dirname($baseUrl));
         }
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $basePath = str_replace('\\', '/', $basePath);
-        }
-
-        return rtrim($basePath, '/');
+        // Base path is identical to base URL
+        return $baseUrl;
     }
 
     /**
-     * Prepares the path info.
+     * Detects the path info of the request based on the server variables.
      *
-     * @return string path info
+     * @return string The path info
      */
     protected function preparePathInfo()
     {
+        // We cannot use the PATH_INFO server variable because it is already
+        // URL-decoded (see http://www.ietf.org/rfc/rfc3875).
+
+        $path = $this->getRequestUri();
+        // Remove the query string from the request URI.
+        if (false !== $pos = strpos($path, '?')) {
+            $path = substr($path, 0, $pos);
+        }
+
         $baseUrl = $this->getBaseUrl();
-
-        if (null === ($requestUri = $this->getRequestUri())) {
+        if ($path === $baseUrl) {
+            // When the base URL equals the request path (e.g. "/app.php"), the path info
+            // is still "/" (instead of being empty) so it always starts with a slash.
             return '/';
         }
 
-        $pathInfo = '/';
-
-        // Remove the query string from REQUEST_URI
-        if ($pos = strpos($requestUri, '?')) {
-            $requestUri = substr($requestUri, 0, $pos);
-        }
-
-        if ((null !== $baseUrl) && (false === ($pathInfo = substr($requestUri, strlen($baseUrl))))) {
-            // If substr() returns false then PATH_INFO is set to an empty string
-            return '/';
-        } elseif (null === $baseUrl) {
-            return $requestUri;
-        }
-
-        return (string) $pathInfo;
+        return substr($path, strlen($baseUrl));
     }
 
     /**

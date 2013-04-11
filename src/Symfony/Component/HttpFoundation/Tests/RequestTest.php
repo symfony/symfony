@@ -1133,7 +1133,86 @@ class RequestTest extends \PHPUnit_Framework_TestCase
                 '/foo',
                 '/bar+baz',
             ),
+            array(
+                '/webmaster',
+                array(
+                    'SCRIPT_FILENAME' => '/foo/bar/web/index.php',
+                    'SCRIPT_NAME'     => '/web/index.php',
+                    'PHP_SELF'        => '/web/index.php',
+                ),
+                '',
+                '/webmaster',
+            ),
+            array(
+                '/foobar/index.php',
+                array(
+                    'SCRIPT_FILENAME' => '/foo/bar/web/index.php',
+                    'SCRIPT_NAME'     => '/web/index.php',
+                    'PHP_SELF'        => '/web/index.php',
+                ),
+                '',
+                '/foobar/index.php',
+            ),
+            array(
+                '/~username/public/',
+                array(
+                    'SCRIPT_FILENAME' => '/Users/username/Sites/public/index.php',
+                    'SCRIPT_NAME'     => '/~username/public/index.php',
+                    'PHP_SELF'        => '/~username/public/index.php',
+                ),
+                '/~username/public',
+                '/',
+            ),
+            array(
+                '/symfony/',
+                array(
+                    'SCRIPT_FILENAME' => 'c:/myproject/public/index.php',
+                    'SCRIPT_NAME'     => '/symfony/index.php',
+                    'PHP_SELF'        => '/symfony/index.php',
+                ),
+                '/symfony',
+                '/',
+            ),
+            array(
+                '/html/index.php/news/3?var1=val1&var2=/index.php',
+                array(
+                    'PHP_SELF'        => '/html/index.php/news/3',
+                    'SCRIPT_FILENAME' => '/var/web/html/index.php',
+                ),
+                '/html/index.php',
+                '/news/3'
+            ),
+            array(
+                '/html/index.php/news/index.php',
+                array(
+                    'SCRIPT_FILENAME' => '/var/web/html/index.php',
+                    'PHP_SELF'        => '/html/index.php/news/index.php',
+                ),
+                '/html/index.php',
+                '/news/index.php'
+            ),
+            array(
+                '/html/index.php?url=http://test.example.com/path/&foo=bar',
+                array(
+                    'SCRIPT_FILENAME' => '/var/web/html/index.php',
+                    'PHP_SELF' => '/html/index.php',
+                ),
+                '/html/index.php',
+                '/'
+            ),
         );
+    }
+
+    public function testBaseurlFallsBackToRootPathIfScriptFilenameIsNotSet()
+    {
+        $request = new Request();
+        $request->server->set('SCRIPT_NAME', null);
+        $request->server->set('PHP_SELF', null);
+        $request->server->set('ORIG_SCRIPT_NAME', null);
+        $request->server->set('ORIG_SCRIPT_NAME', null);
+        $request->server->set('SCRIPT_FILENAME', null);
+
+        $this->assertSame('', $request->getBaseUrl());
     }
 
     /**

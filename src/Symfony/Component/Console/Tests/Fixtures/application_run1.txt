@@ -6,7 +6,7 @@ Usage:
 Options:
   --help           -h Display this help message.
   --quiet          -q Do not output any message.
-  --verbose        -v Increase verbosity of messages.
+  --verbose        -v Increase verbosity of messages. Can be between 1 (normal, default), 2 (more verbose) and 3 (maximum)
   --version        -V Display this application version.
   --ansi              Force ANSI output.
   --no-ansi           Disable ANSI output.

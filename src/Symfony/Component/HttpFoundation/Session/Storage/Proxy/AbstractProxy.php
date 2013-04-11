@@ -36,7 +36,7 @@ abstract class AbstractProxy
     protected $saveHandlerName;
 
     /**
-     * Gets the session.save_handler name.
+     * Gets the session.save_handler name
      *
      * @return string
      */
@@ -46,7 +46,7 @@ abstract class AbstractProxy
     }
 
     /**
-     * Is this proxy handler and instance of \SessionHandlerInterface.
+     * Is this proxy handler and instance of \SessionHandlerInterface
      *
      * @return boolean
      */
@@ -56,7 +56,7 @@ abstract class AbstractProxy
     }
 
     /**
-     * Returns true if this handler wraps an internal PHP session save handler using \SessionHandler.
+     * Returns true if this handler wraps an internal PHP session save handler using \SessionHandler
      *
      * @return Boolean
      */
@@ -105,7 +105,7 @@ abstract class AbstractProxy
     public function setId($id)
     {
         if ($this->isActive()) {
-            throw new \LogicException('Cannot change the ID of an active session');
+            throw new \LogicException('Cannot change the ID of an active session.');
         }
 
         session_id($id);
@@ -131,7 +131,7 @@ abstract class AbstractProxy
     public function setName($name)
     {
         if ($this->isActive()) {
-            throw new \LogicException('Cannot change the name of an active session');
+            throw new \LogicException('Cannot change the name of an active session.');
         }
 
         session_name($name);

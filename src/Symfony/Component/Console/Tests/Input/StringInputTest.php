@@ -73,4 +73,16 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
             array('foo -a -ffoo --long bar', array('foo', '-a', '-ffoo', '--long', 'bar'), '->tokenize() parses when several arguments and options'),
         );
     }
+
+    public function testToString()
+    {
+        $input = new StringInput('-f foo');
+        $this->assertEquals('-f foo', (string) $input);
+
+        $input = new StringInput('-f --bar=foo "a b c d"');
+        $this->assertEquals('-f --bar=foo "a b c d"', (string) $input);
+
+        $input = new StringInput('-f --bar=foo \'a b c d\'');
+        $this->assertEquals('-f --bar=foo "a b c d"', (string) $input);
+    }
 }

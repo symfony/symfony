@@ -135,6 +135,32 @@ UPGRADE FROM 2.x to 3.0
     * `Symfony\Component\HttpKernel\Exception\FatalErrorException` -> `Symfony\Component\Debug\Exception\FatalErrorException`
     * `Symfony\Component\HttpKernel\Exception\FlattenException` -> `Symfony\Component\Debug\Exception\FlattenException`
 
+### Form
+
+ * The `TypeTestCase` class was moved from the `Symfony\Component\Form\Tests\Extension\Core\Type` namespace to the `Symfony\Component\Form\Test` namespace.
+ 
+   Before:
+
+   ```
+   use Symfony\Component\Form\Tests\Extension\Core\Type\TypeTestCase
+
+   class MyTypeTest extends TypeTestCase
+   {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\Form\Test\TypeTestCase;
+
+   class MyTypeTest extends TypeTestCase
+   {
+       // ...
+   }
+   ```
+
 ### Routing
 
  * Some route settings have been renamed:

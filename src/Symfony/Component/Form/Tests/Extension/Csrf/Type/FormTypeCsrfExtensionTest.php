@@ -13,8 +13,8 @@ namespace Symfony\Component\Form\Tests\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-use Symfony\Component\Form\Tests\Extension\Core\Type\TypeTestCase;
 
 class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 {

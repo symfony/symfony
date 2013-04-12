@@ -664,19 +664,9 @@ class Request
     /**
      * Returns the client IP addresses.
      *
-     * This method can read the client IP address from the "X-Forwarded-For" header
-     * when trusted proxies were set via "setTrustedProxies()". The "X-Forwarded-For"
-     * header value is a comma+space separated list of IP addresses, the left-most
-     * being the original client, and each successive proxy that passed the request
-     * adding the IP address where it received the request from.
-     *
-     * If your reverse proxy uses a different header name than "X-Forwarded-For",
-     * ("Client-Ip" for instance), configure it via "setTrustedHeaderName()" with
-     * the "client-ip" key.
-     *
      * @return array The client IP addresses
      *
-     * @see http://en.wikipedia.org/wiki/X-Forwarded-For
+     * @see getClientIp()
      */
     public function getClientIps()
     {
@@ -702,9 +692,20 @@ class Request
     /**
      * Returns the client IP address.
      *
+     * This method can read the client IP address from the "X-Forwarded-For" header
+     * when trusted proxies were set via "setTrustedProxies()". The "X-Forwarded-For"
+     * header value is a comma+space separated list of IP addresses, the left-most
+     * being the original client, and each successive proxy that passed the request
+     * adding the IP address where it received the request from.
+     *
+     * If your reverse proxy uses a different header name than "X-Forwarded-For",
+     * ("Client-Ip" for instance), configure it via "setTrustedHeaderName()" with
+     * the "client-ip" key.
+     *
      * @return string The client IP address
      *
      * @see getClientIps()
+     * @see http://en.wikipedia.org/wiki/X-Forwarded-For
      *
      * @api
      */

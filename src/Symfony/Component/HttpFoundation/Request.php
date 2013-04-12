@@ -662,6 +662,34 @@ class Request
     }
 
     /**
+     * Returns the client IP addresses.
+     *
+     * @return array The client IP addresses
+     *
+     * @see getClientIp()
+     */
+    public function getClientIps()
+    {
+        $ip = $this->server->get('REMOTE_ADDR');
+
+        if (!self::$trustProxy) {
+            return array($ip);
+        }
+
+        if (!self::$trustedHeaders[self::HEADER_CLIENT_IP] || !$this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
+            return array($ip);
+        }
+
+        $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
+        $clientIps[] = $ip;
+
+        $trustedProxies = self::$trustProxy && !self::$trustedProxies ? array($ip) : self::$trustedProxies;
+        $clientIps = array_diff($clientIps, $trustedProxies);
+
+        return $clientIps;
+    }
+
+    /**
      * Returns the client IP address.
      *
      * This method can read the client IP address from the "X-Forwarded-For" header
@@ -676,29 +704,16 @@ class Request
      *
      * @return string The client IP address
      *
+     * @see getClientIps()
      * @see http://en.wikipedia.org/wiki/X-Forwarded-For
      *
      * @api
      */
     public function getClientIp()
     {
-        $ip = $this->server->get('REMOTE_ADDR');
+        $ipAddresses = $this->getClientIps();
 
-        if (!self::$trustProxy) {
-            return $ip;
-        }
-
-        if (!self::$trustedHeaders[self::HEADER_CLIENT_IP] || !$this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
-            return $ip;
-        }
-
-        $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
-        $clientIps[] = $ip;
-
-        $trustedProxies = self::$trustProxy && !self::$trustedProxies ? array($ip) : self::$trustedProxies;
-        $clientIps = array_diff($clientIps, $trustedProxies);
-
-        return array_pop($clientIps);
+        return array_pop($ipAddresses);
     }
 
     /**

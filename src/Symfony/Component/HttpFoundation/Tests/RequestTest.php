@@ -743,18 +743,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetClientIp($expected, $proxy, $remoteAddr, $httpForwardedFor, $trustedProxies)
     {
-        $request = new Request();
+        $request = $this->getRequestInstanceForClientIpTests($proxy, $remoteAddr, $httpForwardedFor, $trustedProxies);
 
-        $server = array('REMOTE_ADDR' => $remoteAddr);
-        if (null !== $httpForwardedFor) {
-            $server['HTTP_X_FORWARDED_FOR'] = $httpForwardedFor;
-        }
-
-        if ($proxy || $trustedProxies) {
-            Request::setTrustedProxies(null === $trustedProxies ? array($remoteAddr) : $trustedProxies);
-        }
-
-        $request->initialize(array(), array(), array(), array(), array(), $server);
         $this->assertEquals($expected, $request->getClientIp());
 
         Request::setTrustedProxies(array());
@@ -772,6 +762,33 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('88.88.88.88',              true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', null),
             array('87.65.43.21',              true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
             array('87.65.43.21',              false, '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
+        );
+    }
+
+    /**
+     * @dataProvider testGetClientIpsProvider
+     */
+    public function testGetClientIps($expected, $proxy, $remoteAddr, $httpForwardedFor, $trustedProxies)
+    {
+        $request = $this->getRequestInstanceForClientIpTests($proxy, $remoteAddr, $httpForwardedFor, $trustedProxies);
+
+        $this->assertEquals($expected, $request->getClientIps());
+
+        Request::setTrustedProxies(array());
+    }
+
+    public function testGetClientIpsProvider()
+    {
+        return array(
+            array(array('88.88.88.88'),                             false, '88.88.88.88',  null,                                  null),
+            array(array('127.0.0.1'),                               false, '127.0.0.1',    null,                                  null),
+            array(array('::1'),                                     false, '::1',          null,                                  null),
+            array(array('127.0.0.1'),                               false, '127.0.0.1',    '88.88.88.88',                         null),
+            array(array('88.88.88.88'),                             true,  '127.0.0.1',    '88.88.88.88',                         null),
+            array(array('2620:0:1cfe:face:b00c::3'),                true,  '::1',          '2620:0:1cfe:face:b00c::3',            null),
+            array(array('127.0.0.1', '87.65.43.21', '88.88.88.88'), true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', null),
+            array(array('127.0.0.1', '87.65.43.21'),                true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
+            array(array('127.0.0.1', '87.65.43.21'),                false, '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
         );
     }
 
@@ -1271,6 +1288,24 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $property = $class->getProperty('httpMethodParameterOverride');
         $property->setAccessible(true);
         $property->setValue(false);
+    }
+
+    private function getRequestInstanceForClientIpTests($proxy, $remoteAddr, $httpForwardedFor, $trustedProxies)
+    {
+        $request = new Request();
+
+        $server = array('REMOTE_ADDR' => $remoteAddr);
+        if (null !== $httpForwardedFor) {
+            $server['HTTP_X_FORWARDED_FOR'] = $httpForwardedFor;
+        }
+
+        if ($proxy || $trustedProxies) {
+            Request::setTrustedProxies(null === $trustedProxies ? array($remoteAddr) : $trustedProxies);
+        }
+
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        return $request;
     }
 
     public function testTrustedProxies()

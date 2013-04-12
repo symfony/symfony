@@ -97,9 +97,11 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
-        session_cache_limiter('');
+        session_cache_limiter(''); // disable by default because it's managed by HeaderBag (if used)
         if (ini_get('session.use_cookies') != 1) {
-             ini_set('session.use_cookies', 1);
+             if (ini_set('session.use_cookies', 1) === false) {
+                 throw new \RuntimeException('Failed to initialize the session to use cookies');
+             }
         }
 
         if (version_compare(phpversion(), '5.4.0', '>=')) {

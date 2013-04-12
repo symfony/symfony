@@ -166,6 +166,8 @@ class BinaryFileResponse extends Response
             $this->setProtocolVersion('1.1');
         }
 
+        $this->ensureIEOverSSLCompatibility($request);
+
         $this->offset = 0;
         $this->maxlen = -1;
 

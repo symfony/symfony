@@ -102,7 +102,7 @@ class Parser
                         $parser->refs =& $this->refs;
 
                         $block = $values['value'];
-                        if (!$this->isNextLineIndented()) {
+                        if ($this->isNextLineIndented()) {
                             $block .= "\n".$this->getNextEmbedBlock($this->getCurrentLineIndentation() + 2);
                         }
 
@@ -174,7 +174,7 @@ class Parser
                 // hash
                 } elseif (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
                     // if next line is less indented or equal, then it means that the current value is null
-                    if ($this->isNextLineIndented() && !$this->isNextLineUnIndentedCollection()) {
+                    if (!$this->isNextLineIndented() && !$this->isNextLineUnIndentedCollection()) {
                         $data[$key] = null;
                     } else {
                         $c = $this->getRealCurrentLineNb() + 1;
@@ -482,18 +482,18 @@ class Parser
     private function isNextLineIndented()
     {
         $currentIndentation = $this->getCurrentLineIndentation();
-        $notEOF = $this->moveToNextLine();
+        $EOF = !$this->moveToNextLine();
 
-        while ($notEOF && $this->isCurrentLineEmpty()) {
-            $notEOF = $this->moveToNextLine();
+        while (!$EOF && $this->isCurrentLineEmpty()) {
+            $EOF = !$this->moveToNextLine();
         }
 
-        if (false === $notEOF) {
+        if ($EOF) {
             return false;
         }
 
         $ret = false;
-        if ($this->getCurrentLineIndentation() <= $currentIndentation) {
+        if ($this->getCurrentLineIndentation() > $currentIndentation) {
             $ret = true;
         }
 

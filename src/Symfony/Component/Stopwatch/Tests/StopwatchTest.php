@@ -29,6 +29,21 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('cat', $event->getCategory());
     }
 
+    public function testIsStarted()
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('foo', 'cat');
+
+        $this->assertTrue($stopwatch->isStarted('foo'));
+    }
+
+    public function testIsNotStarted()
+    {
+        $stopwatch = new Stopwatch();
+
+        $this->assertFalse($stopwatch->isStarted('foo'));
+    }
+
     public function testStop()
     {
         $stopwatch = new Stopwatch();

@@ -16,6 +16,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
 use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -180,6 +183,43 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
             'kernel.terminate',
             'kernel.terminate.loading',
         ), array_keys($events));
+    }
+
+    public function testStopwatchCheckControllerOnRequestEvent()
+    {
+        $stopwatch = $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')
+            ->setMethods(array('isStarted'))
+            ->getMock();
+        $stopwatch->expects($this->once())
+            ->method('isStarted')
+            ->will($this->returnValue(false));
+
+
+        $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch);
+
+        $kernel = $this->getHttpKernel($dispatcher, function () { return new Response(); });
+        $request = Request::create('/');
+        $kernel->handle($request);
+    }
+
+    public function testStopwatchStopControllerOnRequestEvent()
+    {
+        $stopwatch = $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')
+            ->setMethods(array('isStarted', 'stop', 'stopSection'))
+            ->getMock();
+        $stopwatch->expects($this->once())
+            ->method('isStarted')
+            ->will($this->returnValue(true));
+        $stopwatch->expects($this->once())
+            ->method('stop');
+        $stopwatch->expects($this->once())
+            ->method('stopSection');
+
+        $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch);
+
+        $kernel = $this->getHttpKernel($dispatcher, function () { return new Response(); });
+        $request = Request::create('/');
+        $kernel->handle($request);
     }
 
     protected function getHttpKernel($dispatcher, $controller)

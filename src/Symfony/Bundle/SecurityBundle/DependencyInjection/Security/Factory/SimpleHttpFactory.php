@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class SimpleTokenFactory implements SecurityFactoryInterface
+class SimpleHttpFactory implements SecurityFactoryInterface
 {
     public function getPosition()
     {
@@ -28,10 +28,8 @@ class SimpleTokenFactory implements SecurityFactoryInterface
 
     public function getKey()
     {
-        return 'simple-token';
+        return 'simple-http';
     }
-
-// TODO add support for success_handler/failure_handler that call the impl ones
 
     public function addConfiguration(NodeDefinition $node)
     {
@@ -45,7 +43,7 @@ class SimpleTokenFactory implements SecurityFactoryInterface
 
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
-        $provider = 'security.authentication.provider.simple_form.'.$id;
+        $provider = 'security.authentication.provider.simple_http.'.$id;
         $container
             ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.simple'))
             ->replaceArgument(0, new Reference($config['authenticator']))
@@ -54,11 +52,11 @@ class SimpleTokenFactory implements SecurityFactoryInterface
         ;
 
         // listener
-        $listenerId = 'security.authentication.listener.simple_token.'.$id;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.simple_token'));
+        $listenerId = 'security.authentication.listener.simple_http.'.$id;
+        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.simple_http'));
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, new Reference($config['authenticator']));
 
-        return array($provider, $listenerId);
+        return array($provider, $listenerId, null);
     }
 }

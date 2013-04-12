@@ -28,8 +28,6 @@ class SimpleFormFactory extends FormLoginFactory
         $this->addOption('authenticator', null);
     }
 
-// TODO create proxies for success_handler/failure_handler that call the impl ones then the default ones by default if no response is returned
-
     public function getKey()
     {
         return 'simple-form';
@@ -65,17 +63,21 @@ class SimpleFormFactory extends FormLoginFactory
     protected function createListener($container, $id, $config, $userProvider)
     {
         $listenerId = parent::createListener($container, $id, $config, $userProvider);
+        $listener = $container->getDefinition($listenerId);
 
         if (!isset($config['csrf_provider'])) {
-            $container
-                ->getDefinition($listenerId)
-                ->addArgument(null)
-            ;
+            $listener->addArgument(null);
         }
-        $container
-            ->getDefinition($listenerId)
-            ->addArgument(new Reference($config['authenticator']))
-        ;
+
+        $simpleAuthHandlerId = 'security.authentication.simple_success_failure_handler.'.$id;
+        $simpleAuthHandler = $container->setDefinition($simpleAuthHandlerId, new DefinitionDecorator('security.authentication.simple_success_failure_handler'));
+        $simpleAuthHandler->replaceArgument(0, new Reference($config['authenticator']));
+        $simpleAuthHandler->replaceArgument(1, new Reference($this->getSuccessHandlerId($id)));
+        $simpleAuthHandler->replaceArgument(2, new Reference($this->getFailureHandlerId($id)));
+
+        $listener->replaceArgument(5, new Reference($simpleAuthHandlerId));
+        $listener->replaceArgument(6, new Reference($simpleAuthHandlerId));
+        $listener->addArgument(new Reference($config['authenticator']));
 
         return $listenerId;
     }

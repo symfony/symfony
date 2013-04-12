@@ -16,16 +16,19 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Security\Core\Authentication\SimpleTokenAuthenticatorInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\SimpleHttpAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 
 /**
- * SimpleTokenListener implements simple proxying to an authenticator.
+ * SimpleHttpListener implements simple proxying to an authenticator.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class SimpleTokenAuthenticationListener implements ListenerInterface
+class SimpleHttpAuthenticationListener implements ListenerInterface
 {
     private $securityContext;
     private $authenticationManager;
@@ -39,10 +42,10 @@ class SimpleTokenAuthenticationListener implements ListenerInterface
      * @param SecurityContextInterface         $securityContext       A SecurityContext instance
      * @param AuthenticationManagerInterface   $authenticationManager An AuthenticationManagerInterface instance
      * @param string                           $providerKey
-     * @param SimpleTokenAuthenticatorInterface $simpleAuthenticator   A SimpleTokenAuthenticatorInterface instance
+     * @param SimpleHttpAuthenticatorInterface $simpleAuthenticator   A SimpleHttpAuthenticatorInterface instance
      * @param LoggerInterface                  $logger                A LoggerInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, SimpleTokenAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, SimpleHttpAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -65,26 +68,39 @@ class SimpleTokenAuthenticationListener implements ListenerInterface
         $request = $event->getRequest();
 
         if (null !== $this->logger) {
-            $this->logger->info(sprintf('Attempting simple token authorization %s', $this->providerKey));
+            $this->logger->info(sprintf('Attempting simple http authorization %s', $this->providerKey));
         }
-
 
         try {
             $token = $this->simpleAuthenticator->createToken($request, $this->providerKey);
             $token = $this->authenticationManager->authenticate($token);
             $this->securityContext->setToken($token);
-
-        } catch (AuthenticationException $failed) {
+        } catch (AuthenticationException $e) {
             $this->securityContext->setToken(null);
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
+                $this->logger->info(sprintf('Authentication request failed: %s', $e->getMessage()));
             }
 
-            // TODO call failure handler
+            if ($this->simpleAuthenticator instanceof AuthenticationFailureHandlerInterface) {
+                $response = $this->simpleAuthenticator->onAuthenticationFailure($request, $e);
+                if ($response instanceof Response) {
+                    $event->setResponse($response);
+                } elseif (null !== $response) {
+                    throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationFailure method must return null or a Response object', get_class($this->simpleAuthenticator)));
+                }
+            }
+
             return;
         }
 
-        // TODO call success handler
+        if ($this->simpleAuthenticator instanceof AuthenticationSuccessHandlerInterface) {
+            $response = $this->simpleAuthenticator->onAuthenticationSuccess($request, $token);
+            if ($response instanceof Response) {
+                $event->setResponse($response);
+            } elseif (null !== $response) {
+                throw new \UnexpectedValueException(sprintf('The %s::onAuthenticationSuccess method must return null or a Response object', get_class($this->simpleAuthenticator)));
+            }
+        }
     }
 }

@@ -52,6 +52,17 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar', 'bar' => 'bas'), $bag->all());
         $bag->remove('bar');
         $this->assertEquals(array('foo' => 'bar'), $bag->all());
+        $bag->add(array('foo' => array('bar' => 'bas'), 
+                                'foo1' => array('bar1' => array('bas1' => 'bas11', 'bas2' => 'bas22')),
+                                'foo2' => array('bar2' => array('bas1' => 'bas11', 'bas2' => array('bas21'=> 'bas211', 'bas22'=> 'bas221')))));
+        $bag->remove(array('foo1' => array('bar1' => array('bas2'))));
+        $this->assertEquals(array('foo' => array('bar' => 'bas'), 
+                                'foo1' => array('bar1' => array('bas1' => 'bas11')),
+                                'foo2' => array('bar2' => array('bas1' => 'bas11', 'bas2' => array('bas21'=> 'bas211', 'bas22'=> 'bas221')))), $bag->all());
+        $bag->remove(array('foo2' => array('bar2' => array('bas2'))));
+        $this->assertEquals(array('foo' => array('bar' => 'bas'), 
+                                'foo1' => array('bar1' => array('bas1' => 'bas11')),
+                                'foo2' => array('bar2' => array('bas1' => 'bas11'))), $bag->all());
     }
 
     /**

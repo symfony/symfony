@@ -28,6 +28,8 @@ class SimpleFormFactory extends FormLoginFactory
         $this->addOption('authenticator', null);
     }
 
+// TODO create proxies for success_handler/failure_handler that call the impl ones then the default ones by default if no response is returned
+
     public function getKey()
     {
         return 'simple-form';

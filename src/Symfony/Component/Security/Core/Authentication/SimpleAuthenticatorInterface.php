@@ -13,18 +13,19 @@ namespace Symfony\Component\Security\Core\Authentication;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 interface SimpleAuthenticatorInterface
 {
-    public function authenticate(TokenInterface $token, UserProviderInterface $userProvider, $providerKey);
+    public function authenticateToken(TokenInterface $token, UserProviderInterface $userProvider, $providerKey);
 
-    public function supports(TokenInterface $token, $providerKey);
+    public function supportsToken(TokenInterface $token, $providerKey);
 
-    public function handleAuthenticationFailure(GetResponseEvent $event, AuthenticationException $exception);
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception);
+
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token);
 }

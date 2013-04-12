@@ -14,6 +14,8 @@
 
         <parameter key="security.authentication.listener.simple_form.class">Symfony\Component\Security\Http\Firewall\SimpleFormAuthenticationListener</parameter>
 
+        <parameter key="security.authentication.listener.simple_token.class">Symfony\Component\Security\Http\Firewall\SimpleTokenAuthenticationListener</parameter>
+
         <parameter key="security.authentication.listener.basic.class">Symfony\Component\Security\Http\Firewall\BasicAuthenticationListener</parameter>
         <parameter key="security.authentication.basic_entry_point.class">Symfony\Component\Security\Http\EntryPoint\BasicAuthenticationEntryPoint</parameter>
 
@@ -140,6 +142,15 @@
                  class="%security.authentication.listener.simple_form.class%"
                  parent="security.authentication.listener.abstract"
                  abstract="true">
+        </service>
+
+        <service id="security.authentication.listener.simple_token" class="%security.authentication.listener.simple_token.class%" public="false" abstract="true">
+            <tag name="monolog.logger" channel="security" />
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.authentication.manager" />
+            <argument /> <!-- Provider-shared Key -->
+            <argument /> <!-- Authenticator -->
+            <argument type="service" id="logger" on-invalid="null" />
         </service>
 
         <service id="security.authentication.listener.x509" class="%security.authentication.listener.x509.class%" public="false" abstract="true">

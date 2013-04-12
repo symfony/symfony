@@ -40,7 +40,7 @@ class SimpleAuthenticationProvider implements AuthenticationProviderInterface
 
     public function authenticate(TokenInterface $token)
     {
-        $authToken = $this->simpleAuthenticator->authenticate($token, $this->userProvider, $this->providerKey);
+        $authToken = $this->simpleAuthenticator->authenticateToken($token, $this->userProvider, $this->providerKey);
 
         if ($authToken instanceof TokenInterface) {
             return $authToken;
@@ -51,6 +51,6 @@ class SimpleAuthenticationProvider implements AuthenticationProviderInterface
 
     public function supports(TokenInterface $token)
     {
-        return $this->simpleAuthenticator->supports($token, $this->providerKey);
+        return $this->simpleAuthenticator->supportsToken($token, $this->providerKey);
     }
 }

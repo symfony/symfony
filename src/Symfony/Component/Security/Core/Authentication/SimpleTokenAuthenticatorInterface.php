@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-interface SimpleFormAuthenticatorInterface extends SimpleAuthenticatorInterface
+interface SimpleTokenAuthenticatorInterface extends SimpleAuthenticatorInterface
 {
-    public function createToken(Request $request, $username, $password, $providerKey);
+    public function createToken(Request $request, $providerKey);
 }

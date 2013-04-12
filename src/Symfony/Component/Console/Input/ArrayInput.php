@@ -119,14 +119,10 @@ class ArrayInput extends Input
     {
         $params = array();
         foreach ($this->parameters as $param => $val) {
-            $val = addcslashes($val, '"');
-            if (false !== strpos($val, ' ')) {
-                $val = '"'.$val.'"';
-            }
             if ($param && '-' === $param[0]) {
-                $params[] = $param . ('' != $val ? ' '.$val : $val);
+                $params[] = $param . ('' != $val ? '='.$this->escapeToken($val) : '');
             } else {
-                $params[] = $val;
+                $params[] = $this->escapeToken($val);
             }
         }
 

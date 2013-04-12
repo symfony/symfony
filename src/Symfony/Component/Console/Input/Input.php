@@ -210,4 +210,14 @@ abstract class Input implements InputInterface
     {
         return $this->definition->hasOption($name);
     }
+
+    /**
+     * Escapes a token through escapeshellarg if it contains unsafe chars
+     *
+     * @return string
+     */
+    protected function escapeToken($token)
+    {
+        return preg_match('{^[\w-]+$}', $token) ? $token : escapeshellarg($token);
+    }
 }

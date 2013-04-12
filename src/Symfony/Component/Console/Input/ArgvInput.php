@@ -321,9 +321,10 @@ class ArgvInput extends Input
     public function __toString()
     {
         $tokens = array_map(function ($token) {
-            $token = addcslashes($token, '"');
-            if (false !== strpos($token, ' ')) {
-                return '"'.$token.'"';
+            if (preg_match('{^(-[^=]+=)(.+)}', $token, $match)) {
+                return $match[1] . $this->escapeToken($match[2]);
+            } elseif ($token && $token[0] !== '-') {
+                return $this->escapeToken($token);
             }
 
             return $token;

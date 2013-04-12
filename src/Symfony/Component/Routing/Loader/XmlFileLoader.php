@@ -141,7 +141,11 @@ class XmlFileLoader extends FileLoader
 
             switch ($node->tagName) {
                 case 'default':
-                    $defaults[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
+                    if ($node->hasAttribute('xsi:nil') && 'true' == $node->getAttribute('xsi:nil')) {
+                        $defaults[(string) $node->getAttribute('key')] = null;
+                    } else {
+                        $defaults[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
+                    }
                     break;
                 case 'option':
                     $options[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);

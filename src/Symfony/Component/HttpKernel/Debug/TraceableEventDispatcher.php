@@ -385,9 +385,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
             case KernelEvents::VIEW:
             case KernelEvents::RESPONSE:
                 // stop only if a controller has been executed
-                try {
+                if ($this->stopwatch->isStarted('controller')) {
                     $this->stopwatch->stop('controller');
-                } catch (\LogicException $e) {
                 }
                 break;
             case KernelEvents::TERMINATE:

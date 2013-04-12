@@ -482,13 +482,13 @@ class Parser
     private function isNextLineIndented()
     {
         $currentIndentation = $this->getCurrentLineIndentation();
-        $notEOF = $this->moveToNextLine();
+        $EOF = !$this->moveToNextLine();
 
-        while ($notEOF && $this->isCurrentLineEmpty()) {
-            $notEOF = $this->moveToNextLine();
+        while (!$EOF && $this->isCurrentLineEmpty()) {
+            $EOF = !$this->moveToNextLine();
         }
 
-        if (false === $notEOF) {
+        if ($EOF) {
             return false;
         }
 

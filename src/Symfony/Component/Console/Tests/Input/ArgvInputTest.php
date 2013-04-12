@@ -255,6 +255,15 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($input->hasParameterOption('--foo'), '->hasParameterOption() returns false if the given short option is not in the raw input');
     }
 
+    public function testToString()
+    {
+        $input = new ArgvInput(array('cli.php', '-f', 'foo'));
+        $this->assertEquals('-f foo', (string) $input);
+
+        $input = new ArgvInput(array('cli.php', '-f', '--bar=foo', 'a b c d'));
+        $this->assertEquals('-f --bar=foo "a b c d"', (string) $input);
+    }
+
     /**
      * @dataProvider provideGetParameterOptionValues
      */

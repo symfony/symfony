@@ -111,6 +111,29 @@ class ArrayInput extends Input
     }
 
     /**
+     * Returns a stringified representation of the args passed to the command
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $params = array();
+        foreach ($this->parameters as $param => $val) {
+            $val = addcslashes($val, '"');
+            if (false !== strpos($val, ' ')) {
+                $val = '"'.$val.'"';
+            }
+            if ($param && '-' === $param[0]) {
+                $params[] = $param . ('' != $val ? ' '.$val : $val);
+            } else {
+                $params[] = $val;
+            }
+        }
+
+        return implode(' ', $params);
+    }
+
+    /**
      * Processes command line arguments.
      */
     protected function parse()

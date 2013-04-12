@@ -193,6 +193,10 @@ class XmlUtils
                 return false;
             case is_numeric($value):
                 return '0x' == $value[0].$value[1] ? hexdec($value) : floatval($value);
+            case preg_match('/^[0-9]{1,3}(,[0-9]{3})+?$/', $value):
+                return floatval(str_replace(',', '', $value));
+            case preg_match('/^[0-9]+(,[0-9]+)+?$/', $value):
+                return $value;
             case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $value):
                 return floatval(str_replace(',', '', $value));
             default:

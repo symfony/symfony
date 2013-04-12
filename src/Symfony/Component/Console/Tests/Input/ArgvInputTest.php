@@ -260,8 +260,8 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         $input = new ArgvInput(array('cli.php', '-f', 'foo'));
         $this->assertEquals('-f foo', (string) $input);
 
-        $input = new ArgvInput(array('cli.php', '-f', '--bar=foo', 'a b c d'));
-        $this->assertEquals('-f --bar=foo "a b c d"', (string) $input);
+        $input = new ArgvInput(array('cli.php', '-f', '--bar=foo', 'a b c d', "A\nB'C"));
+        $this->assertEquals('-f --bar=foo '.escapeshellarg('a b c d').' '.escapeshellarg("A\nB'C"), (string) $input);
     }
 
     /**

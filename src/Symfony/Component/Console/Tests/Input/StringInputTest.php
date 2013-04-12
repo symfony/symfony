@@ -53,6 +53,8 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
             array('  foo  bar  ', array('foo', 'bar'), '->tokenize() ignores whitespaces between arguments'),
             array('"quoted"', array('quoted'), '->tokenize() parses quoted arguments'),
             array("'quoted'", array('quoted'), '->tokenize() parses quoted arguments'),
+            array("'a\rb\nc\td'", array("a\rb\nc\td"), '->tokenize() parses whitespace chars in strings'),
+            array("'a'\r'b'\n'c'\t'd'", array('a','b','c','d'), '->tokenize() parses whitespace chars between args as spaces'),
             array('\"quoted\"', array('"quoted"'), '->tokenize() parses escaped-quoted arguments'),
             array("\'quoted\'", array('\'quoted\''), '->tokenize() parses escaped-quoted arguments'),
             array('-a', array('-a'), '->tokenize() parses short options'),
@@ -80,9 +82,9 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('-f foo', (string) $input);
 
         $input = new StringInput('-f --bar=foo "a b c d"');
-        $this->assertEquals('-f --bar=foo "a b c d"', (string) $input);
+        $this->assertEquals('-f --bar=foo '.escapeshellarg('a b c d'), (string) $input);
 
-        $input = new StringInput('-f --bar=foo \'a b c d\'');
-        $this->assertEquals('-f --bar=foo "a b c d"', (string) $input);
+        $input = new StringInput('-f --bar=foo \'a b c d\' '."'A\nB\\'C'");
+        $this->assertEquals('-f --bar=foo '.escapeshellarg('a b c d').' '.escapeshellarg("A\nB'C"), (string) $input);
     }
 }

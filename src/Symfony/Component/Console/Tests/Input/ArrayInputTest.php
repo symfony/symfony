@@ -120,4 +120,10 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
             )
         );
     }
+
+    public function testToString()
+    {
+        $input = new ArrayInput(array('-f' => null, '-b' => 'bar', '--foo' => 'b a z', '--lala' => null, 'test' => 'Foo'));
+        $this->assertEquals('-f -b bar --foo "b a z" --lala Foo', (string) $input);
+    }
 }

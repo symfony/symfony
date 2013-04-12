@@ -80,9 +80,9 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('-f foo', (string) $input);
 
         $input = new StringInput('-f --bar=foo "a b c d"');
-        $this->assertEquals('-f --bar=foo "a b c d"', (string) $input);
+        $this->assertEquals('-f --bar=foo '.escapeshellarg('a b c d'), (string) $input);
 
-        $input = new StringInput('-f --bar=foo \'a b c d\'');
-        $this->assertEquals('-f --bar=foo "a b c d"', (string) $input);
+        $input = new StringInput('-f --bar=foo \'a b c d\' '."'A\nB\\'C'");
+        $this->assertEquals('-f --bar=foo '.escapeshellarg('a b c d').' '.escapeshellarg("A\nB'C"), (string) $input);
     }
 }

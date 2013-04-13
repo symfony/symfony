@@ -220,30 +220,23 @@
 
 {% block button_widget %}
 {% spaceless %}
-    {% if type is not defined or type is empty %}
-        {% set type = "button" %}
-    {% endif %}
     {% if label is empty %}
         {% set label = name|humanize %}
     {% endif %}
-    <button type="{{ type }}" {{ block('button_attributes') }}>{{ label|trans({}, translation_domain) }}</button>
+    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ label|trans({}, translation_domain) }}</button>
 {% endspaceless %}
 {% endblock button_widget %}
 
 {% block submit_widget %}
 {% spaceless %}
-    {% if type is not defined %}
-        {% set type = "submit" %}
-    {% endif %}
+    {% set type = type|default('submit') %}
     {{ block('button_widget') }}
 {% endspaceless %}
 {% endblock submit_widget %}
 
 {% block reset_widget %}
 {% spaceless %}
-    {% if type is not defined %}
-        {% set type = "reset" %}
-    {% endif %}
+    {% set type = type|default('reset') %}
     {{ block('button_widget') }}
 {% endspaceless %}
 {% endblock reset_widget %}

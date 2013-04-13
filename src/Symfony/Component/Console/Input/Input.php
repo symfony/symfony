@@ -214,9 +214,11 @@ abstract class Input implements InputInterface
     /**
      * Escapes a token through escapeshellarg if it contains unsafe chars
      *
+     * @param string $token
+     *
      * @return string
      */
-    protected function escapeToken($token)
+    public function escapeToken($token)
     {
         return preg_match('{^[\w-]+$}', $token) ? $token : escapeshellarg($token);
     }

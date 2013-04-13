@@ -72,7 +72,7 @@ class ResourceValidatingCache extends NonvalidatingCache
                     continue;
                 }
 
-                $check = $validator->isFresh($resource);
+                $check = $validator->isFresh($resource, $this);
 
                 if (true === $check) {
                     continue 2; // next resource

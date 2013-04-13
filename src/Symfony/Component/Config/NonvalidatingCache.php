@@ -63,4 +63,11 @@ class NonvalidatingCache implements ConfigCacheInterface
     {
         CacheFileUtils::dumpInFile($this->file, $content);
     }
+
+
+    public function getCreationTime()
+    {
+        return filemtime($this->file);
+    }
+
 }

@@ -18,43 +18,63 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FileResource implements SelfValidatingResourceInterface
+class FileResource implements ResourceInterface, \Serializable
 {
-    private $filename;
-    private $mtime;
+    private $resource;
 
     /**
      * Constructor.
      *
-     * @param string $filename The file path to the resource
+     * @param string $resource The file path to the resource
      */
-    public function __construct($filename)
+    public function __construct($resource)
     {
-        $this->filename = realpath($filename);
-        $this->mtime = filemtime($this->filename);
+        $this->resource = realpath($resource);
     }
 
-    public function isFresh()
+    /**
+     * Returns a string representation of the Resource.
+     *
+     * @return string A string representation of the Resource
+     */
+    public function __toString()
     {
-        if (!file_exists($this->filename)) {
+        return (string) $this->resource;
+    }
+
+    /**
+     * Returns the resource tied to this Resource.
+     *
+     * @return mixed The resource
+     */
+    public function getResource()
+    {
+        return $this->resource;
+    }
+
+    /**
+     * Returns true if the resource has not been updated since the given timestamp.
+     *
+     * @param integer $timestamp The last time the resource was loaded
+     *
+     * @return Boolean true if the resource has not been updated, false otherwise
+     */
+    public function isFresh($timestamp)
+    {
+        if (!file_exists($this->resource)) {
             return false;
         }
 
-        return filemtime($this->filename) == $this->mtime;
+        return filemtime($this->resource) < $timestamp;
     }
 
     public function serialize()
     {
-        return serialize(array(
-            'filename' => $this->filename,
-            'mtime' => $this->mtime
-        ));
+        return serialize($this->resource);
     }
 
     public function unserialize($serialized)
     {
-        $data = unserialize($serialized);
-        $this->filename = $data['filename'];
-        $this->mtime = $data['mtime'];
+        $this->resource = unserialize($serialized);
     }
 }

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Config;
 
 /**
- * ConfigCache is n (almost) backwards-compatible way of using the new
+ * ConfigCache is the backwards-compatible way of using the new
  * cache implementation classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>

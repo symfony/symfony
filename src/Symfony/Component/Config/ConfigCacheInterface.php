@@ -43,4 +43,11 @@ interface ConfigCacheInterface
      */
     public function write($content, array $metadata = null);
 
+    /**
+     * Gets the timestamp at which the cache was created.
+     *
+     * @return int The timestamp at which the cache was created.
+     */
+    public function getCreationTime();
+
 }

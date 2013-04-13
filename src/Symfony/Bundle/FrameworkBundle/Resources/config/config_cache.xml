@@ -12,7 +12,7 @@
         <service id="config.cache_factory.default" class="%config.cache_factory.class%" public="false" />
         <service id="config.cache_factory" alias="config.cache_factory.default" />
 
-        <service class="Symfony\Component\Config\Resource\SelfValidatingResourceValidator" public="false">
+        <service class="Symfony\Component\Config\Resource\ResourceInterfaceValidator" public="false">
             <tag name="config.resource_validator" />
         </service>
     </services>

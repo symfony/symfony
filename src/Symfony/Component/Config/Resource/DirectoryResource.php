@@ -16,23 +16,41 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DirectoryResource implements SelfValidatingResourceInterface
+class DirectoryResource implements ResourceInterface, \Serializable
 {
-    private $directory;
+    private $resource;
     private $pattern;
-    private $hash = '';
 
     /**
      * Constructor.
      *
-     * @param string $directory The file path to the resource
-     * @param string $pattern   A pattern to restrict monitored files
+     * @param string $resource The file path to the resource
+     * @param string $pattern  A pattern to restrict monitored files
      */
-    public function __construct($directory, $pattern = null)
+    public function __construct($resource, $pattern = null)
     {
-        $this->directory = $directory;
-        $this->hash = $this->calculateHash();
+        $this->resource = $resource;
         $this->pattern = $pattern;
+    }
+
+    /**
+     * Returns a string representation of the Resource.
+     *
+     * @return string A string representation of the Resource
+     */
+    public function __toString()
+    {
+        return (string) $this->resource;
+    }
+
+    /**
+     * Returns the resource tied to this Resource.
+     *
+     * @return mixed The resource
+     */
+    public function getResource()
+    {
+        return $this->resource;
     }
 
     public function getPattern()
@@ -44,52 +62,41 @@ class DirectoryResource implements SelfValidatingResourceInterface
      * Returns true if the resource has not been updated since the given timestamp.
      *
      * @param integer $timestamp The last time the resource was loaded
+     *
      * @return Boolean true if the resource has not been updated, false otherwise
      */
-    public function isFresh()
+    public function isFresh($timestamp)
     {
-        return $this->calculateHash() == $this->hash;
-    }
-
-    protected function calculateHash()
-    {
-        $hash = '';
-
-        if (is_dir($this->directory)) {
-            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
-
-                // only check files, because directories change state also if files not matching the pattern are added/deleted
-                if ($file->isDir()) {
-                    continue;
-                }
-
-                // if regex filtering is enabled only check matching files
-                if ($this->pattern && !preg_match($this->pattern, $file->getBasename())) {
-                    continue;
-                }
-
-                $hash = md5($hash .  '-' . $file . '-' . $file->getMTime());
-            }
+        if (!is_dir($this->resource)) {
+            return false;
         }
 
-        return $hash;
+        $newestMTime = filemtime($this->resource);
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->resource), \RecursiveIteratorIterator::SELF_FIRST) as $file) {
+            // if regex filtering is enabled only check matching files
+            if ($this->pattern && $file->isFile() && !preg_match($this->pattern, $file->getBasename())) {
+                continue;
+            }
+
+            // always monitor directories for changes, except the .. entries
+            // (otherwise deleted files wouldn't get detected)
+            if ($file->isDir() && '/..' === substr($file, -3)) {
+                continue;
+            }
+
+            $newestMTime = max($file->getMTime(), $newestMTime);
+        }
+
+        return $newestMTime < $timestamp;
     }
 
     public function serialize()
     {
-        return serialize(array(
-            'directory' => $this->directory,
-            'pattern' => $this->pattern,
-            'hash' => $this->hash
-        ));
+        return serialize(array($this->resource, $this->pattern));
     }
 
     public function unserialize($serialized)
     {
-        $data = unserialize($serialized);
-        $this->directory = $data['directory'];
-        $this->pattern = $data['pattern'];
-        $this->hash = $data['hash'];
+        list($this->resource, $this->pattern) = unserialize($serialized);
     }
-
 }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Config\Resource;
 
+use Symfony\Component\Config\ConfigCacheInterface;
+
 /**
  * ResourceValidators check instances of ResourceInterface and tell whether a particular
  * resource is still fresh or if it has been changed since it was cached.
@@ -23,10 +25,11 @@ interface ResourceValidatorInterface
     /**
      * Check whether the given resource is still fresh.
      *
-     * @param  ResourceInterface $resource
-     * @return boolean|null      Return true if the resource is still fresh, false if not and NULL if this particular validator cannot tell for the resource.
+     * @param  ResourceInterface    $resource The resource to be checked
+     * @param  ConfigCacheInterface $cache    The cache instance the resource was used for
+     * @return boolean|null         Return true if the resource is still fresh, false if not and NULL if this particular validator cannot tell for the resource.
      */
-    public function isFresh(ResourceInterface $resource);
+    public function isFresh($resource, ConfigCacheInterface $cache);
 
     /**
      * Tell whether this validator supports the given resource object.
@@ -34,5 +37,5 @@ interface ResourceValidatorInterface
      * @param  ResourceInterface $resource
      * @return boolean           Returns whether or not this validator can check the given resource.
      */
-    public function supports(ResourceInterface $resource);
+    public function supports($resource);
 }

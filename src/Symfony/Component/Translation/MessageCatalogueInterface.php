@@ -155,7 +155,7 @@ interface MessageCatalogueInterface
     /**
      * Returns an array of resources loaded to build this collection.
      *
-     * @return ResourceInterface[] An array of resources
+     * @return object[] An array of resources
      *
      * @api
      */
@@ -164,9 +164,9 @@ interface MessageCatalogueInterface
     /**
      * Adds a resource for this collection.
      *
-     * @param ResourceInterface $resource A resource instance
+     * @param object $resource A resource instance
      *
      * @api
      */
-    public function addResource(ResourceInterface $resource);
+    public function addResource($resource);
 }

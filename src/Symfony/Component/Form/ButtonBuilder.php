@@ -165,52 +165,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
-     * Does nothing.
-     *
-     * @param FormBuilderInterface $parent The parent builder
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. You
-     *             should not rely on the parent of a builder, because it is
-     *             likely that the parent is only set after turning the builder
-     *             into a form.
-     */
-    public function setParent(FormBuilderInterface $parent = null)
-    {
-    }
-
-    /**
-     * Unsupported method.
-     *
-     * @return null Always returns null.
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. You
-     *             should not rely on the parent of a builder, because it is
-     *             likely that the parent is only set after turning the builder
-     *             into a form.
-     */
-    public function getParent()
-    {
-        return null;
-    }
-
-    /**
-     * Unsupported method.
-     *
-     * @return Boolean Always returns false.
-     *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. You
-     *             should not rely on the parent of a builder, because it is
-     *             likely that the parent is only set after turning the builder
-     *             into a form.
-     */
-    public function hasParent()
-    {
-        return false;
-    }
-
-    /**
-     * Unsupported method.
-     *
      * This method should not be invoked.
      *
      * @param string   $eventName
@@ -236,22 +190,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     public function addEventSubscriber(EventSubscriberInterface $subscriber)
     {
         throw new \BadMethodCallException('Buttons do not support event subscribers.');
-    }
-
-    /**
-     * Unsupported method.
-     *
-     * This method should not be invoked.
-     *
-     * @param FormValidatorInterface $validator
-     *
-     * @throws \BadMethodCallException
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function addValidator(FormValidatorInterface $validator)
-    {
-        throw new \BadMethodCallException('Buttons do not support validators.');
     }
 
     /**
@@ -638,18 +576,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     public function getDataMapper()
     {
         return null;
-    }
-
-    /**
-     * Unsupported method.
-     *
-     * @return array Always returns null.
-     *
-     * @deprecated Deprecated since version 2.1, to be removed in 2.3.
-     */
-    public function getValidators()
-    {
-        return array();
     }
 
     /**

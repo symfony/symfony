@@ -104,7 +104,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function createBuilder(FormFactoryInterface $factory, $name, array $options = array(), FormBuilderInterface $parent = null)
+    public function createBuilder(FormFactoryInterface $factory, $name, array $options = array())
     {
         $options = $this->getOptionsResolver()->resolve($options);
 
@@ -113,7 +113,6 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
         $builder = $this->newBuilder($name, $dataClass, $factory, $options);
         $builder->setType($this);
-        $builder->setParent($parent);
 
         $this->buildForm($builder, $options);
 

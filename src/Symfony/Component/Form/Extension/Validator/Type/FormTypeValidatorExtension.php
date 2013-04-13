@@ -55,11 +55,6 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
     {
         parent::setDefaultOptions($resolver);
 
-        // BC clause
-        $constraints = function (Options $options) {
-            return $options['validation_constraint'];
-        };
-
         // Constraint should always be converted to an array
         $constraintsNormalizer = function (Options $options, $constraints) {
             return is_object($constraints) ? array($constraints) : (array) $constraints;
@@ -67,9 +62,8 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
 
         $resolver->setDefaults(array(
             'error_mapping'              => array(),
-            // "validation_constraint" is deprecated. Use "constraints".
             'validation_constraint'      => null,
-            'constraints'                => $constraints,
+            'constraints'                => array(),
             'cascade_validation'         => false,
             'invalid_message'            => 'This value is not valid.',
             'invalid_message_parameters' => array(),

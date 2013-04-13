@@ -356,15 +356,3 @@
     {% for attrname, attrvalue in attr %}{{ attrname }}="{{ attrvalue }}" {% endfor %}
 {% endspaceless %}
 {% endblock button_attributes %}
-
-{# Deprecated in Symfony 2.1, to be removed in 2.3 #}
-
-{% block generic_label %}{{ block('form_label') }}{% endblock %}
-{% block widget_choice_options %}{{ block('choice_widget_options') }}{% endblock %}
-{% block field_widget %}{{ block('form_widget_simple') }}{% endblock %}
-{% block field_label %}{{ block('form_label') }}{% endblock %}
-{% block field_row %}{{ block('form_row') }}{% endblock %}
-{% block field_enctype %}{{ block('form_enctype') }}{% endblock %}
-{% block field_errors %}{{ block('form_errors') }}{% endblock %}
-{% block field_rest %}{{ block('form_rest') }}{% endblock %}
-{% block field_rows %}{{ block('form_rows') }}{% endblock %}

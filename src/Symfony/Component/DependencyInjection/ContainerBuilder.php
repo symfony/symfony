@@ -162,7 +162,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns an array of resources loaded to build this configuration.
      *
-     * @return ResourceInterface[] An array of resources
+     * @return array An array of resources
      *
      * @api
      */
@@ -174,13 +174,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Adds a resource for this configuration.
      *
-     * @param ResourceInterface $resource A resource instance
+     * @param object $resource  A resource instance
      *
      * @return ContainerBuilder The current instance
      *
      * @api
      */
-    public function addResource(ResourceInterface $resource)
+    public function addResource($resource)
     {
         if (!$this->trackResources) {
             return $this;
@@ -194,7 +194,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the resources for this configuration.
      *
-     * @param ResourceInterface[] $resources An array of resources
+     * @param array $resources  An array of resources
      *
      * @return ContainerBuilder The current instance
      *

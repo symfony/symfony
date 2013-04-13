@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\PhpSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 
 /**
@@ -49,11 +49,11 @@ class PhpSessionStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return PhpSessionStorage
+     * @return PhpBridgeSessionStorage
      */
     protected function getStorage()
     {
-        $storage = new PhpSessionStorage();
+        $storage = new PhpBridgeSessionStorage();
         $storage->registerBag(new AttributeBag);
 
         return $storage;

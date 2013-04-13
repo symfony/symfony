@@ -101,7 +101,6 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage->regenerate();
         $this->assertNotEquals($id, $storage->getId());
         $this->assertEquals(7, $storage->getBag('attributes')->get('lucky'));
-
     }
 
     public function testRegenerateDestroy()

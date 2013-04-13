@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandle
  *
  * @author Drak <drak@zikula.org>
  */
-class PhpSessionStorage extends NativeSessionStorage
+class PhpBridgeSessionStorage extends NativeSessionStorage
 {
     /**
      * Constructor.

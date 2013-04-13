@@ -72,7 +72,7 @@ class DialogHelper extends Helper
                 if (empty($choices[$value])) {
                     throw new \InvalidArgumentException(sprintf($errorMessage, $value));
                 }
-                $multiselectChoices[$value] = $choices[$value];
+                array_push($multiselectChoices, $value);
             }
 
             if ($multiselect){

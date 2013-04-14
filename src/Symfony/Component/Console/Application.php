@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Descriptor\Text\ApplicationTextDescriptor;
+use Symfony\Component\Console\Descriptor\Xml\ApplicationXmlDescriptor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -678,6 +680,47 @@ class Application
         }
 
         return $abbrevs;
+    }
+
+    /**
+     * Returns a text representation of the Application.
+     *
+     * @param string  $namespace An optional namespace name
+     * @param boolean $raw       Whether to return raw command list
+     *
+     * @return string A string representing the Application
+     *
+     * @deprecated
+     */
+    public function asText($namespace = null, $raw = false)
+    {
+        $descriptor = new ApplicationTextDescriptor($namespace, $raw);
+
+        return $descriptor->describe($this);
+    }
+
+    /**
+     * Returns an XML representation of the Application.
+     *
+     * @param string  $namespace An optional namespace name
+     * @param Boolean $asDom     Whether to return a DOM or an XML string
+     *
+     * @return string|\DOMDocument An XML string representing the Application
+     *
+     * @deprecated
+     */
+    public function asXml($namespace = null, $asDom = false)
+    {
+        $descriptor = new ApplicationXmlDescriptor($namespace);
+
+        if ($asDom) {
+            $dom = new \DOMDocument('1.0', 'UTF-8');
+            $descriptor->buildDocument($dom, $this);
+
+            return $dom;
+        }
+
+        return $descriptor->describe($this);
     }
 
     /**

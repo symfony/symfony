@@ -37,9 +37,9 @@ class InputOptionXmlDescriptor extends AbstractXmlDescriptor
 
         if ($object->acceptValue()) {
             $defaults = is_array($object->getDefault()) ? $object->getDefault() : (is_bool($object->getDefault()) ? array(var_export($object->getDefault(), true)) : ($object->getDefault() ? array($object->getDefault()) : array()));
+            $objectXML->appendChild($defaultsXML = $dom->createElement('defaults'));
 
             if (!empty($defaults)) {
-                $objectXML->appendChild($defaultsXML = $dom->createElement('defaults'));
                 foreach ($defaults as $default) {
                     $defaultsXML->appendChild($defaultXML = $dom->createElement('default'));
                     $defaultXML->appendChild($dom->createTextNode($default));

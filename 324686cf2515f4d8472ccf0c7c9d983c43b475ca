@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-13T17:51:06Z
+
+One of the goal of displaying the token is to be able to copy/paste it. So, a better fix would be to just get the first 6 characters of the `sha1` in the Profiler class instead.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-04-13T17:57:37Z
+
+:+1: for using the first 6 characters (or make the hash a copy button to copy the sha1, but that would be hard to make'
+
+---------------------------------------------------------------------------
+
+by 1ed at 2013-04-13T17:59:13Z
+
+Yes, I thought that and it still can be copied right from this popover:
+![hover](https://f.cloud.github.com/assets/162986/376920/a64865c4-a463-11e2-8181-e4272fee8623.png)
+
+Or it's not convenient enough?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-13T18:08:54Z
+
+Let's keep it simple: limiting the sha1 to the first 6 chars is good enough.
+
+---------------------------------------------------------------------------
+
+by 1ed at 2013-04-13T18:23:16Z
+
+@fabpot done

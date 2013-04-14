@@ -31,7 +31,6 @@ class DescriptorProvider
         'namespace'      => null,
         'raw_text'       => false,
         'json_encoding'  => 0,
-        'markdown_width' => 120,
     );
 
     /**

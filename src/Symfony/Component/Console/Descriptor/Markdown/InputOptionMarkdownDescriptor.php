@@ -21,21 +21,17 @@ class InputOptionMarkdownDescriptor extends AbstractMarkdownDescriptor
     /**
      * {@inheritdoc}
      */
-    public function getDocument($object)
+    public function describe($object)
     {
         /** @var InputOption $object */
-        return new Document\Document(array(
-            new Document\Paragraph('**'.$object->getName().':**'),
-            new Document\UnorderedList(array(
-                'Name: `--'.$object->getName().'`',
-                'Shortcut: '.($object->getShortcut() ? '`-'.$object->getShortcut().'`' : '<none>'),
-                'Accept value: '.($object->acceptValue() ? 'yes' : 'no'),
-                'Is value required: '.($object->isValueRequired() ? 'yes' : 'no'),
-                'Is multiple: '.($object->isArray() ? 'yes' : 'no'),
-                'Description: '.($object->getDescription() ?: '<none>'),
-                'Default: `'.str_replace("\n", '', var_export($object->getDefault(), true)).'`',
-            )),
-        ));
+        return '**'.$object->getName().':**'."\n\n"
+            .'* Name: `--'.$object->getName().'`'."\n"
+            .'* Shortcut: '.($object->getShortcut() ? '`-'.$object->getShortcut().'`' : '<none>')."\n"
+            .'* Accept value: '.($object->acceptValue() ? 'yes' : 'no')."\n"
+            .'* Is value required: '.($object->isValueRequired() ? 'yes' : 'no')."\n"
+            .'* Is multiple: '.($object->isArray() ? 'yes' : 'no')."\n"
+            .'* Description: '.($object->getDescription() ?: '<none>')."\n"
+            .'* Default: `'.str_replace("\n", '', var_export($object->getDefault(), true)).'`';
     }
 
     /**

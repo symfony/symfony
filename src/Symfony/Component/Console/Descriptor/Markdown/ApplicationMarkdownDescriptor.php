@@ -31,7 +31,6 @@ class ApplicationMarkdownDescriptor extends AbstractMarkdownDescriptor
     public function __construct($namespace = null, $maxWidth = 120)
     {
         $this->namespace = $namespace;
-        parent::__construct($maxWidth);
     }
 
     /**
@@ -49,26 +48,29 @@ class ApplicationMarkdownDescriptor extends AbstractMarkdownDescriptor
     /**
      * {@inheritdoc}
      */
-    public function getDocument($object)
+    public function describe($object)
     {
         /** @var Application $object */
         $description = new ApplicationDescription($object, $this->namespace);
         $descriptor = new CommandMarkdownDescriptor();
-        $document = new Document\Document(array(new Document\Title($object->getName(), 1)));
+
+        $blocks = array($object->getName()."\n".str_repeat('=', strlen($object->getName())));
 
         foreach ($description->getNamespaces() as $namespace) {
             if (ApplicationDescription::GLOBAL_NAMESPACE !== $namespace['id']) {
-                $document->add(new Document\Paragraph('**'.$namespace['id'].':**'));
+                $blocks[] = '**'.$namespace['id'].':**';
             }
 
-            $document->add(new Document\UnorderedList($namespace['commands']));
+            $blocks[] = implode("\n", array_map(function ($commandName) {
+                return '* '.$commandName;
+            } , $namespace['commands']));
         }
 
         foreach ($description->getCommands() as $command) {
-            $document->add($descriptor->getDocument($command));
+            $blocks[] = $descriptor->describe($command);
         }
 
-        return $document;
+        return implode("\n\n", $blocks);
     }
 
     /**

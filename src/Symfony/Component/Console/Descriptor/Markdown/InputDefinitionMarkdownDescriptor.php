@@ -21,29 +21,29 @@ class InputDefinitionMarkdownDescriptor extends AbstractMarkdownDescriptor
     /**
      * {@inheritdoc}
      */
-    public function getDocument($object)
+    public function describe($object)
     {
-        $document = new Document\Document();
+        $blocks = array();
         $argumentDescriptor = new InputArgumentMarkdownDescriptor();
         $optionDescriptor = new InputOptionMarkdownDescriptor();
 
         /** @var InputDefinition $object */
 
         if (count($object->getArguments()) > 0) {
-            $document->add(new Document\Title('Arguments:', 3));
+            $blocks[] = '### Arguments:';
             foreach ($object->getArguments() as $argument) {
-                $document->add($argumentDescriptor->getDocument($argument));
+                $blocks[] = $argumentDescriptor->describe($argument);
             }
         }
 
         if (count($object->getOptions()) > 0) {
-            $document->add(new Document\Title('Options:', 3));
+            $blocks[] = '### Options:';
             foreach ($object->getOptions() as $option) {
-                $document->add($optionDescriptor->getDocument($option));
+                $blocks[] = $optionDescriptor->describe($option);
             }
         }
 
-        return $document;
+        return implode("\n\n", $blocks);
     }
 
     /**

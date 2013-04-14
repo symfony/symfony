@@ -21,19 +21,15 @@ class InputArgumentMarkdownDescriptor extends AbstractMarkdownDescriptor
     /**
      * {@inheritdoc}
      */
-    public function getDocument($object)
+    public function describe($object)
     {
         /** @var InputArgument $object */
-        return new Document\Document(array(
-            new Document\Paragraph('**'.$object->getName().':**'),
-            new Document\UnorderedList(array(
-                'Name: '.($object->getName() ?: '<none>'),
-                'Is required: '.($object->isRequired() ? 'yes' : 'no'),
-                'Is array: '.($object->isArray() ? 'yes' : 'no'),
-                'Description: '.($object->getDescription() ?: '<none>'),
-                'Default: `'.str_replace("\n", '', var_export($object->getDefault(), true)).'`',
-            )),
-        ));
+        return '**'.$object->getName().':**'."\n\n"
+            .'* Name: '.($object->getName() ?: '<none>')."\n"
+            .'* Is required: '.($object->isRequired() ? 'yes' : 'no')."\n"
+            .'* Is array: '.($object->isArray() ? 'yes' : 'no')."\n"
+            .'* Description: '.($object->getDescription() ?: '<none>')."\n"
+            .'* Default: `'.str_replace("\n", '', var_export($object->getDefault(), true)).'`';
     }
 
     /**

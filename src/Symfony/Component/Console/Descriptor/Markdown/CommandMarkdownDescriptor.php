@@ -22,22 +22,28 @@ class CommandMarkdownDescriptor extends AbstractMarkdownDescriptor
     /**
      * {@inheritdoc}
      */
-    public function getDocument($object)
+    public function describe($object)
     {
         /** @var Command $object */
         $description = new CommandDescription($object);
         $definitionDescriptor = new InputDefinitionMarkdownDescriptor();
 
-        return new Document\Document(array(
-            new Document\Title($description->getName(), 2),
-            new Document\UnorderedList(array(
-                'Description: '.($description->getDescription() ?: '<none>'),
-                'Usage: `'.$description->getSynopsis().'`',
-                'Aliases: '.(count($description->getAliases()) ? '`'.implode('`, `', $description->getAliases()).'`' : '<none>'),
-            )),
-            new Document\Paragraph($description->getHelp()),
-            $definitionDescriptor->getDocument($description->getDefinition()),
-        ));
+        $markdown = $description->getName()."\n"
+            .str_repeat('-', strlen($description->getName()))."\n\n"
+            .'* Description: '.($description->getDescription() ?: '<none>')."\n"
+            .'* Usage: `'.$description->getSynopsis().'`'."\n"
+            .'* Aliases: '.(count($description->getAliases()) ? '`'.implode('`, `', $description->getAliases()).'`' : '<none>');
+
+        if ($description->getHelp()) {
+            $markdown .= "\n\n".$description->getHelp();
+        }
+
+        $definitionMarkdown = $definitionDescriptor->describe($description->getDefinition());
+        if ($definitionMarkdown) {
+            $markdown .= "\n\n".$definitionMarkdown;
+        }
+
+        return $markdown;
     }
 
     /**

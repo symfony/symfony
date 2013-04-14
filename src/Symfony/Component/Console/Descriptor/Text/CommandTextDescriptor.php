@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Descriptor\Text;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Descriptor\CommandDescription;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -33,17 +32,18 @@ class CommandTextDescriptor extends AbstractTextDescriptor
     public function getFormattedText($object)
     {
         /** @var Command $object */
-        $description = new CommandDescription($object);
-        $messages = array('<comment>Usage:</comment>', ' '.$description->getSynopsis(), '');
+        $object->getSynopsis();
+        $object->mergeApplicationDefinition(false);
+        $messages = array('<comment>Usage:</comment>', ' '.$object->getSynopsis(), '');
 
         if ($object->getAliases()) {
-            $messages[] = '<comment>Aliases:</comment> <info>'.implode(', ', $description->getAliases()).'</info>';
+            $messages[] = '<comment>Aliases:</comment> <info>'.implode(', ', $object->getAliases()).'</info>';
         }
 
         $descriptor = new InputDefinitionTextDescriptor();
-        $messages[] = $descriptor->getFormattedText($description->getDefinition());
+        $messages[] = $descriptor->getFormattedText($object->getNativeDefinition());
 
-        if ($help = $description->getHelp()) {
+        if ($help = $object->getProcessedHelp()) {
             $messages[] = '<comment>Help:</comment>';
             $messages[] = ' '.str_replace("\n", "\n ", $help)."\n";
         }

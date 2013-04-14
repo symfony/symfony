@@ -133,9 +133,21 @@ class ApplicationDescription
      */
     private function sortCommands(array $commands)
     {
-        $method = new \ReflectionMethod($this->application, 'sortCommands');
-        $method->setAccessible(true);
+        $namespacedCommands = array();
+        foreach ($commands as $name => $command) {
+            $key = $this->application->extractNamespace($name, 1);
+            if (!$key) {
+                $key = '_global';
+            }
 
-        return $method->invoke($this->application, $commands);
+            $namespacedCommands[$key][$name] = $command;
+        }
+        ksort($namespacedCommands);
+
+        foreach ($namespacedCommands as &$commands) {
+            ksort($commands);
+        }
+
+        return $namespacedCommands;
     }
 }

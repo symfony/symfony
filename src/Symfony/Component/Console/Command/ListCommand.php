@@ -30,8 +30,6 @@ class ListCommand extends Command
      */
     protected function configure()
     {
-        parent::configure();
-
         $this
             ->setName('list')
             ->setDescription('Lists commands')
@@ -60,7 +58,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function createDefinition()
+    private function createDefinition()
     {
         return new InputDefinition(array(
             new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output list in other formats.'),
@@ -73,7 +71,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function getNativeDefinition()
+    public function getNativeDefinition()
     {
         return $this->createDefinition();
     }

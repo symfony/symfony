@@ -277,7 +277,7 @@ class Command
      *
      * @param Boolean $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      */
-    private function mergeApplicationDefinition($mergeArgs = true)
+    public function mergeApplicationDefinition($mergeArgs = true)
     {
         if (null === $this->application || true === $this->applicationDefinitionMerged) {
             return;
@@ -336,7 +336,7 @@ class Command
      *
      * @return InputDefinition An InputDefinition instance
      */
-    protected function getNativeDefinition()
+    public function getNativeDefinition()
     {
         return $this->getDefinition();
     }

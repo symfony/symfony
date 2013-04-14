@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Descriptor\Markdown;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Descriptor\CommandDescription;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -25,20 +24,21 @@ class CommandMarkdownDescriptor extends AbstractMarkdownDescriptor
     public function describe($object)
     {
         /** @var Command $object */
-        $description = new CommandDescription($object);
+        $object->getSynopsis();
+        $object->mergeApplicationDefinition(false);
         $definitionDescriptor = new InputDefinitionMarkdownDescriptor();
 
-        $markdown = $description->getName()."\n"
-            .str_repeat('-', strlen($description->getName()))."\n\n"
-            .'* Description: '.($description->getDescription() ?: '<none>')."\n"
-            .'* Usage: `'.$description->getSynopsis().'`'."\n"
-            .'* Aliases: '.(count($description->getAliases()) ? '`'.implode('`, `', $description->getAliases()).'`' : '<none>');
+        $markdown = $object->getName()."\n"
+            .str_repeat('-', strlen($object->getName()))."\n\n"
+            .'* Description: '.($object->getDescription() ?: '<none>')."\n"
+            .'* Usage: `'.$object->getSynopsis().'`'."\n"
+            .'* Aliases: '.(count($object->getAliases()) ? '`'.implode('`, `', $object->getAliases()).'`' : '<none>');
 
-        if ($description->getHelp()) {
-            $markdown .= "\n\n".$description->getHelp();
+        if ($help = $object->getProcessedHelp()) {
+            $markdown .= "\n\n".$help;
         }
 
-        $definitionMarkdown = $definitionDescriptor->describe($description->getDefinition());
+        $definitionMarkdown = $definitionDescriptor->describe($object->getNativeDefinition());
         if ($definitionMarkdown) {
             $markdown .= "\n\n".$definitionMarkdown;
         }

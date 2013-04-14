@@ -31,7 +31,6 @@ class HelpCommand extends Command
      */
     protected function configure()
     {
-        parent::configure();
         $this->ignoreValidationErrors();
 
         $this

@@ -1006,33 +1006,6 @@ class Application
     }
 
     /**
-     * Sorts commands in alphabetical order.
-     *
-     * @param array $commands An associative array of commands to sort
-     *
-     * @return array A sorted array of commands
-     */
-    private function sortCommands($commands)
-    {
-        $namespacedCommands = array();
-        foreach ($commands as $name => $command) {
-            $key = $this->extractNamespace($name, 1);
-            if (!$key) {
-                $key = '_global';
-            }
-
-            $namespacedCommands[$key][$name] = $command;
-        }
-        ksort($namespacedCommands);
-
-        foreach ($namespacedCommands as &$commands) {
-            ksort($commands);
-        }
-
-        return $namespacedCommands;
-    }
-
-    /**
      * Returns abbreviated suggestions in string format.
      *
      * @param array $abbrevs Abbreviated suggestions to convert
@@ -1052,7 +1025,7 @@ class Application
      *
      * @return string The namespace of the command
      */
-    private function extractNamespace($name, $limit = null)
+    public function extractNamespace($name, $limit = null)
     {
         $parts = explode(':', $name);
         array_pop($parts);

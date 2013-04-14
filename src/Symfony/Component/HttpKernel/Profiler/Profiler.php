@@ -165,7 +165,7 @@ class Profiler
             return;
         }
 
-        $profile = new Profile(sha1(uniqid(mt_rand(), true)));
+        $profile = new Profile(substr(sha1(uniqid(mt_rand(), true)), 0, 6));
         $profile->setTime(time());
         $profile->setUrl($request->getUri());
         $profile->setIp($request->getClientIp());

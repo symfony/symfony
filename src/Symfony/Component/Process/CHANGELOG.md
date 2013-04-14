@@ -7,6 +7,7 @@ CHANGELOG
  * added ProcessBuilder::setArguments() to reset the arguments on a builder
  * added a way to retrieve the standard and error output incrementally
  * added Process:restart()
+ * added ProcessUtils::escapeArgument() to fix the bug in escapeshellarg() function on Windows
 
 2.1.0
 -----

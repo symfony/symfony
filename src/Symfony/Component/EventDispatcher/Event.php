@@ -25,6 +25,8 @@ namespace Symfony\Component\EventDispatcher;
  * @author  Roman Borschel <roman@code-factory.org>
  * @author  Bernhard Schussek <bschussek@gmail.com>
  *
+ * @deprecated Events objects are no longer requited to extend a base class
+ *
  * @api
  */
 class Event
@@ -68,6 +70,12 @@ class Event
      */
     public function stopPropagation()
     {
+        trigger_error(
+            'Calling stopPropagation() on the event object is deprecated. '.
+            'Throw a StopPropagationException instead.',
+            E_USER_DEPRECATED
+        );
+
         $this->propagationStopped = true;
     }
 
@@ -88,8 +96,6 @@ class Event
      *
      * @return EventDispatcherInterface
      *
-     * @deprecated The dispatcher is now the second argument passed to each listener
-     *
      * @api
      */
     public function getDispatcher()
@@ -107,8 +113,6 @@ class Event
      * Gets the event's name.
      *
      * @return string
-     *
-     * @deprecated The name is now the third argument passed to each listener
      *
      * @api
      */

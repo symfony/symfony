@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ListCommand extends AbstractDescriptionCommand
+class ListCommand extends Command
 {
     /**
      * {@inheritdoc}
@@ -33,6 +35,7 @@ class ListCommand extends AbstractDescriptionCommand
         $this
             ->setName('list')
             ->setDescription('Lists commands')
+            ->setDefinition($this->createDefinition())
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lists all commands:
 
@@ -59,10 +62,11 @@ EOF
      */
     protected function createDefinition()
     {
-        $definition = parent::createDefinition();
-        $definition->addArgument(new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'));
-
-        return $definition;
+        return new InputDefinition(array(
+            new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output list in other formats.'),
+            new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list.'),
+            new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
+        ));
     }
 
     /**
@@ -78,8 +82,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        parent::execute($input, $output);
-
-        $this->getHelper('descriptor')->describe($output, $this->getApplication(), $input->getOption('format'), $input->getOption('raw'));
+        $helper = new DescriptorHelper();
+        $helper->describe($output, $this->getApplication(), $input->getOption('format'), $input->getOption('raw'));
     }
 }

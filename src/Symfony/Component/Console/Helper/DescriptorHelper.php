@@ -31,9 +31,9 @@ class DescriptorHelper extends Helper
      *
      * @param DescriptorProvider $provider
      */
-    public function __construct(DescriptorProvider $provider)
+    public function __construct(DescriptorProvider $provider = null)
     {
-        $this->provider = $provider;
+        $this->provider = $provider ?: new DescriptorProvider();
     }
 
     /**

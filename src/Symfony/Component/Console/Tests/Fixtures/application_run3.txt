@@ -5,7 +5,7 @@ Arguments:
  namespace  The namespace name
 
 Options:
- --format   To output help in other formats.
+ --format   To output list in other formats.
  --raw      To output raw command list.
 
 Help:

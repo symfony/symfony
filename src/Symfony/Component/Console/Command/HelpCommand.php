@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HelpCommand extends AbstractDescriptionCommand
+class HelpCommand extends Command
 {
     private $command;
 
@@ -36,6 +37,11 @@ class HelpCommand extends AbstractDescriptionCommand
         $this
             ->setName('help')
             ->setDescription('Displays help for a command')
+            ->setDefinition(array(
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output help in other formats.'),
+                new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command help.'),
+                new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
+            ))
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command displays help for a given command:
 
@@ -64,25 +70,14 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function createDefinition()
-    {
-        $definition = parent::createDefinition();
-        $definition->addArgument(new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'));
-
-        return $definition;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (null === $this->command) {
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
 
-        parent::execute($input, $output);
-        $this->getHelper('descriptor')->describe($output, $this->command, $input->getOption('format'), $input->getOption('raw'));
+        $helper = new DescriptorHelper();
+        $helper->describe($output, $this->command, $input->getOption('format'), $input->getOption('raw'));
         $this->command = null;
     }
 }

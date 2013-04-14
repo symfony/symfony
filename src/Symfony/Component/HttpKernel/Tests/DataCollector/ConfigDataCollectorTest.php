@@ -53,6 +53,8 @@ class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
                 ||
                 (extension_loaded('apc') && ini_get('apc.enabled'))
                 ||
+                (extension_loaded('Zend OPcache') && ini_get('opcache.enable'))
+                ||
                 (extension_loaded('xcache') && ini_get('xcache.cacher'))
                 ||
                 (extension_loaded('wincache') && ini_get('wincache.ocenabled')))) {

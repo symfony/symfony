@@ -690,7 +690,7 @@ class Application
      *
      * @return string A string representing the Application
      *
-     * @deprecated
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
      */
     public function asText($namespace = null, $raw = false)
     {
@@ -707,7 +707,7 @@ class Application
      *
      * @return string|\DOMDocument An XML string representing the Application
      *
-     * @deprecated
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
      */
     public function asXml($namespace = null, $asDom = false)
     {

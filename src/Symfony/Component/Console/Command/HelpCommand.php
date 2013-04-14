@@ -77,6 +77,10 @@ EOF
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
 
+        if ($input->getOption('xml')) {
+            $input->setOption('format', 'xml');
+        }
+
         $helper = new DescriptorHelper();
         $helper->describe($output, $this->command, $input->getOption('format'), $input->getOption('raw'));
         $this->command = null;

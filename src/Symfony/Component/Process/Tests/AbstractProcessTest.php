@@ -50,9 +50,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $this->markTestSkipped('Stop with timeout does not work on windows, it requires posix signals');
         }
-        if (!function_exists('pcntl_signal')) {
-            $this->markTestSkipped('This test require pcntl_signal function');
-        }
 
         // exec is mandatory here since we send a signal to the process
         // see https://github.com/symfony/symfony/issues/5030 about prepending
@@ -61,7 +58,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p->start();
         usleep(100000);
         $start = microtime(true);
-        $p->stop(1.1);
+        $p->stop(1.1, SIGKILL);
         while ($p->isRunning()) {
             usleep(1000);
         }
@@ -224,7 +221,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStatus()
     {
-        $process = $this->getProcess('php -r "sleep(1);"');
+        $process = $this->getProcess('php -r "usleep(500000);"');
         $this->assertFalse($process->isRunning());
         $this->assertFalse($process->isStarted());
         $this->assertFalse($process->isTerminated());
@@ -267,6 +264,17 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testProcessIsNotSignaled()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('Windows does not support POSIX signals');
+        }
+
+        $process = $this->getProcess('php -m');
+        $process->run();
+        $this->assertFalse($process->hasBeenSignaled());
+    }
+
+    public function testProcessWithoutTermSignalIsNotSignaled()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $this->markTestSkipped('Windows does not support POSIX signals');
@@ -385,6 +393,70 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $duration = microtime(true) - $start;
 
         $this->assertLessThan($timeout + $precision, $duration);
+    }
+
+    public function testGetPid()
+    {
+        $process = $this->getProcess('php -r "sleep(1);"');
+        $process->start();
+        $this->assertGreaterThan(0, $process->getPid());
+        $process->stop();
+    }
+
+    public function testGetPidIsNullBeforeStart()
+    {
+        $process = $this->getProcess('php -r "sleep(1);"');
+        $this->assertNull($process->getPid());
+    }
+
+    public function testGetPidIsNullAfterRun()
+    {
+        $process = $this->getProcess('php -m');
+        $process->run();
+        $this->assertNull($process->getPid());
+    }
+
+    public function testSignal()
+    {
+        $process = $this->getProcess('exec php -f ' . __DIR__ . '/SignalListener.php');
+        $process->start();
+        usleep(500000);
+        $process->signal(SIGUSR1);
+
+        while ($process->isRunning() && false === strpos($process->getoutput(), 'Caught SIGUSR1')) {
+            usleep(10000);
+        }
+
+        $this->assertEquals('Caught SIGUSR1', $process->getOutput());
+    }
+
+    /**
+     * @expectedException Symfony\Component\Process\Exception\LogicException
+     */
+    public function testSignalProcessNotRunning()
+    {
+        $process = $this->getProcess('php -m');
+        $process->signal(SIGHUP);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function testSignalWithWrongIntSignal()
+    {
+        $process = $this->getProcess('php -r "sleep(3);"');
+        $process->start();
+        $process->signal(-4);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function testSignalWithWrongNonIntSignal()
+    {
+        $process = $this->getProcess('php -r "sleep(3);"');
+        $process->start();
+        $process->signal('Céphalopodes');
     }
 
     public function responsesCodeProvider()

@@ -32,19 +32,9 @@ namespace Symfony\Component\EventDispatcher;
 class Event
 {
     /**
-     * @var Boolean Whether no further event listeners should be triggered
+     * @var EventPropagation The propagation class used to track this event
      */
-    private $propagationStopped = false;
-
-    /**
-     * @var EventDispatcher Dispatcher that dispatched this event
-     */
-    private $dispatcher;
-
-    /**
-     * @var string This event's name
-     */
-    private $name;
+    private $propagation;
 
     /**
      * Returns whether further event listeners should be triggered.
@@ -53,10 +43,17 @@ class Event
      * @return Boolean Whether propagation was already stopped for this event.
      *
      * @api
+     * @deprecated
      */
     public function isPropagationStopped()
     {
-        return $this->propagationStopped;
+        trigger_error(
+            'Calling isPropagationStopped() on the event object is deprecated. '.
+            'Consult the EventPropagation class instead which is passed to the listener.',
+            E_USER_DEPRECATED
+        );
+
+        return $this->propagation->isStopped();
     }
 
     /**
@@ -67,28 +64,17 @@ class Event
      * stopPropagation().
      *
      * @api
+     * @deprecated
      */
     public function stopPropagation()
     {
         trigger_error(
             'Calling stopPropagation() on the event object is deprecated. '.
-            'Throw a StopPropagationException instead.',
+            'Call it on the EventPropagation class instead which is passed to the listener.',
             E_USER_DEPRECATED
         );
 
-        $this->propagationStopped = true;
-    }
-
-    /**
-     * Stores the EventDispatcher that dispatches this Event
-     *
-     * @param EventDispatcherInterface $dispatcher
-     *
-     * @api
-     */
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
+        $this->propagation->stop();
     }
 
     /**
@@ -97,16 +83,18 @@ class Event
      * @return EventDispatcherInterface
      *
      * @api
+     * @deprecated
      */
     public function getDispatcher()
     {
         trigger_error(
             'Calling getDispatcher() on the event object is deprecated. '.
-            'The dispatcher is now the second argument passed to your listener.',
+            'The dispatchers are available on the EventPropagation class which is passed to the listener. '.
+            'Your code will currently get the Dispatcher that was initially used to dispatch the event.',
             E_USER_DEPRECATED
         );
 
-        return $this->dispatcher;
+        return $this->propagation->getDispatcher();
     }
 
     /**
@@ -115,27 +103,29 @@ class Event
      * @return string
      *
      * @api
+     * @deprecated
      */
     public function getName()
     {
         trigger_error(
             'Calling getName() on the event object is deprecated. '.
-            'The event name is now the third argument passed to your listener.',
+            'Call it on the EventPropagation class instead which is passed to the listener.',
             E_USER_DEPRECATED
         );
 
-        return $this->name;
+        return $this->propagation->getName();
     }
 
     /**
-     * Sets the event's name property.
+     * Injects the EventPropagation instance that tracks the propagation
+     * of this event.
      *
-     * @param string $name The event name.
-     *
-     * @api
+     * @deprecated Injecting the EventPropagation is only necessary to ease migration to this class.
+
+     * @param EventPropagation $propagation The propagation for this event.
      */
-    public function setName($name)
+    public function setEventPropagation(EventPropagation $propagation)
     {
-        $this->name = $name;
+        $this->propagation = $propagation;
     }
 }

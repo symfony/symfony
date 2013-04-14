@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\EventDispatcher;
 
-use Symfony\Component\EventDispatcher\Exception\StopPropagationException;
-
 /**
  * The EventDispatcherInterface is the central point of Symfony's event listener system.
  *
@@ -26,6 +24,7 @@ use Symfony\Component\EventDispatcher\Exception\StopPropagationException;
  * @author  Fabien Potencier <fabien@symfony.com>
  * @author  Jordi Boggiano <j.boggiano@seld.be>
  * @author  Jordan Alliot <jordan.alliot@gmail.com>
+ * @author Matthias Pigulla <mp@webfactory.de>
  *
  * @api
  */
@@ -39,25 +38,36 @@ class EventDispatcher implements EventDispatcherInterface
      *
      * @api
      */
-    public function dispatch($eventName, Event $event = null, EventDispatcherInterface $dispatcher = null)
+    public function dispatch($eventName, $event = null)
     {
-        if (null === $event) {
-            $event = new Event();
-        }
+        $propagation = new EventPropagation($eventName, $event);
 
-        // deprecated
         if ($event instanceof Event) {
-            $event->setDispatcher($dispatcher ?: $this);
-            $event->setName($eventName);
+            $event->setEventPropagation($propagation);
         }
 
-        if (!isset($this->listeners[$eventName])) {
-            return $event;
+        if (isset($this->listeners[$eventName])) {
+            $this->propagate($propagation);
         }
 
-        $this->doDispatch($this->getListeners($eventName), $eventName, $event, $dispatcher);
+        return $propagation;
+    }
 
-        return $event;
+    /**
+     * @see EventDispatcherInterface::propagate
+     */
+    public function propagate(EventPropagation $propagation)
+    {
+        $propagation->pushDispatcher($this);
+
+        try {
+            $this->doDispatch($this->getListeners($propagation->getName()), $propagation);
+        } catch (\Exeception $e) {
+            $propagation->popDispatcher();
+            throw $e;
+        }
+
+        $propagation->popDispatcher();
     }
 
     /**
@@ -159,21 +169,16 @@ class EventDispatcher implements EventDispatcherInterface
      * This method can be overridden to add functionality that is executed
      * for each listener.
      *
-     * @param array[callback] $listeners The event listeners.
-     * @param string          $eventName The name of the event to dispatch.
-     * @param mixed           $event     The event object to pass to the event handlers/listeners.
+     * @param array[callback]  $listeners   The event listeners.
+     * @param EventPropagation $propagation The propagation used to track this event.
+     * @param mixed            $event       The event object to pass to the event handlers/listeners.
      */
-    protected function doDispatch($listeners, $eventName, $event, EventDispatcherInterface $dispatcher = null)
+    protected function doDispatch($listeners, EventPropagation $propagation)
     {
         foreach ($listeners as $listener) {
-            try {
-                call_user_func($listener, $event, $dispatcher ?: $this, $eventName);
-            } catch (StopPropagationException $e) {
-                break;
-            }
+            call_user_func($listener, $propagation->getEvent(), $propagation);
 
-            // deprecated
-            if ($event instanceof Event && $event->isPropagationStopped()) {
+            if ($propagation->isPropagationStopped()) {
                 break;
             }
         }

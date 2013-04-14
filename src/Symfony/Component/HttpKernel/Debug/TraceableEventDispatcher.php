@@ -124,6 +124,13 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
             $event = new Event();
         }
 
+        $initialDispatcher = (null == $event->getDispatcher());
+
+        if ($initialDispatcher) {
+            $event->setDispatcher($this);
+            $event->setName($eventName);
+        }
+
         $this->id = spl_object_hash($event);
 
         $this->preDispatch($eventName, $event);

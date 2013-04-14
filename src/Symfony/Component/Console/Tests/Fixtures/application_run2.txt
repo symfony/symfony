@@ -1,5 +1,5 @@
 Usage:
- help [--format="..."] [--raw] [command_name]
+ help [--format="..."] [--raw] [--xml] [command_name]
 
 Arguments:
  command               The command to execute
@@ -8,6 +8,7 @@ Arguments:
 Options:
  --format              To output help in other formats.
  --raw                 To output raw command help.
+ --xml                 To output help as XML.
  --help (-h)           Display this help message.
  --quiet (-q)          Do not output any message.
  --verbose (-v)        Increase verbosity of messages.

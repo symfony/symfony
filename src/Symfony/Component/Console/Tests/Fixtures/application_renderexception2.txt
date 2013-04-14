@@ -6,6 +6,6 @@
                                       
 
 
-list [--format="..."] [--raw] [namespace]
+list [--format="..."] [--raw] [--xml] [namespace]
 
 

@@ -2,7 +2,7 @@
 <symfony>
   <commands>
     <command id="help" name="help">
-  <usage>help [--format="..."] [--raw] [command_name]</usage>
+  <usage>help [--format="..."] [--raw] [--xml] [command_name]</usage>
   <description>Displays help for a command</description>
   <help>The &lt;info&gt;help&lt;/info&gt; command displays help for a given command:
  
@@ -30,6 +30,9 @@
     <option name="--raw" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
       <description>To output raw command help.</description>
     </option>
+    <option name="--xml" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+      <description>To output help as XML.</description>
+    </option>
     <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
       <description>Display this help message.</description>
     </option>
@@ -54,7 +57,7 @@
   </options>
 </command>
     <command id="list" name="list">
-  <usage>list [--format="..."] [--raw] [namespace]</usage>
+  <usage>list [--format="..."] [--raw] [--xml] [namespace]</usage>
   <description>Lists commands</description>
   <help>The &lt;info&gt;list&lt;/info&gt; command lists all commands:
  
@@ -85,6 +88,9 @@
     </option>
     <option name="--raw" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
       <description>To output raw command list.</description>
+    </option>
+    <option name="--xml" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+      <description>To output list as XML.</description>
     </option>
   </options>
 </command>

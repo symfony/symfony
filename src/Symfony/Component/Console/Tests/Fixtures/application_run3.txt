@@ -1,5 +1,5 @@
 Usage:
- list [--format="..."] [--raw] [namespace]
+ list [--format="..."] [--raw] [--xml] [namespace]
 
 Arguments:
  namespace  The namespace name
@@ -7,6 +7,7 @@ Arguments:
 Options:
  --format   To output list in other formats.
  --raw      To output raw command list.
+ --xml      To output list as XML.
 
 Help:
  The list command lists all commands:

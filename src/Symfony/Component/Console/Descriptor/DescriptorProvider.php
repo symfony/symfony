@@ -75,6 +75,7 @@ class DescriptorProvider
     public function add(DescriptorInterface $descriptor)
     {
         $descriptor->configure($this->options);
+        $descriptor->setDescriptorProvider($this);
         $this->descriptors[] = $descriptor;
 
         return $this;

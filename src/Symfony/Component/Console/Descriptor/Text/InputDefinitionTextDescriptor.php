@@ -54,18 +54,22 @@ class InputDefinitionTextDescriptor extends AbstractTextDescriptor
 
         if ($object->getArguments()) {
             $text[] = '<comment>Arguments:</comment>';
-            $descriptor = new InputArgumentTextDescriptor($nameWidth);
             foreach ($object->getArguments() as $argument) {
-                $text[] = $descriptor->getFormattedText($argument);
+                $text[] = $this
+                    ->getDescriptor($argument)
+                    ->configure(array('name_width' => $nameWidth))
+                    ->getFormattedText($argument);
             }
             $text[] = '';
         }
 
         if ($object->getOptions()) {
             $text[] = '<comment>Options:</comment>';
-            $descriptor = new InputOptionTextDescriptor($nameWidth);
             foreach ($object->getOptions() as $option) {
-                $text[] = $descriptor->getFormattedText($option);
+                $text[] = $this
+                    ->getDescriptor($option)
+                    ->configure(array('name_width' => $nameWidth))
+                    ->getFormattedText($option);
             }
             $text[] = '';
         }

@@ -26,7 +26,7 @@ class CommandJsonDescriptor extends AbstractJsonDescriptor
         /** @var Command $object */
         $object->getSynopsis();
         $object->mergeApplicationDefinition(false);
-        $definitionDescriptor = new InputDefinitionJsonDescriptor();
+        $definition = $object->getNativeDefinition();
 
         return array(
             'name'        => $object->getName(),
@@ -34,7 +34,7 @@ class CommandJsonDescriptor extends AbstractJsonDescriptor
             'description' => $object->getDescription(),
             'help'        => $object->getProcessedHelp(),
             'aliases'     => $object->getAliases(),
-            'definition'  => $definitionDescriptor->getData($object->getNativeDefinition()),
+            'definition'  => $this->getDescriptor($definition)->getData($definition),
         );
     }
 

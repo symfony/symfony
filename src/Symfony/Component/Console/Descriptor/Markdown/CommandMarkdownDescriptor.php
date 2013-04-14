@@ -26,7 +26,6 @@ class CommandMarkdownDescriptor extends AbstractMarkdownDescriptor
         /** @var Command $object */
         $object->getSynopsis();
         $object->mergeApplicationDefinition(false);
-        $definitionDescriptor = new InputDefinitionMarkdownDescriptor();
 
         $markdown = $object->getName()."\n"
             .str_repeat('-', strlen($object->getName()))."\n\n"
@@ -38,7 +37,8 @@ class CommandMarkdownDescriptor extends AbstractMarkdownDescriptor
             $markdown .= "\n\n".$help;
         }
 
-        $definitionMarkdown = $definitionDescriptor->describe($object->getNativeDefinition());
+        $definition = $object->getNativeDefinition();
+        $definitionMarkdown = $this->getDescriptor($definition)->describe($definition);
         if ($definitionMarkdown) {
             $markdown .= "\n\n".$definitionMarkdown;
         }

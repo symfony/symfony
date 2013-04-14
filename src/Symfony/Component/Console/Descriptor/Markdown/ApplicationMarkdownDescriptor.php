@@ -52,8 +52,6 @@ class ApplicationMarkdownDescriptor extends AbstractMarkdownDescriptor
     {
         /** @var Application $object */
         $description = new ApplicationDescription($object, $this->namespace);
-        $descriptor = new CommandMarkdownDescriptor();
-
         $blocks = array($object->getName()."\n".str_repeat('=', strlen($object->getName())));
 
         foreach ($description->getNamespaces() as $namespace) {
@@ -67,7 +65,7 @@ class ApplicationMarkdownDescriptor extends AbstractMarkdownDescriptor
         }
 
         foreach ($description->getCommands() as $command) {
-            $blocks[] = $descriptor->describe($command);
+            $blocks[] = $this->getDescriptor($command)->describe($command);
         }
 
         return implode("\n\n", $blocks);

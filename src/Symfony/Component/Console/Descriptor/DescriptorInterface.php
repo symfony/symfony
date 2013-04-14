@@ -56,4 +56,9 @@ interface DescriptorInterface
      * @return boolean
      */
     public function useFormatting();
+
+    /**
+     * @param DescriptorProvider $descriptorProvider
+     */
+    public function setDescriptorProvider(DescriptorProvider $descriptorProvider);
 }

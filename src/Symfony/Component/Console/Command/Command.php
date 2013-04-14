@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Console\Command;
 
-use Symfony\Component\Console\Descriptor\Text\CommandTextDescriptor;
-use Symfony\Component\Console\Descriptor\Xml\CommandXmlDescriptor;
+use Symfony\Component\Console\Descriptor\DescriptorProvider;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -566,9 +565,9 @@ class Command
      */
     public function asText()
     {
-        $descriptor = new CommandTextDescriptor();
+        $descriptor = new DescriptorProvider();
 
-        return $descriptor->describe($this);
+        return $descriptor->get($this, 'txt')->describe($this);
     }
 
     /**
@@ -582,7 +581,8 @@ class Command
      */
     public function asXml($asDom = false)
     {
-        $descriptor = new CommandXmlDescriptor();
+        $provider = new DescriptorProvider();
+        $descriptor = $provider->get($this, 'xml');
 
         if ($asDom) {
             $dom = new \DOMDocument('1.0', 'UTF-8');

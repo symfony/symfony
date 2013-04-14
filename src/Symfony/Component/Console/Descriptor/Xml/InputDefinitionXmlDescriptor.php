@@ -31,16 +31,14 @@ class InputDefinitionXmlDescriptor extends AbstractXmlDescriptor
         }
 
         $parent->appendChild($argumentsXML = $dom->createElement('arguments'));
-        $descriptor = new InputArgumentXmlDescriptor();
         /** @var InputDefinition $object */
         foreach ($object->getArguments() as $argument) {
-            $descriptor->buildDocument($argumentsXML, $argument);
+            $this->getDescriptor($argument)->buildDocument($argumentsXML, $argument);
         }
 
         $parent->appendChild($optionsXML = $dom->createElement('options'));
-        $descriptor = new InputOptionXmlDescriptor();
         foreach ($object->getOptions() as $option) {
-            $descriptor->buildDocument($optionsXML, $option);
+            $this->getDescriptor($option)->buildDocument($optionsXML, $option);
         }
     }
 

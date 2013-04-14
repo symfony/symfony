@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Console;
 
-use Symfony\Component\Console\Descriptor\Text\ApplicationTextDescriptor;
-use Symfony\Component\Console\Descriptor\Xml\ApplicationXmlDescriptor;
+use Symfony\Component\Console\Descriptor\DescriptorProvider;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -694,9 +693,9 @@ class Application
      */
     public function asText($namespace = null, $raw = false)
     {
-        $descriptor = new ApplicationTextDescriptor($namespace, $raw);
+        $descriptor = new DescriptorProvider(array('namespace' => $namespace, 'raw_text' => $raw));
 
-        return $descriptor->describe($this);
+        return $descriptor->get($this, 'txt')->describe($this);
     }
 
     /**
@@ -711,7 +710,8 @@ class Application
      */
     public function asXml($namespace = null, $asDom = false)
     {
-        $descriptor = new ApplicationXmlDescriptor($namespace);
+        $provider = new DescriptorProvider(array('namespace' => $namespace));
+        $descriptor = $provider->get($this, 'xml');
 
         if ($asDom) {
             $dom = new \DOMDocument('1.0', 'UTF-8');

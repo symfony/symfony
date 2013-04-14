@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests\Descriptor;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
+use Symfony\Component\Console\Descriptor\DescriptorProvider;
 use Symfony\Component\Console\Input\InputArgument;
 
 abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
@@ -23,6 +24,8 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         if ($object instanceof Application) {
             $this->ensureStaticCommandHelp($object);
         }
+
+        $descriptor->setDescriptorProvider(new DescriptorProvider());
 
         $this->assertTrue($descriptor->supports($object));
         $this->assertEquals(trim($description), trim($descriptor->describe($object)));

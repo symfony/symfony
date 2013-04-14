@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Console\Descriptor\Text;
 
-use Symfony\Component\Console\Descriptor\DescriptorInterface;
+use Symfony\Component\Console\Descriptor\AbstractDescriptor;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-abstract class AbstractTextDescriptor implements DescriptorInterface
+abstract class AbstractTextDescriptor extends AbstractDescriptor
 {
     /**
      * @var boolean

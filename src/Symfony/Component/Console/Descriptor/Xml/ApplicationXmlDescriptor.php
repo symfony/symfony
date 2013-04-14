@@ -56,14 +56,13 @@ class ApplicationXmlDescriptor extends AbstractXmlDescriptor
 
         /** @var Application $object */
         $description = new ApplicationDescription($object, $this->namespace);
-        $descriptor = new CommandXmlDescriptor();
 
         if ($this->namespace) {
             $commandsXML->setAttribute('namespace', $this->namespace);
         }
 
         foreach ($description->getCommands() as $command) {
-            $descriptor->buildDocument($commandsXML, $command);
+            $this->getDescriptor($command)->buildDocument($commandsXML, $command);
         }
 
         if (!$this->namespace) {

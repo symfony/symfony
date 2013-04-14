@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Console\Descriptor\Json;
 
-use Symfony\Component\Console\Descriptor\DescriptorInterface;
+use Symfony\Component\Console\Descriptor\AbstractDescriptor;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-abstract class AbstractJsonDescriptor implements DescriptorInterface
+abstract class AbstractJsonDescriptor extends AbstractDescriptor
 {
     /**
      * @var int

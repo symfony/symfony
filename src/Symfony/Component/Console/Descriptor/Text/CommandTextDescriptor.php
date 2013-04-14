@@ -40,8 +40,8 @@ class CommandTextDescriptor extends AbstractTextDescriptor
             $messages[] = '<comment>Aliases:</comment> <info>'.implode(', ', $object->getAliases()).'</info>';
         }
 
-        $descriptor = new InputDefinitionTextDescriptor();
-        $messages[] = $descriptor->getFormattedText($object->getNativeDefinition());
+        $definition = $object->getNativeDefinition();
+        $messages[] = $this->getDescriptor($definition)->getFormattedText($definition);
 
         if ($help = $object->getProcessedHelp()) {
             $messages[] = '<comment>Help:</comment>';

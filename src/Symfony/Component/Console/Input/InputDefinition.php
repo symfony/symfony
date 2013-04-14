@@ -11,8 +11,7 @@
 
 namespace Symfony\Component\Console\Input;
 
-use Symfony\Component\Console\Descriptor\Text\InputDefinitionTextDescriptor;
-use Symfony\Component\Console\Descriptor\Xml\InputDefinitionXmlDescriptor;
+use Symfony\Component\Console\Descriptor\DescriptorProvider;
 
 /**
  * A InputDefinition represents a set of valid command line arguments and options.
@@ -413,9 +412,9 @@ class InputDefinition
      */
     public function asText()
     {
-        $descriptor = new InputDefinitionTextDescriptor();
+        $descriptor = new DescriptorProvider();
 
-        return $descriptor->describe($this);
+        return $descriptor->get($this, 'txt')->describe($this);
     }
 
     /**
@@ -429,7 +428,8 @@ class InputDefinition
      */
     public function asXml($asDom = false)
     {
-        $descriptor = new InputDefinitionXmlDescriptor();
+        $provider = new DescriptorProvider();
+        $descriptor = $provider->get($this, 'xml');
 
         if ($asDom) {
             $dom = new \DOMDocument('1.0', 'UTF-8');

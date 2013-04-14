@@ -48,8 +48,8 @@ class CommandXmlDescriptor extends AbstractXmlDescriptor
             $aliasXML->appendChild($dom->createTextNode($alias));
         }
 
-        $descriptor = new InputDefinitionXmlDescriptor();
-        $descriptor->buildDocument($commandXML, $object->getNativeDefinition());
+        $definition = $object->getNativeDefinition();
+        $this->getDescriptor($definition)->buildDocument($commandXML, $definition);
     }
 
     /**

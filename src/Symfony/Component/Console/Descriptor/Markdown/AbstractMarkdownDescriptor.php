@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Console\Descriptor\Markdown;
 
-use Symfony\Component\Console\Descriptor\DescriptorInterface;
+use Symfony\Component\Console\Descriptor\AbstractDescriptor;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-abstract class AbstractMarkdownDescriptor implements DescriptorInterface
+abstract class AbstractMarkdownDescriptor extends AbstractDescriptor
 {
     /**
      * {@inheritdoc}

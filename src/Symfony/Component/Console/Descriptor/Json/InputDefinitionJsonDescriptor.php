@@ -25,17 +25,20 @@ class InputDefinitionJsonDescriptor extends AbstractJsonDescriptor
      */
     public function getData($object)
     {
-        $argumentDescriptor = new InputArgumentJsonDescriptor();
-        $optionDescriptor = new InputOptionJsonDescriptor();
-
+        $arguments = array();
         /** @var InputDefinition $object */
+        foreach ($object->getArguments() as $name => $argument) {
+            $arguments[$name] = $this->getDescriptor($argument)->getData($argument);
+        }
+
+        $options = array();
+        foreach ($object->getOptions() as $name => $option) {
+            $options[$name] = $this->getDescriptor($option)->getData($option);
+        }
+
         return array(
-            'arguments' => array_map(function (InputArgument $argument) use ($argumentDescriptor) {
-                return $argumentDescriptor->getData($argument);
-            }, $object->getArguments()),
-            'options' => array_map(function (InputOption $option) use ($optionDescriptor) {
-                return $optionDescriptor->getData($option);
-            }, $object->getOptions()),
+            'arguments' => $arguments,
+            'options'   => $options
         );
     }
 

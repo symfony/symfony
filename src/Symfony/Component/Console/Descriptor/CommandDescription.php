@@ -77,6 +77,12 @@ class CommandDescription
      */
     public function getDefinition()
     {
+        // ensure command definition is merged with application one
+        $method = new \ReflectionMethod($this->command, 'mergeApplicationDefinition');
+        $method->setAccessible(true);
+        $method->invoke($this->command, false);
+        
+        // reads native definition
         $method = new \ReflectionMethod($this->command, 'getNativeDefinition');
         $method->setAccessible(true);
 

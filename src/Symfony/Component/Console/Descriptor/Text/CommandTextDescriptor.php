@@ -13,7 +13,6 @@ namespace Symfony\Component\Console\Descriptor\Text;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Descriptor\CommandDescription;
-use Symfony\Component\Console\Input\InputDefinition;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>

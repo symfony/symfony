@@ -97,8 +97,8 @@ class DateTimeTypeTest extends LocalizedTestCase
     public function testSubmitWithoutMinutes()
     {
         $form = $this->factory->create('datetime', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'date_widget' => 'choice',
             'time_widget' => 'choice',
             'input' => 'datetime',

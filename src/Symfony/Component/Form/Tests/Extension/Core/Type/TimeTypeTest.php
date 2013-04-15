@@ -114,8 +114,8 @@ class TimeTypeTest extends LocalizedTestCase
     public function testSubmitDatetimeSingleTextWithoutMinutes()
     {
         $form = $this->factory->create('time', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'input' => 'datetime',
             'widget' => 'single_text',
             'with_minutes' => false,
@@ -150,8 +150,8 @@ class TimeTypeTest extends LocalizedTestCase
     public function testSubmitArraySingleTextWithoutMinutes()
     {
         $form = $this->factory->create('time', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'input' => 'array',
             'widget' => 'single_text',
             'with_minutes' => false,
@@ -207,8 +207,8 @@ class TimeTypeTest extends LocalizedTestCase
     public function testSubmitStringSingleTextWithoutMinutes()
     {
         $form = $this->factory->create('time', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'input' => 'string',
             'widget' => 'single_text',
             'with_minutes' => false,
@@ -223,8 +223,8 @@ class TimeTypeTest extends LocalizedTestCase
     public function testSetDataWithoutMinutes()
     {
         $form = $this->factory->create('time', null, array(
-            'data_timezone' => 'UTC',
-            'user_timezone' => 'UTC',
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
             'input' => 'datetime',
             'with_minutes' => false,
         ));

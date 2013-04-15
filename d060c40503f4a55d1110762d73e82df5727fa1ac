@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-04-15T12:31:26Z
+
+I know that you only removed the BC data, but timezone information on plain Date and plain Time objects is useless. Because without both pieces of information you cannot convert between the two.
+IMO it should be removed altogether from those two types.

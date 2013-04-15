@@ -13,7 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\ExceptionInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
  * The central registry of the Form component.
@@ -86,7 +86,7 @@ class FormRegistry implements FormRegistryInterface
             }
 
             if (!$type) {
-                throw new Exception(sprintf('Could not load type "%s"', $name));
+                throw new InvalidArgumentException(sprintf('Could not load type "%s"', $name));
             }
 
             $this->resolveAndAddType($type);

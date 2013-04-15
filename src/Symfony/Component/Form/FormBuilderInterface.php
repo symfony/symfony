@@ -49,7 +49,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @return FormBuilderInterface The builder for the child
      *
-     * @throws Exception\FormException if the given child does not exist
+     * @throws Exception\InvalidArgumentException if the given child does not exist
      */
     public function get($name);
 

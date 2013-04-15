@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Kernel;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
@@ -28,31 +29,31 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 abstract class RegisterMappingsPass implements CompilerPassInterface
 {
     /**
-     * Hashmap of directory path ot namespace
-     * @var array
+     * DI object for the driver to use, either a service definition for a
+     * private service or a reference for a public service.
+     * @var Definition|Reference
      */
-    protected $mappings;
+    protected $driver;
+
     /**
-     * Mapping file extension, for example '.orm.xml'
-     * @var string
+     * List of namespaces handled by the driver
+     * @var string[]
      */
-    protected $extension;
+    protected $namespaces;
+
     /**
      * Parameter name of the entity managers list in the service container.
      * For example 'doctrine.entity_managers'
      * @var string
      */
     protected $managersParameter;
-    /**
-     * Mapping driver class to use, for example 'Doctrine\ORM\Mapping\Driver\XmlDriver'
-     * @var string
-     */
-    protected $driverClass;
+
     /**
      * Naming pattern of the metadata service ids, for example 'doctrine.orm.%s_metadata_driver'
      * @var string
      */
     protected $driverPattern;
+
     /**
      * A name for a parameter in the container. If set, this compiler pass will
      * only do anything if the parameter is present. (But regardless of the
@@ -62,20 +63,18 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     protected $enabledParameter;
 
     /**
-     * @param array  $mappings          hashmap of absolute directory paths to namespaces
-     * @param string $extension         file extension to look for the mapping files
-     * @param string $managersParameter service container parameter name for the managers list
-     * @param string $driverClass       name of the mapping driver to instantiate
-     * @param string $driverPattern     pattern to get the metadata driver service names
-     * @param string $enableParameter   service container parameter that must be
+     * @param Definition|Reference $driver            driver DI definition or reference
+     * @param string[]             $namespaces        list of namespaces handled by $driver
+     * @param string               $managersParameter service container parameter name for the managers list
+     * @param string               $driverPattern     pattern to get the metadata driver service names
+     * @param string               $enableParameter   service container parameter that must be
      *      present to enable the mapping. Set to false to not do any check, optional.
      */
-    public function __construct(array $mappings, $extension, $managersParameter, $driverClass, $driverPattern, $enableParameter = false)
+    public function __construct($driver, array $namespaces, $managersParameter, $driverPattern, $enableParameter = false)
     {
-        $this->mappings = $mappings;
-        $this->extension = $extension;
+        $this->driver = $driver;
+        $this->namespaces = $namespaces;
         $this->managersParameter = $managersParameter;
-        $this->driverClass = $driverClass;
         $this->driverPattern = $driverPattern;
         $this->enabledParameter = $enableParameter;
     }
@@ -91,11 +90,11 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
             return;
         }
 
-        $mappingDriverDef = $this->buildDriver($container);
+        $mappingDriverDef = $this->getDriver($container);
         foreach ($container->getParameter($this->managersParameter) as $name => $manager) {
             $chainDriverDefService = sprintf($this->driverPattern, $name);
             $chainDriverDef = $container->getDefinition($chainDriverDefService);
-            foreach ($this->mappings as $namespace) {
+            foreach ($this->namespaces as $namespace) {
                 $chainDriverDef->addMethodCall('addDriver', array($mappingDriverDef, $namespace));
             }
         }
@@ -107,13 +106,11 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @param ContainerBuilder $container passed on in case an extending class
      *      needs access to the container.
      *
-     * @return Definition the metadata driver to add to all chain drivers
+     * @return Definition|Reference the metadata driver to add to all chain drivers
      */
-    protected function buildDriver(ContainerBuilder $container)
+    protected function getDriver(ContainerBuilder $container)
     {
-        $arguments = array($this->mappings, $this->extension);
-        $locator = new Definition('Doctrine\Common\Persistence\Mapping\Driver\SymfonyFileLocator', $arguments);
-        return new Definition($this->driverClass, array($locator));
+        return $this->driver;
     }
 
     /**

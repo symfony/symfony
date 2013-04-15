@@ -2,8 +2,12 @@ CHANGELOG
 =========
 
 2.3.0
+-----
 
  * `UploadedFile::isValid` now returns false if the file was not uploaded via HTTP (in a non-test mode)
+ * Improved error-handling of `\Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler`
+   to ensure the supplied PDO handler throws Exceptions on error (as the class expects). Added related test cases
+   to verify that Exceptions are properly thrown when the PDO queries fail.
 
 2.2.0
 -----

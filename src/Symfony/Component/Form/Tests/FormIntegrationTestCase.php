@@ -32,15 +32,6 @@ abstract class FormIntegrationTestCase extends \PHPUnit_Framework_TestCase
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions($this->getExtensions())
             ->getFormFactory();
-
-        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
-    }
-
-    protected function tearDown()
-    {
-        $this->factory = null;
-
-        restore_error_handler();
     }
 
     protected function getExtensions()

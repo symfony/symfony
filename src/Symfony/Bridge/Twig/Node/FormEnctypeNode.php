@@ -24,6 +24,8 @@ class FormEnctypeNode extends SearchAndRenderBlockNode
         parent::compile($compiler);
 
         $compiler->raw(";\n");
-        $compiler->write('trigger_error(\'The helper form_enctype(form) is deprecated since version 2.3 and will be removed in 3.0. Use form_start(form) instead.\', E_USER_DEPRECATED)');
+
+        // Uncomment this as soon as the deprecation note should be shown
+        // $compiler->write('trigger_error(\'The helper form_enctype(form) is deprecated since version 2.3 and will be removed in 3.0. Use form_start(form) instead.\', E_USER_DEPRECATED)');
     }
 }

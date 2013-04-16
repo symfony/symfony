@@ -91,6 +91,19 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $event->stop();
     }
 
+    public function testIsStarted()
+    {
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        $event->start();
+        $this->assertTrue($event->isStarted());
+    }
+
+    public function testIsNotStarted()
+    {
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        $this->assertFalse($event->isStarted());
+    }
+
     public function testEnsureStopped()
     {
         // this also test overlap between two periods

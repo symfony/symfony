@@ -258,7 +258,7 @@ class Section
      */
     public function isEventStarted($name)
     {
-        return isset($this->events[$name]);
+        return isset($this->events[$name]) && $this->events[$name]->isStarted();
     }
 
     /**

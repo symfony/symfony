@@ -206,7 +206,47 @@ class UploadedFile extends File
             }
         }
 
-        throw new FileException(sprintf('The file "%s" has not been uploaded via Http', $this->getPathname()));
+        $error = $this->getError();
+
+        switch ($error) {
+            case UPLOAD_ERR_INI_SIZE:
+                $max = self::getMaxFilesize() / 1024;
+                $ex = sprintf(
+                    'The file "%s" exceeds your upload_max_filesize ini directive (%d kb)',
+                    $this->getClientOriginalName(), $max);
+                break;
+
+            case UPLOAD_ERR_FORM_SIZE:
+                $ex = sprintf(
+                    'The file "%s" exceeds the upload limit defined in your form.',
+                    $this->getClientOriginalName());
+                break;
+
+            case UPLOAD_ERR_PARTIAL:
+                $ex = sprintf(
+                    'The file "%s" was only partially uploaded.',
+                    $this->getClientOriginalName());
+                break;
+
+            case UPLOAD_ERR_CANT_WRITE:
+                $ex = sprintf(
+                    'The file "%s" could not be written on disk.',
+                    $this->getClientOriginalName());
+                break;
+
+            case UPLOAD_ERR_NO_TMP_DIR:
+                $ex = sprintf(
+                    'Could not upload the file %s: the temporary directory is missing.',
+                    $this->getClientOriginalName());
+                break;
+
+            default:
+                $ex = sprintf(
+                    'The file "%s" could not be uploaded.',
+                    $this->getClientOriginalName());
+        }
+
+        throw new FileException($ex);
     }
 
     /**

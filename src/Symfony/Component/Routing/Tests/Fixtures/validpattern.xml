@@ -12,6 +12,7 @@
 
     <route id="blog_show_legacy" pattern="/blog/{slug}" host="{locale}.example.com">
         <default key="_controller">MyBundle:Blog:show</default>
+        <default key="slug" xsi:nil="true" />
         <requirement key="_method">GET|POST|put|OpTiOnS</requirement>
         <requirement key="_scheme">hTTps</requirement>
         <requirement key="locale">\w+</requirement>

@@ -113,7 +113,7 @@ class StopwatchEvent
      */
     public function isStarted()
     {
-        return (bool) count($this->started);
+        return !empty($this->started);
     }
 
     /**

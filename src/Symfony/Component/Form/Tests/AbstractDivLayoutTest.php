@@ -82,6 +82,22 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testButtonRow()
+    {
+        $form = $this->factory->createNamed('name', 'button');
+        $view = $form->createView();
+        $html = $this->renderRow($view);
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
+        ./button[@type="button"][@name="name"]
+    ]
+    [count(//label)=0]
+'
+        );
+    }
+
     public function testRest()
     {
         $view = $this->factory->createNamedBuilder('name', 'form')

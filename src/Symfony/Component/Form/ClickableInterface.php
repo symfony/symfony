@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -11,21 +12,16 @@
 namespace Symfony\Component\Form;
 
 /**
+ * A clickable form element.
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-final class FormEvents
+interface ClickableInterface
 {
-    const PRE_BIND = 'form.pre_bind';
-
-    const BIND = 'form.bind';
-
-    const POST_BIND = 'form.post_bind';
-
-    const PRE_SET_DATA = 'form.pre_set_data';
-
-    const POST_SET_DATA = 'form.post_set_data';
-
-    private function __construct()
-    {
-    }
+    /**
+     * Returns whether this element was clicked.
+     *
+     * @return Boolean Whether this element was clicked.
+     */
+    public function isClicked();
 }

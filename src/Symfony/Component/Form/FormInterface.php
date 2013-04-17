@@ -150,9 +150,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function getConfig();
 
     /**
-     * Returns whether the field is bound.
+     * Returns whether the form is submitted.
      *
-     * @return Boolean true if the form is bound to input values, false otherwise
+     * @return Boolean true if the form is submitted, false otherwise
      */
     public function isBound();
 

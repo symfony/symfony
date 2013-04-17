@@ -53,7 +53,7 @@ class DialogHelper extends Helper
 
         $result = $this->askAndValidate($output, '> ', function ($picked) use ($choices, $errorMessage, $multiselect) {
             // Collapse all spaces.
-            $selectedChoices = str_replace(" ","", $picked);
+            $selectedChoices = str_replace(" ", "", $picked);
 
             if ($multiselect) {
                 // Check for a separated comma values

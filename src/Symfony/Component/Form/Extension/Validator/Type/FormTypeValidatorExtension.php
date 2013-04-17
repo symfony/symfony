@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormTypeValidatorExtension extends AbstractTypeExtension
+class FormTypeValidatorExtension extends BaseValidatorExtension
 {
     /**
      * @var ValidatorInterface
@@ -53,18 +53,7 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        // Make sure that validation groups end up as null, closure or array
-        $validationGroupsNormalizer = function (Options $options, $groups) {
-            if (empty($groups)) {
-                return null;
-            }
-
-            if (is_callable($groups)) {
-                return $groups;
-            }
-
-            return (array) $groups;
-        };
+        parent::setDefaultOptions($resolver);
 
         // Constraint should always be converted to an array
         $constraintsNormalizer = function (Options $options, $constraints) {
@@ -73,8 +62,8 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
 
         $resolver->setDefaults(array(
             'error_mapping'              => array(),
-            'validation_groups'          => null,
-            'constraints'                => null,
+            'validation_constraint'      => null,
+            'constraints'                => array(),
             'cascade_validation'         => false,
             'invalid_message'            => 'This value is not valid.',
             'invalid_message_parameters' => array(),
@@ -83,7 +72,6 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
         ));
 
         $resolver->setNormalizers(array(
-            'validation_groups' => $validationGroupsNormalizer,
             'constraints'       => $constraintsNormalizer,
         ));
     }

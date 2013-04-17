@@ -34,43 +34,43 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create($type = 'form', $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function create($type = 'form', $data = null, array $options = array())
     {
-        return $this->createBuilder($type, $data, $options, $parent)->getForm();
+        return $this->createBuilder($type, $data, $options)->getForm();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createNamed($name, $type = 'form', $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function createNamed($name, $type = 'form', $data = null, array $options = array())
     {
-        return $this->createNamedBuilder($name, $type, $data, $options, $parent)->getForm();
+        return $this->createNamedBuilder($name, $type, $data, $options)->getForm();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function createForProperty($class, $property, $data = null, array $options = array())
     {
-        return $this->createBuilderForProperty($class, $property, $data, $options, $parent)->getForm();
+        return $this->createBuilderForProperty($class, $property, $data, $options)->getForm();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createBuilder($type = 'form', $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function createBuilder($type = 'form', $data = null, array $options = array())
     {
         $name = $type instanceof FormTypeInterface || $type instanceof ResolvedFormTypeInterface
             ? $type->getName()
             : $type;
 
-        return $this->createNamedBuilder($name, $type, $data, $options, $parent);
+        return $this->createNamedBuilder($name, $type, $data, $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createNamedBuilder($name, $type = 'form', $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function createNamedBuilder($name, $type = 'form', $data = null, array $options = array())
     {
         if (null !== $data && !array_key_exists('data', $options)) {
             $options['data'] = $data;
@@ -84,16 +84,16 @@ class FormFactory implements FormFactoryInterface
             throw new UnexpectedTypeException($type, 'string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface');
         }
 
-        return $type->createBuilder($this, $name, $options, $parent);
+        return $type->createBuilder($this, $name, $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createBuilderForProperty($class, $property, $data = null, array $options = array(), FormBuilderInterface $parent = null)
+    public function createBuilderForProperty($class, $property, $data = null, array $options = array())
     {
         if (null === $guesser = $this->registry->getTypeGuesser()) {
-            return $this->createNamedBuilder($property, 'text', $data, $options, $parent);
+            return $this->createNamedBuilder($property, 'text', $data, $options);
         }
 
         $typeGuess = $guesser->guessType($class, $property);
@@ -123,7 +123,7 @@ class FormFactory implements FormFactoryInterface
             $options = array_merge($typeGuess->getOptions(), $options);
         }
 
-        return $this->createNamedBuilder($property, $type, $data, $options, $parent);
+        return $this->createNamedBuilder($property, $type, $data, $options);
     }
 
     /**

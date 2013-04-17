@@ -171,25 +171,6 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('BUILDER', $this->factory->createNamedBuilder('name', $resolvedType, null, $options));
     }
 
-    public function testCreateNamedBuilderWithParentBuilder()
-    {
-        $options = array('a' => '1', 'b' => '2');
-        $parentBuilder = $this->getMockFormBuilder();
-        $resolvedType = $this->getMockResolvedType();
-
-        $this->registry->expects($this->once())
-            ->method('getType')
-            ->with('type')
-            ->will($this->returnValue($resolvedType));
-
-        $resolvedType->expects($this->once())
-            ->method('createBuilder')
-            ->with($this->factory, 'name', $options, $parentBuilder)
-            ->will($this->returnValue('BUILDER'));
-
-        $this->assertSame('BUILDER', $this->factory->createNamedBuilder('name', 'type', null, $options, $parentBuilder));
-    }
-
     public function testCreateNamedBuilderFillsDataOption()
     {
         $givenOptions = array('a' => '1', 'b' => '2');
@@ -228,7 +209,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException        \Symfony\Component\Form\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Expected argument of type "string, Symfony\Component\Form\ResolvedFormTypeInterface or Symfony\Component\Form\FormTypeInterface", "stdClass" given
      */
     public function testCreateNamedBuilderThrowsUnderstandableException()

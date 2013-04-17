@@ -38,13 +38,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     private $unresolvedChildren = array();
 
     /**
-     * The parent of this builder.
-     *
-     * @var FormBuilder
-     */
-    private $parent;
-
-    /**
      * Creates a new form builder.
      *
      * @param string                   $name
@@ -70,7 +63,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         }
 
         if ($child instanceof self) {
-            $child->setParent($this);
             $this->children[$child->getName()] = $child;
 
             // In case an unresolved child with the same name exists
@@ -111,10 +103,10 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         }
 
         if (null !== $type) {
-            return $this->getFormFactory()->createNamedBuilder($name, $type, null, $options, $this);
+            return $this->getFormFactory()->createNamedBuilder($name, $type, null, $options);
         }
 
-        return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, null, $options, $this);
+        return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, null, $options);
     }
 
     /**
@@ -149,9 +141,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         unset($this->unresolvedChildren[$name]);
 
         if (array_key_exists($name, $this->children)) {
-            if ($this->children[$name] instanceof self) {
-                $this->children[$name]->setParent(null);
-            }
             unset($this->children[$name]);
         }
 
@@ -211,7 +200,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     {
         $config = parent::getFormConfig();
 
-        $config->parent = null;
         $config->children = array();
         $config->unresolvedChildren = array();
 
@@ -236,44 +224,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         }
 
         return $form;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->parent;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setParent(FormBuilderInterface $parent = null)
-    {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        $this->parent = $parent;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasParent()
-    {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return null !== $this->parent;
     }
 
     /**

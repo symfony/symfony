@@ -1762,4 +1762,38 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
              //input[@type="text"][@id="child"][@name="child"]'
         , 2);
     }
+
+    public function testButton()
+    {
+        $form = $this->factory->createNamed('name', 'button');
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/button[@type="button"][@name="name"]'
+        );
+    }
+
+    public function testButtonLabelIsEmpty()
+    {
+        $form = $this->factory->createNamed('name', 'button');
+
+        $this->assertSame('', $this->renderLabel($form->createView()));
+    }
+
+    public function testSubmit()
+    {
+        $form = $this->factory->createNamed('name', 'submit');
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/button[@type="submit"][@name="name"]'
+        );
+    }
+
+    public function testReset()
+    {
+        $form = $this->factory->createNamed('name', 'reset');
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/button[@type="reset"][@name="name"]'
+        );
+    }
 }

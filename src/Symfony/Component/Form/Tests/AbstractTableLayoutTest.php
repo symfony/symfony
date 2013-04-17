@@ -125,6 +125,25 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testButtonRow()
+    {
+        $form = $this->factory->createNamed('name', 'button');
+        $view = $form->createView();
+        $html = $this->renderRow($view);
+
+        $this->assertMatchesXpath($html,
+'/tr
+    [
+        ./td
+            [.=""]
+        /following-sibling::td
+            [./button[@type="button"][@name="name"]]
+    ]
+    [count(//label)=0]
+'
+        );
+    }
+
     public function testRest()
     {
         $view = $this->factory->createNamedBuilder('name', 'form')

@@ -215,7 +215,12 @@ class XmlFileLoader extends FileLoader
         foreach ($node->getElementsByTagNameNS(self::NAMESPACE_URI, '*') as $n) {
             switch ($n->localName) {
                 case 'default':
-                    $defaults[$n->getAttribute('key')] = trim($n->textContent);
+                    if ($n->hasAttribute('xsi:nil') && 'true' == $n->getAttribute('xsi:nil')) {
+                        $defaults[$n->getAttribute('key')] = null;
+                    } else {
+                        $defaults[$n->getAttribute('key')] = trim($n->textContent);
+                    }
+
                     break;
                 case 'requirement':
                     $requirements[$n->getAttribute('key')] = trim($n->textContent);

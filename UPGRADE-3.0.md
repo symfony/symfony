@@ -113,3 +113,37 @@ UPGRADE FROM 2.x to 3.0
    ```
    Yaml::parse(file_get_contents($fileName));
    ```
+
+### Validator
+
+ * The constraints `Optional` and `Required` were moved to the
+   `Symfony\Component\Validator\Constraints\` namespace. You should adapt
+   the path wherever you used them.
+
+   Before:
+
+   ```
+   use Symfony\Component\Validator\Constraints as Assert;
+
+   /**
+    * @Assert\Collection({
+    *     "foo" = @Assert\Collection\Required(),
+    *     "bar" = @Assert\Collection\Optional(),
+    * })
+    */
+   private $property;
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\Validator\Constraints as Assert;
+
+   /**
+    * @Assert\Collection({
+    *     "foo" = @Assert\Required(),
+    *     "bar" = @Assert\Optional(),
+    * })
+    */
+   private $property;
+   ```

@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraint;
  * Validates that a value is a valid IP address
  *
  * @Annotation
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
  *

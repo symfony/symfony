@@ -59,7 +59,7 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
             array(
                 'foo' =>
                 $this->getMockBuilder('Symfony\Component\Stopwatch\StopwatchEvent')
-                    ->setConstructorArgs([microtime(true) * 1000])
+                    ->setConstructorArgs(array(microtime(true) * 1000))
                     ->getMock())
         );
 

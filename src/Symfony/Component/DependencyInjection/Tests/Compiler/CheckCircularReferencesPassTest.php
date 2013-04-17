@@ -61,6 +61,19 @@ class CheckCircularReferencesPassTest extends \PHPUnit_Framework_TestCase
         $this->process($container);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testDeepCircularReference()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->addArgument(new Reference('b'));
+        $container->register('b')->addArgument(new Reference('c'));
+        $container->register('c')->addArgument(new Reference('b'));
+
+        $this->process($container);
+    }
+
     public function testProcessIgnoresMethodCalls()
     {
         $container = new ContainerBuilder();

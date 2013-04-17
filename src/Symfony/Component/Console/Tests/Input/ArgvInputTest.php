@@ -227,8 +227,6 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
             new InputOption('anotherOption', null, InputOption::VALUE_NONE),
         )));
         $this->assertSame(array('name' => array('foo', 'bar', null), 'anotherOption' => true), $input->getOptions(), '->parse() parses empty array options as null ("--option value" syntax)');
-
-        $this->assertEquals(array('name' => array('foo', 'bar', 'baz')), $input->getOptions());
     }
 
     public function testParseNegativeNumberAfterDoubleDash()

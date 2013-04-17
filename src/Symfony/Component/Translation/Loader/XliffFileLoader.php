@@ -24,9 +24,6 @@ use Symfony\Component\Config\Resource\FileResource;
 class XliffFileLoader implements LoaderInterface
 {
 
-    const ISO_8859_1 = 'ISO-8859-1';
-    const UTF_8 = 'UTF-8';
-
     /**
      * Encoding specified in xlf file
      *
@@ -87,14 +84,12 @@ class XliffFileLoader implements LoaderInterface
             // If the xlf file has another encoding specified try to convert it here because
             // simple_xml will always return utf-8 encoded values
             if ($encoding !== null) {
-                if ($encoding == self::ISO_8859_1) {
-                    $target = utf8_decode($target);
+                if (function_exists('mb_convert_encoding')) {
+                    $target = mb_convert_encoding($target, $encoding, 'UTF-8');
+                } elseif (function_exists('iconv')) {
+                    $target = iconv('UTF-8', $encoding, $target);
                 } else {
-                    if (function_exists('mb_convert_encoding')) {
-                        $target = mb_convert_encoding($target, $encoding, 'UTF-8');
-                    } else {
-                        throw new \RuntimeException(sprintf('Cannot convert encoding from "UTF-8" to "%1$s"', $encoding));
-                    }
+                    throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
                 }
             }
 
@@ -129,7 +124,7 @@ class XliffFileLoader implements LoaderInterface
         }
 
         $encoding = strtoupper($dom->encoding);
-        if ($encoding != self::UTF_8) {
+        if (!empty($encoding) && $encoding != 'UTF-8') {
             $this->setEncoding($encoding);
         }
 

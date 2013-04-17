@@ -492,6 +492,15 @@ yaml:
 EOF
         );
     }
+
+    public function testEmptyValue()
+    {
+        $input = <<<EOF
+hash:
+EOF;
+
+        $this->assertEquals(array('hash' => null), Yaml::parse($input));
+    }
 }
 
 class B

@@ -253,15 +253,7 @@ class Response
             $this->headers->set('expires', -1);
         }
 
-        /**
-         * Check if we need to remove Cache-Control for ssl encrypted downloads when using IE < 9
-         * @link http://support.microsoft.com/kb/323308
-         */
-        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) == 1 && true === $request->isSecure()) {
-            if (intval(preg_replace("/(MSIE )(.*?);/", "$2", $match[0])) < 9) {
-                $this->headers->remove('Cache-Control');
-            }
-        }
+        $this->ensureIEOverSSLCompatibility($request);
 
         return $this;
     }
@@ -1178,5 +1170,19 @@ class Response
     public function isEmpty()
     {
         return in_array($this->statusCode, array(201, 204, 304));
+    }
+
+    /**
+     * Check if we need to remove Cache-Control for ssl encrypted downloads when using IE < 9
+     *
+     * @link http://support.microsoft.com/kb/323308
+     */
+    protected function ensureIEOverSSLCompatibility(Request $request)
+    {
+        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) == 1 && true === $request->isSecure()) {
+            if (intval(preg_replace("/(MSIE )(.*?);/", "$2", $match[0])) < 9) {
+                $this->headers->remove('Cache-Control');
+            }
+        }
     }
 }

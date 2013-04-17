@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
+use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -774,7 +775,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if (self::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
             if (self::SCOPE_CONTAINER !== $scope && !isset($this->scopedServices[$scope])) {
-                throw new RuntimeException('You tried to create a service of an inactive scope.');
+                throw new InactiveScopeException($id, $scope);
             }
 
             $this->services[$lowerId = strtolower($id)] = $service;

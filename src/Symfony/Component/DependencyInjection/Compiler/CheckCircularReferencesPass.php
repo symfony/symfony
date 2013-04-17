@@ -65,10 +65,6 @@ class CheckCircularReferencesPass implements CompilerPassInterface
                 throw new ServiceCircularReferenceException($id, array_slice($this->currentPath, $searchKey));
             }
 
-            if ($this->currentId === $id) {
-                throw new ServiceCircularReferenceException($this->currentId, $this->currentPath);
-            }
-
             $this->checkOutEdges($node->getOutEdges());
             array_pop($this->currentPath);
         }

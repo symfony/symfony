@@ -18,6 +18,97 @@ UPGRADE FROM 2.x to 3.0
    `DebugClassLoader`. The difference is that the constructor now takes a
    loader to wrap.
 
+### Form
+
+ * Passing a `Symfony\Component\HttpFoundation\Request` instance to
+   `FormInterface::bind()` was disabled. You should use
+   `FormInterface::process()` instead.
+
+   Before:
+
+   ```
+   if ('POST' === $request->getMethod()) {
+       $form->bind($request);
+
+       if ($form->isValid()) {
+           // ...
+       }
+   }
+   ```
+
+   After:
+
+   ```
+   if ($form->process($request)->isValid()) {
+       // ...
+   }
+   ```
+
+   If you want to test whether the form was submitted separately, you can use
+   the method `isBound()`:
+
+   ```
+   if ($form->process($request)->isBound()) {
+      // ...
+
+      if ($form->isValid()) {
+          // ...
+      }
+   }
+   ```
+
+### FrameworkBundle
+
+ * The `enctype` method of the `form` helper was removed. You should use the
+   new method `start` instead.
+
+   Before:
+
+   ```
+   <form method="post" action="http://example.com" <?php echo $view['form']->enctype($form) ?>>
+       ...
+   </form>
+   ```
+
+   After:
+
+   ```
+   <?php echo $view['form']->start($form) ?>
+       ...
+   <?php echo $view['form']->end($form) ?>
+   ```
+
+   The method and action of the form default to "POST" and the current
+   document. If you want to change these values, you can set them explicitly in
+   the controller.
+
+   Alternative 1:
+
+   ```
+   $form = $this->createForm('my_form', $formData, array(
+       'method' => 'PUT',
+       'action' => $this->generateUrl('target_route'),
+   ));
+   ```
+
+   Alternative 2:
+
+   ```
+   $form = $this->createFormBuilder($formData)
+       // ...
+       ->setMethod('PUT')
+       ->setAction($this->generateUrl('target_route'))
+       ->getForm();
+   ```
+
+   It is also possible to override the method and the action in the template:
+
+   ```
+   <?php echo $view['form']->start($form, array('method' => 'GET', 'action' => 'http://example.com')) ?>
+       ...
+   <?php echo $view['form']->end($form) ?>
+   ```
+
 ### HttpKernel
 
  * The `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed in
@@ -97,6 +188,56 @@ UPGRADE FROM 2.x to 3.0
 ### Twig Bridge
 
  * The `render` tag is deprecated in favor of the `render` function.
+
+ * The `form_enctype` helper was removed. You should use the new `form_start`
+   function instead.
+
+   Before:
+
+   ```
+   <form method="post" action="http://example.com" {{ form_enctype(form) }}>
+       ...
+   </form>
+   ```
+
+   After:
+
+   ```
+   {{ form_start(form) }}
+       ...
+   {{ form_end(form) }}
+   ```
+
+   The method and action of the form default to "POST" and the current
+   document. If you want to change these values, you can set them explicitly in
+   the controller.
+
+   Alternative 1:
+
+   ```
+   $form = $this->createForm('my_form', $formData, array(
+       'method' => 'PUT',
+       'action' => $this->generateUrl('target_route'),
+   ));
+   ```
+
+   Alternative 2:
+
+   ```
+   $form = $this->createFormBuilder($formData)
+       // ...
+       ->setMethod('PUT')
+       ->setAction($this->generateUrl('target_route'))
+       ->getForm();
+   ```
+
+   It is also possible to override the method and the action in the template:
+
+   ```
+   {{ form_start(form, {'method': 'GET', 'action': 'http://example.com'}) }}
+       ...
+   {{ form_end(form) }}
+   ```
 
 ### Yaml
 

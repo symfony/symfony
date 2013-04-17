@@ -75,7 +75,7 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceof('Symfony\Component\Stopwatch\StopwatchEvent', $event);
         $total = $event->getDuration();
-        $this->assertTrue($total > 10 && $total <= 29, $total . ' should be 20 (between 10 and 29)');
+        $this->assertTrue($total > 10 && $total <= 29, $total.' should be 20 (between 10 and 29)');
     }
 
     public function testLap()
@@ -89,7 +89,7 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceof('Symfony\Component\Stopwatch\StopwatchEvent', $event);
         $total = $event->getDuration();
-        $this->assertTrue($total > 10 && $total <= 29, $total . ' should be 20 (between 10 and 29)');
+        $this->assertTrue($total > 10 && $total <= 29, $total.' should be 20 (between 10 and 29)');
     }
 
     /**

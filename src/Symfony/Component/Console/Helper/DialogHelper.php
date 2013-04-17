@@ -52,11 +52,10 @@ class DialogHelper extends Helper
         $output->writeln($messages);
 
         $result = $this->askAndValidate($output, '> ', function ($picked) use ($choices, $errorMessage, $multiselect) {
-
             // Collapse all spaces.
             $selectedChoices = str_replace(" ","", $picked);
 
-            if ($multiselect){
+            if ($multiselect) {
                 // Check for a separated comma values
                 if(!preg_match('/^[a-zA-Z0-9_-]+(?:,[a-zA-Z0-9_-]+)*$/', $selectedChoices, $matches)) {
                     throw new \InvalidArgumentException(sprintf($errorMessage, $picked));
@@ -80,7 +79,6 @@ class DialogHelper extends Helper
             } 
             
             return $picked;
-
         }, $attempts, $default);
 
         return $result;

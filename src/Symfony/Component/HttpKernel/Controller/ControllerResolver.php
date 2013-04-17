@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ControllerResolver implements ControllerResolverInterface
 {
-    private $logger;
+    protected $logger;
 
     /**
      * Constructor.

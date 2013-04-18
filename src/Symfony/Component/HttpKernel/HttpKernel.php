@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestFinishedEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -35,19 +36,22 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
     protected $dispatcher;
     protected $resolver;
+    protected $requestStack;
 
     /**
      * Constructor
      *
-     * @param EventDispatcherInterface    $dispatcher An EventDispatcherInterface instance
-     * @param ControllerResolverInterface $resolver   A ControllerResolverInterface instance
+     * @param EventDispatcherInterface    $dispatcher   An EventDispatcherInterface instance
+     * @param ControllerResolverInterface $resolver     A ControllerResolverInterface instance
+     * @param RequestStack                $requestStack A stack for master/sub requests
      *
      * @api
      */
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver)
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null)
     {
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
+        $this->requestStack = $requestStack ?: new RequestStack();
     }
 
     /**
@@ -60,6 +64,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         try {
             return $this->handleRaw($request, $type);
         } catch (\Exception $e) {
+            $this->finishRequest($request, $type);
+
             if (false === $catch) {
                 throw $e;
             }
@@ -93,6 +99,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     private function handleRaw(Request $request, $type = self::MASTER_REQUEST)
     {
+        $this->requestStack->push($request);
+
         // request
         $event = new GetResponseEvent($this, $request, $type);
         $this->dispatcher->dispatch(KernelEvents::REQUEST, $event);
@@ -156,7 +164,27 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
 
+        $this->finishRequest($request, $type);
+
         return $event->getResponse();
+    }
+
+    /**
+     * Publish event finished event, then pop the request from the stack.
+     *
+     * Note: Order of the operations is important here, otherwise operations
+     * such as {@link RequestStack::getParentRequest()} can lead to weird
+     * results.
+     *
+     * @param Request $request
+     * @param int $type
+     *
+     * @return void
+     */
+    private function finishRequest(Request $request, $type)
+    {
+        $this->dispatcher->dispatch(KernelEvents::REQUEST_FINISHED, new RequestFinishedEvent($this, $request, $type));
+        $this->requestStack->pop();
     }
 
     /**

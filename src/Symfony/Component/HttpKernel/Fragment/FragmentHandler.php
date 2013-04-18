@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpKernel\RequestContext;
 
 /**
  * Renders a URI that represents a resource fragment.
@@ -30,7 +31,7 @@ class FragmentHandler
 {
     private $debug;
     private $renderers;
-    private $request;
+    private $context;
 
     /**
      * Constructor.
@@ -38,8 +39,9 @@ class FragmentHandler
      * @param FragmentRendererInterface[] $renderers An array of FragmentRendererInterface instances
      * @param Boolean                     $debug     Whether the debug mode is enabled or not
      */
-    public function __construct(array $renderers = array(), $debug = false)
+    public function __construct(RequestContext $context, array $renderers = array(), $debug = false)
     {
+        $this->context = $context;
         $this->renderers = array();
         foreach ($renderers as $renderer) {
             $this->addRenderer($renderer);
@@ -55,16 +57,6 @@ class FragmentHandler
     public function addRenderer(FragmentRendererInterface $renderer)
     {
         $this->renderers[$renderer->getName()] = $renderer;
-    }
-
-    /**
-     * Sets the current Request.
-     *
-     * @param Request $request The current Request
-     */
-    public function setRequest(Request $request = null)
-    {
-        $this->request = $request;
     }
 
     /**
@@ -93,11 +85,7 @@ class FragmentHandler
             throw new \InvalidArgumentException(sprintf('The "%s" renderer does not exist.', $renderer));
         }
 
-        if (null === $this->request) {
-            throw new \LogicException('Rendering a fragment can only be done when handling a master Request.');
-        }
-
-        return $this->deliver($this->renderers[$renderer]->render($uri, $this->request, $options));
+        return $this->deliver($this->renderers[$renderer]->render($uri, $this->context->getCurrentRequest(), $options));
     }
 
     /**
@@ -115,7 +103,8 @@ class FragmentHandler
     protected function deliver(Response $response)
     {
         if (!$response->isSuccessful()) {
-            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $this->request->getUri(), $response->getStatusCode()));
+            $request = $this->context->getCurrentRequest();
+            throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $request->getUri(), $response->getStatusCode()));
         }
 
         if (!$response instanceof StreamedResponse) {

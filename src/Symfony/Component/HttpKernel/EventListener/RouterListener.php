@@ -13,9 +13,11 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestFinishedEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\RequestContext as KernelRequestContext;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
@@ -36,6 +38,7 @@ class RouterListener implements EventSubscriberInterface
     private $context;
     private $logger;
     private $request;
+    private $kernelContext;
 
     /**
      * Constructor.
@@ -46,7 +49,7 @@ class RouterListener implements EventSubscriberInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null)
+    public function __construct($matcher, KernelRequestContext $kernelContext, RequestContext $context = null, LoggerInterface $logger = null)
     {
         if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
             throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
@@ -58,6 +61,7 @@ class RouterListener implements EventSubscriberInterface
 
         $this->matcher = $matcher;
         $this->context = $context ?: $matcher->getContext();
+        $this->kernelContext = $kernelContext;
         $this->logger = $logger;
     }
 
@@ -71,13 +75,18 @@ class RouterListener implements EventSubscriberInterface
      *
      * @param Request|null $request A Request instance
      */
-    public function setRequest(Request $request = null)
+    private function populateRoutingContext(Request $request = null)
     {
         if (null !== $request && $this->request !== $request) {
             $this->context->fromRequest($request);
         }
         $this->request = $request;
     }
+
+     public function onKernelRequestFinished(RequestFinishedEvent $event)
+     {
+         $this->populateRoutingContext($this->kernelContext->getParentRequest());
+     }
 
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -86,7 +95,7 @@ class RouterListener implements EventSubscriberInterface
         // initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
         // we call setRequest even if most of the time, it has already been done to keep compatibility
         // with frameworks which do not use the Symfony service container
-        $this->setRequest($request);
+        $this->populateRoutingContext($request);
 
         if ($request->attributes->has('_controller')) {
             // routing is already done
@@ -139,6 +148,7 @@ class RouterListener implements EventSubscriberInterface
     {
         return array(
             KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
+            KernelEvents::REQUEST_FINISHED => array(array('onKernelRequestFinished', 0)),
         );
     }
 }

@@ -1,0 +1,245 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-03-15T10:24:38Z
+
+The circular dependency between ``symfony/intl`` and ``symfony/icu`` looks weird to me.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-15T10:27:41Z
+
+And IMO, ``\Locale::setDefault()`` should not throw an exception if you set the default to ``en`` as it is the supported case
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-15T10:31:33Z
+
+And some of the utils used to build the ICU data should be moved to Icu instead of being in Intl IMO
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-15T11:17:41Z
+
+@stof The circular dependency can't be removed. One component cannot be installed without the other (by design). The separation into separate components has a single purpose: separate versioning.
+
+* The first release version of symfony/intl will be 2.3.0
+* The first release versions of symfony/icu will be 1.x.0 for x in [40, 42, 44, 46, 48, 49, 50]
+
+Equally, the symfony/intl component has one master branch while the symfony/icu repository has seven (40-master, 42-master etc.).
+
+To make maintenance easier, every piece of code that is not directly related to the ICU data of a specific version is contained in the Intl component. That's why the scripts are there and not in the Icu component.
+
+I'm ok for changing `\Locale::setDefault()`, I just left the old behavior in place here.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-15T11:28:15Z
+
+@bschussek But circular dependencies may cause some weird issues when solving.
+Thus, you still have an issue: when you don't have lib-ICU installed, the latest version of ``symfony/Icu`` will always be installed. But this suppose that the stub is always written against the latest ICU version (which will be wrong as the stub will not be upgraded to a newer ICU in tagged releases when a new ICU version gets supported in ``symfony/Icu``).
+The stub package has to require a particular version based on the ICU version it uses.
+
+Btw, why naming the branch ``48-master`` and then aliasing it as ``1.48.x-dev`` (requiring to do the alias for all branches) instead of naming the branches ``1.48.x`` directly ?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-15T11:48:35Z
+
+@stof If you don't have lib-ICU installed, it doesn't matter which symfony/icu version is installed. It will not be used but be simply ignored.
+
+I wasn't aware that I could simply name the branch `1.48.x`. Will requiring `1.48.x-dev` work then?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-15T11:55:43Z
+
+@bschussek It will matter unless the stub implementation is able to load the ResourceBundle for any ICU version (including future versions) which is not the case as the format of the ICU file is not BC (which is what you are trying to fix for the case where the real Intl is used). The stub implementation of ResourceBundle will be tied to an ICU version.
+
+For the branch name, yes. This is exactly how the ``2.0``, ``2.1`` and ``2.2`` branches are working (the ``.x`` at the end is optional, as well as the ``v`` at the beginning)
+
+And btw, the ``Symfony\Component\Intl\ResourceBundle\Stub\*`` classes are wrong. They are trying to load the data from the Intl component, where they are not available.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-15T12:32:48Z
+
+@stof Again, the files in the Icu component are completely ignored if the intl extension is not available. That means:
+
+* If the intl extension is available with ICU version N, the Icu component 1.N.* is loaded. The intl extension classes are used (version N), the resource bundles are loaded from Icu/Resources/data (N <= version < N+1).
+
+* If the intl extension is **not** available, the latest Icu component is loaded, but not used. The stub classes from the Intl component are used (version 50.1.0), the resource bundles are loaded from Intl/Resources/data (50.1.0 <= version < 51).
+
+That means that if the intl extension is not available, the Intl component emulates a *specific* intl version (50.1.0 right now). We don't even have to load the Icu component in this case, but there is currently no way to avoid this with Composer.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-15T12:40:59Z
+
+> They are trying to load the data from the Intl component, where they are not available.
+
+@stof Have a closer look ;)
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-15T14:16:05Z
+
+@bschussek Having a close look is not as easy as usually when github refuses to display the diff for the PR :)
+
+Btw, it looks like the bin script are trying to use an inexistant autoload file: https://github.com/bschussek/symfony/blob/c3b98a066e3ca80874701d8c299f726c676ef621/src/Symfony/Component/Intl/Resources/bin/icu-version.php#L15
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-15T14:57:26Z
+
+Anybody else wondering, you can look at the source view here: https://github.com/bschussek/symfony/tree/intl/src/Symfony/Component/Intl
+
+@stof I added the autoload file now.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-15T15:21:28Z
+
+@bschussek Sure we can see the source there, but not easily the difference compared to master...
+
+---------------------------------------------------------------------------
+
+by bendavies at 2013-03-15T15:27:56Z
+
+@stof that's not really @bschussek 's fault, is it?
+https://github.com/symfony/symfony/pull/7386.patch
+https://github.com/symfony/symfony/pull/7386.diff
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-15T15:36:56Z
+
+@bendavies noit is not. It is simply because the intl data are lots of files
+
+---------------------------------------------------------------------------
+
+by bendavies at 2013-03-15T15:42:10Z
+
+@stof i am aware of why github won't show the diff.
+I was merely pointing out there there are many ways of viewing the the PR changes, because you complained twice about it.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-15T15:43:25Z
+
+@bendavies Seeing the patch does not allow commenting on it to do the PR review.
+
+@bschussek in CurrencyBundleInterface (and the other bundle interfaces), the phpdoc mentions ``\Locale::getLocale()`` instead of ``\Locale::getDefault()``
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-03-15T15:48:42Z
+
+I would suggest to open another PR with the binary changes and keep it off from this PR to ease reviewing.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-15T16:05:00Z
+
+@stof Fixed.
+
+@Tobion I would ask you to use the patch view, since splitting the PR is unnecessarily complicated now.
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-03-15T16:35:06Z
+
+Why are the separate branches necessary? Can't the component ship all binary data?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-15T16:43:55Z
+
+@asm89 the goal is precisely to avoid having all the different versions together and having to choose the right ones (which is why the Locale component has a rule to ignore the other versions currently)
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-16T10:57:44Z
+
+I built all the ICU branches now. Only some glitches in the documentation are missing now, unless you have further feedback.
+
+And does anybody have a clue what causes the failing tests on Travis?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-16T10:58:08Z
+
+@schmittjoh What's the way to go to ignore the leftover Scrutinizer errors?
+
+---------------------------------------------------------------------------
+
+by schmittjoh at 2013-03-16T11:21:28Z
+
+You can use the delete button on the comment (top right), then they are
+ignored for good.
+
+On Sat, Mar 16, 2013 at 11:58 AM, Bernhard Schussek <
+notifications@github.com> wrote:
+
+> @schmittjoh <https://github.com/schmittjoh> What's the way to go to
+> ignore the leftover Scrutinizer errors?
+>
+> —
+> Reply to this email directly or view it on GitHub<https://github.com/symfony/symfony/pull/7386#issuecomment-15002952>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-16T12:12:33Z
+
+Apparently I cannot when I'm logged in. Do I need admin rights on symfony/symfony?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-16T12:20:04Z
+
+Forget it, it works now. Sorry.
+
+---------------------------------------------------------------------------
+
+by shoomyth at 2013-03-16T12:23:55Z
+
+Oh, ResourceBundle? I think this will confuse developers when use with symfony's bundle system.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-17T12:17:24Z
+
+There is one major stumble stone left before this PR can be merged. We want to load only symfony/icu versions that are compatible with the ICU library bundled with the local PHP installation. This was achieved by:
+
+* `"require": { "symfony/icu": "1.*" }` in symfony/intl
+* `"conflict": { "lib-ICU": "<4.0,>=4.1" }` in symfony/icu 1.40
+* `"conflict": { "lib-ICU": "<4.2,>=4.3" }` in symfony/icu 1.42
+* etc.
+
+This way
+
+* when lib-ICU is not present, the latest symfony/icu version would be installed (not needed but ok)
+* when lib-ICU is present, the matching symfony/icu version would be installed, since all other versions conflict with it
+
+Apparently though composer cannot handle inverse ranges in the conflict clause (e.g. `<4.0,>=4.1`), so this doesn't work.
+
+@Seldaek Do you see any solution?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-17T12:27:58Z
+
+To clarify, symfony/icu is not needed when lib-ICU is not present. With the current design it would be installed anyway.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-03-19T01:29:33Z
+
+@bschussek IMO if things get too crazy the best option is to always enforce it's installation, and skip using it if the ICU version is unusable, or never require it but throw an exception when it's missing but ICU is avail, or solve it via documentation somehow.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-19T06:59:57Z
+
+@Seldaek This is what I had planned. The problem is that *if ICU is installed*, we need to install the *correct version* of symfony/icu. The only other possibility that we have is to include the resource bundles for all ICU versions in the package, which blows up its size by factor 7 and growing (the current size is 6,2MB!).

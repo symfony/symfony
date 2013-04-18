@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpKernel\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -29,6 +30,7 @@ use Symfony\Component\DependencyInjection\Scope;
 class ContainerAwareHttpKernel extends HttpKernel
 {
     protected $container;
+    protected $requestStack;
 
     /**
      * Constructor.
@@ -36,12 +38,15 @@ class ContainerAwareHttpKernel extends HttpKernel
      * @param EventDispatcherInterface    $dispatcher         An EventDispatcherInterface instance
      * @param ContainerInterface          $container          A ContainerInterface instance
      * @param ControllerResolverInterface $controllerResolver A ControllerResolverInterface instance
+     * @param RequestStack                $requestStack       A stack for master/sub requests
      */
-    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
+    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver, RequestStack $requestStack)
     {
         parent::__construct($dispatcher, $controllerResolver);
 
+        $this->requestStack = $requestStack;
         $this->container = $container;
+
         $container->addScope(new Scope('request'));
     }
 
@@ -50,6 +55,8 @@ class ContainerAwareHttpKernel extends HttpKernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
+        $this->requestStack->push($request);
+
         $request->headers->set('X-Php-Ob-Level', ob_get_level());
 
         $this->container->enterScope('request');
@@ -66,6 +73,8 @@ class ContainerAwareHttpKernel extends HttpKernel
 
         $this->container->set('request', null, 'request');
         $this->container->leaveScope('request');
+
+        $this->requestStack->pop();
 
         return $response;
     }

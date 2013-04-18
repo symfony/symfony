@@ -13,9 +13,11 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\RequestContext as KernelRequestContext;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
@@ -35,6 +37,7 @@ class RouterListener implements EventSubscriberInterface
     private $matcher;
     private $context;
     private $logger;
+    private $kernelContext;
 
     /**
      * Constructor.
@@ -45,7 +48,7 @@ class RouterListener implements EventSubscriberInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($matcher, RequestContext $context = null, LoggerInterface $logger = null)
+    public function __construct($matcher, KernelRequestContext $kernelContext, RequestContext $context = null, LoggerInterface $logger = null)
     {
         if (!$matcher instanceof UrlMatcherInterface && !$matcher instanceof RequestMatcherInterface) {
             throw new \InvalidArgumentException('Matcher must either implement UrlMatcherInterface or RequestMatcherInterface.');
@@ -57,6 +60,7 @@ class RouterListener implements EventSubscriberInterface
 
         $this->matcher = $matcher;
         $this->context = $context ?: $matcher->getContext();
+        $this->kernelContext = $kernelContext;
         $this->logger = $logger;
     }
 
@@ -75,6 +79,11 @@ class RouterListener implements EventSubscriberInterface
         if (null !== $request) {
             $this->context->fromRequest($request);
         }
+    }
+
+    public function onKernelResponse(FilterResponseEvent $event)
+    {
+        $this->setRequest($this->kernelContext->getParentRequest());
     }
 
     public function onKernelRequest(GetResponseEvent $event)
@@ -133,6 +142,7 @@ class RouterListener implements EventSubscriberInterface
     {
         return array(
             KernelEvents::REQUEST => array(array('onKernelRequest', 32)),
+            KernelEvents::RESPONSE => array(array('onKernelResponse', -255)),
         );
     }
 }

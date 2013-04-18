@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-12T10:12:54Z
+
+ping @beberlei
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-13T19:25:10Z
+
+@rybakit What are the implications here? What is the reason for the change?
+
+---------------------------------------------------------------------------
+
+by rybakit at 2013-04-15T07:26:37Z
+
+@drak the reason is trivial, the change allows to bypass unnecessary `is_dir()` call for every bundle from `kernel.bundles`. For example, for the symfony-standard configuration it will save 11 calls in the prod environment (cold start).
+
+---------------------------------------------------------------------------
+
+by stof at 2013-04-15T08:04:52Z
+
+@rybakit These checks being done only when compiling the container, they are not an issue in prod, as they are only done when deploying
+
+---------------------------------------------------------------------------
+
+by rybakit at 2013-04-15T08:35:19Z
+
+@stof Agree, my example was not a good one. Anyway, why not speed up the compilation process a bit?

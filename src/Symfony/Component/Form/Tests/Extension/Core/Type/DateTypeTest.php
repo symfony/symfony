@@ -13,12 +13,16 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class DateTypeTest extends LocalizedTestCase
+class DateTypeTest extends TypeTestCase
 {
     protected function setUp()
     {
         parent::setUp();
+
+        // we test against "de_AT", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
 
         \Locale::setDefault('de_AT');
     }
@@ -385,7 +389,7 @@ class DateTypeTest extends LocalizedTestCase
 
         $this->assertEquals(array(
             new ChoiceView('1', '1', 'Jän'),
-            new ChoiceView('4', '4', 'Apr')
+            new ChoiceView('4', '4', 'Apr.')
         ), $view['month']->vars['choices']);
     }
 

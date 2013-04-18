@@ -11,89 +11,17 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
-use Symfony\Component\Locale\Exception\NotImplementedException;
+use Symfony\Component\Intl\DateFormatter\DateFormat\TimeZoneTransformer as BaseTimeZoneTransformer;
 
 /**
- * Parser and formatter for time zone format
+ * Alias of {@link \Symfony\Component\Intl\DateFormatter\DateFormat\TimeZoneTransformer}.
  *
- * @author Igor Wiedler <igor@wiedler.ch>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+ *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\TimeZoneTransformer}
+ *             instead.
  */
-class TimeZoneTransformer extends Transformer
+class TimeZoneTransformer extends BaseTimeZoneTransformer
 {
-    /**
-     * {@inheritDoc}
-     *
-     * @throws NotImplementedException  When time zone is different than UTC or GMT (Etc/GMT)
-     */
-    public function format(\DateTime $dateTime, $length)
-    {
-        $timeZone = substr($dateTime->getTimezone()->getName(), 0, 3);
-
-        if (!in_array($timeZone, array('Etc', 'UTC'))) {
-            throw new NotImplementedException('Time zone different than GMT or UTC is not supported as a formatting output.');
-        }
-
-        // From ICU >= 4.8, the zero offset is not more used, example: GMT instead of GMT+00:00
-        $format = (0 !== (int) $dateTime->format('O')) ? '\G\M\TP' : '\G\M\T';
-
-        return $dateTime->format($format);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getReverseMatchingRegExp($length)
-    {
-        return 'GMT[+-]\d{2}:?\d{2}';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function extractDateOptions($matched, $length)
-    {
-        return array(
-            'timezone' => self::getEtcTimeZoneId($matched)
-        );
-    }
-
-    /**
-     * Get an Etc/GMT timezone identifier for the specified timezone
-     *
-     * The PHP documentation for timezones states to not use the 'Other' time zones because them exists
-     * "for backwards compatibility". However all Etc/GMT time zones are in the tz database 'etcetera' file,
-     * which indicates they are not deprecated (neither are old names).
-     *
-     * Only GMT, Etc/Universal, Etc/Zulu, Etc/Greenwich, Etc/GMT-0, Etc/GMT+0 and Etc/GMT0 are old names and
-     * are linked to Etc/GMT or Etc/UTC.
-     *
-     * @param string $formattedTimeZone A GMT timezone string (GMT-03:00, e.g.)
-     *
-     * @return string                     A timezone identifier
-     *
-     * @see    http://php.net/manual/en/timezones.others.php
-     * @see    http://www.twinsun.com/tz/tz-link.htm
-     *
-     * @throws NotImplementedException   When the GMT time zone have minutes offset different than zero
-     * @throws \InvalidArgumentException  When the value can not be matched with pattern
-     */
-    public static function getEtcTimeZoneId($formattedTimeZone)
-    {
-        if (preg_match('/GMT(?P<signal>[+-])(?P<hours>\d{2}):?(?P<minutes>\d{2})/', $formattedTimeZone, $matches)) {
-            $hours   = (int) $matches['hours'];
-            $minutes = (int) $matches['minutes'];
-            $signal  = $matches['signal'] == '-' ? '+' : '-';
-
-            if (0 < $minutes) {
-                throw new NotImplementedException(sprintf(
-                    'It is not possible to use a GMT time zone with minutes offset different than zero (0). GMT time zone tried: %s.',
-                    $formattedTimeZone
-                ));
-            }
-
-            return 'Etc/GMT'.($hours !== 0 ? $signal.$hours : '');
-        }
-
-        throw new \InvalidArgumentException('The GMT time zone \'%s\' does not match with the supported formats GMT[+-]HH:MM or GMT[+-]HHMM.');
-    }
 }

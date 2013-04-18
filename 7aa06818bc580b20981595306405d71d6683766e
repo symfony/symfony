@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by drak at 2013-04-06T09:42:08Z
+
+note: The tests pass, but there is an error with Travis on 5.3 build segfault.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-04-06T13:50:39Z
+
+Your link to the doc PR is wrong. It is linking to a doc issue, not to a doc PR.
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-06T16:24:10Z
+
+@stof - does it have to be a PR rather than an issue? I thought the idea was so that a feature will not be forgotten. the eventual PR will reference that ticket. I'd prefer not to write docs until it's merged.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-06T16:29:21Z
+
+@stof is right: we don't merge new features anymore without proper documentation.
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-06T16:30:10Z
+
+@fabpot - OK, that's fine. If the PR is acceptable now then I'll do the docs.
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-06T18:51:27Z
+
+@fabpot - Documentation PR completed

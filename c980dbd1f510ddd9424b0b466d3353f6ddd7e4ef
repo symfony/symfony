@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-04-17T12:31:07Z
+
+:+1: but shouldn't it be applied in older branches as it is a bugfix ? Or is it only a bug in master ?
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-17T12:52:09Z
+
+@stof - the issue it's fixing only occurred since #7007

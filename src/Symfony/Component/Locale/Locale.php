@@ -11,13 +11,19 @@
 
 namespace Symfony\Component\Locale;
 
+use Symfony\Component\Icu\IcuData;
+use Symfony\Component\Intl\Intl;
+
+/**
+ * Helper class for dealing with locale strings.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+ *             {@link \Locale} and {@link \Symfony\Component\Intl\Intl} instead.
+ */
 class Locale extends \Locale
 {
-    /**
-     * The ICU data version that ships with Symfony
-     */
-    const ICU_DATA_VERSION = '49';
-
     /**
      * Caches the countries in different locales
      * @var array
@@ -48,33 +54,7 @@ class Locale extends \Locale
     public static function getDisplayCountries($locale)
     {
         if (!isset(self::$countries[$locale])) {
-            $bundle = \ResourceBundle::create($locale, self::getIcuDataDirectory().'/region');
-
-            if (null === $bundle) {
-                throw new \RuntimeException(sprintf('The country resource bundle could not be loaded for locale "%s"', $locale));
-            }
-
-            $collator = new \Collator($locale);
-            $countries = array();
-            $bundleCountries = $bundle->get('Countries') ?: array();
-
-            foreach ($bundleCountries as $code => $name) {
-                // Global countries (f.i. "America") have numeric codes
-                // Countries have alphabetic codes
-                // "ZZ" is the code for unknown country
-                if (ctype_alpha($code) && 'ZZ' !== $code) {
-                    $countries[$code] = $name;
-                }
-            }
-
-            $fallbackLocale = self::getFallbackLocale($locale);
-            if (null !== $fallbackLocale) {
-                $countries = array_merge(self::getDisplayCountries($fallbackLocale), $countries);
-            }
-
-            $collator->asort($countries);
-
-            self::$countries[$locale] = $countries;
+            self::$countries[$locale] = Intl::getRegionBundle()->getCountryNames($locale);
         }
 
         return self::$countries[$locale];
@@ -84,7 +64,7 @@ class Locale extends \Locale
      * Returns all available country codes
      *
      * @return array              The country codes
-     * @throws RuntimeException   When the resource bundles cannot be loaded
+     * @throws \RuntimeException  When the resource bundles cannot be loaded
      */
     public static function getCountries()
     {
@@ -103,31 +83,7 @@ class Locale extends \Locale
     public static function getDisplayLanguages($locale)
     {
         if (!isset(self::$languages[$locale])) {
-            $bundle = \ResourceBundle::create($locale, self::getIcuDataDirectory().'/lang');
-
-            if (null === $bundle) {
-                throw new \RuntimeException(sprintf('The language resource bundle could not be loaded for locale "%s"', $locale));
-            }
-
-            $collator = new \Collator($locale);
-            $languages = array();
-            $bundleLanguages = $bundle->get('Languages') ?: array();
-
-            foreach ($bundleLanguages as $code => $name) {
-                // "mul" is the code for multiple languages
-                if ('mul' !== $code) {
-                    $languages[$code] = $name;
-                }
-            }
-
-            $fallbackLocale = self::getFallbackLocale($locale);
-            if (null !== $fallbackLocale) {
-                $languages = array_merge(self::getDisplayLanguages($fallbackLocale), $languages);
-            }
-
-            $collator->asort($languages);
-
-            self::$languages[$locale] = $languages;
+            self::$languages[$locale] = Intl::getLanguageBundle()->getLanguageNames($locale);
         }
 
         return self::$languages[$locale];
@@ -137,7 +93,7 @@ class Locale extends \Locale
      * Returns all available language codes
      *
      * @return array              The language codes
-     * @throws RuntimeException   When the resource bundles cannot be loaded
+     * @throws \RuntimeException  When the resource bundles cannot be loaded
      */
     public static function getLanguages()
     {
@@ -156,28 +112,7 @@ class Locale extends \Locale
     public static function getDisplayLocales($locale)
     {
         if (!isset(self::$locales[$locale])) {
-            $bundle = \ResourceBundle::create($locale, self::getIcuDataDirectory().'/names');
-
-            if (null === $bundle) {
-                throw new \RuntimeException(sprintf('The locale resource bundle could not be loaded for locale "%s"', $locale));
-            }
-
-            $collator = new \Collator($locale);
-            $locales = array();
-            $bundleLocales = $bundle->get('Locales') ?: array();
-
-            foreach ($bundleLocales as $code => $name) {
-                $locales[$code] = $name;
-            }
-
-            $fallbackLocale = self::getFallbackLocale($locale);
-            if (null !== $fallbackLocale) {
-                $locales = array_merge(self::getDisplayLocales($fallbackLocale), $locales);
-            }
-
-            $collator->asort($locales);
-
-            self::$locales[$locale] = $locales;
+            self::$locales[$locale] = Intl::getLocaleBundle()->getLocaleNames($locale);
         }
 
         return self::$locales[$locale];
@@ -187,7 +122,7 @@ class Locale extends \Locale
      * Returns all available locale codes
      *
      * @return array              The locale codes
-     * @throws RuntimeException   When the resource bundles cannot be loaded
+     * @throws \RuntimeException  When the resource bundles cannot be loaded
      */
     public static function getLocales()
     {
@@ -201,22 +136,7 @@ class Locale extends \Locale
      */
     public static function getIntlIcuVersion()
     {
-        if (defined('INTL_ICU_VERSION')) {
-            return INTL_ICU_VERSION;
-        }
-
-        try {
-            $reflector = new \ReflectionExtension('intl');
-        } catch (\ReflectionException $e) {
-            return;
-        }
-
-        ob_start();
-        $reflector->info();
-        $output = strip_tags(ob_get_clean());
-        preg_match('/^ICU version (?:=>)?(.*)$/m', $output, $matches);
-
-        return trim($matches[1]);
+        return Intl::getIcuVersion();
     }
 
     /**
@@ -226,22 +146,7 @@ class Locale extends \Locale
      */
     public static function getIntlIcuDataVersion()
     {
-        if (defined('INTL_ICU_DATA_VERSION')) {
-            return INTL_ICU_DATA_VERSION;
-        }
-
-        try {
-            $reflector = new \ReflectionExtension('intl');
-        } catch (\ReflectionException $e) {
-            return;
-        }
-
-        ob_start();
-        $reflector->info();
-        $output = strip_tags(ob_get_clean());
-        preg_match('/^ICU Data version (?:=>)?(.*)$/m', $output, $matches);
-
-        return trim($matches[1]);
+        return Intl::getIcuDataVersion();
     }
 
     /**
@@ -252,21 +157,7 @@ class Locale extends \Locale
      */
     public static function getIcuDataVersion()
     {
-        static $dataVersion;
-
-        if (null === $dataVersion) {
-            $dataVersion = self::ICU_DATA_VERSION;
-
-            if (getenv('USE_INTL_ICU_DATA_VERSION') && self::getIntlIcuVersion()) {
-                $dataVersion = self::getIntlIcuVersion();
-
-                preg_match('/^(?P<version>[0-9]\.[0-9]|[0-9]{2,})/', $dataVersion, $matches);
-
-                $dataVersion = $matches['version'];
-            }
-        }
-
-        return $dataVersion;
+        return Intl::getIcuDataVersion();
     }
 
     /**
@@ -276,14 +167,15 @@ class Locale extends \Locale
      */
     public static function getIcuDataDirectory()
     {
-        return __DIR__.'/Resources/data/'.self::getIcuDataVersion();
+        return IcuData::getResourceDirectory();
     }
 
     /**
      * Returns the fallback locale for a given locale, if any
      *
-     * @param $locale             The locale to find the fallback for
-     * @return string|null        The fallback locale, or null if no parent exists
+     * @param string $locale The locale to find the fallback for.
+     *
+     * @return string|null The fallback locale, or null if no parent exists
      */
     protected static function getFallbackLocale($locale)
     {

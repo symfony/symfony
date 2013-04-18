@@ -11,8 +11,17 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-class IntegerTypeTest extends LocalizedTestCase
+use Symfony\Component\Intl\Util\IntlTestHelper;
+
+class IntegerTypeTest extends TypeTestCase
 {
+    protected function setUp()
+    {
+        IntlTestHelper::requireIntl($this);
+
+        parent::setUp();
+    }
+
     public function testSubmitCastsToInteger()
     {
         $form = $this->factory->create('integer');

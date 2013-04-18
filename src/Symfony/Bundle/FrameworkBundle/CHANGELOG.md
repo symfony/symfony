@@ -10,6 +10,9 @@ CHANGELOG
  * added `TimedPhpEngine`
  * added `--clean` option the the `translation:update` command
  * added `http_method_override` option
+ * added support for default templates per render tag
+ * added FormHelper::form(), FormHelper::start() and FormHelper::end()
+ * deprecated FormHelper::enctype() in favor of FormHelper::start()
 
 2.2.0
 -----
@@ -27,10 +30,10 @@ CHANGELOG
  * replaced Symfony\Bundle\FrameworkBundle\Controller\TraceableControllerResolver by Symfony\Component\HttpKernel\Controller\TraceableControllerResolver
  * replaced Symfony\Component\HttpKernel\Debug\ContainerAwareTraceableEventDispatcher by Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher
  * added Client::enableProfiler()
- * A new parameter has been added to the DIC: `router.request_context.base_url`
+ * a new parameter has been added to the DIC: `router.request_context.base_url`
    You can customize it for your functional tests or for generating urls with
    the right base url when your are in the cli context.
- * Added support for default templates per render tag
+ * added support for default templates per render tag
 
 2.1.0
 -----

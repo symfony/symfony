@@ -58,18 +58,87 @@ class FormHelper extends Helper
     }
 
     /**
+     * Renders the HTML for a form.
+     *
+     * Example usage:
+     *
+     *     <?php echo view['form']->form($form) ?>
+     *
+     * You can pass options during the call:
+     *
+     *     <?php echo view['form']->form($form, array('attr' => array('class' => 'foo'))) ?>
+     *
+     *     <?php echo view['form']->form($form, array('separator' => '+++++')) ?>
+     *
+     * This method is mainly intended for prototyping purposes. If you want to
+     * control the layout of a form in a more fine-grained manner, you are
+     * advised to use the other helper methods for rendering the parts of the
+     * form individually. You can also create a custom form theme to adapt
+     * the look of the form.
+     *
+     * @param FormView $view      The view for which to render the form
+     * @param array    $variables Additional variables passed to the template
+     *
+     * @return string The HTML markup
+     */
+    public function form(FormView $view, array $variables = array())
+    {
+        return $this->renderer->renderBlock($view, 'form', $variables);
+    }
+
+    /**
+     * Renders the form start tag.
+     *
+     * Example usage templates:
+     *
+     *     <?php echo $view['form']->start($form) ?>>
+     *
+     * @param FormView $view      The view for which to render the start tag
+     * @param array    $variables Additional variables passed to the template
+     *
+     * @return string The HTML markup
+     */
+    public function start(FormView $view, array $variables = array())
+    {
+        return $this->renderer->renderBlock($view, 'form_start', $variables);
+    }
+
+    /**
+     * Renders the form end tag.
+     *
+     * Example usage templates:
+     *
+     *     <?php echo $view['form']->end($form) ?>>
+     *
+     * @param FormView $view      The view for which to render the end tag
+     * @param array    $variables Additional variables passed to the template
+     *
+     * @return string The HTML markup
+     */
+    public function end(FormView $view, array $variables = array())
+    {
+        return $this->renderer->renderBlock($view, 'form_end', $variables);
+    }
+
+    /**
      * Renders the HTML enctype in the form tag, if necessary.
      *
      * Example usage templates:
      *
-     *     <form action="..." method="post" <?php echo $view['form']->enctype() ?>>
+     *     <form action="..." method="post" <?php echo $view['form']->enctype($form) ?>>
      *
      * @param FormView $view The view for which to render the encoding type
      *
      * @return string The HTML markup
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link start} instead.
      */
     public function enctype(FormView $view)
     {
+        // Uncomment this as soon as the deprecation note should be shown
+        // trigger_error('The form helper $view[\'form\']->enctype() is deprecated since version 2.3 and will be removed in 3.0. Use $view[\'form\']->start() instead.', E_USER_DEPRECATED);
+
         return $this->renderer->searchAndRenderBlock($view, 'enctype');
     }
 
@@ -78,13 +147,13 @@ class FormHelper extends Helper
      *
      * Example usage:
      *
-     *     <?php echo view['form']->widget() ?>
+     *     <?php echo view['form']->widget($form) ?>
      *
      * You can pass options during the call:
      *
-     *     <?php echo view['form']->widget(array('attr' => array('class' => 'foo'))) ?>
+     *     <?php echo view['form']->widget($form, array('attr' => array('class' => 'foo'))) ?>
      *
-     *     <?php echo view['form']->widget(array('separator' => '+++++')) ?>
+     *     <?php echo view['form']->widget($form, array('separator' => '+++++')) ?>
      *
      * @param FormView $view      The view for which to render the widget
      * @param array    $variables Additional variables passed to the template

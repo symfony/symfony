@@ -6,6 +6,9 @@ CHANGELOG
 ------
 
  * changed FormRenderer::humanize() to humanize also camel cased field name
+ * added FormProcessorInterface and FormInterface::process()
+ * deprecated passing a Request instance to FormInterface::bind()
+ * added options "method" and "action" to FormType
 
 2.2.0
 -----

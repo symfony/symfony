@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added helpers form(), form_start() and form_end()
+ * deprecated form_enctype() in favor of form_start()
+
 2.2.0
 -----
 

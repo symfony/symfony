@@ -19,8 +19,6 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 {
     protected $csrfProvider;
 
-    protected $factory;
-
     protected function setUp()
     {
         if (!extension_loaded('intl')) {
@@ -44,7 +42,6 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     protected function tearDown()
     {
         $this->csrfProvider = null;
-        $this->factory = null;
 
         parent::tearDown();
     }
@@ -102,6 +99,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertMatchesXpath($html, $xpath);
     }
 
+    abstract protected function renderForm(FormView $view, array $vars = array());
+
     abstract protected function renderEnctype(FormView $view);
 
     abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
@@ -113,6 +112,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     abstract protected function renderRow(FormView $view, array $vars = array());
 
     abstract protected function renderRest(FormView $view, array $vars = array());
+
+    abstract protected function renderStart(FormView $view, array $vars = array());
+
+    abstract protected function renderEnd(FormView $view, array $vars = array());
 
     abstract protected function setTheme(FormView $view, array $themes);
 
@@ -1744,9 +1747,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertMatchesXpath($html,
             '//div[@id="name_items"][@data-prototype]
             |
-             //table[@id="name_items"][@data-prototype]
-
-'
+            //table[@id="name_items"][@data-prototype]'
         );
     }
 
@@ -1795,5 +1796,77 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertWidgetMatchesXpath($form->createView(), array(),
             '/button[@type="reset"][@name="name"]'
         );
+    }
+
+    public function testStartTag()
+    {
+        $form = $this->factory->create('form', null, array(
+            'method' => 'get',
+            'action' => 'http://example.com/directory'
+        ));
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertSame('<form method="get" action="http://example.com/directory">', $html);
+    }
+
+    public function testStartTagForPutRequest()
+    {
+        $form = $this->factory->create('form', null, array(
+            'method' => 'put',
+            'action' => 'http://example.com/directory'
+        ));
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertMatchesXpath($html . '</form>',
+'/form
+    [./input[@type="hidden"][@name="_method"][@value="PUT"]]
+    [@method="post"]
+    [@action="http://example.com/directory"]'
+        );
+    }
+
+    public function testStartTagWithOverriddenVars()
+    {
+        $form = $this->factory->create('form', null, array(
+            'method' => 'put',
+            'action' => 'http://example.com/directory',
+        ));
+
+        $html = $this->renderStart($form->createView(), array(
+            'method' => 'post',
+            'action' => 'http://foo.com/directory'
+        ));
+
+        $this->assertSame('<form method="post" action="http://foo.com/directory">', $html);
+    }
+
+    public function testStartTagForMultipartForm()
+    {
+        $form = $this->factory->createBuilder('form', null, array(
+                'method' => 'get',
+                'action' => 'http://example.com/directory'
+            ))
+            ->add('file', 'file')
+            ->getForm();
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertSame('<form method="get" action="http://example.com/directory" enctype="multipart/form-data">', $html);
+    }
+
+    public function testStartTagWithExtraAttributes()
+    {
+        $form = $this->factory->create('form', null, array(
+            'method' => 'get',
+            'action' => 'http://example.com/directory'
+        ));
+
+        $html = $this->renderStart($form->createView(), array(
+            'attr' => array('class' => 'foobar'),
+        ));
+
+        $this->assertSame('<form method="get" action="http://example.com/directory" class="foobar">', $html);
     }
 }

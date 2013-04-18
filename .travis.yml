@@ -13,4 +13,6 @@ matrix:
 before_script:
     - echo '' > ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
     - sh -c 'if [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
-    - COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install
+
+script:
+    - ant travis -keep-going

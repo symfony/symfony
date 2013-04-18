@@ -548,7 +548,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [@name="name"]
     [@required="required"]
     [
-        ./option[@value=""][not(@selected)][@disabled][.="[trans]Test&Me[/trans]"]
+        ./option[not(@value)][not(@selected)][@disabled][.="[trans]Test&Me[/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -571,7 +571,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [@name="name"]
     [@required="required"]
     [
-        ./option[@value=""][not(@selected)][@disabled][.="[trans][/trans]"]
+        ./option[not(@value)][not(@selected)][@disabled][.="[trans][/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]

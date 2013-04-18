@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
-use Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler\NativeSessionHandlerTest;
 
 /**
  * Test class for NativeSessionStorage.
@@ -279,33 +278,5 @@ class SessionHandler implements \SessionHandlerInterface
 
     public function gc($maxlifetime)
     {
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testStartOnDemandException()
-    {
-        $storage = new NativeSessionStorage(array(), null, null, NativeSessionStorage::NO_START_ON_DEMAND_STRICT);
-        $storage->registerBag(new AttributeBag);
-        $this->assertFalse($storage->isStarted());
-        $storage->getBag('attributes');
-    }
-
-    public function testStartOnDemandDefaults()
-    {
-        $storage = new NativeSessionStorage();
-        $storage->registerBag(new AttributeBag);
-        $storage->getBag('attributes');
-        $this->assertTrue($storage->isStarted());
-    }
-
-    public function testNoStartOnDemandLax()
-    {
-        $storage = new NativeSessionStorage(array(), null, null, NativeSessionStorage::NO_START_ON_DEMAND_LAX);
-        $storage->registerBag($bag = new AttributeBag);
-        $bag->set('foo', 'bar');
-        $storage->getBag('attributes');
-        $this->assertEquals(array('foo' => 'bar'), $storage->getBag('attributes')->all());
     }
 }

@@ -23,9 +23,9 @@ interface SessionInterface
     /**
      * Starts the session storage.
      *
-     * @return Boolean True if session started
+     * @return Boolean True if session started.
      *
-     * @throws \RuntimeException If session fails to start
+     * @throws \RuntimeException If session fails to start.
      *
      * @api
      */
@@ -34,7 +34,7 @@ interface SessionInterface
     /**
      * Returns the session ID.
      *
-     * @return string The session ID
+     * @return string The session ID.
      *
      * @api
      */
@@ -52,7 +52,7 @@ interface SessionInterface
     /**
      * Returns the session name.
      *
-     * @return mixed The session name
+     * @return mixed The session name.
      *
      * @api
      */
@@ -76,9 +76,9 @@ interface SessionInterface
      * @param integer $lifetime Sets the cookie lifetime for the session cookie. A null value
      *                          will leave the system settings unchanged, 0 sets the cookie
      *                          to expire with browser session. Time is in seconds, and is
-     *                          not a Unix timestamp
+     *                          not a Unix timestamp.
      *
-     * @return Boolean True if session invalidated, false if error
+     * @return Boolean True if session invalidated, false if error.
      *
      * @api
      */
@@ -92,9 +92,9 @@ interface SessionInterface
      * @param integer $lifetime Sets the cookie lifetime for the session cookie. A null value
      *                          will leave the system settings unchanged, 0 sets the cookie
      *                          to expire with browser session. Time is in seconds, and is
-     *                          not a Unix timestamp
+     *                          not a Unix timestamp.
      *
-     * @return Boolean True if session migrated, false if error
+     * @return Boolean True if session migrated, false if error.
      *
      * @api
      */

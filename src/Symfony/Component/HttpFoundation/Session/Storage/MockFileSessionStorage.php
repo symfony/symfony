@@ -30,14 +30,18 @@ class MockFileSessionStorage extends MockArraySessionStorage
     private $savePath;
 
     /**
+     * @var array
+     */
+    private $sessionData;
+
+    /**
      * Constructor.
      *
-     * @param string      $savePath Path of directory to save session files
-     * @param string      $name     Session name
-     * @param MetadataBag $metaBag  MetadataBag instance
-     * @param integer     $mode     Start on demand mode
+     * @param string      $savePath Path of directory to save session files.
+     * @param string      $name     Session name.
+     * @param MetadataBag $metaBag  MetadataBag instance.
      */
-    public function __construct($savePath = null, $name = 'MOCKSESSID', MetadataBag $metaBag = null, $mode = self::START_ON_DEMAND)
+    public function __construct($savePath = null, $name = 'MOCKSESSID', MetadataBag $metaBag = null)
     {
         if (null === $savePath) {
             $savePath = sys_get_temp_dir();
@@ -49,7 +53,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
 
         $this->savePath = $savePath;
 
-        parent::__construct($name, $metaBag, $mode);
+        parent::__construct($name, $metaBag);
     }
 
     /**
@@ -94,7 +98,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
     public function save()
     {
         if (!$this->started) {
-            throw new \RuntimeException("Trying to save a session that was not started yet or was already closed.");
+            throw new \RuntimeException("Trying to save a session that was not started yet or was already closed");
         }
 
         file_put_contents($this->getFilePath(), serialize($this->data));

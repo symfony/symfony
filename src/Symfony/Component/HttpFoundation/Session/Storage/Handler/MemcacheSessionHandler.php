@@ -29,7 +29,7 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
     private $ttl;
 
     /**
-     * @var string Key prefix for shared environments
+     * @var string Key prefix for shared environments.
      */
     private $prefix;
 

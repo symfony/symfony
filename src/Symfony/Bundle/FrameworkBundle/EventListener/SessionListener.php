@@ -29,12 +29,10 @@ class SessionListener implements EventSubscriberInterface
      * @var ContainerInterface
      */
     private $container;
-    private $autoStart;
 
-    public function __construct(ContainerInterface $container, $autoStart = false)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->autoStart = $autoStart;
     }
 
     public function onKernelRequest(GetResponseEvent $event)
@@ -48,11 +46,7 @@ class SessionListener implements EventSubscriberInterface
             return;
         }
 
-        $request->setSession($session = $this->container->get('session'));
-
-        if ($this->autoStart || $request->hasPreviousSession()) {
-            $session->start();
-        }
+        $request->setSession($this->container->get('session'));
     }
 
     public static function getSubscribedEvents()

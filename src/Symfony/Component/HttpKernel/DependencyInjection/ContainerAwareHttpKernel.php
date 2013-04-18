@@ -42,9 +42,8 @@ class ContainerAwareHttpKernel extends HttpKernel
      */
     public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver, RequestStack $requestStack)
     {
-        parent::__construct($dispatcher, $controllerResolver);
+        parent::__construct($dispatcher, $controllerResolver, $requestStack);
 
-        $this->requestStack = $requestStack;
         $this->container = $container;
 
         $container->addScope(new Scope('request'));
@@ -55,8 +54,6 @@ class ContainerAwareHttpKernel extends HttpKernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        $this->requestStack->push($request);
-
         $request->headers->set('X-Php-Ob-Level', ob_get_level());
 
         $this->container->enterScope('request');
@@ -73,8 +70,6 @@ class ContainerAwareHttpKernel extends HttpKernel
 
         $this->container->set('request', null, 'request');
         $this->container->leaveScope('request');
-
-        $this->requestStack->pop();
 
         return $response;
     }

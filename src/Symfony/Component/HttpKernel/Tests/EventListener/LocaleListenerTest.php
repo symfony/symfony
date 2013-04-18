@@ -73,7 +73,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($this->getEvent($request));
     }
 
-    public function testRouterResetWithParentRequestOnKernelResponse()
+    public function testRouterResetWithParentRequestOnKernelRequestFinished()
     {
         if (!class_exists('Symfony\Component\Routing\Router')) {
             $this->markTestSkipped('The "Routing" component is not available');
@@ -91,10 +91,10 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->context->expects($this->once())->method('getParentRequest')->will($this->returnValue($parentRequest));
 
-        $event = $this->getMock('Symfony\Component\HttpKernel\Event\FilterResponseEvent', array(), array(), '', false);
+        $event = $this->getMock('Symfony\Component\HttpKernel\Event\RequestFinishedEvent', array(), array(), '', false);
 
         $listener = new LocaleListener('fr', $this->context, $router);
-        $listener->onKernelResponse($event);
+        $listener->onKernelRequestFinished($event);
     }
 
     public function testRequestLocaleIsNotOverridden()

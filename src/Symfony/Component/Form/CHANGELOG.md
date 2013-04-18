@@ -9,7 +9,7 @@ CHANGELOG
  * added FormProcessorInterface and FormInterface::process()
  * deprecated passing a Request instance to FormInterface::bind()
  * added options "method" and "action" to FormType
- * deprecated option "virtual", renamed it to "inherit_data"
+ * deprecated option "virtual" in favor "inherit_data"
  * deprecated VirtualFormAwareIterator in favor of InheritDataAwareIterator
  * [BC BREAK] removed the "array" type hint from DataMapperInterface
  * improved forms inheriting their parent data to actually return that data from getData(), getNormData() and getViewData()

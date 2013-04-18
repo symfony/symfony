@@ -351,12 +351,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @return FormConfigBuilder The configuration object.
      *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link getInheritData()} instead.
      */
     public function getVirtual()
     {
-        trigger_error('getVirtual() is deprecated since version 2.2 and will be removed in 2.3. Use getInheritData() instead.', E_USER_DEPRECATED);
+        // Uncomment this as soon as the deprecation note should be shown
+        // trigger_error('getVirtual() is deprecated since version 2.3 and will be removed in 3.0. Use getInheritData() instead.', E_USER_DEPRECATED);
 
         return $this->getInheritData();
     }
@@ -709,12 +710,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @return FormConfigBuilder The configuration object.
      *
-     * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
      *             {@link setInheritData()} instead.
      */
     public function setVirtual($inheritData)
     {
-        trigger_error('setVirtual() is deprecated since version 2.2 and will be removed in 2.3. Use setInheritData() instead.', E_USER_DEPRECATED);
+        // Uncomment this as soon as the deprecation note should be shown
+        // trigger_error('setVirtual() is deprecated since version 2.3 and will be removed in 3.0. Use setInheritData() instead.', E_USER_DEPRECATED);
 
         $this->setInheritData($inheritData);
     }

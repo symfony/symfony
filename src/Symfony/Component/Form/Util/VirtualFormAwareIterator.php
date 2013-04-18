@@ -20,7 +20,7 @@ namespace Symfony\Component\Form\Util;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.2, to be removed in 2.3. Use
+ * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
  *             {@link InheritDataAwareIterator} instead.
  */
 class VirtualFormAwareIterator extends \ArrayIterator implements \RecursiveIterator
@@ -32,7 +32,8 @@ class VirtualFormAwareIterator extends \ArrayIterator implements \RecursiveItera
      */
     public function __construct(array $forms)
     {
-        trigger_error('VirtualFormAwareIterator is deprecated since version 2.2 and will be removed in 2.3. Use InheritDataAwareIterator instead.', E_USER_DEPRECATED);
+        // Uncomment this as soon as the deprecation note should be shown
+        // trigger_error('VirtualFormAwareIterator is deprecated since version 2.3 and will be removed in 3.0. Use InheritDataAwareIterator instead.', E_USER_DEPRECATED);
 
         parent::__construct($forms);
     }

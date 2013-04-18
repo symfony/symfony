@@ -11,11 +11,15 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
+use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
+use Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy;
+use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 
 /**
  * Test class for NativeSessionStorage.
@@ -28,6 +32,28 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
  */
 class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
 {
+    private $savePath;
+
+    protected function setUp()
+    {
+        ini_set('session.save_handler', 'files');
+        ini_set('session.save_path', $this->savePath = sys_get_temp_dir().'/sf2test');
+        if (!is_dir($this->savePath)) {
+            mkdir($this->savePath);
+        }
+    }
+
+    protected function tearDown()
+    {
+        session_write_close();
+        array_map('unlink', glob($this->savePath.'/*'));
+        if (is_dir($this->savePath)) {
+            rmdir($this->savePath);
+        }
+
+        $this->savePath = null;
+    }
+
     /**
      * @param array $options
      *
@@ -75,7 +101,6 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $storage->regenerate();
         $this->assertNotEquals($id, $storage->getId());
         $this->assertEquals(7, $storage->getBag('attributes')->get('lucky'));
-
     }
 
     public function testRegenerateDestroy()
@@ -126,32 +151,132 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($options, $gco);
     }
 
-    public function testSetSaveHandler()
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetSaveHandlerException()
     {
         $storage = $this->getStorage();
-        $storage->setSaveHandler(new \StdClass());
+        $storage->setSaveHandler(new \StdClass);
+    }
+
+    public function testSetSaveHandler53()
+    {
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
+            $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
+        }
+
+        ini_set('session.save_handler', 'files');
+        $storage = $this->getStorage();
+        $storage->setSaveHandler();
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy', $storage->getSaveHandler());
+        $storage->setSaveHandler(null);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy', $storage->getSaveHandler());
+        $storage->setSaveHandler(new NativeSessionHandler());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy', $storage->getSaveHandler());
+        $storage->setSaveHandler(new SessionHandlerProxy(new SessionHandler()));
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
+        $storage->setSaveHandler(new SessionHandler());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
+        $storage->setSaveHandler(new NativeProxy());
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy', $storage->getSaveHandler());
     }
 
-    public function testSetSaveHandlerPHP53()
+    public function testSetSaveHandler54()
+    {
+        if (version_compare(phpversion(), '5.4.0', '<')) {
+            $this->markTestSkipped('Test skipped, for PHP 5.4 only.');
+        }
+
+        ini_set('session.save_handler', 'files');
+        $storage = $this->getStorage();
+        $storage->setSaveHandler();
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
+        $storage->setSaveHandler(null);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
+        $storage->setSaveHandler(new SessionHandlerProxy(new NativeSessionHandler()));
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
+        $storage->setSaveHandler(new NativeSessionHandler());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
+        $storage->setSaveHandler(new SessionHandlerProxy(new SessionHandler()));
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
+        $storage->setSaveHandler(new SessionHandler());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testStartedOutside53()
     {
         if (version_compare(phpversion(), '5.4.0', '>=')) {
             $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
         }
 
         $storage = $this->getStorage();
-        $storage->setSaveHandler(new NativeFileSessionHandler());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy', $storage->getSaveHandler());
+
+        $this->assertFalse(isset($_SESSION));
+
+        session_start();
+        $this->assertTrue(isset($_SESSION));
+        // PHP session might have started, but the storage driver has not, so false is correct here
+        $this->assertFalse($storage->isStarted());
+
+        $key = $storage->getMetadataBag()->getStorageKey();
+        $this->assertFalse(isset($_SESSION[$key]));
+        $storage->start();
     }
 
-    public function testSetSaveHandlerPHP54()
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testCanStartOutside54()
     {
         if (version_compare(phpversion(), '5.4.0', '<')) {
-            $this->markTestSkipped('Test skipped, for PHP 5.4+ only.');
+            $this->markTestSkipped('Test skipped, for PHP 5.4 only.');
         }
 
         $storage = $this->getStorage();
-        $storage->setSaveHandler(new NullSessionHandler());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
+
+        $this->assertFalse(isset($_SESSION));
+        $this->assertFalse($storage->getSaveHandler()->isActive());
+        $this->assertFalse($storage->isStarted());
+
+        session_start();
+        $this->assertTrue(isset($_SESSION));
+        $this->assertTrue($storage->getSaveHandler()->isActive());
+        // PHP session might have started, but the storage driver has not, so false is correct here
+        $this->assertFalse($storage->isStarted());
+
+        $key = $storage->getMetadataBag()->getStorageKey();
+        $this->assertFalse(isset($_SESSION[$key]));
+        $storage->start();
+    }
+}
+
+class SessionHandler implements \SessionHandlerInterface
+{
+    public function open($savePath, $sessionName)
+    {
+    }
+
+    public function close()
+    {
+    }
+
+    public function read($id)
+    {
+    }
+
+    public function write($id, $data)
+    {
+    }
+
+    public function destroy($id)
+    {
+    }
+
+    public function gc($maxlifetime)
+    {
     }
 }

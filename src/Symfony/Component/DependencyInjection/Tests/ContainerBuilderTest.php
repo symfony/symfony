@@ -139,6 +139,17 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::get
+     */
+    public function testGetReturnsNullOnInactiveScope()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'stdClass')->setScope('request');
+
+        $this->assertNull($builder->get('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::getServiceIds
      */
     public function testGetServiceIds()

@@ -4,9 +4,6 @@ CHANGELOG
 2.3.0
 -----
 
- * [BC BREAK] restricted the `render` tag to only accept URIs as reference (the signature changed)
- * added a render function to render a request
- * the `app` global variable is now injected even when using the twig service directly.
  * added helpers form(), form_start() and form_end()
  * deprecated form_enctype() in favor of form_start()
 

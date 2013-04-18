@@ -304,10 +304,6 @@ class ResolvedFormType implements ResolvedFormTypeInterface
             $position = $child->getConfig()->getPosition();
 
             if (is_string($position)) {
-                if (($position !== 'first') && ($position !== 'last')) {
-                    throw new InvalidConfigurationException('If you use position as string, you can only use "first" & "last".');
-                }
-
                 if ($position === 'first') {
                     if (isset($differredBefores[$child->getName()])) {
                         foreach ($differredBefores[$child->getName()] as $differredBefore) {
@@ -348,10 +344,6 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
                 continue;
             } elseif (is_array($position)) {
-                if (!isset($position['before']) && !isset($position['after'])) {
-                    throw new InvalidConfigurationException('If you use position as array, you must at least define the "before" or "after" option.');
-                }
-
                 if (isset($position['before'])) {
                     $cachedPositions[$child->getName()]['before'] = $position['before'];
 
@@ -484,9 +476,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
                 ));
             }
 
-            if ($positions[$item]['before'] !== null) {
-                $this->detectCircularBeforeAndAfterReferences($positions, $positions[$item]['before'], $name);
-            }
+            $this->detectCircularBeforeAndAfterReferences($positions, $positions[$item]['before'], $name);
         }
     }
 }

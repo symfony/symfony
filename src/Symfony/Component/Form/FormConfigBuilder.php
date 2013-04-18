@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -706,6 +707,12 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     {
         if ($this->locked) {
             throw new FormException('The config builder cannot be modified anymore.');
+        }
+
+        if (is_string($position) && ($position !== 'first') && ($position !== 'last')) {
+            throw new InvalidConfigurationException('If you use position as string, you can only use "first" & "last".');
+        } elseif (is_array($position) && !isset($position['before']) && !isset($position['after'])) {
+            throw new InvalidConfigurationException('If you use position as array, you must at least define the "before" or "after" option.');
         }
 
         $this->position = $position;

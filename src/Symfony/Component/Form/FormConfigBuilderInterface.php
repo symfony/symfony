@@ -265,6 +265,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param null|string|array $position The form position.
      *
+     * @throws InvalidConfigurationException If the position is not valid.
+     *
      * @return self The configuration object.
      */
     public function setPosition($position);

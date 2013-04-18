@@ -49,7 +49,7 @@ class Shell
         $this->application = $application;
         $this->history = getenv('HOME').'/.history_'.$application->getName();
         $this->output = new ConsoleOutput();
-        $this->prompt = $application->getName().' > ';
+        $this->prompt = new Prompt($application);
         $this->processIsolation = false;
     }
 
@@ -184,10 +184,11 @@ EOF;
      */
     private function readline()
     {
+        $renderedPrompt = $this->prompt->render($this->output->getFormatter());
         if ($this->hasReadline) {
-            $line = readline($this->prompt);
+            $line = readline($renderedPrompt);
         } else {
-            $this->output->write($this->prompt);
+            $this->output->write($renderedPrompt);
             $line = fgets(STDIN, 1024);
             $line = (!$line && strlen($line) == 0) ? false : rtrim($line);
         }
@@ -207,5 +208,15 @@ EOF;
         if ($this->processIsolation && !class_exists('Symfony\\Component\\Process\\Process')) {
             throw new \RuntimeException('Unable to isolate processes as the Symfony Process Component is not installed.');
         }
+    }
+
+    public function setPrompt(Prompt $prompt)
+    {
+        $this->prompt;
+    }
+
+    public function getPrompt()
+    {
+        return $this->prompt;
     }
 }

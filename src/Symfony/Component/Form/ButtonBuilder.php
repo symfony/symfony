@@ -14,6 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 
 /**
  * A builder for {@link Button} instances.
@@ -51,6 +52,11 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * @var array
      */
     private $options;
+
+    /**
+     * @var null|string|array
+     */
+    private $position;
 
     /**
      * Creates a new button builder.
@@ -446,7 +452,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * This method should not be invoked.
      *
      * @param FormFactoryInterface $formFactory
-     * 
+     *
      * @return void
      *
      * @throws \BadMethodCallException
@@ -454,6 +460,20 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     public function setFormFactory(FormFactoryInterface $formFactory)
     {
         throw new \BadMethodCallException('Buttons do not support form factories.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPosition($position)
+    {
+        if (is_string($position) && ($position !== 'first') && ($position !== 'last')) {
+            throw new InvalidConfigurationException('If you use position as string, you can only use "first" & "last".');
+        } elseif (is_array($position) && !isset($position['before']) && !isset($position['after'])) {
+            throw new InvalidConfigurationException('If you use position as array, you must at least define the "before" or "after" option.');
+        }
+
+        $this->position = $position;
     }
 
     /**
@@ -726,6 +746,14 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     public function getOption($name, $default = null)
     {
         return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPosition()
+    {
+        return $this->position;
     }
 
     /**

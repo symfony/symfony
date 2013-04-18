@@ -64,15 +64,22 @@ class MockArraySessionStorage implements SessionStorageInterface
     protected $bags;
 
     /**
+     * @var Boolean
+     */
+    protected $mode;
+
+    /**
      * Constructor.
      *
      * @param string      $name    Session name
-     * @param MetadataBag $metaBag MetadataBag instance.
+     * @param MetadataBag $metaBag MetadataBag instance
+     * @param integer     $mode    Session on demand mode
      */
-    public function __construct($name = 'MOCKSESSID', MetadataBag $metaBag = null)
+    public function __construct($name = 'MOCKSESSID', MetadataBag $metaBag = null, $mode = self::START_ON_DEMAND)
     {
         $this->name = $name;
         $this->setMetadataBag($metaBag);
+        $this->mode = $mode;
     }
 
     /**
@@ -160,7 +167,7 @@ class MockArraySessionStorage implements SessionStorageInterface
     public function save()
     {
         if (!$this->started || $this->closed) {
-            throw new \RuntimeException("Trying to save a session that was not started yet or was already closed");
+            throw new \RuntimeException("Trying to save a session that was not started yet or was already closed.");
         }
         // nothing to do since we don't persist the session data
         $this->closed = false;
@@ -200,8 +207,10 @@ class MockArraySessionStorage implements SessionStorageInterface
             throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered.', $name));
         }
 
-        if (!$this->started) {
+        if (!$this->started && self::START_ON_DEMAND === $this->mode) {
             $this->start();
+        } elseif (!$this->started && self::NO_START_ON_DEMAND_STRICT === $this->mode) {
+            throw new \RuntimeException('Cannot access session bags because the session has not been started.');
         }
 
         return $this->bags[$name];

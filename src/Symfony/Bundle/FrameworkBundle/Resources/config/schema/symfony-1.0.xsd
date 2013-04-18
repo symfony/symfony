@@ -77,6 +77,9 @@
     </xsd:complexType>
 
     <xsd:complexType name="session">
+        <xsd:attribute name="auto-start" type="xsd:boolean" />
+        <xsd:attribute name="on-demand-mode" type="xsd:string" />
+        <xsd:attribute name="mock-name" type="xsd:string" />
         <xsd:attribute name="storage-id" type="xsd:string" />
         <xsd:attribute name="handler-id" type="xsd:string" />
         <xsd:attribute name="name" type="xsd:string" />

@@ -24,10 +24,10 @@ class NativeFileSessionHandler extends NativeSessionHandler
      * Constructor.
      *
      * @param string $savePath Path of directory to save session files.
-     *                         Default null will leave setting as defined by PHP.
+     *                         Default null will leave setting as defined by PHP
      *                         '/path', 'N;/path', or 'N;octal-mode;/path
      *
-     * @see http://php.net/session.configuration.php#ini.session.save-path for further details.
+     * @see http://php.net/session.configuration.php#ini.session.save-path for further details
      *
      * @throws \InvalidArgumentException On invalid $savePath
      */
@@ -41,7 +41,7 @@ class NativeFileSessionHandler extends NativeSessionHandler
 
         if ($count = substr_count($savePath, ';')) {
             if ($count > 2) {
-                throw new \InvalidArgumentException(sprintf('Invalid argument $savePath \'%s\'', $savePath));
+                throw new \InvalidArgumentException(sprintf('Invalid argument $savePath \'%s\'.', $savePath));
             }
 
             // characters after last ';' are the path

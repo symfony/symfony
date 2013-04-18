@@ -46,7 +46,7 @@ abstract class AbstractProxy
     }
 
     /**
-     * Is this proxy handler and instance of \SessionHandlerInterface
+     * Is this proxy handler and instance of \SessionHandlerInterface.
      *
      * @return boolean
      */
@@ -56,7 +56,7 @@ abstract class AbstractProxy
     }
 
     /**
-     * Returns true if this handler wraps an internal PHP session save handler using \SessionHandler
+     * Returns true if this handler wraps an internal PHP session save handler using \SessionHandler.
      *
      * @return Boolean
      */

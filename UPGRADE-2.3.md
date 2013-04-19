@@ -1,4 +1,4 @@
-UPGRADE FROM 2.2 to 2.3
+﻿UPGRADE FROM 2.2 to 2.3
 =======================
 
 ### Form
@@ -34,6 +34,79 @@ UPGRADE FROM 2.2 to 2.3
    // equivalent notations for skipping validation
    "validation_groups" => false
    "validation_groups" => array()
+   ```
+ * The array type hint from DataMapperInterface was removed. You should adapt
+   implementations of that interface accordingly.
+
+   Before:
+
+   ```
+   use Symfony\Component\Form\DataMapperInterface;
+
+   class MyDataMapper
+   {
+       public function mapFormsToData(array $forms, $data)
+       {
+           // ...
+       }
+
+       public function mapDataToForms($data, array $forms)
+       {
+           // ...
+       }
+   }
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\Form\DataMapperInterface;
+
+   class MyDataMapper
+   {
+       public function mapFormsToData($forms, $data)
+       {
+           // ...
+       }
+
+       public function mapDataToForms($data, $forms)
+       {
+           // ...
+       }
+   }
+   ```
+
+   Instead of an array, the methods here are now passed a
+   RecursiveIteratorIterator containing an InheritDataAwareIterator by default,
+   so you don't need to handle forms inheriting their parent data (former
+   "virtual forms") in the data mapper anymore.
+
+   Before:
+
+   ```
+   use Symfony\Component\Form\Util\VirtualFormAwareIterator;
+
+   public function mapFormsToData(array $forms, $data)
+   {
+       $iterator = new \RecursiveIteratorIterator(
+           new VirtualFormAwareIterator($forms)
+       );
+
+       foreach ($iterator as $form) {
+           // ...
+       }
+   }
+   ```
+
+   After:
+
+   ```
+   public function mapFormsToData($forms, $data)
+   {
+       foreach ($forms as $form) {
+           // ...
+       }
+   }
    ```
 
 ### PropertyAccess

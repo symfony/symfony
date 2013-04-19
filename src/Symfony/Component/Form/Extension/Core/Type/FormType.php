@@ -48,7 +48,7 @@ class FormType extends BaseType
             ->setPropertyPath($options['property_path'])
             ->setMapped($options['mapped'])
             ->setByReference($options['by_reference'])
-            ->setVirtual($options['virtual'])
+            ->setInheritData($options['inherit_data'])
             ->setCompound($options['compound'])
             ->setData(isset($options['data']) ? $options['data'] : null)
             ->setDataLocked(isset($options['data']))
@@ -95,8 +95,8 @@ class FormType extends BaseType
             'size'       => null,
             'label_attr' => $options['label_attr'],
             'compound'   => $form->getConfig()->getCompound(),
-            'method'              => $form->getConfig()->getMethod(),
-            'action'              => $form->getConfig()->getAction(),
+            'method'     => $form->getConfig()->getMethod(),
+            'action'     => $form->getConfig()->getAction(),
         ));
     }
 
@@ -150,6 +150,18 @@ class FormType extends BaseType
             return $options['compound'];
         };
 
+        // BC with old "virtual" option
+        $inheritData = function (Options $options) {
+            if (null !== $options['virtual']) {
+                // Uncomment this as soon as the deprecation note should be shown
+                // trigger_error('The form option "virtual" is deprecated since version 2.3 and will be removed in 3.0. Use "inherit_data" instead.', E_USER_DEPRECATED);
+
+                return $options['virtual'];
+            }
+
+            return false;
+        };
+
         // If data is given, the form is locked to that data
         // (independent of its value)
         $resolver->setOptional(array(
@@ -169,7 +181,8 @@ class FormType extends BaseType
             'by_reference'       => true,
             'error_bubbling'     => $errorBubbling,
             'label_attr'         => array(),
-            'virtual'            => false,
+            'virtual'            => null,
+            'inherit_data'       => $inheritData,
             'compound'           => true,
             'method'             => 'POST',
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)

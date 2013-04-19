@@ -57,6 +57,42 @@ UPGRADE FROM 2.x to 3.0
    }
    ```
 
+ * The option "virtual" was renamed to "inherit_data".
+
+   Before:
+
+   ```
+   $builder->add('address', 'form', array(
+       'virtual' => true,
+   ));
+   ```
+
+   After:
+
+   ```
+   $builder->add('address', 'form', array(
+       'inherit_data' => true,
+   ));
+   ```
+
+ * The class VirtualFormAwareIterator was renamed to InheritDataAwareIterator.
+
+   Before:
+
+   ```
+   use Symfony\Component\Form\Util\VirtualFormAwareIterator;
+
+   $iterator = new VirtualFormAwareIterator($forms);
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\Form\Util\InheritDataAwareIterator;
+
+   $iterator = new InheritDataAwareIterator($forms);
+   ```
+
 ### FrameworkBundle
 
  * The `enctype` method of the `form` helper was removed. You should use the

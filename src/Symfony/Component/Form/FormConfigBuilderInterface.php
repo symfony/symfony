@@ -180,13 +180,13 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setByReference($byReference);
 
     /**
-     * Sets whether the form should be virtual.
+     * Sets whether the form should read and write the data of its parent.
      *
-     * @param Boolean $virtual Whether the form should be virtual.
+     * @param Boolean $inheritData Whether the form should inherit its parent's data.
      *
      * @return self The configuration object.
      */
-    public function setVirtual($virtual);
+    public function setInheritData($inheritData);
 
     /**
      * Sets whether the form should be compound.

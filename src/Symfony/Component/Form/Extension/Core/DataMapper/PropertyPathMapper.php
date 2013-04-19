@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Extension\Core\DataMapper;
 
 use Symfony\Component\Form\DataMapperInterface;
-use Symfony\Component\Form\Util\VirtualFormAwareIterator;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -42,7 +41,7 @@ class PropertyPathMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function mapDataToForms($data, array $forms)
+    public function mapDataToForms($data, $forms)
     {
         if (null === $data || array() === $data) {
             return;
@@ -52,11 +51,7 @@ class PropertyPathMapper implements DataMapperInterface
             throw new UnexpectedTypeException($data, 'object, array or empty');
         }
 
-        $iterator = new VirtualFormAwareIterator($forms);
-        $iterator = new \RecursiveIteratorIterator($iterator);
-
-        foreach ($iterator as $form) {
-            /* @var FormInterface $form */
+        foreach ($forms as $form) {
             $propertyPath = $form->getPropertyPath();
             $config = $form->getConfig();
 
@@ -69,7 +64,7 @@ class PropertyPathMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function mapFormsToData(array $forms, &$data)
+    public function mapFormsToData($forms, &$data)
     {
         if (null === $data) {
             return;
@@ -79,11 +74,7 @@ class PropertyPathMapper implements DataMapperInterface
             throw new UnexpectedTypeException($data, 'object, array or empty');
         }
 
-        $iterator = new VirtualFormAwareIterator($forms);
-        $iterator = new \RecursiveIteratorIterator($iterator);
-
-        foreach ($iterator as $form) {
-            /* @var FormInterface $form */
+        foreach ($forms as $form) {
             $propertyPath = $form->getPropertyPath();
             $config = $form->getConfig();
 

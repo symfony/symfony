@@ -55,11 +55,11 @@ class AssetsExtension extends \Twig_Extension
     {
         return $this->container->get('templating.helper.assets')->getUrl($path, $packageName);
     }
-    
+
     /**
      * Returns absolute URL for a given asset path
      * Does not rely on assets_base_urls parameter, instead tries to match request scheme/host/port
-     * 
+     *
      * If called from CLI, then relies on router.request_context.* parameters:
      *   router.request_context.host
      *   router.request_context.scheme

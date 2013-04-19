@@ -22,7 +22,7 @@ use Symfony\Component\Templating\Asset\Package;
 class AbsoluteUrlPackage extends Package
 {
     private $context;
-    
+
     /**
      * @param RequestContext $context Request context
      * @param string         $version The version
@@ -31,27 +31,27 @@ class AbsoluteUrlPackage extends Package
     public function __construct(RequestContext $context, $version = null, $format = null)
     {
         $this->context = $context;
-        
+
         parent::__construct($version, $format);
     }
-    
+
     public function getUrl($path)
     {
         if (false !== strpos($path, '://') || 0 === strpos($path, '//')) {
             return $path;
         }
-        
+
         $url = ltrim($path, '/');
         if ($baseUrl = $this->context->getBaseUrl()) {
             $url = trim($baseUrl, '/').'/'.$url;
         }
-        
+
         // get scheme, host and port from RequestContext
         // based on \Symfony\Component\Routing\Generator\UrlGenerator::doGenerate()
         $schemeAuthority = '';
         if ($host = $this->context->getHost()) {
             $scheme = $this->context->getScheme();
-            
+
             $port = '';
             if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
                 $port = ':'.$this->context->getHttpPort();
@@ -63,9 +63,9 @@ class AbsoluteUrlPackage extends Package
         }
 
         $url = $schemeAuthority.'/'.$url;
-        
+
         $url = $this->applyVersion($url);
-        
+
         return $url;
     }
 }

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-04-12T21:42:38Z
+
+I had to use fully qualified names because you can't have an alias name which is equal to an existing class.
+
+The other failing tests in 5.3.* are not caused by this PR.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-19T09:07:34Z
+
+Apart from the mentioned issues, this looks good. Could you please rebase and make the suggested changes?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-04-19T12:51:43Z
+
+@bschussek I fixed/did the suggested changes, updated the doc PR and rebased it. I think it's ready to merge now.

@@ -288,14 +288,10 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
         $car = $this->getMock(__CLASS__.'_CarNoAdderAndRemover');
         $propertyPath = 'axes';
         $expectedMessage = sprintf(
-            'Neither element "axes" nor method "setAxes()" exists in class '
-                .'"%s", nor could adders and removers be found based on the '
-                .'guessed singulars: %s'
-//               .'(provide a singular by suffixing the '
-//                .'property path with "|{singular}" to override the guesser)'
-                ,
-            get_class($car),
-            implode(', ', (array) $singulars = StringUtil::singularify('Axes'))
+            'Neither the property "axes" nor one of the methods "addAx()", '.
+            '"addAxe()", "addAxis()", "setAxes()" or "__set()" exist and have '.
+            'public access in class "%s".',
+            get_class($car)
         );
         $data[] = array($car, $propertyPath, $expectedMessage);
 
@@ -316,14 +312,10 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
         $car = $this->getMock(__CLASS__.'_CarNoAdderAndRemoverWithProperty');
         $propertyPath = 'axes';
         $expectedMessage = sprintf(
-            'Property "axes" is not public in class "%s", nor could adders and '
-                .'removers be found based on the guessed singulars: %s'
-//                .' (provide a singular by suffixing the property path with '
-//                .'"|{singular}" to override the guesser)'
-               .'. Maybe you should '
-                .'create the method "setAxes()"?',
-            get_class($car),
-            implode(', ', (array) $singulars = StringUtil::singularify('Axes'))
+            'Neither the property "axes" nor one of the methods "addAx()", '.
+            '"addAxe()", "addAxis()", "setAxes()" or "__set()" exist and have '.
+            'public access in class "%s".',
+            get_class($car)
         );
         $data[] = array($car, $propertyPath, $expectedMessage);
 

@@ -161,6 +161,8 @@ UPGRADE FROM 2.x to 3.0
    }
    ```
 
+ * The `FormItegrationTestCase` and `FormPerformanceTestCase` classes were moved form the `Symfony\Component\Form\Tests` namespace to the `Symfony\Component\Form\Test` namespace.
+
 ### Routing
 
  * Some route settings have been renamed:

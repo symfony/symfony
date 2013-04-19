@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Test;
 
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Tests\FormIntegrationTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class TypeTestCase extends FormIntegrationTestCase

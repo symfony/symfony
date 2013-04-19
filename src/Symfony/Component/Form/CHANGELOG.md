@@ -5,7 +5,8 @@ CHANGELOG
 2.3.0
 ------
 
- * deprecated TypeTestCase in the Symfony\Component\Form\Tests\Extension\Core\Type namespace and moved it to the Symfony\Component\Form\Test namespace.
+ * deprecated FormPerformanceTestCase and FormIntegrationTestCase in the Symfony\Component\Form\Tests namespace and moved them to the Symfony\Component\Form\Test namespace
+ * deprecated TypeTestCase in the Symfony\Component\Form\Tests\Extension\Core\Type namespace and moved it to the Symfony\Component\Form\Test namespace
  * changed FormRenderer::humanize() to humanize also camel cased field name
  * added FormProcessorInterface and FormInterface::process()
  * deprecated passing a Request instance to FormInterface::bind()

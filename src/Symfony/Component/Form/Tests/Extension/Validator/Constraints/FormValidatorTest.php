@@ -575,8 +575,12 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
     public function testViolationIfExtraData()
     {
         $context = $this->getMockExecutionContext();
+        $options = array(
+            'extra_fields_message' => 'Extra!', 
+            'forbid_extra_data'    => true,
+        );
 
-        $form = $this->getBuilder('parent', null, array('extra_fields_message' => 'Extra!'))
+        $form = $this->getBuilder('parent', null, $options)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
             ->add($this->getBuilder('child'))
@@ -591,6 +595,27 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
                 array('{{ extra_fields }}' => 'foo'),
                 array('foo' => 'bar')
             );
+        $context->expects($this->never())
+            ->method('addViolationAt');
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
+    public function testDontMarkInvalidIfNotForbidExtraData()
+    {
+        $context = $this->getMockExecutionContext();
+
+        $form = $this->getBuilder('parent', null, array('forbid_extra_data' => false))
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->add($this->getBuilder('child'))
+            ->getForm();
+
+        $form->bind(array('foo' => 'bar'));
+
+        $context->expects($this->never())
+            ->method('addViolation');
         $context->expects($this->never())
             ->method('addViolationAt');
 

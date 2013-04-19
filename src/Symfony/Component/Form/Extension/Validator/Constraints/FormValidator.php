@@ -106,8 +106,8 @@ class FormValidator extends ConstraintValidator
             }
         }
 
-        // Mark the form with an error if it contains extra fields
-        if (count($form->getExtraData()) > 0) {
+        // Mark the form with an error if it contains not allowed extra fields
+        if ($config->getOption('forbid_extra_data') && count($form->getExtraData()) > 0) {
             $this->context->addViolation(
                 $config->getOption('extra_fields_message'),
                 array('{{ extra_fields }}' => implode('", "', array_keys($form->getExtraData()))),

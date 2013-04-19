@@ -17,6 +17,8 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 /**
  * @Annotation
  *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @api
  */
 class Count extends Constraint

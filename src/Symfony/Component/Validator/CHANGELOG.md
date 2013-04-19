@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * copied the constraints `Optional` and `Required` to the
+   `Symfony\Component\Validator\Constraints\` namespace and deprecated the original
+   classes.
+
 2.2.0
 -----
 

@@ -14,13 +14,14 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
-class DateTime extends Constraint
+abstract class Existence extends Constraint
 {
-    public $message = 'This value is not a valid datetime.';
+    public $constraints = array();
+
+    public function getDefaultOption()
+    {
+        return 'constraints';
+    }
 }

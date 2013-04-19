@@ -114,7 +114,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\PropertyAccessDeniedException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfPropertyIsNotPublic()
     {
@@ -138,7 +138,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\PropertyAccessDeniedException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfGetterIsNotPublic()
     {
@@ -180,7 +180,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\PropertyAccessDeniedException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfIsserIsNotPublic()
     {
@@ -295,7 +295,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\PropertyAccessDeniedException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testSetValueThrowsExceptionIfGetterIsNotPublic()
     {

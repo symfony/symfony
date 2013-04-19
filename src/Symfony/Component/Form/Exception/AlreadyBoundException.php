@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Form\Exception;
 
-class AlreadyBoundException extends Exception
+class AlreadyBoundException extends LogicException
 {
 }

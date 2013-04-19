@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
-use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -74,7 +74,7 @@ class FormType extends BaseType
 
         if ($view->parent) {
             if ('' === $name) {
-                throw new Exception('Form node with empty name can be used only as root form node.');
+                throw new LogicException('Form node with empty name can be used only as root form node.');
             }
 
             // Complex fields are read-only if they themselves or their parents are.

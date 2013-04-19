@@ -12,10 +12,10 @@
 namespace Symfony\Component\Form\Exception;
 
 /**
- * Thrown when a form type is configured incorrectly
+ * Base OutOfBoundsException for Form component.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Alexander Kotynia <aleksander.kot@gmail.com>
  */
-class TypeDefinitionException extends Exception
+class OutOfBoundsException extends \OutOfBoundsException implements ExceptionInterface
 {
 }

@@ -15,6 +15,9 @@ CHANGELOG
  * deprecated VirtualFormAwareIterator in favor of InheritDataAwareIterator
  * [BC BREAK] removed the "array" type hint from DataMapperInterface
  * improved forms inheriting their parent data to actually return that data from getData(), getNormData() and getViewData()
+ * added component-level exceptions for various SPL exceptions
+   changed all uses of the deprecated Exception class to use more specialized exceptions instead
+   removed NotInitializedException, NotValidException, TypeDefinitionException, TypeLoaderException, CreationException
 
 2.2.0
 -----

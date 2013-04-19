@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 
 /**
@@ -76,7 +77,7 @@ class FormRenderer implements FormRendererInterface
     public function renderCsrfToken($intention)
     {
         if (null === $this->csrfProvider) {
-            throw new \BadMethodCallException('CSRF token can only be generated if a CsrfProviderInterface is injected in the constructor.');
+            throw new BadMethodCallException('CSRF token can only be generated if a CsrfProviderInterface is injected in the constructor.');
         }
 
         return $this->csrfProvider->generateCsrfToken($intention);
@@ -90,7 +91,7 @@ class FormRenderer implements FormRendererInterface
         $resource = $this->engine->getResourceForBlockName($view, $blockName);
 
         if (!$resource) {
-            throw new Exception(sprintf('No block "%s" found while rendering the form.', $blockName));
+            throw new LogicException(sprintf('No block "%s" found while rendering the form.', $blockName));
         }
 
         $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
@@ -235,7 +236,7 @@ class FormRenderer implements FormRendererInterface
 
         // Escape if no resource exists for this block
         if (!$resource) {
-            throw new Exception(sprintf(
+            throw new LogicException(sprintf(
                 'Unable to render the form as none of the following blocks exist: "%s".',
                 implode('", "', array_reverse($blockNameHierarchy))
             ));

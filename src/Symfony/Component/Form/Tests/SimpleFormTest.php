@@ -718,7 +718,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\Exception
+     * @expectedException \Symfony\Component\Form\Exception\LogicException
      * @expectedExceptionMessage A form with an empty name cannot have a parent form.
      */
     public function testFormCannotHaveEmptyNameNotInRootLevel()
@@ -800,7 +800,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\Exception
+     * @expectedException \Symfony\Component\Form\Exception\LogicException
      */
     public function testViewDataMustNotBeObjectIfDataClassIsNull()
     {
@@ -830,7 +830,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\Exception
+     * @expectedException \Symfony\Component\Form\Exception\LogicException
      */
     public function testViewDataMustBeObjectIfDataClassIsSet()
     {
@@ -917,7 +917,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
      */
     public function testInheritDataDisallowsSetData()
     {
@@ -929,7 +929,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
      */
     public function testGetDataRequiresParentToBeSetIfInheritData()
     {
@@ -941,7 +941,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
      */
     public function testGetNormDataRequiresParentToBeSetIfInheritData()
     {
@@ -953,7 +953,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
      */
     public function testGetViewDataRequiresParentToBeSetIfInheritData()
     {

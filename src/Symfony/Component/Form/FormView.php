@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Exception\BadMethodCallException;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -118,11 +120,11 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Implements \ArrayAccess.
      *
-     * @throws \BadMethodCallException always as setting a child by name is not allowed
+     * @throws BadMethodCallException always as setting a child by name is not allowed
      */
     public function offsetSet($name, $value)
     {
-        throw new \BadMethodCallException('Not supported');
+        throw new BadMethodCallException('Not supported');
     }
 
     /**

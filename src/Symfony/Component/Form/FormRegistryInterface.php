@@ -27,8 +27,8 @@ interface FormRegistryInterface
      *
      * @return ResolvedFormTypeInterface The type
      *
-     * @throws Exception\UnexpectedTypeException if the passed name is not a string
-     * @throws Exception\FormException           if the type can not be retrieved from any extension
+     * @throws Exception\UnexpectedTypeException  if the passed name is not a string
+     * @throws Exception\InvalidArgumentException if the type can not be retrieved from any extension
      */
     public function getType($name);
 

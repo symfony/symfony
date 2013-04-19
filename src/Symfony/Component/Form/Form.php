@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\BadMethodCallException;
-use Symfony\Component\Form\Exception\Exception;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\AlreadyBoundException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -146,7 +146,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param FormConfigInterface $config The form configuration.
      *
-     * @throws Exception if a data mapper is not provided for a compound form
+     * @throws LogicException if a data mapper is not provided for a compound form
      */
     public function __construct(FormConfigInterface $config)
     {
@@ -154,7 +154,7 @@ class Form implements \IteratorAggregate, FormInterface
         // `setData` and `add` will not lead to the correct population of
         // the child forms.
         if ($config->getCompound() && !$config->getDataMapper()) {
-            throw new Exception('Compound forms need a data mapper');
+            throw new LogicException('Compound forms need a data mapper');
         }
 
         // If the form inherits the data from its parent, it is not necessary
@@ -249,7 +249,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (null !== $parent && '' === $this->config->getName()) {
-            throw new Exception('A form with an empty name cannot have a parent form.');
+            throw new LogicException('A form with an empty name cannot have a parent form.');
         }
 
         $this->parent = $parent;
@@ -340,7 +340,7 @@ class Form implements \IteratorAggregate, FormInterface
             if (null === $dataClass && is_object($viewData) && !$viewData instanceof \ArrayAccess) {
                 $expectedType = 'scalar, array or an instance of \ArrayAccess';
 
-                throw new Exception(
+                throw new LogicException(
                     'The form\'s view data is expected to be of type '.$expectedType.', ' .
                     'but is '.$actualType.'. You ' .
                     'can avoid this error by setting the "data_class" option to ' .
@@ -350,7 +350,7 @@ class Form implements \IteratorAggregate, FormInterface
             }
 
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
-                throw new Exception(
+                throw new LogicException(
                     'The form\'s view data is expected to be an instance of class ' .
                     $dataClass.', but is '. $actualType.'. You can avoid this error ' .
                     'by setting the "data_class" option to null or by adding a view ' .
@@ -729,7 +729,7 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (!$this->config->getCompound()) {
-            throw new Exception('You cannot add children to a simple form. Maybe you should set the option "compound" to true?');
+            throw new LogicException('You cannot add children to a simple form. Maybe you should set the option "compound" to true?');
         }
 
         // Obtain the view data
@@ -815,7 +815,7 @@ class Form implements \IteratorAggregate, FormInterface
             return $this->children[$name];
         }
 
-        throw new \OutOfBoundsException(sprintf('Child "%s" does not exist.', $name));
+        throw new OutOfBoundsException(sprintf('Child "%s" does not exist.', $name));
     }
 
     /**
@@ -851,7 +851,7 @@ class Form implements \IteratorAggregate, FormInterface
      * @param FormInterface $child The child to be added.
      *
      * @throws AlreadyBoundException If the form has already been bound.
-     * @throws FormException         When trying to add a child to a non-compound form.
+     * @throws LogicException        When trying to add a child to a non-compound form.
      *
      * @see self::add()
      */

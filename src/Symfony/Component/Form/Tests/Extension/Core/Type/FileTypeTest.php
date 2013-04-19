@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-class FileTypeTest extends TypeTestCase
+class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
     // https://github.com/symfony/symfony/pull/5028
     public function testSetData()

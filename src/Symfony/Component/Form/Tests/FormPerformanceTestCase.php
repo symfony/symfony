@@ -11,60 +11,11 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\Test\FormPerformanceTestCase as BaseFormPerformanceTestCase;
+
 /**
- * Base class for performance tests.
- *
- * Copied from Doctrine 2's OrmPerformanceTestCase.
- *
- * @author robo
- * @author Bernhard Schussek <bschussek@gmail.com>
+ * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use Symfony\Component\Form\Test\FormPerformanceTestCase instead.
  */
-abstract class FormPerformanceTestCase extends FormIntegrationTestCase
+abstract class FormPerformanceTestCase extends BaseFormPerformanceTestCase
 {
-    /**
-     * @var    integer
-     */
-    protected $maxRunningTime = 0;
-
-    /**
-     */
-    protected function runTest()
-    {
-        $s = microtime(true);
-        parent::runTest();
-        $time = microtime(true) - $s;
-
-        if ($this->maxRunningTime != 0 && $time > $this->maxRunningTime) {
-            $this->fail(
-                sprintf(
-                    'expected running time: <= %s but was: %s',
-
-                    $this->maxRunningTime,
-                    $time
-                )
-            );
-        }
-    }
-
-    /**
-     * @param  integer $maxRunningTime
-     * @throws \InvalidArgumentException
-     */
-    public function setMaxRunningTime($maxRunningTime)
-    {
-        if (is_integer($maxRunningTime) && $maxRunningTime >= 0) {
-            $this->maxRunningTime = $maxRunningTime;
-        } else {
-            throw new \InvalidArgumentException;
-        }
-    }
-
-    /**
-     * @return integer
-     * @since  Method available since Release 2.3.0
-     */
-    public function getMaxRunningTime()
-    {
-        return $this->maxRunningTime;
-    }
 }

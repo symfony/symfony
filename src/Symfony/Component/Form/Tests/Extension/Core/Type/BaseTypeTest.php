@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class BaseTypeTest extends TypeTestCase
+abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
     public function testPassDisabledAsOption()
     {

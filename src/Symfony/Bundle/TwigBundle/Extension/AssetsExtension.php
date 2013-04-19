@@ -36,6 +36,7 @@ class AssetsExtension extends \Twig_Extension
     {
         return array(
             'asset' => new \Twig_Function_Method($this, 'getAssetUrl'),
+            'asset_url' => new \Twig_Function_Method($this, 'getAssetAbsoluteUrl'),
             'assets_version' => new \Twig_Function_Method($this, 'getAssetsVersion'),
         );
     }
@@ -53,6 +54,24 @@ class AssetsExtension extends \Twig_Extension
     public function getAssetUrl($path, $packageName = null)
     {
         return $this->container->get('templating.helper.assets')->getUrl($path, $packageName);
+    }
+    
+    /**
+     * Returns absolute URL for a given asset path
+     * Does not rely on assets_base_urls parameter, instead tries to match request scheme/host/port
+     * 
+     * If called from CLI, then relies on router.request_context.* parameters:
+     *   router.request_context.host
+     *   router.request_context.scheme
+     *   router.request_context.base_url
+     *
+     * @param string $path A public path
+     *
+     * @return string A public path which takes into account the base path and URL path
+     */
+    public function getAssetAbsoluteUrl($path)
+    {
+        return $this->getAssetUrl($path, 'absolute_url');
     }
 
     /**

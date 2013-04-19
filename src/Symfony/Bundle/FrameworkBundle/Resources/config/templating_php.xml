@@ -20,6 +20,7 @@
         <parameter key="templating.globals.class">Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables</parameter>
         <parameter key="templating.asset.path_package.class">Symfony\Bundle\FrameworkBundle\Templating\Asset\PathPackage</parameter>
         <parameter key="templating.asset.url_package.class">Symfony\Component\Templating\Asset\UrlPackage</parameter>
+        <parameter key="templating.asset.absolute_url_package.class">Symfony\Bundle\FrameworkBundle\Templating\Asset\AbsoluteUrlPackage</parameter>
         <parameter key="templating.asset.package_factory.class">Symfony\Bundle\FrameworkBundle\Templating\Asset\PackageFactory</parameter>
     </parameters>
 
@@ -53,6 +54,14 @@
             <argument /> <!-- version -->
             <argument /> <!-- version format -->
         </service>
+
+        <service id="templating.asset.absolute_url_package" class="%templating.asset.absolute_url_package.class%" abstract="true">
+            <argument type="service" id="router.request_context" on-invalid="ignore" />
+            <argument /> <!-- version -->
+            <argument /> <!-- version format -->
+        </service>
+        
+        <service id="absolute_url" alias="templating.asset.absolute_url_package" />
 
         <service id="templating.asset.request_aware_package" class="Symfony\Component\Templating\Asset\PackageInterface" factory-service="templating.asset.package_factory" factory-method="getPackage" abstract="true">
             <argument type="service" id="request" strict="false" />

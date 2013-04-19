@@ -763,6 +763,42 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertEquals(new PropertyPath('[name]'), $form->getPropertyPath());
     }
 
+    public function testGetPropertyPathDefaultsToNameIfFirstParentWithoutInheritDataHasDataClass()
+    {
+        $grandParent = $this->getBuilder(null, null, 'stdClass')
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
+        $parent = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->setInheritData(true)
+            ->getForm();
+        $form = $this->getBuilder('name')->getForm();
+        $grandParent->add($parent);
+        $parent->add($form);
+
+        $this->assertEquals(new PropertyPath('name'), $form->getPropertyPath());
+    }
+
+    public function testGetPropertyPathDefaultsToIndexedNameIfDataClassOfFirstParentWithoutInheritDataIsNull()
+    {
+        $grandParent = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
+        $parent = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->setInheritData(true)
+            ->getForm();
+        $form = $this->getBuilder('name')->getForm();
+        $grandParent->add($parent);
+        $parent->add($form);
+
+        $this->assertEquals(new PropertyPath('[name]'), $form->getPropertyPath());
+    }
+
     /**
      * @expectedException \Symfony\Component\Form\Exception\Exception
      */
@@ -809,7 +845,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\Exception
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
      */
     public function testSetDataCannotInvokeItself()
     {
@@ -855,6 +891,103 @@ class SimpleFormTest extends AbstractFormTest
             ->with($this->identicalTo($form), 'REQUEST');
 
         $this->assertSame($form, $form->process('REQUEST'));
+    }
+
+    public function testFormInheritsParentData()
+    {
+        $child = $this->getBuilder('child')
+            ->setInheritData(true);
+
+        $parent = $this->getBuilder('parent')
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->setData('foo')
+            ->addModelTransformer(new FixedDataTransformer(array(
+                'foo' => 'norm[foo]',
+            )))
+            ->addViewTransformer(new FixedDataTransformer(array(
+                'norm[foo]' => 'view[foo]',
+            )))
+            ->add($child)
+            ->getForm();
+
+        $this->assertSame('foo', $parent->get('child')->getData());
+        $this->assertSame('norm[foo]', $parent->get('child')->getNormData());
+        $this->assertSame('view[foo]', $parent->get('child')->getViewData());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\FormException
+     */
+    public function testInheritDataDisallowsSetData()
+    {
+        $form = $this->getBuilder()
+            ->setInheritData(true)
+            ->getForm();
+
+        $form->setData('foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\FormException
+     */
+    public function testGetDataRequiresParentToBeSetIfInheritData()
+    {
+        $form = $this->getBuilder()
+            ->setInheritData(true)
+            ->getForm();
+
+        $form->getData();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\FormException
+     */
+    public function testGetNormDataRequiresParentToBeSetIfInheritData()
+    {
+        $form = $this->getBuilder()
+            ->setInheritData(true)
+            ->getForm();
+
+        $form->getNormData();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\FormException
+     */
+    public function testGetViewDataRequiresParentToBeSetIfInheritData()
+    {
+        $form = $this->getBuilder()
+            ->setInheritData(true)
+            ->getForm();
+
+        $form->getViewData();
+    }
+
+    public function testPostBindDataIsNullIfInheritData()
+    {
+        $test = $this;
+        $form = $this->getBuilder()
+            ->addEventListener(FormEvents::POST_BIND, function (FormEvent $event) use ($test) {
+                $test->assertNull($event->getData());
+            })
+            ->setInheritData(true)
+            ->getForm();
+
+        $form->bind('foo');
+    }
+
+    public function testBindIsNeverFiredIfInheritData()
+    {
+        $test = $this;
+        $form = $this->getBuilder()
+            ->addEventListener(FormEvents::BIND, function (FormEvent $event) use ($test) {
+                $test->fail('The BIND event should not be fired');
+            })
+            ->setInheritData(true)
+            ->getForm();
+
+        $form->bind('foo');
     }
 
     protected function createForm()

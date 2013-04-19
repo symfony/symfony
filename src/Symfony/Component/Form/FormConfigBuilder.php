@@ -80,7 +80,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @var Boolean
      */
-    private $virtual = false;
+    private $inheritData = false;
 
     /**
      * @var Boolean
@@ -341,9 +341,25 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function getInheritData()
+    {
+        return $this->inheritData;
+    }
+
+    /**
+     * Alias of {@link getInheritData()}.
+     *
+     * @return FormConfigBuilder The configuration object.
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link getInheritData()} instead.
+     */
     public function getVirtual()
     {
-        return $this->virtual;
+        // Uncomment this as soon as the deprecation note should be shown
+        // trigger_error('getVirtual() is deprecated since version 2.3 and will be removed in 3.0. Use getInheritData() instead.', E_USER_DEPRECATED);
+
+        return $this->getInheritData();
     }
 
     /**
@@ -676,15 +692,33 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setVirtual($virtual)
+    public function setInheritData($inheritData)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->virtual = $virtual;
+        $this->inheritData = $inheritData;
 
         return $this;
+    }
+
+    /**
+     * Alias of {@link setInheritData()}.
+     *
+     * @param Boolean $inheritData Whether the form should inherit its parent's data.
+     *
+     * @return FormConfigBuilder The configuration object.
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link setInheritData()} instead.
+     */
+    public function setVirtual($inheritData)
+    {
+        // Uncomment this as soon as the deprecation note should be shown
+        // trigger_error('setVirtual() is deprecated since version 2.3 and will be removed in 3.0. Use setInheritData() instead.', E_USER_DEPRECATED);
+
+        $this->setInheritData($inheritData);
     }
 
     /**

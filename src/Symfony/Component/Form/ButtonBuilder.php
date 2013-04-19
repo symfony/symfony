@@ -493,6 +493,18 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     }
 
     /**
+     * Unsupported method.
+     *
+     * @param Boolean $inheritData
+     *
+     * @throws \BadMethodCallException
+     */
+    public function setInheritData($inheritData)
+    {
+        throw new \BadMethodCallException('Buttons do not support data inheritance.');
+    }
+
+    /**
      * Builds and returns the button configuration.
      *
      * @return FormConfigInterface
@@ -755,6 +767,16 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * @return null Always returns null.
      */
     public function getFormProcessor()
+    {
+        return null;
+    }
+
+    /**
+     * Unsupported method.
+     *
+     * @return null Always returns null.
+     */
+    public function getInheritData()
     {
         return null;
     }

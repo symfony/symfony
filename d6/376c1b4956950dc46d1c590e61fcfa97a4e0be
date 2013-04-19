@@ -1,0 +1,252 @@
+---------------------------------------------------------------------------
+
+by vicb at 2013-01-05T14:28:38Z
+
+I think this PR should be split in 2:
+
+- The first PR would contain the second commit only (ie bug fix)
+- The second PR would contain the first commit (option name change)
+
+What about considering `$builder->include()` as described in #5899 - this would be part of the second PR.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-05T14:39:59Z
+
+@vicb Splitting this PR up in two would greatly increase my workload for no particular benefit.
+
+I don't like an `include` function. This would break BC (because modifying our interfaces) and at the same time be less flexible than `inherit_data` (since it cannot be defined in the form type that actually inherits its parent's data).
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-01-05T14:52:07Z
+
+I see `include()` as an helper around `add()` that would also set the `virtual/inherit_data` option to `true`. So flexibility would be the same, usability better.
+
+Breaking BC ??? Which do you expect to be more frequent, extending the `FormBuilder` or using the `virtual` option ?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-05T14:58:04Z
+
+I expect neither of them to be very frequent. IMO the most useful purpose of `inherit_data` is to create fieldset-like structures, which are only represented in the view, but not in the model. These structures would mostly be implemented as types, which need to be able to define the `inherit_data` option.
+
+So I think passing `inherit_data` as option to `add()` is really an edge case that does not justify a dedicated helper. We don't have *any* other form option that features a dedicated helper in the interfaces.
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-01-05T15:16:56Z
+
+> So I think passing inherit_data as option to add() is really an edge case that does not justify a dedicated helper. We don't have any other form option that features a dedicated helper in the interfaces.
+
+What I expect from a builder is to ease the construction of an object and I think `include()` is much more meaningful and intuitive than a `virtual` or `inherit_data` option and it would also allow auto-completion - but of course this is a personal opinion.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-08T14:23:32Z
+
+Postponed to 2.3.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-06T18:58:17Z
+
+As it's going to be merged in 2.3, the old behavior should be kept until 3.0.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-23T18:05:42Z
+
+I've just re-read the documentation before and after the change. Frankly, I don't think that the new name is much better than the old one. Considering that this will break BC at some point, I would like that we reconsider this change.
+
+---------------------------------------------------------------------------
+
+by Koc at 2013-03-31T00:21:54Z
+
+@bschussek two questions about this PR:
+
+1. Is now we can do not pass `data_class` option by hand (it will get it from parent form)?
+2. Is there possible do not add virtual field name to children fields full names? We are using virtual forms as  nested containers and names got too long: i.e. `guardclient[tabpanel][timline_tab][fieldset][task_notes]` instead of `guardclient[task_notes]`
+
+---------------------------------------------------------------------------
+
+by Strate at 2013-04-07T07:50:35Z
+
+@bschussek will this PR fix #7570 ?
+
+---------------------------------------------------------------------------
+
+by shuogawa at 2013-04-07T14:07:05Z
+
+Hi, I have created a code as below to create a form with little complicated layout.
+<pre>
+class Question{
+    protected $subject;
+    protected $body;
+}
+class Answer{
+    protected $subject;
+    protected $body;
+}
+class FormData{
+    protected $question;
+    protected $answer;
+}
+class RowType extends AbstractType{
+    public function setDefaultOptions($resolver){
+    	$resolver->setDefaults(array('virtual' => true));
+    }
+}
+class QuestionAndAnswerType extends AbstractType{
+    public function buildForm($builder, $options){
+        $builder->add('row1', 'row');
+        $builder->add('row2', 'row');
+		$row1 = $builder->get('row1');
+		$row2 = $builder->get('row2');
+        $row1->add('question_subject', 'text', array('property_path'=>'question.subject'));
+        $row1->add('answer_subject', 'text', array('property_path'=>'answer.subject'));
+        $row2->add('question_body', 'textarea', array('property_path'=>'question.body'));
+        $row2->add('answer_body', 'textarea', array('property_path'=>'answer.body'));
+    }
+}
+</pre>
+With the code above, I have created the form with layered structure as below.
+<pre>
+form
+　row(virtual=true)
+　　　text(property_path=question.subject)
+　　　text(property_path=anwser.subject)
+　row(virtual=true)
+　　　textarea(property_path=question.body)
+　　　textarea(property_path=anwser.body)
+</pre>
+This form will show the below as a content as well as results.
+<pre>
+&lt;div class="row"&gt;
+    &lt;div class="span6"&gt;
+        &lt;input type="text"&gt;
+    &lt;/div&gt;
+    &lt;div class="span6"&gt;
+        &lt;input type="text"&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="row"&gt;
+    &lt;div class="span6"&gt;
+        &lt;textarea&gt;&lt;/textarea&gt;
+    &lt;/div&gt;
+    &lt;div class="span6"&gt;
+        &lt;textarea&gt;&lt;/textarea&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+
+However, this form returns an error as "Cannot write property "question_subject" to an array.".
+I think this is due to an unclassified data_class in RowType. It is, however, not possible to specify the Data_Class.
+
+The code above is an example and It would be necessary to have a hypothetical FormType which does not affect property_path to create a complicated form.
+
+With that, I think the link below is a good sample
+https://github.com/symfony/symfony/issues/6584
+
+and https://github.com/symfony/symfony/pull/6573 is a necessary function.
+
+Also, I would like to create a code as below which nested virtual formtype
+
+<pre>
+form
+  row(virtual=true)
+    cell(virtual=true)
+      text(property_path=firstName)
+　　  text(property_path=lastName)
+    cell(virtual=true)
+　　  textarea(property_path=comment)
+</pre>
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-15T15:31:05Z
+
+@shuogawa Did you test whether your form works with this PR applied?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-15T15:41:05Z
+
+@fabpot I still think that "inherit_data" is much better than "virtual", especially when you contrast the two options used for data mapping:
+
+* `property_path`: to read a field's data from a property of the parent's data
+* `inherit_data`: to inherit the parent's data
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-15T15:45:23Z
+
+Even if the new name is better, I'm not sure the difference is enough to justify a BC break. What others think?
+
+---------------------------------------------------------------------------
+
+by Koc at 2013-04-15T15:57:04Z
+
+It is easy do `s/virtual/inherit_data` globally in project.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-15T16:06:41Z
+
+@Koc: What about bundles or Open-Source that want to support several Symfony versions?
+
+---------------------------------------------------------------------------
+
+by aderuwe at 2013-04-16T08:23:21Z
+
+`virtual` is good imo, it's a virtual field in my form - it will not be propagated to the data.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-16T12:13:37Z
+
+@fabpot They can use the old name. "virtual" will remain in as an alias until 3.0.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-16T12:16:36Z
+
+@aderuwe That's only part of the truth. The current naming (and documentation) suggested that virtual fields were somehow "skipped" by data mapping (which was the case). But truth is (after this PR) that they are not skipped. They just receive the same data as their parent.
+
+---------------------------------------------------------------------------
+
+by aderuwe at 2013-04-16T12:24:52Z
+
+@bschussek but the use-case (structuring the form differently to the underlying model) will still work? I ask because I really understood them as "skipped" and have used them as such. I guess I'll need to modify some stuff here and there. :)
+
+That being said, `virtual` might not make sense for what you describe as it does somehow imply being "skipped".
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-16T12:37:23Z
+
+@aderuwe You don't need to modify anything. The use cases of `inherit_data` are a superset of the use cases of `virtual`. That means, all use cases that worked with `virtual` will work with `inherit_data`, plus some more (see also the linked tickets).
+
+---------------------------------------------------------------------------
+
+by aderuwe at 2013-04-16T12:42:42Z
+
+@bschussek Ok, then I think I need to change my opinion on the name change, `virtual` implies skipped, `inherit_data` seems to cover more of the meat of it. And it's not a difficult BC to overcome.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-16T12:45:30Z
+
+Just to clarify again: Both `virtual` and `inherit_data` will work until 3.0, but `virtual` will be marked deprecated while `inherit_data` will be documented and promoted for the reason you just mentioned.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-16T14:00:05Z
+
+@bschussek Can you update this PR to take into account that virtual will be supported until 3.0?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-19T08:11:31Z
+
+Rebased and pushed.

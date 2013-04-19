@@ -29,6 +29,7 @@
         "symfony/console": "self.version",
         "symfony/css-selector": "self.version",
         "symfony/dependency-injection": "self.version",
+        "symfony/debug": "self.version",
         "symfony/doctrine-bridge": "self.version",
         "symfony/dom-crawler": "self.version",
         "symfony/event-dispatcher": "self.version",

@@ -15,6 +15,7 @@ namespace Symfony\Component\Validator\Constraints;
  * Annotation for group sequences
  *
  * @Annotation
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api

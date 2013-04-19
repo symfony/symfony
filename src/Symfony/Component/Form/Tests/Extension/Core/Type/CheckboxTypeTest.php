@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\CallbackTransformer;
 
-class CheckboxTypeTest extends TypeTestCase
+class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
     public function testPassValueToView()
     {

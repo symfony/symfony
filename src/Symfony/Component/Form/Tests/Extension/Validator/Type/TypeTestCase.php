@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
-use Symfony\Component\Form\Tests\Extension\Core\Type\TypeTestCase as BaseTestCase;
+use Symfony\Component\Form\Test\TypeTestCase as BaseTypeTestCase;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 
-abstract class TypeTestCase extends BaseTestCase
+abstract class TypeTestCase extends BaseTypeTestCase
 {
     protected $validator;
 

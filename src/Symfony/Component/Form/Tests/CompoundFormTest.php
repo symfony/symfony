@@ -11,9 +11,8 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\Extension\HttpFoundation\RequestFormProcessor;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
@@ -421,14 +420,15 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('author')
+            ->setMethod($method)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->addEventSubscriber(new BindRequestListener())
+            ->setFormProcessor(new RequestFormProcessor())
             ->getForm();
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
 
-        $form->bind($request);
+        $form->process($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -470,14 +470,15 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('')
+            ->setMethod($method)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->addEventSubscriber(new BindRequestListener())
+            ->setFormProcessor(new RequestFormProcessor())
             ->getForm();
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
 
-        $form->bind($request);
+        $form->process($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -515,10 +516,11 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('image')
-            ->addEventSubscriber(new BindRequestListener())
+            ->setMethod($method)
+            ->setFormProcessor(new RequestFormProcessor())
             ->getForm();
 
-        $form->bind($request);
+        $form->process($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -548,10 +550,11 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('name')
-            ->addEventSubscriber(new BindRequestListener())
+            ->setMethod($method)
+            ->setFormProcessor(new RequestFormProcessor())
             ->getForm();
 
-        $form->bind($request);
+        $form->process($request);
 
         $this->assertEquals('Bernhard', $form->getData());
 
@@ -576,14 +579,15 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('author')
+            ->setMethod('GET')
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->addEventSubscriber(new BindRequestListener())
+            ->setFormProcessor(new RequestFormProcessor())
             ->getForm();
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());
 
-        $form->bind($request);
+        $form->process($request);
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());
@@ -606,14 +610,15 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('')
+            ->setMethod('GET')
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->addEventSubscriber(new BindRequestListener())
+            ->setFormProcessor(new RequestFormProcessor())
             ->getForm();
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());
 
-        $form->bind($request);
+        $form->process($request);
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());

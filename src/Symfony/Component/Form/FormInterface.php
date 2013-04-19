@@ -182,6 +182,8 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the form and all children are valid.
      *
+     * If the form is not bound, this method always returns false.
+     *
      * @return Boolean
      */
     public function isValid();
@@ -223,6 +225,19 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @return Boolean
      */
     public function isSynchronized();
+
+    /**
+     * Processes the given request and binds the form if it was submitted.
+     *
+     * Internally, the request is forwarded to a {@link FormProcessorInterface}
+     * instance. This instance determines the allowed value of the
+     * $request parameter.
+     *
+     * @param mixed $request The request to check.
+     *
+     * @return FormInterface The form instance.
+     */
+    public function process($request = null);
 
     /**
      * Binds data to the form, transforms and validates it.

@@ -407,6 +407,16 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
+    public function process($request = null)
+    {
+        $this->config->getFormProcessor()->processForm($this, $request);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function bind($submittedData)
     {
         if ($this->bound) {
@@ -579,7 +589,7 @@ class Form implements \IteratorAggregate, FormInterface
     public function isValid()
     {
         if (!$this->bound) {
-            throw new \LogicException('You cannot call isValid() on a form that is not bound.');
+            return false;
         }
 
         if (count($this->errors) > 0) {

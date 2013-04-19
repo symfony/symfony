@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\Form\Test;
 
+use Symfony\Component\Form\FormEvent;
+
 class DeprecationErrorHandler
 {
     public static function handle($errorNumber, $message, $file, $line, $context)
@@ -20,5 +22,12 @@ class DeprecationErrorHandler
         }
 
         return false;
+    }
+
+    public static function preBind($listener, FormEvent $event)
+    {
+        set_error_handler(array('Symfony\Component\Form\Test\DeprecationErrorHandler', 'handle'));
+        $listener->preBind($event);
+        restore_error_handler();
     }
 }

@@ -275,12 +275,9 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertTrue($form->isValid());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testNotValidIfNotBound()
     {
-        $this->form->isValid();
+        $this->assertFalse($this->form->isValid());
     }
 
     public function testNotValidIfErrors()
@@ -843,6 +840,21 @@ class SimpleFormTest extends AbstractFormTest
             ->getForm();
 
         $parent->bind('not-an-array');
+    }
+
+    public function testProcessForwardsToFormProcessor()
+    {
+        $processor = $this->getMock('Symfony\Component\Form\FormProcessorInterface');
+
+        $form = $this->getBuilder()
+            ->setFormProcessor($processor)
+            ->getForm();
+
+        $processor->expects($this->once())
+            ->method('processForm')
+            ->with($this->identicalTo($form), 'REQUEST');
+
+        $this->assertSame($form, $form->process('REQUEST'));
     }
 
     protected function createForm()

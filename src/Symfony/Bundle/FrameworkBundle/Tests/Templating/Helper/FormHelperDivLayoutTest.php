@@ -72,6 +72,11 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         parent::tearDown();
     }
 
+    protected function renderForm(FormView $view, array $vars = array())
+    {
+        return (string) $this->engine->get('form')->form($view, $vars);
+    }
+
     protected function renderEnctype(FormView $view)
     {
         return (string) $this->engine->get('form')->enctype($view);
@@ -100,6 +105,16 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
     protected function renderRest(FormView $view, array $vars = array())
     {
         return (string) $this->engine->get('form')->rest($view, $vars);
+    }
+
+    protected function renderStart(FormView $view, array $vars = array())
+    {
+        return (string) $this->engine->get('form')->start($view, $vars);
+    }
+
+    protected function renderEnd(FormView $view, array $vars = array())
+    {
+        return (string) $this->engine->get('form')->end($view, $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)

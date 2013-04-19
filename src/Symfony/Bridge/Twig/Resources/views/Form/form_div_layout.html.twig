@@ -298,6 +298,38 @@
 
 {# Misc #}
 
+{% block form %}
+{% spaceless %}
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+    {{ form_end(form) }}
+{% endspaceless %}
+{% endblock form %}
+
+{% block form_start %}
+{% spaceless %}
+    {% set method = method|upper %}
+    {% if method in ["GET", "POST"] %}
+        {% set form_method = method %}
+    {% else %}
+        {% set form_method = "POST" %}
+    {% endif %}
+    <form method="{{ form_method|lower }}" action="{{ action }}"{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
+    {% if form_method != method %}
+        <input type="hidden" name="_method" value="{{ method }}" />
+    {% endif %}
+{% endspaceless %}
+{% endblock form_start %}
+
+{% block form_end %}
+{% spaceless %}
+    {% if not render_rest is defined or render_rest %}
+        {{ form_rest(form) }}
+    {% endif %}
+    </form>
+{% endspaceless %}
+{% endblock form_end %}
+
 {% block form_enctype %}
 {% spaceless %}
     {% if multipart %}enctype="multipart/form-data"{% endif %}

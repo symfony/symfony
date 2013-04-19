@@ -191,6 +191,25 @@ interface FormConfigInterface
     public function getFormFactory();
 
     /**
+     * Returns the target URL of the form.
+     *
+     * @return string The target URL of the form.
+     */
+    public function getAction();
+
+    /**
+     * Returns the HTTP method used by the form.
+     *
+     * @return string The HTTP method of the form.
+     */
+    public function getMethod();
+
+    /**
+     * @return FormProcessorInterface The form processor.
+     */
+    public function getFormProcessor();
+
+    /**
      * Returns all options passed during the construction of the form.
      *
      * @return array The passed options.

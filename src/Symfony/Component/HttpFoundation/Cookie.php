@@ -95,7 +95,7 @@ class Cookie
             $str .= '; path='.$this->path;
         }
 
-        if (null !== $this->getDomain()) {
+        if ($this->getDomain()) {
             $str .= '; domain='.$this->getDomain();
         }
 

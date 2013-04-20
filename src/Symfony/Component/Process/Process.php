@@ -867,25 +867,25 @@ class Process
     }
 
     /**
-     * Enable/Disable TTY mode
+     * Enables or disables the TTY mode.
      *
-     * @param boolean $tty If is enabled or not
+     * @param boolean $tty True to enabled and false to disable
      *
      * @return self The current Process instance
      */
-    public function setTTY($tty)
+    public function setTty($tty)
     {
-        $this->tty = $tty;
+        $this->tty = (Boolean) $tty;
 
         return $this;
     }
 
     /**
-     * Gets if TTY is enabled/disabled  
+     * Checks if  the TTY mode is enabled.
      *
-     * @return string The current contents
+     * @return Boolean true if the TTY mode is enabled, false otherwise
      */
-    public function getTTY()
+    public function isTty()
     {
         return $this->tty;
     }
@@ -994,7 +994,7 @@ class Process
     }
 
     /**
-     * Gets whether or not Windows compatibility is enabled
+     * Gets whether or not Windows compatibility is enabled.
      *
      * This is true by default.
      *
@@ -1006,7 +1006,7 @@ class Process
     }
 
     /**
-     * Sets whether or not Windows compatibility is enabled
+     * Sets whether or not Windows compatibility is enabled.
      *
      * @param Boolean $enhance
      *
@@ -1020,7 +1020,7 @@ class Process
     }
 
     /**
-     * Return whether sigchild compatibility mode is activated or not
+     * Returns whether sigchild compatibility mode is activated or not.
      *
      * @return Boolean
      */
@@ -1030,7 +1030,7 @@ class Process
     }
 
     /**
-     * Activate sigchild compatibility mode
+     * Activates sigchild compatibility mode.
      *
      * Sigchild compatibility mode is required to get the exit code and
      * determine the success of a process when PHP has been compiled with
@@ -1048,8 +1048,7 @@ class Process
     }
 
     /**
-     * Performs a check between the timeout definition and the time the process
-     * started
+     * Performs a check between the timeout definition and the time the process started.
      *
      * In case you run a background process (with the start method), you should
      * trigger this method regularly to ensure the process timeout
@@ -1066,7 +1065,7 @@ class Process
     }
 
     /**
-     * Create the descriptors needed by the proc_open
+     * Creates the descriptors needed by the proc_open.
      *
      * @return array
      */
@@ -1185,7 +1184,7 @@ class Process
     }
 
     /**
-     * Return whether PHP has been compiled with the '--enable-sigchild' option or not
+     * Returns whether PHP has been compiled with the '--enable-sigchild' option or not.
      *
      * @return Boolean
      */
@@ -1202,7 +1201,7 @@ class Process
     }
 
     /**
-     * Handles the windows file handles fallbacks
+     * Handles the windows file handles fallbacks.
      *
      * @param callable $callback A valid PHP callback
      * @param Boolean $closeEmptyHandles if true, handles that are empty will be assumed closed

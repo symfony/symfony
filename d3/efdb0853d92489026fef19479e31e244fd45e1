@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by Olden at 2013-04-18T09:20:52Z
+
+ping @bschussek
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-18T10:14:17Z
+
+Hi @Olden, thank you for this much needed PR! :) Unfortunately there are a few other PRs in the merge queue that create a few conflicts with yours. Would you mind to rebase your PR on symfony/master once #6522 and #6573 are merged?
+
+---------------------------------------------------------------------------
+
+by Olden at 2013-04-18T10:17:08Z
+
+@bschussek no problem, I'll wait.
+
+---------------------------------------------------------------------------
+
+by canni at 2013-04-19T11:49:54Z
+
+IMO renaming/removing even things like exceptions IS a BC-Break and should be mentioned in changelog/update documents.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-19T14:40:43Z
+
+Both PRs referenced by @bschussek have been merged now. And Yes, this is a BC break.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-19T16:12:18Z
+
+I think it is not necessary to rename any exception. Otherwise this PR should be fine in terms of BC.
+
+---------------------------------------------------------------------------
+
+by Olden at 2013-04-19T16:25:52Z
+
+A bit later today I'll make rebase and update changelog file.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-19T16:36:12Z
+
+Thank you! I would appreciate if you could check the full component code again for "old-style" exceptions, because a couple of older PRs were merged recently. Their exception code possibly needs to be adapted too.
+
+---------------------------------------------------------------------------
+
+by Olden at 2013-04-19T19:45:32Z
+
+Rebased. @bschussek plz review this.
+
+---------------------------------------------------------------------------
+
+by Olden at 2013-04-19T19:46:54Z
+
+Sorry for closing
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-19T21:16:44Z
+
+Apart from my comments, this PR looks very good! Thank you! :)
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-19T21:17:45Z
+
+For everybody confused by the diff view, the "renamed" exceptions are really just removed (because unused) exceptions and new exceptions that Git wrongly considers "renamed".
+
+---------------------------------------------------------------------------
+
+by Olden at 2013-04-19T21:28:48Z
+
+updated.
+
+---------------------------------------------------------------------------
+
+by Olden at 2013-04-19T21:30:27Z
+
+@bschussek not at all. It's pleasure to me to be a part of great community :)
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-19T21:31:22Z
+
+Could you please squash the commits into a single commit?
+
+---------------------------------------------------------------------------
+
+by Olden at 2013-04-19T21:36:17Z
+
+done

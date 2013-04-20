@@ -878,19 +878,19 @@ class SimpleFormTest extends AbstractFormTest
         $parent->bind('not-an-array');
     }
 
-    public function testProcessForwardsToFormProcessor()
+    public function testHandleRequestForwardsToRequestHandler()
     {
-        $processor = $this->getMock('Symfony\Component\Form\FormProcessorInterface');
+        $processor = $this->getMock('Symfony\Component\Form\RequestHandlerInterface');
 
         $form = $this->getBuilder()
-            ->setFormProcessor($processor)
+            ->setRequestHandler($processor)
             ->getForm();
 
         $processor->expects($this->once())
-            ->method('processForm')
+            ->method('handleRequest')
             ->with($this->identicalTo($form), 'REQUEST');
 
-        $this->assertSame($form, $form->process('REQUEST'));
+        $this->assertSame($form, $form->handleRequest('REQUEST'));
     }
 
     public function testFormInheritsParentData()

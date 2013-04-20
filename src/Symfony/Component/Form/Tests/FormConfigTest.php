@@ -91,19 +91,19 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testGetFormProcessorCreatesNativeFormProcessorIfNotSet()
+    public function testGetRequestHandlerCreatesNativeRequestHandlerIfNotSet()
     {
         $config = $this->getConfigBuilder()->getFormConfig();
 
-        $this->assertInstanceOf('Symfony\Component\Form\NativeFormProcessor', $config->getFormProcessor());
+        $this->assertInstanceOf('Symfony\Component\Form\NativeRequestHandler', $config->getRequestHandler());
     }
 
-    public function testGetFormProcessorReusesNativeFormProcessorInstance()
+    public function testGetRequestHandlerReusesNativeRequestHandlerInstance()
     {
         $config1 = $this->getConfigBuilder()->getFormConfig();
         $config2 = $this->getConfigBuilder()->getFormConfig();
 
-        $this->assertSame($config1->getFormProcessor(), $config2->getFormProcessor());
+        $this->assertSame($config1->getRequestHandler(), $config2->getRequestHandler());
     }
 
     public function testSetMethodAllowsGet()

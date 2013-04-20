@@ -256,11 +256,11 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setMethod($method);
 
     /**
-     * @param FormProcessorInterface $formProcessor
+     * @param RequestHandlerInterface $requestHandler
      *
      * @return self The configuration object.
      */
-    public function setFormProcessor(FormProcessorInterface $formProcessor);
+    public function setRequestHandler(RequestHandlerInterface $requestHandler);
 
     /**
      * Builds and returns the form configuration.

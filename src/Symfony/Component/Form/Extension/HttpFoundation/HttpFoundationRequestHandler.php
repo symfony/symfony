@@ -14,21 +14,21 @@ namespace Symfony\Component\Form\Extension\HttpFoundation;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormProcessorInterface;
+use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * A form processor using the {@link Request} class of the HttpFoundation
+ * A request processor using the {@link Request} class of the HttpFoundation
  * component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class RequestFormProcessor implements FormProcessorInterface
+class HttpFoundationRequestHandler implements RequestHandlerInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function processForm(FormInterface $form, $request = null)
+    public function handleRequest(FormInterface $form, $request = null)
     {
         if (!$request instanceof Request) {
             throw new UnexpectedTypeException($request, 'Symfony\Component\HttpFoundation\Request');

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Component\Form\Extension\HttpFoundation\RequestFormProcessor;
+use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -481,12 +481,12 @@ class CompoundFormTest extends AbstractFormTest
             ->setMethod($method)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->setFormProcessor(new RequestFormProcessor())
+            ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm();
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
 
-        $form->process($request);
+        $form->handleRequest($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -531,12 +531,12 @@ class CompoundFormTest extends AbstractFormTest
             ->setMethod($method)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->setFormProcessor(new RequestFormProcessor())
+            ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm();
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
 
-        $form->process($request);
+        $form->handleRequest($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -575,10 +575,10 @@ class CompoundFormTest extends AbstractFormTest
 
         $form = $this->getBuilder('image')
             ->setMethod($method)
-            ->setFormProcessor(new RequestFormProcessor())
+            ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm();
 
-        $form->process($request);
+        $form->handleRequest($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -609,10 +609,10 @@ class CompoundFormTest extends AbstractFormTest
 
         $form = $this->getBuilder('name')
             ->setMethod($method)
-            ->setFormProcessor(new RequestFormProcessor())
+            ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm();
 
-        $form->process($request);
+        $form->handleRequest($request);
 
         $this->assertEquals('Bernhard', $form->getData());
 
@@ -640,12 +640,12 @@ class CompoundFormTest extends AbstractFormTest
             ->setMethod('GET')
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->setFormProcessor(new RequestFormProcessor())
+            ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm();
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());
 
-        $form->process($request);
+        $form->handleRequest($request);
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());
@@ -671,12 +671,12 @@ class CompoundFormTest extends AbstractFormTest
             ->setMethod('GET')
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->setFormProcessor(new RequestFormProcessor())
+            ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm();
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());
 
-        $form->process($request);
+        $form->handleRequest($request);
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());

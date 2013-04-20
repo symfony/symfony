@@ -14,18 +14,18 @@ namespace Symfony\Component\Form\Tests;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractFormProcessorTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Symfony\Component\Form\FormProcessorInterface
+     * @var \Symfony\Component\Form\RequestHandlerInterface
      */
-    protected $processor;
+    protected $requestHandler;
 
     protected $request;
 
     protected function setUp()
     {
-        $this->processor = $this->getFormProcessor();
+        $this->requestHandler = $this->getRequestHandler();
         $this->request = null;
     }
 
@@ -61,7 +61,7 @@ abstract class AbstractFormProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('bind')
             ->with('DATA');
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     /**
@@ -80,7 +80,7 @@ abstract class AbstractFormProcessorTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->never())
             ->method('bind');
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     /**
@@ -98,7 +98,7 @@ abstract class AbstractFormProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('bind')
             ->with($this->identicalTo(null));
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     /**
@@ -116,7 +116,7 @@ abstract class AbstractFormProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('bind')
             ->with($this->identicalTo(array()));
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     public function testDoNotBindIfNameNotInRequestAndGetRequest()
@@ -130,7 +130,7 @@ abstract class AbstractFormProcessorTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->never())
             ->method('bind');
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     /**
@@ -155,7 +155,7 @@ abstract class AbstractFormProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('bind')
             ->with($requestData);
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     /**
@@ -178,7 +178,7 @@ abstract class AbstractFormProcessorTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->never())
             ->method('bind');
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     /**
@@ -206,7 +206,7 @@ abstract class AbstractFormProcessorTest extends \PHPUnit_Framework_TestCase
                 'field2' => $file,
             ));
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     /**
@@ -227,7 +227,7 @@ abstract class AbstractFormProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('bind')
             ->with('DATA');
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     /**
@@ -248,12 +248,12 @@ abstract class AbstractFormProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('bind')
             ->with($file);
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     abstract protected function setRequestData($method, $data, $files = array());
 
-    abstract protected function getFormProcessor();
+    abstract protected function getRequestHandler();
 
     abstract protected function getMockFile();
 

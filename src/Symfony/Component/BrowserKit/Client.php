@@ -266,7 +266,7 @@ abstract class Client
 
         $response = $this->filterResponse($this->response);
 
-        $this->cookieJar->updateFromResponse($response);
+        $this->cookieJar->updateFromResponse($response, $uri);
 
         $this->redirect = $response->getHeader('Location');
 

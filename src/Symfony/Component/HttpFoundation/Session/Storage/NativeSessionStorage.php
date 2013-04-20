@@ -140,8 +140,8 @@ class NativeSessionStorage implements SessionStorageInterface
             throw new \RuntimeException('Failed to start the session: already started by PHP ($_SESSION is set).');
         }
 
-        if (ini_get('session.use_cookies') && headers_sent()) {
-            throw new \RuntimeException('Failed to start the session because headers have already been sent.');
+        if (ini_get('session.use_cookies') && headers_sent($headers_sent_file, $headers_sent_line_number)) {
+            throw new \RuntimeException('Failed to start the session because headers have already been sent by '.$headers_sent_file.':'.$headers_sent_line_number.'.');
         }
 
         // ok to try and start the session

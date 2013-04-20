@@ -95,7 +95,7 @@ class Cookie
             $cookie .= '; domain='.$this->domain;
         }
 
-        if ('/' !== $this->path) {
+        if ($this->path) {
             $cookie .= '; path='.$this->path;
         }
 

@@ -91,7 +91,7 @@ class Cookie
             }
         }
 
-        if ('/' !== $this->path) {
+        if ($this->path) {
             $str .= '; path='.$this->path;
         }
 

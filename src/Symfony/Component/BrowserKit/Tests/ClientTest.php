@@ -211,7 +211,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>', 200, array('Set-Cookie' => 'foo=bar; path=/; secure')));
         $client->request('GET', 'https://www.example.com/foo/foobar');
 
-        $this->assertTrue($client->getCookieJar()->get('foo','/','www.example.com')->isSecure());
+        $this->assertTrue($client->getCookieJar()->get('foo', '/', 'www.example.com')->isSecure());
     }
 
     public function testClick()

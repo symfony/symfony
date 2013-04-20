@@ -51,6 +51,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             array(null, array()),
             array(false, array()),
             array(array(), array()),
+            array(array('10.0.0.0/8'), array('10.0.0.0/8')),
+            array(array('::ffff:0:0/96'), array('::ffff:0:0/96')),
         );
     }
 

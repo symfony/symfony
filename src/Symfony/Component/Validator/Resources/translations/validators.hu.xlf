@@ -222,6 +222,22 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Nem támogatott kártyatípus vagy érvénytelen kártyaszám.</target>
             </trans-unit>            
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Ez nem egy érvényes nemzetközi bankszámlaszám (IBAN).</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Ez nem egy érvényes ISBN-10.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Ez nem egy érvényes ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Ez nem egy érvényes ISBN-10 vagy ISBN-13.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

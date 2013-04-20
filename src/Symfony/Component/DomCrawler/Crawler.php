@@ -147,7 +147,14 @@ class Crawler extends \SplObjectStorage
 
         $baseHref = current($base);
         if (count($base) && !empty($baseHref)) {
-            $this->uri = $baseHref;
+            if ($this->uri) {
+                $linkNode = $dom->createElement('a');
+                $linkNode->setAttribute('href', $baseHref);
+                $link = new Link($linkNode, $this->uri);
+                $this->uri = $link->getUri();
+            } else {
+                $this->uri = $baseHref;
+            }
         }
     }
 

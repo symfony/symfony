@@ -243,9 +243,9 @@ class UploadedFile extends File
      */
     private function getErrorMessage($errorCode)
     {
-        $max_filesize = 0;
+        $maxFilesize = 0;
         if ($errorCode === UPLOAD_ERR_INI_SIZE) {
-            $max_filesize = self::getMaxFilesize()/1024;
+            $maxFilesize = self::getMaxFilesize()/1024;
         }
 
         $error[UPLOAD_ERR_INI_SIZE]   = 'The file "%s" exceeds your upload_max_filesize ini directive (limit is %d kb)';
@@ -256,12 +256,12 @@ class UploadedFile extends File
         $error[UPLOAD_ERR_NO_TMP_DIR] = 'File could not be uploaded: missing temporary directory';
         $error[UPLOAD_ERR_EXTENSION]  = 'File upload was stopped by a php extension';
 
-        $message = $error[$errorCode];
+        $message = isset($error[$errorCode]) ? $error[$errorCode] : null;
         if (empty($message)) {
             $message = 'The file "%s" was not uploaded due to an unknown error';
         }
 
-       return sprintf($message, $this->getClientOriginalName(), $max_filesize);
+       return sprintf($message, $this->getClientOriginalName(), $maxFilesize);
     }
 
 }

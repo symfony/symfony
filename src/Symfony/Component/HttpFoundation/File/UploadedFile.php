@@ -243,20 +243,22 @@ class UploadedFile extends File
      */
     private function getErrorMessage($errorCode)
     {
+        static $errors = array(
+            UPLOAD_ERR_INI_SIZE   => 'The file "%s" exceeds your upload_max_filesize ini directive (limit is %d kb)',
+            UPLOAD_ERR_FORM_SIZE  => 'The file "%s" exceeds the upload limit defined in your form',
+            UPLOAD_ERR_PARTIAL    => 'The file "%s" was only partially uploaded',
+            UPLOAD_ERR_NO_FILE    => 'No file was uploaded',
+            UPLOAD_ERR_CANT_WRITE => 'The file "%s" could not be written on disk',
+            UPLOAD_ERR_NO_TMP_DIR => 'File could not be uploaded: missing temporary directory',
+            UPLOAD_ERR_EXTENSION  => 'File upload was stopped by a php extension',
+        );
+
         $maxFilesize = 0;
         if ($errorCode === UPLOAD_ERR_INI_SIZE) {
             $maxFilesize = self::getMaxFilesize()/1024;
         }
 
-        $error[UPLOAD_ERR_INI_SIZE]   = 'The file "%s" exceeds your upload_max_filesize ini directive (limit is %d kb)';
-        $error[UPLOAD_ERR_FORM_SIZE]  = 'The file "%s" exceeds the upload limit defined in your form';
-        $error[UPLOAD_ERR_PARTIAL]    = 'The file "%s" was only partially uploaded';
-        $error[UPLOAD_ERR_NO_FILE]    = 'No file was uploaded';
-        $error[UPLOAD_ERR_CANT_WRITE] = 'The file "%s" could not be written on disk';
-        $error[UPLOAD_ERR_NO_TMP_DIR] = 'File could not be uploaded: missing temporary directory';
-        $error[UPLOAD_ERR_EXTENSION]  = 'File upload was stopped by a php extension';
-
-        $message = isset($error[$errorCode]) ? $error[$errorCode] : null;
+        $message = isset($errors[$errorCode]) ? $errors[$errorCode] : null;
         if (empty($message)) {
             $message = 'The file "%s" was not uploaded due to an unknown error';
         }

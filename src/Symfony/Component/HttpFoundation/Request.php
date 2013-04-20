@@ -661,6 +661,12 @@ class Request
     /**
      * Returns the client IP addresses.
      *
+     * The most trusted IP address is first, and the less trusted one last.
+     * The "real" client IP address is the last one, but this is also the
+     * less trusted one.
+     *
+     * Use this method carefully; you should use getClientIp() instead.
+     *
      * @return array The client IP addresses
      *
      * @see getClientIp()
@@ -684,7 +690,7 @@ class Request
         $ip = $clientIps[0];
         $clientIps = array_values(array_diff($clientIps, $trustedProxies));
 
-        return $clientIps ? $clientIps : array($ip);
+        return $clientIps ? array_reverse($clientIps) : array($ip);
     }
 
     /**
@@ -711,7 +717,7 @@ class Request
     {
         $ipAddresses = $this->getClientIps();
 
-        return array_pop($ipAddresses);
+        return $ipAddresses[0];
     }
 
     /**

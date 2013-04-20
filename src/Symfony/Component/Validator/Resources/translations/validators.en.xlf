@@ -222,10 +222,10 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Unsupported card type or invalid card number.</target>
             </trans-unit>
-	    <trans-unit id="59">
-		<source>This is not a valid International Bank Account Number (IBAN).</source>
-		<target>This is not a valid International Bank Account Number (IBAN).</target>
-	    </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>This is not a valid International Bank Account Number (IBAN).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

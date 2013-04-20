@@ -21,31 +21,23 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-    $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-    $this->validator = new IbanValidator();
-    $this->validator->initialize($this->context);
-    }
-
-    protected function tearDown()
-    {
-    $this->context = null;
-    $this->validator = null;
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
+        $this->validator = new IbanValidator();
+        $this->validator->initialize($this->context);
     }
 
     public function testNullIsValid()
     {
-    $this->context->expects($this->never())
-        ->method('addViolation');
+        $this->context->expects($this->never())->method('addViolation');
 
-    $this->validator->validate(null, new Iban());
+        $this->validator->validate(null, new Iban());
     }
 
     public function testEmptyStringIsValid()
     {
-    $this->context->expects($this->never())
-        ->method('addViolation');
+        $this->context->expects($this->never())->method('addViolation');
 
-    $this->validator->validate('', new Iban());
+        $this->validator->validate('', new Iban());
     }
 
     /**
@@ -53,10 +45,9 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidIbans($iban)
     {
-    $this->context->expects($this->never())
-    ->method('addViolation');
+        $this->context->expects($this->never())->method('addViolation');
 
-    $this->validator->validate($iban, new Iban());
+        $this->validator->validate($iban, new Iban());
     }
 
     public function getValidIbans()
@@ -158,7 +149,6 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
             array('TN5914207207100707129648'), //Tunisia
             array('TR330006100519786457841326'), //Turkey
             array('AE260211000000230064016'), //United Arab Emirates
-
         );
     }
 
@@ -167,31 +157,31 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidIbans($iban)
     {
-    $constraint = new Iban(array(
-        'message' => 'myMessage'
-    ));
-
-    $this->context->expects($this->once())
-        ->method('addViolation')
-        ->with('myMessage', array(
-        '{{ value }}' => $iban,
+        $constraint = new Iban(array(
+            'message' => 'myMessage'
         ));
 
-    $this->validator->validate($iban, $constraint);
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => $iban,
+            ));
+
+        $this->validator->validate($iban, $constraint);
     }
 
     public function getInvalidIbans()
     {
-    return array(
-        array('CH93 0076 2011 6238 5295'),
-        array('CH930076201162385295'),
-        array('GB29 RBOS 6016 1331 9268 19'),
-        array('CH930072011623852957'),
-        array('NL39 RASO 0300 0652 64'),
-        array('NO93 8601117 947'),
-        array('CY170020 128 0000 0012 0052 7600'),
-        array('foo'),
-        array('123'),
-    );
+        return array(
+            array('CH93 0076 2011 6238 5295'),
+            array('CH930076201162385295'),
+            array('GB29 RBOS 6016 1331 9268 19'),
+            array('CH930072011623852957'),
+            array('NL39 RASO 0300 0652 64'),
+            array('NO93 8601117 947'),
+            array('CY170020 128 0000 0012 0052 7600'),
+            array('foo'),
+            array('123'),
+        );
     }
 }

@@ -50,6 +50,15 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($catalogue->has('extra', 'domain1'));
     }
 
+    public function testEncoding()
+    {
+        $loader = $this->createLoader();
+        $catalogue = $loader->load(__DIR__.'/../fixtures/encoding.xlf', 'en', 'domain1');
+
+        $this->assertEquals(utf8_decode('föö'), $catalogue->get('bar', 'domain1'));
+        $this->assertEquals(utf8_decode('bär'), $catalogue->get('foo', 'domain1'));
+    }
+
     /**
      * @expectedException \RuntimeException
      */

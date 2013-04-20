@@ -259,7 +259,7 @@ class UploadedFile extends File
         }
 
         $message = isset($errors[$errorCode]) ? $errors[$errorCode] : null;
-        if (empty($message)) {
+        if (!isset($message)) {
             $message = 'The file "%s" was not uploaded due to an unknown error';
         }
 

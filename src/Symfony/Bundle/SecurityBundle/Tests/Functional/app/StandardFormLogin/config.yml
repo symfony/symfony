@@ -28,5 +28,7 @@ security:
     access_control:
         - { path: ^/unprotected_resource$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/secure-but-not-covered-by-access-control$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/secured-by-one-ip$, ip: 10.10.10.10, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/secured-by-two-ips$, ips: [1.1.1.1, 2.2.2.2], roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/highly_protected_resource$, roles: IS_ADMIN }
         - { path: .*, roles: IS_AUTHENTICATED_FULLY }

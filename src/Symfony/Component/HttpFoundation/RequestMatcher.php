@@ -38,7 +38,7 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * @var string
      */
-    private $ip;
+    private $ips = array();
 
     /**
      * @var array
@@ -49,15 +49,15 @@ class RequestMatcher implements RequestMatcherInterface
      * @param string|null          $path
      * @param string|null          $host
      * @param string|string[]|null $methods
-     * @param string|null          $ip
+     * @param string|string[]|null $ips
      * @param array                $attributes
      */
-    public function __construct($path = null, $host = null, $methods = null, $ip = null, array $attributes = array())
+    public function __construct($path = null, $host = null, $methods = null, $ips = null, array $attributes = array())
     {
         $this->matchPath($path);
         $this->matchHost($host);
         $this->matchMethod($methods);
-        $this->matchIp($ip);
+        $this->matchIps($ips);
         foreach ($attributes as $k => $v) {
             $this->matchAttribute($k, $v);
         }
@@ -90,7 +90,17 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matchIp($ip)
     {
-        $this->ip = $ip;
+        $this->matchIps($ip);
+    }
+
+    /**
+     * Adds a check for the client IP.
+     *
+     * @param string|string[] $ip A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
+     */
+    public function matchIps($ips)
+    {
+        $this->ips = (array) $ips;
     }
 
     /**
@@ -143,10 +153,15 @@ class RequestMatcher implements RequestMatcherInterface
             return false;
         }
 
-        if (null !== $this->ip && !IpUtils::checkIp($request->getClientIp(), $this->ip)) {
-            return false;
+        foreach($this->ips as $ip) { 
+            if (IpUtils::checkIp($request->getClientIp(), $ip)) {
+                return true;
+            }
         }
 
-        return true;
+        // Note to future implementors: add additional checks above the 
+        // foreach above or else your check might not be run!
+
+        return count($this->ips) === 0;
     }
 }

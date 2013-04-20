@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Component\Form\NativeFormProcessor;
+use Symfony\Component\Form\NativeRequestHandler;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class NativeFormProcessorTest extends AbstractFormProcessorTest
+class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 {
     private static $serverBackup;
 
@@ -53,7 +53,7 @@ class NativeFormProcessorTest extends AbstractFormProcessorTest
      */
     public function testRequestShouldBeNull()
     {
-        $this->processor->processForm($this->getMockForm('name', 'GET'), 'request');
+        $this->requestHandler->handleRequest($this->getMockForm('name', 'GET'), 'request');
     }
 
     public function testMethodOverrideHeaderTakesPrecedenceIfPost()
@@ -70,7 +70,7 @@ class NativeFormProcessorTest extends AbstractFormProcessorTest
             ->method('bind')
             ->with('DATA');
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     public function testConvertEmptyUploadedFilesToNull()
@@ -89,7 +89,7 @@ class NativeFormProcessorTest extends AbstractFormProcessorTest
             ->method('bind')
             ->with($this->identicalTo(null));
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     public function testFixBuggyFilesArray()
@@ -126,7 +126,7 @@ class NativeFormProcessorTest extends AbstractFormProcessorTest
                 ),
             ));
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     public function testFixBuggyNestedFilesArray()
@@ -165,7 +165,7 @@ class NativeFormProcessorTest extends AbstractFormProcessorTest
                 ),
             ));
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     public function testMethodOverrideHeaderIgnoredIfNotPost()
@@ -181,7 +181,7 @@ class NativeFormProcessorTest extends AbstractFormProcessorTest
         $form->expects($this->never())
             ->method('bind');
 
-        $this->processor->processForm($form, $this->request);
+        $this->requestHandler->handleRequest($form, $this->request);
     }
 
     protected function setRequestData($method, $data, $files = array())
@@ -201,9 +201,9 @@ class NativeFormProcessorTest extends AbstractFormProcessorTest
         );
     }
 
-    protected function getFormProcessor()
+    protected function getRequestHandler()
     {
-        return new NativeFormProcessor();
+        return new NativeRequestHandler();
     }
 
     protected function getMockFile()

@@ -11,28 +11,28 @@
 
 namespace Symfony\Component\Form\Tests\Extension\HttpFoundation;
 
-use Symfony\Component\Form\Extension\HttpFoundation\RequestFormProcessor;
-use Symfony\Component\Form\Tests\AbstractFormProcessorTest;
+use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
+use Symfony\Component\Form\Tests\AbstractRequestHandlerTest;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class RequestFormProcessorTest extends AbstractFormProcessorTest
+class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
 {
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testRequestShouldNotBeNull()
     {
-        $this->processor->processForm($this->getMockForm('name', 'GET'));
+        $this->requestHandler->handleRequest($this->getMockForm('name', 'GET'));
     }
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testRequestShouldBeInstanceOfRequest()
     {
-        $this->processor->processForm($this->getMockForm('name', 'GET'), new \stdClass());
+        $this->requestHandler->handleRequest($this->getMockForm('name', 'GET'), new \stdClass());
     }
 
     protected function setRequestData($method, $data, $files = array())
@@ -40,9 +40,9 @@ class RequestFormProcessorTest extends AbstractFormProcessorTest
         $this->request = Request::create('http://localhost', $method, $data, array(), $files);
     }
 
-    protected function getFormProcessor()
+    protected function getRequestHandler()
     {
-        return new RequestFormProcessor();
+        return new HttpFoundationRequestHandler();
     }
 
     protected function getMockFile()

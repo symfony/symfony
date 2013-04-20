@@ -454,9 +454,9 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function process($request = null)
+    public function handleRequest($request = null)
     {
-        $this->config->getFormProcessor()->processForm($this, $request);
+        $this->config->getRequestHandler()->handleRequest($this, $request);
 
         return $this;
     }

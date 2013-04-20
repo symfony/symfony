@@ -201,9 +201,9 @@ interface FormConfigInterface
     public function getMethod();
 
     /**
-     * @return FormProcessorInterface The form processor.
+     * @return RequestHandlerInterface The form processor.
      */
-    public function getFormProcessor();
+    public function getRequestHandler();
 
     /**
      * Returns all options passed during the construction of the form.

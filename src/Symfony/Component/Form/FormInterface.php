@@ -229,7 +229,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Processes the given request and binds the form if it was submitted.
      *
-     * Internally, the request is forwarded to a {@link FormProcessorInterface}
+     * Internally, the request is forwarded to a {@link RequestHandlerInterface}
      * instance. This instance determines the allowed value of the
      * $request parameter.
      *
@@ -237,7 +237,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormInterface The form instance.
      */
-    public function process($request = null);
+    public function handleRequest($request = null);
 
     /**
      * Binds data to the form, transforms and validates it.

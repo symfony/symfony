@@ -13,14 +13,14 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormProcessorInterface;
+use Symfony\Component\Form\RequestHandlerInterface;
 
 /**
- * A form processor using PHP's super globals $_GET, $_POST and $_SERVER.
+ * A request handler using PHP's super globals $_GET, $_POST and $_SERVER.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class NativeFormProcessor implements FormProcessorInterface
+class NativeRequestHandler implements RequestHandlerInterface
 {
     /**
      * The allowed keys of the $_FILES array.
@@ -38,7 +38,7 @@ class NativeFormProcessor implements FormProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function processForm(FormInterface $form, $request = null)
+    public function handleRequest(FormInterface $form, $request = null)
     {
         if (null !== $request) {
             throw new UnexpectedTypeException($request, 'null');

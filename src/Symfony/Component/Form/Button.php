@@ -350,7 +350,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function process($request = null)
+    public function handleRequest($request = null)
     {
         throw new BadMethodCallException('Buttons cannot be processed. Call process() on the root form instead.');
     }

@@ -483,11 +483,11 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
-     * @param FormProcessorInterface $formProcessor
+     * @param RequestHandlerInterface $requestHandler
      *
      * @throws BadMethodCallException
      */
-    public function setFormProcessor(FormProcessorInterface $formProcessor)
+    public function setRequestHandler(RequestHandlerInterface $requestHandler)
     {
         throw new BadMethodCallException('Buttons do not support form processors.');
     }
@@ -766,7 +766,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @return null Always returns null.
      */
-    public function getFormProcessor()
+    public function getRequestHandler()
     {
         return null;
     }

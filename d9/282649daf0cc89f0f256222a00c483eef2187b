@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-20T07:47:59Z
+
+Can you squash your commits please? As you merged master, it's not mergeable cleanly as is. Thanks.
+
+---------------------------------------------------------------------------
+
+by mcuadros at 2013-04-20T11:28:18Z
+
+Done, i hope was enough, the diff looks ok,  i made some "--force" commits.
+
+Regards and thanks!

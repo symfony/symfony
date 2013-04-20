@@ -34,7 +34,7 @@ class XliffFileLoader implements LoaderInterface
             throw new \InvalidArgumentException(sprintf('This is not a local file "%s".', $resource));
         }
 
-        $xml = $this->parseFile($resource);
+        list($xml, $encoding) = $this->parseFile($resource);
         $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:1.2');
 
         $catalogue = new MessageCatalogue($locale);
@@ -50,11 +50,11 @@ class XliffFileLoader implements LoaderInterface
 
             // If the xlf file has another encoding specified, try to convert it because
             // simple_xml will always return utf-8 encoded values
-            if ('UTF-8' !== $this->encoding && !empty($this->encoding)) {
+            if ('UTF-8' !== $encoding && !empty($encoding)) {
                 if (function_exists('mb_convert_encoding')) {
-                    $target = mb_convert_encoding($target, $this->encoding, 'UTF-8');
+                    $target = mb_convert_encoding($target, $encoding, 'UTF-8');
                 } elseif (function_exists('iconv')) {
-                    $target = iconv('UTF-8', $this->encoding, $target);
+                    $target = iconv('UTF-8', $encoding, $target);
                 } else {
                     throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
                 }
@@ -90,8 +90,6 @@ class XliffFileLoader implements LoaderInterface
             throw new \RuntimeException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
 
-        $this->encoding = strtoupper($dom->encoding);
-
         libxml_disable_entity_loader($disableEntities);
 
         foreach ($dom->childNodes as $child) {
@@ -125,7 +123,7 @@ class XliffFileLoader implements LoaderInterface
 
         libxml_use_internal_errors($internalErrors);
 
-        return simplexml_import_dom($dom);
+        return array(simplexml_import_dom($dom), strtoupper($dom->encoding));
     }
 
     /**

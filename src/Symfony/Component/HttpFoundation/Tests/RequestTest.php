@@ -666,7 +666,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com', 'HTTP_HOST' => 'www.host.com'));
         $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
-        $this->stopTrustingProxyData();
     }
 
     /**
@@ -1275,14 +1274,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('fo+o/bar', 'fo+o', 'fo+o'),
             array('fo%2Bo/bar', 'fo+o', 'fo%2Bo'),
         );
-    }
-
-    private function stopTrustingProxyData()
-    {
-        $class = new \ReflectionClass('Symfony\\Component\\HttpFoundation\\Request');
-        $property = $class->getProperty('trustProxy');
-        $property->setAccessible(true);
-        $property->setValue(false);
     }
 
     private function disableHttpMethodParameterOverride()

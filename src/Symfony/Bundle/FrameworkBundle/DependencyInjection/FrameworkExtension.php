@@ -585,6 +585,10 @@ class FrameworkExtension extends Extension
                 list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
                 $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
             }
+
+            if ($config['logging']) {
+                $translator->addMethodCall('setLogger', array(new Reference('logger')));
+            }
         }
     }
 

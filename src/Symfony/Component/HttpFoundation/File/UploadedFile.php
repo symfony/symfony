@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
-use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 
 /**
  * A file uploaded through a form.
@@ -198,7 +197,7 @@ class UploadedFile extends File
 
                 if (!@move_uploaded_file($this->getPathname(), $target)) {
                     $error = error_get_last();
-                    throw new UploadException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
+                    throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
                 }
 
                 @chmod($target, 0666 & ~umask());
@@ -207,7 +206,7 @@ class UploadedFile extends File
             }
         }
 
-        throw new UploadException($this->getErrorMessage($this->getError()));
+        throw new FileException($this->getErrorMessage($this->getError()));
     }
 
     /**

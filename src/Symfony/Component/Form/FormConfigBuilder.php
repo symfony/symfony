@@ -28,11 +28,11 @@ use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 class FormConfigBuilder implements FormConfigBuilderInterface
 {
     /**
-     * Caches a globally unique {@link NativeFormProcessor} instance.
+     * Caches a globally unique {@link NativeRequestHandler} instance.
      *
-     * @var NativeFormProcessor
+     * @var NativeRequestHandler
      */
-    private static $nativeFormProcessor;
+    private static $nativeRequestProcessor;
 
     /**
      * The accepted request methods.
@@ -168,9 +168,9 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $method = 'POST';
 
     /**
-     * @var FormProcessorInterface
+     * @var RequestHandlerInterface
      */
-    private $formProcessor;
+    private $requestHandler;
 
     /**
      * @var array
@@ -509,16 +509,16 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getFormProcessor()
+    public function getRequestHandler()
     {
-        if (null === $this->formProcessor) {
-            if (null === self::$nativeFormProcessor) {
-                self::$nativeFormProcessor = new NativeFormProcessor();
+        if (null === $this->requestHandler) {
+            if (null === self::$nativeRequestProcessor) {
+                self::$nativeRequestProcessor = new NativeRequestHandler();
             }
-            $this->formProcessor = self::$nativeFormProcessor;
+            $this->requestHandler = self::$nativeRequestProcessor;
         }
 
-        return $this->formProcessor;
+        return $this->requestHandler;
     }
 
     /**
@@ -832,13 +832,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setFormProcessor(FormProcessorInterface $formProcessor)
+    public function setRequestHandler(RequestHandlerInterface $requestHandler)
     {
         if ($this->locked) {
             throw new BadMethodCallException('The config builder cannot be modified anymore.');
         }
 
-        $this->formProcessor = $formProcessor;
+        $this->requestHandler = $requestHandler;
 
         return $this;
     }

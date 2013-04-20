@@ -22,7 +22,7 @@ UPGRADE FROM 2.x to 3.0
 
  * Passing a `Symfony\Component\HttpFoundation\Request` instance to
    `FormInterface::bind()` was disabled. You should use
-   `FormInterface::process()` instead.
+   `FormInterface::handleRequest()` instead.
 
    Before:
 
@@ -39,7 +39,9 @@ UPGRADE FROM 2.x to 3.0
    After:
 
    ```
-   if ($form->process($request)->isValid()) {
+   $form->handleRequest();
+
+   if ($form->isValid()) {
        // ...
    }
    ```
@@ -48,7 +50,9 @@ UPGRADE FROM 2.x to 3.0
    the method `isBound()`:
 
    ```
-   if ($form->process($request)->isBound()) {
+   $form->handleRequest();
+
+   if ($form->isBound()) {
       // ...
 
       if ($form->isValid()) {

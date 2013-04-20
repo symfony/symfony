@@ -16,7 +16,7 @@ namespace Symfony\Component\Form;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-interface FormProcessorInterface
+interface RequestHandlerInterface
 {
     /**
      * Binds a form from a request if it was submitted.
@@ -24,5 +24,5 @@ interface FormProcessorInterface
      * @param FormInterface $form    The form to bind.
      * @param mixed         $request The current request.
      */
-    public function processForm(FormInterface $form, $request = null);
+    public function handleRequest(FormInterface $form, $request = null);
 }

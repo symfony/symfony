@@ -2,12 +2,12 @@
 
 /*
  * This file is part of the Symfony package.
-*
-* (c) Fabien Potencier <fabien@symfony.com>
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Symfony\Component\Validator\Constraints;
 
@@ -16,10 +16,8 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
  * @Annotation
- * 
+ *
  * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
- * 
- * @api
  */
 class Isbn extends Constraint
 {
@@ -28,7 +26,7 @@ class Isbn extends Constraint
     public $bothIsbnMessage = 'This value is neither a valid ISBN-10 nor a valid ISBN-13.';
     public $isbn10;
     public $isbn13;
-    
+
     public function __construct($options = null)
     {
         if (null !== $options && !is_array($options)) {
@@ -37,11 +35,11 @@ class Isbn extends Constraint
                 'isbn13' => $options,
             );
         }
-        
+
         parent::__construct($options);
-        
+
         if (null === $this->isbn10 && null === $this->isbn13) {
-            throw new MissingOptionsException('Either option "isbn10" or "isbn13" must be given for constraint ' . __CLASS__, array('isbn10', 'isbn13'));
+            throw new MissingOptionsException(sprintf('Either option "isbn10" or "isbn13" must be given for constraint "%s".', __CLASS__), array('isbn10', 'isbn13'));
         }
     }
 }

@@ -16,26 +16,19 @@ use Symfony\Component\Validator\Constraints\IsbnValidator;
 
 /**
  * @see https://en.wikipedia.org/wiki/Isbn
- *
  */
 class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $context;
     protected $validator;
-    
+
     public function setUp()
     {
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
         $this->validator = new IsbnValidator();
         $this->validator->initialize($this->context);
     }
-    
-    public function tearDown()
-    {
-        $this->context = null;
-        $this->validator = null;
-    }
-    
+
     public function getValidIsbn10()
     {
         return array(
@@ -53,7 +46,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
             array('0-4712-92311'),
         );
     }
-    
+
     public function getInvalidIsbn10()
     {
         return array(
@@ -67,7 +60,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
             array('2870#971#648'),
         );
     }
-    
+
     public function getValidIsbn13()
     {
         return array(
@@ -85,7 +78,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
             array('978-0471292319'),
         );
     }
-    
+
     public function getInvalidIsbn13()
     {
         return array(
@@ -101,7 +94,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
             array('978#0471292319'),
         );
     }
-    
+
     public function getValidIsbn()
     {
         return array_merge(
@@ -109,7 +102,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
             $this->getValidIsbn13()
         );
     }
-    
+
     public function getInvalidIsbn()
     {
         return array_merge(
@@ -117,27 +110,27 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
             $this->getInvalidIsbn13()
         );
     }
-    
+
     public function testNullIsValid()
     {
         $constraint = new Isbn(true);
         $this->context
             ->expects($this->never())
             ->method('addViolation');
-        
+
         $this->validator->validate(null, $constraint);
     }
-    
+
     public function testEmptyStringIsValid()
     {
         $constraint = new Isbn(true);
         $this->context
             ->expects($this->never())
             ->method('addViolation');
-        
+
         $this->validator->validate('', $constraint);
     }
-    
+
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
@@ -146,7 +139,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
         $constraint = new Isbn(true);
         $this->validator->validate(new \stdClass(), $constraint);
     }
-    
+
     /**
      * @dataProvider getValidIsbn10
      */
@@ -156,10 +149,10 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->never())
             ->method('addViolation');
-        
+
         $this->validator->validate($isbn, $constraint);
     }
-    
+
     /**
      * @dataProvider getInvalidIsbn10
      */
@@ -173,7 +166,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
         
         $this->validator->validate($isbn, $constraint);
     }
-    
+
     /**
      * @dataProvider getValidIsbn13
      */
@@ -183,10 +176,10 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->never())
             ->method('addViolation');
-        
+
         $this->validator->validate($isbn, $constraint);
     }
-    
+
     /**
      * @dataProvider getInvalidIsbn13
      */
@@ -197,10 +190,10 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('addViolation')
             ->with($constraint->isbn13Message);
-        
+
         $this->validator->validate($isbn, $constraint);
     }
-    
+
     /**
      * @dataProvider getValidIsbn
      */
@@ -210,10 +203,10 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->never())
             ->method('addViolation');
-        
+
         $this->validator->validate($isbn, $constraint);
     }
-    
+
     /**
      * @dataProvider getInvalidIsbn
      */
@@ -224,7 +217,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('addViolation')
             ->with($constraint->bothIsbnMessage);
-        
+
         $this->validator->validate($isbn, $constraint);
     }
 }

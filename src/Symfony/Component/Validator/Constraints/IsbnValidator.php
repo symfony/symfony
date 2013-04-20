@@ -16,12 +16,11 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * Validates wether the value is a valid ISBN-10 or ISBN-13
- * 
- * @see https://en.wikipedia.org/wiki/Isbn
+ * Validates wether the value is a valid ISBN-10 or ISBN-13.
+ *
  * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
  *
- * @api
+ * @see https://en.wikipedia.org/wiki/Isbn
  */
 class IsbnValidator extends ConstraintValidator
 {
@@ -41,7 +40,7 @@ class IsbnValidator extends ConstraintValidator
         if (!is_numeric($value)) {
             $value = str_replace('-', '', $value);
         }
-        
+
         $validation = 0;
         $value = strtoupper($value);
         $valueLength = strlen($value);

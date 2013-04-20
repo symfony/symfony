@@ -25,6 +25,12 @@ form_login_redirect_to_protected_resource_after_login:
 highly_protected_resource:
     path:     /highly_protected_resource
 
+secured-by-one-ip:
+    path:     /secured-by-one-ip
+
+secured-by-two-ips:
+    path:     /secured-by-two-ips
+
 form_logout:
     path:     /logout_path
 

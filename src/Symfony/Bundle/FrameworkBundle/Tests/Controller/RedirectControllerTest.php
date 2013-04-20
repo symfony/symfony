@@ -39,13 +39,12 @@ class RedirectControllerTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function testRoute($permanent, $expectedCode)
+    public function testRoute($permanent, $ignoreAttributes, $expectedCode, $expectedAttributes)
     {
         $request = new Request();
 
         $route = 'new-route';
         $url = '/redirect-url';
-        $params = array('additional-parameter' => 'value');
         $attributes = array(
             'route' => $route,
             'permanent' => $permanent,
@@ -53,9 +52,9 @@ class RedirectControllerTest extends TestCase
             '_route_params' => array(
                 'route' => $route,
                 'permanent' => $permanent,
+                'additional-parameter' => 'value',
             ),
         );
-        $attributes['_route_params'] = $attributes['_route_params'] + $params;
 
         $request->attributes = new ParameterBag($attributes);
 
@@ -63,7 +62,7 @@ class RedirectControllerTest extends TestCase
         $router
             ->expects($this->once())
             ->method('generate')
-            ->with($this->equalTo($route), $this->equalTo($params))
+            ->with($this->equalTo($route), $this->equalTo($expectedAttributes))
             ->will($this->returnValue($url));
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
@@ -77,7 +76,7 @@ class RedirectControllerTest extends TestCase
         $controller = new RedirectController();
         $controller->setContainer($container);
 
-        $returnResponse = $controller->redirectAction($request, $route, $permanent);
+        $returnResponse = $controller->redirectAction($request, $route, $permanent, $ignoreAttributes);
 
         $this->assertRedirectUrl($returnResponse, $url);
         $this->assertEquals($expectedCode, $returnResponse->getStatusCode());
@@ -86,8 +85,10 @@ class RedirectControllerTest extends TestCase
     public function provider()
     {
         return array(
-            array(true, 301),
-            array(false, 302),
+            array(true, false, 301, array('additional-parameter' => 'value')),
+            array(false, false, 302, array('additional-parameter' => 'value')),
+            array(false, true, 302, array()),
+            array(false, array('additional-parameter'), 302, array()),
         );
     }
 
@@ -178,7 +179,7 @@ class RedirectControllerTest extends TestCase
         $expectedUrl = "$scheme://$host$expectedPort$baseUrl$path";
 
         $request = $this->createRequestObject($requestScheme, $host, $requestPort, $baseUrl);
-        $controller = $this->createRedirectController($request);
+        $controller = $this->createRedirectController();
 
         $returnValue = $controller->urlRedirectAction($request, $path, false, $scheme, $httpPort, $httpsPort);
         $this->assertRedirectUrl($returnValue, $expectedUrl);

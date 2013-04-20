@@ -56,7 +56,7 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('The iconv and mbstring extensions are not available.');
         }
 
-        $loader = $this->createLoader();
+        $loader = new XliffFileLoader();
         $catalogue = $loader->load(__DIR__.'/../fixtures/encoding.xlf', 'en', 'domain1');
 
         $this->assertEquals(utf8_decode('föö'), $catalogue->get('bar', 'domain1'));

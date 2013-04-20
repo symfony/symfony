@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-25T22:03:02Z
+
+I don't like adding this very specific code here, but I have not any other ideas to do it in a better way.
+
+To be sure that we don't introduce any regression when trying to refactor/change this implementation, can you add some unit tests?
+
+---------------------------------------------------------------------------
+
+by mweimerskirch at 2013-04-06T18:50:29Z
+
+@fabpot I added a simple testcase. Let me know if anything is missing.

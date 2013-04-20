@@ -205,6 +205,15 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar'), $client->getCookieJar()->allValues('http://www.example.com/foo/foobar'), '->request() updates the CookieJar');
     }
 
+    public function testRequestSecureCookies()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>', 200, array('Set-Cookie' => 'foo=bar; path=/; secure')));
+        $client->request('GET', 'https://www.example.com/foo/foobar');
+
+        $this->assertTrue($client->getCookieJar()->get('foo', '/', 'www.example.com')->isSecure());
+    }
+
     public function testClick()
     {
         if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {

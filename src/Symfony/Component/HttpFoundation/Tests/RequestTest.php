@@ -1137,6 +1137,16 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $this->assertNull($request->setRequestFormat('foo'));
         $this->assertEquals('foo', $request->getRequestFormat(null));
+
+        $request = new Request();
+        $request->headers->set('Accept', 'text/xml,application/xml;q=0.9,*/*;q=0.8');
+        $this->assertEquals('xml', $request->getRequestFormat());
+        $this->assertEquals('xml', $request->getRequestFormat('json'));
+
+        $request = new Request();
+        $request->headers->set('Accept', 'text/xml,application/xml;q=0.9,*/*;q=0.8');
+        $request->setRequestFormat('foo');
+        $this->assertEquals('foo', $request->getRequestFormat());
     }
 
     public function testHasSession()

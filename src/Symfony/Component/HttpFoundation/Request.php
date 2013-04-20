@@ -1176,6 +1176,7 @@ class Request
      *
      *  * format defined by the user (with setRequestFormat())
      *  * _format request parameter
+     *  * `Accept` header value
      *  * $default
      *
      * @param string $default The default format
@@ -1187,7 +1188,12 @@ class Request
     public function getRequestFormat($default = 'html')
     {
         if (null === $this->format) {
-            $this->format = $this->get('_format', $default);
+            $format = AcceptHeader::fromString($this->headers->get('Accept'))->first();
+            if ($format) {
+                $format = $this->getFormat($format->getValue());
+            }
+
+            $this->format = $this->get('_format', $format ?: $default);
         }
 
         return $this->format;

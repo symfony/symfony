@@ -4,11 +4,11 @@
     <body>
       <trans-unit id="1" resname="foo">
         <source>foo</source>
-        <target>bär</target>
+        <target>bÃ¤r</target>
       </trans-unit>
       <trans-unit id="2" resname="bar">
-        <source>bar</source> 
-        <target>föö</target>
+        <source>bar</source>
+        <target>fÃ¶Ã¶</target>
       </trans-unit>
     </body>
   </file>

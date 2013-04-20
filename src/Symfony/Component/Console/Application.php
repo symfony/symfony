@@ -281,6 +281,34 @@ class Application
     }
 
     /**
+     * Gets the help message in Markdown.
+     *
+     * @return string A help message in Markdown.
+     */
+    public function getHelpInMarkdown()
+    {
+        $messages = array(
+            $this->getLongVersionInMarkdown(),
+            '',
+            'Usage',
+            '-----',
+            sprintf("    [options] command [arguments]\n"),
+            'Options',
+            '-------'
+        );
+
+        foreach ($this->getDefinition()->getOptions() as $option) {
+            $messages[] = sprintf('    %-16s %s %s',
+                '--'.$option->getName(),
+                $option->getShortcut() ? '(-'.$option->getShortcut().')' : '    ',
+                $option->getDescription()
+            );
+        }
+
+        return implode(PHP_EOL, $messages);
+    }
+
+    /**
      * Sets whether to catch exceptions or not during commands execution.
      *
      * @param Boolean $boolean Whether to catch exceptions or not during commands execution
@@ -366,6 +394,22 @@ class Application
         }
 
         return '<info>Console Tool</info>';
+    }
+
+    /**
+     * Returns the long version of the application in Markdown.
+     *
+     * @return string The long application version in Markdown
+     *
+     * @api
+     */
+    public function getLongVersionInMarkdown()
+    {
+        if ('UNKNOWN' !== $this->getName() && 'UNKNOWN' !== $this->getVersion()) {
+            return sprintf('%s version %s', $this->getName(), $this->getVersion());
+        }
+
+        return implode(PHP_EOL, array('Console Tool', '============'));
     }
 
     /**
@@ -692,11 +736,7 @@ class Application
     {
         $commands = $namespace ? $this->all($this->findNamespace($namespace)) : $this->commands;
 
-        $width = 0;
-        foreach ($commands as $command) {
-            $width = strlen($command->getName()) > $width ? strlen($command->getName()) : $width;
-        }
-        $width += 2;
+        $width = $this->getMaximumCommandNameLength($commands) + 2;
 
         if ($raw) {
             $messages = array();
@@ -724,6 +764,43 @@ class Application
 
             foreach ($commands as $name => $command) {
                 $messages[] = sprintf("  <info>%-${width}s</info> %s", $name, $command->getDescription());
+            }
+        }
+
+        return implode(PHP_EOL, $messages);
+    }
+
+    /**
+     * Returns Markdown representation of the Application.
+     *
+     * @param string  $namespace An optional namespace name
+     *
+     * @return string Markdown representing the Application
+     */
+    public function asMarkdown($namespace = null)
+    {
+        $commands = $namespace ? $this->all($this->findNamespace($namespace)) : $this->commands;
+
+        $width = $this->getMaximumCommandNameLength($commands) + 2;
+
+        $messages = array($this->getHelpInMarkdown(), '');
+        if ($namespace) {
+            $message = sprintf("Available commands for the \"%s\" namespace", $namespace);
+            $messages[] = $message;
+            $messages[] = str_repeat('-', mb_strlen($message));
+        } else {
+            $messages[] = 'Available commands';
+            $messages[] = '------------------';
+        }
+
+        // add commands by namespace
+        foreach ($this->sortCommands($commands) as $space => $commands) {
+            if (!$namespace && '_global' !== $space) {
+                $messages[] = '';
+            }
+
+            foreach ($commands as $name => $command) {
+                $messages[] = sprintf("    %-${width}s %s", $name, $command->getDescription());
             }
         }
 
@@ -1016,6 +1093,15 @@ class Application
             new ProgressHelper(),
             new TableHelper(),
         ));
+    }
+
+    private function getMaximumCommandNameLength(array $commands) {
+        $width = 0;
+        foreach ($commands as $command) {
+            $width = strlen($command->getName()) > $width ? strlen($command->getName()) : $width;
+        }
+
+        return $width;
     }
 
     /**

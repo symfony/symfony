@@ -2,7 +2,7 @@
 <symfony>
   <commands>
     <command id="help" name="help">
-  <usage>help [--xml] [command_name]</usage>
+  <usage>help [--markdown] [--xml] [command_name]</usage>
   <description>Displays help for a command</description>
   <help>The &lt;info&gt;help&lt;/info&gt; command displays help for a given command:
  
@@ -23,6 +23,9 @@
     </argument>
   </arguments>
   <options>
+    <option name="--markdown" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+      <description>To output help as Markdown</description>
+    </option>
     <option name="--xml" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
       <description>To output help as XML</description>
     </option>

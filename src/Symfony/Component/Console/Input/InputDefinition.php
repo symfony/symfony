@@ -407,20 +407,7 @@ class InputDefinition
      */
     public function asText()
     {
-        // find the largest option or argument name
-        $max = 0;
-        foreach ($this->getOptions() as $option) {
-            $nameLength = strlen($option->getName()) + 2;
-            if ($option->getShortcut()) {
-                $nameLength += strlen($option->getShortcut()) + 3;
-            }
-
-            $max = max($max, $nameLength);
-        }
-        foreach ($this->getArguments() as $argument) {
-            $max = max($max, strlen($argument->getName()));
-        }
-        ++$max;
+        $max = $this->getMaximumOptionOrArgumentNameLength() + 1;
 
         $text = array();
 
@@ -468,6 +455,61 @@ class InputDefinition
         }
 
         return implode("\n", $text);
+    }
+
+    /**
+     * Returns Markdown representation of the InputDefinition.
+     *
+     * @return string Markdown string representing the InputDefinition
+     */
+    public function asMarkdown()
+    {
+        $max = $this->getMaximumOptionOrArgumentNameLength() + 1;
+
+        $markdown = array();
+        if ($this->getArguments()) {
+            $markdown[] = 'Arguments';
+            $markdown[] = '---------';
+            foreach ($this->getArguments() as $argument) {
+                if (null !== $argument->getDefault() && (!is_array($argument->getDefault()) || count($argument->getDefault()))) {
+                    $default = sprintf(' (default: %s)', $this->formatDefaultValue($argument->getDefault()));
+                } else {
+                    $default = '';
+                }
+
+                $description = str_replace("\n", "\n".str_pad('', $max + 2, ' '), $argument->getDescription());
+
+                $markdown[] = sprintf("    %-${max}s %s%s", $argument->getName(), $description, $default);
+            }
+            $markdown[] = '';
+        }
+
+        if ($this->getOptions()) {
+            $markdown[] = 'Options';
+            $markdown[] = '-------';
+            foreach ($this->getOptions() as $option) {
+                if ($option->acceptValue() && null !== $option->getDefault() && (!is_array($option->getDefault()) || count($option->getDefault()))) {
+                    $default = sprintf(' (default: %s)', $this->formatDefaultValue($option->getDefault()));
+                } else {
+                    $default = '';
+                }
+
+                $multiple = $option->isArray() ? ' (multiple values allowed)' : '';
+                $description = str_replace("\n", "\n".str_pad('', $max + 2, ' '), $option->getDescription());
+
+                $optionMax = $max - strlen($option->getName()) - 2;
+                $markdown[] = sprintf("    %s %-${optionMax}s%s%s%s",
+                    '--'.$option->getName(),
+                    $option->getShortcut() ? sprintf('(-%s) ', $option->getShortcut()) : '',
+                    $description,
+                    $default,
+                    $multiple
+                );
+            }
+            $markdown[] = '';
+        }
+
+        return implode("\n", $markdown);
     }
 
     /**
@@ -522,6 +564,30 @@ class InputDefinition
         }
 
         return $asDom ? $dom : $dom->saveXml();
+    }
+
+    /**
+     * Finds the longest option or argument name and returns its length.
+     *
+     * @return integer Length of the longest option or argument name
+     */
+    private function getMaximumOptionOrArgumentNameLength()
+    {
+        // find the largest option or argument name
+        $max = 0;
+        foreach ($this->getOptions() as $option) {
+            $nameLength = strlen($option->getName()) + 2;
+            if ($option->getShortcut()) {
+                $nameLength += strlen($option->getShortcut()) + 3;
+            }
+
+            $max = max($max, $nameLength);
+        }
+        foreach ($this->getArguments() as $argument) {
+            $max = max($max, strlen($argument->getName()));
+        }
+
+        return $max;
     }
 
     private function formatDefaultValue($default)

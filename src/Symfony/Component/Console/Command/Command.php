@@ -593,6 +593,48 @@ class Command
     }
 
     /**
+     * Returns Markdown representation of the command.
+     *
+     * @return string Markdown representing the command
+     */
+    public function asMarkdown()
+    {
+        if ($this->application && !$this->applicationDefinitionMerged) {
+            $this->getSynopsis();
+            $this->mergeApplicationDefinition(false);
+        }
+
+        $markdown = array();
+        $markdown[] = $this->name;
+        $markdown[] = \str_repeat('=', mb_strlen($this->name));
+        $markdown[] = '';
+        $markdown[] = $this->description;
+        $markdown[] = '';
+        $markdown[] = 'Usage';
+        $markdown[] = '-----';
+        $markdown[] = '    '.$this->getSynopsis();
+        $markdown[] = '';
+
+        if ($this->getAliases()) {
+            $markdown[] = 'Aliases';
+            $markdown[] = '-------';
+            foreach ($this->getAliases() as $alias) {
+                $markdown[] = '* '.$alias;
+            }
+            $markdown[] = '';
+        }
+
+        $markdown[] = $this->getNativeDefinition()->asMarkdown();
+        if ($help = $this->getProcessedHelp()) {
+            $markdown[] = 'Help';
+            $markdown[] = '----';
+            $markdown[] = '  '.strip_tags(str_replace("\n", "\n  ", $help))."\n";
+        }
+
+        return implode("\n", $markdown);
+    }
+
+    /**
      * Returns an XML representation of the command.
      *
      * @param Boolean $asDom Whether to return a DOM or an XML string

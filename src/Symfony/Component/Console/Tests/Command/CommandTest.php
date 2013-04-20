@@ -313,6 +313,15 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/command_astext.txt', $command->asText(), '->asText() returns a text representation of the command');
     }
 
+    public function testAsMarkdown()
+    {
+        $command = new \TestCommand();
+        $command->setApplication(new Application());
+        $tester = new CommandTester($command);
+        $tester->execute(array('command' => $command->getName()));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/command_asmarkdown.txt', $command->asMarkdown(), '->asMarkdown() returns Markdown representation of the command');
+    }
+
     public function testAsXml()
     {
         $command = new \TestCommand();

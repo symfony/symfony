@@ -37,6 +37,7 @@ class HelpCommand extends Command
             ->setName('help')
             ->setDefinition(array(
                 new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
+                new InputOption('markdown', null, InputOption::VALUE_NONE, 'To output help as Markdown'),
                 new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
             ))
             ->setDescription('Displays help for a command')
@@ -76,6 +77,8 @@ EOF
 
         if ($input->getOption('xml')) {
             $output->writeln($this->command->asXml(), OutputInterface::OUTPUT_RAW);
+        } elseif ($input->getOption('markdown')) {
+            $output->writeln($this->command->asMarkdown(), OutputInterface::OUTPUT_RAW);
         } else {
             $output->writeln($this->command->asText());
         }

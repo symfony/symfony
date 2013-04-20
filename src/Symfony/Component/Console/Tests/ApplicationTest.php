@@ -401,6 +401,15 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext2.txt', $this->normalizeLineBreaks($application->asText('foo')), '->asText() returns a text representation of the application');
     }
 
+    public function testAsMarkdown()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand);
+        $this->ensureStaticCommandHelp($application);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_asmarkdown1.txt', $application->asMarkdown(), '->asMarkdown() returns Markdown representation of the application');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_asmarkdown2.txt', $application->asMarkdown('foo'), '->asMarkdown() returns Markdown representation of the application');
+    }
+
     public function testAsXml()
     {
         $application = new Application();

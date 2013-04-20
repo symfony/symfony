@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 /**
@@ -119,6 +120,19 @@ class UploadedFile extends File
     }
 
     /**
+     * Returns the original file extension
+     *
+     * It is extracted from the original file name that was uploaded.
+     * Then is should not be considered as a safe value.
+     *
+     * @return string The extension
+     */
+    public function getClientOriginalExtension()
+    {
+        return pathinfo($this->originalName, PATHINFO_EXTENSION);
+    }
+
+    /**
      * Returns the file mime type.
      *
      * It is extracted from the request from which the file has been uploaded.
@@ -166,13 +180,15 @@ class UploadedFile extends File
     /**
      * Returns whether the file was uploaded successfully.
      *
-     * @return Boolean True if no error occurred during uploading
+     * @return Boolean True if the file has been uploaded with HTTP and no error occurred.
      *
      * @api
      */
     public function isValid()
     {
-        return $this->error === UPLOAD_ERR_OK;
+        $isOk = $this->error === UPLOAD_ERR_OK;
+
+        return $this->test ? $isOk : $isOk && is_uploaded_file($this->getPathname());
     }
 
     /**
@@ -183,7 +199,7 @@ class UploadedFile extends File
      *
      * @return File A File object representing the new file
      *
-     * @throws FileException if the file has not been uploaded via Http
+     * @throws UploadException if, for any reason, the file could not have been moved
      *
      * @api
      */
@@ -192,21 +208,21 @@ class UploadedFile extends File
         if ($this->isValid()) {
             if ($this->test) {
                 return parent::move($directory, $name);
-            } elseif (is_uploaded_file($this->getPathname())) {
-                $target = $this->getTargetFile($directory, $name);
-
-                if (!@move_uploaded_file($this->getPathname(), $target)) {
-                    $error = error_get_last();
-                    throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
-                }
-
-                @chmod($target, 0666 & ~umask());
-
-                return $target;
             }
+
+            $target = $this->getTargetFile($directory, $name);
+
+            if (!@move_uploaded_file($this->getPathname(), $target)) {
+                $error = error_get_last();
+                throw new UploadException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
+            }
+
+            @chmod($target, 0666 & ~umask());
+
+            return $target;
         }
 
-        throw new FileException(sprintf('The file "%s" has not been uploaded via Http', $this->getPathname()));
+        throw new UploadException($this->getErrorMessage($this->getError()));
     }
 
     /**
@@ -216,21 +232,50 @@ class UploadedFile extends File
      */
     public static function getMaxFilesize()
     {
-        $max = trim(ini_get('upload_max_filesize'));
+        $max = strtolower(ini_get('upload_max_filesize'));
 
         if ('' === $max) {
             return PHP_INT_MAX;
         }
 
-        switch (strtolower(substr($max, -1))) {
-            case 'g':
-                $max *= 1024;
-            case 'm':
-                $max *= 1024;
-            case 'k':
-                $max *= 1024;
+        if (preg_match('#^\+?(0x?)?(.*?)([kmg]?)$#', $max, $match)) {
+            $shifts = array('' => 0, 'k' => 10, 'm' => 20, 'g' => 30);
+            $bases = array('' => 10, '0' => 8, '0x' => 16);
+
+            return intval($match[2], $bases[$match[1]]) << $shifts[$match[3]];
         }
 
-        return (integer) $max;
+        return 0;
     }
+
+    /**
+     * Returns an informative upload error message
+     *
+     * @param int $code The error code returned by upload attempt
+     *
+     * @return string The error message regarding specified error code
+     */
+    private function getErrorMessage($errorCode)
+    {
+        $max_filesize = 0;
+        if ($errorCode === UPLOAD_ERR_INI_SIZE) {
+            $max_filesize = self::getMaxFilesize()/1024;
+        }
+
+        $error[UPLOAD_ERR_INI_SIZE]   = 'The file "%s" exceeds your upload_max_filesize ini directive (limit is %d kb)';
+        $error[UPLOAD_ERR_FORM_SIZE]  = 'The file "%s" exceeds the upload limit defined in your form';
+        $error[UPLOAD_ERR_PARTIAL]    = 'The file "%s" was only partially uploaded';
+        $error[UPLOAD_ERR_NO_FILE]    = 'No file was uploaded';
+        $error[UPLOAD_ERR_CANT_WRITE] = 'The file "%s" could not be written on disk';
+        $error[UPLOAD_ERR_NO_TMP_DIR] = 'File could not be uploaded: missing temporary directory';
+        $error[UPLOAD_ERR_EXTENSION]  = 'File upload was stopped by a php extension';
+
+        $message = $error[$errorCode];
+        if (empty($message)) {
+            $message = 'The file "%s" was not uploaded due to an unknown error';
+        }
+
+       return sprintf($message, $this->getClientOriginalName(), $max_filesize);
+    }
+
 }

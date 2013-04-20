@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-04-18T11:19:22Z
+
+What is the benefit of this ?
+
+---------------------------------------------------------------------------
+
+by srogier at 2013-04-18T11:30:01Z
+
+As you see it, there is no direct feature addition in this PR.
+But, with this object, I can now create a dynamic prompt when I use a Shell application (which can display the service's status I'm requesting, etc.)

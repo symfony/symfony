@@ -690,12 +690,10 @@ class Request
         $ip = $clientIps[0];
 
         foreach ($clientIps as $key => $clientIp) {
-            foreach ($trustedProxies as $trustedProxy) {
-                if (IpUtils::checkIp($clientIp, $trustedProxy)) {
-                    unset($clientIps[$key]);
+            if (IpUtils::checkIp($clientIp, $trustedProxies)) {
+                unset($clientIps[$key]);
 
-                    continue 2;
-                }
+                continue;
             }
         }
 

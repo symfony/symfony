@@ -1,0 +1,144 @@
+---------------------------------------------------------------------------
+
+by alexandresalome at 2013-01-04T12:01:51Z
+
+It might be great to add an optional arguments to the command to get a specific value :
+
+    php app/console container:debug-parameters kernel.root_dir
+
+Could be useful in some cases, for bash scripts:
+
+    $CACHE_DIR="`php app/console container:debug-parameter kernel.cache_dir`/custom-folder"
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-04T13:38:12Z
+
+@alexandresalome :+1: I just push a commit which add your feature.
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-05T10:21:37Z
+
+Except the terminal width, is there something else which need to be rework?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-05T18:15:09Z
+
+I now use `getTerminalWidth` for determining how many chars I can display on a line.
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-05T20:42:38Z
+
+As `getTerminalWidth` has been kept protected for BC break reason, I now use the `getTerminalDimensions`. Something else?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-06T13:09:58Z
+
+I just fix the command filename & squash all commits.
+
+---------------------------------------------------------------------------
+
+by alexandresalome at 2013-01-06T13:14:47Z
+
+When I run your code locally, I get an error about ``getTerminalDimensions()`` not being defined.
+
+You need to rebase your work on top of master.
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-06T13:25:34Z
+
+@alexandresalome rebase
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-16T14:43:28Z
+
+@fabpot There is something missing before merging?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-30T16:39:13Z
+
+ping
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-02-05T11:42:14Z
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-23T16:47:59Z
+
+I've just  reviewed this PR. I'm :+1: on adding this feature but I don't like the name. What about doing that in the existing `container:debug` command by adding a switch like `--parameters`?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-03-26T19:26:32Z
+
+@fabpot Thanks for your feedback! I will do that when I will find some free time :)
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-03-30T15:40:31Z
+
+@fabpot I have added the `--parameter` & `--parameters` option in order to display all or a specific parameter. Additionally, I have refactored the input validation. The rest is the same as before.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-30T16:55:18Z
+
+Instead of the 2 options and making them incompatible with the ``name`` argument, I suugest the following signature:
+
+- ``container:debug`` shows the list of services
+- ``container:debug foo`` shows the ``foo`` service
+- ``container:debug --parameters`` shows the list of parameters
+- ``container:debug foo --parameters`` shows the ``foo`` parameter
+
+This would mean that the ``--parameters`` is toggling the command from services to services, and the argument is still used to pass the name. And it would mean you don't need 2 options to support parameters but only one.
+
+The same change could then be applied to the support of tags
+
+What do you think about it ?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-03-30T17:22:50Z
+
+@fabpot What's your opinion?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-04-13T11:37:04Z
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-13T12:35:54Z
+
+I prefer what you've implemented @egeloen. Can you add support for `--tags`?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-04-13T16:02:39Z
+
+@fabpot I don't really understand your question. The `--tags` option is already supported.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-13T16:04:37Z
+
+@egeloen Sorry, I was confused by the red/green lines. Anything else before I merge?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-04-13T16:07:43Z
+
+For me, it is good to merge.

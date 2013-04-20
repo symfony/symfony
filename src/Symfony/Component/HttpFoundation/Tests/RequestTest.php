@@ -666,7 +666,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->initialize(array(), array(), array(), array(), array(), array('SERVER_NAME' => 'www.exemple.com', 'HTTP_HOST' => 'www.host.com'));
         $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
-        $this->stopTrustingProxyData();
     }
 
     /**
@@ -739,41 +738,23 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testGetClientIpProvider
+     * @dataProvider testGetClientIpsProvider
      */
-    public function testGetClientIp($expected, $proxy, $remoteAddr, $httpForwardedFor, $trustedProxies)
+    public function testGetClientIp($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
     {
-        $request = $this->getRequestInstanceForClientIpTests($proxy, $remoteAddr, $httpForwardedFor, $trustedProxies);
+        $request = $this->getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies);
 
-        $this->assertEquals($expected, $request->getClientIp());
+        $this->assertEquals($expected[0], $request->getClientIp());
 
         Request::setTrustedProxies(array());
-    }
-
-    public function testGetClientIpProvider()
-    {
-        return array(
-            array('88.88.88.88',              false, '88.88.88.88',  null,                                  null),
-            array('88.88.88.88',              true,  '88.88.88.88',  null,                                  null),
-            array('127.0.0.1',                false, '127.0.0.1',    null,                                  null),
-            array('::1',                      false, '::1',          null,                                  null),
-            array('127.0.0.1',                false, '127.0.0.1',    '88.88.88.88',                         null),
-            array('88.88.88.88',              true,  '127.0.0.1',    '88.88.88.88',                         null),
-            array('2620:0:1cfe:face:b00c::3', true,  '::1',          '2620:0:1cfe:face:b00c::3',            null),
-            array('88.88.88.88',              true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', null),
-            array('87.65.43.21',              true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
-            array('87.65.43.21',              false, '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
-            array('88.88.88.88',              true,  '123.45.67.89', '88.88.88.88',                         array('123.45.67.89', '88.88.88.88')),
-            array('88.88.88.88',              false, '123.45.67.89', '88.88.88.88',                         array('123.45.67.89', '88.88.88.88')),
-        );
     }
 
     /**
      * @dataProvider testGetClientIpsProvider
      */
-    public function testGetClientIps($expected, $proxy, $remoteAddr, $httpForwardedFor, $trustedProxies)
+    public function testGetClientIps($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
     {
-        $request = $this->getRequestInstanceForClientIpTests($proxy, $remoteAddr, $httpForwardedFor, $trustedProxies);
+        $request = $this->getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies);
 
         $this->assertEquals($expected, $request->getClientIps());
 
@@ -782,16 +763,45 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClientIpsProvider()
     {
+        //        $expected                   $remoteAddr                $httpForwardedFor            $trustedProxies
         return array(
-            array(array('88.88.88.88'),                             false, '88.88.88.88',  null,                                  null),
-            array(array('127.0.0.1'),                               false, '127.0.0.1',    null,                                  null),
-            array(array('::1'),                                     false, '::1',          null,                                  null),
-            array(array('127.0.0.1'),                               false, '127.0.0.1',    '88.88.88.88',                         null),
-            array(array('88.88.88.88'),                             true,  '127.0.0.1',    '88.88.88.88',                         null),
-            array(array('2620:0:1cfe:face:b00c::3'),                true,  '::1',          '2620:0:1cfe:face:b00c::3',            null),
-            array(array('127.0.0.1', '87.65.43.21', '88.88.88.88'), true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', null),
-            array(array('127.0.0.1', '87.65.43.21'),                true,  '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
-            array(array('127.0.0.1', '87.65.43.21'),                false, '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
+            // simple IPv4
+            array(array('88.88.88.88'),              '88.88.88.88',              null,                        null),
+            // trust the IPv4 remote addr
+            array(array('88.88.88.88'),              '88.88.88.88',              null,                        array('88.88.88.88')),
+
+            // simple IPv6
+            array(array('::1'),                      '::1',                      null,                        null),
+            // trust the IPv6 remote addr
+            array(array('::1'),                      '::1',                      null,                        array('::1')),
+
+            // forwarded for with remote IPv4 addr not trusted
+            array(array('127.0.0.1'),                '127.0.0.1',                '88.88.88.88',               null),
+            // forwarded for with remote IPv4 addr trusted
+            array(array('88.88.88.88'),              '127.0.0.1',                '88.88.88.88',               array('127.0.0.1')),
+            // forwarded for with remote IPv4 and all FF addrs trusted
+            array(array('88.88.88.88'),              '127.0.0.1',                '88.88.88.88',               array('127.0.0.1', '88.88.88.88')),
+
+            // forwarded for with remote IPv6 addr not trusted
+            array(array('1620:0:1cfe:face:b00c::3'), '1620:0:1cfe:face:b00c::3', '2620:0:1cfe:face:b00c::3',  null),
+            // forwarded for with remote IPv6 addr trusted
+            array(array('2620:0:1cfe:face:b00c::3'), '1620:0:1cfe:face:b00c::3', '2620:0:1cfe:face:b00c::3',  array('1620:0:1cfe:face:b00c::3')),
+
+            // multiple forwarded for with remote IPv4 addr trusted
+            array(array('88.88.88.88', '87.65.43.21', '127.0.0.1'), '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89')),
+            // multiple forwarded for with remote IPv4 addr and some reverse proxies trusted
+            array(array('87.65.43.21', '127.0.0.1'), '123.45.67.89',             '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '88.88.88.88')),
+            // multiple forwarded for with remote IPv4 addr and some reverse proxies trusted but in the middle
+            array(array('88.88.88.88', '127.0.0.1'), '123.45.67.89',             '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '87.65.43.21')),
+            // multiple forwarded for with remote IPv4 addr and all reverse proxies trusted
+            array(array('127.0.0.1'),                '123.45.67.89',             '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89', '87.65.43.21', '88.88.88.88', '127.0.0.1')),
+
+            // multiple forwarded for with remote IPv6 addr trusted
+            array(array('2620:0:1cfe:face:b00c::3', '3620:0:1cfe:face:b00c::3'), '1620:0:1cfe:face:b00c::3', '3620:0:1cfe:face:b00c::3,2620:0:1cfe:face:b00c::3', array('1620:0:1cfe:face:b00c::3')),
+            // multiple forwarded for with remote IPv6 addr and some reverse proxies trusted
+            array(array('3620:0:1cfe:face:b00c::3'), '1620:0:1cfe:face:b00c::3', '3620:0:1cfe:face:b00c::3,2620:0:1cfe:face:b00c::3', array('1620:0:1cfe:face:b00c::3', '2620:0:1cfe:face:b00c::3')),
+            // multiple forwarded for with remote IPv4 addr and some reverse proxies trusted but in the middle
+            array(array('2620:0:1cfe:face:b00c::3', '4620:0:1cfe:face:b00c::3'), '1620:0:1cfe:face:b00c::3', '4620:0:1cfe:face:b00c::3,3620:0:1cfe:face:b00c::3,2620:0:1cfe:face:b00c::3', array('1620:0:1cfe:face:b00c::3', '3620:0:1cfe:face:b00c::3')),
         );
     }
 
@@ -1277,14 +1287,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    private function stopTrustingProxyData()
-    {
-        $class = new \ReflectionClass('Symfony\\Component\\HttpFoundation\\Request');
-        $property = $class->getProperty('trustProxy');
-        $property->setAccessible(true);
-        $property->setValue(false);
-    }
-
     private function disableHttpMethodParameterOverride()
     {
         $class = new \ReflectionClass('Symfony\\Component\\HttpFoundation\\Request');
@@ -1293,7 +1295,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $property->setValue(false);
     }
 
-    private function getRequestInstanceForClientIpTests($proxy, $remoteAddr, $httpForwardedFor, $trustedProxies)
+    private function getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies)
     {
         $request = new Request();
 
@@ -1302,8 +1304,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             $server['HTTP_X_FORWARDED_FOR'] = $httpForwardedFor;
         }
 
-        if ($proxy || $trustedProxies) {
-            Request::setTrustedProxies(null === $trustedProxies ? array($remoteAddr) : $trustedProxies);
+        if ($trustedProxies) {
+            Request::setTrustedProxies($trustedProxies);
         }
 
         $request->initialize(array(), array(), array(), array(), array(), $server);

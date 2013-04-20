@@ -35,8 +35,6 @@ class Request
     const HEADER_CLIENT_PROTO = 'client_proto';
     const HEADER_CLIENT_PORT  = 'client_port';
 
-    protected static $trustProxy = false;
-
     protected static $trustedProxies = array();
 
     /**
@@ -476,7 +474,6 @@ class Request
     public static function setTrustedProxies(array $proxies)
     {
         self::$trustedProxies = $proxies;
-        self::$trustProxy = $proxies ? true : false;
     }
 
     /**
@@ -664,6 +661,12 @@ class Request
     /**
      * Returns the client IP addresses.
      *
+     * The most trusted IP address is first, and the less trusted one last.
+     * The "real" client IP address is the last one, but this is also the
+     * less trusted one.
+     *
+     * Use this method carefully; you should use getClientIp() instead.
+     *
      * @return array The client IP addresses
      *
      * @see getClientIp()
@@ -672,7 +675,7 @@ class Request
     {
         $ip = $this->server->get('REMOTE_ADDR');
 
-        if (!self::$trustProxy) {
+        if (!self::$trustedProxies) {
             return array($ip);
         }
 
@@ -683,11 +686,11 @@ class Request
         $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
         $clientIps[] = $ip;
 
-        $trustedProxies = self::$trustProxy && !self::$trustedProxies ? array($ip) : self::$trustedProxies;
+        $trustedProxies = !self::$trustedProxies ? array($ip) : self::$trustedProxies;
         $ip = $clientIps[0];
-        $clientIps = array_diff($clientIps, $trustedProxies);
+        $clientIps = array_values(array_diff($clientIps, $trustedProxies));
 
-        return $clientIps ? $clientIps : array($ip);
+        return $clientIps ? array_reverse($clientIps) : array($ip);
     }
 
     /**
@@ -714,7 +717,7 @@ class Request
     {
         $ipAddresses = $this->getClientIps();
 
-        return array_pop($ipAddresses);
+        return $ipAddresses[0];
     }
 
     /**
@@ -827,7 +830,7 @@ class Request
      */
     public function getPort()
     {
-        if (self::$trustProxy && self::$trustedHeaders[self::HEADER_CLIENT_PORT] && $port = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PORT])) {
+        if (self::$trustedProxies && self::$trustedHeaders[self::HEADER_CLIENT_PORT] && $port = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PORT])) {
             return $port;
         }
 
@@ -988,7 +991,7 @@ class Request
      */
     public function isSecure()
     {
-        if (self::$trustProxy && self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && $proto = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO])) {
+        if (self::$trustedProxies && self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && $proto = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO])) {
             return in_array(strtolower($proto), array('https', 'on', '1'));
         }
 
@@ -1014,7 +1017,7 @@ class Request
      */
     public function getHost()
     {
-        if (self::$trustProxy && self::$trustedHeaders[self::HEADER_CLIENT_HOST] && $host = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_HOST])) {
+        if (self::$trustedProxies && self::$trustedHeaders[self::HEADER_CLIENT_HOST] && $host = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_HOST])) {
             $elements = explode(',', $host);
 
             $host = $elements[count($elements) - 1];

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 /**
@@ -198,7 +199,7 @@ class UploadedFile extends File
      *
      * @return File A File object representing the new file
      *
-     * @throws FileException if, for any reason, the file could not have been moved
+     * @throws UploadException if, for any reason, the file could not have been moved
      *
      * @api
      */
@@ -213,7 +214,7 @@ class UploadedFile extends File
 
             if (!@move_uploaded_file($this->getPathname(), $target)) {
                 $error = error_get_last();
-                throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
+                throw new UploadException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
             }
 
             @chmod($target, 0666 & ~umask());
@@ -221,7 +222,7 @@ class UploadedFile extends File
             return $target;
         }
 
-        throw new FileException(sprintf('The file "%s" is not valid', $this->getPathname()));
+        throw new UploadException($this->getErrorMessage($this->getError()));
     }
 
     /**
@@ -246,4 +247,35 @@ class UploadedFile extends File
 
         return 0;
     }
+
+    /**
+     * Returns an informative upload error message
+     *
+     * @param int $code The error code returned by upload attempt
+     *
+     * @return string The error message regarding specified error code
+     */
+    private function getErrorMessage($errorCode)
+    {
+        $max_filesize = 0;
+        if ($errorCode === UPLOAD_ERR_INI_SIZE) {
+            $max_filesize = self::getMaxFilesize()/1024;
+        }
+
+        $error[UPLOAD_ERR_INI_SIZE]   = 'The file "%s" exceeds your upload_max_filesize ini directive (limit is %d kb)';
+        $error[UPLOAD_ERR_FORM_SIZE]  = 'The file "%s" exceeds the upload limit defined in your form';
+        $error[UPLOAD_ERR_PARTIAL]    = 'The file "%s" was only partially uploaded';
+        $error[UPLOAD_ERR_NO_FILE]    = 'No file was uploaded';
+        $error[UPLOAD_ERR_CANT_WRITE] = 'The file "%s" could not be written on disk';
+        $error[UPLOAD_ERR_NO_TMP_DIR] = 'File could not be uploaded: missing temporary directory';
+        $error[UPLOAD_ERR_EXTENSION]  = 'File upload was stopped by a php extension';
+
+        $message = $error[$errorCode];
+        if (empty($message)) {
+            $message = 'The file "%s" was not uploaded due to an unknown error';
+        }
+
+       return sprintf($message, $this->getClientOriginalName(), $max_filesize);
+    }
+
 }

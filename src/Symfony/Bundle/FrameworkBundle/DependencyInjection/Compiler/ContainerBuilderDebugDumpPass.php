@@ -28,6 +28,8 @@ class ContainerBuilderDebugDumpPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $dumper = new XmlDumper($container);
+        // this does not really mean a ConfigCache, but just a way of atomically
+        // writing to a file?
         $cache = new ConfigCache($container->getParameter('debug.container.dump'), false);
         $cache->write($dumper->dump());
     }

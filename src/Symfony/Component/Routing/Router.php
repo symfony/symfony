@@ -13,6 +13,7 @@ namespace Symfony\Component\Routing;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -65,6 +66,7 @@ class Router implements RouterInterface
      * @var LoggerInterface|null
      */
     protected $logger;
+    protected $configCacheFactory;
 
     /**
      * Constructor.
@@ -200,6 +202,30 @@ class Router implements RouterInterface
     }
 
     /**
+     * Sets an configCacheFactory-implementation
+     *
+     * @param configCacheFactoryInterface $configCacheFactory The implementation
+     */
+    public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
+    {
+        $this->configCacheFactory = $configCacheFactory;
+    }
+
+    /**
+     * Returns the configCacheFactory set by setConfigCacheFactory or a BC default implementation
+     *
+     * @return ConfigCacheFactoryInterface $configCacheFactory
+     */
+    private function getConfigCacheFactory()
+    {
+        if (!$this->configCacheFactory) {
+            $this->configCacheFactory = new \Symfony\Component\Config\ConfigCacheFactory($this->options['debug']);
+        }
+
+        return $this->configCacheFactory;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
@@ -231,17 +257,21 @@ class Router implements RouterInterface
         }
 
         $class = $this->options['matcher_cache_class'];
-        $cache = new ConfigCache($this->options['cache_dir'].'/'.$class.'.php', $this->options['debug']);
-        if (!$cache->isFresh($class)) {
-            $dumper = new $this->options['matcher_dumper_class']($this->getRouteCollection());
+        $routerOptions = $this->options;
+        $self = $this;
 
-            $options = array(
-                'class'      => $class,
-                'base_class' => $this->options['matcher_base_class'],
-            );
+        $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$class.'.php',
+            function($cache) use ($routerOptions, $self, $class) {
+                $dumper = new $routerOptions['matcher_dumper_class']($self->getRouteCollection());
 
-            $cache->write($dumper->dump($options), $this->getRouteCollection()->getResources());
-        }
+                $options = array(
+                    'class'      => $class,
+                    'base_class' => $routerOptions['matcher_base_class'],
+                );
+
+                $cache->write($dumper->dump($options), $self->getRouteCollection()->getResources());
+            }
+        );
 
         require_once $cache;
 
@@ -263,17 +293,21 @@ class Router implements RouterInterface
             $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger);
         } else {
             $class = $this->options['generator_cache_class'];
-            $cache = new ConfigCache($this->options['cache_dir'].'/'.$class.'.php', $this->options['debug']);
-            if (!$cache->isFresh($class)) {
-                $dumper = new $this->options['generator_dumper_class']($this->getRouteCollection());
+            $routerOptions = $this->options;
+            $self = $this;
 
-                $options = array(
-                    'class'      => $class,
-                    'base_class' => $this->options['generator_base_class'],
-                );
+            $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$class.'.php',
+                function($cache) use ($routerOptions, $self, $class) {
+                    $dumper = new $routerOptions['generator_dumper_class']($self->getRouteCollection());
 
-                $cache->write($dumper->dump($options), $this->getRouteCollection()->getResources());
-            }
+                    $options = array(
+                        'class'      => $class,
+                        'base_class' => $routerOptions['generator_base_class'],
+                    );
+
+                    $cache->write($dumper->dump($options), $self->getRouteCollection()->getResources());
+                }
+            );
 
             require_once $cache;
 

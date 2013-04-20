@@ -20,6 +20,8 @@ class CompilerDebugDumpPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
+        // this does not really mean a ConfigCache, but just a way of atomically
+        // writing to a file?
         $cache = new ConfigCache($this->getCompilerLogFilename($container), false);
         $cache->write(implode("\n", $container->getCompiler()->getLog()));
     }

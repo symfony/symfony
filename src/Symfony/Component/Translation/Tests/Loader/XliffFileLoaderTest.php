@@ -52,6 +52,10 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testEncoding()
     {
+        if (!function_exists('iconv') && !function_exists('mb_convert_encoding')) {
+            $this->markTestSkipped('The iconv and mbstring extensions are not available.');
+        }
+
         $loader = $this->createLoader();
         $catalogue = $loader->load(__DIR__.'/../fixtures/encoding.xlf', 'en', 'domain1');
 

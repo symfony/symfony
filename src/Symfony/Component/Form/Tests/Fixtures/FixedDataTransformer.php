@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Fixtures;
 
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Exception\RuntimeException;
 
 class FixedDataTransformer implements DataTransformerInterface
 {
@@ -25,7 +26,7 @@ class FixedDataTransformer implements DataTransformerInterface
     public function transform($value)
     {
         if (!array_key_exists($value, $this->mapping)) {
-            throw new \RuntimeException(sprintf('No mapping for value "%s"', $value));
+            throw new RuntimeException(sprintf('No mapping for value "%s"', $value));
         }
 
         return $this->mapping[$value];
@@ -36,7 +37,7 @@ class FixedDataTransformer implements DataTransformerInterface
         $result = array_search($value, $this->mapping, true);
 
         if ($result === false) {
-            throw new \RuntimeException(sprintf('No reverse mapping for value "%s"', $value));
+            throw new RuntimeException(sprintf('No reverse mapping for value "%s"', $value));
         }
 
         return $result;

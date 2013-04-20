@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormConfigBuilder;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -82,7 +83,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
             if ($accepted) {
                 throw $e;
             }
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             // if the value was not accepted, but should be, rethrow exception
             if ($accepted) {
                 throw $e;
@@ -131,7 +132,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      */
     public function testSetMethodDoesNotAllowOtherValues()
     {

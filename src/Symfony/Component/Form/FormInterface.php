@@ -26,7 +26,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @return FormInterface The form instance
      *
      * @throws Exception\AlreadyBoundException If the form has already been bound.
-     * @throws Exception\FormException         When trying to set a parent for a form with
+     * @throws Exception\LogicException        When trying to set a parent for a form with
      *                                         an empty name.
      */
     public function setParent(FormInterface $parent = null);
@@ -48,7 +48,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @return FormInterface The form instance
      *
      * @throws Exception\AlreadyBoundException   If the form has already been bound.
-     * @throws Exception\FormException           When trying to add a child to a non-compound form.
+     * @throws Exception\LogicException          When trying to add a child to a non-compound form.
      * @throws Exception\UnexpectedTypeException If $child or $type has an unexpected type.
      */
     public function add($child, $type = null, array $options = array());
@@ -106,7 +106,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @return FormInterface The form instance
      *
      * @throws Exception\AlreadyBoundException If the form has already been bound.
-     * @throws Exception\FormException         If listeners try to call setData in a cycle. Or if
+     * @throws Exception\LogicException        If listeners try to call setData in a cycle. Or if
      *                                         the view data does not match the expected type
      *                                         according to {@link FormConfigInterface::getDataClass}.
      */

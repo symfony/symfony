@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
  * A form extension with preloaded types, type exceptions and type guessers.
@@ -55,7 +55,7 @@ class PreloadedExtension implements FormExtensionInterface
     public function getType($name)
     {
         if (!isset($this->types[$name])) {
-            throw new Exception(sprintf('The type "%s" can not be loaded by this extension', $name));
+            throw new InvalidArgumentException(sprintf('The type "%s" can not be loaded by this extension', $name));
         }
 
         return $this->types[$name];

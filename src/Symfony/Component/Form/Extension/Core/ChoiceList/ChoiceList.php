@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
 /**
@@ -254,7 +255,7 @@ class ChoiceList implements ChoiceListInterface
      * @param array              $labels             The labels corresponding to the choices.
      * @param array              $preferredChoices   The preferred choices.
      *
-     * @throws \InvalidArgumentException     If the structures of the choices and labels array do not match.
+     * @throws InvalidArgumentException     If the structures of the choices and labels array do not match.
      * @throws InvalidConfigurationException If no valid value or index could be created for a choice.
      */
     protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
@@ -262,7 +263,7 @@ class ChoiceList implements ChoiceListInterface
         // Add choices to the nested buckets
         foreach ($choices as $group => $choice) {
             if (!array_key_exists($group, $labels)) {
-                throw new \InvalidArgumentException('The structures of the choices and labels array do not match.');
+                throw new InvalidArgumentException('The structures of the choices and labels array do not match.');
             }
 
             if (is_array($choice)) {

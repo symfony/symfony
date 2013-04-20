@@ -173,7 +173,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\Exception
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testGetTypeThrowsExceptionIfParentNotFound()
     {
@@ -185,7 +185,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\Exception
+     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      */
     public function testGetTypeThrowsExceptionIfTypeNotFound()
     {

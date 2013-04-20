@@ -65,11 +65,11 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @param mixed $offset
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     public function offsetGet($offset)
     {
-        throw new \BadMethodCallException('Buttons cannot have children.');
+        throw new BadMethodCallException('Buttons cannot have children.');
     }
 
     /**
@@ -80,11 +80,11 @@ class Button implements \IteratorAggregate, FormInterface
      * @param mixed $offset
      * @param mixed $value
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     public function offsetSet($offset, $value)
     {
-        throw new \BadMethodCallException('Buttons cannot have children.');
+        throw new BadMethodCallException('Buttons cannot have children.');
     }
 
     /**
@@ -94,11 +94,11 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @param mixed $offset
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     public function offsetUnset($offset)
     {
-        throw new \BadMethodCallException('Buttons cannot have children.');
+        throw new BadMethodCallException('Buttons cannot have children.');
     }
 
     /**
@@ -126,11 +126,11 @@ class Button implements \IteratorAggregate, FormInterface
      * @param null                     $type
      * @param array                    $options
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     public function add($child, $type = null, array $options = array())
     {
-        throw new \BadMethodCallException('Buttons cannot have children.');
+        throw new BadMethodCallException('Buttons cannot have children.');
     }
 
     /**
@@ -140,11 +140,11 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @param string $name
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     public function get($name)
     {
-        throw new \BadMethodCallException('Buttons cannot have children.');
+        throw new BadMethodCallException('Buttons cannot have children.');
     }
 
     /**
@@ -166,11 +166,11 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @param string $name
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     public function remove($name)
     {
-        throw new \BadMethodCallException('Buttons cannot have children.');
+        throw new BadMethodCallException('Buttons cannot have children.');
     }
 
     /**
@@ -196,11 +196,11 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @param string $modelData
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     public function setData($modelData)
     {
-        throw new \BadMethodCallException('Buttons cannot have data.');
+        throw new BadMethodCallException('Buttons cannot have data.');
     }
 
     /**
@@ -288,11 +288,11 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @param FormError $error
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     public function addError(FormError $error)
     {
-        throw new \BadMethodCallException('Buttons cannot have errors.');
+        throw new BadMethodCallException('Buttons cannot have errors.');
     }
 
     /**

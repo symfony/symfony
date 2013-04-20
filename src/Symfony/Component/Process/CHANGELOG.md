@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added Process::signal()
+ * added Process::getPid()
+ * added support for a TTY mode
+
 2.2.0
 -----
 

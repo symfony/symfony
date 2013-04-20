@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by pvolok at 2013-04-12T17:05:28Z
+
+In order to test the changes I have to use reflection or add a getter for uri field. Which way is preferred?
+
+---------------------------------------------------------------------------
+
+by pvolok at 2013-04-20T12:57:56Z
+
+Reworked it as stof suggested and added unit tests.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-20T13:07:52Z
+
+Tests do not pass for me:
+
+```
+1) Symfony\Component\DomCrawler\Tests\CrawlerTest::testBaseTag
+<base> tag can use a schema-less url
+Failed asserting that two strings are equal.
+--- Expected
++++ Actual
+@@ @@
+-'https://base.com/link'
++'https://domain.com/link'
+
+.../src/Symfony/Component/DomCrawler/Tests/CrawlerTest.php:567
+```
+
+---------------------------------------------------------------------------
+
+by pvolok at 2013-04-20T13:26:04Z
+
+@fabpot Is it possible that you missed something? Because it passes for me and travis.
+
+I noticed that in your test the line number is 567, for me its 577.
+
+Also, I got confused while rebasing 2 my commits and decided to remove and create the branch. I doubt it could cause any problems.

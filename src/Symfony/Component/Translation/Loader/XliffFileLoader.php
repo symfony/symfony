@@ -23,6 +23,37 @@ use Symfony\Component\Config\Resource\FileResource;
  */
 class XliffFileLoader implements LoaderInterface
 {
+
+    /**
+     * Encoding specified in xlf file
+     *
+     * @var string
+     */
+    protected $encoding = null;
+
+    /**
+     * Get $encoding
+     *
+     * @return string
+     */
+    public function getEncoding()
+    {
+        return $this->encoding;
+    }
+
+    /**
+     * Set $encoding
+     *
+     * @param  string $encoding
+     * @return \Symfony\Component\Translation\Loader\XliffFileLoader
+     */
+    public function setEncoding($encoding)
+    {
+        $this->encoding = strtoupper($encoding);
+
+        return $this;
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -37,6 +68,8 @@ class XliffFileLoader implements LoaderInterface
         $xml = $this->parseFile($resource);
         $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:1.2');
 
+        $encoding = $this->getEncoding();
+
         $catalogue = new MessageCatalogue($locale);
         foreach ($xml->xpath('//xliff:trans-unit') as $translation) {
             $attributes = $translation->attributes();
@@ -46,7 +79,21 @@ class XliffFileLoader implements LoaderInterface
             }
 
             $source = isset($attributes['resname']) && $attributes['resname'] ? $attributes['resname'] : $translation->source;
-            $catalogue->set((string) $source, (string) $translation->target, $domain);
+            $target = (string) $translation->target;
+
+            // If the xlf file has another encoding specified try to convert it here because
+            // simple_xml will always return utf-8 encoded values
+            if ($encoding !== null) {
+                if (function_exists('mb_convert_encoding')) {
+                    $target = mb_convert_encoding($target, $encoding, 'UTF-8');
+                } elseif (function_exists('iconv')) {
+                    $target = iconv('UTF-8', $encoding, $target);
+                } else {
+                    throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
+                }
+            }
+
+            $catalogue->set((string) $translation->source, $target, $domain);
         }
         $catalogue->addResource(new FileResource($resource));
 
@@ -74,6 +121,11 @@ class XliffFileLoader implements LoaderInterface
             libxml_disable_entity_loader($disableEntities);
 
             throw new \RuntimeException(implode("\n", $this->getXmlErrors($internalErrors)));
+        }
+
+        $encoding = strtoupper($dom->encoding);
+        if (!empty($encoding) && $encoding != 'UTF-8') {
+            $this->setEncoding($encoding);
         }
 
         libxml_disable_entity_loader($disableEntities);

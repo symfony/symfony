@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Tests;
+namespace Symfony\Component\HttpFoundation\Tests\Session\Attribute;
 
 use Symfony\Component\HttpFoundation\Session\Attribute\NamespacedAttributeBag;
 

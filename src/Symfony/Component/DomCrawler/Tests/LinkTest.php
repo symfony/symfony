@@ -96,6 +96,10 @@ class LinkTest extends \PHPUnit_Framework_TestCase
             array('https://login.foo.com/foo', 'https://localhost/bar/', 'https://login.foo.com/foo'),
             array('mailto:foo@bar.com', 'http://localhost/foo', 'mailto:foo@bar.com'),
 
+            // tests schema relative URL (issue #7169)
+            array('//login.foo.com/foo', 'http://localhost/bar/', 'http://login.foo.com/foo'),
+            array('//login.foo.com/foo', 'https://localhost/bar/', 'https://login.foo.com/foo'),
+
             array('?foo=2', 'http://localhost?foo=1', 'http://localhost?foo=2'),
             array('?foo=2', 'http://localhost/?foo=1', 'http://localhost/?foo=2'),
             array('?foo=2', 'http://localhost/bar?foo=1', 'http://localhost/bar?foo=2'),

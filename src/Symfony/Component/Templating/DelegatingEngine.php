@@ -20,12 +20,15 @@ namespace Symfony\Component\Templating;
  */
 class DelegatingEngine implements EngineInterface, StreamingEngineInterface
 {
+    /**
+     * @var EngineInterface[]
+     */
     protected $engines;
 
     /**
      * Constructor.
      *
-     * @param array $engines An array of EngineInterface instances to add
+     * @param EngineInterface[] $engines An array of EngineInterface instances to add
      *
      * @api
      */
@@ -38,15 +41,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     }
 
     /**
-     * Renders a template.
-     *
-     * @param mixed $name       A template name or a TemplateReferenceInterface instance
-     * @param array $parameters An array of parameters to pass to the template
-     *
-     * @return string The evaluated template as a string
-     *
-     * @throws \InvalidArgumentException if the template does not exist
-     * @throws \RuntimeException         if the template cannot be rendered
+     * {@inheritdoc}
      *
      * @api
      */
@@ -56,12 +51,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     }
 
     /**
-     * Streams a template.
-     *
-     * @param mixed $name       A template name or a TemplateReferenceInterface instance
-     * @param array $parameters An array of parameters to pass to the template
-     *
-     * @throws \RuntimeException if the template cannot be rendered
+     * {@inheritdoc}
      *
      * @api
      */
@@ -76,11 +66,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     }
 
     /**
-     * Returns true if the template exists.
-     *
-     * @param mixed $name A template name or a TemplateReferenceInterface instance
-     *
-     * @return Boolean true if the template exists, false otherwise
+     * {@inheritdoc}
      *
      * @api
      */
@@ -102,11 +88,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     }
 
     /**
-     * Returns true if this class is able to render the given template.
-     *
-     * @param mixed $name A template name or a TemplateReferenceInterface instance
-     *
-     * @return Boolean true if this class supports the given template, false otherwise
+     * {@inheritdoc}
      *
      * @api
      */

@@ -17,11 +17,19 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/twig-bridge": "2.1.*"
+        "symfony/twig-bridge": "2.2.*"
+    },
+    "require-dev": {
+        "symfony/stopwatch": ">=2.2,<2.4-dev"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bundle\\TwigBundle": "" }
+        "psr-0": { "Symfony\\Bundle\\TwigBundle\\": "" }
     },
     "target-dir": "Symfony/Bundle/TwigBundle",
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.3-dev"
+        }
+    }
 }

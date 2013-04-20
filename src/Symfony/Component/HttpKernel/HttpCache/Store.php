@@ -71,7 +71,13 @@ class Store implements StoreInterface
      */
     public function lock(Request $request)
     {
-        if (false !== $lock = @fopen($path = $this->getPath($this->getCacheKey($request).'.lck'), 'x')) {
+        $path = $this->getPath($this->getCacheKey($request).'.lck');
+        if (!is_dir(dirname($path)) && false === @mkdir(dirname($path), 0777, true)) {
+            return false;
+        }
+
+        $lock = @fopen($path, 'x');
+        if (false !== $lock) {
             fclose($lock);
 
             $this->locks[] = $path;
@@ -79,7 +85,7 @@ class Store implements StoreInterface
             return true;
         }
 
-        return $path;
+        return !file_exists($path) ?: $path;
     }
 
     /**
@@ -94,6 +100,11 @@ class Store implements StoreInterface
         $file = $this->getPath($this->getCacheKey($request).'.lck');
 
         return is_file($file) ? @unlink($file) : false;
+    }
+
+    public function isLocked(Request $request)
+    {
+        return is_file($this->getPath($this->getCacheKey($request).'.lck'));
     }
 
     /**
@@ -146,6 +157,8 @@ class Store implements StoreInterface
      * @param Response $response A Response instance
      *
      * @return string The key under which the response is stored
+     *
+     * @throws \RuntimeException
      */
     public function write(Request $request, Response $response)
     {
@@ -208,6 +221,8 @@ class Store implements StoreInterface
      * Invalidates all cache entries that match the request.
      *
      * @param Request $request A Request instance
+     *
+     * @throws \RuntimeException
      */
     public function invalidate(Request $request)
     {
@@ -325,6 +340,8 @@ class Store implements StoreInterface
      *
      * @param string $key  The store key
      * @param string $data The data to store
+     *
+     * @return Boolean
      */
     private function save($key, $data)
     {
@@ -404,6 +421,8 @@ class Store implements StoreInterface
      *
      * @param array  $headers An array of HTTP headers for the Response
      * @param string $body    The Response body
+     *
+     * @return Response
      */
     private function restoreResponse($headers, $body = null)
     {

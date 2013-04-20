@@ -233,7 +233,7 @@ class Response
             $headers->remove('Content-Length');
         }
 
-        if ('HEAD' === $request->getMethod()) {
+        if ($request->isMethod('HEAD')) {
             // cf. RFC2616 14.13
             $length = $headers->get('Content-Length');
             $this->setContent(null);
@@ -253,15 +253,7 @@ class Response
             $this->headers->set('expires', -1);
         }
 
-        /**
-         * Check if we need to remove Cache-Control for ssl encrypted downloads when using IE < 9
-         * @link http://support.microsoft.com/kb/323308
-         */
-        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) == 1 && true === $request->isSecure()) {
-            if (intval(preg_replace("/(MSIE )(.*?);/", "$2", $match[0])) < 9) {
-                $this->headers->remove('Cache-Control');
-            }
-        }
+        $this->ensureIEOverSSLCompatibility($request);
 
         return $this;
     }
@@ -282,7 +274,7 @@ class Response
         header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
 
         // headers
-        foreach ($this->headers->all() as $name => $values) {
+        foreach ($this->headers->allPreserveCase() as $name => $values) {
             foreach ($values as $value) {
                 header($name.': '.$value, false);
             }
@@ -348,12 +340,14 @@ class Response
      *
      * @return Response
      *
+     * @throws \UnexpectedValueException
+     *
      * @api
      */
     public function setContent($content)
     {
         if (null !== $content && !is_string($content) && !is_numeric($content) && !is_callable(array($content, '__toString'))) {
-            throw new \UnexpectedValueException('The Response content must be a string or object implementing __toString(), "'.gettype($content).'" given.');
+            throw new \UnexpectedValueException(sprintf('The Response content must be a string or object implementing __toString(), "%s" given.', gettype($content)));
         }
 
         $this->content = (string) $content;
@@ -894,6 +888,8 @@ class Response
      *
      * @return Response
      *
+     * @throws \InvalidArgumentException
+     *
      * @api
      */
     public function setCache(array $options)
@@ -1127,7 +1123,7 @@ class Response
     }
 
     /**
-     * Is the reponse forbidden?
+     * Is the response forbidden?
      *
      * @return Boolean
      *
@@ -1174,5 +1170,19 @@ class Response
     public function isEmpty()
     {
         return in_array($this->statusCode, array(201, 204, 304));
+    }
+
+    /**
+     * Check if we need to remove Cache-Control for ssl encrypted downloads when using IE < 9
+     *
+     * @link http://support.microsoft.com/kb/323308
+     */
+    protected function ensureIEOverSSLCompatibility(Request $request)
+    {
+        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) == 1 && true === $request->isSecure()) {
+            if (intval(preg_replace("/(MSIE )(.*?);/", "$2", $match[0])) < 9) {
+                $this->headers->remove('Cache-Control');
+            }
+        }
     }
 }

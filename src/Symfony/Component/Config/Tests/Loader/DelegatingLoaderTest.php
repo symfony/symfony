@@ -69,7 +69,7 @@ class DelegatingLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Config\Exception\FileLoaderLoadException
+     * @expectedException \Symfony\Component\Config\Exception\FileLoaderLoadException
      */
     public function testLoadThrowsAnExceptionIfTheResourceCannotBeLoaded()
     {

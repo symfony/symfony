@@ -16,6 +16,51 @@ use Symfony\Component\HttpFoundation\Cookie;
 
 class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @covers Symfony\Component\HttpFoundation\ResponseHeaderBag::allPreserveCase
+     * @dataProvider provideAllPreserveCase
+     */
+    public function testAllPreserveCase($headers, $expected)
+    {
+        $bag = new ResponseHeaderBag($headers);
+
+        $this->assertEquals($expected, $bag->allPreserveCase(), '->allPreserveCase() gets all input keys in original case');
+    }
+
+    public function provideAllPreserveCase()
+    {
+        return array(
+            array(
+                array('fOo' => 'BAR'),
+                array('fOo' => array('BAR'), 'Cache-Control' => array('no-cache'))
+            ),
+            array(
+                array('ETag' => 'xyzzy'),
+                array('ETag' => array('xyzzy'), 'Cache-Control' => array('private, must-revalidate'))
+            ),
+            array(
+                array('Content-MD5' => 'Q2hlY2sgSW50ZWdyaXR5IQ=='),
+                array('Content-MD5' => array('Q2hlY2sgSW50ZWdyaXR5IQ=='), 'Cache-Control' => array('no-cache'))
+            ),
+            array(
+                array('P3P' => 'CP="CAO PSA OUR"'),
+                array('P3P' => array('CP="CAO PSA OUR"'), 'Cache-Control' => array('no-cache'))
+            ),
+            array(
+                array('WWW-Authenticate' => 'Basic realm="WallyWorld"'),
+                array('WWW-Authenticate' => array('Basic realm="WallyWorld"'), 'Cache-Control' => array('no-cache'))
+            ),
+            array(
+                array('X-UA-Compatible' => 'IE=edge,chrome=1'),
+                array('X-UA-Compatible' => array('IE=edge,chrome=1'), 'Cache-Control' => array('no-cache'))
+            ),
+            array(
+                array('X-XSS-Protection' => '1; mode=block'),
+                array('X-XSS-Protection' => array('1; mode=block'), 'Cache-Control' => array('no-cache'))
+            ),
+        );
+    }
+
     public function testCacheControlHeader()
     {
         $bag = new ResponseHeaderBag(array());
@@ -188,6 +233,20 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
         $headers = new ResponseHeaderBag();
 
         $this->assertEquals($expected, $headers->makeDisposition($disposition, $filename, $filenameFallback));
+    }
+
+    public function testToStringDoesntMessUpHeaders()
+    {
+        $headers = new ResponseHeaderBag();
+
+        $headers->set('Location', 'http://www.symfony.com');
+        $headers->set('Content-type', 'text/html');
+
+        (string) $headers;
+
+        $allHeaders = $headers->allPreserveCase();
+        $this->assertEquals(array('http://www.symfony.com'), $allHeaders['Location']);
+        $this->assertEquals(array('text/html'), $allHeaders['Content-type']);
     }
 
     public function provideMakeDisposition()

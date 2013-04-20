@@ -258,7 +258,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'checked' => 'checked'));
         $field = new ChoiceFormField($node);
         $field->untick();
-        $this->assertNull($field->getValue(), '->untick() unticks checkoxes');
+        $this->assertNull($field->getValue(), '->untick() unticks checkboxes');
     }
 
     public function testSelect()

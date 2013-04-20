@@ -14,11 +14,11 @@ namespace Symfony\Component\CssSelector\Exception;
 /**
  * ParseException is thrown when a CSS selector syntax is not valid.
  *
- * This component is a port of the Python lxml library,
- * which is copyright Infrae and distributed under the BSD license.
+ * This component is a port of the Python cssselector library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ParseException extends \Exception
+class ParseException extends \Exception implements ExceptionInterface
 {
 }

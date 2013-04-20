@@ -17,6 +17,7 @@ use Redis;
  * RedisProfilerStorage stores profiling information in Redis.
  *
  * @author Andrej Hudec <pulzarraider@gmail.com>
+ * @author Stephane PY <py.stephane1@gmail.com>
  */
 class RedisProfilerStorage implements ProfilerStorageInterface
 {
@@ -52,7 +53,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method)
+    public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
         $indexName = $this->getIndexName();
 
@@ -74,7 +75,17 @@ class RedisProfilerStorage implements ProfilerStorageInterface
 
             list($itemToken, $itemIp, $itemMethod, $itemUrl, $itemTime, $itemParent) = explode("\t", $item, 6);
 
+            $itemTime = (int) $itemTime;
+
             if ($ip && false === strpos($itemIp, $ip) || $url && false === strpos($itemUrl, $url) || $method && false === strpos($itemMethod, $method)) {
+                continue;
+            }
+
+            if (!empty($start) && $itemTime < $start) {
+                continue;
+            }
+
+            if (!empty($end) && $itemTime > $end) {
                 continue;
             }
 
@@ -189,28 +200,31 @@ class RedisProfilerStorage implements ProfilerStorageInterface
      * Internal convenience method that returns the instance of Redis.
      *
      * @return Redis
+     *
+     * @throws \RuntimeException
      */
     protected function getRedis()
     {
         if (null === $this->redis) {
-            if (!preg_match('#^redis://(?(?=\[.*\])\[(.*)\]|(.*)):(\d+)(/(\d+))?$#', $this->dsn, $matches)) {
-                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Redis with an invalid dsn "%s". The expected format is "redis://[host]:port[/db-number]".', $this->dsn));
-            }
+            $data = parse_url($this->dsn);
 
-            $host = $matches[1] ?: $matches[2];
-            $port = $matches[3];
-            $dbnum = !empty($matches[5]) ? intval($matches[5]) : -1;
+            if (false === $data || !isset($data['scheme']) || $data['scheme'] !== 'redis' || !isset($data['host']) || !isset($data['port'])) {
+                throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use Redis with an invalid dsn "%s". The minimal expected format is "redis://[host]:port".', $this->dsn));
+            }
 
             if (!extension_loaded('redis')) {
                 throw new \RuntimeException('RedisProfilerStorage requires that the redis extension is loaded.');
             }
 
             $redis = new Redis;
-            $redis->connect($host, $port);
-            
-            // if a valid dbnumber is given select the redis index
-            if (-1 < $dbnum) {
-                $redis->select($dbnum);
+            $redis->connect($data['host'], $data['port']);
+
+            if (isset($data['path'])) {
+                $redis->select(substr($data['path'], 1));
+            }
+
+            if (isset($data['pass'])) {
+                $redis->auth($data['pass']);
             }
 
             $redis->setOption(self::REDIS_OPT_PREFIX, self::TOKEN_PREFIX);

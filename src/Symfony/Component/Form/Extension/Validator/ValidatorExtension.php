@@ -36,7 +36,7 @@ class ValidatorExtension extends AbstractExtension
         // code must be kept synchronized with validation.xml
 
         /** @var \Symfony\Component\Validator\Mapping\ClassMetadata $metadata */
-        $metadata = $this->validator->getMetadataFactory()->getClassMetadata('Symfony\Component\Form\Form');
+        $metadata = $this->validator->getMetadataFactory()->getMetadataFor('Symfony\Component\Form\Form');
         $metadata->addConstraint(new Form());
         $metadata->addPropertyConstraint('children', new Valid());
     }
@@ -51,6 +51,7 @@ class ValidatorExtension extends AbstractExtension
         return array(
             new Type\FormTypeValidatorExtension($this->validator),
             new Type\RepeatedTypeValidatorExtension(),
+            new Type\SubmitTypeValidatorExtension(),
         );
     }
 }

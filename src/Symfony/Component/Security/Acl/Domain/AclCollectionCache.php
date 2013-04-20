@@ -44,8 +44,8 @@ class AclCollectionCache
      * Batch loads ACLs for an entire collection; thus, it reduces the number
      * of required queries considerably.
      *
-     * @param mixed $collection anything that can be passed to foreach()
-     * @param array $tokens     an array of TokenInterface implementations
+     * @param mixed            $collection anything that can be passed to foreach()
+     * @param TokenInterface[] $tokens     an array of TokenInterface implementations
      */
     public function cache($collection, array $tokens = array())
     {

@@ -143,6 +143,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
         $this->options = array();
         $this->lazy = array();
+        $this->normalizers = array();
 
         foreach ($options as $option => $value) {
             $this->overload($option, $value);
@@ -224,7 +225,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         $this->reading = true;
 
         if (!array_key_exists($option, $this->options)) {
-            throw new \OutOfBoundsException('The option "' . $option . '" does not exist.');
+            throw new \OutOfBoundsException(sprintf('The option "%s" does not exist.', $option));
         }
 
         if (isset($this->lazy[$option])) {
@@ -458,7 +459,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
                 }
             }
 
-            throw new OptionDefinitionException('The options "' . implode('", "', $conflicts) . '" have a cyclic dependency.');
+            throw new OptionDefinitionException(sprintf('The options "%s" have a cyclic dependency.', implode('", "', $conflicts)));
         }
 
         $this->lock[$option] = true;
@@ -496,14 +497,14 @@ class Options implements \ArrayAccess, \Iterator, \Countable
                 }
             }
 
-            throw new OptionDefinitionException('The options "' . implode('", "', $conflicts) . '" have a cyclic dependency.');
+            throw new OptionDefinitionException(sprintf('The options "%s" have a cyclic dependency.', implode('", "', $conflicts)));
         }
 
         /** @var \Closure $normalizer */
         $normalizer = $this->normalizers[$option];
 
         $this->lock[$option] = true;
-        $this->options[$option] = $normalizer($this, $this->options[$option]);
+        $this->options[$option] = $normalizer($this, array_key_exists($option, $this->options) ? $this->options[$option] : null);
         unset($this->lock[$option]);
 
         // The option is now normalized

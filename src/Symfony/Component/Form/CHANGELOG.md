@@ -1,6 +1,48 @@
 CHANGELOG
 =========
 
+
+2.3.0
+------
+
+ * deprecated FormPerformanceTestCase and FormIntegrationTestCase in the Symfony\Component\Form\Tests namespace and moved them to the Symfony\Component\Form\Test namespace
+ * deprecated TypeTestCase in the Symfony\Component\Form\Tests\Extension\Core\Type namespace and moved it to the Symfony\Component\Form\Test namespace
+ * changed FormRenderer::humanize() to humanize also camel cased field name
+ * added FormProcessorInterface and FormInterface::process()
+ * deprecated passing a Request instance to FormInterface::bind()
+ * added options "method" and "action" to FormType
+ * deprecated option "virtual" in favor "inherit_data"
+ * deprecated VirtualFormAwareIterator in favor of InheritDataAwareIterator
+ * [BC BREAK] removed the "array" type hint from DataMapperInterface
+ * improved forms inheriting their parent data to actually return that data from getData(), getNormData() and getViewData()
+ * added component-level exceptions for various SPL exceptions
+   changed all uses of the deprecated Exception class to use more specialized exceptions instead
+   removed NotInitializedException, NotValidException, TypeDefinitionException, TypeLoaderException, CreationException
+
+2.2.0
+-----
+
+ * TrimListener now removes unicode whitespaces
+ * deprecated getParent(), setParent() and hasParent() in FormBuilderInterface
+ * FormInterface::add() now accepts a FormInterface instance OR a field's name, type and options
+ * removed special characters between the choice or text fields of DateType unless
+   the option "format" is set to a custom value
+ * deprecated FormException and introduced ExceptionInterface instead
+ * [BC BREAK] FormException is now an interface
+ * protected FormBuilder methods from being called when it is turned into a FormConfigInterface with getFormConfig()
+ * [BC BREAK] inserted argument `$message` in the constructor of `FormError`
+ * the PropertyPath class and related classes were moved to a dedicated
+   PropertyAccess component. During the move, InvalidPropertyException was
+   renamed to NoSuchPropertyException. FormUtil was split: FormUtil::singularify()
+   can now be found in Symfony\Component\PropertyAccess\StringUtil. The methods
+   getValue() and setValue() from PropertyPath were extracted into a new class
+   PropertyAccessor.
+ * added an optional PropertyAccessorInterface parameter to FormType,
+   ObjectChoiceList and PropertyPathMapper
+ * [BC BREAK] PropertyPathMapper and FormType now have a constructor
+ * [BC BREAK] setting the option "validation_groups" to ``false`` now disables validation
+   instead of assuming group "Default"
+
 2.1.0
 -----
 

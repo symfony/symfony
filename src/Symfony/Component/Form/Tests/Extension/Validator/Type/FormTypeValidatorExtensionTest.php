@@ -40,6 +40,15 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
         $this->assertEquals(array('group1', 'group2'), $form->getConfig()->getOption('validation_groups'));
     }
 
+    public function testValidationGroupsCanBeSetToFalse()
+    {
+        $form = $this->factory->create('form', null, array(
+                'validation_groups' => false,
+            ));
+
+        $this->assertEquals(array(), $form->getConfig()->getOption('validation_groups'));
+    }
+
     public function testValidationGroupsCanBeSetToCallback()
     {
         $form = $this->factory->create('form', null, array(

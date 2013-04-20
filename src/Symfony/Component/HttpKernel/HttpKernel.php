@@ -172,13 +172,15 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Handles and exception by trying to convert it to a Response.
+     * Handles an exception by trying to convert it to a Response.
      *
      * @param \Exception $e       An \Exception instance
      * @param Request    $request A Request instance
      * @param integer    $type    The type of the request
      *
      * @return Response A Response instance
+     *
+     * @throws \Exception
      */
     private function handleException(\Exception $e, $request, $type)
     {

@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added `GetSetMethodNormalizer::setCamelizedAttributes` to allow calling
+   camel cased methods for underscored properties
+
+2.2.0
+-----
+
+ * [BC BREAK] All Serializer, Normalizer and Encoder interfaces have been
+   modified to include an optional `$context` array parameter.
+ * The XML Root name can now be configured with the `xml_root_name`
+   parameter in the context option to the `XmlEncoder`.
+ * Options to `json_encode` and `json_decode` can be passed through
+   the context options of `JsonEncode` and `JsonDecode` encoder/decoders.
+
 2.1.0
 -----
 

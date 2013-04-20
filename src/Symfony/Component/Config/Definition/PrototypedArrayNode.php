@@ -183,7 +183,7 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @param NodeInterface $node The child node to add
      *
-     * @throws \RuntimeException Prototyped array nodes can't have concrete children.
+     * @throws Exception
      */
     public function addChild(NodeInterface $node)
     {
@@ -233,6 +233,9 @@ class PrototypedArrayNode extends ArrayNode
      * @param mixed $value The value to normalize
      *
      * @return mixed The normalized value
+     *
+     * @throws InvalidConfigurationException
+     * @throws DuplicateKeyException
      */
     protected function normalizeValue($value)
     {

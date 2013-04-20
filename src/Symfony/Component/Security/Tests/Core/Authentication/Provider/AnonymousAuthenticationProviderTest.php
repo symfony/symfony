@@ -31,7 +31,7 @@ class AnonymousAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
     public function testAuthenticateWhenKeyIsNotValid()
     {

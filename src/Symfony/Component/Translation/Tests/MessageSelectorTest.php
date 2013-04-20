@@ -67,6 +67,14 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
             array('There are %count% apples', 'There is one apple|There are %count% apples', 0),
             array('There is one apple', 'There is one apple|There are %count% apples', 1),
             array('There are %count% apples', 'There is one apple|There are %count% apples', 2),
+
+            // Tests for float numbers
+            array('There is almost one apple', '{0} There is no apples|]0,1[ There is almost one apple|{1} There is one apple|[1,Inf] There is more than one apple', 0.7),
+            array('There is one apple', '{0} There is no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 1),
+            array('There is more than one apple', '{0} There is no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 1.7),
+            array('There is no apples', '{0} There is no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0),
+            array('There is no apples', '{0} There is no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0.0),
+            array('There is no apples', '{0.0} There is no apples|]0,1[There are %count% apples|{1} There is one apple|[1,Inf] There is more than one apple', 0),
         );
     }
 }

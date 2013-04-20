@@ -19,8 +19,13 @@
         "php": ">=5.3.3"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\OptionsResolver": "" }
+        "psr-0": { "Symfony\\Component\\OptionsResolver\\": "" }
     },
     "target-dir": "Symfony/Component/OptionsResolver",
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.3-dev"
+        }
+    }
 }

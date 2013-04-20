@@ -107,7 +107,7 @@ https://github.com/fabpot/Silex/blob/master/src/Silex/Provider/ValidatorServiceP
 
 Documentation:
 
-http://symfony.com/doc/2.1/book/validation.html
+http://symfony.com/doc/2.3/book/validation.html
 
 JSR-303 Specification:
 
@@ -115,9 +115,6 @@ http://jcp.org/en/jsr/detail?id=303
 
 You can run the unit tests with the following command:
 
-    phpunit
-
-If you also want to run the unit tests that depend on other Symfony
-Components, install dev dependencies before running PHPUnit:
-
-    php composer.phar install --dev
+    $ cd path/to/Symfony/Component/Validator/
+    $ composer.phar install --dev
+    $ phpunit

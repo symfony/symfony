@@ -24,6 +24,49 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($bag->has('foo'));
     }
 
+    public function testToStringNull()
+    {
+        $bag = new HeaderBag();
+        $this->assertEquals('', $bag->__toString());
+    }
+
+    public function testToStringNotNull()
+    {
+        $bag = new HeaderBag(array('foo' => 'bar'));
+        $this->assertEquals("Foo: bar\r\n", $bag->__toString());
+    }
+
+    public function testKeys()
+    {
+        $bag = new HeaderBag(array('foo' => 'bar'));
+        $keys = $bag->keys();
+        $this->assertEquals("foo", $keys[0]);
+    }
+
+    public function testGetDate()
+    {
+        $bag = new HeaderBag(array('foo' => 'Tue, 4 Sep 2012 20:00:00 +0200'));
+        $headerDate = $bag->getDate('foo');
+        $this->assertInstanceOf('DateTime', $headerDate);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testGetDateException()
+    {
+        $bag = new HeaderBag(array('foo' => 'Tue'));
+        $headerDate = $bag->getDate('foo');
+    }
+
+    public function testGetCacheControlHeader()
+    {
+        $bag = new HeaderBag();
+        $bag->addCacheControlDirective('public', '#a');
+        $this->assertTrue($bag->hasCacheControlDirective('public'));
+        $this->assertEquals('#a', $bag->getCacheControlDirective('public'));
+    }
+
     /**
      * @covers Symfony\Component\HttpFoundation\HeaderBag::all
      */

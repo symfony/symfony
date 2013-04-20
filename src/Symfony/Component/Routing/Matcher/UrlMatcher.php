@@ -30,10 +30,20 @@ class UrlMatcher implements UrlMatcherInterface
     const REQUIREMENT_MISMATCH  = 1;
     const ROUTE_MATCH           = 2;
 
+    /**
+     * @var RequestContext
+     */
     protected $context;
-    protected $allow;
 
-    private $routes;
+    /**
+     * @var array
+     */
+    protected $allow = array();
+
+    /**
+     * @var RouteCollection
+     */
+    protected $routes;
 
     /**
      * Constructor.
@@ -95,18 +105,6 @@ class UrlMatcher implements UrlMatcherInterface
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
         foreach ($routes as $name => $route) {
-            if ($route instanceof RouteCollection) {
-                if (false === strpos($route->getPrefix(), '{') && $route->getPrefix() !== substr($pathinfo, 0, strlen($route->getPrefix()))) {
-                    continue;
-                }
-
-                if (!$ret = $this->matchCollection($pathinfo, $route)) {
-                    continue;
-                }
-
-                return $ret;
-            }
-
             $compiledRoute = $route->compile();
 
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
@@ -115,6 +113,11 @@ class UrlMatcher implements UrlMatcherInterface
             }
 
             if (!preg_match($compiledRoute->getRegex(), $pathinfo, $matches)) {
+                continue;
+            }
+
+            $hostMatches = array();
+            if ($compiledRoute->getHostRegex() && !preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches)) {
                 continue;
             }
 
@@ -142,8 +145,28 @@ class UrlMatcher implements UrlMatcherInterface
                 continue;
             }
 
-            return array_merge($this->mergeDefaults($matches, $route->getDefaults()), array('_route' => $name));
+            return $this->getAttributes($route, $name, array_replace($matches, $hostMatches));
         }
+    }
+
+    /**
+     * Returns an array of values to use as request attributes.
+     *
+     * As this method requires the Route object, it is not available
+     * in matchers that do not have access to the matched Route instance
+     * (like the PHP and Apache matcher dumpers).
+     *
+     * @param Route  $route      The route we are matching against
+     * @param string $name       The name of the route
+     * @param array  $attributes An array of attributes from the matcher
+     *
+     * @return array An array of parameters
+     */
+    protected function getAttributes(Route $route, $name, array $attributes)
+    {
+        $attributes['_route'] = $name;
+
+        return $this->mergeDefaults($attributes, $route->getDefaults());
     }
 
     /**

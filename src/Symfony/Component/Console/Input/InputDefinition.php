@@ -72,7 +72,7 @@ class InputDefinition
     /**
      * Sets the InputArgument objects.
      *
-     * @param array $arguments An array of InputArgument objects
+     * @param InputArgument[] $arguments An array of InputArgument objects
      *
      * @api
      */
@@ -178,7 +178,7 @@ class InputDefinition
     /**
      * Gets the array of InputArgument objects.
      *
-     * @return array An array of InputArgument objects
+     * @return InputArgument[] An array of InputArgument objects
      *
      * @api
      */
@@ -225,7 +225,7 @@ class InputDefinition
     /**
      * Sets the InputOption objects.
      *
-     * @param array $options An array of InputOption objects
+     * @param InputOption[] $options An array of InputOption objects
      *
      * @api
      */
@@ -310,7 +310,7 @@ class InputDefinition
     /**
      * Gets the array of InputOption objects.
      *
-     * @return array An array of InputOption objects
+     * @return InputOption[] An array of InputOption objects
      *
      * @api
      */
@@ -433,7 +433,7 @@ class InputDefinition
                     $default = '';
                 }
 
-                $description = str_replace("\n", "\n".str_pad('', $max + 2, ' '), $argument->getDescription());
+                $description = str_replace("\n", "\n".str_repeat(' ', $max + 2), $argument->getDescription());
 
                 $text[] = sprintf(" <info>%-${max}s</info> %s%s", $argument->getName(), $description, $default);
             }
@@ -452,7 +452,7 @@ class InputDefinition
                 }
 
                 $multiple = $option->isArray() ? '<comment> (multiple values allowed)</comment>' : '';
-                $description = str_replace("\n", "\n".str_pad('', $max + 2, ' '), $option->getDescription());
+                $description = str_replace("\n", "\n".str_repeat(' ', $max + 2), $option->getDescription());
 
                 $optionMax = $max - strlen($option->getName()) - 2;
                 $text[] = sprintf(" <info>%s</info> %-${optionMax}s%s%s%s",

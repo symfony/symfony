@@ -73,11 +73,11 @@ class MemberMetadataTest extends \PHPUnit_Framework_TestCase
 
 class TestMemberMetadata extends MemberMetadata
 {
-    public function getValue($object)
+    public function getPropertyValue($object)
     {
     }
 
-    protected function newReflectionMember()
+    protected function newReflectionMember($object)
     {
     }
 }

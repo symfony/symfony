@@ -12,12 +12,14 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\Collection\Required;
-use Symfony\Component\Validator\Constraints\Collection\Optional;
+use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @Annotation
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */
@@ -43,7 +45,7 @@ class Collection extends Constraint
         parent::__construct($options);
 
         if (!is_array($this->fields)) {
-            throw new ConstraintDefinitionException('The option "fields" is expected to be an array in constraint ' . __CLASS__);
+            throw new ConstraintDefinitionException(sprintf('The option "fields" is expected to be an array in constraint %s', __CLASS__));
         }
 
         foreach ($this->fields as $fieldName => $field) {
@@ -57,11 +59,11 @@ class Collection extends Constraint
 
             foreach ($field->constraints as $constraint) {
                 if (!$constraint instanceof Constraint) {
-                    throw new ConstraintDefinitionException('The value ' . $constraint . ' of the field ' . $fieldName . ' is not an instance of Constraint in constraint ' . __CLASS__);
+                    throw new ConstraintDefinitionException(sprintf('The value %s of the field %s is not an instance of Constraint in constraint %s', $constraint, $fieldName, __CLASS__));
                 }
 
                 if ($constraint instanceof Valid) {
-                    throw new ConstraintDefinitionException('The constraint Valid cannot be nested inside constraint ' . __CLASS__ . '. You can only declare the Valid constraint directly on a field or method.');
+                    throw new ConstraintDefinitionException(sprintf('The constraint Valid cannot be nested inside constraint %s. You can only declare the Valid constraint directly on a field or method.', __CLASS__));
                 }
             }
         }

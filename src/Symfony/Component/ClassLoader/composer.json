@@ -20,11 +20,15 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/finder": "2.1.*"
+        "symfony/finder": "~2.0"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\ClassLoader": "" }
+        "psr-0": { "Symfony\\Component\\ClassLoader\\": "" }
     },
     "target-dir": "Symfony/Component/ClassLoader",
-    "minimum-stability": "dev"
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.3-dev"
+        }
+    }
 }

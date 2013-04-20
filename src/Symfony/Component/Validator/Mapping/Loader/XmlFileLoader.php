@@ -13,12 +13,14 @@ namespace Symfony\Component\Validator\Mapping\Loader;
 
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Config\Util\XmlUtils;
 
 class XmlFileLoader extends FileLoader
 {
     /**
      * An array of SimpleXMLElement instances.
-     * @val array
+     *
+     * @var \SimpleXMLElement[]
      */
     protected $classes = null;
 
@@ -184,54 +186,12 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseFile($file)
     {
-        $internalErrors = libxml_use_internal_errors(true);
-        $disableEntities = libxml_disable_entity_loader(true);
-        libxml_clear_errors();
-
-        $dom = new \DOMDocument();
-        $dom->validateOnParse = true;
-        if (!$dom->loadXML(file_get_contents($file), LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
-            libxml_disable_entity_loader($disableEntities);
-
-            throw new MappingException(implode("\n", $this->getXmlErrors($internalErrors)));
-        }
-
-        libxml_disable_entity_loader($disableEntities);
-
-        if (!$dom->schemaValidate(__DIR__.'/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd')) {
-            throw new MappingException(implode("\n", $this->getXmlErrors($internalErrors)));
-        }
-
-        $dom->normalizeDocument();
-
-        libxml_use_internal_errors($internalErrors);
-
-        foreach ($dom->childNodes as $child) {
-            if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
-                throw new MappingException('Document types are not allowed.');
-            }
+        try {
+            $dom = XmlUtils::loadFile($file, __DIR__.'/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd');
+        } catch (\Exception $e) {
+            throw new MappingException($e->getMessage(), $e->getCode(), $e);
         }
 
         return simplexml_import_dom($dom);
-    }
-
-    protected function getXmlErrors($internalErrors)
-    {
-        $errors = array();
-        foreach (libxml_get_errors() as $error) {
-            $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
-                LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
-                $error->code,
-                trim($error->message),
-                $error->file ? $error->file : 'n/a',
-                $error->line,
-                $error->column
-            );
-        }
-
-        libxml_clear_errors();
-        libxml_use_internal_errors($internalErrors);
-
-        return $errors;
     }
 }

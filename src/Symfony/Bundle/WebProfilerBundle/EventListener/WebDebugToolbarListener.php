@@ -17,7 +17,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Bundle\TwigBundle\TwigEngine;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
@@ -31,17 +30,17 @@ use Symfony\Bundle\TwigBundle\TwigEngine;
  */
 class WebDebugToolbarListener implements EventSubscriberInterface
 {
-    const DISABLED        = 1;
-    const ENABLED         = 2;
+    const DISABLED = 1;
+    const ENABLED  = 2;
 
-    protected $templating;
+    protected $twig;
     protected $interceptRedirects;
     protected $mode;
     protected $position;
 
-    public function __construct(TwigEngine $templating, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom')
+    public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom')
     {
-        $this->templating = $templating;
+        $this->twig = $twig;
         $this->interceptRedirects = (Boolean) $interceptRedirects;
         $this->mode = (integer) $mode;
         $this->position = $position;
@@ -73,7 +72,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
             }
 
-            $response->setContent($this->templating->render('WebProfilerBundle:Profiler:toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));
+            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));
             $response->setStatusCode(200);
             $response->headers->remove('Location');
         }
@@ -109,8 +108,8 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $pos = $posrFunction($content, '</body>');
 
         if (false !== $pos) {
-            $toolbar = "\n".str_replace("\n", '', $this->templating->render(
-                'WebProfilerBundle:Profiler:toolbar_js.html.twig',
+            $toolbar = "\n".str_replace("\n", '', $this->twig->render(
+                '@WebProfiler/Profiler/toolbar_js.html.twig',
                 array(
                     'position' => $this->position,
                     'token' => $response->headers->get('X-Debug-Token'),

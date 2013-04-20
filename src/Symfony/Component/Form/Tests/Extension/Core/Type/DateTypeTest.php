@@ -13,32 +13,36 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class DateTypeTest extends LocalizedTestCase
+class DateTypeTest extends TypeTestCase
 {
     protected function setUp()
     {
         parent::setUp();
 
+        // we test against "de_AT", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
         \Locale::setDefault('de_AT');
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testInvalidWidgetOption()
     {
-        $form = $this->factory->create('date', null, array(
+        $this->factory->create('date', null, array(
             'widget' => 'fake_widget',
         ));
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testInvalidInputOption()
     {
-        $form = $this->factory->create('date', null, array(
+        $this->factory->create('date', null, array(
             'input' => 'fake_input',
         ));
     }
@@ -271,7 +275,7 @@ class DateTypeTest extends LocalizedTestCase
      * This test is to check that the strings '0', '1', '2', '3' are no accepted
      * as valid IntlDateFormatter constants for FULL, LONG, MEDIUM or SHORT respectively.
      *
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testThrowExceptionIfFormatIsNoPattern()
     {
@@ -283,7 +287,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testThrowExceptionIfFormatDoesNotContainYearMonthAndDay()
     {
@@ -294,7 +298,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testThrowExceptionIfFormatIsNoConstant()
     {
@@ -304,7 +308,7 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testThrowExceptionIfFormatIsInvalid()
     {
@@ -385,7 +389,7 @@ class DateTypeTest extends LocalizedTestCase
 
         $this->assertEquals(array(
             new ChoiceView('1', '1', 'Jän'),
-            new ChoiceView('4', '4', 'Apr')
+            new ChoiceView('4', '4', 'Apr.')
         ), $view['month']->vars['choices']);
     }
 
@@ -510,7 +514,7 @@ class DateTypeTest extends LocalizedTestCase
         $form = $this->factory->create('date');
         $view = $form->createView();
 
-        $this->assertSame('{{ day }}.{{ month }}.{{ year }}', $view->vars['date_pattern']);
+        $this->assertSame('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
     }
 
     public function testPassDatePatternToViewDifferentFormat()
@@ -521,10 +525,21 @@ class DateTypeTest extends LocalizedTestCase
 
         $view = $form->createView();
 
-        $this->assertSame('{{ day }}. {{ month }} {{ year }}', $view->vars['date_pattern']);
+        $this->assertSame('{{ day }}{{ month }}{{ year }}', $view->vars['date_pattern']);
     }
 
     public function testPassDatePatternToViewDifferentPattern()
+    {
+        $form = $this->factory->create('date', null, array(
+            'format' => 'MMyyyydd'
+        ));
+
+        $view = $form->createView();
+
+        $this->assertSame('{{ month }}{{ year }}{{ day }}', $view->vars['date_pattern']);
+    }
+
+    public function testPassDatePatternToViewDifferentPatternWithSeparators()
     {
         $form = $this->factory->create('date', null, array(
             'format' => 'MM*yyyy*dd'

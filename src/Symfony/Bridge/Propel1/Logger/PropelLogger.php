@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\Propel1\Logger;
 
-use Symfony\Component\HttpKernel\Debug\Stopwatch;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
+use Psr\Log\LoggerInterface;
 
 /**
  * PropelLogger.
@@ -33,7 +33,7 @@ class PropelLogger
     protected $queries;
 
     /**
-     * @var \Symfony\Component\HttpKernel\Debug\Stopwatch
+     * @var Stopwatch
      */
     protected $stopwatch;
 
@@ -73,7 +73,7 @@ class PropelLogger
     public function crit($message)
     {
         if (null !== $this->logger) {
-            $this->logger->crit($message);
+            $this->logger->critical($message);
         }
     }
 
@@ -85,7 +85,7 @@ class PropelLogger
     public function err($message)
     {
         if (null !== $this->logger) {
-            $this->logger->err($message);
+            $this->logger->error($message);
         }
     }
 
@@ -97,7 +97,7 @@ class PropelLogger
     public function warning($message)
     {
         if (null !== $this->logger) {
-            $this->logger->warn($message);
+            $this->logger->warning($message);
         }
     }
 
@@ -161,7 +161,7 @@ class PropelLogger
     /**
      * Returns queries.
      *
-     * @return array    Queries
+     * @return array Queries
      */
     public function getQueries()
     {

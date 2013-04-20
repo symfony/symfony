@@ -9,8 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Form;
+namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\Tests\Fixtures\TestExtension;
 use Symfony\Component\Form\Tests\Fixtures\FooSubTypeWithParentInstance;
 use Symfony\Component\Form\Tests\Fixtures\FooSubType;
@@ -64,19 +66,6 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
             $this->extension1,
             $this->extension2,
         ), $this->resolvedTypeFactory);
-    }
-
-    public function testGetTypeReturnsAddedType()
-    {
-        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-
-        $resolvedType->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('foo'));
-
-        $this->registry->addType($resolvedType);
-
-        $this->assertSame($resolvedType, $this->registry->getType('foo'));
     }
 
     public function testGetTypeFromExtension()
@@ -184,7 +173,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testGetTypeThrowsExceptionIfParentNotFound()
     {
@@ -196,7 +185,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      */
     public function testGetTypeThrowsExceptionIfTypeNotFound()
     {
@@ -204,26 +193,11 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testGetTypeThrowsExceptionIfNoString()
     {
         $this->registry->getType(array());
-    }
-
-    public function testHasTypeAfterAdding()
-    {
-        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-
-        $resolvedType->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('foo'));
-
-        $this->assertFalse($this->registry->hasType('foo'));
-
-        $this->registry->addType($resolvedType);
-
-        $this->assertTrue($this->registry->hasType('foo'));
     }
 
     public function testHasTypeAfterLoadingFromExtension()

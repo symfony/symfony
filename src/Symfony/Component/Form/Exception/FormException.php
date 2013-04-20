@@ -11,6 +11,14 @@
 
 namespace Symfony\Component\Form\Exception;
 
-class FormException extends \Exception
+/**
+ * Alias of {@link ExceptionInterface}.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated This interface was deprecated and will be removed in Symfony 2.3.
+ *             You should code against {@link ExceptionInterface} instead.
+ */
+interface FormException
 {
 }

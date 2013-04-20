@@ -102,4 +102,14 @@ class FileFormFieldTest extends FormFieldTestCase
             $this->assertTrue(true, '->setErrorCode() throws a \InvalidArgumentException if the error code is not valid');
         }
     }
+
+    public function testSetRawFilePath()
+    {
+        $node = $this->createNode('input', '', array('type' => 'file'));
+        $field = new FileFormField($node);
+        $field->setFilePath(__FILE__);
+
+        $this->assertEquals(__FILE__, $field->getValue());
+    }
+
 }

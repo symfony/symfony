@@ -47,7 +47,7 @@ class PhpGeneratorDumper extends GeneratorDumper
 
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * {$options['class']}
@@ -91,6 +91,7 @@ EOF;
             $properties[] = $route->getDefaults();
             $properties[] = $route->getRequirements();
             $properties[] = $compiledRoute->getTokens();
+            $properties[] = $compiledRoute->getHostTokens();
 
             $routes .= sprintf("        '%s' => %s,\n", $name, str_replace("\n", '', var_export($properties, true)));
         }
@@ -107,15 +108,15 @@ EOF;
     private function generateGenerateMethod()
     {
         return <<<EOF
-    public function generate(\$name, \$parameters = array(), \$absolute = false)
+    public function generate(\$name, \$parameters = array(), \$referenceType = self::ABSOLUTE_PATH)
     {
         if (!isset(self::\$declaredRoutes[\$name])) {
-            throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', \$name));
+            throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', \$name));
         }
 
-        list(\$variables, \$defaults, \$requirements, \$tokens) = self::\$declaredRoutes[\$name];
+        list(\$variables, \$defaults, \$requirements, \$tokens, \$hostTokens) = self::\$declaredRoutes[\$name];
 
-        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$absolute);
+        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$referenceType, \$hostTokens);
     }
 EOF;
     }

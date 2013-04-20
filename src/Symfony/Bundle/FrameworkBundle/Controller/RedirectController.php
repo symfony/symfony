@@ -12,8 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Redirects a request to another URL.
@@ -45,7 +46,7 @@ class RedirectController extends ContainerAware
         $attributes = $this->container->get('request')->attributes->get('_route_params');
         unset($attributes['route'], $attributes['permanent']);
 
-        return new RedirectResponse($this->container->get('router')->generate($route, $attributes, true), $permanent ? 301 : 302);
+        return new RedirectResponse($this->container->get('router')->generate($route, $attributes, UrlGeneratorInterface::ABSOLUTE_URL), $permanent ? 301 : 302);
     }
 
     /**

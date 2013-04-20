@@ -26,7 +26,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @return FormInterface The form instance
      *
      * @throws Exception\AlreadyBoundException If the form has already been bound.
-     * @throws Exception\FormException         When trying to set a parent for a form with
+     * @throws Exception\LogicException        When trying to set a parent for a form with
      *                                         an empty name.
      */
     public function setParent(FormInterface $parent = null);
@@ -41,14 +41,17 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Adds a child to the form.
      *
-     * @param  FormInterface $child The FormInterface to add as a child
+     * @param FormInterface|string|integer $child   The FormInterface instance or the name of the child.
+     * @param string|null                  $type    The child's type, if a name was passed.
+     * @param array                        $options The child's options, if a name was passed.
      *
      * @return FormInterface The form instance
      *
-     * @throws Exception\AlreadyBoundException If the form has already been bound.
-     * @throws Exception\FormException         When trying to add a child to a non-compound form.
+     * @throws Exception\AlreadyBoundException   If the form has already been bound.
+     * @throws Exception\LogicException          When trying to add a child to a non-compound form.
+     * @throws Exception\UnexpectedTypeException If $child or $type has an unexpected type.
      */
-    public function add(FormInterface $child);
+    public function add($child, $type = null, array $options = array());
 
     /**
      * Returns the child with the given name.
@@ -84,14 +87,14 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns all children in this group.
      *
-     * @return array An array of FormInterface instances
+     * @return FormInterface[] An array of FormInterface instances
      */
     public function all();
 
     /**
      * Returns all errors.
      *
-     * @return array An array of FormError instances that occurred during binding
+     * @return FormError[] An array of FormError instances that occurred during binding
      */
     public function getErrors();
 
@@ -103,7 +106,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @return FormInterface The form instance
      *
      * @throws Exception\AlreadyBoundException If the form has already been bound.
-     * @throws Exception\FormException         If listeners try to call setData in a cycle. Or if
+     * @throws Exception\LogicException        If listeners try to call setData in a cycle. Or if
      *                                         the view data does not match the expected type
      *                                         according to {@link FormConfigInterface::getDataClass}.
      */
@@ -147,9 +150,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function getConfig();
 
     /**
-     * Returns whether the field is bound.
+     * Returns whether the form is submitted.
      *
-     * @return Boolean true if the form is bound to input values, false otherwise
+     * @return Boolean true if the form is submitted, false otherwise
      */
     public function isBound();
 
@@ -163,7 +166,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the property path that the form is mapped to.
      *
-     * @return Util\PropertyPathInterface The property path.
+     * @return \Symfony\Component\PropertyAccess\PropertyPathInterface The property path.
      */
     public function getPropertyPath();
 
@@ -178,6 +181,8 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
 
     /**
      * Returns whether the form and all children are valid.
+     *
+     * If the form is not bound, this method always returns false.
      *
      * @return Boolean
      */
@@ -220,6 +225,19 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @return Boolean
      */
     public function isSynchronized();
+
+    /**
+     * Processes the given request and binds the form if it was submitted.
+     *
+     * Internally, the request is forwarded to a {@link FormProcessorInterface}
+     * instance. This instance determines the allowed value of the
+     * $request parameter.
+     *
+     * @param mixed $request The request to check.
+     *
+     * @return FormInterface The form instance.
+     */
+    public function process($request = null);
 
     /**
      * Binds data to the form, transforms and validates it.

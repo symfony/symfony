@@ -15,7 +15,15 @@ namespace Symfony\Component\Security\Core\Exception;
  * DisabledException is thrown when the user account is disabled.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexander <iam.asm89@gmail.com>
  */
 class DisabledException extends AccountStatusException
 {
+    /**
+     * {@inheritDoc}
+     */
+    public function getMessageKey()
+    {
+        return 'Account is disabled.';
+    }
 }

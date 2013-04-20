@@ -29,6 +29,8 @@ class RememberMeToken extends AbstractToken
      * @param UserInterface $user
      * @param string        $providerKey
      * @param string        $key
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(UserInterface $user, $providerKey, $key)
     {

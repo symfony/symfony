@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Tests;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Util\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -204,7 +204,7 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testEmptyIfEmptyCountable()
     {
-        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__ . '\SimpleFormTest_Countable', $this->dispatcher));
+        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__.'\SimpleFormTest_Countable', $this->dispatcher));
 
         $this->form->setData(new SimpleFormTest_Countable(0));
 
@@ -213,7 +213,7 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testNotEmptyIfFilledCountable()
     {
-        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__ . '\SimpleFormTest_Countable', $this->dispatcher));
+        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__.'\SimpleFormTest_Countable', $this->dispatcher));
 
         $this->form->setData(new SimpleFormTest_Countable(1));
 
@@ -222,7 +222,7 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testEmptyIfEmptyTraversable()
     {
-        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__ . '\SimpleFormTest_Traversable', $this->dispatcher));
+        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__.'\SimpleFormTest_Traversable', $this->dispatcher));
 
         $this->form->setData(new SimpleFormTest_Traversable(0));
 
@@ -231,7 +231,7 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testNotEmptyIfFilledTraversable()
     {
-        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__ . '\SimpleFormTest_Traversable', $this->dispatcher));
+        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__.'\SimpleFormTest_Traversable', $this->dispatcher));
 
         $this->form->setData(new SimpleFormTest_Traversable(1));
 
@@ -275,12 +275,9 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertTrue($form->isValid());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testNotValidIfNotBound()
     {
-        $this->form->isValid();
+        $this->assertFalse($this->form->isValid());
     }
 
     public function testNotValidIfErrors()
@@ -640,24 +637,6 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertEquals('bar', $form->getData());
     }
 
-    public function testBindValidatesAfterTransformation()
-    {
-        $test = $this;
-        $validator = $this->getFormValidator();
-        $form = $this->getBuilder()
-            ->addValidator($validator)
-            ->getForm();
-
-        $validator->expects($this->once())
-            ->method('validate')
-            ->with($form)
-            ->will($this->returnCallback(function ($form) use ($test) {
-            $test->assertEquals('foobar', $form->getData());
-        }));
-
-        $form->bind('foobar');
-    }
-
     public function testBindResetsErrors()
     {
         $this->form->addError(new FormError('Error!'));
@@ -684,7 +663,7 @@ class SimpleFormTest extends AbstractFormTest
     {
         $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
         $view = $this->getMock('Symfony\Component\Form\FormView');
-        $parentForm = $this->getMock('Symfony\Component\Form\Tests\FormInterface');
+        $parentForm = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $parentView = $this->getMock('Symfony\Component\Form\FormView');
         $form = $this->getBuilder()->setType($type)->getForm();
         $form->setParent($parentForm);
@@ -739,7 +718,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\LogicException
      * @expectedExceptionMessage A form with an empty name cannot have a parent form.
      */
     public function testFormCannotHaveEmptyNameNotInRootLevel()
@@ -784,8 +763,44 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertEquals(new PropertyPath('[name]'), $form->getPropertyPath());
     }
 
+    public function testGetPropertyPathDefaultsToNameIfFirstParentWithoutInheritDataHasDataClass()
+    {
+        $grandParent = $this->getBuilder(null, null, 'stdClass')
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
+        $parent = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->setInheritData(true)
+            ->getForm();
+        $form = $this->getBuilder('name')->getForm();
+        $grandParent->add($parent);
+        $parent->add($form);
+
+        $this->assertEquals(new PropertyPath('name'), $form->getPropertyPath());
+    }
+
+    public function testGetPropertyPathDefaultsToIndexedNameIfDataClassOfFirstParentWithoutInheritDataIsNull()
+    {
+        $grandParent = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
+        $parent = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->setInheritData(true)
+            ->getForm();
+        $form = $this->getBuilder('name')->getForm();
+        $grandParent->add($parent);
+        $parent->add($form);
+
+        $this->assertEquals(new PropertyPath('[name]'), $form->getPropertyPath());
+    }
+
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\LogicException
      */
     public function testViewDataMustNotBeObjectIfDataClassIsNull()
     {
@@ -815,7 +830,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\LogicException
      */
     public function testViewDataMustBeObjectIfDataClassIsSet()
     {
@@ -830,7 +845,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\FormException
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
      */
     public function testSetDataCannotInvokeItself()
     {
@@ -861,6 +876,118 @@ class SimpleFormTest extends AbstractFormTest
             ->getForm();
 
         $parent->bind('not-an-array');
+    }
+
+    public function testProcessForwardsToFormProcessor()
+    {
+        $processor = $this->getMock('Symfony\Component\Form\FormProcessorInterface');
+
+        $form = $this->getBuilder()
+            ->setFormProcessor($processor)
+            ->getForm();
+
+        $processor->expects($this->once())
+            ->method('processForm')
+            ->with($this->identicalTo($form), 'REQUEST');
+
+        $this->assertSame($form, $form->process('REQUEST'));
+    }
+
+    public function testFormInheritsParentData()
+    {
+        $child = $this->getBuilder('child')
+            ->setInheritData(true);
+
+        $parent = $this->getBuilder('parent')
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->setData('foo')
+            ->addModelTransformer(new FixedDataTransformer(array(
+                'foo' => 'norm[foo]',
+            )))
+            ->addViewTransformer(new FixedDataTransformer(array(
+                'norm[foo]' => 'view[foo]',
+            )))
+            ->add($child)
+            ->getForm();
+
+        $this->assertSame('foo', $parent->get('child')->getData());
+        $this->assertSame('norm[foo]', $parent->get('child')->getNormData());
+        $this->assertSame('view[foo]', $parent->get('child')->getViewData());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     */
+    public function testInheritDataDisallowsSetData()
+    {
+        $form = $this->getBuilder()
+            ->setInheritData(true)
+            ->getForm();
+
+        $form->setData('foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     */
+    public function testGetDataRequiresParentToBeSetIfInheritData()
+    {
+        $form = $this->getBuilder()
+            ->setInheritData(true)
+            ->getForm();
+
+        $form->getData();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     */
+    public function testGetNormDataRequiresParentToBeSetIfInheritData()
+    {
+        $form = $this->getBuilder()
+            ->setInheritData(true)
+            ->getForm();
+
+        $form->getNormData();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     */
+    public function testGetViewDataRequiresParentToBeSetIfInheritData()
+    {
+        $form = $this->getBuilder()
+            ->setInheritData(true)
+            ->getForm();
+
+        $form->getViewData();
+    }
+
+    public function testPostBindDataIsNullIfInheritData()
+    {
+        $test = $this;
+        $form = $this->getBuilder()
+            ->addEventListener(FormEvents::POST_BIND, function (FormEvent $event) use ($test) {
+                $test->assertNull($event->getData());
+            })
+            ->setInheritData(true)
+            ->getForm();
+
+        $form->bind('foo');
+    }
+
+    public function testBindIsNeverFiredIfInheritData()
+    {
+        $test = $this;
+        $form = $this->getBuilder()
+            ->addEventListener(FormEvents::BIND, function (FormEvent $event) use ($test) {
+                $test->fail('The BIND event should not be fired');
+            })
+            ->setInheritData(true)
+            ->getForm();
+
+        $form->bind('foo');
     }
 
     protected function createForm()

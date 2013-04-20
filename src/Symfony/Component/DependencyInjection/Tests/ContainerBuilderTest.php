@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\Config\Resource\FileResource;
 
 class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
@@ -138,6 +139,17 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::get
+     */
+    public function testGetReturnsNullOnInactiveScope()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'stdClass')->setScope('request');
+
+        $this->assertNull($builder->get('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+    }
+
+    /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::getServiceIds
      */
     public function testGetServiceIds()
@@ -231,11 +243,8 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddGetCompilerPass()
     {
-        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
         $builder = new ContainerBuilder();
+        $builder->setResourceTracking(false);
         $builderCompilerPasses = $builder->getCompiler()->getPassConfig()->getPasses();
         $builder->addCompilerPass($this->getMock('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface'));
         $this->assertEquals(sizeof($builderCompilerPasses) + 1, sizeof($builder->getCompiler()->getPassConfig()->getPasses()));
@@ -367,16 +376,14 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testMerge()
     {
-        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
         $container = new ContainerBuilder(new ParameterBag(array('bar' => 'foo')));
+        $container->setResourceTracking(false);
         $config = new ContainerBuilder(new ParameterBag(array('foo' => 'bar')));
         $container->merge($config);
         $this->assertEquals(array('bar' => 'foo', 'foo' => 'bar'), $container->getParameterBag()->all(), '->merge() merges current parameters with the loaded ones');
 
         $container = new ContainerBuilder(new ParameterBag(array('bar' => 'foo')));
+        $container->setResourceTracking(false);
         $config = new ContainerBuilder(new ParameterBag(array('foo' => '%bar%')));
         $container->merge($config);
 ////// FIXME
@@ -384,6 +391,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('bar' => 'foo', 'foo' => 'foo'), $container->getParameterBag()->all(), '->merge() evaluates the values of the parameters towards already defined ones');
 
         $container = new ContainerBuilder(new ParameterBag(array('bar' => 'foo')));
+        $container->setResourceTracking(false);
         $config = new ContainerBuilder(new ParameterBag(array('foo' => '%bar%', 'baz' => '%foo%')));
         $container->merge($config);
 ////// FIXME
@@ -391,6 +399,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('bar' => 'foo', 'foo' => 'foo', 'baz' => 'foo'), $container->getParameterBag()->all(), '->merge() evaluates the values of the parameters towards already defined ones');
 
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
         $container->register('foo', 'FooClass');
         $container->register('bar', 'BarClass');
         $config = new ContainerBuilder();
@@ -404,6 +413,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', (string) $aliases['alias_for_foo']);
 
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
         $container->register('foo', 'FooClass');
         $config->setDefinition('foo', new Definition('BazClass'));
         $container->merge($config);
@@ -416,11 +426,8 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testMergeLogicException()
     {
-        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
         $container->compile();
         $container->merge(new ContainerBuilder());
     }
@@ -488,11 +495,8 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testExtension()
     {
-        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
 
         $container->registerExtension($extension = new \ProjectExtension());
         $this->assertTrue($container->getExtension('project') === $extension, '->registerExtension() registers an extension');
@@ -503,30 +507,24 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testRegisteredButNotLoadedExtension()
     {
-        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
         $extension = $this->getMock('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface');
         $extension->expects($this->once())->method('getAlias')->will($this->returnValue('project'));
         $extension->expects($this->never())->method('load');
 
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
         $container->registerExtension($extension);
         $container->compile();
     }
 
     public function testRegisteredAndLoadedExtension()
     {
-        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
         $extension = $this->getMock('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface');
         $extension->expects($this->exactly(2))->method('getAlias')->will($this->returnValue('project'));
         $extension->expects($this->once())->method('load')->with(array(array('foo' => 'bar')));
 
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
         $container->registerExtension($extension);
         $container->loadFromExtension('project', array('foo' => 'bar'));
         $container->compile();
@@ -534,13 +532,10 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPrivateServiceUser()
     {
-        if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
         $fooDefinition     = new Definition('BarClass');
         $fooUserDefinition = new Definition('BarUserClass', array(new Reference('bar')));
         $container         = new ContainerBuilder();
+        $container->setResourceTracking(false);
 
         $fooDefinition->setPublic(false);
 
@@ -558,6 +553,18 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowsExceptionWhenSetServiceOnAFrozenContainer()
     {
+        $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
+        $container->setDefinition('a', new Definition('stdClass'));
+        $container->compile();
+        $container->set('a', new \stdClass());
+    }
+
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testThrowsExceptionWhenAddServiceOnAFrozenContainer()
+    {
         if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
             $this->markTestSkipped('The "Config" component is not available');
         }
@@ -567,18 +574,98 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->set('a', new \stdClass());
     }
 
-    /**
-     * @expectedException BadMethodCallException
-     */
-    public function testThrowsExceptionWhenSetDefinitionOnAFrozenContainer()
+    public function testNoExceptionWhenSetSyntheticServiceOnAFrozenContainer()
     {
         if (!class_exists('Symfony\Component\Config\Resource\FileResource')) {
             $this->markTestSkipped('The "Config" component is not available');
         }
 
         $container = new ContainerBuilder();
+        $def = new Definition('stdClass');
+        $def->setSynthetic(true);
+        $container->setDefinition('a', $def);
+        $container->compile();
+        $container->set('a', $a = new \stdClass());
+        $this->assertEquals($a, $container->get('a'));
+    }
+
+    public function testSetOnSynchronizedService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('baz', 'BazClass')
+            ->setSynchronized(true)
+        ;
+        $container->register('bar', 'BarClass')
+            ->addMethodCall('setBaz', array(new Reference('baz')))
+        ;
+
+        $container->set('baz', $baz = new \BazClass());
+        $this->assertSame($baz, $container->get('bar')->getBaz());
+
+        $container->set('baz', $baz = new \BazClass());
+        $this->assertSame($baz, $container->get('bar')->getBaz());
+    }
+
+    public function testSynchronizedServiceWithScopes()
+    {
+        $container = new ContainerBuilder();
+        $container->addScope(new Scope('foo'));
+        $container->register('baz', 'BazClass')
+            ->setSynthetic(true)
+            ->setSynchronized(true)
+            ->setScope('foo')
+        ;
+        $container->register('bar', 'BarClass')
+            ->addMethodCall('setBaz', array(new Reference('baz', ContainerInterface::NULL_ON_INVALID_REFERENCE, false)))
+        ;
+        $container->compile();
+
+        $container->enterScope('foo');
+        $container->set('baz', $outerBaz = new \BazClass(), 'foo');
+        $this->assertSame($outerBaz, $container->get('bar')->getBaz());
+
+        $container->enterScope('foo');
+        $container->set('baz', $innerBaz = new \BazClass(), 'foo');
+        $this->assertSame($innerBaz, $container->get('bar')->getBaz());
+        $container->leaveScope('foo');
+
+        $this->assertNotSame($innerBaz, $container->get('bar')->getBaz());
+        $this->assertSame($outerBaz, $container->get('bar')->getBaz());
+
+        $container->leaveScope('foo');
+    }
+
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testThrowsExceptionWhenSetDefinitionOnAFrozenContainer()
+    {
+        $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
         $container->compile();
         $container->setDefinition('a', new Definition());
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::getExtensionConfig
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::prependExtensionConfig
+     */
+    public function testExtensionConfig()
+    {
+        $container = new ContainerBuilder();
+
+        $configs = $container->getExtensionConfig('foo');
+        $this->assertEmpty($configs);
+
+        $first = array('foo' => 'bar');
+        $container->prependExtensionConfig('foo', $first);
+        $configs = $container->getExtensionConfig('foo');
+        $this->assertEquals(array($first), $configs);
+
+        $second = array('ding' => 'dong');
+        $container->prependExtensionConfig('foo', $second);
+        $configs = $container->getExtensionConfig('foo');
+        $this->assertEquals(array($second, $first), $configs);
     }
 }
 

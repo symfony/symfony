@@ -12,7 +12,7 @@
     <li>
         <strong>Route parameters:&nbsp;</strong>
         {% if request.routeParams|length %}
-            {% include 'WebProfilerBundle:Profiler:table.html.twig' with { 'data': request.routeParams, 'class': 'inline' } only %}
+            {% include '@WebProfiler/Profiler/table.html.twig' with { 'data': request.routeParams, 'class': 'inline' } only %}
         {% else %}
             <em>No parameters</em>
         {% endif %}
@@ -33,7 +33,7 @@
             {% for trace in traces %}
                 <tr class="{{ 1 == trace.level ? 'almost' : 2 == trace.level ? 'matches' : '' }}">
                     <td>{{ trace.name }}</td>
-                    <td>{{ trace.pattern }}</td>
+                    <td>{{ trace.path }}</td>
                     <td>{{ trace.log }}</td>
                 </tr>
             {% endfor %}

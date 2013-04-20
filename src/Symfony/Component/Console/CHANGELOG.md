@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added Table Helper for tabular data rendering
+ * added support for events in `Application`
+ * added a way to normalize EOLs in `ApplicationTester::getDisplay()` and `CommandTester::getDisplay()`
+ * added a way to set the progress bar progress via the `setCurrent` method
+
+2.2.0
+-----
+
+ * added support for colorization on Windows via ConEmu
+ * add a method to Dialog Helper to ask for a question and hide the response
+ * added support for interactive selections in console (DialogHelper::select())
+ * added support for autocompletion as you type in Dialog Helper
+
 2.1.0
 -----
 

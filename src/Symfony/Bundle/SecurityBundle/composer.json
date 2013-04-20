@@ -17,11 +17,16 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/security": "2.1.*"
+        "symfony/security": ">=2.2,<2.3-dev"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bundle\\SecurityBundle": "" }
+        "psr-0": { "Symfony\\Bundle\\SecurityBundle\\": "" }
     },
     "target-dir": "Symfony/Bundle/SecurityBundle",
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.3-dev"
+        }
+    }
 }

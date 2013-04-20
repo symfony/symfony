@@ -83,6 +83,16 @@ class FileFormField extends FormField
     }
 
     /**
+     * Sets path to the file as string for simulating HTTP request
+     *
+     * @param string $path The path to the file
+     */
+    public function setFilePath($path)
+    {
+        parent::setValue($path);
+    }
+
+    /**
      * Initializes the form field.
      *
      * @throws \LogicException When node type is incorrect

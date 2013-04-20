@@ -127,6 +127,12 @@ class XmlDumper extends Dumper
         if (!$definition->isPublic()) {
             $service->setAttribute('public', 'false');
         }
+        if ($definition->isSynthetic()) {
+            $service->setAttribute('synthetic', 'true');
+        }
+        if ($definition->isSynchronized()) {
+            $service->setAttribute('synchronized', 'true');
+        }
 
         foreach ($definition->getTags() as $name => $tags) {
             foreach ($tags as $attributes) {
@@ -158,7 +164,7 @@ class XmlDumper extends Dumper
         if ($callable = $definition->getConfigurator()) {
             $configurator = $this->document->createElement('configurator');
             if (is_array($callable)) {
-                $configurator->setAttribute((is_object($callable[0]) && $callable[0] instanceof Reference ? 'service' : 'class'), $callable[0]);
+                $configurator->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
                 $configurator->setAttribute('method', $callable[1]);
             } else {
                 $configurator->setAttribute('function', $callable);
@@ -230,7 +236,7 @@ class XmlDumper extends Dumper
             if (is_array($value)) {
                 $element->setAttribute('type', 'collection');
                 $this->convertParameters($value, $type, $element, 'key');
-            } elseif (is_object($value) && $value instanceof Reference) {
+            } elseif ($value instanceof Reference) {
                 $element->setAttribute('type', 'service');
                 $element->setAttribute('id', (string) $value);
                 $behaviour = $value->getInvalidBehavior();
@@ -239,7 +245,10 @@ class XmlDumper extends Dumper
                 } elseif ($behaviour == ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
                     $element->setAttribute('on-invalid', 'ignore');
                 }
-            } elseif (is_object($value) && $value instanceof Definition) {
+                if (!$value->isStrict()) {
+                    $element->setAttribute('strict', 'false');
+                }
+            } elseif ($value instanceof Definition) {
                 $element->setAttribute('type', 'service');
                 $this->addService($value, null, $element);
             } else {
@@ -294,7 +303,7 @@ class XmlDumper extends Dumper
                 return 'true';
             case false === $value:
                 return 'false';
-            case is_object($value) && $value instanceof Parameter:
+            case $value instanceof Parameter:
                 return '%'.$value.'%';
             case is_object($value) || is_resource($value):
                 throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');

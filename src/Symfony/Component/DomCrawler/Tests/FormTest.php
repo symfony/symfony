@@ -62,6 +62,51 @@ class FormTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * __construct() should throw \\LogicException if the form attribute is invalid
+     * @expectedException \LogicException
+     */
+    public function testConstructorThrowsExceptionIfNoRelatedForm()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('
+            <html>
+                <form id="bar">
+                    <input type="submit" form="nonexistent" />
+                </form>
+                <input type="text" form="nonexistent" />
+                <button />
+            </html>
+        ');
+
+        $nodes = $dom->getElementsByTagName('input');
+
+        $form = new Form($nodes->item(0), 'http://example.com');
+        $form = new Form($nodes->item(1), 'http://example.com');
+    }
+
+    public function testConstructorHandlesFormAttribute()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('
+            <html>
+                <form id="bar">
+                    <input type="submit" form="bar" />
+                </form>
+                <input type="submit" form="bar" />
+                <button />
+            </html>
+        ');
+
+        $nodes = $dom->getElementsByTagName('input');
+
+        $form = new Form($nodes->item(0), 'http://example.com');
+        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form->getFormNode(), 'HTML5-compliant form attribute handled incorrectly');
+
+        $form = new Form($nodes->item(1), 'http://example.com');
+        $this->assertSame($dom->getElementsByTagName('form')->item(0), $form->getFormNode(), 'HTML5-compliant form attribute handled incorrectly');
+    }
+
     public function testMultiValuedFields()
     {
         $form = $this->createForm('<form>
@@ -288,7 +333,7 @@ class FormTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->createForm('<form><select multiple="multiple" name="multi"><option value="foo">foo</option><option value="bar">bar</option></select><input type="submit" /></form>');
         $form->setValues(array('multi' => array("foo", "bar")));
-        $this->assertEquals(array('multi' => array('foo', 'bar')), $form->getValues(), '->setValue() sets tehe values of select');
+        $this->assertEquals(array('multi' => array('foo', 'bar')), $form->getValues(), '->setValue() sets the values of select');
     }
 
     public function testGetPhpValues()

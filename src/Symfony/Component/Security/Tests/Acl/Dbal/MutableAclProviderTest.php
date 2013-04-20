@@ -53,7 +53,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Acl\Exception\AclAlreadyExistsException
+     * @expectedException \Symfony\Component\Security\Acl\Exception\AclAlreadyExistsException
      */
     public function testCreateAclThrowsExceptionWhenAclAlreadyExists()
     {

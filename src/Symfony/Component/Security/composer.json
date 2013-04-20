@@ -17,28 +17,34 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/event-dispatcher": "2.1.*",
-        "symfony/http-foundation": "2.1.*",
-        "symfony/http-kernel": "2.1.*"
+        "symfony/event-dispatcher": "~2.1",
+        "symfony/http-foundation": ">=2.1,<2.4-dev",
+        "symfony/http-kernel": ">=2.1,<=2.3-dev"
     },
     "require-dev": {
-        "symfony/form": "2.1.*",
-        "symfony/routing": "2.1.*",
-        "symfony/validator": "2.1.*",
+        "symfony/form": "~2.0",
+        "symfony/routing": ">=2.2,<2.4-dev",
+        "symfony/validator": ">=2.2,<2.4-dev",
         "doctrine/common": "~2.2",
-        "doctrine/dbal": "~2.2"
+        "doctrine/dbal": "~2.2",
+        "psr/log": "~1.0"
     },
     "suggest": {
-        "symfony/class-loader": "2.1.*",
-        "symfony/finder": "2.1.*",
-        "symfony/form": "2.1.*",
-        "symfony/validator": "2.1.*",
-        "symfony/routing": "2.1.*",
+        "symfony/class-loader": "2.2.*",
+        "symfony/finder": "2.2.*",
+        "symfony/form": "2.2.*",
+        "symfony/validator": "2.2.*",
+        "symfony/routing": "2.2.*",
         "doctrine/dbal": "to use the built-in ACL implementation"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Security": "" }
+        "psr-0": { "Symfony\\Component\\Security\\": "" }
     },
     "target-dir": "Symfony/Component/Security",
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.3-dev"
+        }
+    }
 }

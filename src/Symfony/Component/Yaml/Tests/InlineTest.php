@@ -49,7 +49,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
         $required_locales = array('fr_FR.UTF-8', 'fr_FR.UTF8', 'fr_FR.utf-8', 'fr_FR.utf8', 'French_France.1252');
         if (false === setlocale(LC_ALL, $required_locales)) {
-            $this->markTestSkipped('Could not set any of required locales: ' . implode(", ", $required_locales));
+            $this->markTestSkipped('Could not set any of required locales: '.implode(", ", $required_locales));
         }
 
         $this->assertEquals('1.2', Inline::dump(1.2));
@@ -144,6 +144,8 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             '2007-10-30' => mktime(0, 0, 0, 10, 30, 2007),
             '2007-10-30T02:59:43Z' => gmmktime(2, 59, 43, 10, 30, 2007),
             '2007-10-30 02:59:43 Z' => gmmktime(2, 59, 43, 10, 30, 2007),
+            '1960-10-30 02:59:43 Z' => gmmktime(2, 59, 43, 10, 30, 1960),
+            '1730-10-30T02:59:43Z' => gmmktime(2, 59, 43, 10, 30, 1730),
 
             '"a \\"string\\" with \'quoted strings inside\'"' => 'a "string" with \'quoted strings inside\'',
             "'a \"string\" with ''quoted strings inside'''" => 'a "string" with \'quoted strings inside\'',

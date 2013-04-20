@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\ReversedTransformer;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
@@ -29,10 +30,20 @@ class TimeType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $parts  = array('hour', 'minute');
-        $format = 'H:i';
+        $parts  = array('hour');
+        $format = 'H';
+
+        if ($options['with_seconds'] && !$options['with_minutes']) {
+            throw new InvalidConfigurationException('You can not disable minutes if you have enabled seconds.');
+        }
+
+        if ($options['with_minutes']) {
+            $format .= ':i';
+            $parts[] = 'minute';
+        }
+
         if ($options['with_seconds']) {
-            $format  = 'H:i:s';
+            $format .= ':s';
             $parts[] = 'second';
         }
 
@@ -49,15 +60,19 @@ class TimeType extends AbstractType
                 foreach ($options['hours'] as $hour) {
                     $hours[$hour] = str_pad($hour, 2, '0', STR_PAD_LEFT);
                 }
-                foreach ($options['minutes'] as $minute) {
-                    $minutes[$minute] = str_pad($minute, 2, '0', STR_PAD_LEFT);
-                }
 
                 // Only pass a subset of the options to children
                 $hourOptions['choices'] = $hours;
                 $hourOptions['empty_value'] = $options['empty_value']['hour'];
-                $minuteOptions['choices'] = $minutes;
-                $minuteOptions['empty_value'] = $options['empty_value']['minute'];
+
+                if ($options['with_minutes']) {
+                    foreach ($options['minutes'] as $minute) {
+                        $minutes[$minute] = str_pad($minute, 2, '0', STR_PAD_LEFT);
+                    }
+
+                    $minuteOptions['choices'] = $minutes;
+                    $minuteOptions['empty_value'] = $options['empty_value']['minute'];
+                }
 
                 if ($options['with_seconds']) {
                     $seconds = array();
@@ -72,17 +87,23 @@ class TimeType extends AbstractType
 
                 // Append generic carry-along options
                 foreach (array('required', 'translation_domain') as $passOpt) {
-                    $hourOptions[$passOpt] = $minuteOptions[$passOpt] = $options[$passOpt];
+                    $hourOptions[$passOpt] = $options[$passOpt];
+
+                    if ($options['with_minutes']) {
+                        $minuteOptions[$passOpt] = $options[$passOpt];
+                    }
+
                     if ($options['with_seconds']) {
                         $secondOptions[$passOpt] = $options[$passOpt];
                     }
                 }
             }
 
-            $builder
-                ->add('hour', $options['widget'], $hourOptions)
-                ->add('minute', $options['widget'], $minuteOptions)
-            ;
+            $builder->add('hour', $options['widget'], $hourOptions);
+
+            if ($options['with_minutes']) {
+                $builder->add('minute', $options['widget'], $minuteOptions);
+            }
 
             if ($options['with_seconds']) {
                 $builder->add('second', $options['widget'], $secondOptions);
@@ -113,6 +134,7 @@ class TimeType extends AbstractType
     {
         $view->vars = array_replace($view->vars, array(
             'widget'       => $options['widget'],
+            'with_minutes' => $options['with_minutes'],
             'with_seconds' => $options['with_seconds'],
         ));
 
@@ -151,28 +173,16 @@ class TimeType extends AbstractType
             );
         };
 
-        // BC until Symfony 2.3
-        $modelTimezone = function (Options $options) {
-            return $options['data_timezone'];
-        };
-
-        // BC until Symfony 2.3
-        $viewTimezone = function (Options $options) {
-            return $options['user_timezone'];
-        };
-
         $resolver->setDefaults(array(
             'hours'          => range(0, 23),
             'minutes'        => range(0, 59),
             'seconds'        => range(0, 59),
             'widget'         => 'choice',
             'input'          => 'datetime',
+            'with_minutes'   => true,
             'with_seconds'   => false,
-            'model_timezone' => $modelTimezone,
-            'view_timezone'  => $viewTimezone,
-            // Deprecated timezone options
-            'data_timezone'  => null,
-            'user_timezone'  => null,
+            'model_timezone' => null,
+            'view_timezone'  => null,
             'empty_value'    => $emptyValue,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
@@ -203,14 +213,6 @@ class TimeType extends AbstractType
                 'choice',
             ),
         ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'field';
     }
 
     /**

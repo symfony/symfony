@@ -60,7 +60,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testSetNotSupportedAfterGet()
     {
@@ -70,7 +70,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testRemoveNotSupportedAfterGet()
     {
@@ -80,7 +80,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testSetNormalizerNotSupportedAfterGet()
     {
@@ -225,7 +225,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->options->set('foo', 'bar');
 
         $this->options->setNormalizer('foo', function (Options $options, $value) {
-            return 'normalized[' . $value . ']';
+            return 'normalized['.$value.']';
         });
 
         $this->assertEquals('normalized[bar]', $this->options->get('foo'));
@@ -270,7 +270,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testFailForCyclicDependencies()
     {
@@ -286,7 +286,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testFailForCyclicDependenciesBetweenNormalizers()
     {
@@ -305,7 +305,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testFailForCyclicDependenciesBetweenNormalizerAndLazyOption()
     {
@@ -394,7 +394,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\OptionsResolver\Options::replace
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testCannotReplaceAfterOptionWasRead()
     {
@@ -408,7 +408,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\OptionsResolver\Options::overload
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testCannotOverloadAfterOptionWasRead()
     {
@@ -420,7 +420,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\OptionsResolver\Options::clear
-     * @expectedException Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      */
     public function testCannotClearAfterOptionWasRead()
     {
@@ -468,5 +468,62 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->options->set('foo', null);
 
         $this->assertTrue($this->options->has('foo'));
+    }
+
+    public function testRemoveOptionAndNormalizer()
+    {
+        $this->options->set('foo1', 'bar');
+        $this->options->setNormalizer('foo1', function (Options $options) {
+            return '';
+        });
+        $this->options->set('foo2', 'bar');
+        $this->options->setNormalizer('foo2', function (Options $options) {
+            return '';
+        });
+
+        $this->options->remove('foo2');
+        $this->assertEquals(array('foo1' => ''), $this->options->all());
+    }
+
+    public function testReplaceOptionAndNormalizer()
+    {
+        $this->options->set('foo1', 'bar');
+        $this->options->setNormalizer('foo1', function (Options $options) {
+            return '';
+        });
+        $this->options->set('foo2', 'bar');
+        $this->options->setNormalizer('foo2', function (Options $options) {
+            return '';
+        });
+
+        $this->options->replace(array('foo1' => 'new'));
+        $this->assertEquals(array('foo1' => 'new'), $this->options->all());
+    }
+
+    public function testClearOptionAndNormalizer()
+    {
+        $this->options->set('foo1', 'bar');
+        $this->options->setNormalizer('foo1', function (Options $options) {
+            return '';
+        });
+        $this->options->set('foo2', 'bar');
+        $this->options->setNormalizer('foo2', function (Options $options) {
+            return '';
+        });
+
+        $this->options->clear();
+        $this->assertEmpty($this->options->all());
+    }
+
+    public function testNormalizerWithoutCorrespondingOption()
+    {
+        $test = $this;
+
+        $this->options->setNormalizer('foo', function (Options $options, $previousValue) use ($test) {
+            $test->assertNull($previousValue);
+
+            return '';
+        });
+        $this->assertEquals(array('foo' => ''), $this->options->all());
     }
 }

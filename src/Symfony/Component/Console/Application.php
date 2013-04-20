@@ -26,6 +26,12 @@ use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\TableHelper;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleForExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * An Application is the container for a collection of commands.
@@ -55,6 +61,7 @@ class Application
     private $autoExit;
     private $definition;
     private $helperSet;
+    private $dispatcher;
 
     /**
      * Constructor.
@@ -77,6 +84,11 @@ class Application
         foreach ($this->getDefaultCommands() as $command) {
             $this->add($command);
         }
+    }
+
+    public function setDispatcher(EventDispatcher $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -102,7 +114,7 @@ class Application
         }
 
         try {
-            $statusCode = $this->doRun($input, $output);
+            $exitCode = $this->doRun($input, $output);
         } catch (\Exception $e) {
             if (!$this->catchExceptions) {
                 throw $e;
@@ -113,21 +125,21 @@ class Application
             } else {
                 $this->renderException($e, $output);
             }
-            $statusCode = $e->getCode();
+            $exitCode = $e->getCode();
 
-            $statusCode = is_numeric($statusCode) && $statusCode ? $statusCode : 1;
+            $exitCode = is_numeric($exitCode) && $exitCode ? $exitCode : 1;
         }
 
         if ($this->autoExit) {
-            if ($statusCode > 255) {
-                $statusCode = 255;
+            if ($exitCode > 255) {
+                $exitCode = 255;
             }
             // @codeCoverageIgnoreStart
-            exit($statusCode);
+            exit($exitCode);
             // @codeCoverageIgnoreEnd
         }
 
-        return $statusCode;
+        return $exitCode;
     }
 
     /**
@@ -189,10 +201,10 @@ class Application
         $command = $this->find($name);
 
         $this->runningCommand = $command;
-        $statusCode = $command->run($input, $output);
+        $exitCode = $this->doRunCommand($command, $input, $output);
         $this->runningCommand = null;
 
-        return is_numeric($statusCode) ? $statusCode : 0;
+        return is_numeric($exitCode) ? $exitCode : 0;
     }
 
     /**
@@ -220,6 +232,18 @@ class Application
     }
 
     /**
+     * Set an input definition set to be used with this application
+     *
+     * @param InputDefinition $definition The input definition
+     *
+     * @api
+     */
+    public function setDefinition(InputDefinition $definition)
+    {
+        $this->definition = $definition;
+    }
+
+    /**
      * Gets the InputDefinition related to this Application.
      *
      * @return InputDefinition The InputDefinition instance
@@ -240,7 +264,8 @@ class Application
             $this->getLongVersion(),
             '',
             '<comment>Usage:</comment>',
-            sprintf("  [options] command [arguments]\n"),
+            '  [options] command [arguments]',
+            '',
             '<comment>Options:</comment>',
         );
 
@@ -615,7 +640,7 @@ class Application
      *
      * @param string $namespace A namespace name
      *
-     * @return array An array of Command instances
+     * @return Command[] An array of Command instances
      *
      * @api
      */
@@ -898,6 +923,45 @@ class Application
     }
 
     /**
+     * Runs the current command.
+     *
+     * If an event dispatcher has been attached to the application,
+     * events are also dispatched during the life-cycle of the command.
+     *
+     * @param Command         $command A Command instance
+     * @param InputInterface  $input   An Input instance
+     * @param OutputInterface $output  An Output instance
+     *
+     * @return integer 0 if everything went fine, or an error code
+     */
+    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
+    {
+        if (null === $this->dispatcher) {
+            return $command->run($input, $output);
+        }
+
+        $event = new ConsoleCommandEvent($command, $input, $output);
+        $this->dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
+
+        try {
+            $exitCode = $command->run($input, $output);
+        } catch (\Exception $e) {
+            $event = new ConsoleTerminateEvent($command, $input, $output, $e->getCode());
+            $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
+
+            $event = new ConsoleForExceptionEvent($command, $input, $output, $e, $event->getExitCode());
+            $this->dispatcher->dispatch(ConsoleEvents::EXCEPTION, $event);
+
+            throw $event->getException();
+        }
+
+        $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);
+        $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
+
+        return $event->getExitCode();
+    }
+
+    /**
      * Gets the name of the command based on input.
      *
      * @param InputInterface $input The input interface
@@ -932,7 +996,7 @@ class Application
     /**
      * Gets the default commands that should always be available.
      *
-     * @return array An array of default Command instances
+     * @return Command[] An array of default Command instances
      */
     protected function getDefaultCommands()
     {
@@ -949,6 +1013,8 @@ class Application
         return new HelperSet(array(
             new FormatterHelper(),
             new DialogHelper(),
+            new ProgressHelper(),
+            new TableHelper(),
         ));
     }
 

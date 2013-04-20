@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * draw retina canvas if devicePixelRatio is bigger than 1
+
 2.1.0
 -----
 

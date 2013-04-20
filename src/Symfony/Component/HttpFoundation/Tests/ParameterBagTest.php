@@ -32,6 +32,28 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar'), $bag->all(), '->all() gets all the input');
     }
 
+    public function testKeys()
+    {
+        $bag = new ParameterBag(array('foo' => 'bar'));
+        $this->assertEquals(array('foo'), $bag->keys());
+    }
+
+    public function testAdd()
+    {
+        $bag = new ParameterBag(array('foo' => 'bar'));
+        $bag->add(array('bar' => 'bas'));
+        $this->assertEquals(array('foo' => 'bar', 'bar' => 'bas'), $bag->all());
+    }
+
+    public function testRemove()
+    {
+        $bag = new ParameterBag(array('foo' => 'bar'));
+        $bag->add(array('bar' => 'bas'));
+        $this->assertEquals(array('foo' => 'bar', 'bar' => 'bas'), $bag->all());
+        $bag->remove('bar');
+        $this->assertEquals(array('foo' => 'bar'), $bag->all());
+    }
+
     /**
      * @covers Symfony\Component\HttpFoundation\ParameterBag::replace
      */

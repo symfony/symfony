@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestLis
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\Test\DeprecationErrorHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -101,7 +102,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        $listener->preBind($event);
+        DeprecationErrorHandler::preBind($listener, $event);
 
         $this->assertEquals(array(
             'name' => 'Bernhard',
@@ -128,7 +129,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        $listener->preBind($event);
+        DeprecationErrorHandler::preBind($listener, $event);
 
         $this->assertEquals(array(
             'name' => 'Bernhard',
@@ -157,7 +158,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        $listener->preBind($event);
+        DeprecationErrorHandler::preBind($listener, $event);
 
         // Default to empty array
         $this->assertEquals(array(), $event->getData());
@@ -183,7 +184,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        $listener->preBind($event);
+        DeprecationErrorHandler::preBind($listener, $event);
 
         // Default to null
         $this->assertNull($event->getData());
@@ -206,7 +207,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        $listener->preBind($event);
+        DeprecationErrorHandler::preBind($listener, $event);
 
         $this->assertEquals(array(
             'name' => 'Bernhard',
@@ -230,7 +231,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        $listener->preBind($event);
+        DeprecationErrorHandler::preBind($listener, $event);
 
         $this->assertEquals(array(
             'name' => 'Bernhard',
@@ -256,7 +257,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        $listener->preBind($event);
+        DeprecationErrorHandler::preBind($listener, $event);
 
         $this->assertEquals(array(), $event->getData());
     }
@@ -278,7 +279,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        $listener->preBind($event);
+        DeprecationErrorHandler::preBind($listener, $event);
 
         $this->assertNull($event->getData());
     }

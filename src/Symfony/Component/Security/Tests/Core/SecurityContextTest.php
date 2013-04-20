@@ -41,7 +41,7 @@ class SecurityContextTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException
      */
     public function testVoteWithoutAuthenticationToken()
     {

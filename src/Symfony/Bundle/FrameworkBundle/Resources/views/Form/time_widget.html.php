@@ -7,8 +7,11 @@
             // There should be no spaces between the colons and the widgets, that's why
             // this block is written in a single PHP tag
             echo $view['form']->widget($form['hour'], $vars);
-            echo ':';
-            echo $view['form']->widget($form['minute'], $vars);
+
+            if ($with_minutes) {
+                echo ':';
+                echo $view['form']->widget($form['minute'], $vars);
+            }
 
             if ($with_seconds) {
                 echo ':';

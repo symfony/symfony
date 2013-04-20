@@ -46,12 +46,22 @@ class MoFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
+     */
+    public function testLoadNonExistingResource()
+    {
+        $loader = new MoFileLoader();
+        $resource = __DIR__.'/../fixtures/non-existing.mo';
+        $loader->load($resource, 'en', 'domain1');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
      */
     public function testLoadInvalidResource()
     {
         $loader = new MoFileLoader();
         $resource = __DIR__.'/../fixtures/empty.mo';
-        $catalogue = $loader->load($resource, 'en', 'domain1');
+        $loader->load($resource, 'en', 'domain1');
     }
 }

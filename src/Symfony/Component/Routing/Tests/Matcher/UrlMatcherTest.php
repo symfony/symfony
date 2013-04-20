@@ -130,14 +130,10 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testMatchWithPrefixes()
     {
-        $collection1 = new RouteCollection();
-        $collection1->add('foo', new Route('/{foo}'));
-
-        $collection2 = new RouteCollection();
-        $collection2->addCollection($collection1, '/b');
-
         $collection = new RouteCollection();
-        $collection->addCollection($collection2, '/a');
+        $collection->add('foo', new Route('/{foo}'));
+        $collection->addPrefix('/b');
+        $collection->addPrefix('/a');
 
         $matcher = new UrlMatcher($collection, new RequestContext());
         $this->assertEquals(array('_route' => 'foo', 'foo' => 'foo'), $matcher->match('/a/b/foo'));
@@ -145,17 +141,22 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testMatchWithDynamicPrefix()
     {
-        $collection1 = new RouteCollection();
-        $collection1->add('foo', new Route('/{foo}'));
-
-        $collection2 = new RouteCollection();
-        $collection2->addCollection($collection1, '/b');
-
         $collection = new RouteCollection();
-        $collection->addCollection($collection2, '/{_locale}');
+        $collection->add('foo', new Route('/{foo}'));
+        $collection->addPrefix('/b');
+        $collection->addPrefix('/{_locale}');
 
         $matcher = new UrlMatcher($collection, new RequestContext());
         $this->assertEquals(array('_locale' => 'fr', '_route' => 'foo', 'foo' => 'foo'), $matcher->match('/fr/b/foo'));
+    }
+
+    public function testMatchSpecialRouteName()
+    {
+        $collection = new RouteCollection();
+        $collection->add('$péß^a|', new Route('/bar'));
+
+        $matcher = new UrlMatcher($collection, new RequestContext());
+        $this->assertEquals(array('_route' => '$péß^a|'), $matcher->match('/bar'));
     }
 
     public function testMatchNonAlpha()
@@ -214,6 +215,15 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testDefaultRequirementForOptionalVariables()
+    {
+        $coll = new RouteCollection();
+        $coll->add('test', new Route('/{page}.{_format}', array('page' => 'index', '_format' => 'html')));
+
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $this->assertEquals(array('page' => 'my-page', '_format' => 'xml', '_route' => 'test'), $matcher->match('/my-page.xml'));
+    }
+
     public function testMatchingIsEager()
     {
         $coll = new RouteCollection();
@@ -223,8 +233,85 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'text1-text2-text3', 'bar' => 'text4', '_route' => 'test'), $matcher->match('/text1-text2-text3-text4-'));
     }
 
+    public function testAdjacentVariables()
+    {
+        $coll = new RouteCollection();
+        $coll->add('test', new Route('/{w}{x}{y}{z}.{_format}', array('z' => 'default-z', '_format' => 'html'), array('y' => 'y|Y')));
+
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        // 'w' eagerly matches as much as possible and the other variables match the remaining chars.
+        // This also shows that the variables w-z must all exclude the separating char (the dot '.' in this case) by default requirement.
+        // Otherwise they would also consume '.xml' and _format would never match as it's an optional variable.
+        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'Y', 'z' => 'Z','_format' => 'xml', '_route' => 'test'), $matcher->match('/wwwwwxYZ.xml'));
+        // As 'y' has custom requirement and can only be of value 'y|Y', it will leave  'ZZZ' to variable z.
+        // So with carefully chosen requirements adjacent variables, can be useful.
+        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'y', 'z' => 'ZZZ','_format' => 'html', '_route' => 'test'), $matcher->match('/wwwwwxyZZZ'));
+        // z and _format are optional.
+        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'y', 'z' => 'default-z','_format' => 'html', '_route' => 'test'), $matcher->match('/wwwwwxy'));
+
+        $this->setExpectedException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
+        $matcher->match('/wxy.html');
+    }
+
+    public function testOptionalVariableWithNoRealSeparator()
+    {
+        $coll = new RouteCollection();
+        $coll->add('test', new Route('/get{what}', array('what' => 'All')));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+
+        $this->assertEquals(array('what' => 'All', '_route' => 'test'), $matcher->match('/get'));
+        $this->assertEquals(array('what' => 'Sites', '_route' => 'test'), $matcher->match('/getSites'));
+
+        // Usually the character in front of an optional parameter can be left out, e.g. with pattern '/get/{what}' just '/get' would match.
+        // But here the 't' in 'get' is not a separating character, so it makes no sense to match without it.
+        $this->setExpectedException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
+        $matcher->match('/ge');
+    }
+
+    public function testRequiredVariableWithNoRealSeparator()
+    {
+        $coll = new RouteCollection();
+        $coll->add('test', new Route('/get{what}Suffix'));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+
+        $this->assertEquals(array('what' => 'Sites', '_route' => 'test'), $matcher->match('/getSitesSuffix'));
+    }
+
+    public function testDefaultRequirementOfVariable()
+    {
+        $coll = new RouteCollection();
+        $coll->add('test', new Route('/{page}.{_format}'));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+
+        $this->assertEquals(array('page' => 'index', '_format' => 'mobile.html', '_route' => 'test'), $matcher->match('/index.mobile.html'));
+    }
+
     /**
-     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testDefaultRequirementOfVariableDisallowsSlash()
+    {
+        $coll = new RouteCollection();
+        $coll->add('test', new Route('/{page}.{_format}'));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+
+        $matcher->match('/index.sl/ash');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testDefaultRequirementOfVariableDisallowsNextSeparator()
+    {
+        $coll = new RouteCollection();
+        $coll->add('test', new Route('/{page}.{_format}', array(), array('_format' => 'html|xml')));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+
+        $matcher->match('/do.t.html');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
     public function testSchemeRequirement()
     {
@@ -241,5 +328,56 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $matcher = new UrlMatcher($coll, new RequestContext());
         $this->assertEquals(array('foo' => 'bar%23', '_route' => 'foo'), $matcher->match('/foo/bar%2523'));
+    }
+
+    public function testCannotRelyOnPrefix()
+    {
+        $coll = new RouteCollection();
+
+        $subColl = new RouteCollection();
+        $subColl->add('bar', new Route('/bar'));
+        $subColl->addPrefix('/prefix');
+        // overwrite the pattern, so the prefix is not valid anymore for this route in the collection
+        $subColl->get('bar')->setPattern('/new');
+
+        $coll->addCollection($subColl);
+
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $this->assertEquals(array('_route' => 'bar'), $matcher->match('/new'));
+    }
+
+    public function testWithHost()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/{foo}', array(), array(), array(), '{locale}.example.com'));
+
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'));
+        $this->assertEquals(array('foo' => 'bar', '_route' => 'foo', 'locale' => 'en'), $matcher->match('/foo/bar'));
+    }
+
+    public function testWithHostOnRouteCollection()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/{foo}'));
+        $coll->add('bar', new Route('/bar/{foo}', array(), array(), array(), '{locale}.example.net'));
+        $coll->setHost('{locale}.example.com');
+
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'));
+        $this->assertEquals(array('foo' => 'bar', '_route' => 'foo', 'locale' => 'en'), $matcher->match('/foo/bar'));
+
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'));
+        $this->assertEquals(array('foo' => 'bar', '_route' => 'bar', 'locale' => 'en'), $matcher->match('/bar/bar'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testWithOutHostHostDoesNotMatch()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/{foo}', array(), array(), array(), '{locale}.example.com'));
+
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'example.com'));
+        $matcher->match('/foo/bar');
     }
 }

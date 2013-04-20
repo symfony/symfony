@@ -26,7 +26,7 @@ use Symfony\Component\Finder\Finder;
 class CacheClearCommand extends ContainerAwareCommand
 {
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function configure()
     {

@@ -4,11 +4,11 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>Nilai ini harus salah.</target>
+                <target>Nilai ini harus bernilai salah.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
-                <target>Nilai ini harus benar.</target>
+                <target>Nilai ini harus bernilai benar.</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}.</source>
@@ -20,14 +20,14 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
-                <target>Nilai ini harus salah satu dari pilihan yang diberikan.</target>
+                <target>Nilai yang dipilih tidak tepat.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choices.</source>
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
                 <target>Anda harus memilih paling tidak {{ limit }} pilihan.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choices.</source>
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
                 <target>Anda harus memilih paling banyak {{ limit }} pilihan.</target>
             </trans-unit>
             <trans-unit id="8">
@@ -64,18 +64,18 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>Ukuran berkas terlalu besar ({{ size }} {{ suffix }}). Ukuran maksimum yang diijinkan adalah {{ limit }} {{ suffix }}.</target>
+                <target>Ukuran berkas terlalu besar ({{ size }} {{ suffix }}). Ukuran maksimum yang diizinkan adalah {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>Jenis berkas tidak sah ({{ type }}). Jenis berkas yang diijinkan adalah {{ types }}.</target>
+                <target>Jenis berkas ({{ type }}) tidak sah. Jenis berkas yang diijinkan adalah {{ types }}.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
                 <target>Nilai ini harus {{ limit }} atau kurang.</target>
             </trans-unit>
             <trans-unit id="19">
-                <source>This value is too long. It should have {{ limit }} characters or less.</source>
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
                 <target>Nilai ini terlalu panjang. Seharusnya {{ limit }} karakter atau kurang.</target>
             </trans-unit>
             <trans-unit id="20">
@@ -83,7 +83,7 @@
                 <target>Nilai ini harus {{ limit }} atau lebih.</target>
             </trans-unit>
             <trans-unit id="21">
-                <source>This value is too short. It should have {{ limit }} characters or more.</source>
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
                 <target>Nilai ini terlalu pendek. Seharusnya {{ limit }} karakter atau lebih.</target>
             </trans-unit>
             <trans-unit id="22">
@@ -179,8 +179,48 @@
                 <target>Nilai ini harus kata sandi pengguna saat ini.</target>
             </trans-unit>
             <trans-unit id="48">
-                <source>This value should have exactly {{ limit }} characters.</source>
+                <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
                 <target>Nilai ini harus memiliki tepat {{ limit }} karakter.</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded.</source>
+                <target>Berkas hanya terunggah sebagian.</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded.</source>
+                <target>Tidak ada berkas terunggah.</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>No temporary folder was configured in php.ini.</source>
+                <target>Direktori sementara tidak dikonfiguasi pada php.ini</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk.</source>
+                <target>Tidak dapat menuliskan berkas sementara ke dalam media penyimpanan.</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail.</source>
+                <target>Sebuah ekstensi PHP menyebabkan kegagalan unggah.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
+                <target>Kumpulan ini harus memiliki {{ limit }} elemen atau lebih.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
+                <target>Kumpulan ini harus memiliki kurang dari {{ limit }} elemen.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
+                <target>Kumpulan ini harus memiliki tepat {{ limit }} elemen.</target>
+            </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>Nomor kartu tidak sah.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>Jenis kartu tidak didukung atau nomor kartu tidak sah.</target>
             </trans-unit>
         </body>
     </file>

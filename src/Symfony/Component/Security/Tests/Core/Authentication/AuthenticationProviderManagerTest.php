@@ -37,7 +37,7 @@ class AuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
             $manager->authenticate($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
             $this->fail();
         } catch (ProviderNotFoundException $e) {
-            $this->assertSame($token, $e->getExtraInformation());
+            $this->assertSame($token, $e->getToken());
         }
     }
 
@@ -51,7 +51,7 @@ class AuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
             $manager->authenticate($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
             $this->fail();
         } catch (AccountStatusException $e) {
-            $this->assertSame($token, $e->getExtraInformation());
+            $this->assertSame($token, $e->getToken());
         }
     }
 
@@ -65,7 +65,7 @@ class AuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
             $manager->authenticate($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
             $this->fail();
         } catch (AuthenticationException $e) {
-            $this->assertSame($token, $e->getExtraInformation());
+            $this->assertSame($token, $e->getToken());
         }
     }
 

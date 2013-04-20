@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
 use Symfony\Component\Validator\Constraint;
@@ -51,18 +52,12 @@ class FormValidator extends ConstraintValidator
 
         if ($form->isSynchronized()) {
             // Validate the form data only if transformation succeeded
-            $path = $this->context->getPropertyPath();
-            $graphWalker = $this->context->getGraphWalker();
             $groups = self::getValidationGroups($form);
-
-            if (!empty($path)) {
-                $path .= '.';
-            }
 
             // Validate the data against its own constraints
             if (self::allowDataWalking($form)) {
                 foreach ($groups as $group) {
-                    $graphWalker->walkReference($form->getData(), $group, $path . 'data', true);
+                    $this->context->validate($form->getData(), 'data', $group, true);
                 }
             }
 
@@ -72,7 +67,7 @@ class FormValidator extends ConstraintValidator
             foreach ($constraints as $constraint) {
                 foreach ($groups as $group) {
                     if (in_array($group, $constraint->groups)) {
-                        $graphWalker->walkConstraint($constraint, $form->getData(), $group, $path . 'data');
+                        $this->context->validateValue($form->getData(), $constraint, 'data', $group);
 
                         // Prevent duplicate validation
                         continue 2;
@@ -177,20 +172,65 @@ class FormValidator extends ConstraintValidator
      */
     private static function getValidationGroups(FormInterface $form)
     {
+        $button = self::findClickedButton($form->getRoot());
+
+        if (null !== $button) {
+            $groups = $button->getConfig()->getOption('validation_groups');
+
+            if (null !== $groups) {
+                return self::resolveValidationGroups($groups, $form);
+            }
+        }
+
         do {
             $groups = $form->getConfig()->getOption('validation_groups');
 
             if (null !== $groups) {
-                if (is_callable($groups)) {
-                    $groups = call_user_func($groups, $form);
-                }
-
-                return (array) $groups;
+                return self::resolveValidationGroups($groups, $form);
             }
 
             $form = $form->getParent();
         } while (null !== $form);
 
         return array(Constraint::DEFAULT_GROUP);
+    }
+
+    /**
+     * Extracts a clicked button from a form tree, if one exists.
+     *
+     * @param FormInterface $form The root form.
+     *
+     * @return ClickableInterface|null The clicked button or null.
+     */
+    private static function findClickedButton(FormInterface $form)
+    {
+        if ($form instanceof ClickableInterface && $form->isClicked()) {
+            return $form;
+        }
+
+        foreach ($form as $child) {
+            if (null !== ($button = self::findClickedButton($child))) {
+                return $button;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Post-processes the validation groups option for a given form.
+     *
+     * @param array|callable $groups The validation groups.
+     * @param FormInterface  $form   The validated form.
+     *
+     * @return array The validation groups.
+     */
+    private static function resolveValidationGroups($groups, FormInterface $form)
+    {
+        if (is_callable($groups)) {
+            $groups = call_user_func($groups, $form);
+        }
+
+        return (array) $groups;
     }
 }

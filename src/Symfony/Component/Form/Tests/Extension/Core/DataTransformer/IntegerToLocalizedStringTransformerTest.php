@@ -12,12 +12,16 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\Extension\Core\DataTransformer\IntegerToLocalizedStringTransformer;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class IntegerToLocalizedStringTransformerTest extends LocalizedTestCase
+class IntegerToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
         parent::setUp();
+
+        // Since we test against "de_AT", we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
 
         \Locale::setDefault('de_AT');
     }
@@ -50,7 +54,7 @@ class IntegerToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testReverseTransformExpectsString()
     {
@@ -60,7 +64,7 @@ class IntegerToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformExpectsValidNumber()
     {
@@ -70,7 +74,7 @@ class IntegerToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformDisallowsNaN()
     {
@@ -80,7 +84,7 @@ class IntegerToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformDisallowsNaN2()
     {
@@ -90,7 +94,7 @@ class IntegerToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformDisallowsInfinity()
     {
@@ -100,7 +104,7 @@ class IntegerToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformDisallowsNegativeInfinity()
     {

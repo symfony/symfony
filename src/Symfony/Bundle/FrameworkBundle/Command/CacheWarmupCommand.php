@@ -23,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CacheWarmupCommand extends ContainerAwareCommand
 {
     /**
-     * @see Command
+     * {@inheritdoc}
      */
     protected function configure()
     {

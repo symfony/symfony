@@ -55,6 +55,8 @@ class TranslationWriter
      * @param MessageCatalogue $catalogue The message catalogue to dump
      * @param string           $format    The format to use to dump the messages
      * @param array            $options   Options that are passed to the dumper
+     *
+     * @throws \InvalidArgumentException
      */
     public function writeTranslations(MessageCatalogue $catalogue, $format, $options = array())
     {

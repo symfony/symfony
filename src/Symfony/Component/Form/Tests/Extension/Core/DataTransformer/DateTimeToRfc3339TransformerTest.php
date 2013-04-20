@@ -79,7 +79,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testTransformRequiresValidDateTime()
     {
@@ -102,7 +102,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testReverseTransformRequiresString()
     {
@@ -111,7 +111,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformWithNonExistingDate()
     {

@@ -319,4 +319,27 @@ class ArgvInput extends Input
 
         return $default;
     }
+
+    /**
+     * Returns a stringified representation of the args passed to the command
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $self = $this;
+        $tokens = array_map(function ($token) use ($self) {
+            if (preg_match('{^(-[^=]+=)(.+)}', $token, $match)) {
+                return $match[1] . $self->escapeToken($match[2]);
+            }
+
+            if ($token && $token[0] !== '-') {
+                return $self->escapeToken($token);
+            }
+
+            return $token;
+        }, $this->tokens);
+
+        return implode(' ', $tokens);
+    }
 }

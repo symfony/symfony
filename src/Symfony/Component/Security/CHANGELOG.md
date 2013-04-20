@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * [BC BREAK] return 401 instead of 500 when using use_forward during for form authentication
+ * added a `require_previous_session` option to `AbstractAuthenticationListener`
+
+2.2.0
+-----
+
+ * `Symfony\Component\Security\Http\Firewall` and
+   `Symfony\Component\Security\Http\RememberMe\ResponseListener` now
+   implements EventSubscriberInterface
+ * added secure random number generator
+ * added PBKDF2 Password encoder
+ * added BCrypt password encoder
+
 2.1.0
 -----
 
@@ -25,3 +41,8 @@ CHANGELOG
    `AbstractAuthenticationListener` has changed.
  * [BC BREAK] moved the default logout success handling to a separate class. The
    order of arguments in the constructor of `LogoutListener` has changed.
+ * [BC BREAK] The constructor of `AuthenticationException` and all child
+   classes now matches the constructor of `\Exception`. The extra information
+   getters and setters are removed. There are now dedicated getters/setters for
+   token (`AuthenticationException'), user (`AccountStatusException`) and
+   username (`UsernameNotFoundException`).

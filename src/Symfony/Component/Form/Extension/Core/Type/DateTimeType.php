@@ -69,9 +69,14 @@ class DateTimeType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $parts = array('year', 'month', 'day', 'hour', 'minute');
+        $parts = array('year', 'month', 'day', 'hour');
         $dateParts = array('year', 'month', 'day');
-        $timeParts = array('hour', 'minute');
+        $timeParts = array('hour');
+
+        if ($options['with_minutes']) {
+            $parts[] = 'minute';
+            $timeParts[] = 'minute';
+        }
 
         if ($options['with_seconds']) {
             $parts[] = 'second';
@@ -118,6 +123,7 @@ class DateTimeType extends AbstractType
                 'hours',
                 'minutes',
                 'seconds',
+                'with_minutes',
                 'with_seconds',
                 'empty_value',
                 'required',
@@ -201,28 +207,16 @@ class DateTimeType extends AbstractType
             return $options['widget'];
         };
 
-        // BC until Symfony 2.3
-        $modelTimezone = function (Options $options) {
-            return $options['data_timezone'];
-        };
-
-        // BC until Symfony 2.3
-        $viewTimezone = function (Options $options) {
-            return $options['user_timezone'];
-        };
-
         $resolver->setDefaults(array(
             'input'          => 'datetime',
-            'model_timezone' => $modelTimezone,
-            'view_timezone'  => $viewTimezone,
-            // Deprecated timezone options
-            'data_timezone'  => null,
-            'user_timezone'  => null,
+            'model_timezone' => null,
+            'view_timezone'  => null,
             'format'         => self::HTML5_FORMAT,
             'date_format'    => null,
             'widget'         => null,
             'date_widget'    => $dateWidget,
             'time_widget'    => $timeWidget,
+            'with_minutes'   => true,
             'with_seconds'   => false,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
@@ -275,14 +269,6 @@ class DateTimeType extends AbstractType
                 'choice',
             ),
         ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'field';
     }
 
     /**

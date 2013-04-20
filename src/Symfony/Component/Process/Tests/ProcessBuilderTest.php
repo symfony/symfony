@@ -85,7 +85,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
      */
     public function testNegativeTimeoutFromSetter()
     {
@@ -104,5 +104,15 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $p->setAccessible(true);
 
         $this->assertNull($p->getValue($pb));
+    }
+
+    public function testShouldSetArguments()
+    {
+        $pb = new ProcessBuilder(array('initial'));
+        $pb->setArguments(array('second'));
+
+        $proc = $pb->getProcess();
+
+        $this->assertContains("second", $proc->getCommandLine());
     }
 }

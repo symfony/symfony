@@ -12,7 +12,7 @@
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>El token CSRF no és vàlid. Per favor, provi d'enviar novament el formulari</target>
+                <target>El token CSRF no és vàlid. Per favor, provi d'enviar novament el formulari.</target>
             </trans-unit>
         </body>
     </file>

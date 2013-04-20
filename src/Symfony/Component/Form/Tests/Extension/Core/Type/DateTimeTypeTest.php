@@ -12,9 +12,17 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class DateTimeTypeTest extends LocalizedTestCase
+class DateTimeTypeTest extends TypeTestCase
 {
+    protected function setUp()
+    {
+        IntlTestHelper::requireIntl($this);
+
+        parent::setUp();
+    }
+
     public function testSubmitDateTime()
     {
         $form = $this->factory->create('datetime', null, array(
@@ -92,6 +100,35 @@ class DateTimeTypeTest extends LocalizedTestCase
         $dateTime = new \DateTime('2010-06-02 03:04:00 UTC');
 
         $this->assertEquals($dateTime->format('U'), $form->getData());
+    }
+
+    public function testSubmitWithoutMinutes()
+    {
+        $form = $this->factory->create('datetime', null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'date_widget' => 'choice',
+            'time_widget' => 'choice',
+            'input' => 'datetime',
+            'with_minutes' => false,
+        ));
+
+        $form->setData(new \DateTime('2010-06-02 03:04:05 UTC'));
+
+        $input = array(
+            'date' => array(
+                'day' => '2',
+                'month' => '6',
+                'year' => '2010',
+            ),
+            'time' => array(
+                'hour' => '3',
+            ),
+        );
+
+        $form->bind($input);
+
+        $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:00:00 UTC'), $form->getData());
     }
 
     public function testSubmitWithSeconds()

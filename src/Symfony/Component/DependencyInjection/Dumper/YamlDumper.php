@@ -94,6 +94,18 @@ class YamlDumper extends Dumper
             $code .= sprintf("        file: %s\n", $definition->getFile());
         }
 
+        if ($definition->isSynthetic()) {
+            $code .= sprintf("        synthetic: true\n");
+        }
+
+        if ($definition->isSynchronized()) {
+            $code .= sprintf("        synchronized: true\n");
+        }
+
+        if ($definition->getFactoryClass()) {
+            $code .= sprintf("        factory_class: %s\n", $definition->getFactoryClass());
+        }
+
         if ($definition->getFactoryMethod()) {
             $code .= sprintf("        factory_method: %s\n", $definition->getFactoryMethod());
         }
@@ -120,7 +132,7 @@ class YamlDumper extends Dumper
 
         if ($callable = $definition->getConfigurator()) {
             if (is_array($callable)) {
-                if (is_object($callable[0]) && $callable[0] instanceof Reference) {
+                if ($callable[0] instanceof Reference) {
                     $callable = array($this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]);
                 } else {
                     $callable = array($callable[0], $callable[1]);
@@ -207,9 +219,9 @@ class YamlDumper extends Dumper
             }
 
             return $code;
-        } elseif (is_object($value) && $value instanceof Reference) {
+        } elseif ($value instanceof Reference) {
             return $this->getServiceCall((string) $value, $value);
-        } elseif (is_object($value) && $value instanceof Parameter) {
+        } elseif ($value instanceof Parameter) {
             return $this->getParameterCall((string) $value);
         } elseif (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');

@@ -23,4 +23,6 @@ Help:
  You can also output the help as XML by using the --xml option:
  
    php app/console help --xml list
+ 
+ To display the list of available commands, please use the list command.
 

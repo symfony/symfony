@@ -11,9 +11,8 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\Extension\HttpFoundation\RequestFormProcessor;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
@@ -33,7 +32,7 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertTrue($this->form->isValid());
     }
 
-    public function testInvalidIfChildrenIsInvalid()
+    public function testInvalidIfChildIsInvalid()
     {
         $this->form->add($this->getValidForm('firstName'));
         $this->form->add($this->getInvalidForm('lastName'));
@@ -114,29 +113,93 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertFalse($this->form->isValid());
     }
 
-    public function testHasChildren()
-    {
-        $this->form->add($this->getBuilder()->getForm());
-
-        $this->assertTrue($this->form->hasChildren());
-    }
-
-    public function testHasNoChildren()
-    {
-        $this->assertFalse($this->form->hasChildren());
-    }
-
     public function testAdd()
     {
         $child = $this->getBuilder('foo')->getForm();
         $this->form->add($child);
 
+        $this->assertTrue($this->form->has('foo'));
+        $this->assertSame($this->form, $child->getParent());
+        $this->assertSame(array('foo' => $child), $this->form->all());
+    }
+
+    public function testAddUsingNameAndType()
+    {
+        $child = $this->getBuilder('foo')->getForm();
+
+        $this->factory->expects($this->once())
+            ->method('createNamed')
+            ->with('foo', 'text', null, array('bar' => 'baz'))
+            ->will($this->returnValue($child));
+
+        $this->form->add('foo', 'text', array('bar' => 'baz'));
+
+        $this->assertTrue($this->form->has('foo'));
+        $this->assertSame($this->form, $child->getParent());
+        $this->assertSame(array('foo' => $child), $this->form->all());
+    }
+
+    public function testAddUsingIntegerNameAndType()
+    {
+        $child = $this->getBuilder(0)->getForm();
+
+        $this->factory->expects($this->once())
+            ->method('createNamed')
+            ->with('0', 'text', null, array('bar' => 'baz'))
+            ->will($this->returnValue($child));
+
+        // in order to make casting unnecessary
+        $this->form->add(0, 'text', array('bar' => 'baz'));
+
+        $this->assertTrue($this->form->has(0));
+        $this->assertSame($this->form, $child->getParent());
+        $this->assertSame(array(0 => $child), $this->form->all());
+    }
+
+    public function testAddUsingNameButNoType()
+    {
+        $this->form = $this->getBuilder('name', null, '\stdClass')
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
+
+        $child = $this->getBuilder('foo')->getForm();
+
+        $this->factory->expects($this->once())
+            ->method('createForProperty')
+            ->with('\stdClass', 'foo')
+            ->will($this->returnValue($child));
+
+        $this->form->add('foo');
+
+        $this->assertTrue($this->form->has('foo'));
+        $this->assertSame($this->form, $child->getParent());
+        $this->assertSame(array('foo' => $child), $this->form->all());
+    }
+
+    public function testAddUsingNameButNoTypeAndOptions()
+    {
+        $this->form = $this->getBuilder('name', null, '\stdClass')
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->getForm();
+
+        $child = $this->getBuilder('foo')->getForm();
+
+        $this->factory->expects($this->once())
+            ->method('createForProperty')
+            ->with('\stdClass', 'foo', null, array('bar' => 'baz'))
+            ->will($this->returnValue($child));
+
+        $this->form->add('foo', null, array('bar' => 'baz'));
+
+        $this->assertTrue($this->form->has('foo'));
         $this->assertSame($this->form, $child->getParent());
         $this->assertSame(array('foo' => $child), $this->form->all());
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\AlreadyBoundException
+     * @expectedException \Symfony\Component\Form\Exception\AlreadyBoundException
      */
     public function testAddThrowsExceptionIfAlreadyBound()
     {
@@ -151,11 +214,11 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->remove('foo');
 
         $this->assertNull($child->getParent());
-        $this->assertFalse($this->form->hasChildren());
+        $this->assertCount(0, $this->form);
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\AlreadyBoundException
+     * @expectedException \Symfony\Component\Form\Exception\AlreadyBoundException
      */
     public function testRemoveThrowsExceptionIfAlreadyBound()
     {
@@ -201,6 +264,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testAddMapsViewDataToForm()
     {
+        $test = $this;
         $mapper = $this->getDataMapper();
         $form = $this->getBuilder()
             ->setCompound(true)
@@ -215,13 +279,34 @@ class CompoundFormTest extends AbstractFormTest
         $child = $this->getBuilder()->getForm();
         $mapper->expects($this->once())
             ->method('mapDataToForms')
-            ->with('bar', array($child));
+            ->with('bar', $this->isInstanceOf('\RecursiveIteratorIterator'))
+            ->will($this->returnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child, $test) {
+                $test->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $test->assertSame(array($child), iterator_to_array($iterator));
+            }));
+
+        $form->add($child);
+    }
+
+    public function testAddDoesNotMapViewDataToFormIfInheritData()
+    {
+        $mapper = $this->getDataMapper();
+        $form = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($mapper)
+            ->setInheritData(true)
+            ->getForm();
+
+        $child = $this->getBuilder()->getForm();
+        $mapper->expects($this->never())
+            ->method('mapDataToForms');
 
         $form->add($child);
     }
 
     public function testSetDataMapsViewDataToChildren()
     {
+        $test = $this;
         $mapper = $this->getDataMapper();
         $form = $this->getBuilder()
             ->setCompound(true)
@@ -237,7 +322,11 @@ class CompoundFormTest extends AbstractFormTest
 
         $mapper->expects($this->once())
             ->method('mapDataToForms')
-            ->with('bar', array('firstName' => $child1, 'lastName' => $child2));
+            ->with('bar', $this->isInstanceOf('\RecursiveIteratorIterator'))
+            ->will($this->returnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child1, $child2, $test) {
+                $test->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $test->assertSame(array('firstName' => $child1, 'lastName' => $child2), iterator_to_array($iterator));
+            }));
 
         $form->setData('foo');
     }
@@ -261,11 +350,38 @@ class CompoundFormTest extends AbstractFormTest
 
         $mapper->expects($this->once())
             ->method('mapFormsToData')
-            ->with(array('firstName' => $child1, 'lastName' => $child2), 'bar')
-            ->will($this->returnCallback(function ($children, $bar) use ($test) {
-                $test->assertEquals('Bernhard', $children['firstName']->getData());
-                $test->assertEquals('Schussek', $children['lastName']->getData());
+            ->with($this->isInstanceOf('\RecursiveIteratorIterator'), 'bar')
+            ->will($this->returnCallback(function (\RecursiveIteratorIterator $iterator) use ($child1, $child2, $test) {
+                $test->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $test->assertSame(array('firstName' => $child1, 'lastName' => $child2), iterator_to_array($iterator));
+                $test->assertEquals('Bernhard', $child1->getData());
+                $test->assertEquals('Schussek', $child2->getData());
             }));
+
+        $form->bind(array(
+            'firstName' => 'Bernhard',
+            'lastName' => 'Schussek',
+        ));
+    }
+
+    public function testMapFormsToDataIsNotInvokedIfInheritData()
+    {
+        $mapper = $this->getDataMapper();
+        $form = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($mapper)
+            ->setInheritData(true)
+            ->addViewTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'foo' => 'bar',
+            )))
+            ->getForm();
+
+        $form->add($child1 = $this->getBuilder('firstName')->setCompound(false)->getForm());
+        $form->add($child2 = $this->getBuilder('lastName')->setCompound(false)->getForm());
+
+        $mapper->expects($this->never())
+            ->method('mapFormsToData');
 
         $form->bind(array(
             'firstName' => 'Bernhard',
@@ -293,6 +409,7 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testBindMapsBoundChildrenOntoEmptyData()
     {
+        $test = $this;
         $mapper = $this->getDataMapper();
         $object = new \stdClass();
         $form = $this->getBuilder()
@@ -306,7 +423,11 @@ class CompoundFormTest extends AbstractFormTest
 
         $mapper->expects($this->once())
             ->method('mapFormsToData')
-            ->with(array('name' => $child), $object);
+            ->with($this->isInstanceOf('\RecursiveIteratorIterator'), $object)
+            ->will($this->returnCallback(function (\RecursiveIteratorIterator $iterator) use ($child, $test) {
+                $test->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $test->assertSame(array('name' => $child), iterator_to_array($iterator));
+            }));
 
         $form->bind(array(
             'name' => 'Bernhard',
@@ -357,14 +478,15 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('author')
+            ->setMethod($method)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->addEventSubscriber(new BindRequestListener())
+            ->setFormProcessor(new RequestFormProcessor())
             ->getForm();
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
 
-        $form->bindRequest($request);
+        $form->process($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -406,14 +528,15 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('')
+            ->setMethod($method)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->addEventSubscriber(new BindRequestListener())
+            ->setFormProcessor(new RequestFormProcessor())
             ->getForm();
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
 
-        $form->bindRequest($request);
+        $form->process($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -451,10 +574,11 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('image')
-            ->addEventSubscriber(new BindRequestListener())
+            ->setMethod($method)
+            ->setFormProcessor(new RequestFormProcessor())
             ->getForm();
 
-        $form->bindRequest($request);
+        $form->process($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -484,10 +608,11 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('name')
-            ->addEventSubscriber(new BindRequestListener())
+            ->setMethod($method)
+            ->setFormProcessor(new RequestFormProcessor())
             ->getForm();
 
-        $form->bindRequest($request);
+        $form->process($request);
 
         $this->assertEquals('Bernhard', $form->getData());
 
@@ -512,14 +637,15 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('author')
+            ->setMethod('GET')
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->addEventSubscriber(new BindRequestListener())
+            ->setFormProcessor(new RequestFormProcessor())
             ->getForm();
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());
 
-        $form->bindRequest($request);
+        $form->process($request);
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());
@@ -542,14 +668,15 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('')
+            ->setMethod('GET')
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->addEventSubscriber(new BindRequestListener())
+            ->setFormProcessor(new RequestFormProcessor())
             ->getForm();
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());
 
-        $form->bindRequest($request);
+        $form->process($request);
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());

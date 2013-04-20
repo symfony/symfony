@@ -46,12 +46,12 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
      */
-    public function testLoadThrowsAnExceptionIfFileNotExists()
+    public function testLoadNonExistingResource()
     {
         $loader = new IniFileLoader();
-        $resource = __DIR__.'/../fixtures/not-exists.ini';
+        $resource = __DIR__.'/../fixtures/non-existing.ini';
         $loader->load($resource, 'en', 'domain1');
     }
 }

@@ -12,6 +12,8 @@
 namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
 use Symfony\Bridge\Doctrine\Tests\DoctrineOrmTestCase;
+use Symfony\Component\Validator\DefaultTranslator;
+use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIdentEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoubleIdentEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeIdentEntity;
@@ -93,17 +95,6 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         return $em;
     }
 
-    protected function createMetadataFactoryMock($metadata)
-    {
-        $metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface');
-        $metadataFactory->expects($this->any())
-                        ->method('getClassMetadata')
-                        ->with($this->equalTo($metadata->name))
-                        ->will($this->returnValue($metadata));
-
-        return $metadataFactory;
-    }
-
     protected function createValidatorFactory($uniqueValidator)
     {
         $validatorFactory = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
@@ -138,10 +129,11 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         ));
         $metadata->addConstraint($constraint);
 
-        $metadataFactory = $this->createMetadataFactoryMock($metadata);
+        $metadataFactory = new FakeMetadataFactory();
+        $metadataFactory->addMetadata($metadata);
         $validatorFactory = $this->createValidatorFactory($uniqueValidator);
 
-        return new Validator($metadataFactory, $validatorFactory);
+        return new Validator($metadataFactory, $validatorFactory, new DefaultTranslator());
     }
 
     private function createSchema($em)

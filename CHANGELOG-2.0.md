@@ -254,7 +254,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * d67d419: [HttpFoundation] added missing trustProxy condition
  * efce640: [Yaml][Parser] throw an exception if not readable
  * aa58330: [Form] fixed flawed condition
- * 253eeba: [BugFix][Validator] Fix for PHP incosistent behaviour of ArrayAccess
+ * 253eeba: [BugFix][Validator] Fix for PHP inconsistent behaviour of ArrayAccess
  * 0507840: Prevent parameters from overwriting the template filename.
  * 9bc41d0: [HttpFoundation] Fixed #3053
  * 9441c46: [DependencyInjection] PhpDumper, fixes #2730

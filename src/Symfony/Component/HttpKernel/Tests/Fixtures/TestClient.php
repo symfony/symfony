@@ -19,7 +19,12 @@ class TestClient extends Client
     {
         $script = parent::getScript($request);
 
-        $script = preg_replace('/(\->register\(\);)/', "$0\nrequire_once '".__DIR__."/../bootstrap.php';", $script);
+        $autoload = file_exists(__DIR__.'/../../vendor/autoload.php')
+            ? __DIR__.'/../../vendor/autoload.php'
+            : __DIR__.'/../../../../../../vendor/autoload.php'
+        ;
+
+        $script = preg_replace('/(\->register\(\);)/', "$0\nrequire_once '$autoload';\n", $script);
 
         return $script;
     }

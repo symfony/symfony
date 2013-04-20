@@ -12,11 +12,13 @@
 namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Client as BaseClient;
 use Symfony\Component\HttpKernel\Profiler\Profile as HttpProfile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\BrowserKit\History;
+use Symfony\Component\BrowserKit\CookieJar;
 
 /**
  * Client simulates a browser and makes requests to a Kernel object.
@@ -26,6 +28,15 @@ use Symfony\Component\HttpFoundation\Response;
 class Client extends BaseClient
 {
     private $hasPerformedRequest = false;
+    private $profiler = false;
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct(KernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
+    {
+        parent::__construct($kernel, $server, $history, $cookieJar);
+    }
 
     /**
      * Returns the container.
@@ -40,7 +51,7 @@ class Client extends BaseClient
     /**
      * Returns the kernel.
      *
-     * @return HttpKernelInterface
+     * @return KernelInterface
      */
     public function getKernel()
     {
@@ -62,6 +73,18 @@ class Client extends BaseClient
     }
 
     /**
+     * Enables the profiler for the very next request.
+     *
+     * If the profiler is not enabled, the call to this method does nothing.
+     */
+    public function enableProfiler()
+    {
+        if ($this->kernel->getContainer()->has('profiler')) {
+            $this->profiler = true;
+        }
+    }
+
+    /**
      * Makes a request.
      *
      * @param Request $request A Request instance
@@ -78,7 +101,26 @@ class Client extends BaseClient
             $this->hasPerformedRequest = true;
         }
 
+        if ($this->profiler) {
+            $this->profiler = false;
+
+            $this->kernel->boot();
+            $this->kernel->getContainer()->get('profiler')->enable();
+        }
+
         return parent::doRequest($request);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doRequestInProcess($request)
+    {
+        $response = parent::doRequestInProcess($request);
+
+        $this->profiler = false;
+
+        return $response;
     }
 
     /**
@@ -109,6 +151,11 @@ class Client extends BaseClient
 
         $path = str_replace("'", "\\'", $r->getFileName());
 
+        $profilerCode = '';
+        if ($this->profiler) {
+            $profilerCode = '$kernel->getContainer()->get(\'profiler\')->enable();';
+        }
+
         return <<<EOF
 <?php
 
@@ -119,6 +166,7 @@ require_once '$path';
 
 \$kernel = unserialize('$kernel');
 \$kernel->boot();
+$profilerCode
 echo serialize(\$kernel->handle(unserialize('$request')));
 EOF;
     }

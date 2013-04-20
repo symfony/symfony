@@ -25,7 +25,7 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
     public function testLoadClassMetadata()
     {
         $factory = new ClassMetadataFactory(new TestLoader());
-        $metadata = $factory->getClassMetadata(self::PARENTCLASS);
+        $metadata = $factory->getMetadataFor(self::PARENTCLASS);
 
         $constraints = array(
             new ConstraintA(array('groups' => array('Default', 'EntityParent'))),
@@ -37,7 +37,7 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
     public function testMergeParentConstraints()
     {
         $factory = new ClassMetadataFactory(new TestLoader());
-        $metadata = $factory->getClassMetadata(self::CLASSNAME);
+        $metadata = $factory->getMetadataFor(self::CLASSNAME);
 
         $constraints = array(
             new ConstraintA(array('groups' => array(
@@ -81,7 +81,7 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
                   $tester->assertEquals($constraints, $metadata->getConstraints());
               }));
 
-        $metadata = $factory->getClassMetadata(self::PARENTCLASS);
+        $metadata = $factory->getMetadataFor(self::PARENTCLASS);
 
         $this->assertEquals(self::PARENTCLASS, $metadata->getClassName());
         $this->assertEquals($constraints, $metadata->getConstraints());
@@ -106,7 +106,7 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
               ->method('read')
               ->will($this->returnValue($metadata));
 
-        $this->assertEquals($metadata,$factory->getClassMetadata(self::PARENTCLASS));
+        $this->assertEquals($metadata,$factory->getMetadataFor(self::PARENTCLASS));
     }
 }
 

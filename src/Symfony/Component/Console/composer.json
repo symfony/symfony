@@ -18,9 +18,17 @@
     "require": {
         "php": ">=5.3.3"
     },
+    "require-dev": {
+        "symfony/event-dispatcher": "~2.1"
+    },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Console": "" }
+        "psr-0": { "Symfony\\Component\\Console\\": "" }
     },
     "target-dir": "Symfony/Component/Console",
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.3-dev"
+        }
+    }
 }

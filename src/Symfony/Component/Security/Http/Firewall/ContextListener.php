@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -88,7 +88,7 @@ class ContextListener implements ListenerInterface
             $token = $this->refreshUser($token);
         } elseif (null !== $token) {
             if (null !== $this->logger) {
-                $this->logger->warn(sprintf('Session includes a "%s" where a security token is expected', is_object($token) ? get_class($token) : gettype($token)));
+                $this->logger->warning(sprintf('Session includes a "%s" where a security token is expected', is_object($token) ? get_class($token) : gettype($token)));
             }
 
             $token = null;
@@ -138,6 +138,8 @@ class ContextListener implements ListenerInterface
      * @param TokenInterface $token
      *
      * @return TokenInterface|null
+     *
+     * @throws \RuntimeException
      */
     private function refreshUser(TokenInterface $token)
     {
@@ -163,7 +165,7 @@ class ContextListener implements ListenerInterface
                 // let's try the next user provider
             } catch (UsernameNotFoundException $notFound) {
                 if (null !== $this->logger) {
-                    $this->logger->warn(sprintf('Username "%s" could not be found.', $user->getUsername()));
+                    $this->logger->warning(sprintf('Username "%s" could not be found.', $user->getUsername()));
                 }
 
                 return null;

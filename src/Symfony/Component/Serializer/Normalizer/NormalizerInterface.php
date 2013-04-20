@@ -23,15 +23,18 @@ interface NormalizerInterface
      *
      * @param object $object object to normalize
      * @param string $format format the normalization result will be encoded as
+     * @param array $context Context options for the normalizer
+     *
      * @return array|scalar
      */
-    public function normalize($object, $format = null);
+    public function normalize($object, $format = null, array $context = array());
 
     /**
      * Checks whether the given class is supported for normalization by this normalizer
      *
      * @param mixed  $data   Data to normalize.
      * @param string $format The format being (de-)serialized from or into.
+     *
      * @return Boolean
      */
     public function supportsNormalization($data, $format = null);

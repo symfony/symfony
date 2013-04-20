@@ -179,7 +179,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
 
     public function testLoginSuccessIgnoresTokensWhichDoNotContainAnUserInterfaceImplementation()
     {
-        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true));
+        $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null));
         $request = new Request;
         $response = new Response;
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');

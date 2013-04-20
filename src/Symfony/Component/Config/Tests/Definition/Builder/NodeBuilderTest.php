@@ -76,6 +76,17 @@ class NodeBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(get_class($node1), get_class($node2));
     }
+
+    public function testNumericNodeCreation()
+    {
+        $builder = new NodeBuilder();
+
+        $node = $builder->integerNode('foo')->min(3)->max(5);
+        $this->assertEquals('Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition', get_class($node));
+
+        $node = $builder->floatNode('bar')->min(3.0)->max(5.0);
+        $this->assertEquals('Symfony\Component\Config\Definition\Builder\FloatNodeDefinition', get_class($node));
+    }
 }
 
 class SomeNodeDefinition extends BaseVariableNodeDefinition

@@ -223,8 +223,27 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
             return;
         }
-        $source = <<<EOF
+        $source = <<<'EOF'
 <?php
+
+$string = 'string should not be   modified';
+
+
+$heredoc = <<<HD
+
+
+Heredoc should not be   modified
+
+
+HD;
+
+$nowdoc = <<<'ND'
+
+
+Nowdoc should not be   modified
+
+
+ND;
 
 /**
  * some class comments to strip
@@ -240,8 +259,25 @@ class TestClass
     }
 }
 EOF;
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 <?php
+$string = 'string should not be   modified';
+$heredoc =
+<<<HD
+
+
+Heredoc should not be   modified
+
+
+HD;
+$nowdoc =
+<<<'ND'
+
+
+Nowdoc should not be   modified
+
+
+ND;
 class TestClass
 {
     public function doStuff()

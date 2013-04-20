@@ -19,8 +19,13 @@
         "php": ">=5.3.3"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Templating": "" }
+        "psr-0": { "Symfony\\Component\\Templating\\": "" }
     },
     "target-dir": "Symfony/Component/Templating",
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.3-dev"
+        }
+    }
 }

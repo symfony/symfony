@@ -13,7 +13,6 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
-use Symfony\Component\Routing\Route;
 
 class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,9 +23,6 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @covers Symfony\Component\Routing\Loader\PhpFileLoader::supports
-     */
     public function testSupports()
     {
         $loader = new PhpFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
@@ -44,9 +40,16 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         $routeCollection = $loader->load('validpattern.php');
         $routes = $routeCollection->all();
 
-        $this->assertEquals(1, count($routes), 'One route is loaded');
+        $this->assertCount(2, $routes, 'Two routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
-        $route = $routes['blog_show'];
-        $this->assertEquals('RouteCompiler', $route->getOption('compiler_class'));
+
+        foreach ($routes as $route) {
+            $this->assertSame('/blog/{slug}', $route->getPath());
+            $this->assertSame('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
+            $this->assertSame('{locale}.example.com', $route->getHost());
+            $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
+            $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
+            $this->assertEquals(array('https'), $route->getSchemes());
+        }
     }
 }

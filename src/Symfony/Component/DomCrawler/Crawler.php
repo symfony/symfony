@@ -25,7 +25,7 @@ class Crawler extends \SplObjectStorage
     /**
      * @var string The current URI or the base href value
      */
-    private $uri;
+    protected $uri;
 
     /**
      * Constructor.
@@ -214,7 +214,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Adds an array of \DOMNode instances to the list of nodes.
      *
-     * @param array $nodes An array of \DOMNode instances
+     * @param \DOMNode[] $nodes An array of \DOMNode instances
      *
      * @api
      */
@@ -376,6 +376,8 @@ class Crawler extends \SplObjectStorage
      * Returns the previous sibling nodes of the current selection
      *
      * @return Crawler A Crawler instance with the previous sibling nodes
+     *
+     * @throws \InvalidArgumentException
      *
      * @api
      */
@@ -593,7 +595,7 @@ class Crawler extends \SplObjectStorage
      *
      * @param string $method The method for the link (get by default)
      *
-     * @return Link   A Link instance
+     * @return Link A Link instance
      *
      * @throws \InvalidArgumentException If the current node list is empty
      *
@@ -613,7 +615,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns an array of Link objects for the nodes in the list.
      *
-     * @return array An array of Link instances
+     * @return Link[] An array of Link instances
      *
      * @api
      */
@@ -633,7 +635,7 @@ class Crawler extends \SplObjectStorage
      * @param array  $values An array of values for the form fields
      * @param string $method The method for the form
      *
-     * @return Form   A Form instance
+     * @return Form A Form instance
      *
      * @throws \InvalidArgumentException If the current node list is empty
      *
@@ -702,7 +704,7 @@ class Crawler extends \SplObjectStorage
         return sprintf("concat(%s)", implode($parts, ', '));
     }
 
-    private function getNode($position)
+    protected function getNode($position)
     {
         foreach ($this as $i => $node) {
             if ($i == $position) {
@@ -715,7 +717,7 @@ class Crawler extends \SplObjectStorage
         // @codeCoverageIgnoreEnd
     }
 
-    private function sibling($node, $siblingDir = 'nextSibling')
+    protected function sibling($node, $siblingDir = 'nextSibling')
     {
         $nodes = array();
 

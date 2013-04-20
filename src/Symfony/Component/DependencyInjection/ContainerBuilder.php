@@ -32,13 +32,67 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 class ContainerBuilder extends Container implements TaggedContainerInterface
 {
-    private $extensions       = array();
-    private $extensionsByNs   = array();
-    private $definitions      = array();
-    private $aliases          = array();
-    private $resources        = array();
+    /**
+     * @var ExtensionInterface[]
+     */
+    private $extensions = array();
+
+    /**
+     * @var ExtensionInterface[]
+     */
+    private $extensionsByNs = array();
+
+    /**
+     * @var Definition[]
+     */
+    private $definitions = array();
+
+    /**
+     * @var Definition[]
+     */
+    private $obsoleteDefinitions = array();
+
+    /**
+     * @var Alias[]
+     */
+    private $aliases = array();
+
+    /**
+     * @var ResourceInterface[]
+     */
+    private $resources = array();
+
     private $extensionConfigs = array();
+
+    /**
+     * @var Compiler
+     */
     private $compiler;
+
+    private $trackResources = true;
+
+    /**
+     * Sets the track resources flag.
+     *
+     * If you are not using the loaders and therefore don't want
+     * to depend on the Config component, set this flag to false.
+     *
+     * @param Boolean $track true if you want to track resources, false otherwise
+     */
+    public function setResourceTracking($track)
+    {
+        $this->trackResources = (Boolean) $track;
+    }
+
+    /**
+     * Checks if resources are tracked.
+     *
+     * @return Boolean true if resources are tracked, false otherwise
+     */
+    public function isTrackingResources()
+    {
+        return $this->trackResources;
+    }
 
     /**
      * Registers an extension.
@@ -63,7 +117,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return ExtensionInterface An extension instance
      *
-     * @throws \LogicException if the extension is not registered
+     * @throws LogicException if the extension is not registered
      *
      * @api
      */
@@ -83,7 +137,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns all registered extensions.
      *
-     * @return array An array of ExtensionInterface
+     * @return ExtensionInterface[] An array of ExtensionInterface
      *
      * @api
      */
@@ -129,13 +183,30 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function addResource(ResourceInterface $resource)
     {
+        if (!$this->trackResources) {
+            return $this;
+        }
+
         $this->resources[] = $resource;
 
         return $this;
     }
 
+    /**
+     * Sets the resources for this configuration.
+     *
+     * @param ResourceInterface[] $resources An array of resources
+     *
+     * @return ContainerBuilder The current instance
+     *
+     * @api
+     */
     public function setResources(array $resources)
     {
+        if (!$this->trackResources) {
+            return $this;
+        }
+
         $this->resources = $resources;
 
         return $this;
@@ -146,14 +217,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param object $object An object instance
      *
+     * @return ContainerBuilder The current instance
+     *
      * @api
      */
     public function addObjectResource($object)
     {
+        if (!$this->trackResources) {
+            return $this;
+        }
+
         $parent = new \ReflectionObject($object);
         do {
             $this->addResource(new FileResource($parent->getFileName()));
         } while ($parent = $parent->getParentClass());
+
+        return $this;
     }
 
     /**
@@ -188,6 +267,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param CompilerPassInterface $pass A compiler pass
      * @param string                $type The type of compiler pass
      *
+     * @return ContainerBuilder The current instance
+     *
      * @api
      */
     public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
@@ -199,6 +280,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $this->compiler->addPass($pass, $type);
 
         $this->addObjectResource($pass);
+
+        return $this;
     }
 
     /**
@@ -270,15 +353,32 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
+        $id = strtolower($id);
+
         if ($this->isFrozen()) {
-            throw new BadMethodCallException('Setting service on a frozen container is not allowed');
+            // setting a synthetic service on a frozen container is alright
+            if (
+                (!isset($this->definitions[$id]) && !isset($this->obsoleteDefinitions[$id]))
+                    ||
+                (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())
+                    ||
+                (isset($this->obsoleteDefinitions[$id]) && !$this->obsoleteDefinitions[$id]->isSynthetic())
+            ) {
+                throw new BadMethodCallException(sprintf('Setting service "%s" on a frozen container is not allowed.', $id));
+            }
         }
 
-        $id = strtolower($id);
+        if (isset($this->definitions[$id])) {
+            $this->obsoleteDefinitions[$id] = $this->definitions[$id];
+        }
 
         unset($this->definitions[$id], $this->aliases[$id]);
 
         parent::set($id, $service, $scope);
+
+        if (isset($this->obsoleteDefinitions[$id]) && $this->obsoleteDefinitions[$id]->isSynchronized()) {
+            $this->synchronize($id);
+        }
     }
 
     /**
@@ -330,6 +430,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         try {
             return parent::get($id, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+        } catch (InactiveScopeException $e) {
+            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+                return null;
+            }
+
+            throw $e;
         } catch (InvalidArgumentException $e) {
             if (isset($this->loading[$id])) {
                 throw new LogicException(sprintf('The service "%s" has a circular reference to itself.', $id), 0, $e);
@@ -355,6 +461,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $service = $this->createService($definition, $id);
             } catch (\Exception $e) {
                 unset($this->loading[$id]);
+
+                if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+                    return null;
+                }
+
                 throw $e;
             }
 
@@ -399,8 +510,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $this->addAliases($container->getAliases());
         $this->getParameterBag()->add($container->getParameterBag()->all());
 
-        foreach ($container->getResources() as $resource) {
-            $this->addResource($resource);
+        if ($this->trackResources) {
+            foreach ($container->getResources() as $resource) {
+                $this->addResource($resource);
+            }
         }
 
         foreach ($this->extensions as $name => $extension) {
@@ -431,6 +544,21 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Prepends a config array to the configs of the given extension.
+     *
+     * @param string $name    The name of the extension
+     * @param array  $config  The config to set
+     */
+    public function prependExtensionConfig($name, array $config)
+    {
+        if (!isset($this->extensionConfigs[$name])) {
+            $this->extensionConfigs[$name] = array();
+        }
+
+        array_unshift($this->extensionConfigs[$name], $config);
+    }
+
+    /**
      * Compiles the container.
      *
      * This method passes the container to compiler
@@ -452,8 +580,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $this->compiler = new Compiler();
         }
 
-        foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
-            $this->addObjectResource($pass);
+        if ($this->trackResources) {
+            foreach ($this->compiler->getPassConfig()->getPasses() as $pass) {
+                $this->addObjectResource($pass);
+            }
         }
 
         $this->compiler->compile($this);
@@ -490,7 +620,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the service aliases.
      *
-     * @param array $aliases An array of service definitions
+     * @param array $aliases An array of aliases
      *
      * @api
      */
@@ -506,8 +636,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string        $alias The alias to create
      * @param string|Alias  $id    The service to alias
      *
-     * @throws \InvalidArgumentException if the id is not a string or an Alias
-     * @throws \InvalidArgumentException if the alias is for itself
+     * @throws InvalidArgumentException if the id is not a string or an Alias
+     * @throws InvalidArgumentException if the alias is for itself
      *
      * @api
      */
@@ -522,7 +652,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($alias === strtolower($id)) {
-            throw new InvalidArgumentException('An alias can not reference itself, got a circular reference on "'.$alias.'".');
+            throw new InvalidArgumentException(sprintf('An alias can not reference itself, got a circular reference on "%s".', $alias));
         }
 
         unset($this->definitions[$alias]);
@@ -625,7 +755,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the service definitions.
      *
-     * @param array $definitions An array of service definitions
+     * @param Definition[] $definitions An array of service definitions
      *
      * @api
      */
@@ -763,7 +893,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             } elseif (null !== $definition->getFactoryService()) {
                 $factory = $this->get($parameterBag->resolveValue($definition->getFactoryService()));
             } else {
-                throw new RuntimeException('Cannot create service from factory method without a factory service or factory class.');
+                throw new RuntimeException(sprintf('Cannot create service "%s" from factory method without a factory service or factory class.', $id));
             }
 
             $service = call_user_func_array(array($factory, $definition->getFactoryMethod()), $arguments);
@@ -786,19 +916,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         foreach ($definition->getMethodCalls() as $call) {
-            $services = self::getServiceConditionals($call[1]);
-
-            $ok = true;
-            foreach ($services as $s) {
-                if (!$this->has($s)) {
-                    $ok = false;
-                    break;
-                }
-            }
-
-            if ($ok) {
-                call_user_func_array(array($service, $call[0]), $this->resolveServices($parameterBag->resolveValue($call[1])));
-            }
+            $this->callMethod($service, $call);
         }
 
         $properties = $this->resolveServices($parameterBag->resolveValue($definition->getProperties()));
@@ -807,10 +925,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if ($callable = $definition->getConfigurator()) {
-            if (is_array($callable) && is_object($callable[0]) && $callable[0] instanceof Reference) {
-                $callable[0] = $this->get((string) $callable[0]);
-            } elseif (is_array($callable)) {
-                $callable[0] = $parameterBag->resolveValue($callable[0]);
+            if (is_array($callable)) {
+                $callable[0] = $callable[0] instanceof Reference ? $this->get((string) $callable[0]) : $parameterBag->resolveValue($callable[0]);
             }
 
             if (!is_callable($callable)) {
@@ -836,9 +952,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             foreach ($value as &$v) {
                 $v = $this->resolveServices($v);
             }
-        } elseif (is_object($value) && $value instanceof Reference) {
+        } elseif ($value instanceof Reference) {
             $value = $this->get((string) $value, $value->getInvalidBehavior());
-        } elseif (is_object($value) && $value instanceof Definition) {
+        } elseif ($value instanceof Definition) {
             $value = $this->createService($value, null);
         }
 
@@ -867,6 +983,21 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Returns all tags the defined services use.
+     *
+     * @return array An array of tags
+     */
+    public function findTags()
+    {
+        $tags = array();
+        foreach ($this->getDefinitions() as $id => $definition) {
+            $tags = array_merge(array_keys($definition->getTags()), $tags);
+        }
+
+        return array_unique($tags);
+    }
+
+    /**
      * Returns the Service Conditionals.
      *
      * @param mixed $value An array of conditionals to return.
@@ -881,10 +1012,49 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             foreach ($value as $v) {
                 $services = array_unique(array_merge($services, self::getServiceConditionals($v)));
             }
-        } elseif (is_object($value) && $value instanceof Reference && $value->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
+        } elseif ($value instanceof Reference && $value->getInvalidBehavior() === ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
             $services[] = (string) $value;
         }
 
         return $services;
+    }
+
+    /**
+     * Synchronizes a service change.
+     *
+     * This method updates all services that depend on the given
+     * service by calling all methods referencing it.
+     *
+     * @param string $id A service id
+     */
+    private function synchronize($id)
+    {
+        foreach ($this->definitions as $definitionId => $definition) {
+            // only check initialized services
+            if (!$this->initialized($definitionId)) {
+                continue;
+            }
+
+            foreach ($definition->getMethodCalls() as $call) {
+                foreach ($call[1] as $argument) {
+                    if ($argument instanceof Reference && $id == (string) $argument) {
+                        $this->callMethod($this->get($definitionId), $call);
+                    }
+                }
+            }
+        }
+    }
+
+    private function callMethod($service, $call)
+    {
+        $services = self::getServiceConditionals($call[1]);
+
+        foreach ($services as $s) {
+            if (!$this->has($s)) {
+                return;
+            }
+        }
+
+        call_user_func_array(array($service, $call[0]), $this->resolveServices($this->getParameterBag()->resolveValue($call[1])));
     }
 }

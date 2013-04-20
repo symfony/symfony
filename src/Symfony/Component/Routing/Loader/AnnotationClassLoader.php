@@ -28,9 +28,10 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  * The @Route annotation can be set on the class (for global parameters),
  * and on each method.
  *
- * The @Route annotation main value is the route pattern. The annotation also
- * recognizes three parameters: requirements, options, and name. The name parameter
- * is mandatory. Here is an example of how you should be able to use it:
+ * The @Route annotation main value is the route path. The annotation also
+ * recognizes several parameters: requirements, options, defaults, schemes,
+ * methods, host, and name. The name parameter is mandatory.
+ * Here is an example of how you should be able to use it:
  *
  *     /**
  *      * @Route("/Blog")
@@ -56,9 +57,20 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  */
 abstract class AnnotationClassLoader implements LoaderInterface
 {
+    /**
+     * @var Reader
+     */
     protected $reader;
-    protected $routeAnnotationClass  = 'Symfony\\Component\\Routing\\Annotation\\Route';
-    protected $defaultRouteIndex;
+
+    /**
+     * @var string
+     */
+    protected $routeAnnotationClass = 'Symfony\\Component\\Routing\\Annotation\\Route';
+
+    /**
+     * @var integer
+     */
+    protected $defaultRouteIndex = 0;
 
     /**
      * Constructor.
@@ -83,8 +95,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
     /**
      * Loads from annotations from a class.
      *
-     * @param string $class A class name
-     * @param string $type  The resource type
+     * @param string      $class A class name
+     * @param string|null $type  The resource type
      *
      * @return RouteCollection A RouteCollection instance
      *
@@ -97,10 +109,13 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         $globals = array(
-            'pattern'      => '',
+            'path'         => '',
             'requirements' => array(),
             'options'      => array(),
             'defaults'     => array(),
+            'schemes'      => array(),
+            'methods'      => array(),
+            'host'         => '',
         );
 
         $class = new \ReflectionClass($class);
@@ -109,8 +124,11 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
-            if (null !== $annot->getPattern()) {
-                $globals['pattern'] = $annot->getPattern();
+            // for BC reasons
+            if (null !== $annot->getPath()) {
+                $globals['path'] = $annot->getPath();
+            } elseif (null !== $annot->getPattern()) {
+                $globals['path'] = $annot->getPattern();
             }
 
             if (null !== $annot->getRequirements()) {
@@ -123,6 +141,18 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
             if (null !== $annot->getDefaults()) {
                 $globals['defaults'] = $annot->getDefaults();
+            }
+
+            if (null !== $annot->getSchemes()) {
+                $globals['schemes'] = $annot->getSchemes();
+            }
+
+            if (null !== $annot->getMethods()) {
+                $globals['methods'] = $annot->getMethods();
+            }
+
+            if (null !== $annot->getHost()) {
+                $globals['host'] = $annot->getHost();
             }
         }
 
@@ -148,11 +178,23 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $name = $this->getDefaultRouteName($class, $method);
         }
 
-        $defaults = array_merge($globals['defaults'], $annot->getDefaults());
-        $requirements = array_merge($globals['requirements'], $annot->getRequirements());
-        $options = array_merge($globals['options'], $annot->getOptions());
+        $defaults = array_replace($globals['defaults'], $annot->getDefaults());
+        foreach ($method->getParameters() as $param) {
+            if ($param->isOptional()) {
+                $defaults[$param->getName()] = $param->getDefaultValue();
+            }
+        }
+        $requirements = array_replace($globals['requirements'], $annot->getRequirements());
+        $options = array_replace($globals['options'], $annot->getOptions());
+        $schemes = array_replace($globals['schemes'], $annot->getSchemes());
+        $methods = array_replace($globals['methods'], $annot->getMethods());
 
-        $route = new Route($globals['pattern'].$annot->getPattern(), $defaults, $requirements, $options);
+        $host = $annot->getHost();
+        if (null === $host) {
+            $host = $globals['host'];
+        }
+
+        $route = new Route($globals['path'].$annot->getPath(), $defaults, $requirements, $options, $host, $schemes, $methods);
 
         $this->configureRoute($route, $class, $method, $annot);
 

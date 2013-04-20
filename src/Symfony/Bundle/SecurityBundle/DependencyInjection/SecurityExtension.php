@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -445,6 +446,34 @@ class SecurityExtension extends Extension
 
             return array(
                 'class' => new Parameter('security.encoder.plain.class'),
+                'arguments' => $arguments,
+            );
+        }
+
+        // pbkdf2 encoder
+        if ('pbkdf2' === $config['algorithm']) {
+            $arguments = array(
+                $config['hash_algorithm'],
+                $config['encode_as_base64'],
+                $config['iterations'],
+                $config['key_length'],
+            );
+
+            return array(
+                'class' => new Parameter('security.encoder.pbkdf2.class'),
+                'arguments' => $arguments,
+            );
+        }
+
+        // bcrypt encoder
+        if ('bcrypt' === $config['algorithm']) {
+            $arguments = array(
+                new Reference('security.secure_random'),
+                $config['cost'],
+            );
+
+            return array(
+                'class' => new Parameter('security.encoder.bcrypt.class'),
                 'arguments' => $arguments,
             );
         }

@@ -34,7 +34,7 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
 
     public static function setUpBeforeClass()
     {
-        self::$tmpDir = sys_get_temp_dir() . '/sf2_profiler_file_storage';
+        self::$tmpDir = sys_get_temp_dir().'/sf2_profiler_file_storage';
         if (is_dir(self::$tmpDir)) {
             self::cleanDir();
         }
@@ -63,9 +63,9 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
     {
         $iteration = 3;
         for ($i = 0; $i < $iteration; $i++) {
-            $profile = new Profile('token' . $i);
-            $profile->setIp('127.0.0.' . $i);
-            $profile->setUrl('http://foo.bar/' . $i);
+            $profile = new Profile('token'.$i);
+            $profile->setIp('127.0.0.'.$i);
+            $profile->setUrl('http://foo.bar/'.$i);
             $storage = $this->getStorage();
 
             $storage->write($profile);
@@ -73,13 +73,28 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
             $storage->write($profile);
         }
 
-        $handle = fopen(self::$tmpDir . '/index.csv', 'r');
+        $handle = fopen(self::$tmpDir.'/index.csv', 'r');
         for ($i = 0; $i < $iteration; $i++) {
             $row = fgetcsv($handle);
-            $this->assertEquals('token' . $i, $row[0]);
-            $this->assertEquals('127.0.0.' . $i, $row[1]);
-            $this->assertEquals('http://foo.bar/' . $i, $row[3]);
+            $this->assertEquals('token'.$i, $row[0]);
+            $this->assertEquals('127.0.0.'.$i, $row[1]);
+            $this->assertEquals('http://foo.bar/'.$i, $row[3]);
         }
         $this->assertFalse(fgetcsv($handle));
+    }
+
+    public function testReadLineFromFile()
+    {
+        $r = new \ReflectionMethod(self::$storage, 'readLineFromFile');
+
+        $r->setAccessible(true);
+
+        $h = tmpfile();
+
+        fwrite($h, "line1\n\n\nline2\n");
+        fseek($h, 0, SEEK_END);
+
+        $this->assertEquals("line2", $r->invoke(self::$storage, $h));
+        $this->assertEquals("line1", $r->invoke(self::$storage, $h));
     }
 }

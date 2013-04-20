@@ -31,7 +31,9 @@ interface NormalizableInterface
      *   can use it to normalize objects contained within this object.
      * @param string|null $format The format is optionally given to be able to normalize differently
      *   based on different output formats.
+     * @param array $context Options for normalizing this object
+     *
      * @return array|scalar
      */
-    public function normalize(NormalizerInterface $normalizer, $format = null);
+    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array());
 }

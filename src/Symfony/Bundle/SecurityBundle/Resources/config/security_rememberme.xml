@@ -45,6 +45,7 @@
                  class="%security.authentication.rememberme.services.persistent.class%"
                  parent="security.authentication.rememberme.services.abstract"
                  abstract="true">
+            <argument type="service" id="security.secure_random" />
         </service>
 
         <service id="security.authentication.rememberme.services.simplehash"
@@ -54,7 +55,7 @@
         </service>
 
         <service id="security.rememberme.response_listener" class="%security.rememberme.response_listener.class%">
-            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
+            <tag name="kernel.event_subscriber" />
         </service>
     </services>
 

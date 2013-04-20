@@ -16,6 +16,10 @@
 
         <encoder class="JMS\FooBundle\Entity\User4" id="security.encoder.foo" />
 
+        <encoder class="JMS\FooBundle\Entity\User5" algorithm="pbkdf2" hash-algorithm="sha1" encode-as-base64="false" iterations="5" key-length="30" />
+
+        <encoder class="JMS\FooBundle\Entity\User6" algorithm="bcrypt" cost="15" />
+
         <provider name="default">
             <memory>
                 <user name="foo" password="foo" roles="ROLE_USER" />

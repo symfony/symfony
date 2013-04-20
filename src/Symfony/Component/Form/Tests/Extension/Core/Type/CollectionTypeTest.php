@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Form;
 
-class CollectionTypeTest extends TypeTestCase
+class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
     public function testContainsNoChildByDefault()
     {
@@ -141,7 +141,7 @@ class CollectionTypeTest extends TypeTestCase
         $this->assertTrue($form->createView()->vars['multipart']);
     }
 
-    public function testGetDataDoesNotContainsProtypeNameBeforeDataAreSet()
+    public function testGetDataDoesNotContainsPrototypeNameBeforeDataAreSet()
     {
         $form = $this->factory->create('collection', array(), array(
             'type'      => 'file',

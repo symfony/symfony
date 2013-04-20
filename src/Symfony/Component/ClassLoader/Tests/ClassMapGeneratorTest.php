@@ -72,9 +72,10 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $data = array(
             array(__DIR__.'/Fixtures/Namespaced', array(
-                'Namespaced\\Bar' => realpath(__DIR__).'/Fixtures/Namespaced/Bar.php',
-                'Namespaced\\Foo' => realpath(__DIR__).'/Fixtures/Namespaced/Foo.php',
-                'Namespaced\\Baz' => realpath(__DIR__).'/Fixtures/Namespaced/Baz.php',
+                'Namespaced\\Bar'          => realpath(__DIR__).'/Fixtures/Namespaced/Bar.php',
+                'Namespaced\\Foo'          => realpath(__DIR__).'/Fixtures/Namespaced/Foo.php',
+                'Namespaced\\Baz'          => realpath(__DIR__).'/Fixtures/Namespaced/Baz.php',
+                'Namespaced\\WithComments' => realpath(__DIR__).'/Fixtures/Namespaced/WithComments.php',
                 )
             ),
             array(__DIR__.'/Fixtures/beta/NamespaceCollision', array(
@@ -84,9 +85,10 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
                 'NamespaceCollision\\C\\B\\Foo' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/C/B/Foo.php',
             )),
             array(__DIR__.'/Fixtures/Pearlike', array(
-                'Pearlike_Foo' => realpath(__DIR__).'/Fixtures/Pearlike/Foo.php',
-                'Pearlike_Bar' => realpath(__DIR__).'/Fixtures/Pearlike/Bar.php',
-                'Pearlike_Baz' => realpath(__DIR__).'/Fixtures/Pearlike/Baz.php',
+                'Pearlike_Foo'          => realpath(__DIR__).'/Fixtures/Pearlike/Foo.php',
+                'Pearlike_Bar'          => realpath(__DIR__).'/Fixtures/Pearlike/Bar.php',
+                'Pearlike_Baz'          => realpath(__DIR__).'/Fixtures/Pearlike/Baz.php',
+                'Pearlike_WithComments' => realpath(__DIR__).'/Fixtures/Pearlike/WithComments.php',
             )),
             array(__DIR__.'/Fixtures/classmap', array(
                 'Foo\\Bar\\A'             => realpath(__DIR__).'/Fixtures/classmap/sameNsMultipleClasses.php',
@@ -123,7 +125,7 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
         }
 
         $finder = new \Symfony\Component\Finder\Finder();
-        $finder->files()->in(__DIR__ . '/Fixtures/beta/NamespaceCollision');
+        $finder->files()->in(__DIR__.'/Fixtures/beta/NamespaceCollision');
 
         $this->assertEqualsNormalized(array(
             'NamespaceCollision\\A\\B\\Bar' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Bar.php',

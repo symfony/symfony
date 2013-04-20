@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
 /**
  * Merges extension configs into the container builder
@@ -29,6 +30,12 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
         $definitions = $container->getDefinitions();
         $aliases = $container->getAliases();
 
+        foreach ($container->getExtensions() as $extension) {
+            if ($extension instanceof PrependExtensionInterface) {
+                $extension->prepend($container);
+            }
+        }
+
         foreach ($container->getExtensions() as $name => $extension) {
             if (!$config = $container->getExtensionConfig($name)) {
                 // this extension was not called
@@ -37,6 +44,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
             $config = $container->getParameterBag()->resolveValue($config);
 
             $tmpContainer = new ContainerBuilder($container->getParameterBag());
+            $tmpContainer->setResourceTracking($container->isTrackingResources());
             $tmpContainer->addObjectResource($extension);
 
             $extension->load($config, $tmpContainer);

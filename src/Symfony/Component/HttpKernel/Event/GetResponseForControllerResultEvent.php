@@ -29,6 +29,7 @@ class GetResponseForControllerResultEvent extends GetResponseEvent
 {
     /**
      * The return value of the controller
+     *
      * @var mixed
      */
     private $controllerResult;
@@ -41,7 +42,7 @@ class GetResponseForControllerResultEvent extends GetResponseEvent
     }
 
     /**
-     * Returns the return value of the controller
+     * Returns the return value of the controller.
      *
      * @return mixed The controller return value
      *
@@ -50,5 +51,17 @@ class GetResponseForControllerResultEvent extends GetResponseEvent
     public function getControllerResult()
     {
         return $this->controllerResult;
+    }
+
+    /**
+     * Assigns the return value of the controller.
+     *
+     * @param mixed The controller return value
+     *
+     * @api
+     */
+    public function setControllerResult($controllerResult)
+    {
+        $this->controllerResult = $controllerResult;
     }
 }

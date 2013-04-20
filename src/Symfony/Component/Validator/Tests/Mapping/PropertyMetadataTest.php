@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Tests\Fixtures\Entity;
 class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
 {
     const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
+    const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
 
     public function testInvalidPropertyName()
     {
@@ -25,11 +26,20 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
         new PropertyMetadata(self::CLASSNAME, 'foobar');
     }
 
-    public function testGetValueFromPrivateProperty()
+    public function testGetPropertyValueFromPrivateProperty()
     {
         $entity = new Entity('foobar');
         $metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
 
-        $this->assertEquals('foobar', $metadata->getValue($entity));
+        $this->assertEquals('foobar', $metadata->getPropertyValue($entity));
+    }
+
+    public function testGetPropertyValueFromOverriddenPrivateProperty()
+    {
+        $entity = new Entity('foobar');
+        $metadata = new PropertyMetadata(self::PARENTCLASS, 'data');
+
+        $this->assertTrue($metadata->isPublic($entity));
+        $this->assertEquals('Overridden data', $metadata->getPropertyValue($entity));
     }
 }

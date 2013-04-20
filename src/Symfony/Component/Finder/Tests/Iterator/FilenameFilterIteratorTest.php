@@ -38,7 +38,6 @@ class FilenameFilterIteratorTest extends IteratorTestCase
             array(array(), array('/\.php$/'), array('test.py')),
         );
     }
-
 }
 
 class InnerNameIterator extends \ArrayIterator

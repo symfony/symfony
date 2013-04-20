@@ -18,7 +18,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     public function testRow()
     {
         $form = $this->factory->createNamed('name', 'text');
-        $form->addError(new FormError('Error!'));
+        $form->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
         $html = $this->renderRow($view);
 
@@ -34,6 +34,25 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
                     [count(./li)=1]
                 /following-sibling::input[@id="name"]
             ]
+    ]
+'
+        );
+    }
+
+    public function testLabelIsNotRenderedWhenSetToFalse()
+    {
+        $form = $this->factory->createNamed('name', 'text', null, array(
+            'label' => false
+        ));
+        $html = $this->renderRow($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/tr
+    [
+        ./td
+            [count(//label)=0]
+        /following-sibling::td
+            [./input[@id="name"]]
     ]
 '
         );
@@ -72,7 +91,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     public function testRepeatedRowWithErrors()
     {
         $form = $this->factory->createNamed('name', 'repeated');
-        $form->addError(new FormError('Error!'));
+        $form->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
         $html = $this->renderRow($view);
 
@@ -102,6 +121,25 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         [@id="name__token"]
     ]
     [count(../tr)=3]
+'
+        );
+    }
+
+    public function testButtonRow()
+    {
+        $form = $this->factory->createNamed('name', 'button');
+        $view = $form->createView();
+        $html = $this->renderRow($view);
+
+        $this->assertMatchesXpath($html,
+'/tr
+    [
+        ./td
+            [.=""]
+        /following-sibling::td
+            [./button[@type="button"][@name="name"]]
+    ]
+    [count(//label)=0]
 '
         );
     }
@@ -188,6 +226,58 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     public function testForm()
     {
         $view = $this->factory->createNamedBuilder('name', 'form')
+            ->setMethod('PUT')
+            ->setAction('http://example.com')
+            ->add('firstName', 'text')
+            ->add('lastName', 'text')
+            ->getForm()
+            ->createView();
+
+        $html = $this->renderForm($view, array(
+            'id' => 'my&id',
+            'attr' => array('class' => 'my&class'),
+        ));
+
+        $this->assertMatchesXpath($html,
+'/form
+    [
+        ./input[@type="hidden"][@name="_method"][@value="PUT"]
+        /following-sibling::table
+            [
+                ./tr
+                    [
+                        ./td
+                            [./label[@for="name_firstName"]]
+                        /following-sibling::td
+                            [./input[@id="name_firstName"]]
+                    ]
+                /following-sibling::tr
+                    [
+                        ./td
+                            [./label[@for="name_lastName"]]
+                        /following-sibling::td
+                            [./input[@id="name_lastName"]]
+                    ]
+                /following-sibling::tr[@style="display: none"]
+                    [./td[@colspan="2"]/input
+                        [@type="hidden"]
+                        [@id="name__token"]
+                    ]
+            ]
+            [count(.//input)=3]
+            [@id="my&id"]
+            [@class="my&class"]
+    ]
+    [@method="post"]
+    [@action="http://example.com"]
+    [@class="my&class"]
+'
+        );
+    }
+
+    public function testFormWidget()
+    {
+        $view = $this->factory->createNamedBuilder('name', 'form')
             ->add('firstName', 'text')
             ->add('lastName', 'text')
             ->getForm()
@@ -231,7 +321,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             )
             ->getForm();
 
-        $form->get('child')->addError(new FormError('Error!'));
+        $form->get('child')->addError(new FormError('[trans]Error![/trans]'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
@@ -361,5 +451,59 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     ]
 '
         );
+    }
+
+    public function testFormEndWithRest()
+    {
+        $view = $this->factory->createNamedBuilder('name', 'form')
+            ->add('field1', 'text')
+            ->add('field2', 'text')
+            ->getForm()
+            ->createView();
+
+        $this->renderWidget($view['field1']);
+
+        // Rest should only contain field2
+        $html = $this->renderEnd($view);
+
+        // Insert the start tag, the end tag should be rendered by the helper
+        // Unfortunately this is not valid HTML, because the surrounding table
+        // tag is missing. If someone renders a form with table layout
+        // manually, she should call form_rest() explicitly within the <table>
+        // tag.
+        $this->assertMatchesXpath('<form>' . $html,
+'/form
+    [
+        ./tr
+            [
+                ./td
+                    [./label[@for="name_field2"]]
+                /following-sibling::td
+                    [./input[@id="name_field2"]]
+            ]
+        /following-sibling::tr[@style="display: none"]
+            [./td[@colspan="2"]/input
+                [@type="hidden"]
+                [@id="name__token"]
+            ]
+    ]
+'
+        );
+    }
+
+    public function testFormEndWithoutRest()
+    {
+        $view = $this->factory->createNamedBuilder('name', 'form')
+            ->add('field1', 'text')
+            ->add('field2', 'text')
+            ->getForm()
+            ->createView();
+
+        $this->renderWidget($view['field1']);
+
+        // Rest should only contain field2, but isn't rendered
+        $html = $this->renderEnd($view, array('render_rest' => false));
+
+        $this->assertEquals('</form>', $html);
     }
 }

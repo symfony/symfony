@@ -30,6 +30,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
      * Example : "file:/path/to/the/storage/folder"
      *
      * @param string $dsn The DSN
+     *
+     * @throws \RuntimeException
      */
     public function __construct($dsn)
     {
@@ -46,7 +48,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method)
+    public function find($ip, $url, $limit, $method, $start = null, $end = null)
     {
         $file = $this->getIndexFilename();
 
@@ -59,20 +61,26 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
         $result = array();
 
-        while ($limit > 0) {
+        for (;$limit > 0; $limit--) {
             $line = $this->readLineFromFile($file);
 
-            if (false === $line) {
+            if (null === $line) {
                 break;
-            }
-
-            if ($line === '') {
-                continue;
             }
 
             list($csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent) = str_getcsv($line);
 
+            $csvTime = (int) $csvTime;
+
             if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url) || $method && false === strpos($csvMethod, $method)) {
+                continue;
+            }
+
+            if (!empty($start) && $csvTime < $start) {
+               continue;
+            }
+
+            if (!empty($end) && $csvTime > $end) {
                 continue;
             }
 
@@ -84,7 +92,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 'time'   => $csvTime,
                 'parent' => $csvParent,
             );
-            --$limit;
         }
 
         fclose($file);
@@ -177,6 +184,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * Gets filename to store data, associated to the token.
      *
+     * @param string $token
+     *
      * @return string The profile filename
      */
     protected function getFilename($token)
@@ -199,44 +208,50 @@ class FileProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Reads a line in the file, ending with the current position.
+     * Reads a line in the file, backward.
      *
      * This function automatically skips the empty lines and do not include the line return in result value.
      *
      * @param resource $file The file resource, with the pointer placed at the end of the line to read
      *
-     * @return mixed A string representing the line or FALSE if beginning of file is reached
+     * @return mixed A string representing the line or null if beginning of file is reached
      */
     protected function readLineFromFile($file)
     {
-        if (ftell($file) === 0) {
-            return false;
-        }
+        $line = '';
+        $position = ftell($file);
 
-        fseek($file, -1, SEEK_CUR);
-        $str = '';
+        if (0 === $position) {
+            return null;
+        }
 
         while (true) {
-            $char = fgetc($file);
+            $chunkSize = min($position, 1024);
+            $position -= $chunkSize;
+            fseek($file, $position);
 
-            if ($char === "\n") {
-                // Leave the file with cursor before the line return
-                fseek($file, -1, SEEK_CUR);
+            if (0 === $chunkSize) {
+                // bof reached
                 break;
             }
 
-            $str = $char.$str;
+            $buffer = fread($file, $chunkSize);
 
-            if (ftell($file) === 1) {
-                // All file is read, so we move cursor to the position 0
-                fseek($file, -1, SEEK_CUR);
-                break;
+            if (false === ($upTo = strrpos($buffer, "\n"))) {
+                $line = $buffer.$line;
+                continue;
             }
 
-            fseek($file, -2, SEEK_CUR);
+            $position += $upTo;
+            $line = substr($buffer, $upTo + 1).$line;
+            fseek($file, max(0, $position), SEEK_SET);
+
+            if ('' !== $line) {
+                break;
+            }
         }
 
-        return $str === '' ? $this->readLineFromFile($file) : $str;
+        return '' === $line ? null : $line;
     }
 
     protected function createProfileFromData($token, $data, $parent = null)

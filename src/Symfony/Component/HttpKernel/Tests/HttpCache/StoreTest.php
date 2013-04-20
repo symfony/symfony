@@ -213,6 +213,18 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $this->getStoreMetadata($key));
     }
 
+    public function testLocking()
+    {
+        $req = Request::create('/test', 'get', array(), array(), array(), array('HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar'));
+        $this->assertTrue($this->store->lock($req));
+
+        $path = $this->store->lock($req);
+        $this->assertTrue($this->store->isLocked($req));
+
+        $this->store->unlock($req);
+        $this->assertFalse($this->store->isLocked($req));
+    }
+
     protected function storeSimpleEntry($path = null, $headers = array())
     {
         if (null === $path) {

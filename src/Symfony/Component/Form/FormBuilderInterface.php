@@ -23,9 +23,9 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * If you add a nested group, this group should also be represented in the
      * object hierarchy.
      *
-     * @param string|FormBuilderInterface $child
-     * @param string|FormTypeInterface    $type
-     * @param array                       $options
+     * @param string|integer|FormBuilderInterface $child
+     * @param string|FormTypeInterface            $type
+     * @param array                               $options
      *
      * @return FormBuilderInterface The builder object.
      */
@@ -49,9 +49,10 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @return FormBuilderInterface The builder for the child
      *
-     * @throws Exception\FormException if the given child does not exist
+     * @throws Exception\InvalidArgumentException if the given child does not exist
      */
     public function get($name);
+
     /**
      * Removes the field with the given name.
      *
@@ -78,39 +79,9 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
     public function all();
 
     /**
-     * Returns the associated form factory.
-     *
-     * @return FormFactoryInterface The factory
-     */
-    public function getFormFactory();
-
-    /**
      * Creates the form.
      *
      * @return Form The form
      */
     public function getForm();
-
-    /**
-     * Sets the parent builder.
-     *
-     * @param FormBuilderInterface $parent The parent builder
-     *
-     * @return FormBuilderInterface The builder object.
-     */
-    public function setParent(FormBuilderInterface $parent = null);
-
-    /**
-     * Returns the parent builder.
-     *
-     * @return FormBuilderInterface The parent builder
-     */
-    public function getParent();
-
-    /**
-     * Returns whether the builder has a parent.
-     *
-     * @return Boolean
-     */
-    public function hasParent();
 }

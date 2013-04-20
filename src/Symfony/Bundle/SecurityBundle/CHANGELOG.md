@@ -1,11 +1,16 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * allowed for multiple IP address in security access_control rules
+
 2.2.0
 -----
 
-* Added PBKDF2 Password encoder
-* Added BCrypt password encoder
+ * Added PBKDF2 Password encoder
+ * Added BCrypt password encoder
 
 2.1.0
 -----

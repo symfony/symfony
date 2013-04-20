@@ -153,13 +153,13 @@ class RequestMatcher implements RequestMatcherInterface
             return false;
         }
 
-        foreach($this->ips as $ip) { 
+        foreach ($this->ips as $ip) {
             if (IpUtils::checkIp($request->getClientIp(), $ip)) {
                 return true;
             }
         }
 
-        // Note to future implementors: add additional checks above the 
+        // Note to future implementors: add additional checks above the
         // foreach above or else your check might not be run!
 
         return count($this->ips) === 0;

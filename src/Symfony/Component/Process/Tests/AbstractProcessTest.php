@@ -185,6 +185,19 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertGreaterThan(0, $process->getExitCode());
     }
 
+    public function testTTYCommand()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('Windows does have /dev/tty support');
+        }
+
+        $process = $this->getProcess('echo "foo" >> /dev/null');
+        $process->setTTY(true);
+        $process->run();
+
+        $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
+    }
+
     public function testExitCodeText()
     {
         $process = $this->getProcess('');

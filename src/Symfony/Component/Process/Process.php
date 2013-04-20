@@ -58,6 +58,7 @@ class Process
     private $status = self::STATUS_READY;
     private $incrementalOutputOffset;
     private $incrementalErrorOutputOffset;
+    private $tty;
 
     private $fileHandles;
     private $readBytes;
@@ -239,35 +240,7 @@ class Process
         $this->incrementalOutputOffset = 0;
         $this->incrementalErrorOutputOffset = 0;
         $callback = $this->buildCallback($callback);
-
-        //Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
-        //Workaround for this problem is to use temporary files instead of pipes on Windows platform.
-        //@see https://bugs.php.net/bug.php?id=51800
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->fileHandles = array(
-                self::STDOUT => tmpfile(),
-            );
-            if (false === $this->fileHandles[self::STDOUT]) {
-                throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
-            }
-            $this->readBytes = array(
-                self::STDOUT => 0,
-            );
-            $descriptors = array(array('pipe', 'r'), $this->fileHandles[self::STDOUT], array('pipe', 'w'));
-        } else {
-            $descriptors = array(
-                array('pipe', 'r'), // stdin
-                array('pipe', 'w'), // stdout
-                array('pipe', 'w'), // stderr
-            );
-
-            if ($this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-                // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
-                $descriptors = array_merge($descriptors, array(array('pipe', 'w')));
-
-                $this->commandline = '('.$this->commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
-            }
-        }
+        $descriptors = $this->getDescriptors();
 
         $commandline = $this->commandline;
 
@@ -287,6 +260,12 @@ class Process
 
         foreach ($this->pipes as $pipe) {
             stream_set_blocking($pipe, false);
+        }
+
+
+        if ($this->tty) {
+            $this->status = self::STATUS_TERMINATED;
+            return;
         }
 
         if (null === $this->stdin) {
@@ -888,6 +867,30 @@ class Process
     }
 
     /**
+     * Enable/Disable TTY mode
+     *
+     * @param boolean $tty If is enabled or not
+     *
+     * @return self The current Process instance
+     */
+    public function setTTY($tty)
+    {
+        $this->tty = $tty;
+
+        return $this;
+    }
+
+    /**
+     * Gets if TTY is enabled/disabled  
+     *
+     * @return string The current contents
+     */
+    public function getTTY()
+    {
+        return $this->tty;
+    }
+
+    /**
      * Gets the working directory.
      *
      * @return string The current working directory
@@ -1042,6 +1045,54 @@ class Process
         $this->enhanceSigchildCompatibility = (Boolean) $enhance;
 
         return $this;
+    }
+
+    /**
+     * Create the descriptors needed by the proc_open
+     *
+     * @return array
+     */
+    private function getDescriptors()
+    {
+        //Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
+        //Workaround for this problem is to use temporary files instead of pipes on Windows platform.
+        //@see https://bugs.php.net/bug.php?id=51800
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->fileHandles = array(
+                self::STDOUT => tmpfile(),
+            );
+            if (false === $this->fileHandles[self::STDOUT]) {
+                throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
+            }
+            $this->readBytes = array(
+                self::STDOUT => 0,
+            );
+            
+            return array(array('pipe', 'r'), $this->fileHandles[self::STDOUT], array('pipe', 'w'));
+        } 
+
+        if ($this->tty) {
+            $descriptors = array(
+                array('file', '/dev/tty', 'r'),
+                array('file', '/dev/tty', 'w'),
+                array('file', '/dev/tty', 'w'),
+            );
+        } else {
+           $descriptors = array(
+                array('pipe', 'r'), // stdin
+                array('pipe', 'w'), // stdout
+                array('pipe', 'w'), // stderr
+            );
+        }
+
+        if ($this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+            // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
+            $descriptors = array_merge($descriptors, array(array('pipe', 'w')));
+
+            $this->commandline = '('.$this->commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
+        }
+
+        return $descriptors;
     }
 
     /**

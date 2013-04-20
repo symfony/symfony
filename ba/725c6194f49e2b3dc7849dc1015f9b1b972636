@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by pvolok at 2013-04-12T17:05:28Z
+
+In order to test the changes I have to use reflection or add a getter for uri field. Which way is preferred?
+
+---------------------------------------------------------------------------
+
+by pvolok at 2013-04-20T12:57:56Z
+
+Reworked it as stof suggested and added unit tests.

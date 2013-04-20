@@ -1378,12 +1378,12 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
-    public function testPasswordBoundNotAlwaysEmpty()
+    public function testPasswordSubmittedWithNotAlwaysEmpty()
     {
         $form = $this->factory->createNamed('name', 'password', null, array(
             'always_empty' => false,
         ));
-        $form->bind('foo&bar');
+        $form->submit('foo&bar');
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input

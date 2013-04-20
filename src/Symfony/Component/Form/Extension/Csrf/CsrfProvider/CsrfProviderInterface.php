@@ -22,7 +22,7 @@ namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
  *
  * If you want to secure a form submission against CSRF attacks, you could
  * supply an "intention" string. This way you make sure that the form can only
- * be bound to pages that are designed to handle the form, that is, that use
+ * be submitted to pages that are designed to handle the form, that is, that use
  * the same intention string to validate the CSRF token with isCsrfTokenValid().
  *
  * @author Bernhard Schussek <bschussek@gmail.com>

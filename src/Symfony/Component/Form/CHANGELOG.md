@@ -18,6 +18,12 @@ CHANGELOG
  * added component-level exceptions for various SPL exceptions
    changed all uses of the deprecated Exception class to use more specialized exceptions instead
    removed NotInitializedException, NotValidException, TypeDefinitionException, TypeLoaderException, CreationException
+ * added events PRE_SUBMIT, SUBMIT and POST_SUBMIT
+ * deprecated events PRE_BIND, BIND and POST_BIND
+ * [BC BREAK] renamed bind() and isBound() in FormInterface to submit() and isSubmitted()
+ * added methods submit() and isSubmitted() to Form
+ * deprecated bind() and isBound() in Form
+ * deprecated AlreadyBoundException in favor of AlreadySubmittedException
 
 2.2.0
 -----

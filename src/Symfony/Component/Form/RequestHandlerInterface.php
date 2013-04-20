@@ -12,16 +12,16 @@
 namespace Symfony\Component\Form;
 
 /**
- * Binds forms from requests if they were submitted.
+ * Submits forms if they were submitted.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface RequestHandlerInterface
 {
     /**
-     * Binds a form from a request if it was submitted.
+     * Submits a form if it was submitted.
      *
-     * @param FormInterface $form    The form to bind.
+     * @param FormInterface $form    The form to submit.
      * @param mixed         $request The current request.
      */
     public function handleRequest(FormInterface $form, $request = null);

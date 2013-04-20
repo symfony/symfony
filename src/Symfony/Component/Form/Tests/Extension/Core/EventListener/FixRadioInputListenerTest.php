@@ -44,7 +44,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = new FormEvent($form, $data);
 
-        $this->listener->preBind($event);
+        $this->listener->preSubmit($event);
 
         $this->assertEquals(array(1 => '1'), $event->getData());
     }
@@ -55,7 +55,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = new FormEvent($form, $data);
 
-        $this->listener->preBind($event);
+        $this->listener->preSubmit($event);
 
         $this->assertEquals(array(0 => '0'), $event->getData());
     }
@@ -66,7 +66,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = new FormEvent($form, $data);
 
-        $this->listener->preBind($event);
+        $this->listener->preSubmit($event);
 
         $this->assertEquals(array(), $event->getData());
     }

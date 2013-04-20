@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\AlreadyBoundException;
+use Symfony\Component\Form\Exception\AlreadySubmittedException;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 
 /**
@@ -34,7 +34,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * @var Boolean
      */
-    private $bound = false;
+    private $submitted = false;
 
     /**
      * Creates a new button from a form configuration.
@@ -258,9 +258,9 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return Boolean true if the button was submitted.
      */
-    public function isBound()
+    public function isSubmitted()
     {
-        return $this->bound;
+        return $this->submitted;
     }
 
     /**
@@ -356,21 +356,21 @@ class Button implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Binds data to the button.
+     * Submits data to the button.
      *
      * @param null|string $submittedData The data
      *
      * @return Button The button instance
      *
-     * @throws Exception\AlreadyBoundException If the form has already been bound.
+     * @throws Exception\AlreadySubmittedException If the button has already been submitted.
      */
-    public function bind($submittedData)
+    public function submit($submittedData)
     {
-        if ($this->bound) {
-            throw new AlreadyBoundException('A form can only be bound once');
+        if ($this->submitted) {
+            throw new AlreadySubmittedException('A form can only be submitted once');
         }
 
-        $this->bound = true;
+        $this->submitted = true;
 
         return $this;
     }

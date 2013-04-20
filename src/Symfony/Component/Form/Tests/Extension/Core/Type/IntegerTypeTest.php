@@ -26,7 +26,7 @@ class IntegerTypeTest extends TypeTestCase
     {
         $form = $this->factory->create('integer');
 
-        $form->bind('1.678');
+        $form->submit('1.678');
 
         $this->assertSame(1, $form->getData());
         $this->assertSame('1', $form->getViewData());

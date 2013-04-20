@@ -781,11 +781,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array(array('88.88.88.88'),              '127.0.0.1',                '88.88.88.88',               array('127.0.0.1')),
             // forwarded for with remote IPv4 and all FF addrs trusted
             array(array('88.88.88.88'),              '127.0.0.1',                '88.88.88.88',               array('127.0.0.1', '88.88.88.88')),
+            // forwarded for with remote IPv4 range trusted
+            array(array('88.88.88.88'),              '123.45.67.89',             '88.88.88.88',               array('123.45.67.0/24')),
 
             // forwarded for with remote IPv6 addr not trusted
             array(array('1620:0:1cfe:face:b00c::3'), '1620:0:1cfe:face:b00c::3', '2620:0:1cfe:face:b00c::3',  null),
             // forwarded for with remote IPv6 addr trusted
             array(array('2620:0:1cfe:face:b00c::3'), '1620:0:1cfe:face:b00c::3', '2620:0:1cfe:face:b00c::3',  array('1620:0:1cfe:face:b00c::3')),
+            // forwarded for with remote IPv6 range trusted
+            array(array('88.88.88.88'),              '2a01:198:603:0:396e:4789:8e99:890f', '88.88.88.88',     array('2a01:198:603:0::/65')),
 
             // multiple forwarded for with remote IPv4 addr trusted
             array(array('88.88.88.88', '87.65.43.21', '127.0.0.1'), '123.45.67.89', '127.0.0.1, 87.65.43.21, 88.88.88.88', array('123.45.67.89')),

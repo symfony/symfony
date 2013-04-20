@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-20T19:44:04Z
+
+Looks good to me. Can you add some unit tests?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-04-20T19:53:11Z
+
+ok. i would like to refactor how the request is accessed to use the option to inject the request via the action signature.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-20T20:01:25Z
+
+You mean `public function redirectAction(Request $request, $route, $permanent = false, $ignoreAttributes = false)`? That would indeed be a good idea.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-04-20T20:01:52Z
+
+ok .. will take care of that too. is it ok if i do this in a single PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-20T20:13:06Z
+
+sure, one PR is fine.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-04-20T20:36:32Z
+
+done

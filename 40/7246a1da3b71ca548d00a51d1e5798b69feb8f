@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by mvrhov at 2012-08-28T13:19:49Z
+
+@fabpot: any chances of this getting merged before 2.1 final?
+
+---------------------------------------------------------------------------
+
+by stof at 2012-10-13T17:55:53Z
+
+@fabpot @mvrhov what is the status of this PR ?
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2012-10-13T19:21:08Z
+
+I'm applying this patch to sf codebase every time I do a vendor update otherwise the bootstrap file is missing a couple of classes..
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-20T18:17:35Z
+
+@mvrhov - do you have some PHPUnit test case you can add which proves the case?
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-04-20T18:57:38Z
+
+No, but this might be the reason for a patch fabien did in [SensioDistributionBundle](https://github.com/sensio/SensioDistributionBundle/commit/329d87ab0a0621bf7075f8041cba6885807f3e5e)
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-20T19:33:03Z
+
+ping @fabpot

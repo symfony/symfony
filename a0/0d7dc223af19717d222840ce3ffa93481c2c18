@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-20T15:17:19Z
+
+Can you explain the rationale behind this change?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-20T15:39:16Z
+
+Mainly code readability. "Processing" a form is very ambiguous, while handling a request should explain better what happens under the hood.
+
+###### Example 1 (without HttpFoundation):
+
+```php
+$form = $formFactory->createForm(...);
+
+$form->handleRequest();
+
+if ($form->isValid()) {
+    // ...
+}
+```
+
+vs.
+
+```php
+$form = $formFactory->createForm(...);
+
+$form->process();
+
+if ($form->isValid()) {
+    // ...
+}
+```
+
+###### Example 2 (with HttpFoundation):
+
+```php
+$form = $formFactory->createForm(...);
+
+$form->handleRequest($request);
+
+if ($form->isValid()) {
+    // ...
+}
+```
+
+vs.
+
+```php
+$form = $formFactory->createForm(...);
+
+$form->process($request);
+
+if ($form->isValid()) {
+    // ...
+}
+```

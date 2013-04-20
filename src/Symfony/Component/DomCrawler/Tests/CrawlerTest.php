@@ -568,6 +568,18 @@ EOF
         }
     }
 
+    public function testBaseTag()
+    {
+        $crawler = new Crawler('<html><base href="http://base.com"><a href="link"></a></html>');
+        $this->assertEquals('http://base.com/link', $crawler->filterXPath('//a')->link()->getUri());
+
+        $crawler = new Crawler('<html><base href="//base.com"><a href="link"></a></html>', 'https://domain.com');
+        $this->assertEquals('https://base.com/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can use a schema-less url');
+
+        $crawler = new Crawler('<html><base href="path/"><a href="link"></a></html>', 'https://domain.com');
+        $this->assertEquals('https://domain.com/path/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can set a path');
+    }
+
     public function createTestCrawler($uri = null)
     {
         $dom = new \DOMDocument();

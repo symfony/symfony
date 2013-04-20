@@ -682,7 +682,7 @@ class Request
 
         $trustedProxies = !self::$trustedProxies ? array($ip) : self::$trustedProxies;
         $ip = $clientIps[0];
-        $clientIps = array_diff($clientIps, $trustedProxies);
+        $clientIps = array_values(array_diff($clientIps, $trustedProxies));
 
         return $clientIps ? $clientIps : array($ip);
     }

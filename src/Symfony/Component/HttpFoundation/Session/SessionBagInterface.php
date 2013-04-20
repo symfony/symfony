@@ -42,7 +42,7 @@ interface SessionBagInterface
     /**
      * Clears out data from bag.
      *
-     * @return mixed Whatever data was contained.
+     * @return mixed Whatever data was contained
      */
     public function clear();
 }

@@ -6,6 +6,7 @@ CHANGELOG
 
  * added support for ranges of IPs in trusted proxies
  * `UploadedFile::isValid` now returns false if the file was not uploaded via HTTP (in a non-test mode)
+ * added control for session start on demand.
 
 2.2.0
 -----

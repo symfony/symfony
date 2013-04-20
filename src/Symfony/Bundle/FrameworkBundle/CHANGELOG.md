@@ -13,6 +13,8 @@ CHANGELOG
  * added support for default templates per render tag
  * added FormHelper::form(), FormHelper::start() and FormHelper::end()
  * deprecated FormHelper::enctype() in favor of FormHelper::start()
+ * Reintroduce `auto_start` session config flag to instruct the `SessionListener` to manually start session
+ * Added session config option `on_demand_mode` to control session start on demand.
 
 2.2.0
 -----

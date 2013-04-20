@@ -51,7 +51,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * Constructor.
      *
-     * @param string $storageKey The key used to store bag in the session.
+     * @param string $storageKey The key used to store bag in the session
      */
     public function __construct($storageKey = '_sf2_meta')
     {
@@ -90,7 +90,7 @@ class MetadataBag implements SessionBagInterface
      * @param integer $lifetime Sets the cookie lifetime for the session cookie. A null value
      *                          will leave the system settings unchanged, 0 sets the cookie
      *                          to expire with browser session. Time is in seconds, and is
-     *                          not a Unix timestamp.
+     *                          not a Unix timestamp
      */
     public function stampNew($lifetime = null)
     {

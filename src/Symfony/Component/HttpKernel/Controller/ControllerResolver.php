@@ -76,13 +76,13 @@ class ControllerResolver implements ControllerResolverInterface
             }
         }
 
-        list($controller, $method) = $this->createController($controller);
+        $callable = $this->createController($controller);
 
-        if (!method_exists($controller, $method)) {
-            throw new \InvalidArgumentException(sprintf('Method "%s::%s" does not exist.', get_class($controller), $method));
+        if (!is_callable($callable)) {
+            throw new \InvalidArgumentException(sprintf('The controller for URI "%s" is not callable.', $request->getPathInfo()));
         }
 
-        return array($controller, $method);
+        return $callable;
     }
 
     /**

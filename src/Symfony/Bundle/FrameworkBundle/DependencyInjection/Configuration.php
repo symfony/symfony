@@ -46,7 +46,21 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->prototype('scalar')
                         ->validate()
-                            ->ifTrue(function($v) { return !empty($v) && !filter_var($v, FILTER_VALIDATE_IP); })
+                            ->ifTrue(function($v) {
+                                if (empty($v)) {
+                                    return false;
+                                }
+
+                                if (false !== strpos($v, '/')) {
+                                    list($v, $mask) = explode('/', $v, 2);
+
+                                    if (strcmp($mask, (int) $mask) || $mask < 1 || $mask > (false !== strpos($v, ':') ? 128 : 32)) {
+                                        return true;
+                                    }
+                                }
+
+                                return !filter_var($v, FILTER_VALIDATE_IP);
+                            })
                             ->thenInvalid('Invalid proxy IP "%s"')
                         ->end()
                     ->end()

@@ -80,10 +80,8 @@ class FragmentListener implements EventSubscriberInterface
         // does the Request come from a trusted IP?
         $trustedIps = array_merge($this->getLocalIpAddresses(), $request->getTrustedProxies());
         $remoteAddress = $request->server->get('REMOTE_ADDR');
-        foreach ($trustedIps as $ip) {
-            if (IpUtils::checkIp($remoteAddress, $ip)) {
-                return;
-            }
+        if (IpUtils::checkIp($remoteAddress, $trustedIps)) {
+            return;
         }
 
         // is the Request signed?

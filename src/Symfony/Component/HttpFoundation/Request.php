@@ -688,7 +688,14 @@ class Request
 
         $trustedProxies = !self::$trustedProxies ? array($ip) : self::$trustedProxies;
         $ip = $clientIps[0];
-        $clientIps = array_values(array_diff($clientIps, $trustedProxies));
+
+        foreach ($clientIps as $key => $clientIp) {
+            if (IpUtils::checkIp($clientIp, $trustedProxies)) {
+                unset($clientIps[$key]);
+
+                continue;
+            }
+        }
 
         return $clientIps ? array_reverse($clientIps) : array($ip);
     }

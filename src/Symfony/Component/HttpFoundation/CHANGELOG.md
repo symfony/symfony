@@ -2,7 +2,9 @@ CHANGELOG
 =========
 
 2.3.0
+-----
 
+ * added support for ranges of IPs in trusted proxies
  * `UploadedFile::isValid` now returns false if the file was not uploaded via HTTP (in a non-test mode)
 
 2.2.0

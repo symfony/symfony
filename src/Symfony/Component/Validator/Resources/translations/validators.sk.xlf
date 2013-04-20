@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
-                <target>One or more of the given values is invalid.</target>
+                <target>Niektoré z uvedených hodnôt sú neplatné.</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>The fields {{ fields }} were not expected.</source>
@@ -221,6 +221,22 @@
             <trans-unit id="58">
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Nepodporovaný typ karty alebo neplatné číslo karty.</target>
+            </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Toto je neplatný IBAN.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Táto hodnota je neplatné ISBN-10.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Táto hodnota je neplatné ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Táto hodnota nie je platné ISBN-10 ani ISBN-13.</target>
             </trans-unit>
         </body>
     </file>

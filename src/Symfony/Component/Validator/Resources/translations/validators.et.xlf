@@ -222,6 +222,26 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Kaardi tüüpi ei toetata või kaardi number on vigane.</target>
             </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>Väärtus pole korrektne IBAN-number.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Väärtus pole korrektne ISBN-10.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Väärtus pole korrektne ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Väärtus pole korrektne ISBN-10 ega ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Väärtus pole korrektne ISSN.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

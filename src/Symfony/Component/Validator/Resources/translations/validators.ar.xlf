@@ -236,7 +236,7 @@
             </trans-unit>
             <trans-unit id="62">
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
-                <target>هذه القيمة ليست ISBN-10 صالحة ولا ISBN-13 صالحة</target>
+                <target>هذه القيمة ليست ISBN-10 صالحة ولا ISBN-13 صالحة.</target>
             </trans-unit>
         </body>
     </file>

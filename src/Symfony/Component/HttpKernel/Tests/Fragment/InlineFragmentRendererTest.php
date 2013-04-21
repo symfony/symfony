@@ -55,12 +55,8 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
             '_format'     => 'html',
             '_controller' => 'main_controller',
         ));
-        $subRequest->headers->add(array(
-            'x-forwarded-for' => array('127.0.0.1'),
-        ));
-        $subRequest->server->add(array(
-            'HTTP_X_FORWARDED_FOR' => '127.0.0.1',
-        ));
+        $subRequest->headers->set('x-forwarded-for', array('127.0.0.1'));
+        $subRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
 
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $kernel
@@ -148,7 +144,9 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
     {
         $expectedSubRequest = Request::create('/');
         $expectedSubRequest->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
-        
+        $expectedSubRequest->headers->set('x-forwarded-for', array('127.0.0.1'));
+        $expectedSubRequest->server->set('HTTP_X_FORWARDED_FOR', '127.0.0.1');
+
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $kernel
             ->expects($this->any())

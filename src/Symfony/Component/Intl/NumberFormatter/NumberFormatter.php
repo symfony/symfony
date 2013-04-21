@@ -725,7 +725,7 @@ class NumberFormatter
     }
 
     /**
-     * Returns the precision value if the the DECIMAL style is being used and the FRACTION_DIGITS attribute is unitialized.
+     * Returns the precision value if the DECIMAL style is being used and the FRACTION_DIGITS attribute is unitialized.
      *
      * @param integer|float $value     The value to get the precision from if the FRACTION_DIGITS attribute is unitialized
      * @param int           $precision The precision value to returns if the FRACTION_DIGITS attribute is initialized

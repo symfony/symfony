@@ -4,7 +4,7 @@ CHANGELOG
 2.3.0
 -----
 
- * added option to configure a custom template escaping guesser
+ * added option to configure a custom template escaping guesser (via `autoescape_service` and `autoescape_service_method`)
 
 2.2.0
 -----

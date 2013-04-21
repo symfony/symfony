@@ -228,15 +228,19 @@
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
-                <target>Dieser Wert entspricht keinem gültigen ISBN-10.</target>
+                <target>Dieser Wert entspricht keiner gültigen ISBN-10.</target>
             </trans-unit>
             <trans-unit id="61">
                 <source>This value is not a valid ISBN-13.</source>
-                <target>Dieser Wert entspricht keinem gültigen ISBN-13.</target>
+                <target>Dieser Wert entspricht keiner gültigen ISBN-13.</target>
             </trans-unit>
             <trans-unit id="62">
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
-                <target>Dieser Wert ist weder ein gültiges ISBN-10 noch ein gültige ISBN-13.</target>
+                <target>Dieser Wert ist weder eine gültige ISBN-10 noch eine gültige ISBN-13.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Dieser Wert ist keine gültige ISSN.</target>
             </trans-unit>
         </body>
     </file>

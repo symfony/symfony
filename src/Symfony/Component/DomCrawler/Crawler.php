@@ -481,6 +481,28 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
+     * Returns the html of the first node of the list.
+     *
+     * @return string The node html
+     *
+     * @throws \InvalidArgumentException When current node is empty
+     */
+    public function html()
+    {
+        if (!count($this)) {
+            throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        $html = '';
+        foreach ($this->getNode(0)->childNodes as $child) {
+
+            $html .= $child->ownerDocument->saveXML($child);
+        }
+
+        return str_replace('&#13;', '', $html);
+    }
+
+    /**
      * Extracts information from the list of nodes.
      *
      * You can extract attributes or/and the node value (_text).

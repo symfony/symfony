@@ -161,7 +161,7 @@ class ProcessBuilder
         $options = $this->options;
 
         $script = ($this->prefix ? escapeshellarg($this->prefix) . ' ' : '')
-            . implode(' ', array_map('escapeshellarg', $this->arguments));
+            .implode(' ', array_map(array(__NAMESPACE__.'\\ProcessUtils', 'escapeArgument'), $this->arguments));
 
         if ($this->inheritEnv) {
             $env = $this->env ? $this->env + $_ENV : null;

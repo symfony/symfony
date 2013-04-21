@@ -127,4 +127,16 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $proc = $pb->setArguments(array('-i'))->getProcess();
         $this->assertEquals("'/usr/bin/php' '-i'", $proc->getCommandLine());
     }
+
+    public function testShouldEscapeArguments()
+    {
+        $pb = new ProcessBuilder(array('%path%', 'foo " bar'));
+        $proc = $pb->getProcess();
+
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->assertSame('^%"path"^% "foo "\\"" bar"', $proc->getCommandLine());
+        } else {
+            $this->assertSame("'%path%' 'foo \" bar'", $proc->getCommandLine());
+        }
+    }
 }

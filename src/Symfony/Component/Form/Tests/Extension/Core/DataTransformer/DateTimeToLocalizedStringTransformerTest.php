@@ -263,4 +263,13 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
         $this->assertDateTimeEquals($this->dateTimeWithoutSeconds, $transformer->reverseTransform('31.04.10 04:05'));
     }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformOutOfTimestampRange()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC');
+        $transformer->reverseTransform('1789-07-14');
+    }
 }

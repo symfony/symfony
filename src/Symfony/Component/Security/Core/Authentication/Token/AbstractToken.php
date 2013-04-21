@@ -91,7 +91,7 @@ abstract class AbstractToken implements TokenInterface
     public function setUser($user)
     {
         if (!($user instanceof UserInterface || (is_object($user) && method_exists($user, '__toString')) || is_string($user))) {
-            throw new \InvalidArgumentException('$user must be an instanceof of UserInterface, an object implementing a __toString method, or a primitive string.');
+            throw new \InvalidArgumentException('$user must be an instanceof UserInterface, an object implementing a __toString method, or a primitive string.');
         }
 
         if (null === $this->user) {
@@ -190,7 +190,7 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * Returns a attribute value.
+     * Returns an attribute value.
      *
      * @param string $name The attribute name
      *

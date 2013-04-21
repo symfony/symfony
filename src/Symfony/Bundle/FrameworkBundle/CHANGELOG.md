@@ -8,7 +8,7 @@ CHANGELOG
  * added possibility to load the serializer component in the service container
  * added route debug information when using the `router:match` command
  * added `TimedPhpEngine`
- * added `--clean` option the the `translation:update` command
+ * added `--clean` option to the `translation:update` command
  * added `http_method_override` option
  * added support for default templates per render tag
  * added FormHelper::form(), FormHelper::start() and FormHelper::end()

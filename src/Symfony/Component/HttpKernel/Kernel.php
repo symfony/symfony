@@ -120,7 +120,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         }
 
         if ($this->loadClassCache) {
-            call_user_func_array(array($this, 'doLoadClassCache', $this->loadClassCache);
+            $this->doLoadClassCache($this->loadClassCache[0], $this->loadClassCache[1]);
         }
 
         // init bundles
@@ -388,6 +388,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * Loads the PHP class cache.
+     *
+     * This methods only registers the fact that you want to load the cache classes.
+     * The cache will actually only be loaded when the Kernel is booted.
+     *
+     * That optimization is mainly useful when using the HttpCache class in which
+     * case the class cache is not loaded if the Response is in the cache.
      *
      * @param string $name      The cache name prefix
      * @param string $extension File extension of the resulting file

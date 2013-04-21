@@ -57,6 +57,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $name;
     protected $startTime;
     protected $classes;
+    protected $loadClassCache;
 
     const VERSION         = '2.3.0-DEV';
     const VERSION_ID      = '20300';
@@ -116,6 +117,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         if (true === $this->booted) {
             return;
+        }
+
+        if ($this->loadClassCache) {
+            call_user_func_array(array($this, 'doLoadClassCache', $this->loadClassCache);
         }
 
         // init bundles
@@ -389,9 +394,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {
-        if (!$this->booted && is_file($this->getCacheDir().'/classes.map')) {
-            ClassCollectionLoader::load(include($this->getCacheDir().'/classes.map'), $this->getCacheDir(), $name, $this->debug, false, $extension);
-        }
+        $this->loadClassCache = array($name, $extension);
     }
 
     /**
@@ -440,6 +443,13 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     public function getCharset()
     {
         return 'UTF-8';
+    }
+
+    protected function doLoadClassCache($name, $extension)
+    {
+        if (!$this->booted && is_file($this->getCacheDir().'/classes.map')) {
+            ClassCollectionLoader::load(include($this->getCacheDir().'/classes.map'), $this->getCacheDir(), $name, $this->debug, false, $extension);
+        }
     }
 
     /**

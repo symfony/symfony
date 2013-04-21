@@ -49,22 +49,26 @@ class Collection extends Constraint
         }
 
         foreach ($this->fields as $fieldName => $field) {
-            if (!$field instanceof Optional && !$field instanceof Required) {
-                $this->fields[$fieldName] = $field = new Required($field);
+            $this->addField($fieldName, $field);
+        }
+    }
+
+    public function addField($fieldName, $field) {
+        if (!$field instanceof Optional && !$field instanceof Required) {
+            $this->fields[$fieldName] = $field = new Required($field);
+        }
+
+        if (!is_array($field->constraints)) {
+            $field->constraints = array($field->constraints);
+        }
+
+        foreach ($field->constraints as $constraint) {
+            if (!$constraint instanceof Constraint) {
+                throw new ConstraintDefinitionException(sprintf('The value %s of the field %s is not an instance of Constraint in constraint %s', $constraint, $fieldName, __CLASS__));
             }
 
-            if (!is_array($field->constraints)) {
-                $field->constraints = array($field->constraints);
-            }
-
-            foreach ($field->constraints as $constraint) {
-                if (!$constraint instanceof Constraint) {
-                    throw new ConstraintDefinitionException(sprintf('The value %s of the field %s is not an instance of Constraint in constraint %s', $constraint, $fieldName, __CLASS__));
-                }
-
-                if ($constraint instanceof Valid) {
-                    throw new ConstraintDefinitionException(sprintf('The constraint Valid cannot be nested inside constraint %s. You can only declare the Valid constraint directly on a field or method.', __CLASS__));
-                }
+            if ($constraint instanceof Valid) {
+                throw new ConstraintDefinitionException(sprintf('The constraint Valid cannot be nested inside constraint %s. You can only declare the Valid constraint directly on a field or method.', __CLASS__));
             }
         }
     }

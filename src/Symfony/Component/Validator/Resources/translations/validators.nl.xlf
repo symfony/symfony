@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59">
                 <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Dit is geen geldig International Bank Account nummer (IBAN).</target>
+                <target>Dit is geen geldig internationaal bankrekeningnummer (IBAN).</target>
             </trans-unit>
              <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>

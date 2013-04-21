@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by guilhermeblanco at 2013-04-05T00:55:30Z
+
+@lazyhammer updated code as per your suggestions.
+
+@fabpot could you please review and possibly merge this into master and 2.2 branch?
+This is a bugfix to make inline fragment renderer behaves the exact same way as Symfony handles requested from reverse proxies, such as Varnish. Also updated the tests to handle this concept.

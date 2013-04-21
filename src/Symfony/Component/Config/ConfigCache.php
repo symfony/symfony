@@ -12,7 +12,7 @@
 namespace Symfony\Component\Config;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
-use Symfony\Component\Config\Util\CacheFileUtils;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * ConfigCache manages PHP cache files.
@@ -102,10 +102,11 @@ class ConfigCache
      */
     public function write($content, array $metadata = null)
     {
-        CacheFileUtils::dumpInFile($this->file, $content);
+        $filesystem = new Filesystem();
+        $filesystem->dumpFile($this->file, $content);
 
         if (null !== $metadata && true === $this->debug) {
-            CacheFileUtils::dumpInFile($this->getMetaFile(), serialize($metadata));
+            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata));
         }
     }
 }

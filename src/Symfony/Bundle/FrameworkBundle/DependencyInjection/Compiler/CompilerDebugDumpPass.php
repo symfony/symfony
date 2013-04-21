@@ -12,15 +12,16 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Config\Util\CacheFileUtils;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class CompilerDebugDumpPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        CacheFileUtils::dumpInFile($this->getCompilerLogFilename($container), implode("\n", $container->getCompiler()->getLog()));
+        $filesystem = new Filesystem();
+        $filesystem->dumpFile($this->getCompilerLogFilename($container), implode("\n", $container->getCompiler()->getLog()));
     }
 
     public static function getCompilerLogFilename(ContainerInterface $container)

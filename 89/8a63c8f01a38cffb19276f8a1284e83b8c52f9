@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by lstrojny at 2013-03-26T11:22:22Z
+
+:clap:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-01T08:24:53Z
+
+Looks like a good addition to me.
+
+I would use a notation that would respect how we reference services elsewhere:
+
+```yaml
+twig:
+    autoescape_service: @my_service
+    autoescape_service_method: guess
+```
+
+Also, beside documentation, you should add a note in the component CHANGELOG describing the new feature.
+
+---------------------------------------------------------------------------
+
+by maxbeutel at 2013-04-03T08:07:36Z
+
+I added the new config settings.
+
+---------------------------------------------------------------------------
+
+by maxbeutel at 2013-04-03T08:28:19Z
+
+Added documentation, see above
+
+---------------------------------------------------------------------------
+
+by stof at 2013-04-03T08:58:27Z
+
+@fabpot I would remove the ``@``.
+
+- ``@`` has no special meaning in the semantic config
+- ``@`` is not used in XML
+- we would need to strip it before using
+- we don't use the ``@`` in existing places allowing to configure a service id (in SecurityBundle for instance)
+
+---------------------------------------------------------------------------
+
+by maxbeutel at 2013-04-04T16:21:22Z
+
+ping @fabpot any desicion on this? Currently its implemented that the @ is stripped.
+
+Also another question: Is there any chance of getting this PR also backported to 2.1. or 2.2. ?
+
+---------------------------------------------------------------------------
+
+by canni at 2013-04-04T16:50:08Z
+
+@maxbeutel no, there is no chance for this to be backported, only bug-fixes can be applied to older branches
+
+IMO we could consider to structure this similarly to what we have (ie form fields type guessers) It would be great that guessers can be classes that implement common interface and are registered as a tagged services, and passed to something like a chained guesser, then each bundle will be able to easily define its own guessers (with possibly its own escaping rules) - for now this can be little overhead, but will save us enough playground and flexibility for future
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2013-04-04T17:02:19Z
+
+@canni this sounds way too complicated for such a simple task.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-04-05T23:08:32Z
+
+@canni Twig expects a callable. The goal here is simply to define a callable as ``array($service, $method)``
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2013-04-06T21:47:08Z
+
+What about the `@`? Can we reach a final decision here and go on?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-20T21:13:10Z
+
+Let's remove the `@` altogether.
+
+@maxbeutel After removing the `@`, can you submit a PR on the documentation so that I can merge?

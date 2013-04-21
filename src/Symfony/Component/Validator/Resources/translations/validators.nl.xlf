@@ -238,6 +238,10 @@
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
                 <target>Deze waarde is geen geldige ISBN-10 of ISBN-13 waarde.</target>
             </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Deze waarde is geen geldige ISSN waarde.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

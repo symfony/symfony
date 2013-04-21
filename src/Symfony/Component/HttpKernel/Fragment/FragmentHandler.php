@@ -50,7 +50,7 @@ class FragmentHandler
     /**
      * Adds a renderer.
      *
-     * @param FragmentRendererInterface $strategy A FragmentRendererInterface instance
+     * @param FragmentRendererInterface $renderer A FragmentRendererInterface instance
      */
     public function addRenderer(FragmentRendererInterface $renderer)
     {

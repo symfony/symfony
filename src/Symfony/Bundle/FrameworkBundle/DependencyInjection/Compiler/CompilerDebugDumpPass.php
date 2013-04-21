@@ -21,7 +21,11 @@ class CompilerDebugDumpPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $filesystem = new Filesystem();
-        $filesystem->dumpFile($this->getCompilerLogFilename($container), implode("\n", $container->getCompiler()->getLog()));
+        $filesystem->dumpFile(
+            $this->getCompilerLogFilename($container),
+            implode("\n", $container->getCompiler()->getLog()),
+            0666 & ~umask()
+        );
     }
 
     public static function getCompilerLogFilename(ContainerInterface $container)

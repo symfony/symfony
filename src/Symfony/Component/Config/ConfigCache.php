@@ -102,11 +102,12 @@ class ConfigCache
      */
     public function write($content, array $metadata = null)
     {
+        $mode = 0666 & ~umask();
         $filesystem = new Filesystem();
-        $filesystem->dumpFile($this->file, $content);
+        $filesystem->dumpFile($this->file, $content, $mode);
 
         if (null !== $metadata && true === $this->debug) {
-            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata));
+            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), $mode);
         }
     }
 }

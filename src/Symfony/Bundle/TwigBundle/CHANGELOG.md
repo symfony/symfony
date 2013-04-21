@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added option to configure a custom template escaping guesser
+
 2.2.0
 -----
 

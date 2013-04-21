@@ -16,7 +16,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * Validates wether the value is a valid ISBN-10 or ISBN-13.
+ * Validates whether the value is a valid ISBN-10 or ISBN-13.
  *
  * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
  *

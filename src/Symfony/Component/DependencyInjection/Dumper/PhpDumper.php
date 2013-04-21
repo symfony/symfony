@@ -939,7 +939,7 @@ EOF;
     }
 
     /**
-     * Builds service calls from arguments
+     * Builds service calls from arguments.
      *
      * @param array  $arguments
      * @param array  &$calls    By reference
@@ -968,7 +968,7 @@ EOF;
     }
 
     /**
-     * Returns the inline definition
+     * Returns the inline definition.
      *
      * @param Definition $definition
      *
@@ -992,7 +992,7 @@ EOF;
     }
 
     /**
-     * Gets the definition from arguments
+     * Gets the definition from arguments.
      *
      * @param array $arguments
      *
@@ -1017,11 +1017,12 @@ EOF;
     }
 
     /**
-     * Checks if a service id has a reference
+     * Checks if a service id has a reference.
      *
      * @param string  $id
      * @param array   $arguments
      * @param Boolean $deep
+     * @param array   $visited
      *
      * @return Boolean
      */

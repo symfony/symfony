@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass;
 
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\HttpKernel\Kernel;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -20,9 +21,14 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
  * Base class for the doctrine bundles to provide a compiler pass class that
- * helps to register doctrine mappings. For concrete implementations that are
- * easy to use, see the RegisterXyMappingsPass classes in the DoctrineBundle
- * resp. DoctrineMongodbBundle, DoctrineCouchdbBundle and DoctrinePhpcrBundle.
+ * helps to register doctrine mappings.
+ *
+ * The compiler pass is meant to register the mappings with the metadata
+ * chain driver corresponding to one of the object managers.
+ *
+ * For concrete implementations that are easy to use, see the
+ * RegisterXyMappingsPass classes in the DoctrineBundle resp.
+ * DoctrineMongodbBundle, DoctrineCouchdbBundle and DoctrinePhpcrBundle.
  *
  * @author David Buchmann <david@liip.ch>
  */
@@ -42,14 +48,16 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     protected $namespaces;
 
     /**
-     * Parameter name of the entity managers list in the service container.
-     * For example 'doctrine.entity_managers'
-     * @var string
+     * List of potential container parameters that hold the object manager name
+     * to register the mappings with the correct metadata driver, for example
+     * array('acme.manager', 'doctrine.default_entity_manager')
+     * @var string[]
      */
-    protected $managersParameter;
+    protected $managerParameters;
 
     /**
-     * Naming pattern of the metadata service ids, for example 'doctrine.orm.%s_metadata_driver'
+     * Naming pattern of the metadata chain driver service ids, for example
+     * 'doctrine.orm.%s_metadata_driver'
      * @var string
      */
     protected $driverPattern;
@@ -65,18 +73,20 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     /**
      * @param Definition|Reference $driver            driver DI definition or reference
      * @param string[]             $namespaces        list of namespaces handled by $driver
-     * @param string               $managersParameter service container parameter name for the managers list
+     * @param string[]             $managerParameters list of container parameters
+     *                                                that could hold the manager name
      * @param string               $driverPattern     pattern to get the metadata driver service names
-     * @param string               $enableParameter   service container parameter that must be
-     *      present to enable the mapping. Set to false to not do any check, optional.
+     * @param string               $enabledParameter  service container parameter that must be
+     *                                                present to enable the mapping. Set to false
+     *                                                to not do any check, optional.
      */
-    public function __construct($driver, array $namespaces, $managersParameter, $driverPattern, $enableParameter = false)
+    public function __construct($driver, array $namespaces, array $managerParameters, $driverPattern, $enabledParameter = false)
     {
         $this->driver = $driver;
         $this->namespaces = $namespaces;
-        $this->managersParameter = $managersParameter;
+        $this->managerParameters = $managerParameters;
         $this->driverPattern = $driverPattern;
-        $this->enabledParameter = $enableParameter;
+        $this->enabledParameter = $enabledParameter;
     }
 
     /**
@@ -91,13 +101,39 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
         }
 
         $mappingDriverDef = $this->getDriver($container);
-        foreach ($container->getParameter($this->managersParameter) as $name => $manager) {
-            $chainDriverDefService = sprintf($this->driverPattern, $name);
-            $chainDriverDef = $container->getDefinition($chainDriverDefService);
-            foreach ($this->namespaces as $namespace) {
-                $chainDriverDef->addMethodCall('addDriver', array($mappingDriverDef, $namespace));
+
+        $chainDriverDefService = $this->getChainDriverServiceName($container);
+        $chainDriverDef = $container->getDefinition($chainDriverDefService);
+        foreach ($this->namespaces as $namespace) {
+            $chainDriverDef->addMethodCall('addDriver', array($mappingDriverDef, $namespace));
+        }
+    }
+
+    /**
+     * Get the service name of the metadata chain driver that the mappings
+     * should be registered with. The default implementation loops over the
+     * managerParameters and applies the first non-empty parameter it finds to
+     * the driverPattern.
+     *
+     * @param ContainerBuilder $container
+     *
+     * @return string a service definition name
+     *
+     * @throws ParameterNotFoundException if non of the managerParameters has a
+     *      non-empty value.
+     */
+    protected function getChainDriverServiceName(ContainerBuilder $container)
+    {
+        foreach ($this->managerParameters as $param) {
+            if ($container->hasParameter($param)) {
+                $name = $container->getParameter($param);
+                if ($name) {
+                    return sprintf($this->driverPattern, $name);
+                }
             }
         }
+
+        throw new ParameterNotFoundException('None of the managerParameters resulted in a valid name');
     }
 
     /**

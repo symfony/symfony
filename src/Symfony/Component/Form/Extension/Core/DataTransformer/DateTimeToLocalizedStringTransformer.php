@@ -130,8 +130,12 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException(intl_get_error_message());
         }
 
-        // read timestamp into DateTime object - the formatter delivers in UTC
-        $dateTime = new \DateTime(sprintf('@%s UTC', $timestamp));
+        try {
+            // read timestamp into DateTime object - the formatter delivers in UTC
+            $dateTime = new \DateTime(sprintf('@%s UTC', $timestamp));
+        } catch (\Exception $e) {
+            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+        }
 
         if ('UTC' !== $this->inputTimezone) {
             try {

@@ -74,7 +74,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * @var ConfigCacheFactoryInterface|null
      */
-    protected $configCacheFactory;
+    private $configCacheFactory;
 
     /**
      * Constructor.
@@ -351,7 +351,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * @return ConfigCacheFactoryInterface $configCacheFactory
      */
-    protected function getConfigCacheFactory()
+    private function getConfigCacheFactory()
     {
         if (null === $this->configCacheFactory) {
             $this->configCacheFactory = new DefaultConfigCacheFactory($this->options['debug']);

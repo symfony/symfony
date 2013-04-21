@@ -31,7 +31,11 @@ class Translator extends BaseTranslator
         'debug'     => false,
     );
     protected $loaderIds;
-    protected $configCacheFactory;
+
+    /**
+     * @var ConfigCacheFactoryInterface|null
+     */
+    private $configCacheFactory;
 
     /**
      * Constructor.
@@ -71,21 +75,6 @@ class Translator extends BaseTranslator
     public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
     {
         $this->configCacheFactory = $configCacheFactory;
-    }
-
-    /**
-     * Provides the ConfigCache factory implementation, falling back to a
-     * default implementation if necessary.
-     *
-     * @return ConfigCacheFactoryInterface $configCacheFactory
-     */
-    private function getConfigCacheFactory()
-    {
-        if (!$this->configCacheFactory) {
-            $this->configCacheFactory = new DefaultConfigCacheFactory($this->options['debug']);
-        }
-
-        return $this->configCacheFactory;
     }
 
     /**
@@ -182,4 +171,20 @@ EOF
             }
         }
     }
+
+    /**
+     * Provides the ConfigCache factory implementation, falling back to a
+     * default implementation if necessary.
+     *
+     * @return ConfigCacheFactoryInterface $configCacheFactory
+     */
+    private function getConfigCacheFactory()
+    {
+        if (!$this->configCacheFactory) {
+            $this->configCacheFactory = new DefaultConfigCacheFactory($this->options['debug']);
+        }
+
+        return $this->configCacheFactory;
+    }
+
 }

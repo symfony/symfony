@@ -38,7 +38,11 @@ class DefaultConfigCacheFactory implements ConfigCacheFactoryInterface
     public function cache($file, $callback)
     {
         $cache = new ConfigCache($file, $this->debug);
-        if (!$cache->isFresh()) call_user_func($callback, $cache);
+
+        if (!$cache->isFresh()) {
+            call_user_func($callback, $cache);
+        }
+
         return $cache;
     }
 }

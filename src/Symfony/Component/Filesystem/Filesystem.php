@@ -450,7 +450,7 @@ class Filesystem
 
         $tmpFile = tempnam($dir, basename($filename));
 
-        if (false !== @file_put_contents($tmpFile, $content)) {
+        if (false === @file_put_contents($tmpFile, $content)) {
             throw new IOException(sprintf('Failed to write file "%s".', $filename));
         }
 

@@ -27,10 +27,10 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
 
         $heroes = array('Superman', 'Batman', 'Spiderman');
 
-        $dialog->setInputStream($this->getInputStream("\n1\nFabien\n1\nFabien\nFabien\n"));
+        $dialog->setInputStream($this->getInputStream("\n1\nFabien\n1\nFabien\n1\n0,2\n\n"));
         $this->assertEquals('2', $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, '2'));
         $this->assertEquals('1', $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes));
-        $this->assertEquals('1', $dialog->select($output = $this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!'));
+        $this->assertEquals('1', $dialog->select($output = $this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', false));
 
         rewind($output->getStream());
         $this->assertContains('Input "Fabien" is not a superhero!', stream_get_contents($output->getStream()));
@@ -41,6 +41,10 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals('Value "Fabien" is invalid', $e->getMessage());
         }
+
+        $this->assertEquals(array('1'), $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
+        $this->assertEquals(array('0', '2'), $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, null, false, 'Input "%s" is not a superhero!', true));
+        $this->assertEquals(array('0', '1'), $dialog->select($this->getOutputStream(), 'What is your favorite superhero?', $heroes, '0,1', false, 'Input "%s" is not a superhero!', true));
     }
 
     public function testAsk()

@@ -86,13 +86,28 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $cookies = $request->cookies->all();
         $server = $request->server->all();
 
-        // the sub-request is internal
+        // Override the arguments to emulate a sub-request.
+        // Sub-request object will point to localhost as client ip and real client ip
+        // will be included into trusted header for client ip
+        try {
+            $headerClientIp = 'HTTP_' . Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP);
+
+            $originalXForwardedFor = isset($server[$headerClientIp])
+                ? $server[$headerClientIp] . ', '
+                : '';
+
+            $server[$headerClientIp] = $originalXForwardedFor . $server['REMOTE_ADDR'];
+        } catch (\InvalidArgumentException $e) {
+            // Do nothing
+        }
+
         $server['REMOTE_ADDR'] = '127.0.0.1';
 
         $subRequest = $request::create($uri, 'get', array(), $cookies, array(), $server);
         if ($request->headers->has('Surrogate-Capability')) {
             $subRequest->headers->set('Surrogate-Capability', $request->headers->get('Surrogate-Capability'));
         }
+
         if ($session = $request->getSession()) {
             $subRequest->setSession($session);
         }

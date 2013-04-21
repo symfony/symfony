@@ -55,6 +55,12 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
             '_format'     => 'html',
             '_controller' => 'main_controller',
         ));
+        $subRequest->headers->add(array(
+            'x-forwarded-for' => array('127.0.0.1'),
+        ));
+        $subRequest->server->add(array(
+            'HTTP_X_FORWARDED_FOR' => '127.0.0.1',
+        ));
 
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $kernel

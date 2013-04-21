@@ -260,9 +260,10 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Prepares parameters
+     * Prepares parameters.
      *
-     * @param array $parameters
+     * @param array   $parameters
+     * @param Boolean $escape
      *
      * @return array
      */

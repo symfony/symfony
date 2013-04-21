@@ -139,13 +139,13 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getValidLowerCasedIssn
      */
-    public function testDissalowLowerCasedIssns($issn)
+    public function testCaseSensitiveIssns($issn)
     {
-        $constraint = new Issn(array('disallowLowerCasedX' => true));
+        $constraint = new Issn(array('caseSensitive' => true));
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->issnInvalidValueMessage);
+            ->with($constraint->invalidMessage);
 
         $this->validator->validate($issn, $constraint);
     }
@@ -153,13 +153,13 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getValidNonHyphenatedIssn
      */
-    public function testDissalowNonHyphenatedIssns($issn)
+    public function testRequireHyphensIssns($issn)
     {
-        $constraint = new Issn(array('disallowNonHyphenated' => true));
+        $constraint = new Issn(array('requireHyphens' => true));
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->issnInvalidValueMessage);
+            ->with($constraint->invalidMessage);
 
         $this->validator->validate($issn, $constraint);
     }
@@ -186,7 +186,7 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->issnInvalidValueMessage);
+            ->with($constraint->invalidMessage);
 
         $this->validator->validate($issn, $constraint);
     }
@@ -200,7 +200,7 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->issnInvalidValueMessage);
+            ->with($constraint->invalidMessage);
 
         $this->validator->validate($issn, $constraint);
     }

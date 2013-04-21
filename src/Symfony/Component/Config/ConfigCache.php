@@ -76,7 +76,7 @@ class ConfigCache
             return true;
         }
 
-        $metadata = $this->file.'.meta';
+        $metadata = $this->getMetaFile();
         if (!is_file($metadata)) {
             return false;
         }

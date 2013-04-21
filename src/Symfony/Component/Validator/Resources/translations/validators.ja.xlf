@@ -222,6 +222,22 @@
                 <source>Unsupported card type or invalid card number.</source>
                 <target>未対応のカード種類又は無効なカード番号です。</target>
             </trans-unit>
+            <trans-unit id="59">
+                <source>This is not a valid International Bank Account Number (IBAN).</source>
+                <target>有効なIBANコードではありません。</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>有効なISBN-10コードではありません。</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>有効なISBN-13コードではありません。</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>有効なISBN-10コード又はISBN-13コードではありません。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

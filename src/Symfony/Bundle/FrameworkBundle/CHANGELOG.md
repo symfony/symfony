@@ -13,6 +13,7 @@ CHANGELOG
  * added support for default templates per render tag
  * added FormHelper::form(), FormHelper::start() and FormHelper::end()
  * deprecated FormHelper::enctype() in favor of FormHelper::start()
+ * RedirectController actions now receive the Request instance via the method signature.
 
 2.2.0
 -----

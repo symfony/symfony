@@ -208,7 +208,7 @@
             </trans-unit>
             <trans-unit id="55">
                 <source>This collection should contain {{ limit }} elements or less.</source>
-                <target>Kogumikus peaks olema ülimalt {{ limit }} element.|Kogumikus peaks olema ülimalt {{ limit }} elementi. </target>
+                <target>Kogumikus peaks olema ülimalt {{ limit }} element.|Kogumikus peaks olema ülimalt {{ limit }} elementi.</target>
             </trans-unit>
             <trans-unit id="56">
                 <source>This collection should contain exactly {{ limit }} elements.</source>

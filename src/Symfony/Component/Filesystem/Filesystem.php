@@ -100,12 +100,9 @@ class Filesystem
      */
     public function touch($files, $time = null, $atime = null)
     {
-        if (null === $time) {
-            $time = time();
-        }
-
         foreach ($this->toIterator($files) as $file) {
-            if (true !== @touch($file, $time, $atime)) {
+            $touch = $time ? @touch($file, $time, $atime) : @touch($file);
+            if (true !== $touch) {
                 throw new IOException(sprintf('Failed to touch %s', $file));
             }
         }

@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-11T06:55:15Z
+
+Can you take @stof comments into account?
+
+---------------------------------------------------------------------------
+
+by quiqueporta at 2013-04-11T10:37:45Z
+
+of course, I'm working on it.
+I've had a hard week: P
+
+---------------------------------------------------------------------------
+
+by stof at 2013-04-11T11:05:57Z
+
+@quiqueporta Please also update the PR description with the [PR summary](http://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request)
+
+---------------------------------------------------------------------------
+
+by quiqueporta at 2013-04-11T11:11:50Z
+
+OK, thanks ;)
+sorry for the mistake
+it's my first PR
+
+---------------------------------------------------------------------------
+
+by quiqueporta at 2013-04-12T07:12:03Z
+
+@stof now the multiselect option return an array of key => value.
+
+```php
+$colors = ['red','blue','orange'];
+
+// Make the select with multiselect option true.
+// and select 0,2 options.
+
+// The select returns this ...
+Array
+(
+    [0] => 'red'
+    [2] => 'orange'
+)
+
+```
+
+Would it be better to return only the keys?
+
+```php
+$colors = ['red','blue','orange'];
+
+// Make the select with multiselect option true.
+// and select 0,2 options.
+
+// The select returns this ...
+
+Array
+(
+    [0] => 0
+    [1] => 2
+)
+
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2013-04-13T10:51:43Z
+
+it should indeed return keys to be consistent with the behavior of the non-multiple version
+
+---------------------------------------------------------------------------
+
+by quiqueporta at 2013-04-13T13:28:58Z
+
+Ok, i will make the modification and push it ;)
+
+---------------------------------------------------------------------------
+
+by quiqueporta at 2013-04-17T08:41:04Z
+
+@stof , ok i make the modificacions ;)
+
+---------------------------------------------------------------------------
+
+by quiqueporta at 2013-04-17T09:02:16Z
+
+Yes to all

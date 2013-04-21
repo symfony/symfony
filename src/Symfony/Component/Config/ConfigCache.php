@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Config\Util\CacheFileUtils;
 
 /**
  * ConfigCache manages PHP cache files.
@@ -46,6 +47,15 @@ class ConfigCache
     public function __toString()
     {
         return $this->file;
+    }
+
+    /**
+     * Gets the meta file path.
+     *
+     * @return string The meta file path
+     */
+    protected function getMetaFile() {
+        return $this->file . '.meta';
     }
 
     /**
@@ -92,28 +102,10 @@ class ConfigCache
      */
     public function write($content, array $metadata = null)
     {
-        $dir = dirname($this->file);
-        if (!is_dir($dir)) {
-            if (false === @mkdir($dir, 0777, true)) {
-                throw new \RuntimeException(sprintf('Unable to create the %s directory', $dir));
-            }
-        } elseif (!is_writable($dir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the %s directory', $dir));
-        }
-
-        $tmpFile = tempnam($dir, basename($this->file));
-        if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $this->file)) {
-            @chmod($this->file, 0666 & ~umask());
-        } else {
-            throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $this->file));
-        }
+        CacheFileUtils::dumpInFile($this->file, $content);
 
         if (null !== $metadata && true === $this->debug) {
-            $file = $this->file.'.meta';
-            $tmpFile = tempnam($dir, basename($file));
-            if (false !== @file_put_contents($tmpFile, serialize($metadata)) && @rename($tmpFile, $file)) {
-                @chmod($file, 0666 & ~umask());
-            }
+            CacheFileUtils::dumpInFile($this->getMetaFile(), serialize($metadata));
         }
     }
 }

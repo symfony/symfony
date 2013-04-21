@@ -50,15 +50,6 @@ class ConfigCache
     }
 
     /**
-     * Gets the meta file path.
-     *
-     * @return string The meta file path
-     */
-    protected function getMetaFile() {
-        return $this->file . '.meta';
-    }
-
-    /**
      * Checks if the cache is still fresh.
      *
      * This method always returns true when debug is off and the
@@ -110,4 +101,15 @@ class ConfigCache
             $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), $mode);
         }
     }
+
+    /**
+     * Gets the meta file path.
+     *
+     * @return string The meta file path
+     */
+    private function getMetaFile()
+    {
+        return $this->file.'.meta';
+    }
+
 }

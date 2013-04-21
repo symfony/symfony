@@ -16,7 +16,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * Validates wether the value is a valid ISSN.
+ * Validates whether the value is a valid ISSN.
  *
  * @author Antonio J. García Lagar <aj@garcialagar.es>
  *

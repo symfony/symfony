@@ -38,20 +38,12 @@ class IssnValidator extends ConstraintValidator
         }
 
         // Compose regex pattern
-        if ($constraint->disallowNonHyphenated) {
-            $digitsPattern = "\d{4}-\d{3}";
-        } else {
-            $digitsPattern = "\d{4}-?\d{3}";
-        }
-        if ($constraint->disallowLowerCasedX) {
-            $checksumPattern = "[\d|X]";
-        } else {
-            $checksumPattern = "[\d|X|x]";
-        }
-        $pattern = "/^" . $digitsPattern . $checksumPattern . "$/";
+        $digitsPattern = $constraint->disallowNonHyphenated ? '\d{4}-\d{3}' : '\d{4}-?\d{3}';
+        $checksumPattern = $constraint->disallowLowerCasedX ? '[\d|X]' : '[\d|X|x]';
+        $pattern = "/^".$digitsPattern.$checksumPattern."$/";
 
         if (!preg_match($pattern, $value)) {
-            $this->context->addViolation($constraint->issnInvalidFormatMessage);
+            $this->context->addViolation($constraint->issnInvalidValueMessage);
         } else {
             $digits = str_split(strtoupper(str_replace('-', '', $value)));
 
@@ -60,9 +52,9 @@ class IssnValidator extends ConstraintValidator
                 $sum += $i * (int) array_shift($digits);
             }
 
-            $checksum = (reset($digits) == 'X')?10:(int) reset($digits);
+            $checksum = 'X' == reset($digits) ? 10 : (int) reset($digits);
 
-            if (($sum + $checksum) % 11 != 0) {
+            if (0 != ($sum + $checksum) % 11) {
                 $this->context->addViolation($constraint->issnInvalidValueMessage);
             }
         }

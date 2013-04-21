@@ -145,7 +145,7 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->issnInvalidFormatMessage);
+            ->with($constraint->issnInvalidValueMessage);
 
         $this->validator->validate($issn, $constraint);
     }
@@ -159,7 +159,7 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->issnInvalidFormatMessage);
+            ->with($constraint->issnInvalidValueMessage);
 
         $this->validator->validate($issn, $constraint);
     }
@@ -186,7 +186,7 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with($constraint->issnInvalidFormatMessage);
+            ->with($constraint->issnInvalidValueMessage);
 
         $this->validator->validate($issn, $constraint);
     }

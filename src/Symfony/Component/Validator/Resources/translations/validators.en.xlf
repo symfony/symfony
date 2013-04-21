@@ -239,10 +239,6 @@
                 <target>This value is neither a valid ISBN-10 nor a valid ISBN-13.</target>
             </trans-unit>
             <trans-unit id="63">
-                <source>This value has not valid ISSN format.</source>
-                <target>This value has not valid ISSN format.</target>
-            </trans-unit>
-            <trans-unit id="64">
                 <source>This value is not a valid ISSN.</source>
                 <target>This value is not a valid ISSN.</target>
             </trans-unit>

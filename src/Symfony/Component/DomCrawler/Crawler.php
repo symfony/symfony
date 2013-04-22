@@ -481,7 +481,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Returns the html of the first node of the list.
+     * Returns the first node of the list as HTML.
      *
      * @return string The node html
      *
@@ -495,11 +495,10 @@ class Crawler extends \SplObjectStorage
 
         $html = '';
         foreach ($this->getNode(0)->childNodes as $child) {
-
             $html .= $child->ownerDocument->saveXML($child);
         }
 
-        return str_replace('&#13;', '', $html);
+        return $html;
     }
 
     /**

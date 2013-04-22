@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-03-29T05:30:33Z
+
+@vicb are you okay with the `ignoreUnreadableDirs` name?
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-03-29T08:02:04Z
+
+Does not sound 100% right to me but I can't find anything better. May be a native speaker could help here to know if this is good or come with a better name ?
+
+---------------------------------------------------------------------------
+
+by lazyhammer at 2013-03-29T14:41:04Z
+
+> adds a way to ignore `AccessDeniedException`
+
+So maybe `Inaccessible`?
+
+---------------------------------------------------------------------------
+
+by staabm at 2013-03-29T22:56:28Z
+
+Maybe `omitInaccesible`? `ignorePermissions`?
+
+---------------------------------------------------------------------------
+
+by KingCrunch at 2013-03-30T00:44:30Z
+
+Or the other way round, for example `accessibleOnly`, or `readableOnly`
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-04-11T06:40:38Z
+
+@vicb do you have an idea regarding to above suggestions?
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-04-11T07:32:54Z
+
+I let you pick the best. I think there must be a verb in the name, ie `setAccessibleOnly`.
+
+I have one question that is somehow related to this PR: What happens with unreadable files ? Let's say that you are looking for a file which contains "<?php" but some of the file are not readable by the process which runs the Finder, what would happen, Would the `AccessDenied`Exception been thrown ?
+
+If this is not the case yet, the code should be updated (both native & php drivers).
+
+There should also be a way to ignore those exceptions, ie `->ignoreUnreadable(Finder::FILE | Finder::DIRECTORY)`
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-04-11T08:01:01Z
+
+Go for `setAccessibleOnly`.
+
+In the case of an unreadable file content lookup, the native adapter throws an `AccessDeniedException` (as this exception is thrown anytime stderr returns something), but in the case of the PHP adapter the file is just not matched if not readable. Changing this will be a BC break, but is required as the current behavior it's not consistent.
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-04-11T08:03:25Z
+
+> the PHP adapter the file is just not matched if not readable
+
+why ?
+
+Edit: ok, found [why](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Finder/Iterator/FilecontentFilterIterator.php#L35)
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-04-11T08:05:29Z
+
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Finder/Iterator/FilecontentFilterIterator.php#L35

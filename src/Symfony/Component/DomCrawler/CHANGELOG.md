@@ -4,6 +4,7 @@ CHANGELOG
 2.3.0
 -----
 
+ * [BC BREAK] Crawler::each() and Crawler::reduce() now return Crawler instances instead of DomElement instances
  * added schema relative URL support to links
  * added support for HTML5 'form' attribute
 

@@ -160,3 +160,24 @@
        // Method/property was not found or not public
    }
    ```
+
+### DomCrawler
+
+ * `Crawler::each()` and `Crawler::reduce()` now return Crawler instances
+   instead of DomElement instances:
+
+   Before:
+
+   ```
+   $data = $crawler->each(function ($node, $i) {
+       return $node->nodeValue;
+   });
+   ```
+
+   After:
+
+   ```
+   $data = $crawler->each(function ($crawler, $i) {
+       return $crawler->text();
+   });
+   ```

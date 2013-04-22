@@ -276,7 +276,7 @@ EOF
 
     public function testEach()
     {
-        $data = $this->createTestCrawler()->filter('ul:first-child li')->each(function ($node, $i) {
+        $data = $this->createTestCrawler()->filterXPath('//ul[1]/li')->each(function ($node, $i) {
             return $i.'-'.$node->text();
         });
 

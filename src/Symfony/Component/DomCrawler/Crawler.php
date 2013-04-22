@@ -271,13 +271,13 @@ class Crawler extends \SplObjectStorage
     /**
      * Calls an anonymous function on each node of the list.
      *
-     * The anonymous function receives the position and the node as arguments.
+     * The anonymous function receives the position and the node wrapped
+     * in a Crawler instance as arguments.
      *
      * Example:
      *
-     *     $crawler->filter('h1')->each(function ($node, $i)
-     *     {
-     *       return $node->text();
+     *     $crawler->filter('h1')->each(function ($node, $i) {
+     *         return $node->text();
      *     });
      *
      * @param \Closure $closure An anonymous function
@@ -290,8 +290,7 @@ class Crawler extends \SplObjectStorage
     {
         $data = array();
         foreach ($this as $i => $node) {
-            $node = new static($node, $this->uri);
-            $data[] = $closure($node, $i);
+            $data[] = $closure(new static($node, $this->uri), $i);
         }
 
         return $data;
@@ -312,7 +311,7 @@ class Crawler extends \SplObjectStorage
     {
         $nodes = array();
         foreach ($this as $i => $node) {
-            if (false !== $closure($node, $i)) {
+            if (false !== $closure(new static($node, $this->uri), $i)) {
                 $nodes[] = $node;
             }
         }
@@ -574,7 +573,7 @@ class Crawler extends \SplObjectStorage
      */
     public function selectLink($value)
     {
-        $xpath  = sprintf('//a[contains(concat(\' \', normalize-space(string(.)), \' \'), %s)] ', static::xpathLiteral(' '.$value.' ')).
+        $xpath = sprintf('//a[contains(concat(\' \', normalize-space(string(.)), \' \'), %s)] ', static::xpathLiteral(' '.$value.' ')).
                             sprintf('| //a/img[contains(concat(\' \', normalize-space(string(@alt)), \' \'), %s)]/ancestor::a', static::xpathLiteral(' '.$value.' '));
 
         return $this->filterXPath($xpath);
@@ -684,7 +683,6 @@ class Crawler extends \SplObjectStorage
      * @param string $s String to be escaped
      *
      * @return string Converted string
-     *
      */
     public static function xpathLiteral($s)
     {

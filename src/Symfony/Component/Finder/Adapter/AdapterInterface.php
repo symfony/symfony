@@ -115,6 +115,13 @@ interface AdapterInterface
     public function setNotPath(array $notPaths);
 
     /**
+     * @param boolean $ignore
+     *
+     * @return AdapterInterface Current instance
+     */
+    public function ignoreUnreadableDirs($ignore = true);
+
+    /**
      * @param string $dir
      *
      * @return \Iterator Result iterator

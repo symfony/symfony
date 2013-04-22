@@ -32,7 +32,7 @@ class PhpAdapter extends AbstractAdapter
         }
 
         $iterator = new \RecursiveIteratorIterator(
-            new Iterator\RecursiveDirectoryIterator($dir, $flags),
+            new Iterator\RecursiveDirectoryIterator($dir, $flags, $this->ignoreUnreadableDirs),
             \RecursiveIteratorIterator::SELF_FIRST
         );
 

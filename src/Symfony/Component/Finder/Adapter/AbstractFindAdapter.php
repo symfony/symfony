@@ -92,9 +92,12 @@ abstract class AbstractFindAdapter extends AbstractAdapter
             $this->buildSorting($command, $this->sort);
         }
 
-        $command->setErrorHandler(function ($stderr) {
-            throw new AccessDeniedException($stderr);
-        });
+        $command->setErrorHandler(
+            $this->ignoreUnreadableDirs
+                // If directory is unreadable and finder is set to ignore it, `stderr` is ignored.
+                ? function ($stderr) { return; }
+                : function ($stderr) { throw new AccessDeniedException($stderr); }
+        );
 
         $paths = $this->shell->testCommand('uniq') ? $command->add('| uniq')->execute() : array_unique($command->execute());
         $iterator = new Iterator\FilePathsIterator($paths, $dir);

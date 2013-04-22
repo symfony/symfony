@@ -883,6 +883,17 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testDumpFile()
+    {
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
+
+        $this->filesystem->dumpFile($filename, 'bar', 0753);
+
+        $this->assertFileExists($filename);
+        $this->assertSame('bar', file_get_contents($filename));
+        $this->assertEquals(753, $this->getFilePermissions($filename));
+    }
+
     /**
      * Returns file permissions as three digits (i.e. 755)
      *

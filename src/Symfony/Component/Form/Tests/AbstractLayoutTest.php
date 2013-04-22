@@ -1769,7 +1769,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $form = $this->factory->createNamed('name', 'button');
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
-            '/button[@type="button"][@name="name"]'
+            '/button[@type="button"][@name="name"][.="[trans]Name[/trans]"]'
         );
     }
 

@@ -488,11 +488,14 @@ class Form implements \IteratorAggregate, FormInterface
             $this->setData($this->config->getData());
         }
 
+        // Treat false as NULL to support binding false to checkboxes.
         // Don't convert NULL to a string here in order to determine later
         // whether an empty value has been submitted or whether no value has
         // been submitted at all. This is important for processing checkboxes
         // and radio buttons with empty values.
-        if (is_scalar($submittedData)) {
+        if (false === $submittedData) {
+            $submittedData = null;
+        } elseif (is_scalar($submittedData)) {
             $submittedData = (string) $submittedData;
         }
 

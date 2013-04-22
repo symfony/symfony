@@ -319,6 +319,18 @@ EOF
         }
     }
 
+    public function testHtml()
+    {
+        $this->assertEquals('<img alt="Bar"/>', $this->createTestCrawler()->filterXPath('//a[5]')->html(), '->html() returns the html of the first element of the node list');
+
+        try {
+            $this->createTestCrawler()->filterXPath('//ol')->html();
+            $this->fail('->html() throws an \InvalidArgumentException if the node list is empty');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, '->html() throws an \InvalidArgumentException if the node list is empty');
+        }
+    }
+
     public function testExtract()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');

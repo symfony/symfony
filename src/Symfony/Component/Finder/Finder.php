@@ -55,6 +55,7 @@ class Finder implements \IteratorAggregate, \Countable
     private $adapters    = array();
     private $paths       = array();
     private $notPaths    = array();
+    private $ignoreUnreadableDirs = false;
 
     private static $vcsPatterns = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
 
@@ -627,6 +628,22 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Tells finder to ignore unreadable directories.
+     *
+     * By default, scanning unreadable directories content throws an AccessDeniedException.
+     *
+     * @param boolean $ignore
+     *
+     * @return Finder The current Finder instance
+     */
+    public function ignoreUnreadableDirs($ignore = true)
+    {
+        $this->ignoreUnreadableDirs = (Boolean) $ignore;
+
+        return $this;
+    }
+
+    /**
      * Searches files and directories which match defined rules.
      *
      * @param string|array $dirs A directory path or an array of directories
@@ -794,7 +811,8 @@ class Finder implements \IteratorAggregate, \Countable
             ->setFilters($this->filters)
             ->setSort($this->sort)
             ->setPath($this->paths)
-            ->setNotPath($this->notPaths);
+            ->setNotPath($this->notPaths)
+            ->ignoreUnreadableDirs($this->ignoreUnreadableDirs);
     }
 
     /**

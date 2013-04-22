@@ -153,9 +153,9 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getValidNonHyphenatedIssn
      */
-    public function testRequireHyphensIssns($issn)
+    public function testRequireHyphenIssns($issn)
     {
-        $constraint = new Issn(array('requireHyphens' => true));
+        $constraint = new Issn(array('requireHyphen' => true));
         $this->context
             ->expects($this->once())
             ->method('addViolation')

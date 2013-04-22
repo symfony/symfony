@@ -38,7 +38,7 @@ class IssnValidator extends ConstraintValidator
         }
 
         // Compose regex pattern
-        $digitsPattern = $constraint->requireHyphens ? '\d{4}-\d{3}' : '\d{4}-?\d{3}';
+        $digitsPattern = $constraint->requireHyphen ? '\d{4}-\d{3}' : '\d{4}-?\d{3}';
         $checksumPattern = $constraint->caseSensitive ? '[\d|X]' : '[\d|X|x]';
         $pattern = "/^".$digitsPattern.$checksumPattern."$/";
 

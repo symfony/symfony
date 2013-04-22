@@ -17,6 +17,7 @@ namespace Symfony\Component\EventDispatcher;
  * manager.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Matthias Pigulla <mp@webfactory.de>
  *
  * @api
  */
@@ -28,14 +29,21 @@ interface EventDispatcherInterface
      * @param string $eventName The name of the event to dispatch. The name of
      *                          the event is the name of the method that is
      *                          invoked on listeners.
-     * @param Event $event The event to pass to the event handlers/listeners.
+     * @param object $event     The event to pass to the event handlers/listeners.
      *                          If not supplied, an empty Event instance is created.
      *
-     * @return Event
+     * @return EventPropagation The EventPropagation that recorded the propagation of the event.
      *
      * @api
      */
-    public function dispatch($eventName, Event $event = null);
+    public function dispatch($eventName, $event = null);
+
+    /**
+     * Further propagate an event to all registered listeners.
+     *
+     * @param EventPropagation $propagation The propagation used to track the event.
+     */
+    public function propagate(EventPropagation $propagation);
 
     /**
      * Adds an event listener that listens on the specified events.

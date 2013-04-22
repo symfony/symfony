@@ -214,6 +214,10 @@
                 <source>This collection should contain exactly {{ limit }} elements.</source>
                 <target>Эта коллекция должна содержать ровно {{ limit }} элемент.|Эта коллекция должна содержать ровно {{ limit }} элемента.|Эта коллекция должна содержать ровно {{ limit }} элементов.</target>
             </trans-unit>
+            <trans-unit id="57">
+                <source>This field is missing.</source>
+                <target>Это поле отсутствует.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -22,6 +22,7 @@
         <service id="fragment.renderer.inline" class="%fragment.renderer.inline.class%">
             <tag name="kernel.fragment_renderer" />
             <argument type="service" id="http_kernel" />
+            <argument type="service" id="event_dispatcher" />
             <call method="setFragmentPath"><argument>%fragment.path%</argument></call>
         </service>
 

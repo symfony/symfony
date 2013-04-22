@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-22T09:11:57Z
+
+Looks good, but I'm not sure about the implications of the change in `bind()`. This means that we're breaking with the assumption that the value transformers always receive either a string or null when a form is submitted. Could this be a problem?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-04-22T11:21:11Z
+
+WIthout the change in ``bind()`` the value would be cast to an empty string. We wouldn't be able to tell the difference between an empty string and ``false``.
+
+How about changing ``false`` to ``null`` (in ``bind()``)? We would stick to our promise that value is either a string or null and the ``BooleanToStringTransformer`` wouldn't have to be modified.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-22T11:51:07Z
+
+Changing `false` to `null` sounds like a good plan! :+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-04-22T12:36:43Z
+
+@bschussek PR updated.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-22T12:41:14Z
+
+Great! Can you please also add a test to SimpleFormTest that tests the conversion of false => null?
+
+Please add the URI of this PR as comment over all added test cases:
+
+```php
+// https://github.com/symfony/symfony/pull/7789
+```

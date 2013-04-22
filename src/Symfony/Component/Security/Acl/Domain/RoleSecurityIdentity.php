@@ -34,7 +34,7 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
             $role = $role->getRole();
         }
 
-        $this->role = $role;
+        $this->role = (string) $role;
     }
 
     /**

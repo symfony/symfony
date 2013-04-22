@@ -240,7 +240,7 @@
             </trans-unit>
             <trans-unit id="63">
                 <source>This value is not a valid ISSN.</source>
-                <target>هذه القيمة ليست ISSN صالحة</target>
+                <target>هذه القيمة ليست ISSN صالحة.</target>
             </trans-unit>
         </body>
     </file>

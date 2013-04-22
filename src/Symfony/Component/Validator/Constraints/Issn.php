@@ -22,5 +22,5 @@ class Issn extends Constraint
 {
     public $invalidMessage = 'This value is not a valid ISSN.';
     public $caseSensitive = false;
-    public $requireHyphens = false;
+    public $requireHyphen = false;
 }

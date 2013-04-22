@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\EventDispatcher;
 
+use Symfony\Component\EventDispatcher\Exception\StopPropagationException;
+
 /**
  * The EventDispatcherInterface is the central point of Symfony's event listener system.
  *
@@ -37,20 +39,23 @@ class EventDispatcher implements EventDispatcherInterface
      *
      * @api
      */
-    public function dispatch($eventName, Event $event = null)
+    public function dispatch($eventName, Event $event = null, EventDispatcherInterface $dispatcher = null)
     {
         if (null === $event) {
             $event = new Event();
         }
 
-        $event->setDispatcher($this);
-        $event->setName($eventName);
+        // deprecated
+        if ($event instanceof Event) {
+            $event->setDispatcher($dispatcher ?: $this);
+            $event->setName($eventName);
+        }
 
         if (!isset($this->listeners[$eventName])) {
             return $event;
         }
 
-        $this->doDispatch($this->getListeners($eventName), $eventName, $event);
+        $this->doDispatch($this->getListeners($eventName), $eventName, $event, $dispatcher);
 
         return $event;
     }
@@ -156,13 +161,19 @@ class EventDispatcher implements EventDispatcherInterface
      *
      * @param array[callback] $listeners The event listeners.
      * @param string          $eventName The name of the event to dispatch.
-     * @param Event           $event     The event object to pass to the event handlers/listeners.
+     * @param mixed           $event     The event object to pass to the event handlers/listeners.
      */
-    protected function doDispatch($listeners, $eventName, Event $event)
+    protected function doDispatch($listeners, $eventName, $event, EventDispatcherInterface $dispatcher = null)
     {
         foreach ($listeners as $listener) {
-            call_user_func($listener, $event);
-            if ($event->isPropagationStopped()) {
+            try {
+                call_user_func($listener, $event, $dispatcher ?: $this, $eventName);
+            } catch (StopPropagationException $e) {
+                break;
+            }
+
+            // deprecated
+            if ($event instanceof Event && $event->isPropagationStopped()) {
                 break;
             }
         }

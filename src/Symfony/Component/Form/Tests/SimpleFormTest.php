@@ -96,6 +96,28 @@ class SimpleFormTest extends AbstractFormTest
         $form->bind('foobar');
     }
 
+    // https://github.com/symfony/symfony/pull/7789
+    public function testFalseIsConvertedToNull()
+    {
+        $mock = $this->getMockBuilder('\stdClass')
+            ->setMethods(array('preBind'))
+            ->getMock();
+        $mock->expects($this->once())
+            ->method('preBind')
+            ->with($this->callback(function ($event) {
+                return null === $event->getData();
+            }));
+
+        $config = new FormConfigBuilder('name', null, $this->dispatcher);
+        $config->addEventListener(FormEvents::PRE_BIND, array($mock, 'preBind'));
+        $form = new Form($config);
+
+        $form->bind(false);
+
+        $this->assertTrue($form->isValid());
+        $this->assertNull($form->getData());
+    }
+
     /**
      * @expectedException \Symfony\Component\Form\Exception\AlreadyBoundException
      */

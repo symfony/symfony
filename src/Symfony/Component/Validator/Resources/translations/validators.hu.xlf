@@ -238,6 +238,10 @@
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
                 <target>Ez nem egy érvényes ISBN-10 vagy ISBN-13.</target>
             </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Ez nem egy érvényes ISSN.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -44,25 +44,37 @@ class TemplateNameParserTest extends TestCase
     /**
      * @dataProvider getLogicalNameToTemplateProvider
      */
-    public function testParse($name, $ref)
+    public function testParseLogicalName($logicalName, $atName, $ref)
     {
-        $template = $this->parser->parse($name);
+        $template = $this->parser->parse($logicalName);
 
-        $this->assertEquals($template->getLogicalName(), $ref->getLogicalName());
-        $this->assertEquals($template->getLogicalName(), $name);
+        $this->assertEquals($logicalName, $template->getLogicalName());
+        $this->assertEquals($logicalName, $ref->getLogicalName());
+    }
+
+    /**
+     * @dataProvider getLogicalNameToTemplateProvider
+     */
+    public function testParseAtName($logicalName, $atName, $ref)
+    {
+        $template = $this->parser->parse($atName);
+
+        $this->assertEquals($logicalName, $template->getLogicalName());
+        $this->assertEquals($logicalName, $ref->getLogicalName());
     }
 
     public function getLogicalNameToTemplateProvider()
     {
         return array(
-            array('FooBundle:Post:index.html.php', new TemplateReference('FooBundle', 'Post', 'index', 'html', 'php')),
-            array('FooBundle:Post:index.html.twig', new TemplateReference('FooBundle', 'Post', 'index', 'html', 'twig')),
-            array('FooBundle:Post:index.xml.php', new TemplateReference('FooBundle', 'Post', 'index', 'xml', 'php')),
-            array('SensioFooBundle:Post:index.html.php', new TemplateReference('SensioFooBundle', 'Post', 'index', 'html', 'php')),
-            array('SensioCmsFooBundle:Post:index.html.php', new TemplateReference('SensioCmsFooBundle', 'Post', 'index', 'html', 'php')),
-            array(':Post:index.html.php', new TemplateReference('', 'Post', 'index', 'html', 'php')),
-            array('::index.html.php', new TemplateReference('', '', 'index', 'html', 'php')),
-            array('FooBundle:Post:foo.bar.index.html.php', new TemplateReference('FooBundle', 'Post', 'foo.bar.index', 'html', 'php')),
+            array('FooBundle:Post:index.html.php', '@Foo/Post/index.html.php', new TemplateReference('FooBundle', 'Post', 'index', 'html', 'php')),
+            array('FooBundle:Post:index.html.twig', '@Foo/Post/index.html.twig', new TemplateReference('FooBundle', 'Post', 'index', 'html', 'twig')),
+            array('FooBundle:Post:index.xml.php', '@Foo/Post/index.xml.php', new TemplateReference('FooBundle', 'Post', 'index', 'xml', 'php')),
+            array('SensioFooBundle:Post:index.html.php', '@SensioFoo/Post/index.html.php', new TemplateReference('SensioFooBundle', 'Post', 'index', 'html', 'php')),
+            array('SensioCmsFooBundle:Post:index.html.php', '@SensioCmsFoo/Post/index.html.php', new TemplateReference('SensioCmsFooBundle', 'Post', 'index', 'html', 'php')),
+            array('FooBundle::index.html.php', '@Foo/index.html.php', new TemplateReference('FooBundle', '', 'index', 'html', 'php')),
+            array(':Post:index.html.php', 'Post/index.html.php', new TemplateReference('', 'Post', 'index', 'html', 'php')),
+            array('::index.html.php', 'index.html.php', new TemplateReference('', '', 'index', 'html', 'php')),
+            array('FooBundle:Post:foo.bar.index.html.php', '@Foo/Post/foo.bar.index.html.php', new TemplateReference('FooBundle', 'Post', 'foo.bar.index', 'html', 'php')),
         );
     }
 

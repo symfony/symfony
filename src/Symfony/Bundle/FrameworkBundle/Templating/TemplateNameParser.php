@@ -56,11 +56,24 @@ class TemplateNameParser implements TemplateNameParserInterface
             throw new \RuntimeException(sprintf('Template name "%s" contains invalid characters.', $name));
         }
 
-        if (!preg_match('/^([^:]*):([^:]*):(.+)\.([^\.]+)\.([^\.]+)$/', $name, $matches)) {
-            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.format.engine").', $name));
+        if (!$name) {
+            throw new \InvalidArgumentException('Template names should not be empty.');
         }
 
-        $template = new TemplateReference($matches[1], $matches[2], $matches[3], $matches[4], $matches[5]);
+        // The following blocks are optimized for speed. Named sub-patterns
+        // should not be used because they significantly lower the performance
+        // of the code.
+        if ('@' !== $name[0] && preg_match('#^([^:]*):([^:]*):(.+)\.([^\.]+)\.([^\.]+)$#', $name, $matches)) {
+            $template = new TemplateReference($matches[1], $matches[2], $matches[3], $matches[4], $matches[5]);
+        } elseif (preg_match('#^(@([^/]+)/)?(([^/]+)/)?(.+)\.([^\.]+)\.([^\.]+)$#', $name, $matches)) {
+            if ($matches[2]) {
+                $matches[2] .= 'Bundle';
+            }
+
+            $template = new TemplateReference($matches[2], $matches[4], $matches[5], $matches[6], $matches[7]);
+        } else {
+            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.format.engine").', $name));
+        }
 
         if ($template->get('bundle')) {
             try {

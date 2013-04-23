@@ -22,12 +22,12 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class TextDescriptor implements DescriptorInterface
+class TextDescriptor extends Descriptor
 {
     /**
      * {@inheritdoc}
      */
-    public function describeInputArgument(InputArgument $argument, array $options = array())
+    protected function describeInputArgument(InputArgument $argument, array $options = array())
     {
         if (null !== $argument->getDefault() && (!is_array($argument->getDefault()) || count($argument->getDefault()))) {
             $default = sprintf('<comment> (default: %s)</comment>', $this->formatDefaultValue($argument->getDefault()));
@@ -45,7 +45,7 @@ class TextDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeInputOption(InputOption $option, array $options = array())
+    protected function describeInputOption(InputOption $option, array $options = array())
     {
         if ($option->acceptValue() && null !== $option->getDefault() && (!is_array($option->getDefault()) || count($option->getDefault()))) {
             $default = sprintf('<comment> (default: %s)</comment>', $this->formatDefaultValue($option->getDefault()));
@@ -70,7 +70,7 @@ class TextDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeInputDefinition(InputDefinition $definition, array $options = array())
+    protected function describeInputDefinition(InputDefinition $definition, array $options = array())
     {
         $nameWidth = 0;
         foreach ($definition->getOptions() as $option) {
@@ -111,7 +111,7 @@ class TextDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeCommand(Command $command, array $options = array())
+    protected function describeCommand(Command $command, array $options = array())
     {
         $command->getSynopsis();
         $command->mergeApplicationDefinition(false);
@@ -136,7 +136,7 @@ class TextDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeApplication(Application $application, array $options = array())
+    protected function describeApplication(Application $application, array $options = array())
     {
         $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
         $description = new ApplicationDescription($application, $describedNamespace);

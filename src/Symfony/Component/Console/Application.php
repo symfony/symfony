@@ -696,7 +696,7 @@ class Application
     {
         $descriptor = new TextDescriptor();
 
-        return $descriptor->describeApplication($this, array('namespace' => $namespace, 'raw_text' => $raw));
+        return $descriptor->describe($this, array('namespace' => $namespace, 'raw_text' => $raw));
     }
 
     /**
@@ -713,7 +713,7 @@ class Application
     {
         $descriptor = new XmlDescriptor();
 
-        return $descriptor->describeApplication($this, array('namespace' => $namespace, 'as_dom' => $asDom));
+        return $descriptor->describe($this, array('namespace' => $namespace, 'as_dom' => $asDom));
     }
 
     /**

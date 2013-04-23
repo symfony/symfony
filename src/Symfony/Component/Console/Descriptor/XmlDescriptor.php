@@ -22,12 +22,12 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class XmlDescriptor implements DescriptorInterface
+class XmlDescriptor extends Descriptor
 {
     /**
      * {@inheritdoc}
      */
-    public function describeInputArgument(InputArgument $argument, array $options = array())
+    protected function describeInputArgument(InputArgument $argument, array $options = array())
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
 
@@ -51,7 +51,7 @@ class XmlDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeInputOption(InputOption $option, array $options = array())
+    protected function describeInputOption(InputOption $option, array $options = array())
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
 
@@ -82,7 +82,7 @@ class XmlDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeInputDefinition(InputDefinition $definition, array $options = array())
+    protected function describeInputDefinition(InputDefinition $definition, array $options = array())
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($definitionXML = $dom->createElement('definition'));
@@ -103,7 +103,7 @@ class XmlDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeCommand(Command $command, array $options = array())
+    protected function describeCommand(Command $command, array $options = array())
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($commandXML = $dom->createElement('command'));
@@ -138,7 +138,7 @@ class XmlDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeApplication(Application $application, array $options = array())
+    protected function describeApplication(Application $application, array $options = array())
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($rootXml = $dom->createElement('symfony'));

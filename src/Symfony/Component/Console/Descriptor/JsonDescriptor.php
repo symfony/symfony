@@ -22,12 +22,12 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class JsonDescriptor implements DescriptorInterface
+class JsonDescriptor extends Descriptor
 {
     /**
      * {@inheritdoc}
      */
-    public function describeInputArgument(InputArgument $argument, array $options = array())
+    protected function describeInputArgument(InputArgument $argument, array $options = array())
     {
         return $this->output(array(
             'name'        => $argument->getName(),
@@ -41,7 +41,7 @@ class JsonDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeInputOption(InputOption $option, array $options = array())
+    protected function describeInputOption(InputOption $option, array $options = array())
     {
         return $this->output(array(
             'name'              => '--'.$option->getName(),
@@ -57,7 +57,7 @@ class JsonDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeInputDefinition(InputDefinition $definition, array $options = array())
+    protected function describeInputDefinition(InputDefinition $definition, array $options = array())
     {
         $inputArguments = array();
         foreach ($definition->getArguments() as $name => $argument) {
@@ -75,7 +75,7 @@ class JsonDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeCommand(Command $command, array $options = array())
+    protected function describeCommand(Command $command, array $options = array())
     {
         $command->getSynopsis();
         $command->mergeApplicationDefinition(false);
@@ -93,7 +93,7 @@ class JsonDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeApplication(Application $application, array $options = array())
+    protected function describeApplication(Application $application, array $options = array())
     {
         $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
         $description = new ApplicationDescription($application, $describedNamespace);

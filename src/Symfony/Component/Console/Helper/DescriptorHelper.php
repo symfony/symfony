@@ -61,7 +61,14 @@ class DescriptorHelper extends Helper
     {
         $options = array('raw_text' => $raw, 'format' => $format ?: 'txt');
         $type = !$raw && 'txt' === $options['format'] ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW;
-        $output->writeln($this->getDescription($object, $options), $type);
+
+        if (!isset($this->descriptors[$options['format']])) {
+            throw new \InvalidArgumentException(sprintf('Unsupported format "%s".', $options['format']));
+        }
+
+        $descriptor = $this->descriptors[$options['format']];
+
+        $output->writeln($descriptor->describe($object, $options), $type);
     }
 
     /**
@@ -77,40 +84,6 @@ class DescriptorHelper extends Helper
         $this->descriptors[$format] = $descriptor;
 
         return $this;
-    }
-
-    /**
-     * Gets the descriptor associated with the given object.
-     *
-     * @param object $object  The object to describe
-     * @param array  $options The options
-     *
-     * @return DescriptorInterface The descritptor to use for the given object
-     *
-     * @throws \InvalidArgumentException when no descriptor supports the given object or when the format is not supported
-     */
-    private function getDescription($object, array $options)
-    {
-        if (!isset($this->descriptors[$options['format']])) {
-            throw new \InvalidArgumentException(sprintf('Unsupported format "%s".', $options['format']));
-        }
-
-        $descriptor = $this->descriptors[$options['format']];
-
-        switch (true) {
-            case $object instanceof InputArgument:
-                return $descriptor->describeInputArgument($object, $options);
-            case $object instanceof InputOption:
-                return $descriptor->describeInputOption($object, $options);
-            case $object instanceof InputDefinition:
-                return $descriptor->describeInputDefinition($object, $options);
-            case $object instanceof Command:
-                return $descriptor->describeCommand($object, $options);
-            case $object instanceof Application:
-                return $descriptor->describeApplication($object, $options);
-        }
-
-        throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
     }
 
     /**

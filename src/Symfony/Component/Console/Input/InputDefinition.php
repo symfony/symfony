@@ -415,7 +415,7 @@ class InputDefinition
     {
         $descriptor = new TextDescriptor();
 
-        return $descriptor->describeInputDefinition($this);
+        return $descriptor->describe($this);
     }
 
     /**
@@ -431,6 +431,6 @@ class InputDefinition
     {
         $descriptor = new XmlDescriptor();
 
-        return $descriptor->describeInputDefinition($this, array('as_dom' => $asDom));
+        return $descriptor->describe($this, array('as_dom' => $asDom));
     }
 }

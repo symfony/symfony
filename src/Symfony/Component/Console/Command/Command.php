@@ -568,7 +568,7 @@ class Command
     {
         $descriptor = new TextDescriptor();
 
-        return $descriptor->describeCommand($this);
+        return $descriptor->describe($this);
     }
 
     /**
@@ -584,7 +584,7 @@ class Command
     {
         $descriptor = new XmlDescriptor();
 
-        return $descriptor->describeCommand($this, array('as_dom' => $asDom));
+        return $descriptor->describe($this, array('as_dom' => $asDom));
     }
 
     private function validateName($name)

@@ -23,25 +23,25 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     /** @dataProvider getDescribeInputArgumentTestData */
     public function testDescribeInputArgument(DescriptorInterface $descriptor, InputArgument $argument, $expectedDescription)
     {
-        $this->assertEquals(trim($expectedDescription), trim($descriptor->describeInputArgument($argument)));
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($argument)));
     }
 
     /** @dataProvider getDescribeInputOptionTestData */
     public function testDescribeInputOption(DescriptorInterface $descriptor, InputOption $option, $expectedDescription)
     {
-        $this->assertEquals(trim($expectedDescription), trim($descriptor->describeInputOption($option)));
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($option)));
     }
 
     /** @dataProvider getDescribeInputDefinitionTestData */
     public function testDescribeInputDefinition(DescriptorInterface $descriptor, InputDefinition $definition, $expectedDescription)
     {
-        $this->assertEquals(trim($expectedDescription), trim($descriptor->describeInputDefinition($definition)));
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($definition)));
     }
 
     /** @dataProvider getDescribeCommandTestData */
     public function testDescribeCommand(DescriptorInterface $descriptor, Command $command, $expectedDescription)
     {
-        $this->assertEquals(trim($expectedDescription), trim($descriptor->describeCommand($command)));
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($command)));
     }
 
     /** @dataProvider getDescribeApplicationTestData */
@@ -54,7 +54,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
             $command->setHelp(str_replace('%command.full_name%', 'app/console %command.name%', $command->getHelp()));
         }
 
-        $this->assertEquals(trim($expectedDescription), trim($descriptor->describeApplication($application)));
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($application)));
     }
 
     public function getDescribeInputArgumentTestData()

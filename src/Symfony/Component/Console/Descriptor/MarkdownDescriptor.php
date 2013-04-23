@@ -22,12 +22,12 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class MarkdownDescriptor implements DescriptorInterface
+class MarkdownDescriptor extends Descriptor
 {
     /**
      * {@inheritdoc}
      */
-    public function describeInputArgument(InputArgument $argument, array $options = array())
+    protected function describeInputArgument(InputArgument $argument, array $options = array())
     {
         return '**'.$argument->getName().':**'."\n\n"
             .'* Name: '.($argument->getName() ?: '<none>')."\n"
@@ -40,7 +40,7 @@ class MarkdownDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeInputOption(InputOption $option, array $options = array())
+    protected function describeInputOption(InputOption $option, array $options = array())
     {
         return '**'.$option->getName().':**'."\n\n"
             .'* Name: `--'.$option->getName().'`'."\n"
@@ -55,7 +55,7 @@ class MarkdownDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeInputDefinition(InputDefinition $definition, array $options = array())
+    protected function describeInputDefinition(InputDefinition $definition, array $options = array())
     {
         $blocks = array();
 
@@ -79,7 +79,7 @@ class MarkdownDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeCommand(Command $command, array $options = array())
+    protected function describeCommand(Command $command, array $options = array())
     {
         $command->getSynopsis();
         $command->mergeApplicationDefinition(false);
@@ -104,7 +104,7 @@ class MarkdownDescriptor implements DescriptorInterface
     /**
      * {@inheritdoc}
      */
-    public function describeApplication(Application $application, array $options = array())
+    protected function describeApplication(Application $application, array $options = array())
     {
         $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
         $description = new ApplicationDescription($application, $describedNamespace);

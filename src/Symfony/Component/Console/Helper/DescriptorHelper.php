@@ -11,7 +11,12 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Descriptor\DescriptorProvider;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Descriptor\DescriptorProxy;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -22,18 +27,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 class DescriptorHelper extends Helper
 {
     /**
-     * @var DescriptorProvider
+     * @var DescriptorProxy
      */
-    private $provider;
+    private $descriptor;
 
     /**
      * Constructor.
      *
-     * @param DescriptorProvider $provider
+     * @param DescriptorProxy $descriptor
      */
-    public function __construct(DescriptorProvider $provider = null)
+    public function __construct(DescriptorProxy $descriptor = null)
     {
-        $this->provider = $provider ?: new DescriptorProvider();
+        $this->descriptor = $descriptor ?: new DescriptorProxy();
     }
 
     /**
@@ -46,11 +51,10 @@ class DescriptorHelper extends Helper
      */
     public function describe(OutputInterface $output, $object, $format = null, $raw = false)
     {
-        $format = $format ?: $this->provider->getDefaultFormat();
-        $descriptor = $this->provider->configure(array('raw_text' => $raw))->get($object, $format);
-        $type = !$raw && $descriptor->useFormatting() ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW;
+        $options = array('raw_text' => $raw, 'format' => $format ?: 'txt');
+        $type = !$raw && 'txt' === $options['format'] ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW;
 
-        $output->writeln($descriptor->describe($object), $type);
+        $output->writeln($this->getDescription($object, $options), $type);
     }
 
     /**
@@ -59,5 +63,23 @@ class DescriptorHelper extends Helper
     public function getName()
     {
         return 'descriptor';
+    }
+
+    private function getDescription($object, array $options)
+    {
+        switch (true) {
+            case $object instanceof InputArgument:
+                return $this->descriptor->describeInputArgument($object, $options);
+            case $object instanceof InputOption:
+                return $this->descriptor->describeInputOption($object, $options);
+            case $object instanceof InputDefinition:
+                return $this->descriptor->describeInputDefinition($object, $options);
+            case $object instanceof Command:
+                return $this->descriptor->describeCommand($object, $options);
+            case $object instanceof Application:
+                return $this->descriptor->describeApplication($object, $options);
+        }
+
+        throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
     }
 }

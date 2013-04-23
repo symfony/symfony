@@ -1,64 +1,62 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Symfony\Component\Console\Descriptor;
 
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
+
 /**
- * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ * Descriptor interface.
+ *
+ * @author Jean-François Simon <contact@jfsimon.fr>
  */
 interface DescriptorInterface
 {
     /**
-     * Configures descriptor with description options.
+     * @param InputArgument $argument
      *
-     * @param array $options Description options
+     * @param array $options
      *
-     * @return DescriptorInterface
+     * @return string|mixed
      */
-    public function configure(array $options);
+    public function describeInputArgument(InputArgument $argument, array $options = array());
 
     /**
-     * Returns given object's representation.
+     * @param InputOption $option
      *
-     * @param object  $object The object to describe
+     * @param array $options
      *
-     * @return string The object formatted description
+     * @return string|mixed
      */
-    public function describe($object);
+    public function describeInputOption(InputOption $option, array $options = array());
 
     /**
-     * Tests if this descriptor supports given object.
+     * @param InputDefinition $definition
      *
-     * @param object $object The object to describe
+     * @param array $options
      *
-     * @return boolean
+     * @return string|mixed
      */
-    public function supports($object);
+    public function describeInputDefinition(InputDefinition $definition, array $options = array());
 
     /**
-     * Returns descriptor's format name.
+     * @param Command $command
      *
-     * @return string The format name
+     * @param array $options
+     *
+     * @return string|mixed
      */
-    public function getFormat();
+    public function describeCommand(Command $command, array $options = array());
 
     /**
-     * Returns true if output formatting is used.
+     * @param Application $application
      *
-     * @return boolean
+     * @param array $options
+     *
+     * @return string|mixed
      */
-    public function useFormatting();
-
-    /**
-     * @param DescriptorProvider $descriptorProvider
-     */
-    public function setDescriptorProvider(DescriptorProvider $descriptorProvider);
+    public function describeApplication(Application $application, array $options = array());
 }

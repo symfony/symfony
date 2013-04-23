@@ -12,50 +12,87 @@
 namespace Symfony\Component\Console\Tests\Descriptor;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
-use Symfony\Component\Console\Descriptor\DescriptorProvider;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
 
 abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @dataProvider getDescribeTestData */
-    public function testDescribe(DescriptorInterface $descriptor, $object, $description)
+    /** @dataProvider getDescribeInputArgumentTestData */
+    public function testDescribeInputArgument(DescriptorInterface $descriptor, InputArgument $argument, $expectedDescription)
     {
-        if ($object instanceof Application) {
-            $this->ensureStaticCommandHelp($object);
-        }
-
-        $descriptor->setDescriptorProvider(new DescriptorProvider());
-
-        $this->assertTrue($descriptor->supports($object));
-        $this->assertEquals(trim($description), trim($descriptor->describe($object)));
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describeInputArgument($argument)));
     }
 
-    public function getDescribeTestData()
+    /** @dataProvider getDescribeInputOptionTestData */
+    public function testDescribeInputOption(DescriptorInterface $descriptor, InputOption $option, $expectedDescription)
     {
-        $data = array();
-        $descriptor = $this->getDescriptor();
-
-        foreach ($this->getObjects() as $name => $object) {
-            $description = file_get_contents(sprintf('%s/../Fixtures/%s.%s', __DIR__, $name, $descriptor->getFormat()));
-            $data[] = array($descriptor, $object, $description);
-        }
-
-        return $data;
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describeInputOption($option)));
     }
 
-    abstract protected function getDescriptor();
-    abstract protected function getObjects();
-
-    /**
-     * Replaces the dynamic placeholders of the command help text with a static version.
-     * The placeholder %command.full_name% includes the script path that is not predictable
-     * and can not be tested against.
-     */
-    private function ensureStaticCommandHelp(Application $application)
+    /** @dataProvider getDescribeInputDefinitionTestData */
+    public function testDescribeInputDefinition(DescriptorInterface $descriptor, InputDefinition $definition, $expectedDescription)
     {
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describeInputDefinition($definition)));
+    }
+
+    /** @dataProvider getDescribeCommandTestData */
+    public function testDescribeCommand(DescriptorInterface $descriptor, Command $command, $expectedDescription)
+    {
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describeCommand($command)));
+    }
+
+    /** @dataProvider getDescribeApplicationTestData */
+    public function testDescribeApplication(DescriptorInterface $descriptor, Application $application, $expectedDescription)
+    {
+        // Replaces the dynamic placeholders of the command help text with a static version.
+        // The placeholder %command.full_name% includes the script path that is not predictable
+        // and can not be tested against.
         foreach ($application->all() as $command) {
             $command->setHelp(str_replace('%command.full_name%', 'app/console %command.name%', $command->getHelp()));
         }
+
+        $this->assertEquals(trim($expectedDescription), trim($descriptor->describeApplication($application)));
+    }
+
+    public function getDescribeInputArgumentTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getInputArguments());
+    }
+
+    public function getDescribeInputOptionTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getInputOptions());
+    }
+
+    public function getDescribeInputDefinitionTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getInputDefinitions());
+    }
+
+    public function getDescribeCommandTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getCommands());
+    }
+
+    public function getDescribeApplicationTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getApplications());
+    }
+
+    abstract protected function getDescriptor();
+    abstract protected function getFormat();
+
+    private function getDescriptionTestData(array $objects)
+    {
+        $data = array();
+        foreach ($objects as $name => $object) {
+            $description = file_get_contents(sprintf('%s/../Fixtures/%s.%s', __DIR__, $name, $this->getFormat()));
+            $data[] = array($this->getDescriptor(), $object, $description);
+        }
+
+        return $data;
     }
 }

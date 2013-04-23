@@ -1013,6 +1013,8 @@ class Application
     /**
      * Returns the namespace part of the command name.
      *
+     * This method is not part of public API and should not be used directly.
+     *
      * @param string $name  The full name of the command
      * @param string $limit The maximum number of parts of the namespace
      *

@@ -275,6 +275,8 @@ class Command
     /**
      * Merges the application definition with the command definition.
      *
+     * This method is not part of public API and should not be used directly.
+     *
      * @param Boolean $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      */
     public function mergeApplicationDefinition($mergeArgs = true)
@@ -333,6 +335,8 @@ class Command
      *
      * Can be overridden to provide the original command representation when it would otherwise
      * be changed by merging with the application InputDefinition.
+     *
+     * This method is not part of public API and should not be used directly.
      *
      * @return InputDefinition An InputDefinition instance
      */

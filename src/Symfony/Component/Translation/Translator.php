@@ -95,6 +95,11 @@ class Translator implements TranslatorInterface
         $this->resources[$locale][] = array($format, $resource, $domain);
 
         unset($this->catalogues[$locale]);
+
+        // reload fallback catalogues for all locales that left
+        foreach(array_keys($this->catalogues) as $locale) {
+            $this->loadFallbackCatalogues($locale);
+        }
     }
 
     /**

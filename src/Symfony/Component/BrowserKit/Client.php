@@ -41,6 +41,8 @@ abstract class Client
     protected $insulated;
     protected $redirect;
     protected $followRedirects;
+    protected $maxRedirects = -1;
+    protected $redirectCount = 0;
 
     /**
      * Constructor.
@@ -70,6 +72,16 @@ abstract class Client
     public function followRedirects($followRedirect = true)
     {
         $this->followRedirects = (Boolean) $followRedirect;
+    }
+    
+    /**
+     * Sets the maximum number of requests that crawler can follow.
+     * 
+     * @param integer $maxRedirects 
+     */
+    public function setMaxRedirects($maxRedirects)
+    {
+        $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
     }
 
     /**
@@ -454,6 +466,14 @@ abstract class Client
     {
         if (empty($this->redirect)) {
             throw new \LogicException('The request was not redirected.');
+        }
+        
+        if (-1 !== $this->maxRedirects) {
+            if ($this->redirectCount === $this->maxRedirects) {
+                throw new \LogicException(sprintf('The maximum number (%d) of redirections was reached.', $this->maxRedirects));
+            }
+            
+            ++$this->redirectCount;
         }
 
         return $this->request('get', $this->redirect);

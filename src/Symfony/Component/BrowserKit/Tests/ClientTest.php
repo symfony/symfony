@@ -349,6 +349,25 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() automatically follows redirects if followRedirects is true');
     }
+    
+    public function testFollowRedirectWithMaxRedirects()
+    {
+        $client = new TestClient();
+        $client->setMaxRedirects(1);
+        $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected')));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+
+        $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows a redirect if any');
+        
+        $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected2')));
+        
+        try {
+            $client->followRedirect();
+            $this->fail('->followRedirect() throws a \LogicException if the request was redirected and limit of redirections were reached');
+        } catch (\Exception $e) {
+            $this->assertInstanceof('LogicException', $e, '->followRedirect() throws a \LogicException if the request was redirected and limit of redirections were reached');
+        }
+    }
 
     public function testFollowRedirectWithCookies()
     {

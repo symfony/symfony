@@ -639,6 +639,20 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->rename($file, $newPath);
     }
 
+    public function testRenameOverwritesTheTargetIfItAlreadyExists()
+    {
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $newPath = $this->workspace.DIRECTORY_SEPARATOR.'new_file';
+
+        touch($file);
+        touch($newPath);
+
+        $this->filesystem->rename($file, $newPath, true);
+
+        $this->assertFileNotExists($file);
+        $this->assertFileExists($newPath);
+    }
+
     /**
      * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
@@ -892,6 +906,17 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($filename);
         $this->assertSame('bar', file_get_contents($filename));
         $this->assertEquals(753, $this->getFilePermissions($filename));
+    }
+
+    public function testDumpFileOverwritesAnExistingFile()
+    {
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo.txt';
+        file_put_contents($filename, 'FOO BAR');
+
+        $this->filesystem->dumpFile($filename, 'bar');
+
+        $this->assertFileExists($filename);
+        $this->assertSame('bar', file_get_contents($filename));
     }
 
     /**

@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Console\Descriptor;
 
 use Symfony\Component\Console\Application;
@@ -16,45 +25,50 @@ use Symfony\Component\Console\Input\InputOption;
 interface DescriptorInterface
 {
     /**
-     * @param InputArgument $argument
+     * Describes an InputArgument instance.
      *
-     * @param array $options
+     * @param InputArgument $argument
+     * @param array         $options
      *
      * @return string|mixed
      */
     public function describeInputArgument(InputArgument $argument, array $options = array());
 
     /**
-     * @param InputOption $option
+     * Describes an InputOption instance.
      *
-     * @param array $options
+     * @param InputOption $option
+     * @param array       $options
      *
      * @return string|mixed
      */
     public function describeInputOption(InputOption $option, array $options = array());
 
     /**
-     * @param InputDefinition $definition
+     * Describes an InputDefinition instance.
      *
-     * @param array $options
+     * @param InputDefinition $definition
+     * @param array           $options
      *
      * @return string|mixed
      */
     public function describeInputDefinition(InputDefinition $definition, array $options = array());
 
     /**
-     * @param Command $command
+     * Describes a Command instance.
      *
-     * @param array $options
+     * @param Command $command
+     * @param array   $options
      *
      * @return string|mixed
      */
     public function describeCommand(Command $command, array $options = array());
 
     /**
-     * @param Application $application
+     * Describes an Application instance.
      *
-     * @param array $options
+     * @param Application $application
+     * @param array       $options
      *
      * @return string|mixed
      */

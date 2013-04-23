@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Console\Descriptor;
 
 use Symfony\Component\Console\Application;
@@ -67,13 +76,41 @@ class DescriptorProxy implements DescriptorInterface
     }
 
     /**
+     * Describes given object.
+     *
+     * @param object $object
+     * @param array  $options
+     *
+     * @return mixed|string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function describe($object, array $options = array())
+    {
+        switch (true) {
+            case $object instanceof InputArgument:
+                return $this->describeInputArgument($object, $options);
+            case $object instanceof InputOption:
+                return $this->describeInputOption($object, $options);
+            case $object instanceof InputDefinition:
+                return $this->describeInputDefinition($object, $options);
+            case $object instanceof Command:
+                return $this->describeCommand($object, $options);
+            case $object instanceof Application:
+                return $this->describeApplication($object, $options);
+        }
+
+        throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function describeInputArgument(InputArgument $argument, array $options = array())
     {
         $options = array_merge($this->defaultOptions, $options);
 
-        return $this->descriptors[$options['format']]->describeInputArgument($argument, $options);
+        return $this->getDescriptor($options['format'])->describeInputArgument($argument, $options);
     }
 
     /**
@@ -83,7 +120,7 @@ class DescriptorProxy implements DescriptorInterface
     {
         $options = array_merge($this->defaultOptions, $options);
 
-        return $this->descriptors[$options['format']]->describeInputOption($option, $options);
+        return $this->getDescriptor($options['format'])->describeInputOption($option, $options);
     }
 
     /**
@@ -93,7 +130,7 @@ class DescriptorProxy implements DescriptorInterface
     {
         $options = array_merge($this->defaultOptions, $options);
 
-        return $this->descriptors[$options['format']]->describeInputDefinition($definition, $options);
+        return $this->getDescriptor($options['format'])->describeInputDefinition($definition, $options);
     }
 
     /**
@@ -103,7 +140,7 @@ class DescriptorProxy implements DescriptorInterface
     {
         $options = array_merge($this->defaultOptions, $options);
 
-        return $this->descriptors[$options['format']]->describeCommand($command, $options);
+        return $this->getDescriptor($options['format'])->describeCommand($command, $options);
     }
 
     /**
@@ -113,6 +150,24 @@ class DescriptorProxy implements DescriptorInterface
     {
         $options = array_merge($this->defaultOptions, $options);
 
-        return $this->descriptors[$options['format']]->describeApplication($application, $options);
+        return $this->getDescriptor($options['format'])->describeApplication($application, $options);
+    }
+
+    /**
+     * Returns a descriptor according to gievn format.
+     *
+     * @param string $format
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return DescriptorInterface
+     */
+    private function getDescriptor($format)
+    {
+        if (!isset($this->descriptors[$format])) {
+            throw new \InvalidArgumentException(sprintf('Unsupported format "%s".', $format));
+        }
+
+        return $this->descriptors[$format];
     }
 }

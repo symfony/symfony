@@ -54,7 +54,7 @@ class DescriptorHelper extends Helper
         $options = array('raw_text' => $raw, 'format' => $format ?: 'txt');
         $type = !$raw && 'txt' === $options['format'] ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW;
 
-        $output->writeln($this->getDescription($object, $options), $type);
+        $output->writeln($this->descriptor->describe($object, $options), $type);
     }
 
     /**
@@ -63,23 +63,5 @@ class DescriptorHelper extends Helper
     public function getName()
     {
         return 'descriptor';
-    }
-
-    private function getDescription($object, array $options)
-    {
-        switch (true) {
-            case $object instanceof InputArgument:
-                return $this->descriptor->describeInputArgument($object, $options);
-            case $object instanceof InputOption:
-                return $this->descriptor->describeInputOption($object, $options);
-            case $object instanceof InputDefinition:
-                return $this->descriptor->describeInputDefinition($object, $options);
-            case $object instanceof Command:
-                return $this->descriptor->describeCommand($object, $options);
-            case $object instanceof Application:
-                return $this->descriptor->describeApplication($object, $options);
-        }
-
-        throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
     }
 }

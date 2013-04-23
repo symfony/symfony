@@ -26,6 +26,7 @@ class TemplateNameParser implements TemplateNameParserInterface
 {
     protected $kernel;
     protected $cache;
+    protected $bundles;
 
     /**
      * Constructor.
@@ -35,6 +36,7 @@ class TemplateNameParser implements TemplateNameParserInterface
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
+        $this->bundles = $kernel->getBundles();
         $this->cache = array();
     }
 
@@ -49,35 +51,75 @@ class TemplateNameParser implements TemplateNameParserInterface
             return $this->cache[$name];
         }
 
-        // normalize name
-        $name = str_replace(':/', ':', preg_replace('#/{2,}#', '/', strtr($name, '\\', '/')));
-
         if (false !== strpos($name, '..')) {
             throw new \RuntimeException(sprintf('Template name "%s" contains invalid characters.', $name));
         }
 
+        if ($template = $this->parseColonName($name)) {
+            return $this->cache[$name] = $template;
+        }
+
+        if ($template = $this->parseAtName($name)) {
+            return $this->cache[$name] = $template;
+        }
+
+        // TODO throw
+    }
+
+    protected function parseColonName($name)
+    {
+        $name = str_replace(':/', ':', preg_replace('#/{2,}#', '/', strtr($name, '\\', '/')));
+
         $parts = explode(':', $name);
         if (3 !== count($parts)) {
-            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.format.engine").', $name));
+            return null;
         }
 
         $elements = explode('.', $parts[2]);
         if (3 > count($elements)) {
-            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.format.engine").', $name));
+            return null;
         }
         $engine = array_pop($elements);
         $format = array_pop($elements);
 
         $template = new TemplateReference($parts[0], $parts[1], implode('.', $elements), $format, $engine);
 
-        if ($template->get('bundle')) {
-            try {
-                $this->kernel->getBundle($template->get('bundle'));
-            } catch (\Exception $e) {
-                throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid.', $name), 0, $e);
-            }
+        if (!array_key_exists($template->get('bundle'), $this->bundles)) {
+            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid.', $name));
         }
 
-        return $this->cache[$name] = $template;
+        return $template;
+    }
+
+    protected function parseAtName($name)
+    {
+        $name = preg_replace('#/{2,}#', '/', strtr($name, '\\', '/'));
+
+        if (strlen($name) > 0 && '@' === $name[0] && $parts = explode('/', $name)) {
+            if (count($parts) < 2) {
+                die($name);
+                return null;
+            }
+
+            $bundle = substr(array_shift($parts), 1);
+
+            if (!array_key_exists($bundle, $this->bundles)) {
+                $bundle = $bundle . 'Bundle';
+                if (!array_key_exists($bundle, $this->bundles)) {
+                    var_dump($bundle);
+                    var_dump($this->bundles);
+                    return null;
+                }
+            }
+
+            $elements = explode('.', array_pop($parts));
+            if (3 > count($elements)) {
+                return null;
+            }
+            $engine = array_pop($elements);
+            $format = array_pop($elements);
+
+            return new TemplateReference($bundle, implode('/', $parts), implode('.', $elements), $format, $engine);
+        }
     }
 }

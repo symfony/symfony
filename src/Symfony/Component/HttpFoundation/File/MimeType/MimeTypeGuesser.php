@@ -18,8 +18,13 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
  * A singleton mime type guesser.
  *
  * By default, all mime type guessers provided by the framework are installed
- * (if available on the current OS/PHP setup). You can register custom
- * guessers by calling the register() method on the singleton instance.
+ * (if available on the current OS/PHP setup).
+ *
+ * You can register custom guessers by calling the register() method on the
+ * singleton instance. Custom guessers are always called before any default ones.
+ *
+ * If you want to change the order of the default guessers, just re-register your
+ * preferred one as a custom one.
  *
  * <code>
  * $guesser = MimeTypeGuesser::getInstance();

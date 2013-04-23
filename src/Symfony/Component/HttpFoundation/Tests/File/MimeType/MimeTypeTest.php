@@ -94,6 +94,22 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testDefinesAsInstance()
+    {
+        $guesser = new MimeTypeGuesser();
+        $instance1 = MimeTypeGuesser::getInstance();
+
+        $this->assertNotEquals($instance1, $guesser);
+
+        $guesser->defineAsInstance();
+        $instance2 = MimeTypeGuesser::getInstance();
+
+        $this->assertEquals($instance2, $guesser);
+
+        // revert instances changes
+        $instance1->defineAsInstance();
+    }
+
     public static function tearDownAfterClass()
     {
         $path = __DIR__.'/../Fixtures/to_delete';

@@ -23,15 +23,17 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
  * You can register custom guessers by calling the register() method on the
  * singleton instance. Custom guessers are always called before any default ones.
  *
+ *     $guesser = MimeTypeGuesser::getInstance();
+ *     $guesser->register(new MyCustomMimeTypeGuesser());
+ *
  * If you want to change the order of the default guessers, just re-register your
- * preferred one as a custom one.
+ * preferred one as a custom one. The last registered guesser is preferred over
+ * previously registered ones.
  *
- * <code>
- * $guesser = MimeTypeGuesser::getInstance();
- * $guesser->register(new MyCustomMimeTypeGuesser());
- * </code>
+ * Re-registering a built-in guesser also allows you to configure it:
  *
- * The last registered guesser is preferred over previously registered ones.
+ *     $guesser = MimeTypeGuesser::getInstance();
+ *     $guesser->register(new FileinfoMimeTypeGuesser('/path/to/magic/file'));
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

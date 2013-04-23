@@ -49,9 +49,15 @@ class File extends \SplFileInfo
      *
      * If the mime type is unknown, returns null.
      *
+     * This method uses the mime type as guessed by getMimeType()
+     * to guess the file extension.
+     *
      * @return string|null The guessed extension or null if it cannot be guessed
      *
      * @api
+     *
+     * @see ExtensionGuesser
+     * @see getMimeType()
      */
     public function guessExtension()
     {
@@ -64,11 +70,13 @@ class File extends \SplFileInfo
     /**
      * Returns the mime type of the file.
      *
-     * The mime type is guessed using the functions finfo(), mime_content_type()
-     * and the system binary "file" (in this order), depending on which of those
-     * is available on the current operating system.
+     * The mime type is guessed using a MimeTypeGuesser instance, which uses finfo(),
+     * mime_content_type() and the system binary "file" (in this order), depending on
+     * which of those are available.
      *
      * @return string|null The guessed mime type (i.e. "application/pdf")
+     *
+     * @see MimeTypeGuesser
      *
      * @api
      */

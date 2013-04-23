@@ -134,16 +134,46 @@ class UploadedFile extends File
     /**
      * Returns the file mime type.
      *
-     * It is extracted from the request from which the file has been uploaded.
-     * Then is should not be considered as a safe value.
+     * The client mime type is extracted from the request from which the file
+     * was uploaded, so it should not be considered as a safe value.
+     *
+     * For a trusted mime type, use getMimeType() instead (which guesses the mime
+     * type based on the file content).
      *
      * @return string|null The mime type
+     *
+     * @see getMimeType
      *
      * @api
      */
     public function getClientMimeType()
     {
         return $this->mimeType;
+    }
+
+    /**
+     * Returns the extension based on the client mime type.
+     *
+     * If the mime type is unknown, returns null.
+     *
+     * This method uses the mime type as guessed by getClientMimeType()
+     * to guess the file extension. As such, the extension returned
+     * by this method cannot be trusted.
+     *
+     * For a trusted extension, use guessExtension() instead (which guesses
+     * the extension based on the guessed mime type for the file).
+     *
+     * @return string|null The guessed extension or null if it cannot be guessed
+     *
+     * @see guessExtension()
+     * @see getClientMimeType()
+     */
+    public function guessClientExtension()
+    {
+        $type = $this->getMimeType();
+        $guesser = ExtensionGuesser::getInstance();
+
+        return $guesser->guess($type);
     }
 
     /**

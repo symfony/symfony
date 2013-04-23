@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by pjedrzejewski at 2013-01-05T12:32:33Z
+
+Big :+1: for this. Thanks @mvrhov!
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-01-05T13:38:29Z
+
+BTW: I have no idea why the php 5.3.x seg'faults when running tests on Travis.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-01-06T07:19:12Z
+
+@fabpot: Any chances of having this in 2.2? I really need this in my next project and I would be a shame if I had to maintain a 2.2 fork just because of this feature
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2013-02-01T10:38:31Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Baachi at 2013-02-01T11:19:52Z
+
+Big :+1:
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-02-22T11:12:42Z
+
+Looks good apart from a few minor issues!
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-04-18T07:52:03Z
+
+This has been implemented as a part of #7386
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-18T07:59:31Z
+
+@mvrhov FYI #7386 does not contain a Currency type or validator.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-04-18T08:06:53Z
+
+Ok, I'll reopen and rebase this later today.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-04-22T10:02:20Z
+
+This is now rebased
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-22T10:33:31Z
+
+Thank you @mvrhov! :) :+1:
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-04-23T05:02:17Z
+
+Please let me know before merging so I can cherry pick this on master and do a clean PR.
+I'm afraid that even though I squashed the commits this PR will weigh a hefty 2,8M, due to currency resources data that are not needed anymore.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-23T07:26:55Z
+
+Looks good :) Not sure what you mean with your last comment, but do whatever you feel is necessary!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-23T08:19:48Z
+
+@mvrhov As you squashed your commits, I think there are no problems with the old data.

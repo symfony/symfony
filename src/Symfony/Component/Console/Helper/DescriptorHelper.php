@@ -14,7 +14,6 @@ namespace Symfony\Component\Console\Helper;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
-use Symfony\Component\Console\Descriptor\DescriptorProxy;
 use Symfony\Component\Console\Descriptor\JsonDescriptor;
 use Symfony\Component\Console\Descriptor\MarkdownDescriptor;
 use Symfony\Component\Console\Descriptor\TextDescriptor;

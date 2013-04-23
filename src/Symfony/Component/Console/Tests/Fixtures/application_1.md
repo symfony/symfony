@@ -8,7 +8,7 @@ help
 ----
 
 * Description: Displays help for a command
-* Usage: `help [--format="..."] [--raw] [--xml] [command_name]`
+* Usage: `help [--xml] [--format="..."] [--raw] [command_name]`
 * Aliases: <none>
 
 The <info>help</info> command displays help for a given command:
@@ -33,6 +33,16 @@ To display the list of available commands, please use the <info>list</info> comm
 
 ### Options:
 
+**xml:**
+
+* Name: `--xml`
+* Shortcut: <none>
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Description: To output help as XML
+* Default: `false`
+
 **format:**
 
 * Name: `--format`
@@ -40,7 +50,7 @@ To display the list of available commands, please use the <info>list</info> comm
 * Accept value: yes
 * Is value required: yes
 * Is multiple: no
-* Description: To output help in other formats.
+* Description: To output help in other formats
 * Default: `NULL`
 
 **raw:**
@@ -50,17 +60,7 @@ To display the list of available commands, please use the <info>list</info> comm
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: To output raw command help.
-* Default: `false`
-
-**xml:**
-
-* Name: `--xml`
-* Shortcut: <none>
-* Accept value: no
-* Is value required: no
-* Is multiple: no
-* Description: To output help as XML.
+* Description: To output raw command help
 * Default: `false`
 
 **help:**
@@ -137,7 +137,7 @@ list
 ----
 
 * Description: Lists commands
-* Usage: `list [--format="..."] [--raw] [--xml] [namespace]`
+* Usage: `list [--xml] [--raw] [--format="..."] [namespace]`
 * Aliases: <none>
 
 The <info>list</info> command lists all commands:
@@ -168,15 +168,15 @@ It's also possible to get raw list of commands (useful for embedding command run
 
 ### Options:
 
-**format:**
+**xml:**
 
-* Name: `--format`
+* Name: `--xml`
 * Shortcut: <none>
-* Accept value: yes
-* Is value required: yes
+* Accept value: no
+* Is value required: no
 * Is multiple: no
-* Description: To output list in other formats.
-* Default: `NULL`
+* Description: To output list as XML
+* Default: `false`
 
 **raw:**
 
@@ -185,15 +185,15 @@ It's also possible to get raw list of commands (useful for embedding command run
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: To output raw command list.
+* Description: To output raw command list
 * Default: `false`
 
-**xml:**
+**format:**
 
-* Name: `--xml`
+* Name: `--format`
 * Shortcut: <none>
-* Accept value: no
-* Is value required: no
+* Accept value: yes
+* Is value required: yes
 * Is multiple: no
-* Description: To output list as XML.
-* Default: `false`
+* Description: To output list in other formats
+* Default: `NULL`

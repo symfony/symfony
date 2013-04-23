@@ -1,14 +1,14 @@
 Usage:
- help [--format="..."] [--raw] [--xml] [command_name]
+ help [--xml] [--format="..."] [--raw] [command_name]
 
 Arguments:
  command               The command to execute
  command_name          The command name (default: "help")
 
 Options:
- --format              To output help in other formats.
- --raw                 To output raw command help.
- --xml                 To output help as XML.
+ --xml                 To output help as XML
+ --format              To output help in other formats
+ --raw                 To output raw command help
  --help (-h)           Display this help message.
  --quiet (-q)          Do not output any message.
  --verbose (-v)        Increase verbosity of messages.

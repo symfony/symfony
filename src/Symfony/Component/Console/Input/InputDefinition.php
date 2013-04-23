@@ -403,7 +403,6 @@ class InputDefinition
         return implode(' ', $elements);
     }
 
-
     /**
      * Returns a textual representation of the InputDefinition.
      *

@@ -242,6 +242,10 @@
                 <source>This value is not a valid ISSN.</source>
                 <target>Balio hau ez da onartutako ISSN bat.</target>
             </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>Balio hau ez da baliozko moneta.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

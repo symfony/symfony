@@ -32,7 +32,7 @@ class ValidationListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(FormEvents::POST_BIND => 'validateForm');
+        return array(FormEvents::POST_SUBMIT => 'validateForm');
     }
 
     public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper)

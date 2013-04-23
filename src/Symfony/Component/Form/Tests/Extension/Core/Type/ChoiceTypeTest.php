@@ -163,7 +163,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         }
     }
 
-    public function testBindSingleNonExpanded()
+    public function testSubmitSingleNonExpanded()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -171,13 +171,13 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'choices' => $this->choices,
         ));
 
-        $form->bind('b');
+        $form->submit('b');
 
         $this->assertEquals('b', $form->getData());
         $this->assertEquals('b', $form->getViewData());
     }
 
-    public function testBindSingleNonExpandedObjectChoices()
+    public function testSubmitSingleNonExpandedObjectChoices()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -194,13 +194,13 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         ));
 
         // "id" value of the second entry
-        $form->bind('2');
+        $form->submit('2');
 
         $this->assertEquals($this->objectChoices[1], $form->getData());
         $this->assertEquals('2', $form->getViewData());
     }
 
-    public function testBindMultipleNonExpanded()
+    public function testSubmitMultipleNonExpanded()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => true,
@@ -208,13 +208,13 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'choices' => $this->choices,
         ));
 
-        $form->bind(array('a', 'b'));
+        $form->submit(array('a', 'b'));
 
         $this->assertEquals(array('a', 'b'), $form->getData());
         $this->assertEquals(array('a', 'b'), $form->getViewData());
     }
 
-    public function testBindMultipleNonExpandedObjectChoices()
+    public function testSubmitMultipleNonExpandedObjectChoices()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => true,
@@ -230,13 +230,13 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             ),
         ));
 
-        $form->bind(array('2', '3'));
+        $form->submit(array('2', '3'));
 
         $this->assertEquals(array($this->objectChoices[1], $this->objectChoices[2]), $form->getData());
         $this->assertEquals(array('2', '3'), $form->getViewData());
     }
 
-    public function testBindSingleExpanded()
+    public function testSubmitSingleExpanded()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -244,7 +244,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'choices' => $this->choices,
         ));
 
-        $form->bind('b');
+        $form->submit('b');
 
         $this->assertSame('b', $form->getData());
         $this->assertFalse($form[0]->getData());
@@ -259,7 +259,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testBindSingleExpandedNothingChecked()
+    public function testSubmitSingleExpandedNothingChecked()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -267,7 +267,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'choices' => $this->choices,
         ));
 
-        $form->bind(null);
+        $form->submit(null);
 
         $this->assertNull($form->getData());
         $this->assertFalse($form[0]->getData());
@@ -282,7 +282,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testBindSingleExpandedWithFalseDoesNotHaveExtraChildren()
+    public function testSubmitSingleExpandedWithFalseDoesNotHaveExtraChildren()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -290,13 +290,13 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'choices' => $this->choices,
         ));
 
-        $form->bind(false);
+        $form->submit(false);
 
         $this->assertEmpty($form->getExtraData());
         $this->assertNull($form->getData());
     }
 
-    public function testBindSingleExpandedWithEmptyChild()
+    public function testSubmitSingleExpandedWithEmptyChild()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -307,7 +307,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             ),
         ));
 
-        $form->bind('');
+        $form->submit('');
 
         $this->assertNull($form->getData());
         $this->assertTrue($form[0]->getData());
@@ -316,7 +316,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form[1]->getViewData());
     }
 
-    public function testBindSingleExpandedObjectChoices()
+    public function testSubmitSingleExpandedObjectChoices()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -332,7 +332,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             ),
         ));
 
-        $form->bind('2');
+        $form->submit('2');
 
         $this->assertSame($this->objectChoices[1], $form->getData());
         $this->assertFalse($form[0]->getData());
@@ -347,7 +347,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testBindSingleExpandedNumericChoices()
+    public function testSubmitSingleExpandedNumericChoices()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
@@ -355,7 +355,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'choices' => $this->numericChoices,
         ));
 
-        $form->bind('1');
+        $form->submit('1');
 
         $this->assertSame(1, $form->getData());
         $this->assertFalse($form[0]->getData());
@@ -370,7 +370,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testBindMultipleExpanded()
+    public function testSubmitMultipleExpanded()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => true,
@@ -378,7 +378,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'choices' => $this->choices,
         ));
 
-        $form->bind(array('a', 'c'));
+        $form->submit(array('a', 'c'));
 
         $this->assertSame(array('a', 'c'), $form->getData());
         $this->assertTrue($form[0]->getData());
@@ -393,7 +393,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testBindMultipleExpandedEmpty()
+    public function testSubmitMultipleExpandedEmpty()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => true,
@@ -401,7 +401,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'choices' => $this->choices,
         ));
 
-        $form->bind(array());
+        $form->submit(array());
 
         $this->assertSame(array(), $form->getData());
         $this->assertFalse($form[0]->getData());
@@ -416,7 +416,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testBindMultipleExpandedWithEmptyChild()
+    public function testSubmitMultipleExpandedWithEmptyChild()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => true,
@@ -428,7 +428,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             )
         ));
 
-        $form->bind(array('', '2'));
+        $form->submit(array('', '2'));
 
         $this->assertSame(array('', 2), $form->getData());
         $this->assertTrue($form[0]->getData());
@@ -439,7 +439,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertSame('2', $form[2]->getViewData());
     }
 
-    public function testBindMultipleExpandedObjectChoices()
+    public function testSubmitMultipleExpandedObjectChoices()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => true,
@@ -455,7 +455,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             ),
         ));
 
-        $form->bind(array('1', '2'));
+        $form->submit(array('1', '2'));
 
         $this->assertSame(array($this->objectChoices[0], $this->objectChoices[1]), $form->getData());
         $this->assertTrue($form[0]->getData());
@@ -470,7 +470,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testBindMultipleExpandedNumericChoices()
+    public function testSubmitMultipleExpandedNumericChoices()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => true,
@@ -478,7 +478,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'choices' => $this->numericChoices,
         ));
 
-        $form->bind(array('1', '2'));
+        $form->submit(array('1', '2'));
 
         $this->assertSame(array(1, 2), $form->getData());
         $this->assertFalse($form[0]->getData());

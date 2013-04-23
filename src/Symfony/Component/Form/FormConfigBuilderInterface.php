@@ -122,7 +122,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setDisabled($disabled);
 
     /**
-     * Sets the data used for the client data when no value is bound.
+     * Sets the data used for the client data when no value is submitted.
      *
      * @param mixed $emptyData The empty data.
      *
@@ -140,7 +140,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
     public function setErrorBubbling($errorBubbling);
 
     /**
-     * Sets whether this field is required to be filled out when bound.
+     * Sets whether this field is required to be filled out when submitted.
      *
      * @param Boolean $required
      *
@@ -222,7 +222,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * A form with locked data is restricted to the data passed in
      * this configuration. The data can only be modified then by
-     * binding the form.
+     * submitting the form.
      *
      * @param Boolean $locked Whether to lock the default data.
      *

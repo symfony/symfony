@@ -24,7 +24,7 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->add($this->getValidForm('firstName'));
         $this->form->add($this->getValidForm('lastName'));
 
-        $this->form->bind(array(
+        $this->form->submit(array(
             'firstName' => 'Bernhard',
             'lastName' => 'Schussek',
         ));
@@ -37,7 +37,7 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->add($this->getValidForm('firstName'));
         $this->form->add($this->getInvalidForm('lastName'));
 
-        $this->form->bind(array(
+        $this->form->submit(array(
             'firstName' => 'Bernhard',
             'lastName' => 'Schussek',
         ));
@@ -45,17 +45,17 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertFalse($this->form->isValid());
     }
 
-    public function testBindForwardsNullIfValueIsMissing()
+    public function testSubmitForwardsNullIfValueIsMissing()
     {
         $child = $this->getMockForm('firstName');
 
         $this->form->add($child);
 
         $child->expects($this->once())
-            ->method('bind')
+            ->method('submit')
             ->with($this->equalTo(null));
 
-        $this->form->bind(array());
+        $this->form->submit(array());
     }
 
     public function testCloneChildren()
@@ -82,7 +82,7 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertFalse($this->form->isEmpty());
     }
 
-    public function testValidIfBoundAndDisabledWithChildren()
+    public function testValidIfSubmittedAndDisabledWithChildren()
     {
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -95,7 +95,7 @@ class CompoundFormTest extends AbstractFormTest
             ->setDataMapper($this->getDataMapper())
             ->add('name', 'text')
             ->getForm();
-        $form->bind(array('name' => 'Jacques Doe'));
+        $form->submit(array('name' => 'Jacques Doe'));
 
         $this->assertTrue($form->isValid());
     }
@@ -108,7 +108,7 @@ class CompoundFormTest extends AbstractFormTest
             ->will($this->returnValue(false));
 
         $this->form->add($child);
-        $this->form->bind(array());
+        $this->form->submit(array());
 
         $this->assertFalse($this->form->isValid());
     }
@@ -199,11 +199,11 @@ class CompoundFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\AlreadyBoundException
+     * @expectedException \Symfony\Component\Form\Exception\AlreadySubmittedException
      */
-    public function testAddThrowsExceptionIfAlreadyBound()
+    public function testAddThrowsExceptionIfAlreadySubmitted()
     {
-        $this->form->bind(array());
+        $this->form->submit(array());
         $this->form->add($this->getBuilder('foo')->getForm());
     }
 
@@ -218,12 +218,12 @@ class CompoundFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\AlreadyBoundException
+     * @expectedException \Symfony\Component\Form\Exception\AlreadySubmittedException
      */
-    public function testRemoveThrowsExceptionIfAlreadyBound()
+    public function testRemoveThrowsExceptionIfAlreadySubmitted()
     {
         $this->form->add($this->getBuilder('foo')->setCompound(false)->getForm());
-        $this->form->bind(array('foo' => 'bar'));
+        $this->form->submit(array('foo' => 'bar'));
         $this->form->remove('foo');
     }
 
@@ -331,7 +331,7 @@ class CompoundFormTest extends AbstractFormTest
         $form->setData('foo');
     }
 
-    public function testBindMapsBoundChildrenOntoExistingViewData()
+    public function testSubmitMapsSubmittedChildrenOntoExistingViewData()
     {
         $test = $this;
         $mapper = $this->getDataMapper();
@@ -358,7 +358,7 @@ class CompoundFormTest extends AbstractFormTest
                 $test->assertEquals('Schussek', $child2->getData());
             }));
 
-        $form->bind(array(
+        $form->submit(array(
             'firstName' => 'Bernhard',
             'lastName' => 'Schussek',
         ));
@@ -383,7 +383,7 @@ class CompoundFormTest extends AbstractFormTest
         $mapper->expects($this->never())
             ->method('mapFormsToData');
 
-        $form->bind(array(
+        $form->submit(array(
             'firstName' => 'Bernhard',
             'lastName' => 'Schussek',
         ));
@@ -392,7 +392,7 @@ class CompoundFormTest extends AbstractFormTest
     /*
      * https://github.com/symfony/symfony/issues/4480
      */
-    public function testBindRestoresViewDataIfCompoundAndEmpty()
+    public function testSubmitRestoresViewDataIfCompoundAndEmpty()
     {
         $mapper = $this->getDataMapper();
         $object = new \stdClass();
@@ -402,12 +402,12 @@ class CompoundFormTest extends AbstractFormTest
             ->setData($object)
             ->getForm();
 
-        $form->bind(array());
+        $form->submit(array());
 
         $this->assertSame($object, $form->getData());
     }
 
-    public function testBindMapsBoundChildrenOntoEmptyData()
+    public function testSubmitMapsSubmittedChildrenOntoEmptyData()
     {
         $test = $this;
         $mapper = $this->getDataMapper();
@@ -429,7 +429,7 @@ class CompoundFormTest extends AbstractFormTest
                 $test->assertSame(array('name' => $child), iterator_to_array($iterator));
             }));
 
-        $form->bind(array(
+        $form->submit(array(
             'name' => 'Bernhard',
         ));
     }
@@ -447,7 +447,7 @@ class CompoundFormTest extends AbstractFormTest
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindPostOrPutRequest($method)
+    public function testSubmitPostOrPutRequest($method)
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
@@ -499,7 +499,7 @@ class CompoundFormTest extends AbstractFormTest
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindPostOrPutRequestWithEmptyRootFormName($method)
+    public function testSubmitPostOrPutRequestWithEmptyRootFormName($method)
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
@@ -550,7 +550,7 @@ class CompoundFormTest extends AbstractFormTest
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindPostOrPutRequestWithSingleChildForm($method)
+    public function testSubmitPostOrPutRequestWithSingleChildForm($method)
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
@@ -590,7 +590,7 @@ class CompoundFormTest extends AbstractFormTest
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindPostOrPutRequestWithSingleChildFormUploadedFile($method)
+    public function testSubmitPostOrPutRequestWithSingleChildFormUploadedFile($method)
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
@@ -619,7 +619,7 @@ class CompoundFormTest extends AbstractFormTest
         unlink($path);
     }
 
-    public function testBindGetRequest()
+    public function testSubmitGetRequest()
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');
@@ -651,7 +651,7 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertEquals('Schussek', $form['lastName']->getData());
     }
 
-    public function testBindGetRequestWithEmptyRootFormName()
+    public function testSubmitGetRequestWithEmptyRootFormName()
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
             $this->markTestSkipped('The "HttpFoundation" component is not available');

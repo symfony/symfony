@@ -196,7 +196,7 @@ class EntityTypeTest extends TypeTestCase
             },
         ));
 
-        $field->bind('2');
+        $field->submit('2');
     }
 
     public function testSetDataSingleNull()
@@ -248,7 +248,7 @@ class EntityTypeTest extends TypeTestCase
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
         ));
-        $field->bind(null);
+        $field->submit(null);
 
         $this->assertNull($field->getData());
         $this->assertSame(array(), $field->getViewData());
@@ -262,7 +262,7 @@ class EntityTypeTest extends TypeTestCase
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
         ));
-        $field->bind(null);
+        $field->submit(null);
 
         $this->assertNull($field->getData());
         $this->assertSame('', $field->getViewData());
@@ -275,7 +275,7 @@ class EntityTypeTest extends TypeTestCase
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
         ));
-        $field->bind(null);
+        $field->submit(null);
 
         $this->assertEquals(new ArrayCollection(), $field->getData());
         $this->assertSame(array(), $field->getViewData());
@@ -296,7 +296,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $field->bind('2');
+        $field->submit('2');
 
         $this->assertTrue($field->isSynchronized());
         $this->assertSame($entity2, $field->getData());
@@ -319,7 +319,7 @@ class EntityTypeTest extends TypeTestCase
         ));
 
         // the collection key is used here
-        $field->bind('1');
+        $field->submit('1');
 
         $this->assertTrue($field->isSynchronized());
         $this->assertSame($entity2, $field->getData());
@@ -342,7 +342,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $field->bind(array('1', '3'));
+        $field->submit(array('1', '3'));
 
         $expected = new ArrayCollection(array($entity1, $entity3));
 
@@ -370,7 +370,7 @@ class EntityTypeTest extends TypeTestCase
         $existing = new ArrayCollection(array(0 => $entity2));
 
         $field->setData($existing);
-        $field->bind(array('1', '3'));
+        $field->submit(array('1', '3'));
 
         // entry with index 0 ($entity2) was replaced
         $expected = new ArrayCollection(array(0 => $entity1, 1 => $entity3));
@@ -399,7 +399,7 @@ class EntityTypeTest extends TypeTestCase
         ));
 
         // because of the composite key collection keys are used
-        $field->bind(array('0', '2'));
+        $field->submit(array('0', '2'));
 
         $expected = new ArrayCollection(array($entity1, $entity3));
 
@@ -427,7 +427,7 @@ class EntityTypeTest extends TypeTestCase
         $existing = new ArrayCollection(array(0 => $entity2));
 
         $field->setData($existing);
-        $field->bind(array('0', '2'));
+        $field->submit(array('0', '2'));
 
         // entry with index 0 ($entity2) was replaced
         $expected = new ArrayCollection(array(0 => $entity1, 1 => $entity3));
@@ -454,7 +454,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $field->bind('2');
+        $field->submit('2');
 
         $this->assertTrue($field->isSynchronized());
         $this->assertSame($entity2, $field->getData());
@@ -480,7 +480,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $field->bind(array('1', '3'));
+        $field->submit(array('1', '3'));
 
         $expected = new ArrayCollection(array($entity1, $entity3));
 
@@ -510,7 +510,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $field->bind('2');
+        $field->submit('2');
 
         $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
         $this->assertTrue($field->isSynchronized());
@@ -535,7 +535,7 @@ class EntityTypeTest extends TypeTestCase
             'group_by' => 'groupName',
         ));
 
-        $field->bind('2');
+        $field->submit('2');
 
         $this->assertSame('2', $field->getViewData());
         $this->assertEquals(array(
@@ -599,7 +599,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $field->bind('3');
+        $field->submit('3');
 
         $this->assertFalse($field->isSynchronized());
         $this->assertNull($field->getData());
@@ -620,7 +620,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $field->bind('2');
+        $field->submit('2');
 
         $this->assertFalse($field->isSynchronized());
         $this->assertNull($field->getData());
@@ -644,7 +644,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $field->bind('3');
+        $field->submit('3');
 
         $this->assertFalse($field->isSynchronized());
         $this->assertNull($field->getData());
@@ -668,7 +668,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $field->bind('3');
+        $field->submit('3');
 
         $this->assertFalse($field->isSynchronized());
         $this->assertNull($field->getData());
@@ -692,7 +692,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $field->bind('2');
+        $field->submit('2');
 
         $this->assertFalse($field->isSynchronized());
         $this->assertNull($field->getData());
@@ -712,7 +712,7 @@ class EntityTypeTest extends TypeTestCase
             'property' => 'name',
         ));
 
-        $field->bind('foo');
+        $field->submit('foo');
 
         $this->assertTrue($field->isSynchronized());
         $this->assertSame($entity1, $field->getData());
@@ -734,7 +734,7 @@ class EntityTypeTest extends TypeTestCase
         ));
 
         // the collection key is used here
-        $field->bind('0');
+        $field->submit('0');
 
         $this->assertTrue($field->isSynchronized());
         $this->assertSame($entity1, $field->getData());

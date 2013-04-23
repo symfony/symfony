@@ -173,8 +173,8 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $parent->add($child);
         $child->add($grandChild);
 
-        // bind to invoke the transformer and mark the form unsynchronized
-        $parent->bind(array());
+        // submit to invoke the transformer and mark the form unsynchronized
+        $parent->submit(array());
 
         $this->mapper->mapViolation($violation, $parent);
 
@@ -197,8 +197,8 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $parent->add($child);
         $child->add($grandChild);
 
-        // bind to invoke the transformer and mark the form unsynchronized
-        $parent->bind(array());
+        // submit to invoke the transformer and mark the form unsynchronized
+        $parent->submit(array());
 
         $this->mapper->mapViolation($violation, $parent);
 

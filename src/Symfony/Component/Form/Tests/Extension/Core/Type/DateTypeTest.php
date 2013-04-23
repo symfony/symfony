@@ -56,7 +56,7 @@ class DateTypeTest extends TypeTestCase
             'input' => 'datetime',
         ));
 
-        $form->bind('2010-06-02');
+        $form->submit('2010-06-02');
 
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('2010-06-02', $form->getViewData());
@@ -72,7 +72,7 @@ class DateTypeTest extends TypeTestCase
             'input' => 'datetime',
         ));
 
-        $form->bind('2.6.2010');
+        $form->submit('2.6.2010');
 
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('02.06.2010', $form->getViewData());
@@ -88,7 +88,7 @@ class DateTypeTest extends TypeTestCase
             'input' => 'string',
         ));
 
-        $form->bind('2.6.2010');
+        $form->submit('2.6.2010');
 
         $this->assertEquals('2010-06-02', $form->getData());
         $this->assertEquals('02.06.2010', $form->getViewData());
@@ -104,7 +104,7 @@ class DateTypeTest extends TypeTestCase
             'input' => 'timestamp',
         ));
 
-        $form->bind('2.6.2010');
+        $form->submit('2.6.2010');
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
@@ -122,7 +122,7 @@ class DateTypeTest extends TypeTestCase
             'input' => 'array',
         ));
 
-        $form->bind('2.6.2010');
+        $form->submit('2.6.2010');
 
         $output = array(
             'day' => '2',
@@ -148,7 +148,7 @@ class DateTypeTest extends TypeTestCase
             'year' => '2010',
         );
 
-        $form->bind($text);
+        $form->submit($text);
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
@@ -170,7 +170,7 @@ class DateTypeTest extends TypeTestCase
             'year' => '2010',
         );
 
-        $form->bind($text);
+        $form->submit($text);
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
@@ -193,7 +193,7 @@ class DateTypeTest extends TypeTestCase
             'year' => '',
         );
 
-        $form->bind($text);
+        $form->submit($text);
 
         $this->assertNull($form->getData());
         $this->assertEquals($text, $form->getViewData());
@@ -209,7 +209,7 @@ class DateTypeTest extends TypeTestCase
             'input' => 'datetime',
         ));
 
-        $form->bind('06*2010*02');
+        $form->submit('06*2010*02');
 
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('06*2010*02', $form->getViewData());
@@ -225,7 +225,7 @@ class DateTypeTest extends TypeTestCase
             'input' => 'string',
         ));
 
-        $form->bind('06*2010*02');
+        $form->submit('06*2010*02');
 
         $this->assertEquals('2010-06-02', $form->getData());
         $this->assertEquals('06*2010*02', $form->getViewData());
@@ -241,7 +241,7 @@ class DateTypeTest extends TypeTestCase
             'input' => 'timestamp',
         ));
 
-        $form->bind('06*2010*02');
+        $form->submit('06*2010*02');
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
@@ -259,7 +259,7 @@ class DateTypeTest extends TypeTestCase
             'input' => 'array',
         ));
 
-        $form->bind('06*2010*02');
+        $form->submit('06*2010*02');
 
         $output = array(
             'day' => '2',
@@ -447,7 +447,7 @@ class DateTypeTest extends TypeTestCase
             'widget' => 'single_text',
         ));
 
-        $form->bind('7.6.2010');
+        $form->submit('7.6.2010');
 
         $this->assertFalse($form->isPartiallyFilled());
     }
@@ -462,7 +462,7 @@ class DateTypeTest extends TypeTestCase
             'widget' => 'choice',
         ));
 
-        $form->bind(array(
+        $form->submit(array(
             'day' => '',
             'month' => '',
             'year' => '',
@@ -481,7 +481,7 @@ class DateTypeTest extends TypeTestCase
             'widget' => 'choice',
         ));
 
-        $form->bind(array(
+        $form->submit(array(
             'day' => '2',
             'month' => '6',
             'year' => '2010',
@@ -500,7 +500,7 @@ class DateTypeTest extends TypeTestCase
             'widget' => 'choice',
         ));
 
-        $form->bind(array(
+        $form->submit(array(
             'day' => '',
             'month' => '6',
             'year' => '2010',

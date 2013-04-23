@@ -173,7 +173,7 @@ interface FormConfigInterface
      *
      * A form with locked data is restricted to the data passed in
      * this configuration. The data can only be modified then by
-     * binding the form.
+     * submitting the form.
      *
      * @return Boolean Whether the data is locked.
      */

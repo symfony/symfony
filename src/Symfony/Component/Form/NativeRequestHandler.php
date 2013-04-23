@@ -55,7 +55,7 @@ class NativeRequestHandler implements RequestHandlerInterface
             if ('' === $name) {
                 $data = $_GET;
             } else {
-                // Don't bind GET requests if the form's name does not exist
+                // Don't submit GET requests if the form's name does not exist
                 // in the request
                 if (!isset($_GET[$name])) {
                     return;
@@ -85,12 +85,12 @@ class NativeRequestHandler implements RequestHandlerInterface
             }
         }
 
-        // Don't auto-bind the form unless at least one field is submitted.
+        // Don't auto-submit the form unless at least one field is present.
         if ('' === $name && count(array_intersect_key($data, $form->all())) <= 0) {
             return;
         }
 
-        $form->bind($data);
+        $form->submit($data);
     }
 
     /**

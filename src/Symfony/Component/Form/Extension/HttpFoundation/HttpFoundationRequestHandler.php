@@ -45,7 +45,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             if ('' === $name) {
                 $data = $request->query->all();
             } else {
-                // Don't bind GET requests if the form's name does not exist
+                // Don't submit GET requests if the form's name does not exist
                 // in the request
                 if (!$request->query->has($name)) {
                     return;
@@ -70,11 +70,11 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             }
         }
 
-        // Don't auto-bind the form unless at least one field is submitted.
+        // Don't auto-submit the form unless at least one field is present.
         if ('' === $name && count(array_intersect_key($data, $form->all())) <= 0) {
             return;
         }
 
-        $form->bind($data);
+        $form->submit($data);
     }
 }

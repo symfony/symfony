@@ -244,7 +244,7 @@
             </trans-unit>
             <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
-                <target>Deze waarde is geen geldig valuta.</target>
+                <target>Deze waarde is geen geldige valuta.</target>
             </trans-unit>
         </body>
     </file>

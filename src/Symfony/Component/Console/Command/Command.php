@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Descriptor\TextDescriptor;
+use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -275,9 +277,11 @@ class Command
     /**
      * Merges the application definition with the command definition.
      *
+     * This method is not part of public API and should not be used directly.
+     *
      * @param Boolean $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      */
-    private function mergeApplicationDefinition($mergeArgs = true)
+    public function mergeApplicationDefinition($mergeArgs = true)
     {
         if (null === $this->application || (true === $this->applicationDefinitionMerged && ($this->applicationDefinitionMergedWithArgs || !$mergeArgs))) {
             return;
@@ -337,9 +341,11 @@ class Command
      * Can be overridden to provide the original command representation when it would otherwise
      * be changed by merging with the application InputDefinition.
      *
+     * This method is not part of public API and should not be used directly.
+     *
      * @return InputDefinition An InputDefinition instance
      */
-    protected function getNativeDefinition()
+    public function getNativeDefinition()
     {
         return $this->getDefinition();
     }
@@ -564,32 +570,14 @@ class Command
      * Returns a text representation of the command.
      *
      * @return string A string representing the command
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
      */
     public function asText()
     {
-        if ($this->application && !$this->applicationDefinitionMerged) {
-            $this->getSynopsis();
-            $this->mergeApplicationDefinition(false);
-        }
+        $descriptor = new TextDescriptor();
 
-        $messages = array(
-            '<comment>Usage:</comment>',
-            ' '.$this->getSynopsis(),
-            '',
-        );
-
-        if ($this->getAliases()) {
-            $messages[] = '<comment>Aliases:</comment> <info>'.implode(', ', $this->getAliases()).'</info>';
-        }
-
-        $messages[] = $this->getNativeDefinition()->asText();
-
-        if ($help = $this->getProcessedHelp()) {
-            $messages[] = '<comment>Help:</comment>';
-            $messages[] = ' '.str_replace("\n", "\n ", $help)."\n";
-        }
-
-        return implode("\n", $messages);
+        return $descriptor->describe($this);
     }
 
     /**
@@ -597,41 +585,15 @@ class Command
      *
      * @param Boolean $asDom Whether to return a DOM or an XML string
      *
-     * @return string|DOMDocument An XML string representing the command
+     * @return string|\DOMDocument An XML string representing the command
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
      */
     public function asXml($asDom = false)
     {
-        if ($this->application && !$this->applicationDefinitionMerged) {
-            $this->getSynopsis();
-            $this->mergeApplicationDefinition(false);
-        }
+        $descriptor = new XmlDescriptor();
 
-        $dom = new \DOMDocument('1.0', 'UTF-8');
-        $dom->formatOutput = true;
-        $dom->appendChild($commandXML = $dom->createElement('command'));
-        $commandXML->setAttribute('id', $this->name);
-        $commandXML->setAttribute('name', $this->name);
-
-        $commandXML->appendChild($usageXML = $dom->createElement('usage'));
-        $usageXML->appendChild($dom->createTextNode(sprintf($this->getSynopsis(), '')));
-
-        $commandXML->appendChild($descriptionXML = $dom->createElement('description'));
-        $descriptionXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $this->getDescription())));
-
-        $commandXML->appendChild($helpXML = $dom->createElement('help'));
-        $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $this->getProcessedHelp())));
-
-        $commandXML->appendChild($aliasesXML = $dom->createElement('aliases'));
-        foreach ($this->getAliases() as $alias) {
-            $aliasesXML->appendChild($aliasXML = $dom->createElement('alias'));
-            $aliasXML->appendChild($dom->createTextNode($alias));
-        }
-
-        $definition = $this->getNativeDefinition()->asXml(true);
-        $commandXML->appendChild($dom->importNode($definition->getElementsByTagName('arguments')->item(0), true));
-        $commandXML->appendChild($dom->importNode($definition->getElementsByTagName('options')->item(0), true));
-
-        return $asDom ? $dom : $dom->saveXml();
+        return $descriptor->describe($this, array('as_dom' => $asDom));
     }
 
     private function validateName($name)

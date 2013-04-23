@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Descriptor\TextDescriptor;
+use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -687,47 +689,14 @@ class Application
      * @param boolean $raw       Whether to return raw command list
      *
      * @return string A string representing the Application
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
      */
     public function asText($namespace = null, $raw = false)
     {
-        $commands = $namespace ? $this->all($this->findNamespace($namespace)) : $this->commands;
+        $descriptor = new TextDescriptor();
 
-        $width = 0;
-        foreach ($commands as $command) {
-            $width = strlen($command->getName()) > $width ? strlen($command->getName()) : $width;
-        }
-        $width += 2;
-
-        if ($raw) {
-            $messages = array();
-            foreach ($this->sortCommands($commands) as $space => $commands) {
-                foreach ($commands as $name => $command) {
-                    $messages[] = sprintf("%-${width}s %s", $name, $command->getDescription());
-                }
-            }
-
-            return implode(PHP_EOL, $messages);
-        }
-
-        $messages = array($this->getHelp(), '');
-        if ($namespace) {
-            $messages[] = sprintf("<comment>Available commands for the \"%s\" namespace:</comment>", $namespace);
-        } else {
-            $messages[] = '<comment>Available commands:</comment>';
-        }
-
-        // add commands by namespace
-        foreach ($this->sortCommands($commands) as $space => $commands) {
-            if (!$namespace && '_global' !== $space) {
-                $messages[] = '<comment>'.$space.'</comment>';
-            }
-
-            foreach ($commands as $name => $command) {
-                $messages[] = sprintf("  <info>%-${width}s</info> %s", $name, $command->getDescription());
-            }
-        }
-
-        return implode(PHP_EOL, $messages);
+        return $descriptor->describe($this, array('namespace' => $namespace, 'raw_text' => $raw));
     }
 
     /**
@@ -736,52 +705,15 @@ class Application
      * @param string  $namespace An optional namespace name
      * @param Boolean $asDom     Whether to return a DOM or an XML string
      *
-     * @return string|DOMDocument An XML string representing the Application
+     * @return string|\DOMDocument An XML string representing the Application
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
      */
     public function asXml($namespace = null, $asDom = false)
     {
-        $commands = $namespace ? $this->all($this->findNamespace($namespace)) : $this->commands;
+        $descriptor = new XmlDescriptor();
 
-        $dom = new \DOMDocument('1.0', 'UTF-8');
-        $dom->formatOutput = true;
-        $dom->appendChild($xml = $dom->createElement('symfony'));
-
-        $xml->appendChild($commandsXML = $dom->createElement('commands'));
-
-        if ($namespace) {
-            $commandsXML->setAttribute('namespace', $namespace);
-        } else {
-            $namespacesXML = $dom->createElement('namespaces');
-            $xml->appendChild($namespacesXML);
-        }
-
-        // add commands by namespace
-        foreach ($this->sortCommands($commands) as $space => $commands) {
-            if (!$namespace) {
-                $namespaceArrayXML = $dom->createElement('namespace');
-                $namespacesXML->appendChild($namespaceArrayXML);
-                $namespaceArrayXML->setAttribute('id', $space);
-            }
-
-            foreach ($commands as $name => $command) {
-                if ($name !== $command->getName()) {
-                    continue;
-                }
-
-                if (!$namespace) {
-                    $commandXML = $dom->createElement('command');
-                    $namespaceArrayXML->appendChild($commandXML);
-                    $commandXML->appendChild($dom->createTextNode($name));
-                }
-
-                $node = $command->asXml(true)->getElementsByTagName('command')->item(0);
-                $node = $dom->importNode($node, true);
-
-                $commandsXML->appendChild($node);
-            }
-        }
-
-        return $asDom ? $dom : $dom->saveXml();
+        return $descriptor->describe($this, array('namespace' => $namespace, 'as_dom' => $asDom));
     }
 
     /**
@@ -1067,33 +999,6 @@ class Application
     }
 
     /**
-     * Sorts commands in alphabetical order.
-     *
-     * @param array $commands An associative array of commands to sort
-     *
-     * @return array A sorted array of commands
-     */
-    private function sortCommands($commands)
-    {
-        $namespacedCommands = array();
-        foreach ($commands as $name => $command) {
-            $key = $this->extractNamespace($name, 1);
-            if (!$key) {
-                $key = '_global';
-            }
-
-            $namespacedCommands[$key][$name] = $command;
-        }
-        ksort($namespacedCommands);
-
-        foreach ($namespacedCommands as &$commands) {
-            ksort($commands);
-        }
-
-        return $namespacedCommands;
-    }
-
-    /**
      * Returns abbreviated suggestions in string format.
      *
      * @param array $abbrevs Abbreviated suggestions to convert
@@ -1108,12 +1013,14 @@ class Application
     /**
      * Returns the namespace part of the command name.
      *
+     * This method is not part of public API and should not be used directly.
+     *
      * @param string $name  The full name of the command
      * @param string $limit The maximum number of parts of the namespace
      *
      * @return string The namespace of the command
      */
-    private function extractNamespace($name, $limit = null)
+    public function extractNamespace($name, $limit = null)
     {
         $parts = explode(':', $name);
         array_pop($parts);

@@ -55,5 +55,4 @@ class TimeDataCollectorTest extends \PHPUnit_Framework_TestCase
         $c->collect($request, new Response());
         $this->assertEquals(123456000, $c->getStartTime());
     }
-
 }

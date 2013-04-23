@@ -32,7 +32,7 @@
 {% block collection_widget %}
 {% spaceless %}
     {% if prototype is defined %}
-        {% set attr = attr|merge({'data-prototype': form_row(prototype) }) %}
+        {% set attr = attr|merge({'data-prototype': form_row(prototype), 'data-prototype-name': prototype.vars.name }) %}
     {% endif %}
     {{ block('form_widget') }}
 {% endspaceless %}

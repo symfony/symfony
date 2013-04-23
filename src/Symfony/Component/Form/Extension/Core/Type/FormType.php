@@ -86,7 +86,7 @@ class FormType extends BaseType
         $view->vars = array_replace($view->vars, array(
             'read_only'  => $readOnly,
             'errors'     => $form->getErrors(),
-            'valid'      => $form->isBound() ? $form->isValid() : true,
+            'valid'      => $form->isSubmitted() ? $form->isValid() : true,
             'value'      => $form->getViewData(),
             'data'       => $form->getNormData(),
             'required'   => $form->isRequired(),

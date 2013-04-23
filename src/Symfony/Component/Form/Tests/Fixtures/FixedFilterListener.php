@@ -22,27 +22,27 @@ class FixedFilterListener implements EventSubscriberInterface
     public function __construct(array $mapping)
     {
         $this->mapping = array_merge(array(
-            'preBind' => array(),
-            'onBind' => array(),
+            'preSubmit' => array(),
+            'onSubmit' => array(),
             'preSetData' => array(),
         ), $mapping);
     }
 
-    public function preBind(FormEvent $event)
+    public function preSubmit(FormEvent $event)
     {
         $data = $event->getData();
 
-        if (isset($this->mapping['preBind'][$data])) {
-            $event->setData($this->mapping['preBind'][$data]);
+        if (isset($this->mapping['preSubmit'][$data])) {
+            $event->setData($this->mapping['preSubmit'][$data]);
         }
     }
 
-    public function onBind(FormEvent $event)
+    public function onSubmit(FormEvent $event)
     {
         $data = $event->getData();
 
-        if (isset($this->mapping['onBind'][$data])) {
-            $event->setData($this->mapping['onBind'][$data]);
+        if (isset($this->mapping['onSubmit'][$data])) {
+            $event->setData($this->mapping['onSubmit'][$data]);
         }
     }
 
@@ -58,8 +58,8 @@ class FixedFilterListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            FormEvents::PRE_BIND => 'preBind',
-            FormEvents::BIND => 'onBind',
+            FormEvents::PRE_SUBMIT => 'preSubmit',
+            FormEvents::SUBMIT => 'onSubmit',
             FormEvents::PRE_SET_DATA => 'preSetData',
         );
     }

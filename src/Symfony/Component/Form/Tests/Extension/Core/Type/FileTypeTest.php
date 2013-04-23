@@ -24,22 +24,22 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertSame($data, $form->getData());
     }
 
-    public function testBind()
+    public function testSubmit()
     {
         $form = $this->factory->createBuilder('file')->getForm();
         $data = $this->createUploadedFileMock('abcdef', 'original.jpg', true);
 
-        $form->bind($data);
+        $form->submit($data);
 
         $this->assertSame($data, $form->getData());
     }
 
     // https://github.com/symfony/symfony/issues/6134
-    public function testBindEmpty()
+    public function testSubmitEmpty()
     {
         $form = $this->factory->createBuilder('file')->getForm();
 
-        $form->bind(null);
+        $form->submit(null);
 
         $this->assertNull($form->getData());
     }
@@ -47,7 +47,7 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testDontPassValueToView()
     {
         $form = $this->factory->create('file');
-        $form->bind(array(
+        $form->submit(array(
             'file' => $this->createUploadedFileMock('abcdef', 'original.jpg', true),
         ));
         $view = $form->createView();

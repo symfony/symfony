@@ -30,7 +30,7 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $data);
 
         $filter = new TrimListener();
-        $filter->preBind($event);
+        $filter->preSubmit($event);
 
         $this->assertEquals('Foo!', $event->getData());
     }
@@ -42,7 +42,7 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $data);
 
         $filter = new TrimListener();
-        $filter->preBind($event);
+        $filter->preSubmit($event);
 
         $this->assertSame(1234, $event->getData());
     }
@@ -63,7 +63,7 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $data);
 
         $filter = new TrimListener();
-        $filter->preBind($event);
+        $filter->preSubmit($event);
 
         $this->assertSame("ab\ncd", $event->getData(), 'TrimListener should trim character(s): '.implode(', ', $chars));
     }

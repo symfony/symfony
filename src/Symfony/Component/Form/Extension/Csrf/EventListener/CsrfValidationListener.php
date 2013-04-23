@@ -47,7 +47,7 @@ class CsrfValidationListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            FormEvents::PRE_BIND => 'preBind',
+            FormEvents::PRE_SUBMIT => 'preSubmit',
         );
     }
 
@@ -58,7 +58,7 @@ class CsrfValidationListener implements EventSubscriberInterface
         $this->intention = $intention;
     }
 
-    public function preBind(FormEvent $event)
+    public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -74,5 +74,16 @@ class CsrfValidationListener implements EventSubscriberInterface
         }
 
         $event->setData($data);
+    }
+
+    /**
+     * Alias of {@link preSubmit()}.
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link preSubmit()} instead.
+     */
+    public function preBind(FormEvent $event)
+    {
+        $this->preSubmit($event);
     }
 }

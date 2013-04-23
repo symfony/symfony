@@ -125,7 +125,7 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     {
         $input = array('first' => 'foo', 'second' => 'bar');
 
-        $this->form->bind($input);
+        $this->form->submit($input);
 
         $this->assertEquals('foo', $this->form['first']->getViewData());
         $this->assertEquals('bar', $this->form['second']->getViewData());
@@ -138,7 +138,7 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     {
         $input = array('first' => 'foo', 'second' => 'foo');
 
-        $this->form->bind($input);
+        $this->form->submit($input);
 
         $this->assertEquals('foo', $this->form['first']->getViewData());
         $this->assertEquals('foo', $this->form['second']->getViewData());

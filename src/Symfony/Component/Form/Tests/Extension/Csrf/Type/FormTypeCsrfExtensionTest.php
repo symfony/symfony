@@ -140,7 +140,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     /**
      * @dataProvider provideBoolean
      */
-    public function testValidateTokenOnBindIfRootAndCompound($valid)
+    public function testValidateTokenOnSubmitIfRootAndCompound($valid)
     {
         $this->csrfProvider->expects($this->once())
             ->method('isCsrfTokenValid')
@@ -157,7 +157,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->add('child', 'text')
             ->getForm();
 
-        $form->bind(array(
+        $form->submit(array(
             'child' => 'foobar',
             'csrf' => 'token',
         ));
@@ -184,7 +184,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->add('child', 'text')
             ->getForm();
 
-        $form->bind(array(
+        $form->submit(array(
             'child' => 'foobar',
             // token is missing
         ));
@@ -214,7 +214,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->getForm()
             ->get('form');
 
-        $form->bind(array(
+        $form->submit(array(
             'child' => 'foobar',
             'csrf' => 'token',
         ));
@@ -233,7 +233,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
                 'compound' => false,
             ));
 
-        $form->bind(array(
+        $form->submit(array(
             'csrf' => 'token',
         ));
     }

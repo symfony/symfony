@@ -12,11 +12,11 @@
 namespace Symfony\Component\Form\Exception;
 
 /**
- * Alias of {@link AlreadySubmittedException}.
+ * Thrown when an operation is called that is not acceptable after submitting
+ * a form.
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link AlreadySubmittedException} instead.
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class AlreadyBoundException extends LogicException
+class AlreadySubmittedException extends AlreadyBoundException
 {
 }

@@ -67,7 +67,7 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
         $this->assertTrue(is_callable($form->getConfig()->getOption('validation_groups')));
     }
 
-    public function testBindValidatesData()
+    public function testSubmitValidatesData()
     {
         $builder = $this->factory->createBuilder('form', null, array(
             'validation_groups' => 'group',
@@ -80,6 +80,6 @@ class FormTypeValidatorExtensionTest extends TypeTestCase
             ->with($this->equalTo($form));
 
         // specific data is irrelevant
-        $form->bind(array());
+        $form->submit(array());
     }
 }

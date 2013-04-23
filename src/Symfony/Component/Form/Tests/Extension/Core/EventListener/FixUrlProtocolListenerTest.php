@@ -30,7 +30,7 @@ class FixUrlProtocolListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $data);
 
         $filter = new FixUrlProtocolListener('http');
-        $filter->onBind($event);
+        $filter->onSubmit($event);
 
         $this->assertEquals('http://www.symfony.com', $event->getData());
     }
@@ -42,7 +42,7 @@ class FixUrlProtocolListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $data);
 
         $filter = new FixUrlProtocolListener('http');
-        $filter->onBind($event);
+        $filter->onSubmit($event);
 
         $this->assertEquals('http://www.symfony.com', $event->getData());
     }
@@ -54,7 +54,7 @@ class FixUrlProtocolListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $data);
 
         $filter = new FixUrlProtocolListener('http');
-        $filter->onBind($event);
+        $filter->onSubmit($event);
 
         $this->assertEquals('ftp://www.symfony.com', $event->getData());
     }

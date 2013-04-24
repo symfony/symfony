@@ -139,4 +139,42 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             $this->assertSame("'%path%' 'foo \" bar'", $proc->getCommandLine());
         }
     }
+
+    public function testShouldEscapeArgumentsAndPrefix()
+    {
+        $pb = new ProcessBuilder(array('arg'));
+        $pb->setPrefix('%prefix%');
+        $proc = $pb->getProcess();
+
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->assertSame('^%"prefix"^% "arg"', $proc->getCommandLine());
+        } else {
+            $this->assertSame("'%prefix%' 'arg'", $proc->getCommandLine());
+        }
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
+     */
+    public function testShouldThrowALogicExceptionIfNoPrefixAndNoArgument()
+    {
+        ProcessBuilder::create()->getProcess();
+    }
+
+    public function testShouldNotThrowALogicExceptionIfNoArgument()
+    {
+        $process = ProcessBuilder::create()
+            ->setPrefix('/usr/bin/php')
+            ->getProcess();
+
+        $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
+    }
+
+    public function testShouldNotThrowALogicExceptionIfNoPrefix()
+    {
+        $process = ProcessBuilder::create(array('/usr/bin/php'))
+            ->getProcess();
+
+        $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
+    }
 }

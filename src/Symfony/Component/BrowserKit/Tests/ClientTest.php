@@ -17,6 +17,10 @@ use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\BrowserKit\Response;
 
+class SpecialResponse extends Response
+{
+}
+
 class TestClient extends Client
 {
     protected $nextResponse = null;
@@ -40,6 +44,15 @@ class TestClient extends Client
 
         $response = $this->nextResponse;
         $this->nextResponse = null;
+
+        return $response;
+    }
+
+    protected function filterResponse($response)
+    {
+        if ($response instanceof SpecialResponse) {
+            return new Response($response->getContent(), $response->getStatus(), $response->getHeaders());
+        }
 
         return $response;
     }
@@ -100,6 +113,21 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->request('GET', 'http://example.com/');
 
         $this->assertEquals('foo', $client->getResponse()->getContent(), '->getCrawler() returns the Response of the last request');
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getResponse(), '->getCrawler() returns the Response of the last request');
+    }
+
+    /**
+     * @covers Symfony\Component\BrowserKit\Client::getResponse
+     */
+    public function testgetOriginResponse()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new SpecialResponse('foo'));
+        $client->request('GET', 'http://example.com/');
+
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getResponse());
+        $this->assertNotInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getResponse());
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getOriginResponse());
     }
 
     public function testGetContent()

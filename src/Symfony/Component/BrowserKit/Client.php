@@ -33,7 +33,9 @@ abstract class Client
     protected $history;
     protected $cookieJar;
     protected $server;
+    protected $originRequest;
     protected $request;
+    protected $originResponse;
     protected $response;
     protected $crawler;
     protected $insulated;
@@ -178,6 +180,19 @@ abstract class Client
     }
 
     /**
+     * Returns the origin response instance.
+     *
+     * The origin response is the response instance that is returned
+     * by the code that handles requests.
+     *
+     * @return object A response instance
+     */
+    public function getOriginResponse()
+    {
+        return $this->originResponse;
+    }
+
+    /**
      * Returns the current Request instance.
      *
      * @return Request A Request instance
@@ -187,6 +202,19 @@ abstract class Client
     public function getRequest()
     {
         return $this->request;
+    }
+
+    /**
+     * Returns the origin Request instance.
+     *
+     * The origin request is the request instance that is sent
+     * to the code that handles requests.
+     *
+     * @return object A Request instance
+     */
+    public function getOriginRequest()
+    {
+        return $this->originRequest;
     }
 
     /**
@@ -250,39 +278,39 @@ abstract class Client
         $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
-        $request = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
+        $this->request = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
 
-        $this->request = $this->filterRequest($request);
+        $this->originRequest = $this->filterRequest($this->request);
 
         if (true === $changeHistory) {
-            $this->history->add($request);
+            $this->history->add($this->request);
         }
 
         if ($this->insulated) {
-            $this->response = $this->doRequestInProcess($this->request);
+            $this->originResponse = $this->doRequestInProcess($this->originRequest);
         } else {
-            $this->response = $this->doRequest($this->request);
+            $this->originResponse = $this->doRequest($this->originRequest);
         }
 
-        $response = $this->filterResponse($this->response);
+        $this->response = $this->filterResponse($this->originResponse);
 
-        $this->cookieJar->updateFromResponse($response, $uri);
+        $this->cookieJar->updateFromResponse($this->response, $uri);
 
-        $this->redirect = $response->getHeader('Location');
+        $this->redirect = $this->response->getHeader('Location');
 
         if ($this->followRedirects && $this->redirect) {
             return $this->crawler = $this->followRedirect();
         }
 
-        return $this->crawler = $this->createCrawlerFromContent($request->getUri(), $response->getContent(), $response->getHeader('Content-Type'));
+        return $this->crawler = $this->createCrawlerFromContent($this->request->getUri(), $this->response->getContent(), $this->response->getHeader('Content-Type'));
     }
 
     /**
      * Makes a request in another process.
      *
-     * @param Request $request A Request instance
+     * @param object $request An origin request instance
      *
-     * @return Response A Response instance
+     * @return object An origin response instance
      *
      * @throws \RuntimeException When processing returns exit code
      */
@@ -302,9 +330,9 @@ abstract class Client
     /**
      * Makes a request.
      *
-     * @param Request $request A Request instance
+     * @param object $request An origin request instance
      *
-     * @return Response A Response instance
+     * @return object An origin response instance
      */
     abstract protected function doRequest($request);
 

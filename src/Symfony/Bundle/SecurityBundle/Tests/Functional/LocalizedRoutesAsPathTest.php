@@ -27,11 +27,11 @@ class LocalizedRoutesAsPathTest extends WebTestCase
         $form['_password'] = 'test';
         $client->submit($form);
 
-        $this->assertRedirect($client->getResponse(), '/'.$locale.'/profile');
+        $this->assertRedirect($client->getOriginResponse(), '/'.$locale.'/profile');
         $this->assertEquals('Profile', $client->followRedirect()->text());
 
         $client->request('GET', '/'.$locale.'/logout');
-        $this->assertRedirect($client->getResponse(), '/'.$locale.'/');
+        $this->assertRedirect($client->getOriginResponse(), '/'.$locale.'/');
         $this->assertEquals('Homepage', $client->followRedirect()->text());
     }
 
@@ -49,7 +49,7 @@ class LocalizedRoutesAsPathTest extends WebTestCase
         $form['_password'] = 'foobar';
         $client->submit($form);
 
-        $this->assertRedirect($client->getResponse(), '/'.$locale.'/login');
+        $this->assertRedirect($client->getOriginResponse(), '/'.$locale.'/login');
     }
 
     /**
@@ -61,7 +61,7 @@ class LocalizedRoutesAsPathTest extends WebTestCase
         $client->insulate();
 
         $client->request('GET', '/'.$locale.'/secure/');
-        $this->assertRedirect($client->getResponse(), '/'.$locale.'/login');
+        $this->assertRedirect($client->getOriginResponse(), '/'.$locale.'/login');
     }
 
     /**
@@ -73,7 +73,7 @@ class LocalizedRoutesAsPathTest extends WebTestCase
         $client->insulate();
 
         $crawler = $client->request('GET', '/'.$locale.'/secure/');
-        $this->assertCount(1, $crawler->selectButton('login'), (string) $client->getResponse());
+        $this->assertCount(1, $crawler->selectButton('login'), (string) $client->getOriginResponse());
     }
 
     public function getLocales()

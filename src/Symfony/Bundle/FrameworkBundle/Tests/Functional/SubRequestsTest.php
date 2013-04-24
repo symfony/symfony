@@ -21,6 +21,6 @@ class SubRequestsTest extends WebTestCase
         $client = $this->createClient(array('test_case' => 'Session', 'root_config' => 'config.yml'));
         $client->request('GET', 'https://localhost/subrequest/en');
 
-        $this->assertEquals('--fr/json--en/html--fr/json--http://localhost/subrequest/fragment/en', $client->getResponse()->getContent());
+        $this->assertEquals('--fr/json--en/html--fr/json--http://localhost/subrequest/fragment/en', $client->getOriginResponse()->getContent());
     }
 }

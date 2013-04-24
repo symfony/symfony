@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\BrowserKit\Client as BaseClient;
 use Symfony\Component\BrowserKit\Request as DomRequest;
 use Symfony\Component\BrowserKit\Response as DomResponse;
@@ -47,6 +48,26 @@ class Client extends BaseClient
         parent::__construct($server, $history, $cookieJar);
 
         $this->followRedirects = false;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return Request A Request instance
+     */
+    public function getOriginRequest()
+    {
+        return parent::getOriginRequest();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return Response A Response instance
+     */
+    public function getOriginResponse()
+    {
+        return parent::getOriginResponse();
     }
 
     /**

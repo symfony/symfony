@@ -94,7 +94,11 @@ class Translator implements TranslatorInterface
     {
         $this->resources[$locale][] = array($format, $resource, $domain);
 
-        unset($this->catalogues[$locale]);
+        if(in_array($locale, $this->fallbackLocales)) {
+            $this->catalogues = array();
+        } else {
+            unset($this->catalogues[$locale]);
+        }
     }
 
     /**

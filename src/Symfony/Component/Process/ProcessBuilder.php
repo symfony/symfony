@@ -154,14 +154,14 @@ class ProcessBuilder
 
     public function getProcess()
     {
-        if (!count($this->arguments)) {
+        if (!$this->prefix && !count($this->arguments)) {
             throw new LogicException('You must add() command arguments before calling getProcess().');
         }
 
         $options = $this->options;
 
-        $script = ($this->prefix ? escapeshellarg($this->prefix) . ' ' : '')
-            .implode(' ', array_map(array(__NAMESPACE__.'\\ProcessUtils', 'escapeArgument'), $this->arguments));
+        $arguments = $this->prefix ? array_merge(array($this->prefix), $this->arguments) : $this->arguments;
+        $script = implode(' ', array_map(array(__NAMESPACE__.'\\ProcessUtils', 'escapeArgument'), $arguments));
 
         if ($this->inheritEnv) {
             $env = $this->env ? $this->env + $_ENV : null;

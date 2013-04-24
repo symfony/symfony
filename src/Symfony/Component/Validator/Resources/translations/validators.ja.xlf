@@ -242,6 +242,10 @@
                 <source>This value is not a valid ISSN.</source>
                 <target>有効なISSNコードではありません。</target>
             </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>有効な貨幣ではありません。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

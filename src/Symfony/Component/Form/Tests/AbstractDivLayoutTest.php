@@ -291,6 +291,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
+    [@data-form-widget="collection"]
     [
         ./div[./input[@type="text"][@value="a"]]
         /following-sibling::div[./input[@type="text"][@value="b"]]
@@ -331,6 +332,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
+    [@data-form-widget="collection"]
     [./input[@type="hidden"][@id="name__token"]]
     [count(./div)=0]
 '

@@ -199,6 +199,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
+    [@data-form-widget="collection"]
     [
         ./tr[./td/input[@type="text"][@value="a"]]
         /following-sibling::tr[./td/input[@type="text"][@value="b"]]
@@ -217,9 +218,34 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/table
+    [@data-form-widget="collection"]
     [./tr[@style="display: none"][./td[@colspan="2"]/input[@type="hidden"][@id="name__token"]]]
     [count(./tr[./td/input])=1]
 '
+        );
+    }
+
+    public function testCollectionPrototype()
+    {
+        $form = $this->factory->createNamedBuilder('name', 'form', array('items' => array('one', 'two', 'three')))
+            ->add('items', 'collection', array(
+                'allow_add' => true,
+                'allow_delete' => true,
+                'prototype_name' => '__item__'
+            ))
+            ->getForm()
+            ->createView();
+
+        $html = $this->renderWidget($form);
+
+        $this->assertMatchesXpath($html,
+            '//table[@id="name_items"]
+                [@data-form-widget="collection"]
+                [@id="name_items"]
+                [@data-prototype-name="__item__"]
+                [@data-prototype]
+                [@data-collection-allow-add="1"]
+                [@data-collection-allow-delete="1"]'
         );
     }
 

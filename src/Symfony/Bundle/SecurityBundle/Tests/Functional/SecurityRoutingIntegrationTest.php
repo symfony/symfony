@@ -22,7 +22,7 @@ class SecurityRoutingIntegrationTest extends WebTestCase
         $client->insulate();
         $client->request('GET', '/protected_resource');
 
-        $this->assertRedirect($client->getOriginResponse(), '/login');
+        $this->assertRedirect($client->getResponse(), '/login');
     }
 
     /**
@@ -38,7 +38,7 @@ class SecurityRoutingIntegrationTest extends WebTestCase
         $client->insulate();
         $client->request('GET', '/unprotected_resource');
 
-        $this->assertEquals(404, $client->getOriginResponse()->getStatusCode(), (string) $client->getOriginResponse());
+        $this->assertEquals(404, $client->getResponse()->getStatusCode(), (string) $client->getResponse());
     }
 
     /**
@@ -60,7 +60,7 @@ class SecurityRoutingIntegrationTest extends WebTestCase
 
         $client->request('GET', '/highly_protected_resource');
 
-        $this->assertNotEquals(404, $client->getOriginResponse()->getStatusCode());
+        $this->assertNotEquals(404, $client->getResponse()->getStatusCode());
     }
 
     /**
@@ -93,12 +93,12 @@ class SecurityRoutingIntegrationTest extends WebTestCase
 
     private function assertAllowed($client, $path) {
         $client->request('GET', $path);
-        $this->assertEquals(404, $client->getOriginResponse()->getStatusCode());
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 
     private function assertRestricted($client, $path) {
         $client->request('GET', $path);
-        $this->assertEquals(302, $client->getOriginResponse()->getStatusCode());
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
     public function getConfigs()

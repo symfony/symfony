@@ -29,7 +29,7 @@ class FormLoginTest extends WebTestCase
         $form['_password'] = 'test';
         $client->submit($form);
 
-        $this->assertRedirect($client->getOriginResponse(), '/profile');
+        $this->assertRedirect($client->getResponse(), '/profile');
 
         $text = $client->followRedirect()->text();
         $this->assertContains('Hello johannes!', $text);
@@ -50,7 +50,7 @@ class FormLoginTest extends WebTestCase
         $form['_target_path'] = '/foo';
         $client->submit($form);
 
-        $this->assertRedirect($client->getOriginResponse(), '/foo');
+        $this->assertRedirect($client->getResponse(), '/foo');
 
         $text = $client->followRedirect()->text();
         $this->assertContains('Hello johannes!', $text);
@@ -66,13 +66,13 @@ class FormLoginTest extends WebTestCase
         $client->insulate();
 
         $client->request('GET', '/protected_resource');
-        $this->assertRedirect($client->getOriginResponse(), '/login');
+        $this->assertRedirect($client->getResponse(), '/login');
 
         $form = $client->followRedirect()->selectButton('login')->form();
         $form['_username'] = 'johannes';
         $form['_password'] = 'test';
         $client->submit($form);
-        $this->assertRedirect($client->getOriginResponse(), '/protected_resource');
+        $this->assertRedirect($client->getResponse(), '/protected_resource');
 
         $text = $client->followRedirect()->text();
         $this->assertContains('Hello johannes!', $text);

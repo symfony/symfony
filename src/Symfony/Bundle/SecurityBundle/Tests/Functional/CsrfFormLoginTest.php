@@ -29,7 +29,7 @@ class CsrfFormLoginTest extends WebTestCase
         $form['user_login[password]'] = 'test';
         $client->submit($form);
 
-        $this->assertRedirect($client->getOriginResponse(), '/profile');
+        $this->assertRedirect($client->getResponse(), '/profile');
 
         $crawler = $client->followRedirect();
 
@@ -44,7 +44,7 @@ class CsrfFormLoginTest extends WebTestCase
 
         $client->click($logoutLinks[0]);
 
-        $this->assertRedirect($client->getOriginResponse(), '/');
+        $this->assertRedirect($client->getResponse(), '/');
     }
 
     /**
@@ -59,7 +59,7 @@ class CsrfFormLoginTest extends WebTestCase
         $form['user_login[_token]'] = '';
         $client->submit($form);
 
-        $this->assertRedirect($client->getOriginResponse(), '/login');
+        $this->assertRedirect($client->getResponse(), '/login');
 
         $text = $client->followRedirect()->text();
         $this->assertContains('Invalid CSRF token.', $text);
@@ -79,7 +79,7 @@ class CsrfFormLoginTest extends WebTestCase
         $form['user_login[_target_path]'] = '/foo';
         $client->submit($form);
 
-        $this->assertRedirect($client->getOriginResponse(), '/foo');
+        $this->assertRedirect($client->getResponse(), '/foo');
 
         $text = $client->followRedirect()->text();
         $this->assertContains('Hello johannes!', $text);
@@ -95,13 +95,13 @@ class CsrfFormLoginTest extends WebTestCase
         $client->insulate();
 
         $client->request('GET', '/protected-resource');
-        $this->assertRedirect($client->getOriginResponse(), '/login');
+        $this->assertRedirect($client->getResponse(), '/login');
 
         $form = $client->followRedirect()->selectButton('login')->form();
         $form['user_login[username]'] = 'johannes';
         $form['user_login[password]'] = 'test';
         $client->submit($form);
-        $this->assertRedirect($client->getOriginResponse(), '/protected-resource');
+        $this->assertRedirect($client->getResponse(), '/protected-resource');
 
         $text = $client->followRedirect()->text();
         $this->assertContains('Hello johannes!', $text);

@@ -35,17 +35,17 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $client->request('GET', '/');
         $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Request', $client->getRequest());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Request', $client->getOriginRequest());
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getResponse());
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $client->getOriginResponse());
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Request', $client->getInternalRequest());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Request', $client->getRequest());
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getInternalResponse());
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $client->getResponse());
 
         $client->request('GET', 'http://www.example.com/');
         $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
-        $this->assertEquals('www.example.com', $client->getOriginRequest()->getHost(), '->doRequest() uses the request handler to make the request');
+        $this->assertEquals('www.example.com', $client->getRequest()->getHost(), '->doRequest() uses the request handler to make the request');
 
         $client->request('GET', 'http://www.example.com/?parameter=http://google.com');
-        $this->assertEquals('http://www.example.com/?parameter='.urlencode('http://google.com'), $client->getOriginRequest()->getUri(), '->doRequest() uses the request handler to make the request');
+        $this->assertEquals('http://www.example.com/?parameter='.urlencode('http://google.com'), $client->getRequest()->getUri(), '->doRequest() uses the request handler to make the request');
     }
 
     public function testGetScript()
@@ -124,7 +124,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         foreach ($files as $file) {
             $client->request('POST', '/', array(), array('foo' => $file));
 
-            $files = $client->getOriginRequest()->files->all();
+            $files = $client->getRequest()->files->all();
 
             $this->assertCount(1, $files);
 
@@ -163,7 +163,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $client->request('POST', '/', array(), array($file));
 
-        $files = $client->getOriginRequest()->files->all();
+        $files = $client->getRequest()->files->all();
 
         $this->assertCount(1, $files);
 

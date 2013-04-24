@@ -33,9 +33,9 @@ abstract class Client
     protected $history;
     protected $cookieJar;
     protected $server;
-    protected $originRequest;
+    protected $internalRequest;
     protected $request;
-    protected $originResponse;
+    protected $internalResponse;
     protected $response;
     protected $crawler;
     protected $insulated;
@@ -174,9 +174,9 @@ abstract class Client
      *
      * @api
      */
-    public function getResponse()
+    public function getInternalResponse()
     {
-        return $this->response;
+        return $this->internalResponse;
     }
 
     /**
@@ -186,10 +186,12 @@ abstract class Client
      * by the code that handles requests.
      *
      * @return object A response instance
+     *
+     * @api
      */
-    public function getOriginResponse()
+    public function getResponse()
     {
-        return $this->originResponse;
+        return $this->response;
     }
 
     /**
@@ -199,9 +201,9 @@ abstract class Client
      *
      * @api
      */
-    public function getRequest()
+    public function getInternalRequest()
     {
-        return $this->request;
+        return $this->internalRequest;
     }
 
     /**
@@ -210,11 +212,13 @@ abstract class Client
      * The origin request is the request instance that is sent
      * to the code that handles requests.
      *
+     * @api
+     *
      * @return object A Request instance
      */
-    public function getOriginRequest()
+    public function getRequest()
     {
-        return $this->originRequest;
+        return $this->request;
     }
 
     /**
@@ -278,31 +282,31 @@ abstract class Client
         $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
-        $this->request = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
+        $this->internalRequest = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
 
-        $this->originRequest = $this->filterRequest($this->request);
+        $this->request = $this->filterRequest($this->internalRequest);
 
         if (true === $changeHistory) {
-            $this->history->add($this->request);
+            $this->history->add($this->internalRequest);
         }
 
         if ($this->insulated) {
-            $this->originResponse = $this->doRequestInProcess($this->originRequest);
+            $this->response = $this->doRequestInProcess($this->request);
         } else {
-            $this->originResponse = $this->doRequest($this->originRequest);
+            $this->response = $this->doRequest($this->request);
         }
 
-        $this->response = $this->filterResponse($this->originResponse);
+        $this->internalResponse = $this->filterResponse($this->response);
 
-        $this->cookieJar->updateFromResponse($this->response, $uri);
+        $this->cookieJar->updateFromResponse($this->internalResponse, $uri);
 
-        $this->redirect = $this->response->getHeader('Location');
+        $this->redirect = $this->internalResponse->getHeader('Location');
 
         if ($this->followRedirects && $this->redirect) {
             return $this->crawler = $this->followRedirect();
         }
 
-        return $this->crawler = $this->createCrawlerFromContent($this->request->getUri(), $this->response->getContent(), $this->response->getHeader('Content-Type'));
+        return $this->crawler = $this->createCrawlerFromContent($this->internalRequest->getUri(), $this->internalResponse->getContent(), $this->internalResponse->getHeader('Content-Type'));
     }
 
     /**

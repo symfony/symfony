@@ -188,27 +188,7 @@ DomCrawler
 BrowserKit
 ----------
 
- * The `Symfony\Component\BrowserKit\Client::getResponse()` method now
-   **always** returns a `Symfony\Component\BrowserKit\Response` instance. To
-   get the response from the code that handled the request, use the new
-   `getOriginResponse()` method instead of `getResponse()`.
-
- * The `Symfony\Component\BrowserKit\Client::getRequest()` method now
-   **always** returns a `Symfony\Component\BrowserKit\Request` instance. To
-   get the response from the code that handled the request, use the new
-   `getOriginRequest()` method instead of `getRequest()`.
-
-HttpKernel
-----------
-
- * The `Symfony\Component\HttpKernel\Client::getResponse()` now returns a
-   `Symfony\Component\BrowserKit\Response` instance instead of a
-   `Symfony\Component\HttpFoundation\Response` one (because of a change in
-   BrowserKit -- see above). You can still get the `HttpFoundation` response
-   by using `getOriginResponse()` instead of `getResponse()`.
-
-  * The `Symfony\Component\HttpKernel\Client::getRequest()` now returns a
-    `Symfony\Component\BrowserKit\Request` instance instead of a
-    `Symfony\Component\HttpFoundation\Request` one (because of a change in
-    BrowserKit -- see above). You can still get the `HttpFoundation` response
-    by using `getOriginRequest()` instead of `getRequest()`.
+ * The `Symfony\Component\BrowserKit\Client::getResponse()/getRequest()`
+   methods now **always** return the request/response instance from the code
+   that handles the request. To get the BrowserKit request/response instances,
+   use the new `getInternalResponse()/getInternalRequest()` methods.

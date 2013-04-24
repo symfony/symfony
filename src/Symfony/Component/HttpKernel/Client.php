@@ -55,9 +55,9 @@ class Client extends BaseClient
      *
      * @return Request A Request instance
      */
-    public function getOriginRequest()
+    public function getRequest()
     {
-        return parent::getOriginRequest();
+        return parent::getRequest();
     }
 
     /**
@@ -65,9 +65,9 @@ class Client extends BaseClient
      *
      * @return Response A Response instance
      */
-    public function getOriginResponse()
+    public function getResponse()
     {
-        return parent::getOriginResponse();
+        return parent::getResponse();
     }
 
     /**

@@ -19,6 +19,6 @@ class AuthenticationCommencingTest extends WebTestCase
         $client->insulate();
 
         $client->request('GET', '/secure-but-not-covered-by-access-control');
-        $this->assertRedirect($client->getOriginResponse(), '/login');
+        $this->assertRedirect($client->getResponse(), '/login');
     }
 }

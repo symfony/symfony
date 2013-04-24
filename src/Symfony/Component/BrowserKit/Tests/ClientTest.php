@@ -103,9 +103,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://example.com/', $client->getRequest()->getUri(), '->getCrawler() returns the Request of the last request');
     }
 
-    /**
-     * @covers Symfony\Component\BrowserKit\Client::getResponse
-     */
     public function testGetResponse()
     {
         $client = new TestClient();
@@ -116,18 +113,15 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getResponse(), '->getCrawler() returns the Response of the last request');
     }
 
-    /**
-     * @covers Symfony\Component\BrowserKit\Client::getResponse
-     */
-    public function testgetOriginResponse()
+    public function testGetInternalResponse()
     {
         $client = new TestClient();
         $client->setNextResponse(new SpecialResponse('foo'));
         $client->request('GET', 'http://example.com/');
 
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getResponse());
-        $this->assertNotInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getResponse());
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getOriginResponse());
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getInternalResponse());
+        $this->assertNotInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getInternalResponse());
+        $this->assertInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getResponse());
     }
 
     public function testGetContent()

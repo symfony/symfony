@@ -251,7 +251,10 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $listener = new TestWithDispatcher();
         $this->dispatcher->addListener('test', array($listener, 'foo'));
+        $this->assertNull($listener->name);
+        $this->assertNull($listener->dispatcher);
         $this->dispatcher->dispatch('test');
+        $this->assertEquals('test', $listener->name);
         $this->assertSame($this->dispatcher, $listener->dispatcher);
     }
 
@@ -301,10 +304,12 @@ class TestEventListener
 
 class TestWithDispatcher
 {
+    public $name;
     public $dispatcher;
 
-    public function foo(Event $e, $dispatcher)
+    public function foo(Event $e, $name, $dispatcher)
     {
+        $this->name = $name;
         $this->dispatcher = $dispatcher;
     }
 }

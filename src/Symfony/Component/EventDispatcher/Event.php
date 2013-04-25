@@ -104,6 +104,8 @@ class Event
      *
      * @return string
      *
+     * @deprecated since 2.3 remove in 3.0
+     *
      * @api
      */
     public function getName()
@@ -115,6 +117,8 @@ class Event
      * Sets the event's name property.
      *
      * @param string $name The event name.
+     *
+     * @deprecated since 2.3 remove in 3.0
      *
      * @api
      */

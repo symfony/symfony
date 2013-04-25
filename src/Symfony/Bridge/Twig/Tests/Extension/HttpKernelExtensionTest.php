@@ -20,6 +20,8 @@ class HttpKernelExtensionTest extends TestCase
 {
     protected function setUp()
     {
+        parent::setUp();
+
         if (!class_exists('Symfony\Component\HttpKernel\HttpKernel')) {
             $this->markTestSkipped('The "HttpKernel" component is not available');
         }

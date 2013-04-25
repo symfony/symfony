@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * added `Client::getInternalRequest()` and `Client::getInternalResponse()` to
+   have access to the BrowserKit internal request and response objects
+
 2.1.0
 -----
 

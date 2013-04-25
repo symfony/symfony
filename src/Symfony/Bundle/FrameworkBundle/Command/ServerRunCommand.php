@@ -96,7 +96,7 @@ EOF
         $builder->setWorkingDirectory($input->getOption('docroot'));
         $builder->setTimeout(null);
         $builder->getProcess()->run(function ($type, $buffer) use ($output) {
-            if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) {
+            if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $output->write($buffer);
             }
         });

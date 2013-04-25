@@ -434,13 +434,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Gets a service.
      *
      * @param string  $id              The service identifier
-     * @param int     $invalidBehavior The behavior when the service does not exist
+     * @param integer $invalidBehavior The behavior when the service does not exist
      *
-     * @throws InvalidArgumentException
-     * @throws InactiveScopeException
-     * @throws LogicException
-     * @throws \Exception
      * @return object The associated service
+     *
+     * @throws InvalidArgumentException when no definitions are available
+     * @throws InactiveScopeException   when the current scope is not active
+     * @throws LogicException           when a circular dependency is detected
+     * @throws \Exception
      *
      * @see Reference
      *

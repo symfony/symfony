@@ -58,8 +58,8 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form->expects($this->once())
-            ->method('Submit')
-            ->with('DATA');
+            ->method('submit')
+            ->with('DATA', 'PATCH' !== $method);
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -78,7 +78,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form->expects($this->never())
-            ->method('Submit');
+            ->method('submit');
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -95,8 +95,8 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form->expects($this->once())
-            ->method('Submit')
-            ->with($this->identicalTo(null));
+            ->method('submit')
+            ->with($this->identicalTo(null), 'PATCH' !== $method);
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -113,8 +113,8 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form->expects($this->once())
-            ->method('Submit')
-            ->with($this->identicalTo(array()));
+            ->method('submit')
+            ->with($this->identicalTo(array()), 'PATCH' !== $method);
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -128,7 +128,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form->expects($this->never())
-            ->method('Submit');
+            ->method('submit');
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -152,8 +152,8 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form->expects($this->once())
-            ->method('Submit')
-            ->with($requestData);
+            ->method('submit')
+            ->with($requestData, 'PATCH' !== $method);
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -176,7 +176,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form->expects($this->never())
-            ->method('Submit');
+            ->method('submit');
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -200,11 +200,11 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form->expects($this->once())
-            ->method('Submit')
+            ->method('submit')
             ->with(array(
                 'field1' => 'DATA',
                 'field2' => $file,
-            ));
+            ), 'PATCH' !== $method);
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -224,8 +224,8 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form->expects($this->once())
-            ->method('Submit')
-            ->with('DATA');
+            ->method('submit')
+            ->with('DATA', 'PATCH' !== $method);
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -245,8 +245,8 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         ));
 
         $form->expects($this->once())
-            ->method('Submit')
-            ->with($file);
+            ->method('submit')
+            ->with($file, 'PATCH' !== $method);
 
         $this->requestHandler->handleRequest($form, $this->request);
     }

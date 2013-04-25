@@ -85,7 +85,7 @@ class Client extends BaseClient
     }
 
     /**
-     * Makes a request.
+     * {@inheritdoc}
      *
      * @param Request $request A Request instance
      *
@@ -113,6 +113,10 @@ class Client extends BaseClient
 
     /**
      * {@inheritdoc}
+     *
+     * @param Request $request A Request instance
+     *
+     * @return Response A Response instance
      */
     protected function doRequestInProcess($request)
     {

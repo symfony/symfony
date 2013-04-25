@@ -176,7 +176,7 @@ class PhpDumper extends Dumper
         }
 
         $methodName = 'get' . Container::camelize($id) . 'Service';
-        $proxyClass = str_replace('\\', '', $definition->getClass()) . '_' . md5(spl_object_hash($definition));
+        $proxyClass = str_replace('\\', '', $definition->getClass()) . '_' . spl_object_hash($definition);
 
         return <<<EOF
         if (\$lazyLoad) {
@@ -204,15 +204,16 @@ EOF;
      */
     private function addProxyClasses()
     {
-        $proxyDefinitions = array_filter(
-            $this->container->getDefinitions(),
-            function (Definition $definition) {
-                return $definition->isLazy() && $definition->getClass();
+        $proxyDefinitions = array();
+
+        foreach ($this->container->getDefinitions() as $definition) {
+            if ($this->isProxyCandidate($definition)) {
+                $proxyDefinitions[] = $definition;
             }
-        );
+        }
 
         // avoids hard dependency to ProxyManager
-        if (empty($proxyDefinitions) || !class_exists('ProxyManager\\GeneratorStrategy\\BaseGeneratorStrategy')) {
+        if (empty($proxyDefinitions)) {
             return '';
         }
 
@@ -365,13 +366,13 @@ EOF;
             throw new InvalidArgumentException(sprintf('"%s" is not a valid class name for the "%s" service.', $class, $id));
         }
 
-        $simple = $this->isSimpleInstance($id, $definition);
+        $simple           = $this->isSimpleInstance($id, $definition);
+        $isProxyCandidate = $this->isProxyCandidate($definition);
+        $instantiation    = '';
 
-        $instantiation = '';
-
-        if (!$this->isProxyCandidate($definition) && ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
+        if (!$isProxyCandidate && ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
             $instantiation = "\$this->services['$id'] = ".($simple ? '' : '$instance');
-        } elseif (!$this->isProxyCandidate($definition) && ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+        } elseif (!$isProxyCandidate && ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
             $instantiation = "\$this->services['$id'] = \$this->scopedServices['$scope']['$id'] = ".($simple ? '' : '$instance');
         } elseif (!$simple) {
             $instantiation = '$instance';
@@ -1279,7 +1280,8 @@ EOF;
     }
 
     /**
-     * Tells if the given definitions are to be used for proxying
+     * Tells if the given definitions are to be used for proxying, and if proxying is possible,
+     * since ProxyManager may not be available
      *
      * @param Definition $definition
      *
@@ -1287,7 +1289,11 @@ EOF;
      */
     private function isProxyCandidate(Definition $definition)
     {
-        if (!($definition->isLazy() && $definition->getClass())) {
+        if (!(
+            $definition->isLazy()
+            && $definition->getClass()
+            && class_exists('ProxyManager\\Factory\\LazyLoadingValueHolderFactory')
+        )) {
             return false;
         }
 

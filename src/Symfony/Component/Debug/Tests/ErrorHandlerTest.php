@@ -85,7 +85,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $handler = ErrorHandler::register(E_USER_DEPRECATED);
-        $handler->setLogger('deprecation', $logger);
+        $handler->setLogger($logger);
         $handler->handle(E_USER_DEPRECATED, 'foo', 'foo.php', 12, 'foo');
 
         restore_error_handler();

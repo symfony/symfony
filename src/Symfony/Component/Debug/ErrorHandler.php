@@ -74,7 +74,7 @@ class ErrorHandler
         $this->level = null === $level ? error_reporting() : $level;
     }
 
-    public static function setLogger($channel, LoggerInterface $logger)
+    public static function setLogger(LoggerInterface $logger, $channel = 'deprecation')
     {
         self::$loggers[$channel] = $logger;
     }

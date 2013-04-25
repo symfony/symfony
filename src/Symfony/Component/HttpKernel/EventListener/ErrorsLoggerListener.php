@@ -37,7 +37,7 @@ class ErrorsLoggerListener implements EventSubscriberInterface
     public function injectLogger()
     {
         if (null !== $this->logger) {
-            ErrorHandler::setLogger($this->channel, $this->logger);
+            ErrorHandler::setLogger($this->logger, $this->channel);
         }
     }
 

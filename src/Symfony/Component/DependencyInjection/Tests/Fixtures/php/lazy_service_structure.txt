@@ -64,135 +64,62 @@ class ProjectServiceContainer extends Container
 }
 
 class stdClass_%s extends \stdClass implements \ProxyManager\Proxy\LazyLoadingInterface, \ProxyManager\Proxy\ValueHolderInterface
-{
-
-    /**
-     * @var \Closure|null initializer responsible for generating the wrapped object
-     */
+{%a
+    /**%a*/
     private %s = null;
 
-    /**
-     * @var \Closure|null initializer responsible for generating the wrapped object
-     */
+    /**%a*/
     private %s = null;
 
-    /**
-     * @override constructor for lazy initialization
-     *
-     * @param \Closure|null $initializer
-     */
+    /**%a*/
     public function __construct($initializer)
-    {
-        $this->%s = $initializer;
-    }
+    {%a}
 
-    /**
-     * @param string $name
-     */
+    /**%a*/
     public function __get($name)
-    {
-        $this->%s && $this->%s->__invoke($this->%s, $this, '__get', array('name' => $name));
+    {%a}
 
-        return $this->%s->$name;
-    }
-
-    /**
-     * @param string $name
-     * @param mixed $value
-     */
+    /**%a*/
     public function __set($name, $value)
-    {
-        $this->%s && $this->%s->__invoke($this->%s, $this, '__set', array('name' => $name, 'value' => $value));
+    {%a}
 
-        $this->%s->$name = $value;
-    }
-
-    /**
-     * @param string $name
-     */
+    /**%a*/
     public function __isset($name)
-    {
-        $this->%s && $this->%s->__invoke($this->%s, $this, '__isset', array('name' => $name));
+    {%a}
 
-        return isset($this->%s->$name);
-    }
-
-    /**
-     * @param string $name
-     */
+    /**%a*/
     public function __unset($name)
-    {
-        $this->%s && $this->%s->__invoke($this->%s, $this, '__unset', array('name' => $name));
+    {%a}
 
-        unset($this->%s->$name);
-    }
-
-    /**
-     *
-     */
+    /**%a*/
     public function __clone()
-    {
-        $this->%s && $this->%s->__invoke($this->%s, $this, '__clone', array());
+    {%a}
 
-        $this->%s = clone $this->%s;
-    }
-
-    /**
-     *
-     */
+    /**%a*/
     public function __sleep()
-    {
-        $this->%s && $this->%s->__invoke($this->%s, $this, '__sleep', array());
+    {%a}
 
-        return array('%s');
-    }
-
-    /**
-     *
-     */
+    /**%a*/
     public function __wakeup()
-    {
-    }
+    {%a}
 
-    /**
-     * {@inheritDoc}
-     */
+    /**%a*/
     public function setProxyInitializer(\Closure $initializer = null)
-    {
-        $this->%s = $initializer;
-    }
+    {%a}
 
-    /**
-     * {@inheritDoc}
-     */
+    /**%a*/
     public function getProxyInitializer()
-    {
-        return $this->%s;
-    }
+    {%a}
 
-    /**
-     * {@inheritDoc}
-     */
+    /**%a*/
     public function initializeProxy()
-    {
-        return $this->%s && $this->%s->__invoke($this->%s, $this, 'initializeProxy', array());
-    }
+    {%a}
 
-    /**
-     * {@inheritDoc}
-     */
+    /**%a*/
     public function isProxyInitialized()
-    {
-        return null !== $this->%s;
-    }
+    {%a}
 
-    /**
-     * {@inheritDoc}
-     */
+    /**%a*/
     public function getWrappedValueHolderValue()
-    {
-        return $this->%s;
-    }
-
-
-}
+    {%a}
+%a}

@@ -122,10 +122,18 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $pb->setPrefix('/usr/bin/php');
 
         $proc = $pb->setArguments(array('-v'))->getProcess();
-        $this->assertEquals("'/usr/bin/php' '-v'", $proc->getCommandLine());
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->assertEquals('"/usr/bin/php" "-v"', $proc->getCommandLine());
+        } else {
+            $this->assertEquals("'/usr/bin/php' '-v'", $proc->getCommandLine());
+        }
 
         $proc = $pb->setArguments(array('-i'))->getProcess();
-        $this->assertEquals("'/usr/bin/php' '-i'", $proc->getCommandLine());
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->assertEquals('"/usr/bin/php" "-i"', $proc->getCommandLine());
+        } else {
+            $this->assertEquals("'/usr/bin/php' '-i'", $proc->getCommandLine());
+        }
     }
 
     public function testShouldEscapeArguments()
@@ -167,7 +175,11 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             ->setPrefix('/usr/bin/php')
             ->getProcess();
 
-        $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->assertEquals('"/usr/bin/php"', $process->getCommandLine());
+        } else {
+            $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
+        }
     }
 
     public function testShouldNotThrowALogicExceptionIfNoPrefix()
@@ -175,6 +187,10 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $process = ProcessBuilder::create(array('/usr/bin/php'))
             ->getProcess();
 
-        $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->assertEquals('"/usr/bin/php"', $process->getCommandLine());
+        } else {
+            $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
+        }
     }
 }

@@ -160,6 +160,8 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         });
 
         $dispatcher->dispatch('foo');
+
+        $this->assertEquals(3, $loop);
     }
 
     public function testStopwatchSections()

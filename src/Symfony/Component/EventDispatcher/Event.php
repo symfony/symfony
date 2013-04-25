@@ -76,6 +76,8 @@ class Event
      *
      * @param EventDispatcherInterface $dispatcher
      *
+     * @deprecated since 2.3 remove in 3.0
+     *
      * @api
      */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
@@ -87,6 +89,8 @@ class Event
      * Returns the EventDispatcher that dispatches this Event
      *
      * @return EventDispatcherInterface
+     *
+     * @deprecated since 2.3 remove in 3.0
      *
      * @api
      */
@@ -100,6 +104,8 @@ class Event
      *
      * @return string
      *
+     * @deprecated since 2.3 remove in 3.0
+     *
      * @api
      */
     public function getName()
@@ -111,6 +117,8 @@ class Event
      * Sets the event's name property.
      *
      * @param string $name The event name.
+     *
+     * @deprecated since 2.3 remove in 3.0
      *
      * @api
      */

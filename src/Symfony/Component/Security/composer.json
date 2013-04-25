@@ -27,7 +27,8 @@
         "symfony/validator": ">=2.2,<2.4-dev",
         "doctrine/common": "~2.2",
         "doctrine/dbal": "~2.2",
-        "psr/log": "~1.0"
+        "psr/log": "~1.0",
+        "ircmaxell/password-compat": "1.0.*"
     },
     "suggest": {
         "symfony/class-loader": "2.2.*",
@@ -35,7 +36,8 @@
         "symfony/form": "2.2.*",
         "symfony/validator": "2.2.*",
         "symfony/routing": "2.2.*",
-        "doctrine/dbal": "to use the built-in ACL implementation"
+        "doctrine/dbal": "to use the built-in ACL implementation",
+        "ircmaxell/password-compat": "1.0.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security\\": "" }

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
+namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 /**
  * Compiler pass to register tagged services for an event dispatcher.
  */
-class RegisterKernelListenersPass implements CompilerPassInterface
+class RegisterListenersPass implements CompilerPassInterface
 {
     /**
      * @var string
@@ -35,9 +35,11 @@ class RegisterKernelListenersPass implements CompilerPassInterface
     protected $subscriberTag;
 
     /**
+     * Constructor.
+     *
      * @param string $dispatcherService Service name of the event dispatcher in processed container
-     * @param string $listenerTag Tag name used for listener
-     * @param string $listenerTag Tag name used for subscribers
+     * @param string $listenerTag       Tag name used for listener
+     * @param string $subscriberTag     Tag name used for subscribers
      */
     public function __construct($dispatcherService = 'event_dispatcher', $listenerTag = 'kernel.event_listener', $subscriberTag = 'kernel.event_subscriber')
     {

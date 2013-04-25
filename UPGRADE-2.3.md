@@ -184,3 +184,22 @@ DomCrawler
        return $crawler->text();
    });
    ```
+
+Console
+-------
+
+ * New verbosity levels have been added, therefore if you used to do check
+   the output verbosity level directly for VERBOSITY_VERBOSE you probably
+   want to update it to a greater than comparison:
+
+   Before:
+
+   ```
+   if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) { ... }
+   ```
+
+   After:
+
+   ```
+   if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) { ... }
+   ```

@@ -308,6 +308,15 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->foo, $definition->getOptionForShortcut('f'), '->getOptionForShortcut() returns a InputOption by its shortcut');
     }
 
+    public function testGetOptionForMultiShortcut()
+    {
+        $this->initializeOptions();
+
+        $definition = new InputDefinition(array($this->multi));
+        $this->assertEquals($this->multi, $definition->getOptionForShortcut('m'), '->getOptionForShortcut() returns a InputOption by its shortcut');
+        $this->assertEquals($this->multi, $definition->getOptionForShortcut('mmm'), '->getOptionForShortcut() returns a InputOption by its shortcut');
+    }
+
     /**
      * @expectedException        \InvalidArgumentException
      * @expectedExceptionMessage The "-l" option does not exist.
@@ -406,5 +415,6 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->bar = new InputOption('bar', 'b');
         $this->foo1 = new InputOption('fooBis', 'f');
         $this->foo2 = new InputOption('foo', 'p');
+        $this->multi = new InputOption('multi', 'm|mm|mmm');
     }
 }

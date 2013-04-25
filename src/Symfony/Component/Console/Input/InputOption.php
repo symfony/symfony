@@ -59,9 +59,9 @@ class InputOption
         }
 
         if (null !== $shortcut) {
-            if ('-' === $shortcut[0]) {
-                $shortcut = substr($shortcut, 1);
-            }
+            $shortcuts = preg_split('{(\|)-?}', ltrim($shortcut, '-'));
+            $shortcuts = array_filter($shortcuts);
+            $shortcut = implode('|', $shortcuts);
 
             if (empty($shortcut)) {
                 throw new \InvalidArgumentException('An option shortcut cannot be empty.');

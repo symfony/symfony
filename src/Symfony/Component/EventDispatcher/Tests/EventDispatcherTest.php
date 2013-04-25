@@ -23,6 +23,9 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
     const preBar = 'pre.bar';
     const postBar = 'post.bar';
 
+    /**
+     * @var EventDispatcher
+     */
     private $dispatcher;
 
     private $listener;
@@ -237,12 +240,19 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testEventReceivesTheDispatcherInstance()
     {
-        $test = $this;
         $this->dispatcher->addListener('test', function ($event) use (&$dispatcher) {
             $dispatcher = $event->getDispatcher();
         });
         $this->dispatcher->dispatch('test');
         $this->assertSame($this->dispatcher, $dispatcher);
+    }
+
+    public function testEventReceivesTheDispatcherInstanceAsArgument()
+    {
+        $listener = new TestWithDispatcher();
+        $this->dispatcher->addListener('test', array($listener, 'foo'));
+        $this->dispatcher->dispatch('test');
+        $this->assertSame($this->dispatcher, $listener->dispatcher);
     }
 
     /**
@@ -286,6 +296,16 @@ class TestEventListener
         $this->postFooInvoked = true;
 
         $e->stopPropagation();
+    }
+}
+
+class TestWithDispatcher
+{
+    public $dispatcher;
+
+    public function foo(Event $e, $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 }
 

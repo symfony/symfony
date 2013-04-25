@@ -196,6 +196,8 @@ class ProgressHelper extends Helper
                     }
                     break;
                 case OutputInterface::VERBOSITY_VERBOSE:
+                case OutputInterface::VERBOSITY_VERY_VERBOSE:
+                case OutputInterface::VERBOSITY_DEBUG:
                     $this->format = self::FORMAT_VERBOSE_NOMAX;
                     if ($this->max > 0) {
                         $this->format = self::FORMAT_VERBOSE;

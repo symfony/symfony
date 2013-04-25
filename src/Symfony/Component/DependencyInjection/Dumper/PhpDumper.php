@@ -578,19 +578,22 @@ EOF;
             $lazyInitializationDoc = '';
         }
 
-        $code               = <<<EOF
+        // with proxies, for 5.3.3 compatibility, the getter must be public to be accessible to the initializer
+        $isProxyCandidate = $this->isProxyCandidate($definition);
+        $visibility       = $isProxyCandidate ? 'public' : 'protected';
+        $code             = <<<EOF
 
     /**
      * Gets the '$id' service.$doc
      *$lazyInitializationDoc
      * $return
      */
-    protected function get{$name}Service($lazyInitialization)
+    {$visibility} function get{$name}Service($lazyInitialization)
     {
 
 EOF;
 
-        $code .= $this->addProxyLoading($id, $definition);
+        $code .= $isProxyCandidate ? $this->addProxyLoading($id, $definition) : '';
 
         if (!in_array($scope, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE))) {
             $code .= <<<EOF

@@ -44,7 +44,7 @@ class LazyServiceProjectServiceContainer extends Container
      *
      * @return stdClass A stdClass instance.
      */
-    protected function getFooService($lazyLoad = true)
+    public function getFooService($lazyLoad = true)
     {
         if ($lazyLoad) {
             $container = $this;

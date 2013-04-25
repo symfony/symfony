@@ -4,6 +4,7 @@ CHANGELOG
 2.3.0
 -----
 
+ * added ControllerNameParser::build() to converts a controller short notation (a:b:c) to a class::method notation
  * added possibility to run PHP built-in server in production environment
  * added possibility to load the serializer component in the service container
  * added route debug information when using the `router:match` command

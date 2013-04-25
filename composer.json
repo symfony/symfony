@@ -20,8 +20,7 @@
         "symfony/icu": "~1.0",
         "doctrine/common": "~2.2",
         "twig/twig": "~1.11",
-        "psr/log": "~1.0",
-        "ircmaxell/password-compat": "1.0.*"
+        "psr/log": "~1.0"
     },
     "replace": {
         "symfony/browser-kit": "self.version",
@@ -66,7 +65,8 @@
         "doctrine/dbal": "~2.2",
         "doctrine/orm": "~2.2,>=2.2.3",
         "monolog/monolog": "~1.3",
-        "propel/propel1": "1.6.*"
+        "propel/propel1": "1.6.*",
+        "ircmaxell/password-compat": "1.0.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\": "src/" },

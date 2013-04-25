@@ -452,42 +452,33 @@ class SecurityExtension extends Extension
 
         // pbkdf2 encoder
         if ('pbkdf2' === $config['algorithm']) {
-            $arguments = array(
-                $config['hash_algorithm'],
-                $config['encode_as_base64'],
-                $config['iterations'],
-                $config['key_length'],
-            );
-
             return array(
-                'class' => new Parameter('security.encoder.pbkdf2.class'),
-                'arguments' => $arguments,
+                'class'     => new Parameter('security.encoder.pbkdf2.class'),
+                'arguments' => array(
+                    $config['hash_algorithm'],
+                    $config['encode_as_base64'],
+                    $config['iterations'],
+                    $config['key_length'],
+                ),
             );
         }
 
         // bcrypt encoder
         if ('bcrypt' === $config['algorithm']) {
-            $arguments = array(
-                new Reference('security.secure_random'),
-                $config['cost'],
-            );
-
             return array(
-                'class' => new Parameter('security.encoder.bcrypt.class'),
-                'arguments' => $arguments,
+                'class'     => new Parameter('security.encoder.bcrypt.class'),
+                'arguments' => array($config['cost']),
             );
         }
 
         // message digest encoder
-        $arguments = array(
-            $config['algorithm'],
-            $config['encode_as_base64'],
-            $config['iterations'],
-        );
-
         return array(
-            'class' => new Parameter('security.encoder.digest.class'),
-            'arguments' => $arguments,
+            'class'     => new Parameter('security.encoder.digest.class'),
+            'arguments' => array(
+                $config['algorithm'],
+                $config['encode_as_base64'],
+                $config['iterations'],
+            ),
         );
     }
 

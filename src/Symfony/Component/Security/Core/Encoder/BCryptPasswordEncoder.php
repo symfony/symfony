@@ -46,9 +46,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
      */
     public function encodePassword($raw, $salt)
     {
-        return password_hash($raw, PASSWORD_BCRYPT, array(
-            'cost' => $this->cost,
-        ));
+        return password_hash($raw, PASSWORD_BCRYPT, array('cost' => $this->cost));
     }
 
     /**

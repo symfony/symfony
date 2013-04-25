@@ -356,17 +356,19 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->setMaxRedirects(1);
         $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected')));
         $client->request('GET', 'http://www.example.com/foo/foobar');
-
         $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows a redirect if any');
-        
+
         $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected2')));
-        
         try {
             $client->followRedirect();
-            $this->fail('->followRedirect() throws a \LogicException if the request was redirected and limit of redirections were reached');
+            $this->fail('->followRedirect() throws a \LogicException if the request was redirected and limit of redirections was reached');
         } catch (\Exception $e) {
-            $this->assertInstanceof('LogicException', $e, '->followRedirect() throws a \LogicException if the request was redirected and limit of redirections were reached');
+            $this->assertInstanceof('LogicException', $e, '->followRedirect() throws a \LogicException if the request was redirected and limit of redirections was reached');
         }
+
+        $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected')));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows a redirect if any');
     }
 
     public function testFollowRedirectWithCookies()

@@ -44,6 +44,6 @@ list   Lists commands
 
 EOF;
 
-        $this->assertEquals(str_replace("\n", PHP_EOL, $output), $commandTester->getDisplay());
+        $this->assertEquals($output, $commandTester->getDisplay(true));
     }
 }

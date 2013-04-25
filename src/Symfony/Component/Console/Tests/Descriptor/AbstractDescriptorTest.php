@@ -54,7 +54,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
             $command->setHelp(str_replace('%command.full_name%', 'app/console %command.name%', $command->getHelp()));
         }
 
-        $this->assertEquals(trim($expectedDescription), trim($descriptor->describe($application)));
+        $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $descriptor->describe($application))));
     }
 
     public function getDescribeInputArgumentTestData()

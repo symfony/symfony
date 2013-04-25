@@ -176,13 +176,13 @@ TABLE
 
     protected function getOutputStream()
     {
-        return new StreamOutput($this->stream);
+        return new StreamOutput($this->stream, StreamOutput::VERBOSITY_NORMAL, false);
     }
 
     protected function getOutputContent(StreamOutput $output)
     {
         rewind($output->getStream());
 
-        return stream_get_contents($output->getStream());
+        return str_replace(PHP_EOL, "\n", stream_get_contents($output->getStream()));
     }
 }

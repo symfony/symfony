@@ -184,11 +184,3 @@ DomCrawler
        return $crawler->text();
    });
    ```
-
-BrowserKit
-----------
-
- * The `Symfony\Component\BrowserKit\Client::getResponse()/getRequest()`
-   methods now **always** return the request/response instance from the code
-   that handles the request. To get the BrowserKit request/response instances,
-   use the new `getInternalResponse()/getInternalRequest()` methods.

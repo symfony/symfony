@@ -53,7 +53,7 @@ class Client extends BaseClient
     /**
      * {@inheritdoc}
      *
-     * @return Request A Request instance
+     * @return Request|null A Request instance
      */
     public function getRequest()
     {
@@ -63,7 +63,7 @@ class Client extends BaseClient
     /**
      * {@inheritdoc}
      *
-     * @return Response A Response instance
+     * @return Response|null A Response instance
      */
     public function getResponse()
     {
@@ -121,7 +121,7 @@ EOF;
     /**
      * Converts the BrowserKit request to a HttpKernel request.
      *
-     * @param DomRequest $request A Request instance
+     * @param DomRequest $request A DomRequest instance
      *
      * @return Request A Request instance
      */
@@ -188,7 +188,7 @@ EOF;
      *
      * @param Response $response A Response instance
      *
-     * @return Response A Response instance
+     * @return DomResponse A DomResponse instance
      */
     protected function filterResponse($response)
     {

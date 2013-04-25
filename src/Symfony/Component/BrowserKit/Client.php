@@ -158,7 +158,7 @@ abstract class Client
     /**
      * Returns the current Crawler instance.
      *
-     * @return Crawler A Crawler instance
+     * @return Crawler|null A Crawler instance
      *
      * @api
      */
@@ -168,9 +168,9 @@ abstract class Client
     }
 
     /**
-     * Returns the current Response instance.
+     * Returns the current BrowserKit Response instance.
      *
-     * @return Response A Response instance
+     * @return Response|null A BrowserKit Response instance
      *
      * @api
      */
@@ -180,12 +180,14 @@ abstract class Client
     }
 
     /**
-     * Returns the origin response instance.
+     * Returns the current origin response instance.
      *
      * The origin response is the response instance that is returned
      * by the code that handles requests.
      *
-     * @return object A response instance
+     * @return object|null A response instance
+     *
+     * @see doRequest
      *
      * @api
      */
@@ -195,9 +197,9 @@ abstract class Client
     }
 
     /**
-     * Returns the current Request instance.
+     * Returns the current BrowserKit Request instance.
      *
-     * @return Request A Request instance
+     * @return Request|null A BrowserKit Request instance
      *
      * @api
      */
@@ -207,14 +209,16 @@ abstract class Client
     }
 
     /**
-     * Returns the origin Request instance.
+     * Returns the current origin Request instance.
      *
      * The origin request is the request instance that is sent
      * to the code that handles requests.
      *
-     * @api
+     * @return object|null A Request instance
      *
-     * @return object A Request instance
+     * @see doRequest
+     *
+     * @api
      */
     public function getRequest()
     {
@@ -343,7 +347,7 @@ abstract class Client
     /**
      * Returns the script to execute when the request must be insulated.
      *
-     * @param Request $request A Request instance
+     * @param object $request An origin request instance
      *
      * @throws \LogicException When this abstract class is not implemented
      */
@@ -355,11 +359,11 @@ abstract class Client
     }
 
     /**
-     * Filters the request.
+     * Filters the BrowserKit request to the origin one.
      *
-     * @param Request $request The request to filter
+     * @param Request $request The BrowserKit Request to filter
      *
-     * @return Request
+     * @return object An origin request instance
      */
     protected function filterRequest(Request $request)
     {
@@ -367,11 +371,11 @@ abstract class Client
     }
 
     /**
-     * Filters the Response.
+     * Filters the origin response to the BrowserKit one.
      *
-     * @param Response $response The Response to filter
+     * @param object $response The origin response to filter
      *
-     * @return Response
+     * @return Response An BrowserKit Response instance
      */
     protected function filterResponse($response)
     {

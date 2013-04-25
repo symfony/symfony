@@ -164,6 +164,20 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $loop);
     }
 
+    public function testEventObjectsContainsTheListenerThatInitiallyDispatchedTheEvent()
+    {
+        $inner = new EventDispatcher();
+        $outer = new TraceableEventDispatcher($inner, new Stopwatch());
+
+        $self = $this;
+
+        $inner->addListener('foo', $listener = function($event) use ($self, $outer) {
+            $self->assertEquals($outer, $event->getDispatcher());
+        });
+
+        $outer->dispatch('foo');
+    }
+
     public function testStopwatchSections()
     {
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch = new Stopwatch());

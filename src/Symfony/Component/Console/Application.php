@@ -184,16 +184,14 @@ class Application
 
         if (true === $input->hasParameterOption(array('--quiet', '-q'))) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
-        } elseif($input->hasParameterOption('--verbose')) {
-            if ($input->getParameterOption('--verbose') === 3) {
+        } else {
+            if ($input->hasParameterOption('-vvv') || $input->hasParameterOption('--verbose=3')) {
                 $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
-            } elseif ($input->getParameterOption('--verbose') === 2) {
+            } elseif ($input->hasParameterOption('-vv') || $input->hasParameterOption('--verbose=2')) {
                 $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
-            } else {
+            } elseif ($input->hasParameterOption('-v') || $input->hasParameterOption('--verbose=1') || $input->hasParameterOption('--verbose')) {
                 $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
             }
-        }elseif($input->hasParameterOption('-v')) {
-            $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
         }
 
         if (true === $input->hasParameterOption(array('--version', '-V'))) {

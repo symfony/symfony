@@ -58,6 +58,31 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->submit(array());
     }
 
+    public function testSubmitDoesNotForwardNullIfNotClearMissing()
+    {
+        $child = $this->getMockForm('firstName');
+
+        $this->form->add($child);
+
+        $child->expects($this->never())
+            ->method('submit');
+
+        $this->form->submit(array(), false);
+    }
+
+    public function testClearMissingFlagIsForwarded()
+    {
+        $child = $this->getMockForm('firstName');
+
+        $this->form->add($child);
+
+        $child->expects($this->once())
+            ->method('submit')
+            ->with($this->equalTo('foo'), false);
+
+        $this->form->submit(array('firstName' => 'foo'), false);
+    }
+
     public function testCloneChildren()
     {
         $child = $this->getBuilder('child')->getForm();

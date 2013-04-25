@@ -464,7 +464,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function submit($submittedData)
+    public function submit($submittedData, $clearMissing = true)
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('A form can only be submitted once');
@@ -518,8 +518,10 @@ class Form implements \IteratorAggregate, FormInterface
             }
 
             foreach ($this->children as $name => $child) {
-                $child->submit(isset($submittedData[$name]) ? $submittedData[$name] : null);
-                unset($submittedData[$name]);
+                if (isset($submittedData[$name]) || $clearMissing) {
+                    $child->submit(isset($submittedData[$name]) ? $submittedData[$name] : null, $clearMissing);
+                    unset($submittedData[$name]);
+                }
             }
 
             $this->extraData = $submittedData;

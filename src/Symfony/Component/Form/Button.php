@@ -358,13 +358,14 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Submits data to the button.
      *
-     * @param null|string $submittedData The data
+     * @param null|string $submittedData The data.
+     * @param Boolean     $clearMissing  Not used.
      *
      * @return Button The button instance
      *
      * @throws Exception\AlreadySubmittedException If the button has already been submitted.
      */
-    public function submit($submittedData)
+    public function submit($submittedData, $clearMissing = true)
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('A form can only be submitted once');

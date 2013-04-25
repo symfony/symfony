@@ -434,12 +434,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Gets a service.
      *
      * @param string  $id              The service identifier
-     * @param integer $invalidBehavior The behavior when the service does not exist
+     * @param int     $invalidBehavior The behavior when the service does not exist
      *
+     * @throws InvalidArgumentException
+     * @throws InactiveScopeException
+     * @throws LogicException
+     * @throws \Exception
      * @return object The associated service
-     *
-     * @throws InvalidArgumentException if the service is not defined
-     * @throws LogicException if the service has a circular reference to itself
      *
      * @see Reference
      *
@@ -1116,7 +1117,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param mixed      $service
      * @param string     $id
      *
-     * @throws Exception\RuntimeException
+     * @throws InactiveScopeException
      */
     private function shareService(Definition $definition, $service, $id)
     {

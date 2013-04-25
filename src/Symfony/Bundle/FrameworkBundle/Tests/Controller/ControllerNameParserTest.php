@@ -61,9 +61,6 @@ class ControllerNameParserTest extends TestCase
 
         $this->assertEquals('FooBundle:Default:index', $parser->build('TestBundle\FooBundle\Controller\DefaultController::indexAction'), '->parse() converts a class::method string to a short a:b:c notation string');
         $this->assertEquals('FooBundle:Sub\Default:index', $parser->build('TestBundle\FooBundle\Controller\Sub\DefaultController::indexAction'), '->parse() converts a class::method string to a short a:b:c notation string');
-        $this->assertEquals('FabpotFooBundle:Default:index', $parser->build('TestBundle\Fabpot\FooBundle\Controller\DefaultController::indexAction'), '->parse() converts a class::method string to a short a:b:c notation string');
-        $this->assertEquals('SensioCmsFooBundle:Default:index', $parser->build('TestBundle\Sensio\Cms\FooBundle\Controller\DefaultController::indexAction'), '->parse() converts a class::method string to a short a:b:c notation string');
-        $this->assertEquals('FooBundle:Test\\Default:index', $parser->build('TestBundle\FooBundle\Controller\Test\DefaultController::indexAction'), '->parse() converts a class::method string to a short a:b:c notation string');
 
         try {
             $parser->build('TestBundle\FooBundle\Controller\DefaultController::index');
@@ -74,6 +71,13 @@ class ControllerNameParserTest extends TestCase
 
         try {
             $parser->build('TestBundle\FooBundle\Controller\Default::indexAction');
+            $this->fail('->parse() throws an \InvalidArgumentException if the controller is not an aController::cAction string');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws an \InvalidArgumentException if the controller is not an aController::cAction string');
+        }
+
+        try {
+            $parser->build('Foo\Controller\DefaultController::indexAction');
             $this->fail('->parse() throws an \InvalidArgumentException if the controller is not an aController::cAction string');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws an \InvalidArgumentException if the controller is not an aController::cAction string');
@@ -120,6 +124,13 @@ class ControllerNameParserTest extends TestCase
                 return $bundles[$bundle];
             }))
         ;
+
+        $bundles = array(
+            'SensioFooBundle' => $this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'),
+            'SensioCmsFooBundle' => $this->getBundle('TestBundle\Sensio\Cms\FooBundle', 'SensioCmsFooBundle'),
+            'FooBundle' => $this->getBundle('TestBundle\FooBundle', 'FooBundle'),
+            'FabpotFooBundle' => $this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'),
+        );
         $kernel
             ->expects($this->any())
             ->method('getBundles')

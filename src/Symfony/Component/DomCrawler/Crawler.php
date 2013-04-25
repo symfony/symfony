@@ -197,7 +197,7 @@ class Crawler extends \SplObjectStorage
         $dom->validateOnParse = true;
 
         // remove the default namespace to make XPath expressions simpler
-        @$dom->loadXML(str_replace('xmlns', 'ns', $content), LIBXML_NONET);
+        @$dom->loadXML(str_replace('xmlns=', 'ns=', $content), LIBXML_NONET);
 
         libxml_use_internal_errors($current);
         libxml_disable_entity_loader($disableEntities);

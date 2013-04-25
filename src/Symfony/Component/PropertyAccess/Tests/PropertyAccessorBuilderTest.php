@@ -16,7 +16,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
 class PropertyAccessorBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var PropertyAccessorBuilderInterface
+     * @var PropertyAccessorBuilder
      */
     protected $builder;
 

@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass;
+use Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass;
 
-class RegisterKernelListenersPassTest extends \PHPUnit_Framework_TestCase
+class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Tests that event subscribers not implementing EventSubscriberInterface
@@ -49,7 +49,7 @@ class RegisterKernelListenersPassTest extends \PHPUnit_Framework_TestCase
             ->method('getDefinition')
             ->will($this->returnValue($definition));
 
-        $registerListenersPass = new RegisterKernelListenersPass();
+        $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($builder);
     }
 
@@ -62,7 +62,7 @@ class RegisterKernelListenersPassTest extends \PHPUnit_Framework_TestCase
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
         $definition->expects($this->atLeastOnce())
             ->method('getClass')
-            ->will($this->returnValue('Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\SubscriberService'));
+            ->will($this->returnValue('Symfony\Component\HttpKernel\Tests\DependencyInjection\SubscriberService'));
 
         $builder = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $builder->expects($this->any())
@@ -78,7 +78,7 @@ class RegisterKernelListenersPassTest extends \PHPUnit_Framework_TestCase
             ->method('getDefinition')
             ->will($this->returnValue($definition));
 
-        $registerListenersPass = new RegisterKernelListenersPass();
+        $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($builder);
     }
 }

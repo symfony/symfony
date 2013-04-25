@@ -4,6 +4,8 @@ CHANGELOG
 2.3.0
 -----
 
+ * [BC BREAK] the `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass` was moved
+   to `Component\HttpKernel\DependencyInjection\RegisterListenersPass`
  * added ControllerNameParser::build() to converts a controller short notation (a:b:c) to a class::method notation
  * added possibility to run PHP built-in server in production environment
  * added possibility to load the serializer component in the service container

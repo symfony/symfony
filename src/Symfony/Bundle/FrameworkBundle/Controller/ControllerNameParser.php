@@ -39,7 +39,7 @@ class ControllerNameParser
      *
      * @param string $controller A short notation controller (a:b:c)
      *
-     * @return string A string with class::method
+     * @return string A string in the class::method notation
      *
      * @throws \InvalidArgumentException when the specified bundle is not enabled
      *                                   or the controller cannot be found
@@ -47,7 +47,7 @@ class ControllerNameParser
     public function parse($controller)
     {
         if (3 != count($parts = explode(':', $controller))) {
-            throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid a:b:c controller string.', $controller));
+            throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "a:b:c" controller string.', $controller));
         }
 
         list($bundle, $controller, $action) = $parts;
@@ -70,5 +70,34 @@ class ControllerNameParser
         }
 
         throw new \InvalidArgumentException($msg);
+    }
+
+    /**
+     * Converts a class::method notation to a short one (a:b:c).
+     *
+     * @param string $controller A string in the class::method notation
+     *
+     * @return string A short notation controller (a:b:c)
+     *
+     * @throws \InvalidArgumentException when the controller is not valid or cannot be found in any bundle
+     */
+    public function build($controller)
+    {
+        if (0 === preg_match('#^(.*?\\\\Controller\\\\(.+)Controller)::(.+)Action$#', $controller, $match)) {
+            throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "class::method" string.', $controller));
+        }
+
+        $className = $match[1];
+        $controllerName = $match[2];
+        $actionName = $match[3];
+        foreach ($this->kernel->getBundles() as $name => $bundle) {
+            if (0 !== strpos($className, $bundle->getNamespace())) {
+                continue;
+            }
+
+            return sprintf('%s:%s:%s', $name, $controllerName, $actionName);
+        }
+
+        throw new \InvalidArgumentException(sprintf('Unable to find a bundle that defines controller "%s".', $controller));
     }
 }

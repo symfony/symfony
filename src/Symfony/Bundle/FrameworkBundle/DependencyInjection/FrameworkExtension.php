@@ -48,15 +48,18 @@ class FrameworkExtension extends Extension
         // will be used and everything will still work as expected.
         $loader->load('translation.xml');
 
-        if ($container->getParameter('kernel.debug')) {
-            $loader->load('debug.xml');
+        $loader->load('debug.xml');
 
+        if ($container->getParameter('kernel.debug')) {
             // only HttpKernel needs the debug event dispatcher
             $definition = $container->findDefinition('http_kernel');
             $arguments = $definition->getArguments();
             $arguments[0] = new Reference('debug.event_dispatcher');
             $arguments[2] = new Reference('debug.controller_resolver');
             $definition->setArguments($arguments);
+        } else {
+            $container->removeDefinition('debug.deprecation_logger_listener');
+            $container->setParameter('debug.container.dump', null);
         }
 
         $configuration = $this->getConfiguration($configs, $container);

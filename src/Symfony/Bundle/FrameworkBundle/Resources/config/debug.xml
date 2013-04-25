@@ -37,7 +37,7 @@
 
         <service id="debug.emergency_logger_listener" class="%debug.errors_logger_listener.class%">
             <tag name="kernel.event_subscriber" />
-<!--            <tag name="monolog.logger" channel="emergency" />-->
+            <tag name="monolog.logger" channel="emergency" />
             <argument>emergency</argument>
             <argument type="service" id="logger" on-invalid="null" />
         </service>

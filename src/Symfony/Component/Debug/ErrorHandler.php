@@ -44,6 +44,8 @@ class ErrorHandler
 
     private $reservedMemory;
 
+    private $displayErrors;
+
     /**
      * @var LoggerInterface[] Loggers for channels
      */
@@ -53,13 +55,15 @@ class ErrorHandler
      * Registers the error handler.
      *
      * @param integer $level The level at which the conversion to Exception is done (null to use the error_reporting() value and 0 to disable)
+     * @param Boolean $displayErrors Display errors (for dev environment) or just log they (production usage)
      *
      * @return The registered error handler
      */
-    public static function register($level = null)
+    public static function register($level = null, $displayErrors = true)
     {
         $handler = new static();
         $handler->setLevel($level);
+        $handler->setDisplayErrors($displayErrors);
 
         ini_set('display_errors', 0);
         set_error_handler(array($handler, 'handle'));
@@ -72,6 +76,11 @@ class ErrorHandler
     public function setLevel($level)
     {
         $this->level = null === $level ? error_reporting() : $level;
+    }
+
+    public function setDisplayErrors($displayErrors)
+    {
+        $this->displayErrors = $displayErrors;
     }
 
     public static function setLogger(LoggerInterface $logger, $channel = 'deprecation')
@@ -108,7 +117,7 @@ class ErrorHandler
             return true;
         }
 
-        if (error_reporting() & $level && $this->level & $level) {
+        if ($this->displayErrors && error_reporting() & $level && $this->level & $level) {
             throw new \ErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line);
         }
 
@@ -135,6 +144,10 @@ class ErrorHandler
             );
 
             self::$loggers['emergency']->emerg($error['message'], $fatal);
+        }
+
+        if (!$this->displayErrors) {
+            return;
         }
 
         // get current exception handler

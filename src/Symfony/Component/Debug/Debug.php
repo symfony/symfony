@@ -31,8 +31,9 @@ class Debug
      * class loader is also registered.
      *
      * @param integer $errorReportingLevel The level of error reporting you want
+     * @param Boolean $displayErrors Display errors (for dev environment) or just log they (production usage)
      */
-    public static function enable($errorReportingLevel = null)
+    public static function enable($errorReportingLevel = null, $displayErrors = true)
     {
         if (static::$enabled) {
             return;
@@ -42,10 +43,10 @@ class Debug
 
         error_reporting(-1);
 
-        ErrorHandler::register($errorReportingLevel);
+        ErrorHandler::register($errorReportingLevel, $displayErrors);
         if ('cli' !== php_sapi_name()) {
             ExceptionHandler::register();
-        } elseif (!ini_get('log_errors') || ini_get('error_log')) {
+        } elseif (!ini_get('log_errors') || ini_get('error_log') && $displayErrors) {
             ini_set('display_errors', 1);
         }
 

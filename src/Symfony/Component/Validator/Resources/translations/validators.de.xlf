@@ -242,6 +242,10 @@
                 <source>This value is not a valid ISSN.</source>
                 <target>Dieser Wert ist keine gültige ISSN.</target>
             </trans-unit>
+             <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>Dieser Wert ist keine gültige Währung.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

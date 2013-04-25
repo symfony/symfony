@@ -42,6 +42,10 @@ abstract class Client
     protected $redirect;
     protected $followRedirects;
 
+    private $maxRedirects;
+    private $redirectCount;
+    private $isMainRequest;
+
     /**
      * Constructor.
      *
@@ -58,6 +62,9 @@ abstract class Client
         $this->cookieJar = null === $cookieJar ? new CookieJar() : $cookieJar;
         $this->insulated = false;
         $this->followRedirects = true;
+        $this->maxRedirects = -1;
+        $this->redirectCount = 0;
+        $this->isMainRequest = true;
     }
 
     /**
@@ -70,6 +77,17 @@ abstract class Client
     public function followRedirects($followRedirect = true)
     {
         $this->followRedirects = (Boolean) $followRedirect;
+    }
+    
+    /**
+     * Sets the maximum number of requests that crawler can follow.
+     *
+     * @param integer $maxRedirects
+     */
+    public function setMaxRedirects($maxRedirects)
+    {
+        $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
+        $this->followRedirects = -1 != $this->maxRedirects;
     }
 
     /**
@@ -277,6 +295,12 @@ abstract class Client
      */
     public function request($method, $uri, array $parameters = array(), array $files = array(), array $server = array(), $content = null, $changeHistory = true)
     {
+        if ($this->isMainRequest) {
+            $this->redirectCount = 0;
+        } else {
+            ++$this->redirectCount;
+        }
+
         $uri = $this->getAbsoluteUri($uri);
 
         $server = array_merge($this->server, $server);
@@ -456,7 +480,19 @@ abstract class Client
             throw new \LogicException('The request was not redirected.');
         }
 
-        return $this->request('get', $this->redirect);
+        if (-1 !== $this->maxRedirects) {
+            if ($this->redirectCount > $this->maxRedirects) {
+                throw new \LogicException(sprintf('The maximum number (%d) of redirections was reached.', $this->maxRedirects));
+            }
+        }
+
+        $this->isMainRequest = false;
+
+        $response = $this->request('get', $this->redirect);
+
+        $this->isMainRequest = true;
+
+        return $response;
     }
 
     /**

@@ -242,13 +242,16 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Submits data to the form, transforms and validates it.
      *
-     * @param  null|string|array $submittedData The submitted data.
+     * @param null|string|array $submittedData The submitted data.
+     * @param Boolean           $clearMissing  Whether to set fields to NULL
+     *                                         when they are missing in the
+     *                                         submitted data.
      *
      * @return FormInterface The form instance
      *
      * @throws Exception\AlreadySubmittedException If the form has already been submitted.
      */
-    public function submit($submittedData);
+    public function submit($submittedData, $clearMissing = true);
 
     /**
      * Returns the root of the form tree.

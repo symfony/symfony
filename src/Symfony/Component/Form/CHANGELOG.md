@@ -24,6 +24,7 @@ CHANGELOG
  * added methods submit() and isSubmitted() to Form
  * deprecated bind() and isBound() in Form
  * deprecated AlreadyBoundException in favor of AlreadySubmittedException
+ * added support for PATCH requests
 
 2.2.0
 -----

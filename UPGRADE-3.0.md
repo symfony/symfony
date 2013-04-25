@@ -238,6 +238,26 @@ UPGRADE FROM 2.x to 3.0
 
  * The `FormItegrationTestCase` and `FormPerformanceTestCase` classes were moved form the `Symfony\Component\Form\Tests` namespace to the `Symfony\Component\Form\Test` namespace.
 
+### PropertyAccess
+
+ * Renamed `PropertyAccess::getPropertyAccessor` to `createPropertyAccessor`.
+
+   Before:
+
+   ```
+   use Symfony\Component\PropertyAccess\PropertyAccess;
+
+   $accessor = PropertyAccess::getPropertyAccessor();
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\PropertyAccess\PropertyAccess;
+
+   $accessor = PropertyAccess::createPropertyAccessor();
+   ```
+
 ### Routing
 
  * Some route settings have been renamed:

@@ -210,6 +210,9 @@ class FrameworkExtension extends Extension
     private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
+            // this is needed for the WebProfiler to work even if the profiler is disabled
+            $container->setParameter('data_collector.templates', array());
+
             return;
         }
 

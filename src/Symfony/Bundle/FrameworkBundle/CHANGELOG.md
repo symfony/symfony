@@ -4,6 +4,8 @@ CHANGELOG
 2.3.0
 -----
 
+ * [BC BREAK] added a way to disable the profiler (when disabling the profiler, it is now completely removed)
+   To get the same "disabled" behavior as before, set `enabled` to `true` and `collect` to `false`
  * [BC BREAK] the `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass` was moved
    to `Component\HttpKernel\DependencyInjection\RegisterListenersPass`
  * added ControllerNameParser::build() which converts a controller short notation (a:b:c) to a class::method notation

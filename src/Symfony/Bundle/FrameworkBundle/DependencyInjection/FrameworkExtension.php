@@ -91,11 +91,7 @@ class FrameworkExtension extends Extension
         $this->registerValidationConfiguration($config['validation'], $container, $loader);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
-
-        if (isset($config['profiler']) && isset($config['profiler']['enabled']) && $config['profiler']['enabled']) {
-            $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
-        }
-
+        $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container);
 
         if (isset($config['router'])) {
@@ -213,6 +209,10 @@ class FrameworkExtension extends Extension
      */
     private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        if (!$this->isConfigEnabled($container, $config)) {
+            return;
+        }
+
         $loader->load('profiling.xml');
         $loader->load('collectors.xml');
 
@@ -258,7 +258,7 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (!$this->isConfigEnabled($container, $config)) {
+        if (!$config['collect']) {
             $container->getDefinition('profiler')->addMethodCall('disable', array());
         }
     }

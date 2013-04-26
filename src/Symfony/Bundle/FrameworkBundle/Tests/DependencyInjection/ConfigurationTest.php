@@ -111,6 +111,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'username'             => '',
                 'password'             => '',
                 'lifetime'             => 86400,
+                'collect'              => true,
             ),
             'translator'          => array(
                 'enabled'  => false,

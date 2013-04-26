@@ -139,6 +139,7 @@ class Configuration implements ConfigurationInterface
                     ->info('profiler configuration')
                     ->canBeEnabled()
                     ->children()
+                        ->booleanNode('collect')->defaultTrue()->end()
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_master_requests')->defaultFalse()->end()
                         ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()

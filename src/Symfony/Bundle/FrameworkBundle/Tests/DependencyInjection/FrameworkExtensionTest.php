@@ -54,17 +54,20 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('esi'), '->registerEsiConfiguration() loads esi.xml');
     }
 
-    public function testProfiler()
+    public function testEnabledProfiler()
     {
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainerFromFile('profiler');
 
         $this->assertTrue($container->hasDefinition('profiler'), '->registerProfilerConfiguration() loads profiling.xml');
         $this->assertTrue($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() loads collectors.xml');
-        $this->assertTrue($container->getParameter('profiler_listener.only_exceptions'));
-        $this->assertEquals('%profiler_listener.only_exceptions%', $container->getDefinition('profiler_listener')->getArgument(2));
+    }
 
-        $calls = $container->getDefinition('profiler')->getMethodCalls();
-        $this->assertEquals('disable', $calls[0][0]);
+    public function testDisabledProfiler()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertFalse($container->hasDefinition('profiler'), '->registerProfilerConfiguration() does not load profiling.xml');
+        $this->assertFalse($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() does not load collectors.xml');
     }
 
     public function testRouter()

@@ -53,6 +53,7 @@
             <xsd:element name="matcher" type="profiler_matcher" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
+        <xsd:attribute name="collect" type="xsd:string" />
         <xsd:attribute name="only-exceptions" type="xsd:string" />
         <xsd:attribute name="only-master-requests" type="xsd:string" />
         <xsd:attribute name="enabled" type="xsd:string" />

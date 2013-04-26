@@ -722,6 +722,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
      */
     public function testAccessDeniedException(Adapter\AdapterInterface $adapter)
     {
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $this->markTestSkipped('chmod is not supported on windows');
+        }
+
         $finder = $this->buildFinder($adapter);
         $finder->files()->in(self::$tmpDir);
 
@@ -744,6 +748,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
      */
     public function testIgnoredAccessDeniedException(Adapter\AdapterInterface $adapter)
     {
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $this->markTestSkipped('chmod is not supported on windows');
+        }
+
         $finder = $this->buildFinder($adapter);
         $finder->files()->ignoreUnreadableDirs()->in(self::$tmpDir);
 

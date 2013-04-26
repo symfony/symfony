@@ -266,13 +266,21 @@ class InputDefinition
     {
         if (isset($this->options[$option->getName()]) && !$option->equals($this->options[$option->getName()])) {
             throw new \LogicException(sprintf('An option named "%s" already exists.', $option->getName()));
-        } elseif (isset($this->shortcuts[$option->getShortcut()]) && !$option->equals($this->options[$this->shortcuts[$option->getShortcut()]])) {
-            throw new \LogicException(sprintf('An option with shortcut "%s" already exists.', $option->getShortcut()));
+        }
+
+        if ($option->getShortcut()) {
+            foreach (explode('|', $option->getShortcut()) as $shortcut) {
+                if (isset($this->shortcuts[$shortcut]) && !$option->equals($this->options[$this->shortcuts[$shortcut]])) {
+                    throw new \LogicException(sprintf('An option with shortcut "%s" already exists.', $shortcut));
+                }
+            }
         }
 
         $this->options[$option->getName()] = $option;
         if ($option->getShortcut()) {
-            $this->shortcuts[$option->getShortcut()] = $option->getName();
+            foreach (explode('|', $option->getShortcut()) as $shortcut) {
+                $this->shortcuts[$shortcut] = $option->getName();
+            }
         }
     }
 

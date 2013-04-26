@@ -1,7 +1,8 @@
 ﻿UPGRADE FROM 2.2 to 2.3
 =======================
 
-### Form
+Form
+----
 
  * Although this was not officially supported nor documented, it was possible to
    set the option "validation_groups" to false, resulting in the group "Default"
@@ -109,7 +110,8 @@
    }
    ```
 
-### PropertyAccess
+PropertyAccess
+--------------
 
  * PropertyAccessor was changed to continue its search for a property or method
    even if a non-public match was found. This means that the property "author"
@@ -161,7 +163,8 @@
    }
    ```
 
-### DomCrawler
+DomCrawler
+----------
 
  * `Crawler::each()` and `Crawler::reduce()` now return Crawler instances
    instead of DomElement instances:
@@ -180,4 +183,23 @@
    $data = $crawler->each(function ($crawler, $i) {
        return $crawler->text();
    });
+   ```
+
+Console
+-------
+
+ * New verbosity levels have been added, therefore if you used to do check
+   the output verbosity level directly for VERBOSITY_VERBOSE you probably
+   want to update it to a greater than comparison:
+
+   Before:
+
+   ```
+   if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) { ... }
+   ```
+
+   After:
+
+   ```
+   if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) { ... }
    ```

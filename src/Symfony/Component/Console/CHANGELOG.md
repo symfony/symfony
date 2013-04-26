@@ -9,6 +9,8 @@ CHANGELOG
  * added support for events in `Application`
  * added a way to normalize EOLs in `ApplicationTester::getDisplay()` and `CommandTester::getDisplay()`
  * added a way to set the progress bar progress via the `setCurrent` method
+ * added support for multiple InputOption shortcuts, written as `'-a|-b|-c'`
+ * added two additional verbosity levels, VERBOSITY_VERY_VERBOSE and VERBOSITY_DEBUG
 
 2.2.0
 -----

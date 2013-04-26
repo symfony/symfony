@@ -24,12 +24,15 @@ class PropertyAccessor implements PropertyAccessorInterface
     const VALUE = 0;
     const IS_REF = 1;
 
+    private $magicCall;
+
     /**
      * Should not be used by application code. Use
      * {@link PropertyAccess::getPropertyAccessor()} instead.
      */
-    public function __construct()
+    public function __construct($magicCall = false)
     {
+        $this->magicCall = $magicCall;
     }
 
     /**
@@ -221,10 +224,13 @@ class PropertyAccessor implements PropertyAccessorInterface
             // fatal error.
             $result[self::VALUE] =& $object->$property;
             $result[self::IS_REF] = true;
+        } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
+            // we call the getter and hope the __call do the job
+            $result[self::VALUE] = $object->$getter();
         } else {
             throw new NoSuchPropertyException(sprintf(
                 'Neither the property "%s" nor one of the methods "%s()", '.
-                '"%s()", "%s()" or "__get()" exist and have public access in '.
+                '"%s()", "%s()", "__get()" or "__call()" exist and have public access in '.
                 'class "%s".',
                 $property,
                 $getter,
@@ -348,10 +354,13 @@ class PropertyAccessor implements PropertyAccessorInterface
             // returns true, consequently the following line will result in a
             // fatal error.
             $object->$property = $value;
+        } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
+            // we call the getter and hope the __call do the job
+            $object->$setter($value);
         } else {
             throw new NoSuchPropertyException(sprintf(
-                'Neither the property "%s" nor one of the methods %s"%s()" or '.
-                '"__set()" exist and have public access in class "%s".',
+                'Neither the property "%s" nor one of the methods %s"%s()", '.
+                '"__set()" or "__call()" exist and have public access in class "%s".',
                 $property,
                 $guessedAdders,
                 $setter,

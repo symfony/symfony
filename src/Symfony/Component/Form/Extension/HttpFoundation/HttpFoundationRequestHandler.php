@@ -75,6 +75,6 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             return;
         }
 
-        $form->submit($data);
+        $form->submit($data, 'PATCH' !== $method);
     }
 }

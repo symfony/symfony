@@ -86,11 +86,11 @@ To display the list of available commands, please use the <info>list</info> comm
 **verbose:**
 
 * Name: `--verbose`
-* Shortcut: `-v`
+* Shortcut: `-v|-vv|-vvv`
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Increase verbosity of messages.
+* Description: Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 * Default: `false`
 
 **version:**

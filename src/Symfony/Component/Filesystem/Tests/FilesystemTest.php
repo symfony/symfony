@@ -905,7 +905,11 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFileExists($filename);
         $this->assertSame('bar', file_get_contents($filename));
-        $this->assertEquals(753, $this->getFilePermissions($filename));
+
+        // skip mode check on windows
+        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $this->assertEquals(753, $this->getFilePermissions($filename));
+        }
     }
 
     public function testDumpFileOverwritesAnExistingFile()

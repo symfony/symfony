@@ -30,7 +30,7 @@ class RouterController
     private $matcher;
     private $routes;
 
-    public function __construct(Profiler $profiler, \Twig_Environment $twig, UrlMatcherInterface $matcher = null, RouteCollection $routes = null)
+    public function __construct(Profiler $profiler = null, \Twig_Environment $twig, UrlMatcherInterface $matcher = null, RouteCollection $routes = null)
     {
         $this->profiler = $profiler;
         $this->twig = $twig;
@@ -51,6 +51,10 @@ class RouterController
      */
     public function panelAction($token)
     {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
         $this->profiler->disable();
 
         if (null === $this->matcher || null === $this->routes) {

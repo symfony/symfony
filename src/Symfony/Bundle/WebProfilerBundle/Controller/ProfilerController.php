@@ -43,7 +43,7 @@ class ProfilerController
      * @param array                 $templates       The templates
      * @param string                $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
      */
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal')
+    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal')
     {
         $this->generator = $generator;
         $this->profiler = $profiler;
@@ -59,6 +59,10 @@ class ProfilerController
      */
     public function homeAction()
     {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
         $this->profiler->disable();
 
         return new RedirectResponse($this->generator->generate('_profiler_search_results', array('token' => 'empty', 'limit' => 10)));
@@ -76,6 +80,10 @@ class ProfilerController
      */
     public function panelAction(Request $request, $token)
     {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
         $this->profiler->disable();
 
         $panel = $request->query->get('panel', 'request');
@@ -112,6 +120,10 @@ class ProfilerController
      */
     public function exportAction($token)
     {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
         $this->profiler->disable();
 
         if (!$profile = $this->profiler->loadProfile($token)) {
@@ -131,6 +143,10 @@ class ProfilerController
      */
     public function purgeAction()
     {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
         $this->profiler->disable();
         $this->profiler->purge();
 
@@ -146,6 +162,10 @@ class ProfilerController
      */
     public function importAction(Request $request)
     {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
         $this->profiler->disable();
 
         $file = $request->files->get('file');
@@ -170,6 +190,10 @@ class ProfilerController
      */
     public function infoAction($about)
     {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
         $this->profiler->disable();
 
         return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array(
@@ -187,6 +211,10 @@ class ProfilerController
      */
     public function toolbarAction(Request $request, $token)
     {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
         $session = $request->getSession();
 
         if (null !== $session && $session->getFlashBag() instanceof AutoExpireFlashBag) {
@@ -234,6 +262,10 @@ class ProfilerController
      */
     public function searchBarAction(Request $request)
     {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
         $this->profiler->disable();
 
         if (null === $session = $request->getSession()) {
@@ -275,6 +307,10 @@ class ProfilerController
      */
     public function searchResultsAction(Request $request, $token)
     {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
         $this->profiler->disable();
 
         $profile = $this->profiler->loadProfile($token);
@@ -309,6 +345,10 @@ class ProfilerController
      */
     public function searchAction(Request $request)
     {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
         $this->profiler->disable();
 
         $ip     = preg_replace('/[^:\d\.]/', '', $request->query->get('ip'));
@@ -353,6 +393,10 @@ class ProfilerController
      */
     public function phpinfoAction()
     {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
         $this->profiler->disable();
 
         ob_start();

@@ -24,6 +24,8 @@ namespace Symfony\Component\EventDispatcher;
  * @author  Jonathan Wage <jonwage@gmail.com>
  * @author  Roman Borschel <roman@code-factory.org>
  * @author  Bernhard Schussek <bschussek@gmail.com>
+ * @author  Jordi Boggiano <j.boggiano@seld.be>
+ * @author  Drak <drak@zikula.org>
  *
  * @api
  */
@@ -33,11 +35,6 @@ class Event
      * @var Boolean Whether no further event listeners should be triggered
      */
     private $propagationStopped = false;
-
-    /**
-     * @var EventDispatcher Dispatcher that dispatched this event
-     */
-    private $dispatcher;
 
     /**
      * @var string This event's name
@@ -69,30 +66,6 @@ class Event
     public function stopPropagation()
     {
         $this->propagationStopped = true;
-    }
-
-    /**
-     * Stores the EventDispatcher that dispatches this Event
-     *
-     * @param EventDispatcherInterface $dispatcher
-     *
-     * @api
-     */
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    /**
-     * Returns the EventDispatcher that dispatches this Event
-     *
-     * @return EventDispatcherInterface
-     *
-     * @api
-     */
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
     }
 
     /**

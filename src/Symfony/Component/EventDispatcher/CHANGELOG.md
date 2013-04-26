@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+ * [BC BREAK] added EventDispatcherAwareEvent: moved methods from Event object
+
 2.1.0
 -----
 
@@ -14,3 +19,4 @@ CHANGELOG
  * added the possibility for subscribers to subscribe several times for the
    same event
  * added ImmutableEventDispatcher
+

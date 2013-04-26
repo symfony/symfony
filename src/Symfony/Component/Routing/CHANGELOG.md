@@ -4,13 +4,11 @@ CHANGELOG
 2.3.0
 -----
 
- * [BC BREAK] the BCrypt encoder constructor signature has changed (the first argument was removed)
  * added RequestContext::getQueryString()
 
 2.2.0
 -----
 
- * Added BCrypt password encoder
  * [DEPRECATION] Several route settings have been renamed (the old ones will be removed in 3.0):
 
     * The `pattern` setting for a route has been deprecated in favor of `path`

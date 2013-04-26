@@ -58,11 +58,6 @@ class NativeSessionStorage implements SessionStorageInterface
     protected $mode;
 
     /**
-     * @var Boolean
-     */
-    protected $emulatePhp;
-
-    /**
      * Constructor.
      *
      * Depending on how you want the storage driver to behave you probably

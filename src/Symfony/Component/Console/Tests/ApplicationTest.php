@@ -219,6 +219,16 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFindCommandEqualNamespace()
+    {
+        $application = new Application();
+        $application->add(new \Foo3Command());
+        $application->add(new \Foo4Command());
+
+        $this->assertInstanceOf('Foo3Command', $application->find('foo3:bar'), '->find() returns the good command even if a namespace has same name');
+        $this->assertInstanceOf('Foo4Command', $application->find('foo3:bar:toh'), '->find() returns a command even if its namespace equals another command name');
+    }
+
     public function testFindAlternativeExceptionMessage()
     {
         $application = new Application();

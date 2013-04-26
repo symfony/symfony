@@ -580,6 +580,10 @@ class Application
             return $this->get($abbrevs[$searchName][0]);
         }
 
+        if (isset($abbrevs[$searchName]) && in_array($searchName, $abbrevs[$searchName])) {
+            return $this->get($searchName);
+        }
+
         if (isset($abbrevs[$searchName]) && count($abbrevs[$searchName]) > 1) {
             $suggestions = $this->getAbbreviationSuggestions($abbrevs[$searchName]);
 

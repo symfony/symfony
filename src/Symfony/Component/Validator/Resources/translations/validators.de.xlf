@@ -246,6 +246,10 @@
                 <source>This value is not a valid currency.</source>
                 <target>Dieser Wert ist keine gültige Währung.</target>
             </trans-unit>
+            <trans-unit id="64">
+                <source>This value does not consist of numeric characters only.</source>
+                <target>Dieser Wert besteht nicht ausschließlich aus Ziffern.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

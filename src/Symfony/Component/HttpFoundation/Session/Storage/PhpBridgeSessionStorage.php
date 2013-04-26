@@ -27,11 +27,13 @@ class PhpBridgeSessionStorage extends NativeSessionStorage
      *
      * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $handler
      * @param MetadataBag                                                      $metaBag MetadataBag
+     * @param string                                                           $mode
      */
-    public function __construct($handler = null, MetadataBag $metaBag = null)
+    public function __construct($handler = null, MetadataBag $metaBag = null, $mode = self::START_ON_DEMAND)
     {
         $this->setMetadataBag($metaBag);
         $this->setSaveHandler($handler);
+        $this->mode = $mode;
     }
 
     /**

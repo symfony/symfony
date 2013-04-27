@@ -153,11 +153,11 @@ class InputDefinition
      */
     public function getArgument($name)
     {
-        $arguments = is_int($name) ? array_values($this->arguments) : $this->arguments;
-
         if (!$this->hasArgument($name)) {
             throw new \InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
         }
+
+        $arguments = is_int($name) ? array_values($this->arguments) : $this->arguments;
 
         return $arguments[$name];
     }

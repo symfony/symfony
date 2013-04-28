@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class Issn extends Constraint
 {
-    public $invalidMessage = 'This value is not a valid ISSN.';
+    public $message = 'This value is not a valid ISSN.';
     public $caseSensitive = false;
     public $requireHyphen = false;
 }

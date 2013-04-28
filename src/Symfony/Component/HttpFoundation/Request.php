@@ -855,8 +855,10 @@ class Request
      */
     public function getPort()
     {
-        if (self::$trustedProxies && self::$trustedHeaders[self::HEADER_CLIENT_PORT] && $port = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PORT])) {
+        if (self::$trustedProxies && self::$trustedHeaders[self::HEADER_CLIENT_PORT] && $port = $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PORT])) {            
             return $port;
+        } elseif (self::$trustedProxies && self::$trustedHeaders[self::HEADER_CLIENT_PROTO] && $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_PROTO]) == 'https') {
+            return 443;
         }
 
         return $this->server->get('SERVER_PORT');

@@ -132,6 +132,33 @@ UPGRADE FROM 2.x to 3.0
    $iterator = new InheritDataAwareIterator($forms);
    ```
 
+ * The `TypeTestCase` class was moved from the `Symfony\Component\Form\Tests\Extension\Core\Type` namespace to the `Symfony\Component\Form\Test` namespace.
+ 
+   Before:
+
+   ```
+   use Symfony\Component\Form\Tests\Extension\Core\Type\TypeTestCase
+
+   class MyTypeTest extends TypeTestCase
+   {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```
+   use Symfony\Component\Form\Test\TypeTestCase;
+
+   class MyTypeTest extends TypeTestCase
+   {
+       // ...
+   }
+   ```
+
+ * The `FormItegrationTestCase` and `FormPerformanceTestCase` classes were moved form the `Symfony\Component\Form\Tests` namespace to the `Symfony\Component\Form\Test` namespace.
+
+
 ### FrameworkBundle
 
  * The `enctype` method of the `form` helper was removed. You should use the
@@ -210,33 +237,18 @@ UPGRADE FROM 2.x to 3.0
     * `Symfony\Component\HttpKernel\Exception\FatalErrorException` -> `Symfony\Component\Debug\Exception\FatalErrorException`
     * `Symfony\Component\HttpKernel\Exception\FlattenException` -> `Symfony\Component\Debug\Exception\FlattenException`
 
-### Form
+### Locale
 
- * The `TypeTestCase` class was moved from the `Symfony\Component\Form\Tests\Extension\Core\Type` namespace to the `Symfony\Component\Form\Test` namespace.
- 
-   Before:
-
-   ```
-   use Symfony\Component\Form\Tests\Extension\Core\Type\TypeTestCase
-
-   class MyTypeTest extends TypeTestCase
-   {
-       // ...
-   }
-   ```
-
-   After:
-
-   ```
-   use Symfony\Component\Form\Test\TypeTestCase;
-
-   class MyTypeTest extends TypeTestCase
-   {
-       // ...
-   }
-   ```
-
- * The `FormItegrationTestCase` and `FormPerformanceTestCase` classes were moved form the `Symfony\Component\Form\Tests` namespace to the `Symfony\Component\Form\Test` namespace.
+ * The Locale component was removed and replaced by the Intl component.
+   Instead of the methods in `Symfony\Component\Locale\Locale`, you should use
+   these equivalent methods in `Symfony\Component\Intl\Intl` now:
+   
+    * `Locale::getDisplayCountries()` -> `Intl::getRegionBundle()->getCountryNames()`
+    * `Locale::getCountries()` -> `array_keys(Intl::getRegionBundle()->getCountryNames())`
+    * `Locale::getDisplayLanguages()` -> `Intl::getLanguageBundle()->getLanguageNames()`
+    * `Locale::getLanguages()` -> `array_keys(Intl::getLanguageBundle()->getLanguageNames())`
+    * `Locale::getDisplayLocales()` -> `Intl::getLocaleBundle()->getLocaleNames()`
+    * `Locale::getLocales()` -> `array_keys(Intl::getLocaleBundle()->getLocaleNames())`
 
 ### Routing
 
@@ -342,22 +354,6 @@ UPGRADE FROM 2.x to 3.0
    {{ form_end(form) }}
    ```
 
-### Yaml
-
- * The ability to pass file names to `Yaml::parse()` has been removed.
-
-   Before:
-
-   ```
-   Yaml::parse($fileName);
-   ```
-
-   After:
-
-   ```
-   Yaml::parse(file_get_contents($fileName));
-   ```
-
 ### Validator
 
  * The constraints `Optional` and `Required` were moved to the
@@ -390,4 +386,20 @@ UPGRADE FROM 2.x to 3.0
     * })
     */
    private $property;
+   ```
+
+### Yaml
+
+ * The ability to pass file names to `Yaml::parse()` has been removed.
+
+   Before:
+
+   ```
+   Yaml::parse($fileName);
+   ```
+
+   After:
+
+   ```
+   Yaml::parse(file_get_contents($fileName));
    ```

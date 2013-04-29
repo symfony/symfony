@@ -43,7 +43,7 @@ class IssnValidator extends ConstraintValidator
         $pattern = "/^".$digitsPattern.$checksumPattern."$/";
 
         if (!preg_match($pattern, $value)) {
-            $this->context->addViolation($constraint->invalidMessage);
+            $this->context->addViolation($constraint->message);
         } else {
             $digits = str_split(strtoupper(str_replace('-', '', $value)));
 
@@ -55,7 +55,7 @@ class IssnValidator extends ConstraintValidator
             $checksum = 'X' == reset($digits) ? 10 : (int) reset($digits);
 
             if (0 != ($sum + $checksum) % 11) {
-                $this->context->addViolation($constraint->invalidMessage);
+                $this->context->addViolation($constraint->message);
             }
         }
     }

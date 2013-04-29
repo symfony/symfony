@@ -110,6 +110,66 @@ Form
    }
    ```
 
+ * The *_SET_DATA events are now guaranteed to be fired *after* the children
+   were added by the FormBuilder (unless setData() is called manually). Before,
+   the *_SET_DATA events were sometimes thrown before adding child forms,
+   which made it impossible to remove child forms dynamically.
+
+   A consequence of this change is that you need to set the "auto_initialize"
+   option to `false` for `FormInterface` instances that you pass to
+   `FormInterface::add()`:
+
+   Before:
+
+   ```
+   $form = $factory->create('form');
+   $form->add($factory->createNamed('field', 'text'));
+   ```
+
+   This code will now throw an exception with the following message:
+
+   Automatic initialization is only supported on root forms. You should set the
+   "auto_initialize" option to false on the field "field".
+
+   Consequently, you need to set the "auto_initialize" option:
+
+   After (Alternative 1):
+
+   ```
+   $form = $factory->create('form');
+   $form->add($factory->createNamed('field', 'text', array(
+       'auto_initialize' => false,
+   )));
+   ```
+
+   The problem also disappears if you work with `FormBuilder` instances instead
+   of `Form` instances:
+
+   After (Alternative 2):
+
+   ```
+   $builder = $factory->createBuilder('form');
+   $builder->add($factory->createBuilder('field', 'text'));
+   $form = $builder->getForm();
+   ```
+
+   The best solution is in most cases to let `add()` handle the field creation:
+
+   After (Alternative 3):
+
+   ```
+   $form = $factory->create('form');
+   $form->add('field', 'text');
+   ```
+
+   After (Alternative 4):
+
+   ```
+   $builder = $factory->createBuilder('form');
+   $builder->add('field', 'text');
+   $form = $builder->getForm();
+   ```
+
 PropertyAccess
 --------------
 

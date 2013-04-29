@@ -25,6 +25,12 @@ CHANGELOG
  * deprecated bind() and isBound() in Form
  * deprecated AlreadyBoundException in favor of AlreadySubmittedException
  * added support for PATCH requests
+ * [BC BREAK] added initialize() to FormInterface
+ * [BC BREAK] added getAutoInitialize() to FormConfigInterface
+ * [BC BREAK] added setAutoInitialize() to FormConfigBuilderInterface
+ * [BC BREAK] initialization for Form instances added to a form tree must be manually disabled
+ * PRE_SET_DATA is now guaranteed to be called after children were added by the form builder,
+   unless FormInterface::setData() is called manually
 
 2.2.0
 -----

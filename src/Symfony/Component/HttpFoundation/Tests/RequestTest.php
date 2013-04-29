@@ -646,9 +646,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($request->getQueryString(), '->getQueryString() returns null for empty query string');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::getHost
-     */
     public function testGetHost()
     {
         $request = new Request();
@@ -671,9 +668,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('www.host.com', $request->getHost(), '->getHost() value from Host header has priority over SERVER_NAME ');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\Request::getPort
-     */
     public function testGetPort()
     {
         $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
@@ -691,7 +685,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         ));
         $port = $request->getPort();
 
-        $this->assertEquals(8443, $port, 'With PROTO and PORT set PORT takes precende.');
+        $this->assertEquals(8443, $port, 'With PROTO and PORT set PORT takes precedence.');
 
         $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
             'HTTP_X_FORWARDED_PROTO' => 'https'

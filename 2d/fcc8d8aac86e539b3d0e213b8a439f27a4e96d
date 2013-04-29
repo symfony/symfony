@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-27T07:34:36Z
+
+Can you add a test?
+
+---------------------------------------------------------------------------
+
+by alexpods at 2013-04-28T12:04:30Z
+
+Excuse me, maybe I do not understand the question. What test do you mean? InputDefinition already has tests for the getArgument() method (testGetArgument(), testGetInvalidArgument()). My commit do not change the logic of this method,  it's just code enhancement. We don't need to initialize $arguments array, if we don't have specified argument.

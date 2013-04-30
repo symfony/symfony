@@ -76,6 +76,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         try {
             return $this->handleRaw($request, $type);
         } catch (\Exception $e) {
+            $this->finishRequest($request, $type);
+
             if (false === $catch) {
                 throw $e;
             }
@@ -174,11 +176,27 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);
 
-        $this->requestStack->pop();
-
-        $this->dispatcher->dispatch(KernelEvents::REQUEST_FINISHED, new RequestFinishedEvent($this, $request, $type));
+        $this->finishRequest($request, $type);
 
         return $event->getResponse();
+    }
+
+    /**
+     * Publish event finished event, then pop the request from the stack.
+     *
+     * Note: Order of the operations is important here, otherwise operations
+     * such as {@link RequestStack::getParentRequest()} can lead to weird
+     * results.
+     *
+     * @param Request $request
+     * @param int $type
+     *
+     * @return void
+     */
+    private function finishRequest(Request $request, $type)
+    {
+        $this->dispatcher->dispatch(KernelEvents::REQUEST_FINISHED, new RequestFinishedEvent($this, $request, $type));
+        $this->requestStack->pop();
     }
 
     /**

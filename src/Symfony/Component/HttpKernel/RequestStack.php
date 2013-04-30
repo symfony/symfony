@@ -52,7 +52,7 @@ class RequestStack
     /**
      * Return the parent request of the current.
      *
-     * If current Request ist the master request, method returns null.
+     * If current Request is the master request, method returns null.
      *
      * @return Request
      */

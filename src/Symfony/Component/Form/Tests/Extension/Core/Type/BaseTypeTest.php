@@ -25,8 +25,8 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPassIdAndNameToView()
     {
-        $form = $this->factory->createNamed('name', $this->getTestedType());
-        $view = $form->createView();
+        $view = $this->factory->createNamed('name', $this->getTestedType())
+            ->createView();
 
         $this->assertEquals('name', $view->vars['id']);
         $this->assertEquals('name', $view->vars['name']);
@@ -35,8 +35,8 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testStripLeadingUnderscoresAndDigitsFromId()
     {
-        $form = $this->factory->createNamed('_09name', $this->getTestedType());
-        $view = $form->createView();
+        $view = $this->factory->createNamed('_09name', $this->getTestedType())
+            ->createView();
 
         $this->assertEquals('name', $view->vars['id']);
         $this->assertEquals('_09name', $view->vars['name']);
@@ -45,9 +45,10 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPassIdAndNameToViewWithParent()
     {
-        $parent = $this->factory->createNamed('parent', 'form');
-        $parent->add($this->factory->createNamed('child', $this->getTestedType()));
-        $view = $parent->createView();
+        $view = $this->factory->createNamedBuilder('parent', 'form')
+            ->add('child', $this->getTestedType())
+            ->getForm()
+            ->createView();
 
         $this->assertEquals('parent_child', $view['child']->vars['id']);
         $this->assertEquals('child', $view['child']->vars['name']);
@@ -56,10 +57,10 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPassIdAndNameToViewWithGrandParent()
     {
-        $parent = $this->factory->createNamed('parent', 'form');
-        $parent->add($this->factory->createNamed('child', 'form'));
-        $parent['child']->add($this->factory->createNamed('grand_child', $this->getTestedType()));
-        $view = $parent->createView();
+        $builder = $this->factory->createNamedBuilder('parent', 'form')
+            ->add('child', 'form');
+        $builder->get('child')->add('grand_child', $this->getTestedType());
+        $view = $builder->getForm()->createView();
 
         $this->assertEquals('parent_child_grand_child', $view['child']['grand_child']->vars['id']);
         $this->assertEquals('grand_child', $view['child']['grand_child']->vars['name']);
@@ -78,33 +79,38 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testInheritTranslationDomainFromParent()
     {
-        $parent = $this->factory->createNamed('parent', 'form', null, array(
-            'translation_domain' => 'domain',
-        ));
-        $child = $this->factory->createNamed('child', $this->getTestedType());
-        $view = $parent->add($child)->createView();
+        $view = $this->factory
+            ->createNamedBuilder('parent', 'form', null, array(
+                'translation_domain' => 'domain',
+            ))
+            ->add('child', $this->getTestedType())
+            ->getForm()
+            ->createView();
 
         $this->assertEquals('domain', $view['child']->vars['translation_domain']);
     }
 
     public function testPreferOwnTranslationDomain()
     {
-        $parent = $this->factory->createNamed('parent', 'form', null, array(
-            'translation_domain' => 'parent_domain',
-        ));
-        $child = $this->factory->createNamed('child', $this->getTestedType(), null, array(
-            'translation_domain' => 'domain',
-        ));
-        $view = $parent->add($child)->createView();
+        $view = $this->factory
+            ->createNamedBuilder('parent', 'form', null, array(
+                'translation_domain' => 'parent_domain',
+            ))
+            ->add('child', $this->getTestedType(), array(
+                'translation_domain' => 'domain',
+            ))
+            ->getForm()
+            ->createView();
 
         $this->assertEquals('domain', $view['child']->vars['translation_domain']);
     }
 
     public function testDefaultTranslationDomain()
     {
-        $parent = $this->factory->createNamed('parent', 'form');
-        $child = $this->factory->createNamed('child', $this->getTestedType());
-        $view = $parent->add($child)->createView();
+        $view = $this->factory->createNamedBuilder('parent', 'form')
+            ->add('child', $this->getTestedType())
+            ->getForm()
+            ->createView();
 
         $this->assertEquals('messages', $view['child']->vars['translation_domain']);
     }

@@ -495,6 +495,22 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
+     * @param Boolean $initialize
+     *
+     * @throws BadMethodCallException
+     */
+    public function setAutoInitialize($initialize)
+    {
+        if (true === $initialize) {
+            throw new BadMethodCallException('Buttons do not support automatic initialization.');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Unsupported method.
+     *
      * @param Boolean $inheritData
      *
      * @throws BadMethodCallException
@@ -767,6 +783,16 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * @return null Always returns null.
      */
     public function getRequestHandler()
+    {
+        return null;
+    }
+
+    /**
+     * Unsupported method.
+     *
+     * @return null Always returns null.
+     */
+    public function getAutoInitialize()
     {
         return null;
     }

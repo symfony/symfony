@@ -108,11 +108,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $dataMapper;
 
     /**
-     * @var array
-     */
-    private $validators = array();
-
-    /**
      * @var Boolean
      */
     private $required = true;
@@ -171,6 +166,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @var RequestHandlerInterface
      */
     private $requestHandler;
+
+    /**
+     * @var Boolean
+     */
+    private $autoInitialize = false;
 
     /**
      * @var array
@@ -524,6 +524,14 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function getAutoInitialize()
+    {
+        return $this->autoInitialize;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOptions()
     {
         return $this->options;
@@ -839,6 +847,16 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         }
 
         $this->requestHandler = $requestHandler;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAutoInitialize($initialize)
+    {
+        $this->autoInitialize = (Boolean) $initialize;
 
         return $this;
     }

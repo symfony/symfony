@@ -201,9 +201,19 @@ interface FormConfigInterface
     public function getMethod();
 
     /**
-     * @return RequestHandlerInterface The form processor.
+     * Returns the request handler used by the form.
+     *
+     * @return RequestHandlerInterface The request handler.
      */
     public function getRequestHandler();
+
+    /**
+     * Returns whether the form should be initialized upon creation.
+     *
+     * @return Boolean Returns true if the form should be initialized
+     *                 when created, false otherwise.
+     */
+    public function getAutoInitialize();
 
     /**
      * Returns all options passed during the construction of the form.

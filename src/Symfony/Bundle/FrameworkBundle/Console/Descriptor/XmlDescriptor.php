@@ -1,0 +1,110 @@
+<?php
+
+namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
+
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
+
+/**
+ * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ */
+class XmlDescriptor extends Descriptor
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeRouteCollection(RouteCollection $routes, array $options = array())
+    {
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->appendChild($routesXML = $dom->createElement('routes'));
+
+        foreach ($routes->all() as $name => $route) {
+            $routeXML = $this->describeRoute($route, array('as_dom' => true, 'name' => $name));
+            $routesXML->appendChild($routesXML->ownerDocument->importNode($routeXML->childNodes->item(0), true));
+        }
+
+        return $this->output($dom, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeRoute(Route $route, array $options = array())
+    {
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->appendChild($routeXML = $dom->createElement('route'));
+
+        if (isset($options['name'])) {
+            $routeXML->setAttribute('name', $options['name']);
+        }
+
+        $routeXML->setAttribute('path', $route->getPath());
+        $routeXML->setAttribute('class', get_class($route));
+        $routeXML->setAttribute('path_regex', $route->compile()->getRegex());
+
+        if ('' !== $route->getHost()) {
+            $routeXML->appendChild($hostXML = $dom->createElement('host'));
+            $hostXML->appendChild(new \DOMText($route->getHost()));
+        }
+
+        foreach ($route->getSchemes() as $scheme) {
+            $routeXML->appendChild($schemeXML = $dom->createElement('scheme'));
+            $schemeXML->appendChild(new \DOMText($scheme));
+        }
+
+        foreach ($route->getMethods() as $method) {
+            $routeXML->appendChild($methodXML = $dom->createElement('method'));
+            $methodXML->appendChild(new \DOMText($method));
+        }
+
+        if (count($route->getDefaults())) {
+            $routeXML->appendChild($defaultsXML = $dom->createElement('defaults'));
+            foreach ($route->getDefaults() as $attribute => $value) {
+                $defaultsXML->appendChild($defaultXML = $dom->createElement('default'));
+                $defaultXML->setAttribute('attribute', $attribute);
+                $defaultXML->appendChild(new \DOMText($this->formatValue($value)));
+            }
+        }
+
+        $requirements = $route->getRequirements();
+        unset($requirements['_scheme'], $requirements['_method']);
+        if (count($requirements)) {
+            $routeXML->appendChild($requirementsXML = $dom->createElement('requirements'));
+            foreach ($route->getOptions() as $attribute => $pattern) {
+                $requirementsXML->appendChild($requirementXML = $dom->createElement('requirement'));
+                $requirementXML->setAttribute('attribute', $attribute);
+                $requirementXML->appendChild(new \DOMText($pattern));
+            }
+        }
+
+        if (count($route->getOptions())) {
+            $routeXML->appendChild($optionsXML = $dom->createElement('options'));
+            foreach ($route->getOptions() as $name => $value) {
+                $optionsXML->appendChild($optionXML = $dom->createElement('option'));
+                $optionXML->setAttribute('name', $name);
+                $optionXML->appendChild(new \DOMText($this->formatValue($value)));
+            }
+        }
+
+        return $this->output($dom, $options);
+    }
+
+    /**
+     * Outputs document as DOMDocument or string according to options.
+     *
+     * @param \DOMDocument $dom
+     * @param array        $options
+     *
+     * @return \DOMDocument|string
+     */
+    private function output(\DOMDocument $dom, array $options)
+    {
+        if (isset($options['as_dom']) && $options['as_dom']) {
+            return $dom;
+        }
+
+        $dom->formatOutput = true;
+
+        return $dom->saveXML();
+    }
+}

@@ -353,7 +353,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process->start();
         posix_kill($process->getPid(), $termSignal);
 
-        $this->setExpectedException('Symfony\Component\Process\Exception\RuntimeException', 'The process stopped because of a "9" signal.');
+        $this->setExpectedException('Symfony\Component\Process\Exception\RuntimeException', 'The process has been signaled with signal "9".');
         $process->wait();
     }
 

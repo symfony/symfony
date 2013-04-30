@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
-use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -51,6 +50,9 @@ class PhpDumper extends Dumper
     private $variableCount;
     private $reservedVariables = array('instance', 'class');
 
+    /**
+     * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
+     */
     private $proxyDumper;
 
     /**
@@ -63,8 +65,7 @@ class PhpDumper extends Dumper
         parent::__construct($container);
 
         $this->inlinedDefinitions = new \SplObjectStorage;
-        $this->proxyDumper = new \Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
-        //$this->proxyDumper        = new NullDumper();
+        $this->proxyDumper        = $container->getProxyDumper();
     }
 
     /**

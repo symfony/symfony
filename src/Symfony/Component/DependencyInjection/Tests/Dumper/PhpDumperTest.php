@@ -52,43 +52,6 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertNotRegexp("/function getDefaultParameters\(/", $dumpedString, '->dump() does not add getDefaultParameters() method definition.');
     }
 
-    public function testDumpContainerWithProxyService()
-    {
-        $container = new ContainerBuilder();
-
-        $container->register('foo', 'stdClass');
-        $container->getDefinition('foo')->setLazy(true);
-        $container->compile();
-
-        $dumper       = new PhpDumper($container);
-        $dumpedString = $dumper->dump();
-
-        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/lazy_service_structure.txt', $dumpedString, '->dump() does generate proxy lazy loading logic.');
-    }
-
-    /**
-     * Verifies that the generated container retrieves the same proxy instance on multiple subsequent requests
-     */
-    public function testDumpContainerWithProxyServiceWillShareProxies()
-    {
-        require_once self::$fixturesPath.'/php/lazy_service.php';
-
-        $container = new \LazyServiceProjectServiceContainer();
-
-        /* @var $proxy \stdClass_c1d194250ee2e2b7d2eab8b8212368a8 */
-        $proxy = $container->get('foo');
-
-        $this->assertInstanceOf('stdClass_c1d194250ee2e2b7d2eab8b8212368a8', $proxy);
-        $this->assertSame($proxy, $container->get('foo'));
-
-        $this->assertFalse($proxy->isProxyInitialized());
-
-        $proxy->initializeProxy();
-
-        $this->assertTrue($proxy->isProxyInitialized());
-        $this->assertSame($proxy, $container->get('foo'));
-    }
-
     public function testDumpOptimizationString()
     {
         $definition = new Definition();

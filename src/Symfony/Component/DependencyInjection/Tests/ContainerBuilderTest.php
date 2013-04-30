@@ -267,27 +267,17 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
      */
-    public function testCreateServiceWithDelegateFactory()
+    public function testCreateProxyWithRealServiceInstantiator()
     {
         $builder = new ContainerBuilder();
 
         $builder->register('foo1', 'FooClass')->setFile(__DIR__.'/Fixtures/includes/foo.php');
         $builder->getDefinition('foo1')->setLazy(true);
 
-        /* @var $foo1 \ProxyManager\Proxy\LazyLoadingInterface|\ProxyManager\Proxy\ValueHolderInterface */
         $foo1 = $builder->get('foo1');
 
         $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
-        $this->assertInstanceOf('\FooClass', $foo1);
-        $this->assertInstanceOf('\ProxyManager\Proxy\LazyLoadingInterface', $foo1);
-        $this->assertFalse($foo1->isProxyInitialized());
-
-        $foo1->initializeProxy();
-
-        $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved after initialization');
-        $this->assertTrue($foo1->isProxyInitialized());
-        $this->assertInstanceOf('\FooClass', $foo1->getWrappedValueHolderValue());
-        $this->assertNotInstanceOf('\ProxyManager\Proxy\LazyLoadingInterface', $foo1->getWrappedValueHolderValue());
+        $this->assertSame('FooClass', get_class($foo1));
     }
 
     /**

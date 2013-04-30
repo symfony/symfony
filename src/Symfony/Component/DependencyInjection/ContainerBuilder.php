@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
-use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -128,8 +126,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getProxyInstantiator()
     {
         if (!$this->proxyInstantiator) {
-            //$this->proxyInstantiator = new RealServiceInstantiator();
-            $this->proxyInstantiator = new RuntimeInstantiator();
+            $this->proxyInstantiator = new RealServiceInstantiator();
         }
 
         return $this->proxyInstantiator;
@@ -155,8 +152,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getProxyDumper()
     {
         if (!$this->proxyDumper) {
-            //$this->proxyDumper = new NullDumper();
-            $this->proxyDumper = new ProxyDumper();
+            $this->proxyDumper = new NullDumper();
         }
 
         return $this->proxyDumper;

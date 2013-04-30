@@ -155,14 +155,17 @@ class FrameworkExtension extends Extension
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('form.xml');
-        if (isset($config['csrf_protection'])) {
+        if (isset($config['csrf_protection']) && isset($config['csrf_protection']['enabled']) && $config['csrf_protection']['enabled']) {
             if (!isset($config['session'])) {
                 throw new \LogicException('CSRF protection needs that sessions are enabled.');
             }
-            $loader->load('form_csrf.xml');
 
             $container->setParameter('form.type_extension.csrf.enabled', $config['csrf_protection']['enabled']);
             $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
+        }
+
+        if ($container->hasParameter('form.type_extension.csrf.enabled') && $container->getParameter('form.type_extension.csrf.enabled')) {
+          $loader->load('form_csrf.xml');
         }
     }
 

@@ -17,12 +17,27 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    private $context;
+
+    public function setUp()
+    {
+        $this->context = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\RequestContext')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $this->context
+            ->expects($this->any())
+            ->method('getCurrentRequest')
+            ->will($this->returnValue(Request::create('/')))
+        ;
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
     public function testRenderWhenRendererDoesNotExist()
     {
-        $handler = new FragmentHandler();
+        $handler = new FragmentHandler($this->context);
         $handler->render('/', 'foo');
     }
 
@@ -72,9 +87,8 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
             call_user_func_array(array($e, 'with'), $arguments);
         }
 
-        $handler = new FragmentHandler();
+        $handler = new FragmentHandler($this->context);
         $handler->addRenderer($renderer);
-        $handler->setRequest(Request::create('/'));
 
         return $handler;
     }

@@ -77,10 +77,10 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         try {
             $bag->get('baba');
-            $this->fail('->get() throws an \InvalidArgumentException if the key does not exist');
+            $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\InvalidArgumentException', $e, '->get() throws an \InvalidArgumentException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent parameter "baba".', $e->getMessage(), '->get() throws an \InvalidArgumentException if the key does not exist');
+            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
+            $this->assertEquals('You have requested a non-existent parameter "baba".', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
         }
     }
 
@@ -97,7 +97,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
             $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent parameter "foo1". Did you mean this: "foo" ?', $e->getMessage(), '->get() throws an \InvalidArgumentException with some advices');
+            $this->assertEquals('You have requested a non-existent parameter "foo1". Did you mean this: "foo" ?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException with some advices');
         }
 
         try {
@@ -105,7 +105,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
             $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent parameter "bag". Did you mean one of these: "bar", "baz" ?', $e->getMessage(), '->get() throws an \InvalidArgumentException with some advices');
+            $this->assertEquals('You have requested a non-existent parameter "bag". Did you mean one of these: "bar", "baz" ?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException with some advices');
         }
     }
 

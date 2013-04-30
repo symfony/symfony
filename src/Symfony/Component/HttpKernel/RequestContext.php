@@ -15,7 +15,7 @@ namespace Symfony\Component\HttpKernel;
  * Registry for Requests.
  *
  * Facade for RequestStack that prevents modification of the stack,
- * so that users don't accidentily push()/pop() from the stack and
+ * so that users don't accidentally push()/pop() from the stack and
  * mess up the request cycle.
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>

@@ -106,7 +106,7 @@ final class KernelEvents
     /**
      * The REQUEST_FINISHED event occurs when a response was generated for a request.
      *
-     * This event allows you to reset the global and envioronmental state of
+     * This event allows you to reset the global and environmental state of
      * the application, when it was changed during the request.
      *
      * @var string

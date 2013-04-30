@@ -454,6 +454,25 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
+    public function initialize()
+    {
+        if (null !== $this->parent) {
+            throw new RuntimeException('Only root forms should be initialized.');
+        }
+
+        // Guarantee that the *_SET_DATA events have been triggered once the
+        // form is initialized. This makes sure that dynamically added or
+        // removed fields are already visible after initialization.
+        if (!$this->defaultDataSet) {
+            $this->setData($this->config->getData());
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function handleRequest($request = null)
     {
         $this->config->getRequestHandler()->handleRequest($this, $request);
@@ -774,7 +793,11 @@ class Form implements \IteratorAggregate, FormInterface
         //  * getViewData() is called
         //  * setData() is called since the form is not initialized yet
         //  * ... endless recursion ...
-        if (!$this->lockSetData && !$this->config->getInheritData()) {
+        //
+        // Also skip data mapping if setData() has not been called yet.
+        // setData() will be called upon form initialization and data mapping
+        // will take place by then.
+        if (!$this->lockSetData && $this->defaultDataSet && !$this->config->getInheritData()) {
             $viewData = $this->getViewData();
         }
 
@@ -787,18 +810,27 @@ class Form implements \IteratorAggregate, FormInterface
                 throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');
             }
 
+            // Never initialize child forms automatically
+            $options['auto_initialize'] = false;
+
             if (null === $type) {
                 $child = $this->config->getFormFactory()->createForProperty($this->config->getDataClass(), $child, null, $options);
             } else {
                 $child = $this->config->getFormFactory()->createNamed($child, $type, null, $options);
             }
+        } elseif ($child->getConfig()->getAutoInitialize()) {
+            throw new RuntimeException(sprintf(
+                'Automatic initialization is only supported on root forms. You '.
+                'should set the "auto_initialize" option to false on the field "%s".',
+                $child->getName()
+            ));
         }
 
         $this->children[$child->getName()] = $child;
 
         $child->setParent($this);
 
-        if (!$this->lockSetData && !$this->config->getInheritData()) {
+        if (!$this->lockSetData && $this->defaultDataSet && !$this->config->getInheritData()) {
             $childrenIterator = new InheritDataAwareIterator(array($child));
             $childrenIterator = new \RecursiveIteratorIterator($childrenIterator);
             $this->config->getDataMapper()->mapDataToForms($viewData, $childrenIterator);

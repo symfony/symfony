@@ -227,13 +227,23 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function isSynchronized();
 
     /**
-     * Processes the given request and calls {@link submit()} if it was submitted.
+     * Initializes the form tree.
      *
-     * Internally, the request is forwarded to a {@link RequestHandlerInterface}
-     * instance. This instance determines the allowed value of the
-     * $request parameter.
+     * Should be called on the root form after constructing the tree.
      *
-     * @param mixed $request The request to check.
+     * @return FormInterface The form instance.
+     */
+    public function initialize();
+
+    /**
+     * Inspects the given request and calls {@link submit()} if the form was
+     * submitted.
+     *
+     * Internally, the request is forwarded to the configured
+     * {@link RequestHandlerInterface} instance, which determines whether to
+     * submit the form or not.
+     *
+     * @param mixed $request The request to handle.
      *
      * @return FormInterface The form instance.
      */

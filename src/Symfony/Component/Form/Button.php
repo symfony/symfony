@@ -346,13 +346,23 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
+     * @throws BadMethodCallException
+     */
+    public function initialize()
+    {
+        throw new BadMethodCallException('Buttons cannot be initialized. Call initialized() on the root form instead.');
+    }
+
+    /**
+     * Unsupported method.
+     *
      * @param mixed $request
      *
      * @throws BadMethodCallException
      */
     public function handleRequest($request = null)
     {
-        throw new BadMethodCallException('Buttons cannot be processed. Call process() on the root form instead.');
+        throw new BadMethodCallException('Buttons cannot handle requests. Call handleRequest() on the root form instead.');
     }
 
     /**

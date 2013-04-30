@@ -1152,9 +1152,10 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDateErrorBubbling()
     {
-        $child = $this->factory->createNamed('date', 'date');
-        $form = $this->factory->createNamed('form', 'form')->add($child);
-        $child->addError(new FormError('[trans]Error![/trans]'));
+        $form = $this->factory->createNamedBuilder('form', 'form')
+            ->add('date', 'date')
+            ->getForm();
+        $form->get('date')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
         $this->assertEmpty($this->renderErrors($view));
@@ -1678,9 +1679,10 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTimeErrorBubbling()
     {
-        $child = $this->factory->createNamed('time', 'time');
-        $form = $this->factory->createNamed('form', 'form')->add($child);
-        $child->addError(new FormError('[trans]Error![/trans]'));
+        $form = $this->factory->createNamedBuilder('form', 'form')
+            ->add('time', 'time')
+            ->getForm();
+        $form->get('time')->addError(new FormError('[trans]Error![/trans]'));
         $view = $form->createView();
 
         $this->assertEmpty($this->renderErrors($view));

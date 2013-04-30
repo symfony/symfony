@@ -72,11 +72,11 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->factory->expects($this->at(0))
             ->method('createNamed')
-            ->with(1, 'text', null, array('property_path' => '[1]', 'max_length' => 10))
+            ->with(1, 'text', null, array('property_path' => '[1]', 'max_length' => 10, 'auto_initialize' => false))
             ->will($this->returnValue($this->getForm('1')));
         $this->factory->expects($this->at(1))
             ->method('createNamed')
-            ->with(2, 'text', null, array('property_path' => '[2]', 'max_length' => 10))
+            ->with(2, 'text', null, array('property_path' => '[2]', 'max_length' => 10, 'auto_initialize' => false))
             ->will($this->returnValue($this->getForm('2')));
 
         $data = array(1 => 'string', 2 => 'string');
@@ -116,7 +116,7 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->factory->expects($this->once())
             ->method('createNamed')
-            ->with(1, 'text', null, array('property_path' => '[1]', 'max_length' => 10))
+            ->with(1, 'text', null, array('property_path' => '[1]', 'max_length' => 10, 'auto_initialize' => false))
             ->will($this->returnValue($this->getForm('1')));
 
         $data = array(0 => 'string', 1 => 'string');

@@ -154,7 +154,10 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->factory->expects($this->once())
             ->method('createNamed')
-            ->with('foo', 'text', null, array('bar' => 'baz'))
+            ->with('foo', 'text', null, array(
+                'bar' => 'baz',
+                'auto_initialize' => false,
+            ))
             ->will($this->returnValue($child));
 
         $this->form->add('foo', 'text', array('bar' => 'baz'));
@@ -170,7 +173,10 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->factory->expects($this->once())
             ->method('createNamed')
-            ->with('0', 'text', null, array('bar' => 'baz'))
+            ->with('0', 'text', null, array(
+                'bar' => 'baz',
+                'auto_initialize' => false,
+            ))
             ->will($this->returnValue($child));
 
         // in order to make casting unnecessary
@@ -213,7 +219,10 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->factory->expects($this->once())
             ->method('createForProperty')
-            ->with('\stdClass', 'foo', null, array('bar' => 'baz'))
+            ->with('\stdClass', 'foo', null, array(
+                'bar' => 'baz',
+                'auto_initialize' => false,
+            ))
             ->will($this->returnValue($child));
 
         $this->form->add('foo', null, array('bar' => 'baz'));
@@ -287,7 +296,7 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertSame($this->form->all(), iterator_to_array($this->form));
     }
 
-    public function testAddMapsViewDataToForm()
+    public function testAddMapsViewDataToFormIfInitialized()
     {
         $test = $this;
         $mapper = $this->getDataMapper();
@@ -310,6 +319,22 @@ class CompoundFormTest extends AbstractFormTest
                 $test->assertSame(array($child), iterator_to_array($iterator));
             }));
 
+        $form->initialize();
+        $form->add($child);
+    }
+
+    public function testAddDoesNotMapViewDataToFormIfNotInitialized()
+    {
+        $mapper = $this->getDataMapper();
+        $form = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($mapper)
+            ->getForm();
+
+        $child = $this->getBuilder()->getForm();
+        $mapper->expects($this->never())
+            ->method('mapDataToForms');
+
         $form->add($child);
     }
 
@@ -326,6 +351,7 @@ class CompoundFormTest extends AbstractFormTest
         $mapper->expects($this->never())
             ->method('mapDataToForms');
 
+        $form->initialize();
         $form->add($child);
     }
 

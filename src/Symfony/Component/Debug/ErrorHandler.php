@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
  * ErrorHandler.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Konstantin Myakshin <koc-dp@yandex.ru>
  */
 class ErrorHandler
 {
@@ -43,20 +44,26 @@ class ErrorHandler
 
     private $reservedMemory;
 
-    /** @var LoggerInterface */
-    private static $logger;
+    private $displayErrors;
+
+    /**
+     * @var LoggerInterface[] Loggers for channels
+     */
+    private static $loggers = array();
 
     /**
      * Registers the error handler.
      *
      * @param integer $level The level at which the conversion to Exception is done (null to use the error_reporting() value and 0 to disable)
+     * @param Boolean $displayErrors Display errors (for dev environment) or just log they (production usage)
      *
      * @return The registered error handler
      */
-    public static function register($level = null)
+    public static function register($level = null, $displayErrors = true)
     {
         $handler = new static();
         $handler->setLevel($level);
+        $handler->setDisplayErrors($displayErrors);
 
         ini_set('display_errors', 0);
         set_error_handler(array($handler, 'handle'));
@@ -71,9 +78,14 @@ class ErrorHandler
         $this->level = null === $level ? error_reporting() : $level;
     }
 
-    public static function setLogger(LoggerInterface $logger)
+    public function setDisplayErrors($displayErrors)
     {
-        self::$logger = $logger;
+        $this->displayErrors = $displayErrors;
+    }
+
+    public static function setLogger(LoggerInterface $logger, $channel = 'deprecation')
+    {
+        self::$loggers[$channel] = $logger;
     }
 
     /**
@@ -86,7 +98,7 @@ class ErrorHandler
         }
 
         if ($level & (E_USER_DEPRECATED | E_DEPRECATED)) {
-            if (null !== self::$logger) {
+            if (isset(self::$loggers['deprecation'])) {
                 if (version_compare(PHP_VERSION, '5.4', '<')) {
                     $stack = array_map(
                         function ($row) {
@@ -99,13 +111,13 @@ class ErrorHandler
                     $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
                 }
 
-                self::$logger->warning($message, array('type' => self::TYPE_DEPRECATION, 'stack' => $stack));
+                self::$loggers['deprecation']->warning($message, array('type' => self::TYPE_DEPRECATION, 'stack' => $stack));
             }
 
             return true;
         }
 
-        if (error_reporting() & $level && $this->level & $level) {
+        if ($this->displayErrors && error_reporting() & $level && $this->level & $level) {
             throw new \ErrorException(sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line), 0, $level, $file, $line);
         }
 
@@ -121,6 +133,20 @@ class ErrorHandler
         unset($this->reservedMemory);
         $type = $error['type'];
         if (0 === $this->level || !in_array($type, array(E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE))) {
+            return;
+        }
+
+        if (isset(self::$loggers['emergency'])) {
+            $fatal = array(
+                'type' => $type,
+                'file' => $error['file'],
+                'line' => $error['line'],
+            );
+
+            self::$loggers['emergency']->emerg($error['message'], $fatal);
+        }
+
+        if (!$this->displayErrors) {
             return;
         }
 

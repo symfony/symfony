@@ -74,7 +74,7 @@ class RouterListener implements EventSubscriberInterface
      *
      * @param Request|null $request A Request instance
      */
-    public function setRequest(Request $request = null)
+    private function populateRoutingContext(Request $request = null)
     {
         if (null !== $request) {
             $this->context->fromRequest($request);
@@ -83,7 +83,7 @@ class RouterListener implements EventSubscriberInterface
 
     public function onKernelRequestFinished(RequestFinishedEvent $event)
     {
-        $this->setRequest($this->kernelContext->getParentRequest());
+        $this->populateRoutingContext($this->kernelContext->getParentRequest());
     }
 
     public function onKernelRequest(GetResponseEvent $event)
@@ -93,7 +93,7 @@ class RouterListener implements EventSubscriberInterface
         // initialize the context that is also used by the generator (assuming matcher and generator share the same context instance)
         // we call setRequest even if most of the time, it has already been done to keep compatibility
         // with frameworks which do not use the Symfony service container
-        $this->setRequest($request);
+        $this->populateRoutingContext($request);
 
         if ($request->attributes->has('_controller')) {
             // routing is already done

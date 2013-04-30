@@ -77,7 +77,12 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $array = array('child' => array('index' => array()));
 
-        $this->assertNull($this->propertyAccessor->getValue($array, '[child][index][firstName]'));
+        try {
+            $this->propertyAccessor->getValue($array, '[child][index][firstName]');
+            $this->fail('Getting value on a nonexistent path from array should throw a Symfony\Component\PropertyAccess\Exception\NoSuchIndexException exception');
+        } catch (\Exception $e) {
+            $this->assertInstanceof('Symfony\Component\PropertyAccess\Exception\NoSuchIndexException', $e, 'Getting value on a nonexistent path from array should throw a Symfony\Component\PropertyAccess\Exception\NoSuchIndexException exception');
+        }
     }
 
     public function testGetValueReadsProperty()

@@ -10,3 +10,5 @@ CHANGELOG
    method even if a non-public match was found. Before, a PropertyAccessDeniedException
    was thrown in this case. Class PropertyAccessDeniedException was removed
    now.
+ * deprecated PropertyAccess::getPropertyAccessor
+ * added PropertyAccess::createPropertyAccessor and PropertyAccess::createPropertyAccessorBuilder

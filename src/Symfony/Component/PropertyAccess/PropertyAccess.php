@@ -23,9 +23,9 @@ final class PropertyAccess
      *
      * @return PropertyAccessor The new property accessor
      */
-    public static function getPropertyAccessor()
+    public static function createPropertyAccessor()
     {
-        return new PropertyAccessor();
+        return self::createPropertyAccessorBuilder()->getPropertyAccessor();
     }
 
     /**
@@ -33,9 +33,22 @@ final class PropertyAccess
      *
      * @return PropertyAccessorBuilder The new property accessor builder
      */
-    public static function getPropertyAccessorBuilder()
+    public static function createPropertyAccessorBuilder()
     {
         return new PropertyAccessorBuilder();
+    }
+
+    /**
+     * Alias of {@link getPropertyAccessor}.
+     *
+     * @return PropertyAccessor The new property accessor
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link createPropertyAccessor()} instead.
+     */
+    public static function getPropertyAccessor()
+    {
+        return self::createPropertyAccessor();
     }
 
     /**

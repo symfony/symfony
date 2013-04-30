@@ -17,23 +17,27 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Injects the logger into the ErrorHandler, so that it can log deprecation errors.
+ * Injects the logger into the ErrorHandler, so that it can log various errors.
  *
  * @author Colin Frei <colin@colinfrei.com>
+ * @author Konstantin Myakshin <koc-dp@yandex.ru>
  */
-class DeprecationLoggerListener implements EventSubscriberInterface
+class ErrorsLoggerListener implements EventSubscriberInterface
 {
+    private $channel;
+
     private $logger;
 
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct($channel, LoggerInterface $logger = null)
     {
+        $this->channel = $channel;
         $this->logger = $logger;
     }
 
     public function injectLogger()
     {
         if (null !== $this->logger) {
-            ErrorHandler::setLogger($this->logger);
+            ErrorHandler::setLogger($this->logger, $this->channel);
         }
     }
 

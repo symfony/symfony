@@ -133,6 +133,11 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
         $this->markTestSkipped('Stopping with signal is not supported in sigchild environment');
     }
 
+    public function testProcessThrowsExceptionWhenExternallySignaled()
+    {
+        $this->markTestSkipped('Retrieving Pid is not supported in sigchild environment');
+    }
+
     /**
      * {@inheritdoc}
      */

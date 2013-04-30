@@ -337,6 +337,26 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($termSignal, $process->getTermSignal());
     }
 
+    public function testProcessThrowsExceptionWhenExternallySignaled()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('Windows does not support POSIX signals');
+        }
+
+        if (!function_exists('posix_kill')) {
+            $this->markTestSkipped('posix_kill is required for this test');
+        }
+
+        $termSignal = defined('SIGKILL') ? SIGKILL : 9;
+
+        $process = $this->getProcess('exec php -r "while (true) {}"');
+        $process->start();
+        posix_kill($process->getPid(), $termSignal);
+
+        $this->setExpectedException('Symfony\Component\Process\Exception\RuntimeException', 'The process stopped because of a "9" signal.');
+        $process->wait();
+    }
+
     public function testRestart()
     {
         $process1 = $this->getProcess('php -r "echo getmypid();"');

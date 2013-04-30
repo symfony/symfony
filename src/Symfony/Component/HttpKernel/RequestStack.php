@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\HttpKernel;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -8,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
  * Request stack that controls the lifecycle of requests.
  *
  * Notifies services of changes in the stack.
+ *
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 class RequestStack
 {
@@ -34,18 +45,22 @@ class RequestStack
     }
 
     /**
-     * @return Request
+     * @return Request|null
      */
     public function getCurrentRequest()
     {
-        return end($this->requests);
+        return end($this->requests) ?: null;
     }
 
     /**
-     * @return Request
+     * @return Request|null
      */
     public function getMasterRequest()
     {
+        if (!$this->requests) {
+            return null;
+        }
+
         return $this->requests[0];
     }
 

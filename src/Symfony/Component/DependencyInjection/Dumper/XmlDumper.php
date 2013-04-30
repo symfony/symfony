@@ -133,6 +133,9 @@ class XmlDumper extends Dumper
         if ($definition->isSynchronized()) {
             $service->setAttribute('synchronized', 'true');
         }
+        if ($definition->isLazy()) {
+            $service->setAttribute('lazy', 'true');
+        }
 
         foreach ($definition->getTags() as $name => $tags) {
             foreach ($tags as $attributes) {

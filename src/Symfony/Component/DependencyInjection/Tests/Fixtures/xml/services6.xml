@@ -46,6 +46,6 @@
     <service id="alias_for_foo" alias="foo" />
     <service id="another_alias_for_foo" alias="foo" public="false" />
     <service id="factory_service" factory-method="getInstance" factory-service="baz_factory" />
-    <service id="request" class="Request" synthetic="true" synchronized="true"/>
+    <service id="request" class="Request" synthetic="true" synchronized="true" lazy="true"/>
   </services>
 </container>

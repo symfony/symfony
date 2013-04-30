@@ -28,3 +28,4 @@ services:
         class: Request
         synthetic: true
         synchronized: true
+        lazy: true

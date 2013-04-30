@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use ProxyManager\Generator\ClassGenerator;
+use ProxyManager\GeneratorStrategy\BaseGeneratorStrategy;
+use ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -94,7 +97,8 @@ class PhpDumper extends Dumper
         $code .=
             $this->addServices().
             $this->addDefaultParametersMethod().
-            $this->endClass()
+            $this->endClass().
+            $this->addProxyClasses()
         ;
 
         return $code;
@@ -144,6 +148,88 @@ class PhpDumper extends Dumper
 
         if ('' !== $code) {
             $code .= "\n";
+        }
+
+        return $code;
+    }
+
+    /**
+     * Generates the logic required for proxy lazy loading
+     *
+     * @param string     $id         The service id
+     * @param Definition $definition
+     *
+     * @return string
+     */
+    private function addProxyLoading($id, Definition $definition)
+    {
+        if (!$this->isProxyCandidate($definition)) {
+            return '';
+        }
+
+        $instantiation = 'return';
+
+        if (ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
+            $instantiation .= " \$this->services['$id'] =";
+        } elseif (ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+            $instantiation .= " \$this->services['$id'] = \$this->scopedServices['$scope']['$id'] =";
+        }
+
+        $methodName = 'get' . Container::camelize($id) . 'Service';
+        $proxyClass = str_replace('\\', '', $definition->getClass()) . '_' . spl_object_hash($definition);
+
+        return <<<EOF
+        if (\$lazyLoad) {
+            \$container = \$this;
+
+            $instantiation new $proxyClass(
+                function (& \$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) use (\$container) {
+                    \$proxy->setProxyInitializer(null);
+
+                    \$wrappedInstance = \$container->$methodName(false);
+
+                    return true;
+                }
+            );
+        }
+
+
+EOF;
+    }
+
+    /**
+     * Generates code for the proxy classes to be attached after the container class
+     *
+     * @return string
+     */
+    private function addProxyClasses()
+    {
+        $proxyDefinitions = array();
+
+        foreach ($this->container->getDefinitions() as $definition) {
+            if ($this->isProxyCandidate($definition)) {
+                $proxyDefinitions[] = $definition;
+            }
+        }
+
+        // avoids hard dependency to ProxyManager
+        if (empty($proxyDefinitions)) {
+            return '';
+        }
+
+        $proxyGenerator = new LazyLoadingValueHolderGenerator();
+        $classGenerator = new BaseGeneratorStrategy();
+        $code           = '';
+
+        /* @var $proxyDefinitions Definition[] */
+        foreach ($proxyDefinitions as $definition) {
+            $generatedClass = new ClassGenerator(
+                str_replace('\\', '', $definition->getClass()) . '_' . md5(spl_object_hash($definition))
+            );
+
+            $proxyGenerator->generate(new \ReflectionClass($definition->getClass()), $generatedClass);
+
+            $code .= "\n" . $classGenerator->generate($generatedClass);
         }
 
         return $code;
@@ -280,12 +366,13 @@ class PhpDumper extends Dumper
             throw new InvalidArgumentException(sprintf('"%s" is not a valid class name for the "%s" service.', $class, $id));
         }
 
-        $simple = $this->isSimpleInstance($id, $definition);
+        $simple           = $this->isSimpleInstance($id, $definition);
+        $isProxyCandidate = $this->isProxyCandidate($definition);
+        $instantiation    = '';
 
-        $instantiation = '';
-        if (ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
+        if (!$isProxyCandidate && ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
             $instantiation = "\$this->services['$id'] = ".($simple ? '' : '$instance');
-        } elseif (ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
+        } elseif (!$isProxyCandidate && ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
             $instantiation = "\$this->services['$id'] = \$this->scopedServices['$scope']['$id'] = ".($simple ? '' : '$instance');
         } elseif (!$simple) {
             $instantiation = '$instance';
@@ -483,17 +570,31 @@ EOF;
 EOF;
         }
 
-        $code = <<<EOF
+        if ($definition->isLazy()) {
+            $lazyInitialization    = '$lazyLoad = true';
+            $lazyInitializationDoc = "\n     * @param boolean \$lazyLoad whether to try lazy-loading the"
+                . " service with a proxy\n     *";
+        } else {
+            $lazyInitialization    = '';
+            $lazyInitializationDoc = '';
+        }
+
+        // with proxies, for 5.3.3 compatibility, the getter must be public to be accessible to the initializer
+        $isProxyCandidate = $this->isProxyCandidate($definition);
+        $visibility       = $isProxyCandidate ? 'public' : 'protected';
+        $code             = <<<EOF
 
     /**
      * Gets the '$id' service.$doc
-     *
+     *$lazyInitializationDoc
      * $return
      */
-    protected function get{$name}Service()
+    {$visibility} function get{$name}Service($lazyInitialization)
     {
 
 EOF;
+
+        $code .= $isProxyCandidate ? $this->addProxyLoading($id, $definition) : '';
 
         if (!in_array($scope, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE))) {
             $code .= <<<EOF
@@ -1176,6 +1277,29 @@ EOF;
 
             return sprintf('$this->get(\'%s\')', $id);
         }
+    }
+
+    /**
+     * Tells if the given definitions are to be used for proxying, and if proxying is possible,
+     * since ProxyManager may not be available
+     *
+     * @param Definition $definition
+     *
+     * @return bool
+     */
+    private function isProxyCandidate(Definition $definition)
+    {
+        if (!(
+            $definition->isLazy()
+            && $definition->getClass()
+            && class_exists('ProxyManager\\Factory\\LazyLoadingValueHolderFactory')
+        )) {
+            return false;
+        }
+
+        $class = $this->dumpValue($definition->getClass());
+
+        return (boolean) preg_match('/^\'[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\\{2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*\'$/', $class);
     }
 
     /**

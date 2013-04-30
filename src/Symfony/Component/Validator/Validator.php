@@ -160,7 +160,7 @@ class Validator implements ValidatorInterface
      */
     public function validateValue($value, $constraints, $groups = null)
     {
-        $context = new ExecutionContext($this->createVisitor(null), $this->translator, $this->translationDomain);
+        $context = new ExecutionContext($this->createVisitor($value), $this->translator, $this->translationDomain);
 
         $constraints = is_array($constraints) ? $constraints : array($constraints);
 

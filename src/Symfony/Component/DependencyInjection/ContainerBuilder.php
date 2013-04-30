@@ -11,10 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-use ProxyManager\Configuration;
-use ProxyManager\Factory\LazyLoadingValueHolderFactory;
-use ProxyManager\GeneratorStrategy\EvaluatingGeneratorStrategy;
-use ProxyManager\Proxy\LazyLoadingInterface;
+use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
+use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -26,6 +24,10 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
+use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
+use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
+use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.
@@ -76,6 +78,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $trackResources = true;
 
     /**
+     * @var InstantiatorInterface|null
+     */
+    private $proxyInstantiator;
+
+    /**
+     * @var DumperInterface|null
+     */
+    private $proxyDumper;
+
+    /**
      * Sets the track resources flag.
      *
      * If you are not using the loaders and therefore don't want
@@ -96,6 +108,58 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function isTrackingResources()
     {
         return $this->trackResources;
+    }
+
+    /**
+     * Sets the instantiator to be used when fetching proxies
+     *
+     * @param InstantiatorInterface $proxyInstantiator
+     */
+    public function setProxyInstantiator(InstantiatorInterface $proxyInstantiator)
+    {
+        $this->proxyInstantiator = $proxyInstantiator;
+    }
+
+    /**
+     * Retrieves the currently set proxy instantiator
+     *
+     * @return InstantiatorInterface
+     */
+    public function getProxyInstantiator()
+    {
+        if (!$this->proxyInstantiator) {
+            //$this->proxyInstantiator = new RealServiceInstantiator();
+            $this->proxyInstantiator = new RuntimeInstantiator();
+        }
+
+        return $this->proxyInstantiator;
+    }
+
+    /**
+     * Sets the dumper to be used when dumping proxies in the generated container
+     *
+     * @todo not responsibility of the ContainerBuilder?
+     *
+     * @param DumperInterface $proxyInstantiator
+     */
+    public function setProxyDumper(DumperInterface $proxyDumper)
+    {
+        $this->proxyDumper = $proxyDumper;
+    }
+
+    /**
+     * Retrieves the currently set proxy dumper used when dumping proxies in the generated container
+     *
+     * @return DumperInterface
+     */
+    public function getProxyDumper()
+    {
+        if (!$this->proxyDumper) {
+            //$this->proxyDumper = new NullDumper();
+            $this->proxyDumper = new ProxyDumper();
+        }
+
+        return $this->proxyDumper;
     }
 
     /**
@@ -911,29 +975,18 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The DIC does not know how to construct this service.', $id));
         }
 
-        if (
-            $tryProxy
-            && ($className = $definition->getClass())
-            && $definition->isLazy()
-            && class_exists('ProxyManager\\Factory\\LazyLoadingValueHolderFactory')
-        ) {
-            $config = new Configuration();
-
-            $config->setGeneratorStrategy(new EvaluatingGeneratorStrategy());
-
-            $factory   = new LazyLoadingValueHolderFactory($config);
+        if ($tryProxy && $definition->isLazy()) {
             $container = $this;
-            $proxy     = $factory->createProxy(
-                $className,
-                function (& $wrappedInstance, LazyLoadingInterface $proxy) use ($container, $definition, $id) {
-                    $proxy->setProxyInitializer(null);
 
-                    $wrappedInstance = $container->createService($definition, $id, false);
-
-                    return true;
-                }
-            );
-
+            $proxy = $this
+                ->getProxyInstantiator()
+                ->instantiateProxy(
+                    $container,
+                    $definition,
+                    $id, function () use ($definition, $id, $container) {
+                        return $container->createService($definition, $id, false);
+                    }
+                );
             $this->shareService($definition, $proxy, $id);
 
             return $proxy;

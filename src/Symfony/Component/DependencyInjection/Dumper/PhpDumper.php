@@ -11,9 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
-use ProxyManager\Generator\ClassGenerator;
-use ProxyManager\GeneratorStrategy\BaseGeneratorStrategy;
-use ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator;
+use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -66,6 +64,7 @@ class PhpDumper extends Dumper
 
         $this->inlinedDefinitions = new \SplObjectStorage;
         $this->proxyDumper = new \Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
+        //$this->proxyDumper        = new NullDumper();
     }
 
     /**

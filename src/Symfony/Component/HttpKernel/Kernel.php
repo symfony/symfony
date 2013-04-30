@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
+use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -684,7 +686,14 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function getContainerBuilder()
     {
-        return new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
+        $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
+
+        if (class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')) {
+            $container->setProxyInstantiator(new RuntimeInstantiator());
+            $container->setProxyDumper(new ProxyDumper());
+        }
+
+        return $container;
     }
 
     /**

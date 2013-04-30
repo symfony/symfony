@@ -19,6 +19,7 @@
         "php": ">=5.3.3",
         "symfony/event-dispatcher": "~2.1",
         "symfony/http-foundation": ">=2.2,<2.4-dev",
+        "symfony/debug": "~2.3",
         "psr/log": "~1.0"
     },
     "require-dev": {
@@ -26,7 +27,6 @@
         "symfony/class-loader": "~2.1",
         "symfony/config": "~2.0",
         "symfony/console": "2.2.*",
-        "symfony/debug": "~2.3",
         "symfony/dependency-injection": "~2.0",
         "symfony/finder": "~2.0",
         "symfony/process": "~2.0",

@@ -285,7 +285,19 @@ class Container implements IntrospectableContainerInterface
         }
 
         if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-            throw new ServiceNotFoundException($id);
+            if (!$id) {
+                throw new ServiceNotFoundException($id);
+            }
+
+            $alternatives = array();
+            foreach (array_keys($this->services) as $key) {
+                $lev = levenshtein($id, $key);
+                if ($lev <= strlen($id) / 3 || false !== strpos($key, $id)) {
+                    $alternatives[] = $key;
+                }
+            }
+
+            throw new ServiceNotFoundException($id, null, null, $alternatives);
         }
     }
 

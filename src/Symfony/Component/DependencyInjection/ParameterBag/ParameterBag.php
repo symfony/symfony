@@ -93,6 +93,10 @@ class ParameterBag implements ParameterBagInterface
         $name = strtolower($name);
 
         if (!array_key_exists($name, $this->parameters)) {
+            if (!$name) {
+                throw new ParameterNotFoundException($name);
+            }
+
             $alternatives = array();
             foreach (array_keys($this->parameters) as $key) {
                 $lev = levenshtein($name, $key);

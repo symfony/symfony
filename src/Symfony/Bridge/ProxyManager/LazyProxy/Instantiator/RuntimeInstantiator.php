@@ -11,11 +11,52 @@
 
 namespace Symfony\Bridge\ProxyManager\LazyProxy;
 
+use ProxyManager\Configuration;
+use ProxyManager\Factory\LazyLoadingValueHolderFactory;
+use ProxyManager\GeneratorStrategy\EvaluatingGeneratorStrategy;
+use ProxyManager\Proxy\LazyLoadingInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
+
 /**
  * Runtime lazy loading proxy generator
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */
-class RuntimeInstantiator
+class RuntimeInstantiator implements InstantiatorInterface
 {
+    /**
+     * @var \ProxyManager\Factory\LazyLoadingValueHolderFactory
+     */
+    protected $factory;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $config = new Configuration();
+
+        $config->setGeneratorStrategy(new EvaluatingGeneratorStrategy());
+
+        $this->factory = new LazyLoadingValueHolderFactory($config);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function instantiateProxy(ContainerInterface $container, Definition $definition, $id, $realInstantiator)
+    {
+        return $this->factory->createProxy(
+            $definition->getClass(),
+            function (& $wrappedInstance, LazyLoadingInterface $proxy) use ($realInstantiator) {
+                $proxy->setProxyInitializer(null);
+
+                $wrappedInstance = call_user_func($realInstantiator);
+
+                return true;
+            }
+        );
+    }
 }

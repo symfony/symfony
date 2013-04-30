@@ -9,10 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\ProxyManager\LazyProxy\Instantiator;
+namespace Symfony\Bridge\ProxyManager\LazyProxy\Tests\Instantiator;
 
 use ProxyManager\Configuration;
 use ProxyManager\Proxy\LazyLoadingInterface;
+use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 

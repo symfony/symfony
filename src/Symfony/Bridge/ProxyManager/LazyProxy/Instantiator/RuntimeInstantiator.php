@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\ProxyManager\LazyProxy;
+namespace Symfony\Bridge\ProxyManager\LazyProxy\Instantiator;
 
 use ProxyManager\Configuration;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;

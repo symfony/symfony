@@ -80,13 +80,13 @@ EOT
         $filesystem = $this->getContainer()->get('filesystem');
 
         // Create the bundles directory otherwise symlink will fail.
-        $filesystem->mkdir($targetArg.'/bundles/', 0777);
+        $bundlesDir = $targetArg.'/bundles/';
+        $filesystem->mkdir($bundlesDir, 0777);
 
         $output->writeln(sprintf("Installing assets using the <comment>%s</comment> option", $input->getOption('symlink') ? 'symlink' : 'hard copy'));
 
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
-                $bundlesDir = $targetArg.'/bundles/';
                 $targetDir  = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
 
                 $output->writeln(sprintf('Installing assets for <comment>%s</comment> into <comment>%s</comment>', $bundle->getNamespace(), $targetDir));

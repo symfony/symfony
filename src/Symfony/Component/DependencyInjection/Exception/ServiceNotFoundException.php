@@ -32,11 +32,10 @@ class ServiceNotFoundException extends InvalidArgumentException
         if ($alternatives) {
             if (1 == count($alternatives)) {
                 $msg .= ' Did you mean this: "';
-            } elseif (1 < count($alternatives)) {
+            } else {
                 $msg .= ' Did you mean one of these: "';
             }
-            $msg .= implode('", "', $alternatives);
-            $msg .= '" ?';
+            $msg .= implode('", "', $alternatives).'"?';
         }
 
         parent::__construct($msg, 0, $previous);

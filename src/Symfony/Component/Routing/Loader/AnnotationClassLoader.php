@@ -57,6 +57,9 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  */
 abstract class AnnotationClassLoader implements LoaderInterface
 {
+    const NAMING_STRATEGY_DEFAULT = 'default';
+    const NAMING_STRATEGY_UNDERSCORE = 'underscore';
+
     /**
      * @var Reader
      */
@@ -76,10 +79,12 @@ abstract class AnnotationClassLoader implements LoaderInterface
      * Constructor.
      *
      * @param Reader $reader
+     * @param $namingStrategy
      */
-    public function __construct(Reader $reader)
+    public function __construct(Reader $reader, $namingStrategy = self::NAMING_STRATEGY_DEFAULT)
     {
         $this->reader = $reader;
+        $this->namingStrategy = $namingStrategy;
     }
 
     /**
@@ -233,13 +238,16 @@ abstract class AnnotationClassLoader implements LoaderInterface
      */
     protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
     {
-        $name = strtolower(str_replace('\\', '_', $class->name).'_'.$method->name);
+        $name = str_replace('\\', '_', $class->name).'_'.$method->name;
+        if ($this->namingStrategy == self::NAMING_STRATEGY_UNDERSCORE) {
+            $name = preg_replace('/(?<=[a-z])([A-Z])/', '_$1', $name);
+        }
         if ($this->defaultRouteIndex > 0) {
             $name .= '_'.$this->defaultRouteIndex;
         }
         $this->defaultRouteIndex++;
 
-        return $name;
+        return strtolower($name);
     }
 
     abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot);

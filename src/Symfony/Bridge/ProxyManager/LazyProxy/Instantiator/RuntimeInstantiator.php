@@ -29,7 +29,7 @@ class RuntimeInstantiator implements InstantiatorInterface
     /**
      * @var \ProxyManager\Factory\LazyLoadingValueHolderFactory
      */
-    protected $factory;
+    private $factory;
 
     /**
      * Constructor

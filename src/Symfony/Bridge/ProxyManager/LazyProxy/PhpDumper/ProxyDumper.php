@@ -29,12 +29,12 @@ class ProxyDumper implements DumperInterface
     /**
      * @var \ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator
      */
-    protected $proxyGenerator;
+    private $proxyGenerator;
 
     /**
      * @var \ProxyManager\GeneratorStrategy\BaseGeneratorStrategy
      */
-    protected $classGenerator;
+    private $classGenerator;
 
     /**
      * Constructor
@@ -44,6 +44,7 @@ class ProxyDumper implements DumperInterface
         $this->proxyGenerator = new LazyLoadingValueHolderGenerator();
         $this->classGenerator = new BaseGeneratorStrategy();
     }
+
     /**
      * {@inheritDoc}
      */

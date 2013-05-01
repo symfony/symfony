@@ -65,7 +65,7 @@ class PhpDumper extends Dumper
         parent::__construct($container);
 
         $this->inlinedDefinitions = new \SplObjectStorage;
-        $this->proxyDumper        = $container->getProxyDumper();
+        $this->proxyDumper = $container->getProxyDumper();
     }
 
     /**

@@ -12,6 +12,8 @@
         <parameter key="cache_clearer.class">Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer</parameter>
         <parameter key="file_locator.class">Symfony\Component\HttpKernel\Config\FileLocator</parameter>
         <parameter key="uri_signer.class">Symfony\Component\HttpKernel\UriSigner</parameter>
+        <parameter key="request_stack.class">Symfony\Component\HttpKernel\RequestStack</parameter>
+        <parameter key="request_context.class">Symfony\Component\HttpKernel\RequestContext</parameter>
     </parameters>
 
     <services>
@@ -23,6 +25,14 @@
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
+            <argument type="service" id="request_stack" />
+        </service>
+
+        <service id="request_stack" class="%request_stack.class%">
+        </service>
+
+        <service id="request_context" class="%request_context.class%">
+            <argument type="service" id="request_stack" />
         </service>
 
         <service id="cache_warmer" class="%cache_warmer.class%">

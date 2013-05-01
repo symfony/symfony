@@ -35,6 +35,10 @@ class Filesystem
      */
     public function copy($originFile, $targetFile, $override = false)
     {
+        if (!is_file($originFile)) {
+            throw new IOException(sprintf('Failed to copy %s because file not exists', $originFile));
+        }
+
         $this->mkdir(dirname($targetFile));
 
         if (!$override && is_file($targetFile)) {
@@ -44,7 +48,15 @@ class Filesystem
         }
 
         if ($doCopy) {
-            if (true !== @copy($originFile, $targetFile)) {
+            // https://bugs.php.net/bug.php?id=64634
+            $source = fopen($originFile, 'r');
+            $target = fopen($targetFile, 'w+');
+            stream_copy_to_stream($source, $target);
+            fclose($source);
+            fclose($target);
+            unset($source, $target);
+
+            if (!is_file($targetFile)) {
                 throw new IOException(sprintf('Failed to copy %s to %s', $originFile, $targetFile));
             }
         }

@@ -18,5 +18,5 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class GreaterThan extends AbstractComparison
 {
-    public $message = 'This value should be greater than {{ compared_value }}';
+    public $message = 'This value should be greater than {{ compared_value }}.';
 }

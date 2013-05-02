@@ -18,5 +18,5 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class EqualTo extends AbstractComparison
 {
-    public $message = 'This value should be equal to {{ compared_value }}';
+    public $message = 'This value should be equal to {{ compared_value }}.';
 }

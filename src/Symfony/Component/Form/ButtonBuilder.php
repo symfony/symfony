@@ -790,21 +790,21 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
-     * @return null Always returns null.
+     * @return Boolean Always returns false.
      */
     public function getAutoInitialize()
     {
-        return null;
+        return false;
     }
 
     /**
      * Unsupported method.
      *
-     * @return null Always returns null.
+     * @return Boolean Always returns false.
      */
     public function getInheritData()
     {
-        return null;
+        return false;
     }
 
     /**

@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Closure;
 
 /**
  * Simplify collecting and registering tagged services.
@@ -30,15 +29,15 @@ use Closure;
  * one argument only and injecting the service:
  *
  *      $container->addCompilerPass(new CollectSimpleTaggedServicesPass(
- *          'my_tag_name', 'my_parent_service', 'addListener'
+ *          'my_tag_name', 'my_aggregating_service', 'addListener'
  *      ));
  *
- * Collect all services and work with additional arguments:
+ * Collect all services and work with additional attributes:
  *
  *      $container->addCompilerPass(new CollectSimpleTaggedServicesPass(
- *          'my_tag_name', 'my_parent_service', 'addListener',
- *          function ($id, $arguments) {
- *              return array(new Reference($id), $arguments['foo']);
+ *          'my_tag_name', 'my_aggregating_service', 'addListener',
+ *          function ($id, $attributes) {
+ *              return array(new Reference($id), $attributes['foo']);
  *          }
  *      ));
  */
@@ -53,15 +52,15 @@ class CollectSimpleTaggedServicesPass implements CompilerPassInterface
      * @param string $tagName
      * @param string $service
      * @param string $collectMethodName
-     * @param Closure|null $argumentWrangler
+     * @param callable|null $argumentWrangler
      */
-    public function __construct($tagName, $service, $collectMethodName, Closure $argumentWrangler = null)
+    public function __construct($tagName, $service, $collectMethodName, $argumentWrangler = null)
     {
         $this->tagName = $tagName;
         $this->service = $service;
         $this->collectMethodName = $collectMethodName;
 
-        $this->argumentWrangler = $argumentWrangler ?: function ($id, $arguments) {
+        $this->argumentWrangler = $argumentWrangler ?: function ($id) {
             return array(new Reference($id));
         };
     }
@@ -80,10 +79,10 @@ class CollectSimpleTaggedServicesPass implements CompilerPassInterface
         $wrangler = $this->argumentWrangler;
 
         foreach ($taggedServiceIds as $id => $tags) {
-            foreach ($tags as $arguments) {
+            foreach ($tags as $attributes) {
                 $definition->addMethodCall(
                     $this->collectMethodName,
-                    $wrangler($id, $arguments)
+                    $wrangler($id, $attributes)
                 );
             }
         }

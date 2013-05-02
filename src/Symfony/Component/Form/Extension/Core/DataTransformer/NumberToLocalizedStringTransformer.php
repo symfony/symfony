@@ -80,6 +80,9 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException($formatter->getErrorMessage());
         }
 
+        // Convert fixed spaces to normal ones
+        $value = str_replace("\xc2\xa0", ' ', $value);
+
         return $value;
     }
 
@@ -130,19 +133,31 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException('I don\'t have a clear idea what infinity looks like');
         }
 
+        if (function_exists('mb_detect_encoding') && false !== $encoding = mb_detect_encoding($value)) {
+            $strlen = function ($string) use ($encoding) {
+                return mb_strlen($string, $encoding);
+            };
+            $substr = function ($string, $offset, $length) use ($encoding) {
+                return mb_substr($string, $offset, $length, $encoding);
+            };
+        } else {
+            $strlen = 'strlen';
+            $substr = 'substr';
+        }
+
+        $length = $strlen($value);
+
         // After parsing, position holds the index of the character where the
         // parsing stopped
-        if ($position < strlen($value)) {
+        if ($position < $length) {
             // Check if there are unrecognized characters at the end of the
-            // number
-            $remainder = substr($value, $position);
+            // number (excluding whitespace characters)
+            $remainder = trim($substr($value, $position, $length), " \t\n\r\0\x0b\xc2\xa0");
 
-            // Remove all whitespace characters
-            if ('' !== preg_replace('/[\s\xc2\xa0]*/', '', $remainder)) {
+            if ('' !== $remainder) {
                 throw new TransformationFailedException(
-                    sprintf('The number contains unrecognized characters: "%s"',
-                        $remainder
-                    ));
+                    sprintf('The number contains unrecognized characters: "%s"', $remainder)
+                );
             }
         }
 

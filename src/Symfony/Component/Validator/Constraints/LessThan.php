@@ -18,5 +18,5 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class LessThan extends AbstractComparison
 {
-    public $message = 'This value should be less than {{ compared_value }}';
+    public $message = 'This value should be less than {{ compared_value }}.';
 }

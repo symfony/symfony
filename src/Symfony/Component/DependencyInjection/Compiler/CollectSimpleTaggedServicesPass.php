@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * @example
  *
  * Collect all services tagged with 'my_tag_name' and inject them
- * into 'my_parent_service' using the 'addListener' method. Using
+ * into 'my_aggregating_service' using the 'addListener' method. Using
  * one argument only and injecting the service:
  *
  *      $container->addCompilerPass(new CollectSimpleTaggedServicesPass(

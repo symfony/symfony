@@ -350,7 +350,7 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function initialize()
     {
-        throw new BadMethodCallException('Buttons cannot be initialized. Call initialized() on the root form instead.');
+        throw new BadMethodCallException('Buttons cannot be initialized. Call initialize() on the root form instead.');
     }
 
     /**

@@ -417,13 +417,11 @@ class Application
      */
     public function add(Command $command)
     {
-        $command->setApplication($this);
-
         if (!$command->isEnabled()) {
-            $command->setApplication(null);
-
             return;
         }
+
+        $command->setApplication($this);
 
         $this->commands[$command->getName()] = $command;
 

@@ -157,9 +157,13 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     protected function evaluate(Storage $template, array $parameters = array())
     {
         $__template__ = $template;
+        unset($template);
 
         if (isset($parameters['__template__'])) {
             throw new \InvalidArgumentException('Invalid parameter (__template__)');
+        }
+        if (isset($parameters['parameters'])) {
+            throw new \InvalidArgumentException('Invalid parameter (parameters)');
         }
 
         if ($__template__ instanceof FileStorage) {

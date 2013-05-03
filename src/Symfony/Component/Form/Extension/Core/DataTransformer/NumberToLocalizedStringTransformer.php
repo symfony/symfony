@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Transforms between a number type and a localized number with grouping
@@ -60,8 +59,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @return string Localized value.
      *
-     * @throws UnexpectedTypeException if the given value is not numeric
-     * @throws TransformationFailedException if the value can not be transformed
+     * @throws TransformationFailedException If the given value is not numeric
+     *                                       or if the value can not be transformed.
      */
     public function transform($value)
     {
@@ -70,7 +69,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         if (!is_numeric($value)) {
-            throw new UnexpectedTypeException($value, 'numeric');
+            throw new TransformationFailedException('Expected a numeric.');
         }
 
         $formatter = $this->getNumberFormatter();
@@ -90,13 +89,13 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @return integer|float The numeric value
      *
-     * @throws UnexpectedTypeException if the given value is not a string
-     * @throws TransformationFailedException if the value can not be transformed
+     * @throws TransformationFailedException If the given value is not a string
+     *                                       or if the value can not be transformed.
      */
     public function reverseTransform($value)
     {
         if (!is_string($value)) {
-            throw new UnexpectedTypeException($value, 'string');
+            throw new TransformationFailedException('Expected a string.');
         }
 
         if ('' === $value) {

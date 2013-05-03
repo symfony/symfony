@@ -148,7 +148,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testTransformRequiresValidDateTime()
     {
@@ -231,7 +231,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformRequiresString()
     {

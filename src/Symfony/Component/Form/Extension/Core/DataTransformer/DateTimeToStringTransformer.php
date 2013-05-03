@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Transforms between a date string and a DateTime object
@@ -58,7 +57,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * @param string  $format         The date format
      * @param Boolean $parseUsingPipe Whether to parse by appending a pipe "|" to the parse format
      *
-     * @throws UnexpectedTypeException if a timezone is not a string
+     * @throws \Symfony\Component\Form\Exception\UnexpectedTypeException if a timezone is not a string
      */
     public function __construct($inputTimezone = null, $outputTimezone = null, $format = 'Y-m-d H:i:s', $parseUsingPipe = null)
     {
@@ -93,8 +92,9 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * @return string A value as produced by PHP's date() function
      *
-     * @throws UnexpectedTypeException if the given value is not a \DateTime instance
-     * @throws TransformationFailedException if the output timezone is not supported
+     * @throws TransformationFailedException If the given value is not a \DateTime
+     *                                       instance or if the output timezone
+     *                                       is not supported.
      */
     public function transform($value)
     {
@@ -103,7 +103,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         }
 
         if (!$value instanceof \DateTime) {
-            throw new UnexpectedTypeException($value, '\DateTime');
+            throw new TransformationFailedException('Expected a \DateTime.');
         }
 
         $value = clone $value;
@@ -123,9 +123,9 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * @return \DateTime An instance of \DateTime
      *
-     * @throws UnexpectedTypeException if the given value is not a string
-     * @throws TransformationFailedException if the date could not be parsed
-     * @throws TransformationFailedException if the input timezone is not supported
+     * @throws TransformationFailedException If the given value is not a string,
+     *                                       if the date could not be parsed or
+     *                                       if the input timezone is not supported.
      */
     public function reverseTransform($value)
     {
@@ -134,7 +134,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         }
 
         if (!is_string($value)) {
-            throw new UnexpectedTypeException($value, 'string');
+            throw new TransformationFailedException('Expected a string.');
         }
 
         try {

@@ -111,7 +111,7 @@ class Router implements RouterInterface
             'matcher_dumper_class'   => 'Symfony\\Component\\Routing\\Matcher\\Dumper\\PhpMatcherDumper',
             'matcher_cache_class'    => 'ProjectUrlMatcher',
             'resource_type'          => null,
-            'strict_requirements'    => true,
+            'strict_requirements'    => true
         );
 
         // check option names and live merge, if errors are encountered Exception will be thrown

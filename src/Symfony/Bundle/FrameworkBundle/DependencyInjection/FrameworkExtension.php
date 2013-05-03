@@ -279,6 +279,7 @@ class FrameworkExtension extends Extension
     {
         $loader->load('routing.xml');
 
+        $container->setParameter('router.naming_strategy', $config['naming_strategy']);
         $container->setParameter('router.resource', $config['resource']);
         $container->setParameter('router.cache_class_prefix', $container->getParameter('kernel.name').ucfirst($container->getParameter('kernel.environment')));
         $router = $container->findDefinition('router.default');

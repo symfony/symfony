@@ -69,6 +69,8 @@ class AcceptHeader
      */
     public function __toString()
     {
+        $this->sort();
+
         return implode(',', $this->items);
     }
 
@@ -160,6 +162,10 @@ class AcceptHeader
                 $qB = $b->getQuality();
 
                 if ($qA === $qB) {
+                    if ($a->getIndex() === $b->getIndex()) {
+                        return 0;
+                    }
+
                     return $a->getIndex() > $b->getIndex() ? 1 : -1;
                 }
 

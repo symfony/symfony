@@ -119,8 +119,8 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
     public function testRenderParameter()
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
-        $this->loader->setTemplate('foo.php', '<?php echo $template . $parameters[\'template\'] ?>');
-        $this->assertEquals('foofoo', $engine->render('foo.php', array('template' => 'foo')), '->render() extract variables');
+        $this->loader->setTemplate('foo.php', '<?php echo $template . $parameters ?>');
+        $this->assertEquals('foobar', $engine->render('foo.php', array('template' => 'foo', 'parameters' => 'bar')), '->render() extract variables');
     }
 
     /**
@@ -138,7 +138,7 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('__template__'),
-            array('parameters'),
+            array('__parameters__'),
         );
     }
 

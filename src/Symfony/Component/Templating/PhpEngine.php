@@ -156,25 +156,26 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     protected function evaluate(Storage $template, array $parameters = array())
     {
-        $__template__ = $template;
-        unset($template);
+        $__template__   = &$template;
+        $__parameters__ = &$parameters;
+        unset($template, $parameters);
 
-        if (isset($parameters['__template__'])) {
+        if (isset($__parameters__['__template__'])) {
             throw new \InvalidArgumentException('Invalid parameter (__template__)');
         }
-        if (isset($parameters['parameters'])) {
-            throw new \InvalidArgumentException('Invalid parameter (parameters)');
+        if (isset($__parameters__['__parameters__'])) {
+            throw new \InvalidArgumentException('Invalid parameter (__parameters__)');
         }
 
         if ($__template__ instanceof FileStorage) {
-            extract($parameters, EXTR_SKIP);
+            extract($__parameters__, EXTR_SKIP);
             $view = $this;
             ob_start();
             require $__template__;
 
             return ob_get_clean();
         } elseif ($__template__ instanceof StringStorage) {
-            extract($parameters, EXTR_SKIP);
+            extract($__parameters__, EXTR_SKIP);
             $view = $this;
             ob_start();
             eval('; ?>'.$__template__.'<?php ;');

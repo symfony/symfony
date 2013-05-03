@@ -23,6 +23,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 {
     const VALUE = 0;
     const IS_REF = 1;
+		const EXISTS = 2;
 
     private $magicCall;
 
@@ -38,7 +39,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getValue($objectOrArray, $propertyPath)
+    public function getValue($objectOrArray, $propertyPath, $default = null)
     {
         if (is_string($propertyPath)) {
             $propertyPath = new PropertyPath($propertyPath);
@@ -48,7 +49,9 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength());
 
-        return $propertyValues[count($propertyValues) - 1][self::VALUE];
+				$propertyValue = $propertyValues[count($propertyValues) - 1];
+				
+				return $propertyValue[self::EXISTS] ? $propertyValue[self::VALUE] : $default;
     }
 
     /**
@@ -157,10 +160,12 @@ class PropertyAccessor implements PropertyAccessorInterface
         // Use an array instead of an object since performance is very crucial here
         $result = array(
             self::VALUE => null,
-            self::IS_REF => false
+            self::IS_REF => false,
+						self::EXISTS => false,
         );
 
         if (isset($array[$index])) {
+					  $result[self::EXISTS] = true;
             if (is_array($array)) {
                 $result[self::VALUE] =& $array[$index];
                 $result[self::IS_REF] = true;
@@ -191,7 +196,8 @@ class PropertyAccessor implements PropertyAccessorInterface
         // very crucial here
         $result = array(
             self::VALUE => null,
-            self::IS_REF => false
+            self::IS_REF => false,
+						self::EXISTS => true, //If it does not exists a exception will be thrown
         );
 
         if (!is_object($object)) {

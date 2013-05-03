@@ -79,6 +79,13 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($this->propertyAccessor->getValue($array, '[child][index][firstName]'));
     }
+		
+		public function testGetValueReadsArrayWithMissingIndexForCustomPropertyPathReturnDefault()
+		{
+			  $array = array('child' => array('index' => array()));
+				$defaultValue = 'theDefaultValue';
+        $this->assertEquals($defaultValue, $this->propertyAccessor->getValue($array, '[child][index][firstName]',$defaultValue));
+		}
 
     public function testGetValueReadsProperty()
     {

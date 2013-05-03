@@ -94,7 +94,7 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
     {
         $transformer = new PercentToLocalizedStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->transform('foo');
     }
@@ -103,7 +103,7 @@ class PercentToLocalizedStringTransformerTest extends LocalizedTestCase
     {
         $transformer = new PercentToLocalizedStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->reverseTransform(1);
     }

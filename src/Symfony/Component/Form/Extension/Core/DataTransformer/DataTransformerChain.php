@@ -22,7 +22,7 @@ class DataTransformerChain implements DataTransformerInterface
 {
     /**
      * The value transformers
-     * @var array
+     * @var DataTransformerInterface[]
      */
     protected $transformers;
 
@@ -48,8 +48,7 @@ class DataTransformerChain implements DataTransformerInterface
      *
      * @return mixed The transformed value
      *
-     * @throws Symfony\Component\Form\Exception\TransformationFailedException
-     * @throws Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @throws \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function transform($value)
     {
@@ -73,8 +72,7 @@ class DataTransformerChain implements DataTransformerInterface
      *
      * @return mixed The reverse-transformed value
      *
-     * @throws Symfony\Component\Form\Exception\TransformationFailedException
-     * @throws Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @throws \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function reverseTransform($value)
     {

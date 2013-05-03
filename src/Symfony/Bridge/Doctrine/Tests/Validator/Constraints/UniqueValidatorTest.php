@@ -316,7 +316,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
         $validator = $this->createValidator($entityManagerName, $em, null, array(), null, 'findByCustom');
 
         $violationsList = $validator->validate($entity);
-        $this->assertEquals(0, $violationsList->count(), 'Violation is using unrewound array as return value in the repository method.');
+        $this->assertCount(0, $violationsList, 'Violation is using unrewound array as return value in the repository method.');
     }
 
     /**

@@ -90,8 +90,12 @@ class Translator implements TranslatorInterface
      *
      * @api
      */
-    public function addResource($format, $resource, $locale, $domain = 'messages')
+    public function addResource($format, $resource, $locale, $domain = null)
     {
+        if (null === $domain) {
+            $domain = 'messages';
+        }
+
         $this->resources[$locale][] = array($format, $resource, $domain);
 
         if(in_array($locale, $this->fallbackLocales)) {
@@ -167,10 +171,14 @@ class Translator implements TranslatorInterface
      *
      * @api
      */
-    public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
+    public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
         if (null === $locale) {
             $locale = $this->getLocale();
+        }
+
+        if (null === $domain) {
+            $domain = 'messages';
         }
 
         if (!isset($this->catalogues[$locale])) {
@@ -185,10 +193,14 @@ class Translator implements TranslatorInterface
      *
      * @api
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
+    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
         if (null === $locale) {
             $locale = $this->getLocale();
+        }
+
+        if (null === $domain) {
+            $domain = 'messages';
         }
 
         if (!isset($this->catalogues[$locale])) {

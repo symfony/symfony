@@ -18,21 +18,45 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormTypeCsrfExtension extends AbstractTypeExtension
 {
+    /**
+     * @var CsrfProviderInterface
+     */
     private $defaultCsrfProvider;
+
+    /**
+     * @var Boolean
+     */
     private $defaultEnabled;
+
+    /**
+     * @var string
+     */
     private $defaultFieldName;
 
-    public function __construct(CsrfProviderInterface $defaultCsrfProvider, $defaultEnabled = true, $defaultFieldName = '_token')
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var null|string
+     */
+    private $translationDomain;
+
+    public function __construct(CsrfProviderInterface $defaultCsrfProvider, $defaultEnabled = true, $defaultFieldName = '_token', TranslatorInterface $translator = null, $translationDomain = null)
     {
         $this->defaultCsrfProvider = $defaultCsrfProvider;
         $this->defaultEnabled = $defaultEnabled;
         $this->defaultFieldName = $defaultFieldName;
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
     }
 
     /**
@@ -49,7 +73,14 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
 
         $builder
             ->setAttribute('csrf_factory', $builder->getFormFactory())
-            ->addEventSubscriber(new CsrfValidationListener($options['csrf_field_name'], $options['csrf_provider'], $options['intention']))
+            ->addEventSubscriber(new CsrfValidationListener(
+                $options['csrf_field_name'],
+                $options['csrf_provider'],
+                $options['intention'],
+                $options['csrf_message'],
+                $this->translator,
+                $this->translationDomain
+            ))
         ;
     }
 
@@ -83,6 +114,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             'csrf_protection'   => $this->defaultEnabled,
             'csrf_field_name'   => $this->defaultFieldName,
             'csrf_provider'     => $this->defaultCsrfProvider,
+            'csrf_message'      => 'The CSRF token is invalid. Please try to resubmit the form.',
             'intention'         => 'unknown',
         ));
     }

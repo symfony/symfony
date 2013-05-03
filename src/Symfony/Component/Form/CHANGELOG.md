@@ -31,6 +31,8 @@ CHANGELOG
  * [BC BREAK] initialization for Form instances added to a form tree must be manually disabled
  * PRE_SET_DATA is now guaranteed to be called after children were added by the form builder,
    unless FormInterface::setData() is called manually
+ * fixed CSRF error message to be translated
+ * custom CSRF error messages can now be set through the "csrf_message" option
 
 2.2.0
 -----

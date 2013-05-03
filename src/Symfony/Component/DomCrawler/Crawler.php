@@ -58,7 +58,7 @@ class Crawler extends \SplObjectStorage
      * This method uses the appropriate specialized add*() method based
      * on the type of the argument.
      *
-     * @param null|\DOMNodeList|array|\DOMNode $node A node
+     * @param \DOMNode|\DOMNodeList|array|string|null $node A node
      *
      * @api
      */
@@ -66,12 +66,19 @@ class Crawler extends \SplObjectStorage
     {
         if ($node instanceof \DOMNodeList) {
             $this->addNodeList($node);
+        } elseif ($node instanceof \DOMNode) {
+            $this->addNode($node);
         } elseif (is_array($node)) {
             $this->addNodes($node);
         } elseif (is_string($node)) {
             $this->addContent($node);
-        } elseif (is_object($node)) {
-            $this->addNode($node);
+        } elseif ($node !== null) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Expecting node to be DOMNodeList/DOMNode/array/string/null, but got %s',
+                    (is_object($node)) ? get_class($node) : gettype($node)
+                )
+            );
         }
     }
 

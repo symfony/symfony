@@ -176,6 +176,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('type')->end()
                         ->scalarNode('http_port')->defaultValue(80)->end()
                         ->scalarNode('https_port')->defaultValue(443)->end()
+                        ->scalarNode('naming_strategy')->defaultNull()->end()
                         ->scalarNode('strict_requirements')
                             ->info(
                                 "set to true to throw an exception when a parameter does not match the requirements\n".

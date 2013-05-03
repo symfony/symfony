@@ -181,7 +181,7 @@ class FormValidator extends ConstraintValidator
             $groups = $form->getConfig()->getOption('validation_groups');
 
             if (null !== $groups) {
-                if (is_callable($groups)) {
+                if (!is_string($groups) && is_callable($groups)) {
                     $groups = call_user_func($groups, $form);
                 }
 

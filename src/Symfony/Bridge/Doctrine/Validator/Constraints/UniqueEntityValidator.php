@@ -108,7 +108,7 @@ class UniqueEntityValidator extends ConstraintValidator
          */
         if ($result instanceof \Iterator) {
             $result->rewind();
-        } else if (is_array($result)) {
+        } elseif (is_array($result)) {
             reset($result);
         }
 

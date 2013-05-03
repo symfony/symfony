@@ -302,6 +302,24 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($form, new Form());
     }
 
+    public function testDontExecuteFunctionNames()
+    {
+        $context = $this->getExecutionContext();
+        $graphWalker = $context->getGraphWalker();
+        $object = $this->getMock('\stdClass');
+        $options = array('validation_groups' => 'header');
+        $form = $this->getBuilder('name', '\stdClass', $options)
+            ->setData($object)
+            ->getForm();
+
+        $graphWalker->expects($this->once())
+            ->method('walkReference')
+            ->with($object, 'header', 'data', true);
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
     public function testHandleClosureValidationGroups()
     {
         $context = $this->getExecutionContext();

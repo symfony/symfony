@@ -42,6 +42,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     protected $globals;
     protected $parser;
 
+    private $evalTemplate;
+    private $evalParameters;
+
     /**
      * Constructor.
      *
@@ -156,31 +159,28 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     protected function evaluate(Storage $template, array $parameters = array())
     {
-        $__template__   = $template;
-        $__parameters__ = $parameters;
+        $this->evalTemplate   = $template;
+        $this->evalParameters = $parameters;
 
-        if (isset($__parameters__['__template__'])) {
-            throw new \InvalidArgumentException('Invalid parameter (__template__)');
+        if (isset($this->evalParameters['this'])) {
+            throw new \InvalidArgumentException('Invalid parameter (this)');
         }
-        if (isset($__parameters__['__parameters__'])) {
-            throw new \InvalidArgumentException('Invalid parameter (__parameters__)');
-        }
-        if (isset($__parameters__['view'])) {
+        if (isset($this->evalParameters['view'])) {
             throw new \InvalidArgumentException('Invalid parameter (view)');
         }
 
-        if ($__template__ instanceof FileStorage) {
-            extract($__parameters__, EXTR_OVERWRITE);
+        if ($this->evalTemplate instanceof FileStorage) {
+            extract($this->evalParameters, EXTR_OVERWRITE);
             $view = $this;
             ob_start();
-            require $__template__;
+            require $this->evalTemplate;
 
             return ob_get_clean();
-        } elseif ($__template__ instanceof StringStorage) {
-            extract($__parameters__, EXTR_OVERWRITE);
+        } elseif ($this->evalTemplate instanceof StringStorage) {
+            extract($this->evalParameters, EXTR_OVERWRITE);
             $view = $this;
             ob_start();
-            eval('; ?>'.$__template__.'<?php ;');
+            eval('; ?>'.$this->evalTemplate.'<?php ;');
 
             return ob_get_clean();
         }

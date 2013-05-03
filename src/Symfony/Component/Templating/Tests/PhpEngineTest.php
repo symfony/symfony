@@ -139,6 +139,7 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
         return array(
             array('__template__'),
             array('__parameters__'),
+            array('view'),
         );
     }
 

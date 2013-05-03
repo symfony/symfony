@@ -166,6 +166,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
         if (isset($__parameters__['__parameters__'])) {
             throw new \InvalidArgumentException('Invalid parameter (__parameters__)');
         }
+        if (isset($__parameters__['view'])) {
+            throw new \InvalidArgumentException('Invalid parameter (view)');
+        }
 
         if ($__template__ instanceof FileStorage) {
             extract($__parameters__, EXTR_SKIP);

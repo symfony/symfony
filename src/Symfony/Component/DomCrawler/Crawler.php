@@ -58,7 +58,7 @@ class Crawler extends \SplObjectStorage
      * This method uses the appropriate specialized add*() method based
      * on the type of the argument.
      *
-     * @param \DOMNode|\DOMNodeList|array|string|null $node A node
+     * @param \DOMNodeList|\DOMNode|array|string|null $node A node
      *
      * @throws \InvalidArgumentException When node is not the expected type.
      *

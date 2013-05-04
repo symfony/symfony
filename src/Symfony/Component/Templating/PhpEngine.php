@@ -159,7 +159,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     protected function evaluate(Storage $template, array $parameters = array())
     {
-        $this->evalTemplate   = $template;
+        $this->evalTemplate = $template;
         $this->evalParameters = $parameters;
 
         if (isset($this->evalParameters['this'])) {
@@ -169,16 +169,17 @@ class PhpEngine implements EngineInterface, \ArrayAccess
             throw new \InvalidArgumentException('Invalid parameter (view)');
         }
 
+        extract($this->evalParameters, EXTR_OVERWRITE);
+        $this->evalTemplate = null;
+        $this->evalParameters = null;
+        $view = $this;
+
         if ($this->evalTemplate instanceof FileStorage) {
-            extract($this->evalParameters, EXTR_OVERWRITE);
-            $view = $this;
             ob_start();
             require $this->evalTemplate;
 
             return ob_get_clean();
         } elseif ($this->evalTemplate instanceof StringStorage) {
-            extract($this->evalParameters, EXTR_OVERWRITE);
-            $view = $this;
             ob_start();
             eval('; ?>'.$this->evalTemplate.'<?php ;');
 

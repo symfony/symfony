@@ -77,7 +77,7 @@ class Crawler extends \SplObjectStorage
         } elseif ($node !== null) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'Expecting node to be DOMNodeList/DOMNode/array/string/null, but got %s',
+                    'Expecting node to be DOMNodeList|DOMNode|array|string|null, but got %s',
                     (is_object($node)) ? get_class($node) : gettype($node)
                 )
             );

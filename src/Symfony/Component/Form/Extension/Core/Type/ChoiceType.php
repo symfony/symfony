@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -45,19 +46,34 @@ class ChoiceType extends AbstractType
         }
 
         if ($options['expanded']) {
-            $this->addSubForms($builder, $options['choice_list']->getPreferredViews(), $options);
-            $this->addSubForms($builder, $options['choice_list']->getRemainingViews(), $options);
+            // Initialize all choices before doing the index check below.
+            // This helps in cases where index checks are optimized for non
+            // initialized choice lists. For example, when using an SQL driver,
+            // the index check would read in one SQL query and the initialization
+            // requires another SQL query. When the initialization is done first,
+            // one SQL query is sufficient.
+            $preferredViews = $options['choice_list']->getPreferredViews();
+            $remainingViews = $options['choice_list']->getRemainingViews();
+
+            // Check if the choices already contain the empty value
+            // Only add the empty value option if this is not the case
+            if (null !== $options['empty_value'] && 0 === count($options['choice_list']->getIndicesForValues(array('')))) {
+                $placeholderView = new ChoiceView(null, '', $options['empty_value']);
+
+                // "placeholder" is a reserved index
+                // see also ChoiceListInterface::getIndicesForChoices()
+                $this->addSubForms($builder, array('placeholder' => $placeholderView), $options);
+            }
+
+            $this->addSubForms($builder, $preferredViews, $options);
+            $this->addSubForms($builder, $remainingViews, $options);
 
             if ($options['multiple']) {
-                $builder
-                    ->addViewTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']))
-                    ->addEventSubscriber(new FixCheckboxInputListener($options['choice_list']), 10)
-                ;
+                $builder->addViewTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']));
+                $builder->addEventSubscriber(new FixCheckboxInputListener($options['choice_list']), 10);
             } else {
-                $builder
-                    ->addViewTransformer(new ChoiceToBooleanArrayTransformer($options['choice_list']))
-                    ->addEventSubscriber(new FixRadioInputListener($options['choice_list']), 10)
-                ;
+                $builder->addViewTransformer(new ChoiceToBooleanArrayTransformer($options['choice_list'], $builder->has('placeholder')));
+                $builder->addEventSubscriber(new FixRadioInputListener($options['choice_list'], $builder->has('placeholder')), 10);
             }
         } else {
             if ($options['multiple']) {
@@ -104,7 +120,7 @@ class ChoiceType extends AbstractType
 
         // Check if the choices already contain the empty value
         // Only add the empty value option if this is not the case
-        if (0 === count($options['choice_list']->getIndicesForValues(array('')))) {
+        if (null !== $options['empty_value'] && 0 === count($options['choice_list']->getIndicesForValues(array('')))) {
             $view->vars['empty_value'] = $options['empty_value'];
         }
 
@@ -170,12 +186,15 @@ class ChoiceType extends AbstractType
         };
 
         $emptyValueNormalizer = function (Options $options, $emptyValue) {
-            if ($options['multiple'] || $options['expanded']) {
-                // never use an empty value for these cases
+            if ($options['multiple']) {
+                // never use an empty value for this case
                 return null;
             } elseif (false === $emptyValue) {
                 // an empty value should be added but the user decided otherwise
                 return null;
+            } elseif ($options['expanded'] && '' === $emptyValue) {
+                // never use an empty label for radio buttons
+                return 'None';
             }
 
             // empty value has been set explicitly

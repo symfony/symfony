@@ -95,6 +95,8 @@ interface ChoiceListInterface
     /**
      * Returns the choices corresponding to the given values.
      *
+     * The choices can have any data type.
+     *
      * @param array $values An array of choice values. Not existing values in
      *                      this array are ignored.
      *
@@ -104,6 +106,8 @@ interface ChoiceListInterface
 
     /**
      * Returns the values corresponding to the given choices.
+     *
+     * The values must be a strings.
      *
      * @param array $choices An array of choices. Not existing choices in this
      *                       array are ignored.
@@ -116,20 +120,30 @@ interface ChoiceListInterface
     /**
      * Returns the indices corresponding to the given choices.
      *
+     * The indices must be positive integers or strings accepted by
+     * {@link FormConfigBuilder::validateName()}.
+     *
+     * The index "placeholder" is internally reserved.
+     *
      * @param array $choices An array of choices. Not existing choices in this
      *                       array are ignored.
      *
-     * @return array An array of indices with ascending, 0-based numeric keys
+     * @return array An array of indices with ascending, 0-based numeric keys.
      */
     public function getIndicesForChoices(array $choices);
 
     /**
      * Returns the indices corresponding to the given values.
      *
+     * The indices must be positive integers or strings accepted by
+     * {@link FormConfigBuilder::validateName()}.
+     *
+     * The index "placeholder" is internally reserved.
+     *
      * @param array $values An array of choice values. Not existing values in
      *                      this array are ignored.
      *
-     * @return array An array of indices with ascending, 0-based numeric keys
+     * @return array An array of indices with ascending, 0-based numeric keys.
      */
     public function getIndicesForValues(array $values);
 }

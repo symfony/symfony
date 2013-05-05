@@ -33,6 +33,7 @@ CHANGELOG
    unless FormInterface::setData() is called manually
  * fixed CSRF error message to be translated
  * custom CSRF error messages can now be set through the "csrf_message" option
+ * fixed: expanded single-choice fields now show a radio button for the empty value
 
 2.2.0
 -----

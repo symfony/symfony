@@ -607,8 +607,6 @@ class Definition
      * @param Boolean $lazy
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setLazy($lazy)
     {
@@ -621,8 +619,6 @@ class Definition
      * Whether this service is lazy.
      *
      * @return Boolean
-     *
-     * @api
      */
     public function isLazy()
     {

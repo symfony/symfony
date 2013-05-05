@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\SimplePreAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
@@ -69,6 +70,10 @@ class SimplePreAuthenticationListener implements ListenerInterface
 
         if (null !== $this->logger) {
             $this->logger->info(sprintf('Attempting simple pre-authorization %s', $this->providerKey));
+        }
+
+        if (null !== $this->context->getToken() && !$this->context->getToken() instanceof AnonymousToken) {
+            return;
         }
 
         try {

@@ -70,7 +70,7 @@ class PhpDumper extends Dumper
     }
 
     /**
-     * Sets the dumper to be used when dumping proxies in the generated container
+     * Sets the dumper to be used when dumping proxies in the generated container.
      *
      * @param ProxyDumper $proxyDumper
      */
@@ -119,7 +119,7 @@ class PhpDumper extends Dumper
     }
 
     /**
-     * Retrieves the currently set proxy dumper or instantiates one
+     * Retrieves the currently set proxy dumper or instantiates one.
      *
      * @return ProxyDumper
      */

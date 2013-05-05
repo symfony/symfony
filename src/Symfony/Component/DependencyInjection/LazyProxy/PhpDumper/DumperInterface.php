@@ -15,14 +15,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * Lazy proxy dumper capable of generating the instantiation logic php code for proxied services
+ * Lazy proxy dumper capable of generating the instantiation logic php code for proxied services.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */
 interface DumperInterface
 {
     /**
-     * Inspects whether the given definitions should produce proxy instantiation logic in the dumped container
+     * Inspects whether the given definitions should produce proxy instantiation logic in the dumped container.
      *
      * @param Definition $definition
      *
@@ -31,7 +31,7 @@ interface DumperInterface
     public function isProxyCandidate(Definition $definition);
 
     /**
-     * Generates the code to be used to instantiate a proxy in the dumped factory code
+     * Generates the code to be used to instantiate a proxy in the dumped factory code.
      *
      * @param Definition $definition
      * @param string     $id         service identifier
@@ -41,7 +41,7 @@ interface DumperInterface
     public function getProxyFactoryCode(Definition $definition, $id);
 
     /**
-     * Generates the code for the lazy proxy
+     * Generates the code for the lazy proxy.
      *
      * @param Definition $definition
      *

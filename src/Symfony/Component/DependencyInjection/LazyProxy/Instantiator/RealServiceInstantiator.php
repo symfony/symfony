@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Definition;
 /**
  * {@inheritDoc}
  *
- * Noop proxy instantiator - simply produces the real service instead of a proxy instance
+ * Noop proxy instantiator - simply produces the real service instead of a proxy instance.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */

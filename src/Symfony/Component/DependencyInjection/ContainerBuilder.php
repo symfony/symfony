@@ -102,7 +102,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Sets the instantiator to be used when fetching proxies
+     * Sets the instantiator to be used when fetching proxies.
      *
      * @param InstantiatorInterface $proxyInstantiator
      */
@@ -1073,7 +1073,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Retrieves the currently set proxy instantiator or instantiates one
+     * Retrieves the currently set proxy instantiator or instantiates one.
      *
      * @return InstantiatorInterface
      */

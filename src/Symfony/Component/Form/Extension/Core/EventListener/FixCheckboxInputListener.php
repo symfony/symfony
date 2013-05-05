@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -38,10 +39,43 @@ class FixCheckboxInputListener implements EventSubscriberInterface
 
     public function preSubmit(FormEvent $event)
     {
-        $values = (array) $event->getData();
-        $indices = $this->choiceList->getIndicesForValues($values);
+        $data = $event->getData();
 
-        $event->setData(count($indices) > 0 ? array_combine($indices, $values) : array());
+        if (is_array($data)) {
+            // Flip the submitted values for faster lookup
+            // It's better to flip this array than $existingValues because
+            // $submittedValues is generally smaller.
+            $submittedValues = array_flip($data);
+
+            // Since expanded choice fields are completely loaded anyway, we
+            // can just as well get the values again without losing performance.
+            $existingValues = $this->choiceList->getValues();
+
+            // Clear the data array and fill it with correct indices
+            $data = array();
+
+            foreach ($existingValues as $index => $value) {
+                if (isset($submittedValues[$value])) {
+                    // Value was submitted
+                    $data[$index] = $value;
+                    unset($submittedValues[$value]);
+                }
+            }
+
+            if (count($submittedValues) > 0) {
+                throw new TransformationFailedException(sprintf(
+                    'The following choices were not found: "%s"',
+                    implode('", "', array_keys($submittedValues))
+                ));
+            }
+        } elseif ('' === $data || null === $data) {
+            // Empty values are always accepted.
+            $data = array();
+        }
+
+        // Else leave the data unchanged to provoke an error during submission
+
+        $event->setData($data);
     }
 
     /**

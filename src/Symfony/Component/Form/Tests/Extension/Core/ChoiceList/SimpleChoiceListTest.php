@@ -79,6 +79,18 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(1, 2), $this->list->getIndicesForChoices($choices));
     }
 
+    public function testGetIndicesForChoicesPreservesKeys()
+    {
+        $choices = array(5 => 'b', 8 => 'c');
+        $this->assertSame(array(5 => 1, 8 => 2), $this->list->getIndicesForChoices($choices));
+    }
+
+    public function testGetIndicesForChoicesPreservesOrder()
+    {
+        $choices = array('c', 'b');
+        $this->assertSame(array(2, 1), $this->list->getIndicesForChoices($choices));
+    }
+
     public function testGetIndicesForChoicesIgnoresNonExistingChoices()
     {
         $choices = array('b', 'c', 'foobar');
@@ -96,6 +108,18 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
     {
         $values = array('b', 'c');
         $this->assertSame(array(1, 2), $this->list->getIndicesForValues($values));
+    }
+
+    public function testGetIndicesForValuesPreservesKeys()
+    {
+        $values = array(5 => 'b', 8 => 'c');
+        $this->assertSame(array(5 => 1, 8 => 2), $this->list->getIndicesForValues($values));
+    }
+
+    public function testGetIndicesForValuesPreservesOrder()
+    {
+        $values = array('c', 'b');
+        $this->assertSame(array(2, 1), $this->list->getIndicesForValues($values));
     }
 
     public function testGetIndicesForValuesIgnoresNonExistingValues()
@@ -117,6 +141,18 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('b', 'c'), $this->list->getChoicesForValues($values));
     }
 
+    public function testGetChoicesForValuesPreservesKeys()
+    {
+        $values = array(5 => 'b', 8 => 'c');
+        $this->assertSame(array(5 => 'b', 8 => 'c'), $this->list->getChoicesForValues($values));
+    }
+
+    public function testGetChoicesForValuesPreservesOrder()
+    {
+        $values = array('c', 'b');
+        $this->assertSame(array('c', 'b'), $this->list->getChoicesForValues($values));
+    }
+
     public function testGetChoicesForValuesIgnoresNonExistingValues()
     {
         $values = array('b', 'c', '100');
@@ -134,6 +170,18 @@ class SimpleChoiceListTest extends \PHPUnit_Framework_TestCase
     {
         $choices = array('b', 'c');
         $this->assertSame(array('b', 'c'), $this->list->getValuesForChoices($choices));
+    }
+
+    public function testGetValuesForChoicesPreservesKeys()
+    {
+        $choices = array(5 => 'b', 8 => 'c');
+        $this->assertSame(array(5 => 'b', 8 => 'c'), $this->list->getValuesForChoices($choices));
+    }
+
+    public function testGetValuesForChoicesPreservesOrder()
+    {
+        $choices = array('c', 'b');
+        $this->assertSame(array('c', 'b'), $this->list->getValuesForChoices($choices));
     }
 
     public function testGetValuesForChoicesIgnoresNonExistingValues()

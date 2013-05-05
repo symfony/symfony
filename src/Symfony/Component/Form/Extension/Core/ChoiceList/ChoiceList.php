@@ -156,11 +156,11 @@ class ChoiceList implements ChoiceListInterface
         $values = $this->fixValues($values);
         $choices = array();
 
-        foreach ($values as $j => $givenValue) {
-            foreach ($this->values as $i => $value) {
+        foreach ($values as $i => $givenValue) {
+            foreach ($this->values as $j => $value) {
                 if ($value === $givenValue) {
-                    $choices[] = $this->choices[$i];
-                    unset($values[$j]);
+                    $choices[$i] = $this->choices[$j];
+                    unset($values[$i]);
 
                     if (0 === count($values)) {
                         break 2;
@@ -180,11 +180,11 @@ class ChoiceList implements ChoiceListInterface
         $choices = $this->fixChoices($choices);
         $values = array();
 
-        foreach ($this->choices as $i => $choice) {
-            foreach ($choices as $j => $givenChoice) {
+        foreach ($choices as $i => $givenChoice) {
+            foreach ($this->choices as $j => $choice) {
                 if ($choice === $givenChoice) {
-                    $values[] = $this->values[$i];
-                    unset($choices[$j]);
+                    $values[$i] = $this->values[$j];
+                    unset($choices[$i]);
 
                     if (0 === count($choices)) {
                         break 2;
@@ -204,11 +204,11 @@ class ChoiceList implements ChoiceListInterface
         $choices = $this->fixChoices($choices);
         $indices = array();
 
-        foreach ($this->choices as $i => $choice) {
-            foreach ($choices as $j => $givenChoice) {
+        foreach ($choices as $i => $givenChoice) {
+            foreach ($this->choices as $j => $choice) {
                 if ($choice === $givenChoice) {
-                    $indices[] = $i;
-                    unset($choices[$j]);
+                    $indices[$i] = $j;
+                    unset($choices[$i]);
 
                     if (0 === count($choices)) {
                         break 2;
@@ -228,11 +228,11 @@ class ChoiceList implements ChoiceListInterface
         $values = $this->fixValues($values);
         $indices = array();
 
-        foreach ($this->values as $i => $value) {
-            foreach ($values as $j => $givenValue) {
+        foreach ($values as $i => $givenValue) {
+            foreach ($this->values as $j => $value) {
                 if ($value === $givenValue) {
-                    $indices[] = $i;
-                    unset($values[$j]);
+                    $indices[$i] = $j;
+                    unset($values[$i]);
 
                     if (0 === count($values)) {
                         break 2;

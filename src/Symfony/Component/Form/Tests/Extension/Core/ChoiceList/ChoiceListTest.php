@@ -125,6 +125,18 @@ class ChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(1, 2), $this->list->getIndicesForChoices($choices));
     }
 
+    public function testGetIndicesForChoicesPreservesKeys()
+    {
+        $choices = array(5 => $this->obj2, 8 => $this->obj3);
+        $this->assertSame(array(5 => 1, 8 => 2), $this->list->getIndicesForChoices($choices));
+    }
+
+    public function testGetIndicesForChoicesPreservesOrder()
+    {
+        $choices = array($this->obj3, $this->obj2);
+        $this->assertSame(array(2, 1), $this->list->getIndicesForChoices($choices));
+    }
+
     public function testGetIndicesForChoicesIgnoresNonExistingChoices()
     {
         $choices = array($this->obj2, $this->obj3, 'foobar');
@@ -136,6 +148,20 @@ class ChoiceListTest extends \PHPUnit_Framework_TestCase
         // values and indices are always the same
         $values = array('1', '2');
         $this->assertSame(array(1, 2), $this->list->getIndicesForValues($values));
+    }
+
+    public function testGetIndicesForValuesPreservesKeys()
+    {
+        // values and indices are always the same
+        $values = array(5 => '1', 8 => '2');
+        $this->assertSame(array(5 => 1, 8 => 2), $this->list->getIndicesForValues($values));
+    }
+
+    public function testGetIndicesForValuesPreservesOrder()
+    {
+        // values and indices are always the same
+        $values = array('2', '1');
+        $this->assertSame(array(2, 1), $this->list->getIndicesForValues($values));
     }
 
     public function testGetIndicesForValuesIgnoresNonExistingValues()
@@ -150,7 +176,13 @@ class ChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array($this->obj2, $this->obj3), $this->list->getChoicesForValues($values));
     }
 
-    public function testGetChoicesForValuesCorrectOrderingOfResult()
+    public function testGetChoicesForValuesPreservesKeys()
+    {
+        $values = array(5 => '1', 8 => '2');
+        $this->assertSame(array(5 => $this->obj2, 8 => $this->obj3), $this->list->getChoicesForValues($values));
+    }
+
+    public function testGetChoicesForValuesPreservesOrder()
     {
         $values = array('2', '1');
         $this->assertSame(array($this->obj3, $this->obj2), $this->list->getChoicesForValues($values));
@@ -166,6 +198,20 @@ class ChoiceListTest extends \PHPUnit_Framework_TestCase
     {
         $choices = array($this->obj2, $this->obj3);
         $this->assertSame(array('1', '2'), $this->list->getValuesForChoices($choices));
+    }
+
+
+    public function testGetValuesForChoicesPreservesKeys()
+    {
+        $choices = array(5 => $this->obj2, 8 => $this->obj3);
+        $this->assertSame(array(5 => '1', 8 => '2'), $this->list->getValuesForChoices($choices));
+    }
+
+
+    public function testGetValuesForChoicesPreservesOrder()
+    {
+        $choices = array($this->obj3, $this->obj2);
+        $this->assertSame(array('2', '1'), $this->list->getValuesForChoices($choices));
     }
 
     public function testGetValuesForChoicesIgnoresNonExistingChoices()

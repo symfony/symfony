@@ -76,7 +76,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testWalkSingleConstraint()
     {
-        $constraint = new Range(array('min' => 4));
+        $constraint = new Range(array('min' => 4, 'groups' => 'MyGroup'));
 
         $array = array(
             'foo' => 3,
@@ -106,7 +106,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
     public function testWalkMultipleConstraints()
     {
         $constraints = array(
-            new Range(array('min' => 4)),
+            new Range(array('min' => 4, 'groups' => 'MyGroup')),
             new NotNull(array('groups' => 'MyGroup')),
         );
 
@@ -203,7 +203,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraint = new Collection(array(
             'fields' => array(
-                'foo' => new Range(array('min' => 4)),
+                'foo' => new Range(array('min' => 4, 'groups' => 'MyGroup')),
             ),
             'missingFieldsMessage' => 'myMessage',
         ));
@@ -266,7 +266,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => 5,
         );
 
-        $constraint = new Range(array('min' => 4));
+        $constraint = new Range(array('min' => 4, 'groups' => 'MyGroup'));
 
         $this->context->expects($this->once())
             ->method('validateValue')
@@ -290,7 +290,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraints = array(
             new NotNull(array('groups' => 'MyGroup')),
-            new Range(array('min' => 4)),
+            new Range(array('min' => 4, 'groups' => 'MyGroup')),
         );
         $i = 1;
 
@@ -336,7 +336,9 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->validator->validate($data, new Collection(array(
             'fields' => array(
-                'foo' => new Required(),
+                'foo' => new Required(
+                    new NotNull(array('groups' => 'MyGroup'))
+                ),
             ),
             'missingFieldsMessage' => 'myMessage',
         )));
@@ -348,7 +350,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => 5,
         );
 
-        $constraint = new Range(array('min' => 4));
+        $constraint = new Range(array('min' => 4, 'groups' => 'MyGroup'));
 
         $this->context->expects($this->once())
             ->method('validateValue')
@@ -372,7 +374,7 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraints = array(
             new NotNull(array('groups' => 'MyGroup')),
-            new Range(array('min' => 4)),
+            new Range(array('min' => 4, 'groups' => 'MyGroup')),
         );
         $i = 1;
 
@@ -409,30 +411,57 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
         ), (array) $value);
     }
 
-    public function testWalkbyGroup()
+    public function testByGroup()
     {
         $array = array(
             'foo' => 2,
         );
 
         $constraints = array(
-            new Min(array('limit' => 5, 'groups' => 'MyGroup')),
-            new Min(array('limit' => 3, 'groups' => 'YourGroup')),
+            new Range(array('min' => 5, 'groups' => 'MyGroup')),
+            new Range(array('min' => 3, 'groups' => 'YourGroup')),
         );
 
-        $this->walker->expects($this->once())
-            ->method('walkConstraint')
-            ->with($constraints[0], $array['foo'], 'MyGroup', 'foo.bar[foo]');
+        $this->context->expects($this->once())
+            ->method('validateValue')
+            ->with($array['foo'], $constraints[0], '[foo]', 'MyGroup');
 
         $this->context->expects($this->never())
-            ->method('addViolationAtSubPath');
+            ->method('addViolationAt');
 
         $data = $this->prepareTestData($array);
 
         $this->validator->validate($data, new Collection(array(
-            'fields' => array(
-                'foo' => $constraints,
-            )
+                'fields' => array('foo' => $constraints)
+        )));
+    }
+
+    public function testMultipleByGroup()
+    {
+        $array = array(
+            'bar' => 3,
+            'baz' => 5
+        );
+
+        $constraints = array(
+            new Optional($inner = new NotNull(array('groups' => 'MyGroup'))),
+            new Range(array('min' => 5, 'groups' => 'YourGroup')),
+            new Required($inner)
+        );
+
+        $this->context->expects($this->once())
+            ->method('validateValue')
+            ->with($array['baz'], $inner, '[baz]', 'MyGroup');
+
+        $this->context->expects($this->never())
+            ->method('addViolationAt');
+
+        $data = $this->prepareTestData($array);
+
+        $this->validator->validate($data, new Collection(array(
+            'foo' => $constraints[0],
+            'bar' => $constraints[1],
+            'baz' => $constraints[2]
         )));
     }
 }

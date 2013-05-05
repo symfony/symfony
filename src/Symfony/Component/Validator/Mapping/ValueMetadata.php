@@ -13,11 +13,11 @@ namespace Symfony\Component\Validator\Mapping;
 
 class ValueMetadata extends ElementMetadata
 {
-/**
- * Sets the constraint(s) for this value.
- *
- * @param array $constraints
- */
+    /**
+    * Sets the constraint(s) for this value.
+    *
+    * @param array $constraints
+    */
 	public function setConstraints(array $constraints)
     {
         $this->constraints = $constraints;
@@ -30,6 +30,15 @@ class ValueMetadata extends ElementMetadata
         });
 
         $this->constraintsByGroup = $constraintsByGroup;
-        return $this;
+    }
+
+    /**
+     * Returns whether this element has any constraints, optionally by group.
+     *
+     * @return Boolean
+     */
+    public function hasConstraints($group = null)
+    {
+        return isset($group) ? !empty($this->constraintsByGroup[$group]) : count($this->constraints) > 0;
     }
 }

@@ -41,16 +41,17 @@ class CollectionValidator extends ConstraintValidator
         $map = new ValueMetadata();
 
         foreach ($constraint->fields as $field => $fieldConstraint) {
+            $map->setConstraints($fieldConstraint->constraints);
+
             if (
                 // bug fix issue #2779
                 (is_array($value) && array_key_exists($field, $value)) ||
                 ($value instanceof \ArrayAccess && $value->offsetExists($field))
             ) {
-                foreach ($fieldConstraint->constraints as $constr) {
+                foreach ($map->findConstraints($group) as $constr) {
                     $this->context->validateValue($value[$field], $constr, '['.$field.']', $group);
-                foreach ($map->setConstraints($constraints)->findConstraints($group) as $constr) {
                 }
-            } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
+            } elseif ($map->hasConstraints($group) && !$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
                 $this->context->addViolationAt('['.$field.']', $constraint->missingFieldsMessage, array(
                     '{{ field }}' => $field
                 ), null);

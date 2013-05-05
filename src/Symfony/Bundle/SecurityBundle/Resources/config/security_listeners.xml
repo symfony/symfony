@@ -14,7 +14,7 @@
 
         <parameter key="security.authentication.listener.simple_form.class">Symfony\Component\Security\Http\Firewall\SimpleFormAuthenticationListener</parameter>
 
-        <parameter key="security.authentication.listener.simple_http.class">Symfony\Component\Security\Http\Firewall\SimpleHttpAuthenticationListener</parameter>
+        <parameter key="security.authentication.listener.simple_preauth.class">Symfony\Component\Security\Http\Firewall\SimplePreAuthenticationListener</parameter>
 
         <parameter key="security.authentication.listener.basic.class">Symfony\Component\Security\Http\Firewall\BasicAuthenticationListener</parameter>
         <parameter key="security.authentication.basic_entry_point.class">Symfony\Component\Security\Http\EntryPoint\BasicAuthenticationEntryPoint</parameter>
@@ -153,7 +153,7 @@
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 
-        <service id="security.authentication.listener.simple_http" class="%security.authentication.listener.simple_http.class%" public="false" abstract="true">
+        <service id="security.authentication.listener.simple_preauth" class="%security.authentication.listener.simple_preauth.class%" public="false" abstract="true">
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.manager" />

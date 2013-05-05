@@ -17,18 +17,18 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\SimpleHttpAuthenticatorInterface;
+use Symfony\Component\Security\Core\Authentication\SimplePreAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 
 /**
- * SimpleHttpListener implements simple proxying to an authenticator.
+ * SimplePreAuthenticationListener implements simple proxying to an authenticator.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class SimpleHttpAuthenticationListener implements ListenerInterface
+class SimplePreAuthenticationListener implements ListenerInterface
 {
     private $securityContext;
     private $authenticationManager;
@@ -42,10 +42,10 @@ class SimpleHttpAuthenticationListener implements ListenerInterface
      * @param SecurityContextInterface         $securityContext       A SecurityContext instance
      * @param AuthenticationManagerInterface   $authenticationManager An AuthenticationManagerInterface instance
      * @param string                           $providerKey
-     * @param SimpleHttpAuthenticatorInterface $simpleAuthenticator   A SimpleHttpAuthenticatorInterface instance
+     * @param SimplePreAuthenticatorInterface  $simpleAuthenticator   A SimplePreAuthenticatorInterface instance
      * @param LoggerInterface                  $logger                A LoggerInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, SimpleHttpAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, SimplePreAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -68,7 +68,7 @@ class SimpleHttpAuthenticationListener implements ListenerInterface
         $request = $event->getRequest();
 
         if (null !== $this->logger) {
-            $this->logger->info(sprintf('Attempting simple http authorization %s', $this->providerKey));
+            $this->logger->info(sprintf('Attempting simple pre-authorization %s', $this->providerKey));
         }
 
         try {

@@ -19,16 +19,16 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class SimpleHttpFactory implements SecurityFactoryInterface
+class SimplePreAuthenticationFactory implements SecurityFactoryInterface
 {
     public function getPosition()
     {
-        return 'http';
+        return 'pre_auth';
     }
 
     public function getKey()
     {
-        return 'simple-http';
+        return 'simple-preauth';
     }
 
     public function addConfiguration(NodeDefinition $node)
@@ -43,7 +43,7 @@ class SimpleHttpFactory implements SecurityFactoryInterface
 
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
-        $provider = 'security.authentication.provider.simple_http.'.$id;
+        $provider = 'security.authentication.provider.simple_preauth.'.$id;
         $container
             ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.simple'))
             ->replaceArgument(0, new Reference($config['authenticator']))
@@ -52,8 +52,8 @@ class SimpleHttpFactory implements SecurityFactoryInterface
         ;
 
         // listener
-        $listenerId = 'security.authentication.listener.simple_http.'.$id;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.simple_http'));
+        $listenerId = 'security.authentication.listener.simple_preauth.'.$id;
+        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.simple_preauth'));
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, new Reference($config['authenticator']));
 

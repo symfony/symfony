@@ -81,11 +81,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $proxyInstantiator;
 
     /**
-     * @var DumperInterface|null
-     */
-    private $proxyDumper;
-
-    /**
      * Sets the track resources flag.
      *
      * If you are not using the loaders and therefore don't want
@@ -130,32 +125,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $this->proxyInstantiator;
-    }
-
-    /**
-     * Sets the dumper to be used when dumping proxies in the generated container
-     *
-     * @todo not responsibility of the ContainerBuilder?
-     *
-     * @param DumperInterface $proxyInstantiator
-     */
-    public function setProxyDumper(DumperInterface $proxyDumper)
-    {
-        $this->proxyDumper = $proxyDumper;
-    }
-
-    /**
-     * Retrieves the currently set proxy dumper used when dumping proxies in the generated container
-     *
-     * @return DumperInterface
-     */
-    public function getProxyDumper()
-    {
-        if (!$this->proxyDumper) {
-            $this->proxyDumper = new NullDumper();
-        }
-
-        return $this->proxyDumper;
     }
 
     /**

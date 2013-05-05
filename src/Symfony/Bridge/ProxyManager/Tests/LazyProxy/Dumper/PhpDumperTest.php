@@ -29,13 +29,14 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->setProxyDumper(new ProxyDumper());
-
         $container->register('foo', 'stdClass');
         $container->getDefinition('foo')->setLazy(true);
         $container->compile();
 
-        $dumper       = new PhpDumper($container);
+        $dumper = new PhpDumper($container);
+
+        $dumper->setProxyDumper(new ProxyDumper());
+
         $dumpedString = $dumper->dump();
 
         $this->assertStringMatchesFormatFile(

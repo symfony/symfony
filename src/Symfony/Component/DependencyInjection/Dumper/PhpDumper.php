@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
+use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 
 /**
  * PhpDumper dumps a service container as a PHP class.
@@ -65,7 +67,30 @@ class PhpDumper extends Dumper
         parent::__construct($container);
 
         $this->inlinedDefinitions = new \SplObjectStorage;
-        $this->proxyDumper = $container->getProxyDumper();
+    }
+
+    /**
+     * Sets the dumper to be used when dumping proxies in the generated container
+     *
+     * @param ProxyDumper $proxyDumper
+     */
+    public function setProxyDumper(ProxyDumper $proxyDumper)
+    {
+        $this->proxyDumper = $proxyDumper;
+    }
+
+    /**
+     * Retrieves the currently set proxy dumper used when dumping proxies in the generated container
+     *
+     * @return ProxyDumper
+     */
+    public function getProxyDumper()
+    {
+        if (!$this->proxyDumper) {
+            $this->proxyDumper = new NullDumper();
+        }
+
+        return $this->proxyDumper;
     }
 
     /**
@@ -164,11 +189,14 @@ class PhpDumper extends Dumper
     private function addProxyClasses()
     {
         /* @var $proxyDefinitions Definition[] */
-        $definitions = array_filter($this->container->getDefinitions(), array($this->proxyDumper, 'isProxyCandidate'));
-        $code             = '';
+        $definitions = array_filter(
+            $this->container->getDefinitions(),
+            array($this->getProxyDumper(), 'isProxyCandidate')
+        );
+        $code = '';
 
         foreach ($definitions as $definition) {
-            $code .= "\n" . $this->proxyDumper->getProxyCode($definition);
+            $code .= "\n" . $this->getProxyDumper()->getProxyCode($definition);
         }
 
         return $code;
@@ -306,7 +334,7 @@ class PhpDumper extends Dumper
         }
 
         $simple           = $this->isSimpleInstance($id, $definition);
-        $isProxyCandidate = $this->proxyDumper->isProxyCandidate($definition);
+        $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
         $instantiation    = '';
 
         if (!$isProxyCandidate && ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
@@ -519,7 +547,7 @@ EOF;
         }
 
         // with proxies, for 5.3.3 compatibility, the getter must be public to be accessible to the initializer
-        $isProxyCandidate = $this->proxyDumper->isProxyCandidate($definition);
+        $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
         $visibility       = $isProxyCandidate ? 'public' : 'protected';
         $code             = <<<EOF
 
@@ -533,7 +561,7 @@ EOF;
 
 EOF;
 
-        $code .= $isProxyCandidate ? $this->proxyDumper->getProxyFactoryCode($definition, $id) : '';
+        $code .= $isProxyCandidate ? $this->getProxyDumper()->getProxyFactoryCode($definition, $id) : '';
 
         if (!in_array($scope, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE))) {
             $code .= <<<EOF

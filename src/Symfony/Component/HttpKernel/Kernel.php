@@ -690,7 +690,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         if (class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')) {
             $container->setProxyInstantiator(new RuntimeInstantiator());
-            $container->setProxyDumper(new ProxyDumper());
         }
 
         return $container;
@@ -708,6 +707,11 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         // cache the container
         $dumper = new PhpDumper($container);
+
+        if (class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')) {
+            $dumper->setProxyDumper(new ProxyDumper());
+        }
+
         $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass));
         if (!$this->debug) {
             $content = self::stripComments($content);

@@ -269,8 +269,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param \ReflectionClass $class
      *
      * @return ContainerBuilder The current instance
-     *
-     * @api
      */
     public function addClassResource(\ReflectionClass $class)
     {

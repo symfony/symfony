@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Definition;
  * Lazy proxy dumper capable of generating the instantiation logic php code for proxied services
  *
  * @author Marco Pivetta <ocramius@gmail.com>
- *
- * @api
  */
 interface DumperInterface
 {
@@ -29,8 +27,6 @@ interface DumperInterface
      * @param Definition $definition
      *
      * @return bool
-     *
-     * @api
      */
     public function isProxyCandidate(Definition $definition);
 
@@ -41,8 +37,6 @@ interface DumperInterface
      * @param string     $id         service identifier
      *
      * @return string
-     *
-     * @api
      */
     public function getProxyFactoryCode(Definition $definition, $id);
 
@@ -52,8 +46,6 @@ interface DumperInterface
      * @param Definition $definition
      *
      * @return string
-     *
-     * @api
      */
     public function getProxyCode(Definition $definition);
 }

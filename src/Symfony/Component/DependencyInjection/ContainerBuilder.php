@@ -24,8 +24,6 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
-use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
-use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.
@@ -111,20 +109,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function setProxyInstantiator(InstantiatorInterface $proxyInstantiator)
     {
         $this->proxyInstantiator = $proxyInstantiator;
-    }
-
-    /**
-     * Retrieves the currently set proxy instantiator
-     *
-     * @return InstantiatorInterface
-     */
-    public function getProxyInstantiator()
-    {
-        if (!$this->proxyInstantiator) {
-            $this->proxyInstantiator = new RealServiceInstantiator();
-        }
-
-        return $this->proxyInstantiator;
     }
 
     /**
@@ -1086,6 +1070,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $services;
+    }
+
+    /**
+     * Retrieves the currently set proxy instantiator or instantiates one
+     *
+     * @return InstantiatorInterface
+     */
+    private function getProxyInstantiator()
+    {
+        if (!$this->proxyInstantiator) {
+            $this->proxyInstantiator = new RealServiceInstantiator();
+        }
+
+        return $this->proxyInstantiator;
     }
 
     /**

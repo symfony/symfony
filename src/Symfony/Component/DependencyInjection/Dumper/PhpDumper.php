@@ -80,20 +80,6 @@ class PhpDumper extends Dumper
     }
 
     /**
-     * Retrieves the currently set proxy dumper used when dumping proxies in the generated container
-     *
-     * @return ProxyDumper
-     */
-    public function getProxyDumper()
-    {
-        if (!$this->proxyDumper) {
-            $this->proxyDumper = new NullDumper();
-        }
-
-        return $this->proxyDumper;
-    }
-
-    /**
      * Dumps the service container as a PHP class.
      *
      * Available options:
@@ -130,6 +116,20 @@ class PhpDumper extends Dumper
         ;
 
         return $code;
+    }
+
+    /**
+     * Retrieves the currently set proxy dumper or instantiates one
+     *
+     * @return ProxyDumper
+     */
+    private function getProxyDumper()
+    {
+        if (!$this->proxyDumper) {
+            $this->proxyDumper = new NullDumper();
+        }
+
+        return $this->proxyDumper;
     }
 
     /**

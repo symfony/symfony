@@ -250,8 +250,6 @@ class Container implements IntrospectableContainerInterface
      */
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        $id = strtolower($id);
-
         if (array_key_exists($id, $this->services)) {
             return $this->services[$id];
         }

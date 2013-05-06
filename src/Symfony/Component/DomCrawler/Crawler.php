@@ -74,13 +74,8 @@ class Crawler extends \SplObjectStorage
             $this->addNodes($node);
         } elseif (is_string($node)) {
             $this->addContent($node);
-        } elseif ($node !== null) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Expecting node to be DOMNodeList|DOMNode|array|string|null, but got %s',
-                    (is_object($node)) ? get_class($node) : gettype($node)
-                )
-            );
+        } elseif (null !== $node) {
+            throw new \InvalidArgumentException(sprintf('Expecting a DOMNodeList or DOMNode instance, an array, a string, or null, but got "%s".', is_object($node) ? get_class($node) : gettype($node)));
         }
     }
 

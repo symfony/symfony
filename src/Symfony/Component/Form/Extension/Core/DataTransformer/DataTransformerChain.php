@@ -24,7 +24,7 @@ class DataTransformerChain implements DataTransformerInterface
 {
     /**
      * The value transformers
-     * @var array
+     * @var DataTransformerInterface[]
      */
     protected $transformers;
 
@@ -51,7 +51,6 @@ class DataTransformerChain implements DataTransformerInterface
      * @return mixed The transformed value
      *
      * @throws TransformationFailedException
-     * @throws UnexpectedTypeException
      */
     public function transform($value)
     {
@@ -76,7 +75,6 @@ class DataTransformerChain implements DataTransformerInterface
      * @return mixed The reverse-transformed value
      *
      * @throws TransformationFailedException
-     * @throws UnexpectedTypeException
      */
     public function reverseTransform($value)
     {

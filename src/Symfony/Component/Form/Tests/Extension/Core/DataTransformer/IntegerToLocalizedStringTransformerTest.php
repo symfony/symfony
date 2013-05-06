@@ -50,7 +50,7 @@ class IntegerToLocalizedStringTransformerTest extends LocalizedTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformExpectsString()
     {

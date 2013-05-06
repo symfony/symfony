@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Form\DataTransformer;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\DataTransformerInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -28,7 +28,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
      *
      * @return mixed An array of entities
      *
-     * @throws UnexpectedTypeException
+     * @throws TransformationFailedException
      */
     public function transform($collection)
     {
@@ -37,7 +37,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
         }
 
         if (!$collection instanceof Collection) {
-            throw new UnexpectedTypeException($collection, 'Doctrine\Common\Collections\Collection');
+            throw new TransformationFailedException('Expected a Doctrine\Common\Collections\Collection object.');
         }
 
         return $collection->toArray();

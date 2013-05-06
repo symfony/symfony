@@ -54,6 +54,15 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testAddInvalidNode()
+    {
+        $crawler = new Crawler();
+        $crawler->add(1);
+    }
+
+    /**
      * @covers Symfony\Component\DomCrawler\Crawler::addHtmlContent
      */
     public function testAddHtmlContent()

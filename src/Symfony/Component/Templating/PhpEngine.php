@@ -42,6 +42,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     protected $globals;
     protected $parser;
 
+    private $evalTemplate;
+    private $evalParameters;
+
     /**
      * Constructor.
      *
@@ -151,27 +154,34 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param array   $parameters An array of parameters to pass to the template
      *
      * @return string|false The evaluated template, or false if the engine is unable to render the template
+     *
+     * @throws \InvalidArgumentException
      */
     protected function evaluate(Storage $template, array $parameters = array())
     {
-        $__template__ = $template;
+        $this->evalTemplate = $template;
+        $this->evalParameters = $parameters;
 
-        if (isset($parameters['__template__'])) {
-            throw new \InvalidArgumentException('Invalid parameter (__template__)');
+        if (isset($this->evalParameters['this'])) {
+            throw new \InvalidArgumentException('Invalid parameter (this)');
+        }
+        if (isset($this->evalParameters['view'])) {
+            throw new \InvalidArgumentException('Invalid parameter (view)');
         }
 
-        if ($__template__ instanceof FileStorage) {
-            extract($parameters, EXTR_SKIP);
-            $view = $this;
+        extract($this->evalParameters, EXTR_OVERWRITE);
+        $this->evalTemplate = null;
+        $this->evalParameters = null;
+        $view = $this;
+
+        if ($this->evalTemplate instanceof FileStorage) {
             ob_start();
-            require $__template__;
+            require $this->evalTemplate;
 
             return ob_get_clean();
-        } elseif ($__template__ instanceof StringStorage) {
-            extract($parameters, EXTR_SKIP);
-            $view = $this;
+        } elseif ($this->evalTemplate instanceof StringStorage) {
             ob_start();
-            eval('; ?>'.$__template__.'<?php ;');
+            eval('; ?>'.$this->evalTemplate.'<?php ;');
 
             return ob_get_clean();
         }

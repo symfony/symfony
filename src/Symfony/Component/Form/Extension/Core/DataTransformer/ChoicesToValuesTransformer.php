@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 
 /**
@@ -39,7 +38,7 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
      *
      * @return array
      *
-     * @throws UnexpectedTypeException if the given value is not an array
+     * @throws TransformationFailedException If the given value is not an array.
      */
     public function transform($array)
     {
@@ -48,7 +47,7 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
         }
 
         if (!is_array($array)) {
-            throw new UnexpectedTypeException($array, 'array');
+            throw new TransformationFailedException('Expected an array.');
         }
 
         return $this->choiceList->getValuesForChoices($array);
@@ -59,8 +58,9 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
      *
      * @return array
      *
-     * @throws UnexpectedTypeException       if the given value is not an array
-     * @throws TransformationFailedException if could not find all matching choices for the given values
+     * @throws TransformationFailedException If the given value is not an array
+     *                                       or if no matching choice could be
+     *                                       found for some given value.
      */
     public function reverseTransform($array)
     {
@@ -69,7 +69,7 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
         }
 
         if (!is_array($array)) {
-            throw new UnexpectedTypeException($array, 'array');
+            throw new TransformationFailedException('Expected an array.');
         }
 
         $choices = $this->choiceList->getChoicesForValues($array);

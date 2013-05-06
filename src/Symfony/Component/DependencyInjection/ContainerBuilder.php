@@ -946,9 +946,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns service ids for a given tag.
      *
+     * Example:
+     *
+     * $container->register('foo')->addTag('my.tag', array('hello' => 'world'));
+     *
+     * $serviceIds = $container->findTaggedServiceIds('my.tag');
+     * foreach ($serviceIds as $serviceId => $tags) {
+     *     foreach ($tags as $tag) {
+     *         echo $tag['hello'];
+     *     }
+     * }
+     *
      * @param string $name The tag name
      *
-     * @return array An array of tags
+     * @return array An array of tags with the tagged service as key, holding a list of attribute arrays.
      *
      * @api
      */
@@ -956,7 +967,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $tags = array();
         foreach ($this->getDefinitions() as $id => $definition) {
-            if ($definition->getTag($name)) {
+            if ($definition->hasTag($name)) {
                 $tags[$id] = $definition->getTag($name);
             }
         }

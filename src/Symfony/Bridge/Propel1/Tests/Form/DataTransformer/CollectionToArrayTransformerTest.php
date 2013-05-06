@@ -47,7 +47,7 @@ class CollectionToArrayTransformerTest extends Propel1TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testTransformThrowsExceptionIfNotPropelObjectCollection()
     {
@@ -84,7 +84,7 @@ class CollectionToArrayTransformerTest extends Propel1TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformThrowsExceptionIfNotArray()
     {

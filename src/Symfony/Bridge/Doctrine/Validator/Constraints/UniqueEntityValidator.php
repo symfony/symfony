@@ -111,6 +111,8 @@ class UniqueEntityValidator extends ConstraintValidator
          */
         if ($result instanceof \Iterator) {
             $result->rewind();
+        } elseif (is_array($result)) {
+            reset($result);
         }
 
         /* If no entity matched the query criteria or a single entity matched,

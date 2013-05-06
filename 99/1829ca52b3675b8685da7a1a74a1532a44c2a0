@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by kachkaev at 2013-05-06T09:43:10Z
+
+How about  ```if (!(is_file($originFile) || parse_url($originFile, PHP_URL_SCHEME))) { ```?
+Because ```$originFile``` is usually a local file, there won’t be any need to call ```parse_url``` in most cases. I think we should also add a test case to avoid the regression in future. http://symfony.com/robots.txt could be used for that.

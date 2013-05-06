@@ -23,8 +23,10 @@ use Symfony\Component\DependencyInjection\Definition;
 interface InstantiatorInterface
 {
     /**
+     * Instantiates a proxy object.
+     *
      * @param ContainerInterface $container        the container from which the service is being requested
-     * @param Definition         $definition       the definitions of the requested service
+     * @param Definition         $definition       the definition of the requested service
      * @param string             $id               identifier of the requested service
      * @param callable           $realInstantiator zero-argument callback that is capable of producing the real
      *                                             service instance

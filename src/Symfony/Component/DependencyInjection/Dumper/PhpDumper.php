@@ -539,8 +539,7 @@ EOF;
 
         if ($definition->isLazy()) {
             $lazyInitialization    = '$lazyLoad = true';
-            $lazyInitializationDoc = "\n     * @param boolean \$lazyLoad whether to try lazy-loading the"
-                . " service with a proxy\n     *";
+            $lazyInitializationDoc = "\n     * @param boolean \$lazyLoad whether to try lazy-loading the service with a proxy\n     *";
         } else {
             $lazyInitialization    = '';
             $lazyInitializationDoc = '';

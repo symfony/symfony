@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 
 /**
- * Runtime lazy loading proxy generator
+ * Runtime lazy loading proxy generator.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */
@@ -50,7 +50,7 @@ class RuntimeInstantiator implements InstantiatorInterface
     {
         return $this->factory->createProxy(
             $definition->getClass(),
-            function (& $wrappedInstance, LazyLoadingInterface $proxy) use ($realInstantiator) {
+            function (&$wrappedInstance, LazyLoadingInterface $proxy) use ($realInstantiator) {
                 $proxy->setProxyInitializer(null);
 
                 $wrappedInstance = call_user_func($realInstantiator);

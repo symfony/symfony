@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 
 /**
- * Generates dumped php code of proxies via reflection
+ * Generates dumped php code of proxies via reflection.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */
@@ -50,9 +50,7 @@ class ProxyDumper implements DumperInterface
      */
     public function isProxyCandidate(Definition $definition)
     {
-        return $definition->isLazy()
-            && ($class = $definition->getClass())
-            && class_exists($class);
+        return $definition->isLazy() && ($class = $definition->getClass()) && class_exists($class);
     }
 
     /**
@@ -68,7 +66,7 @@ class ProxyDumper implements DumperInterface
             $instantiation .= " \$this->services['$id'] = \$this->scopedServices['$scope']['$id'] =";
         }
 
-        $methodName = 'get' . Container::camelize($id) . 'Service';
+        $methodName = 'get'.Container::camelize($id).'Service';
         $proxyClass = $this->getProxyClassName($definition);
 
         return <<<EOF
@@ -76,7 +74,7 @@ class ProxyDumper implements DumperInterface
             \$container = \$this;
 
             $instantiation new $proxyClass(
-                function (& \$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) use (\$container) {
+                function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) use (\$container) {
                     \$proxy->setProxyInitializer(null);
 
                     \$wrappedInstance = \$container->$methodName(false);
@@ -103,7 +101,7 @@ EOF;
     }
 
     /**
-     * Produces the proxy class name for the given definition
+     * Produces the proxy class name for the given definition.
      *
      * @param Definition $definition
      *
@@ -111,6 +109,6 @@ EOF;
      */
     private function getProxyClassName(Definition $definition)
     {
-        return str_replace('\\', '', $definition->getClass()) . '_' . spl_object_hash($definition);
+        return str_replace('\\', '', $definition->getClass()).'_'.spl_object_hash($definition);
     }
 }

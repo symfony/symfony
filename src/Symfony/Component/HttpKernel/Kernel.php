@@ -688,7 +688,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
 
-        if (class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')) {
+        if (class_exists('ProxyManager\Configuration')) {
             $container->setProxyInstantiator(new RuntimeInstantiator());
         }
 
@@ -708,7 +708,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         // cache the container
         $dumper = new PhpDumper($container);
 
-        if (class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')) {
+        if (class_exists('ProxyManager\Configuration')) {
             $dumper->setProxyDumper(new ProxyDumper());
         }
 

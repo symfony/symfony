@@ -130,6 +130,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($services['request']->isSynthetic(), '->load() parses the synthetic flag');
         $this->assertTrue($services['request']->isSynchronized(), '->load() parses the synchronized flag');
+        $this->assertTrue($services['request']->isLazy(), '->load() parses the lazy flag');
 
         $aliases = $container->getAliases();
         $this->assertTrue(isset($aliases['alias_for_foo']), '->load() parses aliases');

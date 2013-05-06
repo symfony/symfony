@@ -35,7 +35,7 @@ class Filesystem
      */
     public function copy($originFile, $targetFile, $override = false)
     {
-        if (!is_file($originFile)) {
+        if (stream_is_local($originFile) && !is_file($originFile)) {
             throw new IOException(sprintf('Failed to copy %s because file not exists', $originFile));
         }
 

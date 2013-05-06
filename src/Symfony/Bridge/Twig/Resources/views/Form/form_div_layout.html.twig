@@ -88,7 +88,7 @@
 {% spaceless %}
     {% for group_label, choice in options %}
         {% if choice is iterable %}
-            <optgroup label="{{ group_label|trans({}, translation_domain) }}">
+            <optgroup label="{{ group_label|trans({}, translation_domain) }}" value="0">
                 {% set options = choice %}
                 {{ block('choice_widget_options') }}
             </optgroup>

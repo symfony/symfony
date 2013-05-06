@@ -161,6 +161,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     {
         $this->evalTemplate = $template;
         $this->evalParameters = $parameters;
+        unset($template, $parameters);
 
         if (isset($this->evalParameters['this'])) {
             throw new \InvalidArgumentException('Invalid parameter (this)');
@@ -169,19 +170,25 @@ class PhpEngine implements EngineInterface, \ArrayAccess
             throw new \InvalidArgumentException('Invalid parameter (view)');
         }
 
-        extract($this->evalParameters, EXTR_OVERWRITE);
-        $this->evalTemplate = null;
-        $this->evalParameters = null;
         $view = $this;
-
         if ($this->evalTemplate instanceof FileStorage) {
+            extract($this->evalParameters, EXTR_SKIP);
+            $this->evalParameters = null;
+
             ob_start();
             require $this->evalTemplate;
 
+            $this->evalTemplate = null;
+
             return ob_get_clean();
         } elseif ($this->evalTemplate instanceof StringStorage) {
+            extract($this->evalParameters, EXTR_SKIP);
+            $this->evalParameters = null;
+
             ob_start();
             eval('; ?>'.$this->evalTemplate.'<?php ;');
+
+            $this->evalTemplate = null;
 
             return ob_get_clean();
         }

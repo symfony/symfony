@@ -124,7 +124,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformExpectsValidDateString()
-    {        
+    {
         $transformer = new DateTimeToRfc3339Transformer('UTC', 'UTC');
 
         $transformer->reverseTransform('2010-2010-2010');

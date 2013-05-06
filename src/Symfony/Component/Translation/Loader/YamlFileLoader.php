@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation\Loader;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\Yaml\Exception\ParseException;
 
 /**
@@ -26,6 +26,8 @@ use Symfony\Component\Yaml\Exception\ParseException;
  */
 class YamlFileLoader extends ArrayLoader implements LoaderInterface
 {
+    private $yamlParser;
+
     /**
      * {@inheritdoc}
      *
@@ -41,8 +43,12 @@ class YamlFileLoader extends ArrayLoader implements LoaderInterface
             throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
         }
 
+        if (null === $this->yamlParser) {
+            $this->yamlParser = new YamlParser();
+        }
+
         try {
-            $messages = Yaml::parse($resource);
+            $messages = $this->yamlParser->parse(file_get_contents($resource));
         } catch (ParseException $e) {
             throw new InvalidResourceException('Error parsing YAML.', 0, $e);
         }

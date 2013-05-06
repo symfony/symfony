@@ -308,6 +308,7 @@ class UniqueValidatorTest extends DoctrineOrmTestCase
                         $entity,
                     );
                     next($returnValue);
+
                     return $returnValue;
                 })
             )

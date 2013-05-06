@@ -238,17 +238,17 @@ class RedisMock
 
         return true;
     }
-    
+
     public function select($dbnum)
     {
         if (!$this->connected) {
             return false;
         }
-        
+
         if (0 > $dbnum) {
             return false;
         }
-        
-        return true;   
+
+        return true;
     }
 }

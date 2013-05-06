@@ -26,14 +26,18 @@ class FixRadioInputListener implements EventSubscriberInterface
 {
     private $choiceList;
 
+    private $placeholderPresent;
+
     /**
      * Constructor.
      *
      * @param ChoiceListInterface $choiceList
+     * @param Boolean             $placeholderPresent
      */
-    public function __construct(ChoiceListInterface $choiceList)
+    public function __construct(ChoiceListInterface $choiceList, $placeholderPresent)
     {
         $this->choiceList = $choiceList;
+        $this->placeholderPresent = $placeholderPresent;
     }
 
     public function preSubmit(FormEvent $event)
@@ -41,7 +45,7 @@ class FixRadioInputListener implements EventSubscriberInterface
         $value = $event->getData();
         $index = current($this->choiceList->getIndicesForValues(array($value)));
 
-        $event->setData(false !== $index ? array($index => $value) : array());
+        $event->setData(false !== $index ? array($index => $value) : ($this->placeholderPresent ? array('placeholder' => '') : array()))   ;
     }
 
     /**

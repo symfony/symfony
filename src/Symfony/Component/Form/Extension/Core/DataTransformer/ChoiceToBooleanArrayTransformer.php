@@ -23,14 +23,18 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
 {
     private $choiceList;
 
+    private $placeholderPresent;
+
     /**
      * Constructor.
      *
      * @param ChoiceListInterface $choiceList
+     * @param Boolean             $placeholderPresent
      */
-    public function __construct(ChoiceListInterface $choiceList)
+    public function __construct(ChoiceListInterface $choiceList, $placeholderPresent)
     {
         $this->choiceList = $choiceList;
+        $this->placeholderPresent = $placeholderPresent;
     }
 
     /**
@@ -61,6 +65,10 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
 
         foreach ($values as $i => $value) {
             $values[$i] = $i === $index;
+        }
+
+        if ($this->placeholderPresent) {
+            $values['placeholder'] = false === $index;
         }
 
         return $values;
@@ -97,6 +105,8 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
             if ($selected) {
                 if (isset($choices[$i])) {
                     return $choices[$i] === '' ? null : $choices[$i];
+                } elseif ($this->placeholderPresent && 'placeholder' === $i) {
+                    return null;
                 } else {
                     throw new TransformationFailedException(sprintf('The choice "%s" does not exist', $i));
                 }

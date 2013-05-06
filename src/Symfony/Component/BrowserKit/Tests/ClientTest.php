@@ -342,6 +342,33 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar'), $client->getRequest()->getCookies());
     }
 
+    public function testFollowRedirectWithHeaders()
+    {
+        $headers = array(
+            'HTTP_HOST'       => 'www.example.com',
+            'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
+            'CONTENT_TYPE'    => 'application/vnd.custom+xml',
+            'HTTPS'           => false,
+        );
+
+        $client = new TestClient();
+        $client->followRedirects(false);
+        $client->setNextResponse(new Response('', 302, array(
+            'Location'    => 'http://www.example.com/redirected',
+        )));
+        $client->request('GET', 'http://www.example.com/', array(), array(), array(
+            'CONTENT_TYPE' => 'application/vnd.custom+xml',
+        ));
+
+        $this->assertEquals($headers, $client->getRequest()->getServer());
+
+        $client->followRedirect();
+
+        $headers['HTTP_REFERER'] = 'http://www.example.com/';
+
+        $this->assertEquals($headers, $client->getRequest()->getServer());
+    }
+
     public function testBack()
     {
         $client = new TestClient();

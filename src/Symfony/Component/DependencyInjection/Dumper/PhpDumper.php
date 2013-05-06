@@ -779,6 +779,20 @@ EOF;
             $code .= "        \$this->scopeChildren = array();\n";
         }
 
+        // build method map
+        $code .= "        \$this->methodMap = array(\n";
+        $definitions = $this->container->getDefinitions();
+        ksort($definitions);
+        foreach ($definitions as $id => $definition) {
+            $code .= '            '.var_export($id, true).' => '.var_export('get'.Container::camelize($id).'Service', true).",\n";
+        }
+        $aliases = $this->container->getAliases();
+        ksort($aliases);
+        foreach ($aliases as $alias => $id) {
+            $code .= '            '.var_export($alias, true).' => '.var_export('get'.Container::camelize($id).'Service', true).",\n";
+        }
+        $code .= "        );\n";
+
         $code .= <<<EOF
     }
 

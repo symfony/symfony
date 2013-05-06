@@ -157,6 +157,10 @@ class YamlFileLoader extends FileLoader
             $definition->setSynchronized($service['synchronized']);
         }
 
+        if (isset($service['lazy'])) {
+            $definition->setLazy($service['lazy']);
+        }
+
         if (isset($service['public'])) {
             $definition->setPublic($service['public']);
         }

@@ -24,7 +24,8 @@
     },
     "suggest": {
         "symfony/yaml": "2.2.*",
-        "symfony/config": "2.2.*"
+        "symfony/config": "2.2.*",
+        "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\DependencyInjection\\": "" }

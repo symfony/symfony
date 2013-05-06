@@ -15,10 +15,7 @@ use Symfony\Component\Process\ProcessBuilder;
 
 class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @test
-     */
-    public function shouldInheritEnvironmentVars()
+    public function testInheritEnvironmentVars()
     {
         $snapshot = $_ENV;
         $_ENV = $expected = array('foo' => 'bar');
@@ -32,10 +29,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $_ENV = $snapshot;
     }
 
-    /**
-     * @test
-     */
-    public function shouldInheritAndOverrideEnvironmentVars()
+    public function testProcessShouldInheritAndOverrideEnvironmentVars()
     {
         $snapshot = $_ENV;
         $_ENV = array('foo' => 'bar', 'bar' => 'baz');
@@ -51,10 +45,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $_ENV = $snapshot;
     }
 
-    /**
-     * @test
-     */
-    public function shouldInheritEnvironmentVarsByDefault()
+    public function testInheritEnvironmentVarsByDefault()
     {
         $pb = new ProcessBuilder();
         $proc = $pb->add('foo')->getProcess();
@@ -62,10 +53,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($proc->getEnv());
     }
 
-    /**
-     * @test
-     */
-    public function shouldNotReplaceExplicitlySetVars()
+    public function testNotReplaceExplicitlySetVars()
     {
         $snapshot = $_ENV;
         $_ENV = array('foo' => 'bar');

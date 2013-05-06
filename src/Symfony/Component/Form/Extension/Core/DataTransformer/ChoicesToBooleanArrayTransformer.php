@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -40,8 +39,8 @@ class ChoicesToBooleanArrayTransformer implements DataTransformerInterface
      *
      * @return mixed An array
      *
-     * @throws UnexpectedTypeException       if the given value is not an array
-     * @throws TransformationFailedException if the choices can not be retrieved
+     * @throws TransformationFailedException If the given value is not an array
+     *                                       or if the choices can not be retrieved.
      */
     public function transform($array)
     {
@@ -50,7 +49,7 @@ class ChoicesToBooleanArrayTransformer implements DataTransformerInterface
         }
 
         if (!is_array($array)) {
-            throw new UnexpectedTypeException($array, 'array');
+            throw new TransformationFailedException('Expected an array.');
         }
 
         try {
@@ -79,14 +78,15 @@ class ChoicesToBooleanArrayTransformer implements DataTransformerInterface
      *
      * @return mixed An array
      *
-     * @throws UnexpectedTypeException       if the given value is not an array
-     * @throws TransformationFailedException if the recuperation of the choices fails or
-     *                                       if some choice can't be found
+     * @throws TransformationFailedException If the given value is not an array,
+     *                                       if the recuperation of the choices
+     *                                       fails or if some choice can't be
+     *                                       found.
      */
     public function reverseTransform($values)
     {
         if (!is_array($values)) {
-            throw new UnexpectedTypeException($values, 'array');
+            throw new TransformationFailedException('Expected an array.');
         }
 
         try {

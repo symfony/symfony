@@ -37,7 +37,7 @@ class MoneyToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->transform('abcd');
     }
@@ -60,7 +60,7 @@ class MoneyToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $transformer = new MoneyToLocalizedStringTransformer(null, null, null, 100);
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->reverseTransform(12345);
     }

@@ -42,11 +42,16 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $expected = new Response();
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMock('Symfony\Component\DependencyInjection\Container', array('enterScope', 'leaveScope', 'set', 'isFrozen'));
         $container
             ->expects($this->once())
             ->method('enterScope')
             ->with($this->equalTo('request'))
+        ;
+        $container
+            ->expects($this->any())
+            ->method('isFrozen')
+            ->will($this->returnValue(false))
         ;
         $container
             ->expects($this->once())
@@ -60,7 +65,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('request'), $this->equalTo($request), $this->equalTo('request'))
         ;
         $container
-            ->expects($this->at(3))
+            ->expects($this->at(4))
             ->method('set')
             ->with($this->equalTo('request'), $this->equalTo(null), $this->equalTo('request'))
         ;
@@ -95,11 +100,16 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $expected = new \Exception();
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMock('Symfony\Component\DependencyInjection\Container', array('enterScope', 'leaveScope', 'set', 'isFrozen'));
         $container
             ->expects($this->once())
             ->method('enterScope')
             ->with($this->equalTo('request'))
+        ;
+        $container
+            ->expects($this->any())
+            ->method('isFrozen')
+            ->will($this->returnValue(false))
         ;
         $container
             ->expects($this->once())
@@ -112,7 +122,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('request'), $this->equalTo($request), $this->equalTo('request'))
         ;
         $container
-            ->expects($this->at(3))
+            ->expects($this->at(4))
             ->method('set')
             ->with($this->equalTo('request'), $this->equalTo(null), $this->equalTo('request'))
         ;

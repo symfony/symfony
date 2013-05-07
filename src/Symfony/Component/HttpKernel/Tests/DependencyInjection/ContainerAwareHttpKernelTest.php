@@ -42,11 +42,16 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $expected = new Response();
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface', array('enterScope', 'leaveScope', 'set', 'isFrozen'));
+        $container = $this->getMock('Symfony\Component\DependencyInjection\Container', array('enterScope', 'leaveScope', 'set', 'isFrozen'));
         $container
             ->expects($this->once())
             ->method('enterScope')
             ->with($this->equalTo('request'))
+        ;
+        $container
+            ->expects($this->once())
+            ->method('isFrozen')
+            ->will($this->returnValue(true))
         ;
         $container
             ->expects($this->once())
@@ -95,11 +100,16 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $expected = new \Exception();
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface', array('enterScope', 'leaveScope', 'set', 'isFrozen'));
+        $container = $this->getMock('Symfony\Component\DependencyInjection\Container', array('enterScope', 'leaveScope', 'set', 'isFrozen'));
         $container
             ->expects($this->once())
             ->method('enterScope')
             ->with($this->equalTo('request'))
+        ;
+        $container
+            ->expects($this->once())
+            ->method('isFrozen')
+            ->will($this->returnValue(true))
         ;
         $container
             ->expects($this->once())

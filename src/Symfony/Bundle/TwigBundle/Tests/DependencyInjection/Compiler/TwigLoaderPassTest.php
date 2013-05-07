@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace symfony\src\Symfony\Bundle\TwigBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;

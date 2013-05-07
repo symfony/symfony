@@ -12,6 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
+use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -30,6 +33,12 @@ abstract class Descriptor implements DescriptorInterface
                 return $this->describeRouteCollection($object, $options);
             case $object instanceof Route:
                 return $this->describeRoute($object, $options);
+            case $object instanceof ContainerBuilder:
+                return $this->describeContainerBuilder($object, $options);
+            case $object instanceof Definition:
+                return $this->describeContainerService($object, $options);
+            case $object instanceof Alias:
+                return $this->describeContainerAlias($object, $options);
         }
 
         throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
@@ -54,6 +63,42 @@ abstract class Descriptor implements DescriptorInterface
      * @return string|mixed
      */
     abstract protected function describeRoute(Route $route, array $options = array());
+
+    /**
+     * Describes a container.
+     *
+     * Common options are:
+     * * services:   boolean (default true) adds services to description
+     * * parameters: boolean (default true) adds parameters to description
+     * * tags:       only describe tagged services, grouped by tag
+     * * tag:        filters described services by given tag
+     *
+     * @param ContainerBuilder $builder
+     * @param array            $options
+     *
+     * @return string|mixed
+     */
+    abstract protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array());
+
+    /**
+     * Describes a service definition.
+     *
+     * @param Definition $definition
+     * @param array      $options
+     *
+     * @return string|mixed
+     */
+    abstract protected function describeContainerService(Definition $definition, array $options = array());
+
+    /**
+     * Describes a service alias.
+     *
+     * @param Alias $alias
+     * @param array $options
+     *
+     * @return string|mixed
+     */
+    abstract protected function describeContainerAlias(Alias $alias, array $options = array());
 
     /**
      * Formats a value as string.

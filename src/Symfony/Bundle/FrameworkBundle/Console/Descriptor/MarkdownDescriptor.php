@@ -2,6 +2,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
+use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -36,9 +39,9 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Scheme: '.($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY')
             ."\n".'- Method: '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')
             ."\n".'- Class: '.get_class($route)
-            ."\n".'- Defaults: '.$this->formatConfigs($route->getDefaults())
-            ."\n".'- Requirements: '.$this->formatConfigs($requirements) ?: 'NO CUSTOM'
-            ."\n".'- Options: '.$this->formatConfigs($route->getOptions())
+            ."\n".'- Defaults: '.$this->formatRouterConfig($route->getDefaults())
+            ."\n".'- Requirements: '.$this->formatRouterConfig($requirements) ?: 'NO CUSTOM'
+            ."\n".'- Options: '.$this->formatRouterConfig($route->getOptions())
             ."\n".'- Path-Regex: '.$route->compile()->getRegex();
 
         return isset($options['name'])
@@ -46,7 +49,31 @@ class MarkdownDescriptor extends Descriptor
             : $output;
     }
 
-    private function formatConfigs(array $array)
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array())
+    {
+        // TODO: Implement describeContainerBuilder() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerService(Definition $definition, array $options = array())
+    {
+        // TODO: Implement describeContainerService() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerAlias(Alias $alias, array $options = array())
+    {
+        // TODO: Implement describeContainerAlias() method.
+    }
+
+    private function formatRouterConfig(array $array)
     {
         if (!count($array)) {
             return 'NONE';

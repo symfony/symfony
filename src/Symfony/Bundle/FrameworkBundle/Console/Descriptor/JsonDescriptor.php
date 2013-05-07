@@ -2,6 +2,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
+use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -42,6 +45,30 @@ class JsonDescriptor extends Descriptor
             'options'      => $route->getOptions(),
             'pathRegex'    => $route->compile()->getRegex(),
         ), $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerBuilder(ContainerBuilder $builder, array $options = array())
+    {
+        // TODO: Implement describeContainerBuilder() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerService(Definition $definition, array $options = array())
+    {
+        // TODO: Implement describeContainerService() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeContainerAlias(Alias $alias, array $options = array())
+    {
+        // TODO: Implement describeContainerAlias() method.
     }
 
     /**

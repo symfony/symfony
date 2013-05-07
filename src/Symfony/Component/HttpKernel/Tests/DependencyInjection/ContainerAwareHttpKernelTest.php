@@ -51,7 +51,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         $container
             ->expects($this->once())
             ->method('isFrozen')
-            ->will($this->returnValue(true))
+            ->will($this->returnValue(false))
         ;
         $container
             ->expects($this->once())
@@ -109,7 +109,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         $container
             ->expects($this->once())
             ->method('isFrozen')
-            ->will($this->returnValue(true))
+            ->will($this->returnValue(false))
         ;
         $container
             ->expects($this->once())

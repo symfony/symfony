@@ -42,7 +42,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $expected = new Response();
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface', array('enterScope', 'leaveScope', 'set', 'isFrozen'));
         $container
             ->expects($this->once())
             ->method('enterScope')
@@ -95,7 +95,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $expected = new \Exception();
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface', array('enterScope', 'leaveScope', 'set', 'isFrozen'));
         $container
             ->expects($this->once())
             ->method('enterScope')

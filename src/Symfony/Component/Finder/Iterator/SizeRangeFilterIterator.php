@@ -41,7 +41,7 @@ class SizeRangeFilterIterator extends FilterIterator
     public function accept()
     {
         $fileinfo = $this->current();
-        if (!$fileinfo->isFile()) {
+        if (!$fileinfo->isFile() && !$fileinfo->isDir() ) {
             return true;
         }
 

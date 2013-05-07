@@ -4,6 +4,7 @@ CHANGELOG
 2.3.0
 -----
 
+ * enable ParameterBag's set/has/remove to also handle deep parameters
  * added support for ranges of IPs in trusted proxies
  * `UploadedFile::isValid` now returns false if the file was not uploaded via HTTP (in a non-test mode)
  * Improved error-handling of `\Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler`

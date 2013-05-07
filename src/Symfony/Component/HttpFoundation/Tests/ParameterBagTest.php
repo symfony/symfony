@@ -54,6 +54,15 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar'), $bag->all());
     }
 
+    public function testRemoveDeep()
+    {
+        $bag = new ParameterBag(array('foo' => array('bar' => array('zup' => 'zap', 'moo' => 'boo'))));
+        $bag->remove('foo[bar][zup]', true);
+        $this->assertEquals(array('foo' => array('bar' => array('moo' => 'boo'))), $bag->all());
+        $bag->remove('foo[bar]', true);
+        $this->assertEquals(array('foo' => array()), $bag->all());
+    }
+
     /**
      * @covers Symfony\Component\HttpFoundation\ParameterBag::replace
      */
@@ -131,6 +140,39 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\HttpFoundation\ParameterBag::set
+     */
+    public function testSetDeep()
+    {
+        $bag = new ParameterBag(array());
+
+        $bag->set('foo[bar]', 'baz', true);
+        $this->assertEquals(array('bar' => 'baz'), $bag->get('foo'), '->set() sets the value of deep parameter');
+
+        $bag->set('foo[bar]', 'moo', true);
+        $this->assertEquals(array('bar' => 'moo'), $bag->get('foo'), '->set() overrides previously set deep parameter');
+
+        $bag = new ParameterBag(array());
+
+        $bag->set('foo[moo][zup]', 'zap', true);
+        $this->assertEquals(array('foo' => array('moo' => array('zup' => 'zap'))), $bag->all(), '->set() sets the value of very deep parameter');
+
+        $bag->set('foo[moo][zup]', 'zip', true);
+        $this->assertEquals(array('foo' => array('moo' => array('zup' => 'zip'))), $bag->all(), '->set() overrides previously set very deep parameter');
+    }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\ParameterBag::set
+     * @expectedException \RuntimeException
+     */
+    public function testSetDeepWithInvalidPath()
+    {
+        $bag = new ParameterBag(array('foo' => 'bar'));
+
+        $bag->set('foo[bar][baz]', 'zup', true);
+    }
+
+    /**
      * @covers Symfony\Component\HttpFoundation\ParameterBag::has
      */
     public function testHas()
@@ -139,6 +181,19 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($bag->has('foo'), '->has() returns true if a parameter is defined');
         $this->assertFalse($bag->has('unknown'), '->has() return false if a parameter is not defined');
+    }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\ParameterBag::has
+     */
+    public function testHasDeep()
+    {
+        $bag = new ParameterBag(array('foo' => array('bar' => array('moo' => 'boo'))));
+
+        $this->assertTrue($bag->has('foo[bar]', true), '->has() returns true if a deep parameter is defined');
+        $this->assertTrue($bag->has('foo[bar][moo]', true), '->has() returns true if a deep parameter is defined');
+        $this->assertFalse($bag->has('unknown', true), '->has() return false if a deep parameter is not defined');
+        $this->assertFalse($bag->has('foo[bar]'), '->has() returns true if a deep parameter is tested without deep');
     }
 
     /**

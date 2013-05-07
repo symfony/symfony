@@ -53,13 +53,13 @@ class FileBag extends ParameterBag
      *
      * @api
      */
-    public function set($key, $value)
+    public function set($key, $value, $deep = false)
     {
         if (!is_array($value) && !$value instanceof UploadedFile) {
             throw new \InvalidArgumentException('An uploaded file must be an array or an instance of UploadedFile.');
         }
 
-        parent::set($key, $this->convertFileInformation($value));
+        parent::set($key, $this->convertFileInformation($value), $deep);
     }
 
     /**

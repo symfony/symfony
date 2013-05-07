@@ -49,7 +49,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('request'))
         ;
         $container
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('isFrozen')
             ->will($this->returnValue(false))
         ;
@@ -107,7 +107,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('request'))
         ;
         $container
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('isFrozen')
             ->will($this->returnValue(false))
         ;

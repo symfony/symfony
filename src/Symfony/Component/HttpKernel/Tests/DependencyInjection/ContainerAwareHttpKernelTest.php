@@ -60,7 +60,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         ;
         // first call is for addScope()
         $container
-            ->expects($this->at(3))
+            ->expects($this->at(2))
             ->method('set')
             ->with($this->equalTo('request'), $this->equalTo($request), $this->equalTo('request'))
         ;
@@ -117,7 +117,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('request'))
         ;
         $container
-            ->expects($this->at(3))
+            ->expects($this->at(2))
             ->method('set')
             ->with($this->equalTo('request'), $this->equalTo($request), $this->equalTo('request'))
         ;

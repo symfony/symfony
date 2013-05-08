@@ -25,15 +25,24 @@ class PropertyAccessor implements PropertyAccessorInterface
     const VALUE = 0;
     const IS_REF = 1;
 
+    /**
+     * @var Boolean
+     */
     private $magicCall;
+
+    /**
+     * @var Boolean
+     */
+    private $throwExceptionOnInvalidIndex;
 
     /**
      * Should not be used by application code. Use
      * {@link PropertyAccess::getPropertyAccessor()} instead.
      */
-    public function __construct($magicCall = false)
+    public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false)
     {
         $this->magicCall = $magicCall;
+        $this->throwExceptionOnInvalidIndex = $throwExceptionOnInvalidIndex;
     }
 
     /**
@@ -47,7 +56,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\PropertyAccess\PropertyPathInterface');
         }
 
-        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), true);
+        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->throwExceptionOnInvalidIndex);
 
         return $propertyValues[count($propertyValues) - 1][self::VALUE];
     }

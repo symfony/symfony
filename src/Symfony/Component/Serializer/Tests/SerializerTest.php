@@ -50,8 +50,8 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNormalizeOnDenormalizer()
     {
-      $this->serializer = new Serializer(array(new TestDenormalizer()), array());
-      $this->assertTrue($this->serializer->normalize(new \stdClass, 'json'));
+        $this->serializer = new Serializer(array(new TestDenormalizer()), array());
+        $this->assertTrue($this->serializer->normalize(new \stdClass, 'json'));
     }
 
     /**
@@ -68,9 +68,9 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDenormalizeOnNormalizer()
     {
-      $this->serializer = new Serializer(array(new TestNormalizer()), array());
-      $data = array('title' => 'foo', 'numbers' => array(5, 3));
-      $this->assertTrue($this->serializer->denormalize(json_encode($data), 'stdClass', 'json'));
+        $this->serializer = new Serializer(array(new TestNormalizer()), array());
+        $data = array('title' => 'foo', 'numbers' => array(5, 3));
+        $this->assertTrue($this->serializer->denormalize(json_encode($data), 'stdClass', 'json'));
     }
 
     public function testSerialize()
@@ -244,5 +244,4 @@ class Model
     {
         return array('title' => $this->title, 'numbers' => $this->numbers);
     }
-
 }

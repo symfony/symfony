@@ -20,19 +20,18 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class TestNormalizer implements NormalizerInterface
 {
-  /**
-   * {@inheritdoc}
-   */
-  public function normalize($object, $format = null, array $context = array())
-  {
-    
-  }
+    /**
+    * {@inheritdoc}
+    */
+    public function normalize($object, $format = null, array $context = array())
+    {
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function supportsNormalization($data, $format = null)
-  {
-    return TRUE;
-  }
+    /**
+    * {@inheritdoc}
+    */
+    public function supportsNormalization($data, $format = null)
+    {
+        return true;
+    }
 }

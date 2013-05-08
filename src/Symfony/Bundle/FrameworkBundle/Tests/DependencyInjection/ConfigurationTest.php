@@ -94,6 +94,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'ide'                 => null,
             'default_locale'      => 'en',
             'form'                => array('enabled' => false),
+            'property_accessor'   => array(
+                'magic_call' => false,
+            ),
             'csrf_protection'     => array(
                 'enabled'    => true,
                 'field_name' => '_token',
@@ -128,7 +131,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'debug'          => '%kernel.debug%',
             ),
             'serializer'          => array(
-                'enabled' => false           
+                'enabled' => false
             )
         );
     }

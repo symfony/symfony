@@ -55,7 +55,9 @@
         </service>
 
         <!-- PropertyAccessor -->
-        <service id="property_accessor" class="%property_accessor.class%" />
+        <service id="property_accessor" class="%property_accessor.class%">
+            <argument>%property_accessor.magic_call.enabled%</argument>
+        </service>
 
         <!-- CoreExtension -->
         <service id="form.type.field" class="Symfony\Component\Form\Extension\Core\Type\FieldType">

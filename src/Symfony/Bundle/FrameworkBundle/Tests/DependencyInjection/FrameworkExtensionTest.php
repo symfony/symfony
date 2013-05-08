@@ -272,6 +272,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.xml', $xmlArgs[1]);
     }
 
+    public function testPropertyAccessor()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $this->assertFalse($container->getParameter('property_accessor.magic_call.enabled'));
+    }
+
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(

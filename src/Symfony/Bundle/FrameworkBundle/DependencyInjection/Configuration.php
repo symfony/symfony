@@ -100,6 +100,13 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('field_name')->defaultValue('_token')->end()
                     ->end()
                 ->end()
+                ->arrayNode('property_accessor')
+                    ->info('property accessor configuration')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('magic_call')->defaultFalse()->end()
+                    ->end()
+                ->end()
             ->end()
         ;
     }

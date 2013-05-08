@@ -20,19 +20,18 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 class TestDenormalizer implements DenormalizerInterface
 {
-  /**
-   * {@inheritdoc}
-   */
-  public function denormalize($data, $class, $format = null, array $context = array())
-  {
+    /**
+    * {@inheritdoc}
+    */
+    public function denormalize($data, $class, $format = null, array $context = array())
+    {
+    }
 
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function supportsDenormalization($data, $type, $format = null)
-  {
-    return TRUE;
-  }
+    /**
+    * {@inheritdoc}
+    */
+    public function supportsDenormalization($data, $type, $format = null)
+    {
+        return true;
+    }
 }

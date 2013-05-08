@@ -24,6 +24,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @experimental This feature is experimental in 2.3 and might change in future versions
  */
 class SimpleAuthenticationProvider implements AuthenticationProviderInterface
 {

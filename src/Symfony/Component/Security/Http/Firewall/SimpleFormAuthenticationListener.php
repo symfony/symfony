@@ -32,6 +32,8 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @experimental This feature is experimental in 2.3 and might change in future versions
  */
 class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
 {

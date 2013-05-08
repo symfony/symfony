@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @experimental This feature is experimental in 2.3 and might change in future versions
  */
 class SimpleFormFactory extends FormLoginFactory
 {

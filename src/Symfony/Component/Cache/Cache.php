@@ -90,7 +90,7 @@ class Cache
         $options = $this->options->resolve($options);
         $data = $this->extension->prepareStorage($data, $this, $options);
 
-        return $this->store($data);
+        return $this->driver->store($data);
     }
 
     /**
@@ -139,10 +139,14 @@ class Cache
     private function resolveQuery($query)
     {
         if (is_string($query)) {
-            return array('key' => $query);
+            return array('key' => array($query));
         }
 
         if (is_array($query)) {
+            if (isset($query['key']) && is_string($query['key'])) {
+                $query['key'] = array($query['key']);
+            }
+
             return $query;
         }
 

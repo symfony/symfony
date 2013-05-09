@@ -10,7 +10,7 @@ class NullResult implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function get()
+    public function getData()
     {
         throw new \LogicException('A null result contains no data.');
     }

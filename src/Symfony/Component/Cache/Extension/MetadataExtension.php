@@ -27,7 +27,7 @@ class MetadataExtension extends AbstractExtension
             'with_metadata'    => true,
         ))->addAllowedTypes(array(
             'metadata_pattern' => 'string',
-            'with_metadata'    => 'boolean',
+            'with_metadata'    => 'bool',
         ));
     }
 
@@ -40,10 +40,10 @@ class MetadataExtension extends AbstractExtension
             return $data;
         }
 
-        $pattern = $options['metadata_suffix'];
+        $pattern = $options['metadata_pattern'];
 
         if ($data instanceof ValidItem) {
-            $metadata = $cache->fetch(array('id' => sprintf($pattern, $data->getKey())));
+            $metadata = $cache->fetch(array('key' => sprintf($pattern, $data->getKey())));
             /** @var ItemInterface $metadata */
             if ($metadata->isValid()) {
                 $data->metadata = $metadata->getData();
@@ -51,7 +51,7 @@ class MetadataExtension extends AbstractExtension
         }
 
         if ($data instanceof CollectionInterface) {
-            $metadata = $cache->fetch(array('id' => array_map(function ($key) use ($pattern) {
+            $metadata = $cache->fetch(array('key' => array_map(function ($key) use ($pattern) {
                 return sprintf($pattern, $key);
             }, $data->getKeys())));
             /** @var CollectionInterface $metadata */
@@ -77,16 +77,19 @@ class MetadataExtension extends AbstractExtension
             return $data;
         }
 
-        $suffix = $options['metadata_suffix'];
+        $pattern = $options['metadata_pattern'];
+        $options['with_metadata'] = false;
 
-        if ($data instanceof ValidItem) {
-            return new Collection(array($data, new FreshItem($data->getKey().$suffix, $data->metadata)));
+        if ($data instanceof ValidItem && !$data->metadata->isEmpty()) {
+            $cache->store(new Collection(array($data, new FreshItem(sprintf($pattern, $data->getKey()), $data->metadata))), $options);
         }
 
         if ($data instanceof CollectionInterface) {
-            return $data->merge(new Collection(array_map(function (ValidItem $item) use ($suffix) {
-                return new FreshItem($item->getKey().$suffix, $item->metadata);
-            }, $data->all())));
+            $cache->store(new Collection(array_map(function (ValidItem $item) use ($pattern) {
+                return new FreshItem(sprintf($pattern, $item->getKey()), $item->metadata);
+            }, array_filter($data->all(), function (ItemInterface $item) {
+                return $item instanceof ValidItem && !$item->metadata->isEmpty();
+            }))), $options);
         }
 
         return $data;
@@ -101,10 +104,10 @@ class MetadataExtension extends AbstractExtension
             return $keys;
         }
 
-        $suffix = $options['metadata_suffix'];
+        $pattern = $options['metadata_pattern'];
 
-        return $keys->merge(new KeyCollection(array_map(function ($key) use ($suffix) {
-            return $key.$suffix;
+        return $keys->merge(new KeyCollection(array_map(function ($key) use ($pattern) {
+            return sprintf($pattern, $key);
         }, $keys->getKeys())));
     }
 }

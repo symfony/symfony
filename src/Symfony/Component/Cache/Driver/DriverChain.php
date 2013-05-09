@@ -123,7 +123,7 @@ class DriverChain implements DriverInterface
             return;
         }
 
-        uksort($this->drivers, function (array $a, array $b) {
+        uasort($this->drivers, function (array $a, array $b) {
             return $a['priority'] === $b['priority']
                 ? ($a['index'] < $b['index'] ? 1 : -1)
                 : $a['priority'] > $b['priority'] ? 1 : -1;

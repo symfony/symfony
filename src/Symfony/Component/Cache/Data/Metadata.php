@@ -73,4 +73,12 @@ class Metadata
     {
         return $this->data;
     }
+
+    /**
+     * @return boolean
+     */
+    public function isEmpty()
+    {
+        return empty($this->data);
+    }
 }

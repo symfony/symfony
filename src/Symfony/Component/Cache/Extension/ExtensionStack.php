@@ -170,7 +170,7 @@ class ExtensionStack implements ExtensionInterface
     private function find($query)
     {
         foreach ($this->all() as $extension) {
-            if ($extension->suportsQuery($query)) {
+            if ($extension->supportsQuery($query)) {
                 return $extension;
             }
         }
@@ -184,7 +184,7 @@ class ExtensionStack implements ExtensionInterface
             return;
         }
 
-        uksort($this->extensions, function (array $a, array $b) {
+        uasort($this->extensions, function (array $a, array $b) {
             return $a['priority'] === $b['priority']
                 ? ($a['index'] < $b['index'] ? 1 : -1)
                 : $a['priority'] > $b['priority'] ? 1 : -1;

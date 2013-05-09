@@ -46,7 +46,7 @@ class TagExtension extends AbstractExtension
         $item = $this->findTag($cache, $query['tag'], $options);
 
         if ($item instanceof CachedItem) {
-            return $cache->fetch(array('id' => $item->getData()), $options);
+            return $cache->fetch(array('key' => $item->getData()), $options);
         }
 
         return new NullResult();
@@ -68,6 +68,8 @@ class TagExtension extends AbstractExtension
                 }
             }
         }
+
+        return $data;
     }
 
     /**
@@ -104,7 +106,7 @@ class TagExtension extends AbstractExtension
             $tagData = $tagItem instanceof CachedItem ? $tagItem->getData() : array();
 
             if (!in_array($tag, $tagData)) {
-                $tagsData[] = $item->getKey();
+                $tagData[] = $item->getKey();
                 $dataToStore[] = new FreshItem(sprintf($options['tags_pattern'], $tag), $tagData);
             }
         }
@@ -150,12 +152,8 @@ class TagExtension extends AbstractExtension
      */
     private function findTag(Cache $cache, $tag, array $options)
     {
-        if (empty($tags)) {
-            return new NullResult();
-        }
-
         $options['with_metadata'] = false;
 
-        return $cache->fetch(array('id' => sprintf($options['tags_pattern'], $tag)), $options);
+        return $cache->fetch(array('key' => sprintf($options['tags_pattern'], $tag)), $options);
     }
 }

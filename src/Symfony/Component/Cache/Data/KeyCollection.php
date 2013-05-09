@@ -25,9 +25,7 @@ class KeyCollection implements CollectionInterface
      */
     public function add(ItemInterface $item)
     {
-        $this->keys[] = $item->getKey();
-
-        return $this;
+        throw new \LogicException('Can not add item to key collection.');
     }
 
     /**

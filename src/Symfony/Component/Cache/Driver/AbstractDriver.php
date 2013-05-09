@@ -23,27 +23,25 @@ abstract class AbstractDriver implements DriverInterface
     {
         if ($data instanceof CollectionInterface) {
             $result = $this->fetchMany($data->getKeys());
-
-            if (empty($result)) {
-                return new NullResult();
-            }
-
-            return new Collection(array_map(function ($key, $data) {
-                return new CachedItem($key, $data);
-            }, array_keys($result), $result));
-        }
-
-        if ($data instanceof ItemInterface) {
+        } elseif ($data instanceof ItemInterface) {
             $result = $this->fetchOne($data->getKey());
-
-            if (empty($result)) {
-                return new NullResult();
-            }
-
-            return new CachedItem($data->getKey(), $result);
+        } else {
+            throw new \InvalidArgumentException('Invalid data.');
         }
 
-        throw new \InvalidArgumentException('Invalid data.');
+        if (0 === count($result)) {
+            return new NullResult();
+        }
+
+        if (1 === count($result)) {
+            $keys = array_keys($result);
+
+            return new CachedItem(reset($keys), reset($result));
+        }
+
+        return new Collection(array_map(function ($key, $data) {
+            return new CachedItem($key, $data);
+        }, array_keys($result), $result));
     }
 
     /**
@@ -54,7 +52,7 @@ abstract class AbstractDriver implements DriverInterface
         if ($data instanceof CollectionInterface) {
             $raw = array();
             foreach ($data->all() as $item) {
-                $hash[$item->getKey()] = $item->getData();
+                $raw[$item->getKey()] = $item->getData();
             }
 
             if ($this->storeMany($raw)) {

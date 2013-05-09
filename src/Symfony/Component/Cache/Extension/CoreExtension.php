@@ -3,7 +3,6 @@
 namespace Symfony\Component\Cache\Extension;
 
 use Symfony\Component\Cache\Cache;
-use Symfony\Component\Cache\Data\DataInterface;
 use Symfony\Component\Cache\Data\KeyCollection;
 use Symfony\Component\Cache\Rewriting;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -57,17 +56,17 @@ class CoreExtension extends AbstractExtension
      *
      * @throws \InvalidArgumentException
      *
-     * @return DataInterface
+     * @return KeyCollection
      */
     private function getKey($query, array $options)
     {
         if (is_array($query)) {
-            $keys = array();
+            $keys = new KeyCollection();
             foreach ($query as $key) {
-                $keys[] = $this->getKey($key, $options);
+                $keys->merge($this->getKey($key, $options));
             }
 
-            return new KeyCollection($keys);
+            return $keys;
         }
 
         if (is_string($query)) {

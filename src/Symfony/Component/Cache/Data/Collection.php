@@ -10,7 +10,7 @@ class Collection implements CollectionInterface
     /**
      * @var ItemInterface[]
      */
-    private $items;
+    private $items = array();
 
     /**
      * @var boolean
@@ -25,7 +25,7 @@ class Collection implements CollectionInterface
     /**
      * @param ItemInterface[] $items
      */
-    public function __construct(array $items)
+    public function __construct(array $items = array())
     {
         foreach ($items as $item) {
             $this->add($item);
@@ -77,7 +77,7 @@ class Collection implements CollectionInterface
      */
     public function merge(CollectionInterface $collection)
     {
-        foreach ($collection as $item) {
+        foreach ($collection->all() as $item) {
             $this->add($item);
         }
 

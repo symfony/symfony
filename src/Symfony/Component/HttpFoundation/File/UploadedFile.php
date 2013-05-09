@@ -171,7 +171,7 @@ class UploadedFile extends File
      */
     public function guessClientExtension()
     {
-        $type = $this->getMimeType();
+        $type = $this->getClientMimeType();
         $guesser = ExtensionGuesser::getInstance();
 
         return $guesser->guess($type);

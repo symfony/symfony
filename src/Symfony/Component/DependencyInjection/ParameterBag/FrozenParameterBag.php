@@ -65,7 +65,7 @@ class FrozenParameterBag extends ParameterBag
      *
      * @api
      */
-    public function set($name, $value, $deep = false)
+    public function set($name, $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }

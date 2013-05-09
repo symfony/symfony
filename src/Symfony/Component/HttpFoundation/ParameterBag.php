@@ -294,14 +294,14 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Allows to find the last parent and key for a given path within the parameters.
      *
-     * @param string      $path       A path like foo[bar]
-     * @param null|array  $lastParent A call-by-reference parameter for the last parent
-     * @param null|string $lastKey    A call-by-reference parameter for the last key
+     * @param string      $path           A path like foo[bar]
+     * @param \Closure    $foundCallback  Is called with parent level, key and value, if found 
+     * @param Boolean     $createPath     If true, create missing levels on path
      *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      *
-     * @return boolean True if the path was found, false otherwise
+     * @return Boolean True if the path was found, false otherwise
      */
     private function getParentAndKeyByPath($path, \Closure $foundCallback = null, $createPath = false)
     {

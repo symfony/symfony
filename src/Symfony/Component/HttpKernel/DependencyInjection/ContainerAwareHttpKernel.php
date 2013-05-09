@@ -55,21 +55,25 @@ class ContainerAwareHttpKernel extends HttpKernel
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         $request->headers->set('X-Php-Ob-Level', ob_get_level());
-
-        $this->container->enterScope('request');
-        $this->container->set('request', $request, 'request');
+        if (!$this->container->isFrozen()) {
+            $this->container->enterScope('request');
+            $this->container->set('request', $request, 'request');
+        }
 
         try {
             $response = parent::handle($request, $type, $catch);
         } catch (\Exception $e) {
-            $this->container->set('request', null, 'request');
-            $this->container->leaveScope('request');
+            if (!$this->container->isFrozen()) {
+                $this->container->set('request', null, 'request');
+                $this->container->leaveScope('request');
+            }
 
             throw $e;
         }
-
-        $this->container->set('request', null, 'request');
-        $this->container->leaveScope('request');
+        if (!$this->container->isFrozen()) {
+            $this->container->set('request', null, 'request');
+            $this->container->leaveScope('request');
+        }
 
         return $response;
     }

@@ -42,7 +42,11 @@ class ContainerAwareHttpKernel extends HttpKernel
         parent::__construct($dispatcher, $controllerResolver);
 
         $this->container = $container;
-        $container->addScope(new Scope('request'));
+
+        // the request scope might have been created before (see FrameworkBundle)
+        if (!$container->hasScope('request')) {
+            $container->addScope(new Scope('request'));
+        }
     }
 
     /**

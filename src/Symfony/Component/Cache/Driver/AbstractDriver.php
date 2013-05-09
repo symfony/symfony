@@ -57,7 +57,7 @@ abstract class AbstractDriver implements DriverInterface
 
             if ($this->storeMany($raw)) {
                 return new Collection(array_map(function (ItemInterface $item) {
-                    return CachedItem::duplicate($item);
+                    return CachedItem::createFromItem($item);
                 }, $data->all()));
             }
 
@@ -66,7 +66,7 @@ abstract class AbstractDriver implements DriverInterface
 
         if ($data instanceof ValidItem) {
             if ($this->storeOne($data->getKey(), $data->getData())) {
-                return CachedItem::duplicate($data);
+                return CachedItem::createFromItem($data);
             }
 
             return $data;
@@ -94,20 +94,26 @@ abstract class AbstractDriver implements DriverInterface
     }
 
     /**
+     * Fetches a data by it's key.
+     *
      * @param string $key
      *
-     * @return array
+     * @return array An array of fetched data
      */
     abstract protected function fetchOne($key);
 
     /**
+     * Fetches many data by an array of keys.
+     *
      * @param array $keys
      *
-     * @return array
+     * @return array An array of fetched data
      */
     abstract protected function fetchMany(array $keys);
 
     /**
+     * Stores a data with given given key.
+     *
      * @param string $key
      * @param mixed  $data
      *
@@ -116,23 +122,29 @@ abstract class AbstractDriver implements DriverInterface
     abstract protected function storeOne($key, $data);
 
     /**
-     * @param string[] $data
+     * Stores an array of data, array keys are data keys.
+     *
+     * @param mixed[] $data
      *
      * @return boolean
      */
     abstract protected function storeMany(array $data);
 
     /**
+     * Deletes data corresponding to given key.
+     *
      * @param string $key
      *
-     * @return array
+     * @return array An array of deleted keys
      */
     abstract protected function deleteOne($key);
 
     /**
+     * Deletes data corresponding to given keys.
+     *
      * @param string[] $keys
      *
-     * @return array
+     * @return array An array of deleted keys
      */
     abstract protected function deleteMany(array $keys);
 }

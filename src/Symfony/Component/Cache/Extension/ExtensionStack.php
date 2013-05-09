@@ -13,6 +13,11 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ExtensionStack implements ExtensionInterface
 {
     /**
+     * @var Cache|null
+     */
+    private $cache;
+
+    /**
      * @var array
      */
     private $extensions = array();
@@ -32,6 +37,11 @@ class ExtensionStack implements ExtensionInterface
     public function register($name, ExtensionInterface $extension, $priority = 0)
     {
         $this->sorted = false;
+
+        if (null !== $this->cache) {
+            $extension->setCache($this->cache);
+        }
+
         $this->extensions[$name] = array(
             'index'     => count($this->extensions),
             'extension' => $extension,
@@ -55,6 +65,18 @@ class ExtensionStack implements ExtensionInterface
         }
 
         return $this->extensions[$name]['extension'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCache(Cache $cache)
+    {
+        foreach ($this->all() as $extension) {
+            $extension->setCache($cache);
+        }
+
+        return $this;
     }
 
     /**
@@ -86,18 +108,18 @@ class ExtensionStack implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function fetchResult(array $query, Cache $cache, array $options = array())
+    public function resolveFetch(array $query, array $options)
     {
-        return $this->find($query)->fetchResult($query, $cache, $options);
+        return $this->find($query)->resolveFetch($query, $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildResult(DataInterface $data, Cache $cache, array $options = array())
+    public function buildResult(DataInterface $data, array $options)
     {
         foreach ($this->all() as $extension) {
-            $data = $extension->buildResult($data, $cache, $options);
+            $data = $extension->buildResult($data, $options);
         }
 
         return $data;
@@ -106,11 +128,11 @@ class ExtensionStack implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareStorage(DataInterface $data, Cache $cache, array $options = array())
+    public function prepareStorage(DataInterface $data, array $options)
     {
         /** @var ExtensionInterface $extension */
         foreach (array_reverse($this->all()) as $extension) {
-            $data = $extension->prepareStorage($data, $cache, $options);
+            $data = $extension->prepareStorage($data, $options);
         }
 
         return $data;
@@ -119,20 +141,18 @@ class ExtensionStack implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function deleteData(array $query, Cache $cache, array $options = array())
+    public function resolveDeletion(array $query, array $options)
     {
-        $this->sort();
-
-        return $this->find($query)->deleteData($query, $cache, $options);
+        return $this->find($query)->resolveDeletion($query, $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function propagateDeletion(KeyCollection $keys, Cache $cache, array $options = array())
+    public function propagateDeletion(KeyCollection $keys, array $options)
     {
         foreach ($this->all() as $extension) {
-            $keys->merge($extension->propagateDeletion($keys, $cache, $options));
+            $keys->merge($extension->propagateDeletion($keys, $options));
         }
 
         return $keys;
@@ -141,10 +161,10 @@ class ExtensionStack implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareFlush(Cache $cache, array $options = array())
+    public function prepareFlush(array $options)
     {
         foreach ($this->all() as $extension) {
-            $extension->prepareFlush($cache, $options);
+            $extension->prepareFlush($options);
         }
     }
 
@@ -155,9 +175,12 @@ class ExtensionStack implements ExtensionInterface
     {
         $this->sort();
 
-        return array_map(function (array $extension) {
-            return $extension['extension'];
-        }, $this->extensions);
+        $extensions = array();
+        foreach ($this->extensions as $extension) {
+            $extensions[] = $extension['extension'];
+        }
+
+        return $extensions;
     }
 
     /**
@@ -186,8 +209,8 @@ class ExtensionStack implements ExtensionInterface
 
         uasort($this->extensions, function (array $a, array $b) {
             return $a['priority'] === $b['priority']
-                ? ($a['index'] < $b['index'] ? 1 : -1)
-                : $a['priority'] > $b['priority'] ? 1 : -1;
+                ? ($b['index'] - $a['index'])
+                : $b['priority'] - $a['priority'];
         });
     }
 }

@@ -39,4 +39,9 @@ interface CollectionInterface extends DataInterface
      * @return string[]
      */
     public function getKeys();
+
+    /**
+     * @return boolean
+     */
+    public function isEmpty();
 }

@@ -87,6 +87,14 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function isEmpty()
+    {
+        return empty($this->items);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isValid()
     {
         return $this->valid;

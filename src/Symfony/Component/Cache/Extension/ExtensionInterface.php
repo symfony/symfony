@@ -13,6 +13,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 interface ExtensionInterface
 {
     /**
+     * Gives a cache to the extension.
+     *
+     * @param Cache $cache
+     *
+     * @return ExtensionInterface
+     */
+    public function setCache(Cache $cache);
+
+    /**
      * Setup options resolver.
      *
      * @param OptionsResolverInterface $resolver
@@ -22,6 +31,8 @@ interface ExtensionInterface
     public function configure(OptionsResolverInterface $resolver);
 
     /**
+     * Tests if given query is supported by extension.
+     *
      * @param array $query
      * @param array $options
      *
@@ -30,65 +41,59 @@ interface ExtensionInterface
     public function supportsQuery(array $query, array $options = array());
 
     /**
-     * Fetches queried data.
+     * Resolves query and return keys to fetch.
      *
      * @param array $query
-     * @param Cache $cache
      * @param array $options
      *
-     * @return DataInterface
+     * @return KeyCollection
      */
-    public function fetchResult(array $query, Cache $cache, array $options = array());
+    public function resolveFetch(array $query, array $options);
 
     /**
      * Builds fetched data before returning
      *
      * @param DataInterface $data
-     * @param Cache         $cache
      * @param array         $options
      *
      * @return DataInterface
      */
-    public function buildResult(DataInterface $data, Cache $cache, array $options = array());
+    public function buildResult(DataInterface $data, array $options);
 
     /**
      * Prepares data to be stored by driver.
      *
      * @param DataInterface $data
-     * @param Cache         $cache
      * @param array         $options
      *
      * @return DataInterface
      */
-    public function prepareStorage(DataInterface $data, Cache $cache, array $options = array());
+    public function prepareStorage(DataInterface $data, array $options);
 
     /**
-     * Deletes queried data.
+     * Resolves query and return keys to delete.
      *
      * @param array $query
-     * @param Cache $cache
      * @param array $options
      *
      * @return KeyCollection
      */
-    public function deleteData(array $query, Cache $cache, array $options = array());
+    public function resolveDeletion(array $query, array $options);
 
     /**
      * Prepares data to be stored by driver.
      *
      * @param KeyCollection $keys
-     * @param Cache         $cache
      * @param array         $options
      *
      * @return KeyCollection
      */
-    public function propagateDeletion(KeyCollection $keys, Cache $cache, array $options = array());
+    public function propagateDeletion(KeyCollection $keys, array $options);
 
     /**
      * Prepares data before flush.
      *
-     * @param Cache $cache
      * @param array $options
      */
-    public function prepareFlush(Cache $cache, array $options = array());
+    public function prepareFlush(array $options);
 }

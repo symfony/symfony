@@ -5,7 +5,6 @@ namespace Symfony\Component\Cache\Extension;
 use Symfony\Component\Cache\Cache;
 use Symfony\Component\Cache\Data\DataInterface;
 use Symfony\Component\Cache\Data\KeyCollection;
-use Symfony\Component\Cache\Data\NullResult;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -13,6 +12,21 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 abstract class AbstractExtension implements ExtensionInterface
 {
+    /**
+     * @var Cache|null
+     */
+    private $cache;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCache(Cache $cache)
+    {
+        $this->cache = $cache;
+
+        return $this;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -31,23 +45,15 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function fetchResult(array $query, Cache $cache, array $options = array())
+    public function resolveFetch(array $query, array $options)
     {
-        return new NullResult();
+        return new KeyCollection();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildResult(DataInterface $data, Cache $cache, array $options = array())
-    {
-        return $data;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function prepareStorage(DataInterface $data, Cache $cache, array $options = array())
+    public function buildResult(DataInterface $data, array $options)
     {
         return $data;
     }
@@ -55,15 +61,23 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function deleteData(array $query, Cache $cache, array $options = array())
+    public function prepareStorage(DataInterface $data, array $options)
     {
-        return new NullResult();
+        return $data;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function propagateDeletion(KeyCollection $keys, Cache $cache, array $options = array())
+    public function resolveDeletion(array $query, array $options)
+    {
+        return new KeyCollection();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function propagateDeletion(KeyCollection $keys, array $options)
     {
         return $keys;
     }
@@ -71,7 +85,21 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function prepareFlush(Cache $cache, array $options = array())
+    public function prepareFlush(array $options)
     {
+    }
+
+    /**
+     * @return Cache
+     *
+     * @throws \LogicException
+     */
+    protected function getCache()
+    {
+        if (null === $this->cache) {
+            throw new \LogicException('Cache has not been set to extension.');
+        }
+
+        return $this->cache;
     }
 }

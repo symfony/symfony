@@ -25,7 +25,7 @@ class KeyCollection implements CollectionInterface
      */
     public function add(ItemInterface $item)
     {
-        throw new \LogicException('Can not add item to key collection.');
+        throw new \BadMethodCallException('Can not add item to key collection.');
     }
 
     /**
@@ -51,7 +51,7 @@ class KeyCollection implements CollectionInterface
      */
     public function get($key)
     {
-        throw new \LogicException('Key collection has no item.');
+        throw new \BadMethodCallException('Key collection has no item.');
     }
 
     /**
@@ -59,8 +59,17 @@ class KeyCollection implements CollectionInterface
      */
     public function all()
     {
-        throw new \LogicException('Key collection has no item.');
+        throw new \BadMethodCallException('Key collection has no item.');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEmpty()
+    {
+        return empty($this->keys);
+    }
+
 
     /**
      * {@inheritdoc}

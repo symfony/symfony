@@ -12,7 +12,7 @@ class NullResult implements ItemInterface
      */
     public function getData()
     {
-        throw new \LogicException('A null result contains no data.');
+        throw new \BadMethodCallException('A null result contains no data.');
     }
 
     /**
@@ -20,7 +20,7 @@ class NullResult implements ItemInterface
      */
     public function getKey()
     {
-        throw new \LogicException('A null result has no key.');
+        throw new \BadMethodCallException('A null result has no key.');
     }
 
     /**

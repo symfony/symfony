@@ -38,12 +38,12 @@ abstract class ValidItem implements ItemInterface
      *
      * @return static
      */
-    public static function duplicate(ValidItem $item)
+    public static function createFromItem(ValidItem $item)
     {
-        $duplicate = new static($item->getKey(), $item->getData());
-        $duplicate->metadata = $item->metadata;
+        $createdItem = new static($item->getKey(), $item->getData());
+        $createdItem->metadata = $item->metadata;
 
-        return $duplicate;
+        return $createdItem;
     }
 
     /**

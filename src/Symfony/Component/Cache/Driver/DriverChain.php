@@ -58,12 +58,16 @@ class DriverChain implements DriverInterface
             $missed[] = $driver;
         }
 
+        if (null === $fetched) {
+            return new NullResult();
+        }
+
         /** @var DriverInterface $driver */
         foreach ($missed as $driver) {
             $driver->store($fetched);
         }
 
-        return $fetched ?: new NullResult();
+        return $fetched;
     }
 
     /**
@@ -71,12 +75,14 @@ class DriverChain implements DriverInterface
      */
     public function store(DataInterface $data)
     {
-        $failed = false;
+        $success = false;
         foreach ($this->all() as $driver) {
-            $failed = $failed || $driver->store($data);
+            if ($driver->store($data)) {
+                $success = true;
+            }
         }
 
-        return !$failed;
+        return $success;
     }
 
     /**
@@ -99,7 +105,9 @@ class DriverChain implements DriverInterface
     {
         $done = true;
         foreach ($this->all() as $driver) {
-            $done = $done && $driver->flush();
+            if (!$driver->flush()) {
+                $done = false;
+            }
         }
 
         return $done;
@@ -112,9 +120,12 @@ class DriverChain implements DriverInterface
     {
         $this->sort();
 
-        return array_map(function (array $driver) {
-            return $driver['driver'];
-        }, $this->drivers);
+        $drivers = array();
+        foreach ($this->drivers as $driver) {
+            $drivers[] = $driver['driver'];
+        }
+
+        return $drivers;
     }
 
     private function sort()
@@ -125,8 +136,8 @@ class DriverChain implements DriverInterface
 
         uasort($this->drivers, function (array $a, array $b) {
             return $a['priority'] === $b['priority']
-                ? ($a['index'] < $b['index'] ? 1 : -1)
-                : $a['priority'] > $b['priority'] ? 1 : -1;
+                ? ($b['index'] - $a['index'])
+                : $b['priority'] - $a['priority'];
         });
     }
 }

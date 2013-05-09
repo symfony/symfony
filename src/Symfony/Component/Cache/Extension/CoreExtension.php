@@ -37,17 +37,17 @@ class CoreExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function fetchResult(array $query, Cache $cache, array $options = array())
+    public function resolveFetch(array $query, array $options)
     {
-        return $cache->getDriver()->fetch($this->getKey($query['key'], $options));
+        return $this->getKey($query['key'], $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteData(array $query, Cache $cache, array $options = array())
+    public function resolveDeletion(array $query, array $options)
     {
-        return $cache->getDriver()->delete($this->getKey($query['key'], $options));
+        return $this->getKey($query['key'], $options);
     }
 
     /**
@@ -71,7 +71,7 @@ class CoreExtension extends AbstractExtension
 
         if (is_string($query)) {
             $query = $options['rewriting']->rewrite($query);
-            $query = '' !== $options['namespace'] ? $options['namespace'].'.'.$query : $query;
+            $query = $options['namespace'] ? $options['namespace'].'.'.$query : $query;
 
             return new KeyCollection(array($query));
         }

@@ -36,7 +36,7 @@ class Cache
     public function __construct(DriverInterface $driver, ExtensionInterface $extension, array $options = array())
     {
         $this->driver = $driver;
-        $this->extension = $extension;
+        $this->extension = $extension->setCache($this);
         $this->options = new Options($extension, $options);
     }
 
@@ -68,13 +68,15 @@ class Cache
     {
         $options = $this->options->resolve($options);
         $query = $this->resolveQuery($query);
-        $result = $this->extension->fetchResult($query, $this, $options);
+        $keys = $this->extension->resolveFetch($query, $options);
 
-        if ($result instanceof NullResult) {
-            return $result;
+        if ($keys->isEmpty()) {
+            return new NullResult();
         }
 
-        return $this->extension->buildResult($result, $this, $options);
+        $result = $this->driver->fetch($keys);
+
+        return $this->extension->buildResult($result, $options);
     }
 
     /**
@@ -88,7 +90,7 @@ class Cache
     public function store(DataInterface $data, array $options = array())
     {
         $options = $this->options->resolve($options);
-        $data = $this->extension->prepareStorage($data, $this, $options);
+        $data = $this->extension->prepareStorage($data, $options);
 
         return $this->driver->store($data);
     }
@@ -105,13 +107,15 @@ class Cache
     {
         $options = $this->options->resolve($options);
         $query = $this->resolveQuery($query);
-        $keys = $this->extension->deleteData($query, $this, $options);
+        $keys = $this->extension->resolveDeletion($query, $options);
 
-        if (empty($keys)) {
-            return new KeyCollection();
+        if ($keys->isEmpty()) {
+            return $keys;
         }
 
-        return $this->extension->propagateDeletion($keys, $this, $options);
+        $keys->merge($this->extension->propagateDeletion($keys, $options));
+
+        return $this->driver->delete($keys);
     }
 
     /**
@@ -124,7 +128,7 @@ class Cache
     public function flush(array $options = array())
     {
         $options = $this->options->resolve($options);
-        $this->extension->prepareFlush($this, $options);
+        $this->extension->prepareFlush($options);
 
         return $this->driver->flush();
     }

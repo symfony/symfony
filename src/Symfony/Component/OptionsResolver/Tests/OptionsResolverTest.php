@@ -678,4 +678,15 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             'three' => '3',
         ), $clone->resolve());
     }
+
+    public function testExtraOptions()
+    {
+        $this->resolver->setDefaults(array('one' => '1'));
+        $this->resolver->setAllowExtraOptions();
+
+        $this->assertEquals(array(
+            'one' => '1',
+            'two' => '2'
+        ), $this->resolver->resolve(array('two' => '2')));
+    }
 }

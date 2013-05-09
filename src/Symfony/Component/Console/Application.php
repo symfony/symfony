@@ -154,21 +154,10 @@ class Application
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $name = $this->getCommandName($input);
-
         if (true === $input->hasParameterOption(array('--ansi'))) {
             $output->setDecorated(true);
         } elseif (true === $input->hasParameterOption(array('--no-ansi'))) {
             $output->setDecorated(false);
-        }
-
-        if (true === $input->hasParameterOption(array('--help', '-h'))) {
-            if (!$name) {
-                $name = 'help';
-                $input = new ArrayInput(array('command' => 'help'));
-            } else {
-                $this->wantHelps = true;
-            }
         }
 
         if (true === $input->hasParameterOption(array('--no-interaction', '-n'))) {
@@ -198,6 +187,16 @@ class Application
             $output->writeln($this->getLongVersion());
 
             return 0;
+        }
+
+        $name = $this->getCommandName($input);
+        if (true === $input->hasParameterOption(array('--help', '-h'))) {
+            if (!$name) {
+                $name = 'help';
+                $input = new ArrayInput(array('command' => 'help'));
+            } else {
+                $this->wantHelps = true;
+            }
         }
 
         if (!$name) {

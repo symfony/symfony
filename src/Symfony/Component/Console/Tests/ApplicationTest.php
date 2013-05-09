@@ -146,6 +146,18 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\Console\Command\HelpCommand', $command, '->get() returns the help command if --help is provided as the input');
     }
 
+    public function testSilentHelp()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('-h' => true, '-q' => true), array('decorated' => false));
+
+        $this->assertEmpty($tester->getDisplay(true));
+    }
+
     /**
      * @expectedException        \InvalidArgumentException
      * @expectedExceptionMessage The command "foofoo" does not exist.

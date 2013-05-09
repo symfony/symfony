@@ -303,7 +303,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return boolean True if the path was found, false otherwise
      */
-    protected function getParentAndKeyByPath($path, \Closure $foundCallback = null, $createPath = false)
+    private function getParentAndKeyByPath($path, \Closure $foundCallback = null, $createPath = false)
     {
         $parameters = $this->parameters;
 

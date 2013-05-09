@@ -53,14 +53,23 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             ->method('leaveScope')
             ->with($this->equalTo('request'))
         ;
-        // first call is for addScope()
         $container
-            ->expects($this->at(2))
+            ->expects($this->at(0))
+            ->method('hasScope')
+            ->with($this->equalTo('request'))
+            ->will($this->returnValue(false));
+        $container
+            ->expects($this->at(1))
+            ->method('addScope')
+            ->with($this->isInstanceOf('Symfony\Component\DependencyInjection\Scope'));
+        // enterScope()
+        $container
+            ->expects($this->at(3))
             ->method('set')
             ->with($this->equalTo('request'), $this->equalTo($request), $this->equalTo('request'))
         ;
         $container
-            ->expects($this->at(3))
+            ->expects($this->at(4))
             ->method('set')
             ->with($this->equalTo('request'), $this->equalTo(null), $this->equalTo('request'))
         ;
@@ -107,6 +116,12 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('request'))
         ;
         $container
+            ->expects($this->at(0))
+            ->method('hasScope')
+            ->with($this->equalTo('request'))
+            ->will($this->returnValue(true));
+        // enterScope()
+        $container
             ->expects($this->at(2))
             ->method('set')
             ->with($this->equalTo('request'), $this->equalTo($request), $this->equalTo('request'))
@@ -137,6 +152,8 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         try {
             $kernel->handle($request, $type);
             $this->fail('->handle() suppresses the controller exception');
+        } catch (\PHPUnit_Framework_Exception $exception) {
+            throw $exception;
         } catch (\Exception $actual) {
             $this->assertSame($expected, $actual, '->handle() throws the controller exception');
         }

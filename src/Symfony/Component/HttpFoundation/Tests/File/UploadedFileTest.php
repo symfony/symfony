@@ -73,7 +73,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             null
         );
 
-        $this->assertEquals('gif',$file->guessClientExtension());
+        $this->assertEquals('gif', $file->guessClientExtension());
     }
 
     public function testGuessClientExtensionWithIncorrectMimeType()
@@ -86,7 +86,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             null
         );
 
-        $this->assertEquals('jpeg',$file->guessClientExtension());
+        $this->assertEquals('jpeg', $file->guessClientExtension());
     }
 
     public function testErrorIsOkByDefault()

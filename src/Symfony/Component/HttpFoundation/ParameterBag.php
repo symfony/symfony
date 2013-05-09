@@ -107,9 +107,10 @@ class ParameterBag implements \IteratorAggregate, \Countable
         }
 
         $result = null;
-        if (!$this->getParentAndKeyByPath($path, function($lastParent, $lastKey, $value) use (&$result) {
+        $callback = function($lastParent, $lastKey, $value) use (&$result) {
             $result = $value;
-        })) {
+        };
+        if (!$this->getParentAndKeyByPath($path, $callback)) {
             return $default;
         }
 

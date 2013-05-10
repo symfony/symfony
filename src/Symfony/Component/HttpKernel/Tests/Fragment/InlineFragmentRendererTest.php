@@ -142,7 +142,7 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
     {
         $expectedSubRequest = Request::create('/');
         $expectedSubRequest->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
-        
+
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $kernel
             ->expects($this->any())

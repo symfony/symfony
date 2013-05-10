@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
 /**
  * A file uploaded through a form.
@@ -170,7 +171,7 @@ class UploadedFile extends File
      */
     public function guessClientExtension()
     {
-        $type = $this->getMimeType();
+        $type = $this->getClientMimeType();
         $guesser = ExtensionGuesser::getInstance();
 
         return $guesser->guess($type);

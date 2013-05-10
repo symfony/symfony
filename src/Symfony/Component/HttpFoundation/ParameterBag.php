@@ -102,7 +102,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function get($path, $default = null, $deep = false)
     {
-        if (!$deep) {
+        if (!$deep || false === strpos($path, '[')) {
             return array_key_exists($path, $this->parameters) ? $this->parameters[$path] : $default;
         }
 
@@ -130,7 +130,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function set($path, $value, $deep = false)
     {
-        if (!$deep) {
+        if (!$deep || false === strpos($path, '[')) {
             $this->parameters[$path] = $value;
         } else {
             $this->getParentAndKeyByPath($path, function(&$lastParent, $lastKey, $value) use ($value) {
@@ -151,7 +151,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function has($path, $deep = false)
     {
-        if (!$deep) {
+        if (!$deep || false === strpos($path, '[')) {
             return array_key_exists($path, $this->parameters);
         }
 
@@ -168,7 +168,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function remove($path, $deep = false)
     {
-        if (!$deep) {
+        if (!$deep || false === strpos($path, '[')) {
             unset($this->parameters[$path]);
         } else {
             $this->getParentAndKeyByPath($path, function(&$lastParent, &$lastKey, $value) {

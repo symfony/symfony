@@ -184,7 +184,7 @@
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <source>Fail ei laetud täielikult üles.</target>
+                <target>Fail ei laetud täielikult üles.</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>

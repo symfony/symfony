@@ -421,6 +421,18 @@ class Parser
             return '';
         }
 
+        $isCurrentLineBlank = $this->isCurrentLineBlank();
+        $text = '';
+
+        // leading blank lines are consumed before determining indentation
+        while ($notEOF && $isCurrentLineBlank) {
+            // newline only if not EOF
+            if ($notEOF = $this->moveToNextLine()) {
+                $text .= "\n";
+                $isCurrentLineBlank = $this->isCurrentLineBlank();
+            }
+        }
+
         // determine indentation if not specified
         if (0 === $indentation) {
             if (preg_match('/^ +/', $this->currentLine, $matches)) {
@@ -428,11 +440,9 @@ class Parser
             }
         }
 
-        $text = '';
         if ($indentation > 0) {
             $pattern = sprintf('/^ {%d}(.*)$/', $indentation);
 
-            $isCurrentLineBlank = $this->isCurrentLineBlank();
             while (
                 $notEOF && (
                     $isCurrentLineBlank ||

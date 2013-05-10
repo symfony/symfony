@@ -97,7 +97,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection->addCollection($collection1);
         $collection->add('last', $last = new Route('/last'));
 
-        $this->assertSame(array('bar' => $bar, 'foo' => $foo, 'grandchild' => $grandchild, 'last' => $last), $collection->all(), 
+        $this->assertSame(array('bar' => $bar, 'foo' => $foo, 'grandchild' => $grandchild, 'last' => $last), $collection->all(),
             '->addCollection() imports routes of another collection, overrides if necessary and adds them at the end');
     }
 

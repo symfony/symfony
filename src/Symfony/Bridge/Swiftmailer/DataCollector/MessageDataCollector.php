@@ -21,11 +21,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Clément JOBEILI <clement.jobeili@gmail.com>
+ * @author Jérémy Romey <jeremy@free-agent.fr>
  */
 class MessageDataCollector extends DataCollector
 {
     private $container;
-    private $isSpool;
 
     /**
      * Constructor.
@@ -34,12 +34,10 @@ class MessageDataCollector extends DataCollector
      * to avoid the creation of these objects when no emails are sent.
      *
      * @param ContainerInterface $container A ContainerInterface instance
-     * @param Boolean            $isSpool
      */
-    public function __construct(ContainerInterface $container, $isSpool)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->isSpool = $isSpool;
     }
 
     /**
@@ -47,32 +45,109 @@ class MessageDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        $this->data = array(
+            'mailer' => array(),
+            'messageCount' => 0,
+            'defaultMailer' => '',
+        );
         // only collect when Swiftmailer has already been initialized
         if (class_exists('Swift_Mailer', false)) {
-            $logger = $this->container->get('swiftmailer.plugin.messagelogger');
-            $this->data['messages']     = $logger->getMessages();
-            $this->data['messageCount'] = $logger->countMessages();
-        } else {
-            $this->data['messages']     = array();
-            $this->data['messageCount'] = 0;
+            $mailers = $this->container->getParameter('swiftmailer.mailers');
+            foreach ($mailers as $name => $mailer) {
+                if ($this->container->getParameter('swiftmailer.default_mailer') == $name) {
+                    $this->data['defaultMailer'] = $name;
+                }
+                $loggerName = sprintf('swiftmailer.mailer.%s.plugin.messagelogger', $name);
+                if ($this->container->has($loggerName)) {
+                    $logger = $this->container->get($loggerName);
+                    $this->data['mailer'][$name] = array(
+                        'messages' => $logger->getMessages(),
+                        'messageCount' => $logger->countMessages(),
+                        'isSpool' => $this->container->getParameter(sprintf('swiftmailer.mailer.%s.spool.enabled', $name)),
+                    );
+                    $this->data['messageCount'] += $logger->countMessages();
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns the mailer names.
+     *
+     * @return array The mailer names.
+     */
+    public function getMailers()
+    {
+        return array_keys($this->data['mailer']);
+    }
+
+    /**
+     * Returns the data collected of a mailer.
+     *
+     * @return array The data of the mailer.
+     */
+
+    public function getMailerData($name)
+    {
+        if (!isset($this->data['mailer'][$name])) {
+            throw new \LogicException(sprintf("Missing %s data in %s", $name, get_class()));
         }
 
-        $this->data['isSpool'] = $this->isSpool;
+        return $this->data['mailer'][$name];
     }
 
-    public function getMessageCount()
+    /**
+     * Returns the message count of a mailer or the total.
+     *
+     * @return int The number of messages.
+     */
+    public function getMessageCount($name = null)
     {
-        return $this->data['messageCount'];
+        if (is_null($name)) {
+            return $this->data['messageCount'];
+        } elseif ($data = $this->getMailerData($name)) {
+            return $data['messageCount'];
+        }
+
+        return null;
     }
 
-    public function getMessages()
+    /**
+     * Returns the message of a mailer.
+     *
+     * @return array The messages.
+     */
+    public function getMessages($name)
     {
-        return $this->data['messages'];
+        if ($data = $this->getMailerData($name)) {
+            return $data['messages'];
+        }
+
+        return array();
     }
 
-    public function isSpool()
+    /**
+     * Returns if the mailer has spool.
+     *
+     * @return boolean
+     */
+    public function isSpool($name)
     {
-        return $this->data['isSpool'];
+        if ($data = $this->getMailerData($name)) {
+            return $data['isSpool'];
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns if the mailer is the default mailer.
+     *
+     * @return boolean
+     */
+    public function isDefaultMailer($name)
+    {
+        return $this->data['defaultMailer'] == $name;
     }
 
     /**
